@@ -1,15 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using SequenceSharp.RPC;
+using SequenceSharp.ABI;
+using System.Text;
 
 namespace SequenceSharp.WALLET
 {
+
+    public struct WalletOptions
+    {
+        string derivationPath;
+        int randomWalletEntropyBitSize;
+    }
     public class Wallet : BaseWallet
     {
         Provider provider;
         WalletProvider walletProvider;
+        ECDSAKey key = new ECDSAKey();
+        
        public Task Encrypt()
         {
             throw new System.NotImplementedException();
@@ -41,12 +51,13 @@ namespace SequenceSharp.WALLET
         }
 */
 
-        public void Transactor()
+        public void Transactor(Wallet wallet)
         {
+
             throw new System.NotImplementedException();
         }
 
-        public void TransactorForChainID()
+        public void TransactorForChainID(Wallet wallet)
         {
             throw new System.NotImplementedException();
         }
@@ -56,9 +67,11 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 
-        public void SetProvider()
+        public void SetProvider(Provider _provider)
         {
-            throw new System.NotImplementedException();
+            provider = _provider;
+            
+            //throw new System.NotImplementedException();
         }                                                                                                                                        
         public void Provider()
         {
@@ -84,9 +97,20 @@ namespace SequenceSharp.WALLET
         {
             throw new System.NotImplementedException();
         }
-        public override void SignMessage()
+        public override byte[] SignMessage(byte[] message)
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
+            //TODO: message 191 :?
+            byte[] message191 = Encoding.UTF8.GetBytes("\x19Ethereum Signed Message:\n");
+            //TODO: Check message has message191 has prefix
+
+            byte[] hash = SequenceCoder.KeccakHash(message191);
+
+            byte[] signature = SequenceCoder.SignData(hash, key.PrivateKey);
+            //TODO: ?
+
+            signature[64] += 27;
+            return signature;
         }
 
         public override void SendTransaction()
@@ -98,5 +122,8 @@ namespace SequenceSharp.WALLET
         {
             throw new System.NotImplementedException();
         }
+
+        
+        
     }
 }

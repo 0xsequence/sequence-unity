@@ -17,7 +17,7 @@ namespace SequenceSharp.WALLET
         {
             return address;
         }
-        public abstract void SignMessage();
+        public abstract byte[] SignMessage(byte[] message);
         public abstract void SendTransaction();
 
         public abstract void SignTypedData();

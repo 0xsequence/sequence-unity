@@ -5,6 +5,9 @@ using System.Numerics;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 
 namespace SequenceSharp.ABI
 {
@@ -174,6 +177,75 @@ namespace SequenceSharp.ABI
             string hashString = BitConverter.ToString(result, 0,32);
             hashString = hashString.Replace("-", "").ToLowerInvariant();
             return hashString;
+        }
+
+        public static byte[] KeccakHash(byte[] input)
+        {
+            var keccak256 = new KeccakDigest(256);
+            keccak256.BlockUpdate(input, 0, input.Length);
+            byte[] result = new byte[keccak256.GetByteLength()];
+            keccak256.DoFinal(result, 0);
+            return result;
+
+        }
+
+
+        //https://stackoverflow.com/questions/29423997/bouncy-castle-sign-and-verify-sha256-certificate-with-c-sharp
+
+        public static string SignData(string msg, ECPrivateKeyParameters privatekey)
+        {
+            try
+            {
+                byte[] msgBytes = Encoding.UTF8.GetBytes(msg);
+
+                ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
+                signer.Init(true, privatekey);
+                signer.BlockUpdate(msgBytes, 0, msgBytes.Length);
+                byte[] sigBytes = signer.GenerateSignature();
+
+                return Convert.ToBase64String(sigBytes);
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine("Signing Failed: " + exc.ToString());
+                return null;
+            }
+        }
+
+        public static byte[] SignData(byte[] message, ECPrivateKeyParameters privatekey)
+        {
+            try
+            {
+                ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
+                signer.Init(true, privatekey);
+                signer.BlockUpdate(message, 0, message.Length);
+                byte[] sigBytes = signer.GenerateSignature();
+                return sigBytes;
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine("Signing Failed: " + exc.ToString());
+                return null;
+            }
+        }
+
+        public static bool VerifySignature(ECPublicKeyParameters pubKey, string signature, string msg)
+        {
+            try
+            {
+                byte[] msgBytes = Encoding.UTF8.GetBytes(msg);
+                byte[] sigBytes = Convert.FromBase64String(signature);
+
+                ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
+                signer.Init(false, pubKey);
+                signer.BlockUpdate(msgBytes, 0, msgBytes.Length);
+                return signer.VerifySignature(sigBytes);
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine("Verification failed with the error: " + exc.ToString());
+                return false;
+            }
         }
 
 
