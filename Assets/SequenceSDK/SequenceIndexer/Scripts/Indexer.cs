@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine.Networking;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace SequenceSharp
 {
@@ -253,6 +255,34 @@ namespace SequenceSharp
         {
             T data = JsonConvert.DeserializeObject<T>(text);
             return data;
+        }
+    }
+
+    public static class ExtensionMethods
+    {
+        public static TaskAwaiter GetAwaiter(this AsyncOperation asyncOp)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            asyncOp.completed += obj => { tcs.SetResult(null); };
+            return ((Task)tcs.Task).GetAwaiter();
+        }
+        public static TaskAwaiter GetAwaiter(this UnityWebRequestAsyncOperation webReqOp)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            webReqOp.completed += obj =>
+            {
+                {
+                    if (webReqOp.webRequest.responseCode != 200)
+                    {
+                        tcs.SetException(new FileLoadException(webReqOp.webRequest.error));
+                    }
+                    else
+                    {
+                        tcs.SetResult(null);
+                    }
+                }
+            };
+            return ((Task)tcs.Task).GetAwaiter();
         }
     }
 }

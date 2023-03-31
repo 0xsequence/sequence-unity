@@ -32,16 +32,16 @@ namespace SequenceSharp
     public class SequenceWeb3Client : IClient
     {
         public BigInteger chainID;
-        private readonly Wallet _wallet;
+        //private readonly Wallet _wallet;
 
         // TODO THIS IS WRONG! we need to get tx receipts from specific TXs.
         private TransactionReceipt transactionReceipt = new TransactionReceipt();
 
         public RequestInterceptor OverridingRequestInterceptor { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public SequenceWeb3Client(Wallet wallet, BigInteger chainID)
+        public SequenceWeb3Client(BigInteger chainID)
         {
-            _wallet = wallet;
+           // _wallet = wallet;
             this.chainID = chainID;
         }
 
@@ -80,36 +80,7 @@ namespace SequenceSharp
             {
                 TransactionInput transactionInput = (TransactionInput)request.RawParameters[0];
 
-                string rpcResponse = await _wallet.ExecuteSequenceJS(
-                    @"
-                    const signer = seq.getWallet().getSigner("
-                        + chainID.ToString()
-                        + @");
-                
-                    const tx = {
-                        delegateCall: false,
-                        revertOnError: false,
-                        gasLimit: '0x55555',
-                        to: '"
-                        + transactionInput.To
-                        + @"',
-                        value: "
-                        + transactionInput.Value
-                        + @",
-                        data: '"
-                        + transactionInput.Data
-                        + @"'
-                    };
-                    const txnResponse = await signer.sendTransactionBatch([tx]);
-                
-                    return {
-                        jsonrpc: '2.0',
-                        result: txnResponse,
-                        id: 0, //parsedMessage.id,(???) // TODO?
-                        error: null
-                    };
-                "
-                );
+                string rpcResponse = "";
                 Debug.Log("rpc response: " + rpcResponse);
                 RpcResponseMessage rpcResponseMessage =
                     JsonConvert.DeserializeObject<RpcResponseMessage>(rpcResponse);
@@ -126,25 +97,7 @@ namespace SequenceSharp
             {
                 CallInput callInput = (CallInput)request.RawParameters[0];
 
-                var estimatedGas = await _wallet.ExecuteSequenceJS(
-                    @"
-                    const wallet = seq.getWallet();
-                    const provider = wallet.getProvider("
-                        + chainID.ToString()
-                        + @");
-                    console.log(provider);
-                    const estimate = await provider.estimateGas({
-                        to: '"
-                        + callInput.To
-                        + @"',
-                        data:'"
-                        + callInput.Data
-                        + @"'
-                    });
-
-                    return estimate;
-"
-                );
+                string estimatedGas = "";
                 EstimatedGas gas = JsonConvert.DeserializeObject<EstimatedGas>(estimatedGas);
 
                 return new HexBigInteger(gas.hex);
@@ -155,96 +108,58 @@ namespace SequenceSharp
 
                 if (callInput.From == null)
                 {
-                    var address = _wallet.GetAddress();
+                    var address = "";
+                    string rpcResponse = "";
+
+                    RpcResponseMessage rpcResponseMessage =
+                        JsonConvert.DeserializeObject<RpcResponseMessage>(rpcResponse);
+                    var response = ConvertResponse<string>(rpcResponseMessage);
+
+                    return response;
                 }
-                string rpcResponse = await _wallet.ExecuteSequenceJS(
-                    @"
-                    var wallet = seq.getWallet();
-                    var provider = wallet.getProvider("
-                        + chainID.ToString()
-                        + @");
-                    var hexString = await provider.call({to:'"
-                        + callInput.To
-                        + @"',data:'"
-                        + callInput.Data
-                        + @"'});
-                    
-                    
-                    let rpcResponse = {
-                            jsonrpc: '2.0',
-                            result: hexString,
-                            id: 0, //parsedMessage.id,(???)
-                            error: null
-                        };
-                    return rpcResponse;
-                ");
+                else if (request.Method == ApiMethods.eth_signTypedData_v4.ToString())
+                {
+                    // TODO
+                    throw new NotImplementedException();
+                }
+                else if (request.Method == ApiMethods.eth_sign.ToString())
+                {
+                    string rpcResponse = "";
 
-                RpcResponseMessage rpcResponseMessage =
-                    JsonConvert.DeserializeObject<RpcResponseMessage>(rpcResponse);
-                var response = ConvertResponse<string>(rpcResponseMessage);
-
-                return response;
+                    RpcResponseMessage rpcResponseMessage =
+                        JsonConvert.DeserializeObject<RpcResponseMessage>(rpcResponse);
+                    var response = ConvertResponse<string>(rpcResponseMessage);
+                    Debug.Log(response);
+                    return response;
+                }
+                else if (request.Method == ApiMethods.eth_getBalance.ToString())
+                {
+                    var accountAddress = "";// await _wallet.GetAddress();
+                    var ethBalance = await Indexer.GetEtherBalance(chainID, accountAddress);
+                    return ethBalance;
+                }
+                else if (request.Method == ApiMethods.eth_chainId.ToString())
+                {
+                    return new HexBigInteger(chainID);
+                }
+                else if (request.Method == ApiMethods.wallet_switchEthereumChain.ToString())
+                {
+                    this.chainID = BigInteger.Parse((string)request.RawParameters[0]);
+                    return null; // TODO should throw 4902 if it's not valid
+                }
+                else if (request.Method == ApiMethods.eth_accounts.ToString())
+                {
+                    var accountAddress = "";// await _wallet.GetAddress();
+                    return new string[] { accountAddress };
+                }
+                else
+                {
+                    Debug.Log("Non-intercepted Sequence call: " + request.Method);
+                    throw new NotImplementedException();
+                }
+                
             }
-            else if (request.Method == ApiMethods.eth_signTypedData_v4.ToString())
-            {
-                // TODO
-                throw new NotImplementedException();
-            }
-            else if (request.Method == ApiMethods.eth_sign.ToString())
-            {
-                string rpcResponse = await _wallet.ExecuteSequenceJS(
-                    @"
-                    const wallet = seq.getWallet();
-
-                    const signer = wallet.getSigner("
-                        + chainID.ToString()
-                        + @");
-
-                    const message = `"
-                        + request.RawParameters[1]
-                        + @"`
-                    
-                    var sig = await signer.signMessage(message);
-                    console.log('signature:', sig)
-                    let rpcResponse = {
-                            jsonrpc: '2.0',
-                            result: sig,
-                            id: 0, //parsedMessage.id,(???)
-                            error: null
-                        };
-                    return rpcResponse;
-                ");
-                RpcResponseMessage rpcResponseMessage =
-                    JsonConvert.DeserializeObject<RpcResponseMessage>(rpcResponse);
-                var response = ConvertResponse<string>(rpcResponseMessage);
-                Debug.Log(response);
-                return response;
-            }
-            else if (request.Method == ApiMethods.eth_getBalance.ToString())
-            {
-                var accountAddress = await _wallet.GetAddress();
-                var ethBalance = await Indexer.GetEtherBalance(chainID, accountAddress);
-                return ethBalance;
-            }
-            else if (request.Method == ApiMethods.eth_chainId.ToString())
-            {
-                return new HexBigInteger(chainID);
-            }
-            else if (request.Method == ApiMethods.wallet_switchEthereumChain.ToString())
-            {
-                this.chainID = BigInteger.Parse((string)request.RawParameters[0]);
-                return null; // TODO should throw 4902 if it's not valid
-            }
-            else if (request.Method == ApiMethods.eth_accounts.ToString())
-            {
-                var addr = await _wallet.GetAddress();
-                return new string[] { addr };
-            }
-            else
-            {
-                Debug.Log("Non-intercepted Sequence call: " + request.Method);
-                throw new NotImplementedException();
-            }
+            return null;
         }
 
         protected void HandleRpcError(RpcResponseMessage response)
