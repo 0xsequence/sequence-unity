@@ -215,8 +215,8 @@ namespace SequenceSharp.ABI
                 return null;
             }
         }
-
-        public static byte[] SignData(byte[] message, ECPrivateKeyParameters privatekey)
+        //NonDeterministic
+        public static byte[] SignDataND(byte[] message, ECPrivateKeyParameters privatekey)
         {
             try
             {
@@ -232,7 +232,12 @@ namespace SequenceSharp.ABI
                 return null;
             }
 
-            /*var curve = SecNamedCurves.GetByName("secp256k1");
+            
+        }
+        //Deterministic
+        public static byte[] SignDataD(byte[] message, ECPrivateKeyParameters privatekey)
+        {
+            var curve = SecNamedCurves.GetByName("secp256k1");
             var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
             var keyParameters = new ECPrivateKeyParameters(new BigInteger("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01", 16), domain);
 
@@ -257,19 +262,20 @@ namespace SequenceSharp.ABI
                 new DerInteger(new BigInteger(1, s.ToByteArray()))
             )
             .GetDerEncoded();
-            return derSignature;*/
+            return derSignature;
         }
 
-        public static bool VerifySignature(string publicKey, string signature, string msg)
+        //Non Determnistic
+        public static bool VerifySignatureND(ECPublicKeyParameters publicKey, string signature, string msg)
         {
             //ECPublicKeyParameters pubKey,
-            /*try
+            try
             {
                 byte[] msgBytes = Encoding.UTF8.GetBytes(msg);
                 byte[] sigBytes = Convert.FromBase64String(signature);
 
                 ISigner signer = SignerUtilities.GetSigner("SHA-256withECDSA");
-                signer.Init(false, pubKey);
+                signer.Init(false, publicKey);
                 signer.BlockUpdate(msgBytes, 0, msgBytes.Length);
                 return signer.VerifySignature(sigBytes);
             }
@@ -277,8 +283,15 @@ namespace SequenceSharp.ABI
             {
                 Console.WriteLine("Verification failed with the error: " + exc.ToString());
                 return false;
-            }*/
+            }
 
+            
+        }
+
+
+        //Determnistic
+        public static bool VerifySignatureD(string publicKey, string signature, string msg)
+        {
             var curve = SecNamedCurves.GetByName("secp256k1");
             var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
             var publicKeyBytes = HexStringToByteArray(publicKey);
@@ -308,11 +321,11 @@ namespace SequenceSharp.ABI
         }
 
 
-        // Hex string to byte array and vice versa
-        // Ref:
-        //https://stackoverflow.com/questions/311165/how-do-you-convert-a-byte-array-to-a-hexadecimal-string-and-vice-versa
+            // Hex string to byte array and vice versa
+            // Ref:
+            //https://stackoverflow.com/questions/311165/how-do-you-convert-a-byte-array-to-a-hexadecimal-string-and-vice-versa
 
-        public static byte[] HexStringToByteArray(string hexString)
+            public static byte[] HexStringToByteArray(string hexString)
         {
 
             if (hexString.StartsWith("0x"))

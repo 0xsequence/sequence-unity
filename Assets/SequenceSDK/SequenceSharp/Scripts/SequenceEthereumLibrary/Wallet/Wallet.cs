@@ -73,7 +73,9 @@ namespace SequenceSharp.WALLET
             //Last 20 bytes of the Keccak-256 hash of the public key
             string hashedPublic = SequenceCoder.KeccakHash(publicKey);
             int length = hashedPublic.Length;
-            return hashedPublic.Substring(length - 40);
+            string address = hashedPublic.Substring(length - 40);
+            address = SequenceCoder.AddressChecksum(address);
+            return address;
             
         }
 
@@ -132,7 +134,7 @@ namespace SequenceSharp.WALLET
         public bool IsValidSignature(string publicKey, string sigHash, string hiMessage)
         {
             //ECDSAKey.PublicKey
-            bool valid = SequenceCoder.VerifySignature(publicKey, sigHash, hiMessage);
+            bool valid = SequenceCoder.VerifySignatureD(publicKey, sigHash, hiMessage);
             return valid;
         }
         public override byte[] SignMessage(byte[] message)
@@ -144,7 +146,7 @@ namespace SequenceSharp.WALLET
 
             byte[] hash = SequenceCoder.KeccakHash(message);
 
-            byte[] signature = SequenceCoder.SignData(message, ECDSAKey.PrivateKey);
+            byte[] signature = SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
             //TODO: ?
 
             //signature[64] += 27;

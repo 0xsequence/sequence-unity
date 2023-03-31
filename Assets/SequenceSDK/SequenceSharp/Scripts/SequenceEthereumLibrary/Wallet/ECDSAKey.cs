@@ -15,7 +15,7 @@ using System.Text;
 
 namespace SequenceSharp.WALLET
 {
-    //TODO: Will change this structure, 
+    //TODO: currently for concept testing, Will change this structure
     public class ECDSAKey
     {
         public static readonly ECDomainParameters domainParams;

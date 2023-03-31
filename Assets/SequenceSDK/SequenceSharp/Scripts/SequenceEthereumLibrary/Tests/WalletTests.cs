@@ -13,7 +13,8 @@ public class WalletTests
     public void TestWalletRandom()
     {
         Wallet wallet = new Wallet();
-
+        Assert.NotNull(wallet);
+        //Todo: Check no exceptions been thrown
     }
 
     [Test]
@@ -41,8 +42,8 @@ public class WalletTests
         Debug.Log("public: " + pu);
         Debug.Log("private:" +pr);
         Assert.AreEqual(pr, "b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
-       // string address = wallet.Address();
-       // Debug.Log("address: " + address);
+        string address = wallet.Address();
+        Debug.Log("address: " + address);
         //Assert.AreEqual(address, "");
 
         byte[] hiMessage = Encoding.ASCII.GetBytes("hi");
