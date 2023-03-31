@@ -18,7 +18,23 @@ namespace SequenceSharp.WALLET
     {
         Provider provider;
         WalletProvider walletProvider;
-        ECDSAKey key = new ECDSAKey();
+        public ECDSAKey key;
+        //Only For Testing: (TODO)
+        public string publicKey;
+        public string privateKey;
+        public Wallet()
+        {
+            key = new ECDSAKey();
+            
+        }
+
+       public Wallet(string _privateKey)
+        {
+            privateKey = _privateKey;
+            publicKey = ECDSAKey.PublicKeyFromPrivateKey(_privateKey);
+            
+        }
+
         
        public Task Encrypt()
         {
@@ -50,6 +66,26 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 */
+
+        public string Address()
+        {
+            //TODO: Address return type 
+            //Last 20 bytes of the Keccak-256 hash of the public key
+            string hashedPublic = SequenceCoder.KeccakHash(publicKey);
+            int length = hashedPublic.Length;
+            return hashedPublic.Substring(length - 40);
+            
+        }
+
+        public string RecoverAddress()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string RecoverAddressFromDigest()
+        {
+            throw new System.NotImplementedException();
+        }
 
         public void Transactor(Wallet wallet)
         {
@@ -93,9 +129,11 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 
-        public bool IsValidSignature()
+        public bool IsValidSignature(string publicKey, string sigHash, string hiMessage)
         {
-            throw new System.NotImplementedException();
+            //ECDSAKey.PublicKey
+            bool valid = SequenceCoder.VerifySignature(publicKey, sigHash, hiMessage);
+            return valid;
         }
         public override byte[] SignMessage(byte[] message)
         {
@@ -104,12 +142,12 @@ namespace SequenceSharp.WALLET
             byte[] message191 = Encoding.UTF8.GetBytes("\x19Ethereum Signed Message:\n");
             //TODO: Check message has message191 has prefix
 
-            byte[] hash = SequenceCoder.KeccakHash(message191);
+            byte[] hash = SequenceCoder.KeccakHash(message);
 
-            byte[] signature = SequenceCoder.SignData(hash, key.PrivateKey);
+            byte[] signature = SequenceCoder.SignData(message, ECDSAKey.PrivateKey);
             //TODO: ?
 
-            signature[64] += 27;
+            //signature[64] += 27;
             return signature;
         }
 

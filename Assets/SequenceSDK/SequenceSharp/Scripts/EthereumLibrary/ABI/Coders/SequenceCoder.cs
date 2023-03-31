@@ -1,13 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
+//using System.Numerics;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Asn1.Sec;
+using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Math;
 
 namespace SequenceSharp.ABI
 {
@@ -227,11 +231,39 @@ namespace SequenceSharp.ABI
                 Console.WriteLine("Signing Failed: " + exc.ToString());
                 return null;
             }
+
+            /*var curve = SecNamedCurves.GetByName("secp256k1");
+            var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+            var keyParameters = new ECPrivateKeyParameters(new BigInteger("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01", 16), domain);
+
+            var signer = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
+            signer.Init(true, keyParameters);
+
+            var signature = signer.GenerateSignature(Encoding.UTF8.GetBytes("hi"));
+
+            var r = signature[0];
+            var s = signature[1];
+
+            var otherS = curve.Curve.Order.Subtract(s);
+
+            if (s.CompareTo(otherS) == 1)
+            {
+                s = otherS;
+            }
+
+            var derSignature = new DerSequence
+            (
+                new DerInteger(new BigInteger(1, r.ToByteArray())),
+                new DerInteger(new BigInteger(1, s.ToByteArray()))
+            )
+            .GetDerEncoded();
+            return derSignature;*/
         }
 
-        public static bool VerifySignature(ECPublicKeyParameters pubKey, string signature, string msg)
+        public static bool VerifySignature(string publicKey, string signature, string msg)
         {
-            try
+            //ECPublicKeyParameters pubKey,
+            /*try
             {
                 byte[] msgBytes = Encoding.UTF8.GetBytes(msg);
                 byte[] sigBytes = Convert.FromBase64String(signature);
@@ -245,7 +277,34 @@ namespace SequenceSharp.ABI
             {
                 Console.WriteLine("Verification failed with the error: " + exc.ToString());
                 return false;
+            }*/
+
+            var curve = SecNamedCurves.GetByName("secp256k1");
+            var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
+            var publicKeyBytes = HexStringToByteArray(publicKey);
+            var q = curve.Curve.DecodePoint(publicKeyBytes);
+            var keyParameters = new ECPublicKeyParameters(q, domain);
+
+            var verifier = new ECDsaSigner();
+            verifier.Init(false, keyParameters);
+
+            Asn1InputStream decoder = new Asn1InputStream(HexStringToByteArray(signature));
+            DerInteger r, s;
+            try
+            {
+                DerSequence seq = (DerSequence)decoder.ReadObject();
+                r = (DerInteger)seq[0];
+                s = (DerInteger)seq[1];
             }
+            finally
+            {
+                decoder.Close();
+            }
+
+            var rp = r.PositiveValue;
+            var sp = s.PositiveValue;
+
+            return verifier.VerifySignature(Encoding.UTF8.GetBytes("hi"), rp, sp);
         }
 
 
