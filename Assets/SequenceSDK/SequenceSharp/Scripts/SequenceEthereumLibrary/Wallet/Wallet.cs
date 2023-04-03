@@ -1,3 +1,6 @@
+#define HAS_SPAN
+#define SECP256K1_LIB
+
 using System;
 using System.Linq;
 using System.Numerics;
@@ -5,6 +8,9 @@ using System.Threading.Tasks;
 using SequenceSharp.RPC;
 using SequenceSharp.ABI;
 using System.Text;
+using NBitcoin.Secp256k1;
+
+
 
 namespace SequenceSharp.WALLET
 {
@@ -14,29 +20,34 @@ namespace SequenceSharp.WALLET
         string derivationPath;
         int randomWalletEntropyBitSize;
     }
-    public class Wallet : BaseWallet
+    public class Wallet
     {
         Provider provider;
         WalletProvider walletProvider;
-        public ECDSAKey key;
-        //Only For Testing: (TODO)
-        public string publicKey;
-        public string privateKey;
+
+        //Switch to NBitcoin.Secp256k1 functions
+        //TODO: Testing, will refactor later
+        public ECPrivKey privateKey;
+        public ECPubKey publicKey;
+        private static byte[] testingInput = SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+
+
         public Wallet()
         {
-            key = new ECDSAKey();
-            
+            privateKey = ECPrivKey.Create(testingInput);
+            publicKey = privateKey.CreatePubKey();
+
+
         }
 
-       public Wallet(string _privateKey)
+        public Wallet(string _privateKey)
         {
-            privateKey = _privateKey;
-            publicKey = ECDSAKey.PublicKeyFromPrivateKey(_privateKey);
-            
+            privateKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
+            publicKey = privateKey.CreatePubKey();
+
         }
 
-        
-       public Task Encrypt()
+        public Task Encrypt()
         {
             throw new System.NotImplementedException();
         }
@@ -71,7 +82,7 @@ namespace SequenceSharp.WALLET
         {
             //TODO: Address return type 
             //Last 20 bytes of the Keccak-256 hash of the public key
-            string hashedPublic = SequenceCoder.KeccakHash(publicKey);
+            string hashedPublic = "";// SequenceCoder.KeccakHash(publicKey.ToString());
             int length = hashedPublic.Length;
             string address = hashedPublic.Substring(length - 40);
             address = SequenceCoder.AddressChecksum(address);
@@ -137,33 +148,26 @@ namespace SequenceSharp.WALLET
             bool valid = SequenceCoder.VerifySignatureD(publicKey, sigHash, hiMessage);
             return valid;
         }
-        public override byte[] SignMessage(byte[] message)
+        public bool SignMessage(byte[] message, out SecpECDSASignature signature)
         {
             //throw new System.NotImplementedException();
             //TODO: message 191 :?
-            byte[] message191 = Encoding.UTF8.GetBytes("\x19Ethereum Signed Message:\n");
+            //  byte[] message191 = Encoding.UTF8.GetBytes("\x19Ethereum Signed Message:\n");
             //TODO: Check message has message191 has prefix
 
-            byte[] hash = SequenceCoder.KeccakHash(message);
+            // byte[] hash = SequenceCoder.KeccakHash(message);
 
-            byte[] signature = SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
+            //byte[] signatureBytes
+            
+            bool signed = privateKey.TrySignECDSA(message, out signature);//SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
             //TODO: ?
-
+            UnityEngine.Debug.Log(signed);
             //signature[64] += 27;
-            return signature;
+            return signed;
         }
 
-        public override void SendTransaction()
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public override void SignTypedData()
-        {
-            throw new System.NotImplementedException();
-        }
 
-        
-        
+       
     }
 }

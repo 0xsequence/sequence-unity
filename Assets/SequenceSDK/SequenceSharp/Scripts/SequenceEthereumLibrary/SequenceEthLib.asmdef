@@ -1,3 +1,19 @@
 {
-	"name": "SequenceEthLib"
+    "name": "SequenceEthLib",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "BouncyCastle.Crypto.dll",
+        "NBitcoin.Secp256k1.dll",
+        "NBitcoin.dll",
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
