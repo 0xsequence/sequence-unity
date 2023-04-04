@@ -1,0 +1,31 @@
+// see https://hardhat.org/hardhat-network/docs/reference#config
+module.exports = {
+  solidity: "0.8.17",
+
+  networks: {
+    hardhat: {
+      mining: {
+        auto: false,
+        interval: 1000
+      },
+
+      accounts: [
+        { privateKey: '0xabc0000000000000000000000000000000000000000000000000000000000001', balance: '10000000000000000000000' },
+        { privateKey: '0xabc0000000000000000000000000000000000000000000000000000000000002', balance: '10000000000000000000000' },
+        { privateKey: '0xabc0000000000000000000000000000000000000000000000000000000000003', balance: '10000000000000000000000' },
+        { privateKey: '0xabc0000000000000000000000000000000000000000000000000000000000004', balance: '10000000000000000000000' },
+        { privateKey: '0xabc0000000000000000000000000000000000000000000000000000000000005', balance: '10000000000000000000000' },
+        { privateKey: '0xabc0000000000000000000000000000000000000000000000000000000000006', balance: '10000000000000000000000' },
+      ],
+
+      // gas: 10000000000000,
+      // blockGasLimit: 10000000000000,
+      // gasPrice: 2,
+      initialBaseFeePerGas: 1,
+      chainId: 1337,
+
+      // loggingEnabled: true
+      // verbose: true
+    },
+  }
+}

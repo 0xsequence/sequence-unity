@@ -1,0 +1,26 @@
+{
+  "name": "testchain",
+  "version": "0.0.0",
+  "private": true,
+  "license": "none",
+  "scripts": {
+    "start:hardhat": "hardhat node --hostname 0.0.0.0",
+    "start:hardhat:verbose": "hardhat --verbose node --hostname 0.0.0.0",
+    "start:geth": "docker run -p 8545:8545 --log-driver none --rm ethereum/client-go:v1.10.16 --dev --dev.period 2 --networkid ${npm_package_config_ganacheChainID} --miner.gaslimit 15000000 --miner.gasprice 1 --http --http.addr 0.0.0.0 --rpc.allow-unprotected-txs --verbosity 1",
+    "start:geth:verbose": "docker run -p 8545:8545 --rm ethereum/client-go:v1.10.16 --dev --dev.period 2 --networkid ${npm_package_config_ganacheChainID} --miner.gaslimit 15000000 --miner.gasprice 1 --http --http.addr 0.0.0.0 --rpc.allow-unprotected-txs",
+    "wait:server": "wait-on -t 120000 http-get://127.0.0.1:8545/"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1",
+    "hardhat": "^2.13.0",
+    "wait-on": "^7.0.1"
+  },
+  "config": {
+    "ganacheChainID": 1337,
+    "ganachePort": 8545,
+    "ganacheGasLimit": "0xfffffffffff",
+    "ganacheGasPrice": "20000000000",
+    "etherBalance": "100000",
+    "extra": ""
+  }
+}
