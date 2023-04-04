@@ -57,7 +57,7 @@ public class WalletTests
         CollectionAssert.AreEqual(" 0x2AD3Df4A43445545e486a5c62F98Cee22d500bdf", address);
 
 
-        byte[] hiMessage = Encoding.ASCII.GetBytes("hi");
+        byte[] hiMessage = Encoding.ASCII.GetBytes("this is a test");
         SecpECDSASignature signature;
         bool signed = wallet.SignMessage(hiMessage, out signature);
 

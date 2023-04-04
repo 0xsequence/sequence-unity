@@ -66,17 +66,17 @@ namespace SequenceSharp.WALLET
         {
             throw new System.NotImplementedException();
         }
-/*
-        public static HDWallet CreatRandom()
-        {
-            throw new System.NotImplementedException();
-        }
+        /*
+                public static HDWallet CreatRandom()
+                {
+                    throw new System.NotImplementedException();
+                }
 
-        public static HDWallet FromPrase()
-        {
-            throw new System.NotImplementedException();
-        }
-*/
+                public static HDWallet FromPrase()
+                {
+                    throw new System.NotImplementedException();
+                }
+        */
 
         public string Address()
         {
@@ -94,7 +94,7 @@ namespace SequenceSharp.WALLET
 
             address = SequenceCoder.AddressChecksum(address);
             return address;
-            
+
         }
 
         public string RecoverAddress()
@@ -126,9 +126,9 @@ namespace SequenceSharp.WALLET
         public void SetProvider(Provider _provider)
         {
             provider = _provider;
-            
+
             //throw new System.NotImplementedException();
-        }                                                                                                                                        
+        }
         public void Provider()
         {
             throw new System.NotImplementedException();
@@ -159,22 +159,48 @@ namespace SequenceSharp.WALLET
         {
             //throw new System.NotImplementedException();
             //TODO: message 191 :?
-            //  byte[] message191 = Encoding.UTF8.GetBytes("\x19Ethereum Signed Message:\n");
+
+            byte[] message191 = Encoding.UTF8.GetBytes(@"\x19Ethereum Signed Message:\n");
             //TODO: Check message has message191 has prefix
 
             // byte[] hash = SequenceCoder.KeccakHash(message);
 
             //byte[] signatureBytes
-            
-            bool signed = privateKey.TrySignECDSA(message, out signature);//SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
+            UnityEngine.Debug.Log("message without prefix: " + SequenceCoder.ByteArrayToHexString(message));
+            UnityEngine.Debug.Log("message with prefix: " + SequenceCoder.ByteArrayToHexString(message));
+            UnityEngine.Debug.Log("length: " + message.Length);
+
+            byte[] message32 = new byte[32];
+            int len = message.Length;
+            byte[] messageLen = Encoding.UTF8.GetBytes(len.ToString());
+            message = (message191.Concat(messageLen).ToArray()).Concat(message).ToArray(); // with prefix
+            //message = messageLen.Concat(message).ToArray(); //without prefix
+            UnityEngine.Debug.Log("message concatenated before hash: " + SequenceCoder.ByteArrayToHexString(message));
+            message32 = SequenceCoder.KeccakHash(message);
+
+            UnityEngine.Debug.Log("message after hash: " + SequenceCoder.ByteArrayToHexString(message32));
+            bool signed = privateKey.TrySignECDSA(message32, out signature);//SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
             //TODO: ?
-            UnityEngine.Debug.Log(message);
-            //signature[64] += 27;
+            byte[] sigHash64 = new byte[64];
+
+            signature.WriteCompactToSpan(sigHash64);
+            
+            UnityEngine.Debug.Log("signature hash: " + SequenceCoder.ByteArrayToHexString(sigHash64));
+/*
+            Span<byte> sigHashSpan = stackalloc byte[75];
+            int sigLen = 0;
+            signature.WriteDerToSpan(sigHashSpan, out sigLen);
+            UnityEngine.Debug.Log("signature hash: " + SequenceCoder.ByteArrayToHexString(sigHashSpan.ToArray()));
+            UnityEngine.Debug.Log("signature len: " + sigLen);*/
+
+            
+
+            
             return signed;
         }
 
 
 
-       
+
     }
 }
