@@ -81,10 +81,17 @@ namespace SequenceSharp.WALLET
         public string Address()
         {
             //TODO: Address return type 
+
             //Last 20 bytes of the Keccak-256 hash of the public key
-            string hashedPublic = "";// SequenceCoder.KeccakHash(publicKey.ToString());
-            int length = hashedPublic.Length;
-            string address = hashedPublic.Substring(length - 40);
+            byte[] publickeyBytes = publicKey.ToBytes(false);
+            byte[] publicKeyBytes64 = new byte[64];
+
+            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
+
+            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
+            int length = hashed.Length;
+            string address = hashed.Substring(length - 40);
+
             address = SequenceCoder.AddressChecksum(address);
             return address;
             
@@ -161,7 +168,7 @@ namespace SequenceSharp.WALLET
             
             bool signed = privateKey.TrySignECDSA(message, out signature);//SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
             //TODO: ?
-            UnityEngine.Debug.Log(signed);
+            UnityEngine.Debug.Log(message);
             //signature[64] += 27;
             return signed;
         }

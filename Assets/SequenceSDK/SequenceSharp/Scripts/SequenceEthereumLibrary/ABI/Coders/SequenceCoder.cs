@@ -189,7 +189,10 @@ namespace SequenceSharp.ABI
             keccak256.BlockUpdate(input, 0, input.Length);
             byte[] result = new byte[keccak256.GetByteLength()];
             keccak256.DoFinal(result, 0);
-            return result;
+
+            byte[] result64 = new byte[32];
+            Array.Copy(result, 0, result64, 0, 32);
+            return result64;
 
         }
 

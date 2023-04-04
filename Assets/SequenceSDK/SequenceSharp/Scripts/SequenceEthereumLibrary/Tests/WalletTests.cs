@@ -7,6 +7,7 @@ using SequenceSharp.WALLET;
 using SequenceSharp.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
+using System;
 
 public class WalletTests
 {
@@ -41,10 +42,19 @@ public class WalletTests
 
          Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
          CollectionAssert.AreEqual(  SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privateKey.sec.ToBytes());
+        Debug.Log("private key: " + SequenceCoder.ByteArrayToHexString(wallet.privateKey.sec.ToBytes()));
+        //test
+        Debug.Log("keccak empty: " + SequenceCoder.KeccakHash(""));
 
-        // string address = wallet.Address();
-        // Debug.Log("address: " + address);
-        //Assert.AreEqual(address, "");
+        byte[] publickeyBytes = wallet.publicKey.ToBytes(false);
+        byte[] publicKeyBytes64 = new byte[64];
+        Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
+        string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
+        Debug.Log("hashed public key: " + hashed);
+
+        string address = wallet.Address();
+        Debug.Log("address: " + address);
+        CollectionAssert.AreEqual(" 0x2AD3Df4A43445545e486a5c62F98Cee22d500bdf", address);
 
 
         byte[] hiMessage = Encoding.ASCII.GetBytes("hi");
