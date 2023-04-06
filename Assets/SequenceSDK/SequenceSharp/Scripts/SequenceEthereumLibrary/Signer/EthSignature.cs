@@ -8,6 +8,7 @@ using SequenceSharp.ABI;
 using System.Text;
 using System.Linq;
 using Org.BouncyCastle.Math;
+using System;
 
 namespace SequenceSharp.Signer
 {
@@ -32,13 +33,39 @@ namespace SequenceSharp.Signer
                 signature.WriteToSpanCompact(sigHash64, out recId);
                 signature.Deconstruct(out r, out s, out recId);
                 byte[] v = new[] { (byte)(recId + 27) };
-                R = new BigInteger(1, r.ToBytes()).ToByteArrayUnsigned();
-                S = new BigInteger(1, s.ToBytes()).ToByteArrayUnsigned();
+
+                R = r.ToBytes();//new BigInteger(1, r.ToBytes()).ToByteArrayUnsigned();
+                S = s.ToBytes();//new BigInteger(1, s.ToBytes()).ToByteArrayUnsigned();
                 V = new BigInteger(1, v).ToByteArrayUnsigned();
 
                 return GetSignatureString();
             }
             return "";
+        }
+
+        public static SecpRecoverableECDSASignature GetSignature(string signature, int recId)
+        {
+            UnityEngine.Debug.Log(signature);
+            byte[] sig = SequenceCoder.HexStringToByteArray(signature);
+/*
+            byte[] _r = new byte[32];
+            Array.Copy(sig, 0, _r, 0, 32);
+            byte[] _s = new byte[32];
+            Array.Copy(sig, 32, _s, 0, 32);*/
+
+            byte[] _rs = new byte[64];
+            Array.Copy(sig, 0, _rs, 0, 64);
+
+            SecpRecoverableECDSASignature recoverable;
+
+            bool created = SecpRecoverableECDSASignature.TryCreateFromCompact(_rs, recId, out recoverable);
+
+            if(created)
+            {
+                return recoverable;
+            }
+            return null;
+
         }
 
         

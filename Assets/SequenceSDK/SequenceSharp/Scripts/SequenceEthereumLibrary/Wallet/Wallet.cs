@@ -149,11 +149,26 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 
-        public bool IsValidSignature(string publicKey, string sigHash, string hiMessage)
-        {
-            return false;
-        }
 
+        public bool IsValidSignature( string signature, string message)
+        {
+            byte[] messagePrefix = prefixedMessage( Encoding.UTF8.GetBytes(message));
+            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
+            int recId = 1;//??????
+            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature, recId);
+            
+            if (recoverble!=null)
+            {
+                SecpECDSASignature sig = recoverble.ToSignature();
+                               
+                return pubKey.SigVerify(sig, hashedMessage);
+            }
+
+
+            return false;
+
+
+        }
 
         /// <summary>
         /// 
@@ -174,8 +189,7 @@ namespace SequenceSharp.WALLET
         public string SignMessage(byte[] message)
         {
                             
-            byte[] message32 = new byte[32];
-            message32 = SequenceCoder.KeccakHash(prefixedMessage(message));
+            byte[] message32 = SequenceCoder.KeccakHash(prefixedMessage(message));
 
             return EthSignature.Sign(message32, privKey);
         }

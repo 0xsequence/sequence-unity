@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using Nethereum.Signer;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.ABI.Encoders;
+using SequenceSharp.Signer;
 
 public class SignerTest : MonoBehaviour
 {
@@ -43,15 +44,19 @@ public class SignerTest : MonoBehaviour
         string sig = wallet.SignMessage(testMessage);
         Debug.Log("signature: " + sig);
 
+        bool valid = wallet.IsValidSignature(sig, "this is a test");
+        Debug.Log("isValid? :" + valid);
+
         //Sign with Nethereum
         var signer1 = new EthereumMessageSigner();
         var signature1 = signer1.EncodeUTF8AndSign("this is a test", new EthECKey("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"));
         Debug.Log("nethereum prefix hash: " + SequenceCoder.ByteArrayToHexString(HashPrefixedMessage(Encoding.UTF8.GetBytes("this is a test"))));
         Debug.Log("signature from nethereum:" + signature1);
-        
 
+        //Recover with Nethereum
+        var addressRec1 = signer1.EncodeUTF8AndEcRecover("this is a test", signature1);
+        Debug.Log("nethereum recovered Address:" + addressRec1);
 
-        //test verify
         
         /*bool verified = wallet.publicKey.SigVerify(signature, message32);
         Debug.Log("verified: " + verified);*/
