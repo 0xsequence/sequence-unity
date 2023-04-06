@@ -3,13 +3,13 @@
 
 using System;
 using System.Linq;
-using System.Numerics;
+//using System.Numerics;
 using System.Threading.Tasks;
 using SequenceSharp.RPC;
 using SequenceSharp.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
-
+using SequenceSharp.Signer;
 
 
 namespace SequenceSharp.WALLET
@@ -27,23 +27,24 @@ namespace SequenceSharp.WALLET
 
         //Switch to NBitcoin.Secp256k1 functions
         //TODO: Testing, will refactor later
-        public ECPrivKey privateKey;
-        public ECPubKey publicKey;
+        public ECPrivKey privKey;
+        public ECPubKey pubKey;
+
+        //TODO: make this byte array random?
         private static byte[] testingInput = SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
 
 
         public Wallet()
         {
-            privateKey = ECPrivKey.Create(testingInput);
-            publicKey = privateKey.CreatePubKey();
-
+            privKey = ECPrivKey.Create(testingInput);
+            pubKey = privKey.CreatePubKey();
 
         }
 
         public Wallet(string _privateKey)
         {
-            privateKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
-            publicKey = privateKey.CreatePubKey();
+            privKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
+            pubKey = privKey.CreatePubKey();
 
         }
 
@@ -83,11 +84,10 @@ namespace SequenceSharp.WALLET
             //TODO: Address return type 
 
             //Last 20 bytes of the Keccak-256 hash of the public key
-            byte[] publickeyBytes = publicKey.ToBytes(false);
+            byte[] publickeyBytes = pubKey.ToBytes(false);
             byte[] publicKeyBytes64 = new byte[64];
 
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
-
             string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
             int length = hashed.Length;
             string address = hashed.Substring(length - 40);
@@ -134,12 +134,12 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 
-        public BigInteger GetBalance()
+        public System.Numerics.BigInteger GetBalance()
         {
             throw new System.NotImplementedException();
         }
 
-        public BigInteger GetNonce()
+        public System.Numerics.BigInteger GetNonce()
         {
             throw new System.NotImplementedException();
         }
@@ -151,53 +151,59 @@ namespace SequenceSharp.WALLET
 
         public bool IsValidSignature(string publicKey, string sigHash, string hiMessage)
         {
-            //ECDSAKey.PublicKey
-            bool valid = SequenceCoder.VerifySignatureD(publicKey, sigHash, hiMessage);
-            return valid;
+            return false;
         }
-        public bool SignMessage(byte[] message, out SecpECDSASignature signature)
+
+
+        /// <summary>
+        /// 
+        /// https://docs.ethers.org/v5/api/signer/#Signer-signMessage
+        /// If message is a string, it is treated as a string and converted to its representation in UTF8 bytes.
+
+        ///If and only if a message is a Bytes will it be treated as binary data.
+
+        ///For example, the string "0x1234" is 6 characters long (and in this case 6 bytes long). This is not equivalent to the array[0x12, 0x34], which is 2 bytes long.
+
+        ///A common case is to sign a hash.In this case, if the hash is a string, it must be converted to an array first, using the arrayify utility function.
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="signature"></param>
+        /// <returns></returns>
+        public string SignMessage(byte[] message)
         {
-            //throw new System.NotImplementedException();
-            //TODO: message 191 :?
-
-            byte[] message191 = Encoding.UTF8.GetBytes(@"\x19Ethereum Signed Message:\n");
-            //TODO: Check message has message191 has prefix
-
-            // byte[] hash = SequenceCoder.KeccakHash(message);
-
-            //byte[] signatureBytes
-            UnityEngine.Debug.Log("message without prefix: " + SequenceCoder.ByteArrayToHexString(message));
-            UnityEngine.Debug.Log("message with prefix: " + SequenceCoder.ByteArrayToHexString(message));
-            UnityEngine.Debug.Log("length: " + message.Length);
-
+                            
             byte[] message32 = new byte[32];
-            int len = message.Length;
-            byte[] messageLen = Encoding.UTF8.GetBytes(len.ToString());
-            message = (message191.Concat(messageLen).ToArray()).Concat(message).ToArray(); // with prefix
-            //message = messageLen.Concat(message).ToArray(); //without prefix
-            UnityEngine.Debug.Log("message concatenated before hash: " + SequenceCoder.ByteArrayToHexString(message));
-            message32 = SequenceCoder.KeccakHash(message);
+            message32 = SequenceCoder.KeccakHash(prefixedMessage(message));
 
-            UnityEngine.Debug.Log("message after hash: " + SequenceCoder.ByteArrayToHexString(message32));
-            bool signed = privateKey.TrySignECDSA(message32, out signature);//SequenceCoder.SignDataD(message, ECDSAKey.PrivateKey);
-            //TODO: ?
-            byte[] sigHash64 = new byte[64];
-
-            signature.WriteCompactToSpan(sigHash64);
-            
-            UnityEngine.Debug.Log("signature hash: " + SequenceCoder.ByteArrayToHexString(sigHash64));
-/*
-            Span<byte> sigHashSpan = stackalloc byte[75];
-            int sigLen = 0;
-            signature.WriteDerToSpan(sigHashSpan, out sigLen);
-            UnityEngine.Debug.Log("signature hash: " + SequenceCoder.ByteArrayToHexString(sigHashSpan.ToArray()));
-            UnityEngine.Debug.Log("signature len: " + sigLen);*/
-
-            
-
-            
-            return signed;
+            return EthSignature.Sign(message32, privKey);
         }
+
+        public string SignMessage(string privateKey, string message)
+        {
+         
+            byte[] message32 = new byte[32];
+            message32 = SequenceCoder.KeccakHash(prefixedMessage(Encoding.UTF8.GetBytes(message)));
+
+            ECPrivKey privKey = Context.Instance.CreateECPrivKey(SequenceCoder.HexStringToByteArray(privateKey));
+            return EthSignature.Sign(message32, privKey);
+        
+        }
+
+        /// <summary>
+        /// https://eips.ethereum.org/EIPS/eip-191
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static byte[] prefixedMessage(byte[] message)
+        {
+            byte[] message191 = SequenceCoder.HexStringToByteArray("19").Concat(Encoding.UTF8.GetBytes("Ethereum Signed Message:\n")).ToArray();
+            byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
+            message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
+            return message;
+        }
+
 
 
 
