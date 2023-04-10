@@ -31,10 +31,11 @@ public class SignerTest : MonoBehaviour
         Debug.Log("hashMessage 'Hello World': " + SequenceCoder.ByteArrayToHexString( SequenceCoder.KeccakHash(toHash)));
 
         byte[] publickeyBytes = wallet.pubKey.ToBytes(false);
+        Debug.Log("pubkey:" + SequenceCoder.ByteArrayToHexString(publickeyBytes));
         byte[] publicKeyBytes64 = new byte[64];
         Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
-        string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
-        Debug.Log("hashed public key: " + hashed);
+        string hashedPubkey = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
+        Debug.Log("hashed public key: " + hashedPubkey);
 
         string address = wallet.Address();
         Debug.Log("address: " + address);
@@ -47,6 +48,11 @@ public class SignerTest : MonoBehaviour
         bool valid = wallet.IsValidSignature(sig, "this is a test");
         Debug.Log("isValid? :" + valid);
 
+        //Recover
+        string recoveredAddr = wallet.Recover("this is a test", sig);
+        Debug.Log("recovered addr:" +  recoveredAddr);
+
+
         //Sign with Nethereum
         var signer1 = new EthereumMessageSigner();
         var signature1 = signer1.EncodeUTF8AndSign("this is a test", new EthECKey("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"));
@@ -57,9 +63,7 @@ public class SignerTest : MonoBehaviour
         var addressRec1 = signer1.EncodeUTF8AndEcRecover("this is a test", signature1);
         Debug.Log("nethereum recovered Address:" + addressRec1);
 
-        
-        /*bool verified = wallet.publicKey.SigVerify(signature, message32);
-        Debug.Log("verified: " + verified);*/
+
 
     }
 

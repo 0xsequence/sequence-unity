@@ -88,12 +88,8 @@ namespace SequenceSharp.WALLET
             byte[] publicKeyBytes64 = new byte[64];
 
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
-            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
-            int length = hashed.Length;
-            string address = hashed.Substring(length - 40);
 
-            address = SequenceCoder.AddressChecksum(address);
-            return address;
+            return PubkeyToAddress(publicKeyBytes64);
 
         }
 
@@ -154,8 +150,7 @@ namespace SequenceSharp.WALLET
         {
             byte[] messagePrefix = prefixedMessage( Encoding.UTF8.GetBytes(message));
             byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-            int recId = 1;//??????
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature, recId);
+            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
             
             if (recoverble!=null)
             {
@@ -205,6 +200,26 @@ namespace SequenceSharp.WALLET
         
         }
 
+
+
+        public string Recover(string message, string signature)
+        {
+            byte[] messagePrefix = prefixedMessage(Encoding.UTF8.GetBytes(message));
+            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
+            
+            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
+            ECPubKey _pubkey;
+            var ctx = Context.Instance;
+            ECPubKey.TryRecover(ctx, recoverble, hashedMessage, out _pubkey);
+
+            byte[] publickeyBytes = _pubkey.ToBytes(false);
+            byte[] publicKeyBytes64 = new byte[64];
+            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64); //trim extra 0 at the beginning...
+
+            return PubkeyToAddress(publicKeyBytes64);
+
+        }
+
         /// <summary>
         /// https://eips.ethereum.org/EIPS/eip-191
         /// </summary>
@@ -218,7 +233,16 @@ namespace SequenceSharp.WALLET
             return message;
         }
 
+        private string PubkeyToAddress(byte[] pubkey)
+        {
+            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(pubkey));
+            int length = hashed.Length;
+            string address = hashed.Substring(length - 40);
 
+            address = SequenceCoder.AddressChecksum(address);
+            return address;
+
+        }
 
 
 

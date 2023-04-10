@@ -43,18 +43,17 @@ namespace SequenceSharp.Signer
             return "";
         }
 
-        public static SecpRecoverableECDSASignature GetSignature(string signature, int recId)
+        public static SecpRecoverableECDSASignature GetSignature(string signature)
         {
             UnityEngine.Debug.Log(signature);
             byte[] sig = SequenceCoder.HexStringToByteArray(signature);
-/*
-            byte[] _r = new byte[32];
-            Array.Copy(sig, 0, _r, 0, 32);
-            byte[] _s = new byte[32];
-            Array.Copy(sig, 32, _s, 0, 32);*/
 
             byte[] _rs = new byte[64];
             Array.Copy(sig, 0, _rs, 0, 64);
+            //byte[] v = new[] { (byte)(recId + 27) };
+            byte[] _v = new byte[1];
+            Array.Copy(sig, 64, _v,0, 1);
+            int recId = Convert.ToInt32(_v[0])-27;
 
             SecpRecoverableECDSASignature recoverable;
 
