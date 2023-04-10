@@ -8,9 +8,7 @@ using SequenceSharp.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
 using System;
-
-
-
+using System.Linq;
 
 public class WalletTests
 {
@@ -21,71 +19,77 @@ public class WalletTests
     {
         Wallet wallet = new Wallet();
         Assert.NotNull(wallet);
-        //Todo: Check no exceptions been thrown
+        
     }
 
     [Test]
     public void TestWalletSignMessage()
     {
+        Wallet wallet = new Wallet();
 
+        string address = wallet.Address();
+        Assert.NotNull(address);
+
+        string sig = wallet.SignMessage("hi");
+        Assert.NotNull(sig);
+
+        bool valid = wallet.IsValidSignature(sig, "hi");
+        Assert.IsTrue(valid);
     }
 
     [Test]
     public void TestWalletSignMessageExistingPrefix()
     {
-        
+        Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+        CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
+
+        string address = wallet.Address();
+        CollectionAssert.AreEqual("0x2AD3Df4A43445545e486a5c62F98Cee22d500bdf", address);
+
+        byte[] _19 = SequenceCoder.HexStringToByteArray("19");
+        byte[] testMessage = Encoding.ASCII.GetBytes("Ethereum Signed Message:\n" +"this is a test".Length + "this is a test");
+        testMessage = _19.Concat(testMessage).ToArray();
+        string sig = wallet.SignMessage(testMessage);
+
+        Assert.AreEqual("0x45c666ac1fc5faae5639014d2c163c1ac4863fb78a4bd23c3785f7db99cf553666191da4cad5968d018287e784ceabc7f5565b5375a4b7e35cba897d0b666f0f1b", sig);
     }
 
     [Test]
     public void TestWalletSignMessageFromPrivateKey()
     {
-        //Test with random pair
-        //http://kjur.github.io/jsrsasign/sample/sample-ecdsa.html
-        //
 
          Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
          CollectionAssert.AreEqual(  SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
-        Debug.Log("private key: " + SequenceCoder.ByteArrayToHexString(wallet.privKey.sec.ToBytes()));
-        //test
-        Debug.Log("keccak empty: " + SequenceCoder.KeccakHash(""));
-
-        byte[] publickeyBytes = wallet.pubKey.ToBytes(false);
-        byte[] publicKeyBytes64 = new byte[64];
-        Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
-        string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
-        Debug.Log("hashed public key: " + hashed);
 
         string address = wallet.Address();
-        Debug.Log("address: " + address);
-        CollectionAssert.AreEqual(" 0x2AD3Df4A43445545e486a5c62F98Cee22d500bdf", address);
+        CollectionAssert.AreEqual("0x2AD3Df4A43445545e486a5c62F98Cee22d500bdf", address);
 
 
         byte[] testMessage = Encoding.ASCII.GetBytes("this is a test");
-        SecpRecoverableECDSASignature signature;
+
         string sig = wallet.SignMessage(testMessage);
 
-        Debug.Log("signature: "+ sig);
-       // bool verified = wallet.publicKey.SigVerify(signature, hiMessage);
-
-        //Assert.IsTrue(verified);
-
-        //string sigHash = "0x" + SequenceCoder.ByteArrayToHexString(signature);
-
-        // bool verified = wallet.IsValidSignature(pu, sigHash, "hi");
-        // Assert.IsTrue(verified);
-        //string expected = "0x30440220545b07b54f734265832cc134818502c86210d8d4ff26fd22311daa3f94ab65d702200fb7b65e16a622d29a70cd988cc2959a10f2be5dbd17bbdec0a1cd31f7edd3cf";
-        //Debug.Log("sigHash: " + sigHash);
-
-        //Assert.AreEqual(sigHash, expected);
-        //TOOO: Validate Ethereum Signature
-
-        //TODO: Is Valid 191 Signature
+        Assert.AreEqual("0x45c666ac1fc5faae5639014d2c163c1ac4863fb78a4bd23c3785f7db99cf553666191da4cad5968d018287e784ceabc7f5565b5375a4b7e35cba897d0b666f0f1b", sig);
+       
     }
 
     [Test]
     public void TestWalletSignAndRecover()
     {
+        Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+        CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
+        string address = wallet.Address();
+        CollectionAssert.AreEqual("0x2AD3Df4A43445545e486a5c62F98Cee22d500bdf", address);
+
+
+        byte[] testMessage = Encoding.ASCII.GetBytes("this is a test");
+
+        string sig = wallet.SignMessage(testMessage);
+
+        string recoveredAddr = wallet.Recover("this is a test", sig);
+
+        Assert.AreEqual(address, recoveredAddr);
     }
 
 

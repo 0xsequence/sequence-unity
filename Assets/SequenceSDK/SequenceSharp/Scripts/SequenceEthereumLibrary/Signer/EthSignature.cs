@@ -45,7 +45,6 @@ namespace SequenceSharp.Signer
 
         public static SecpRecoverableECDSASignature GetSignature(string signature)
         {
-            UnityEngine.Debug.Log(signature);
             byte[] sig = SequenceCoder.HexStringToByteArray(signature);
 
             byte[] _rs = new byte[64];
@@ -71,7 +70,7 @@ namespace SequenceSharp.Signer
 
         public static string GetSignatureString()
         {
-            return SequenceCoder.ByteArrayToHexString(R) + SequenceCoder.ByteArrayToHexString(S) + SequenceCoder.ByteArrayToHexString(V);
+            return "0x"+SequenceCoder.ByteArrayToHexString(R) + SequenceCoder.ByteArrayToHexString(S) + SequenceCoder.ByteArrayToHexString(V);
         }
     }
 

@@ -10,6 +10,7 @@ using SequenceSharp.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
 using SequenceSharp.Signer;
+ 
 
 
 namespace SequenceSharp.WALLET
@@ -30,13 +31,12 @@ namespace SequenceSharp.WALLET
         public ECPrivKey privKey;
         public ECPubKey pubKey;
 
-        //TODO: make this byte array random?
-        private static byte[] testingInput = SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
-
 
         public Wallet()
         {
-            privKey = ECPrivKey.Create(testingInput);
+            //TODO: ...
+            byte[] seed = Org.BouncyCastle.Security.SecureRandom.GetInstance("SHA256PRNG").GenerateSeed(64);
+            privKey = ECPrivKey.Create(seed);
             pubKey = privKey.CreatePubKey();
 
         }
@@ -93,10 +93,7 @@ namespace SequenceSharp.WALLET
 
         }
 
-        public string RecoverAddress()
-        {
-            throw new System.NotImplementedException();
-        }
+        
 
         public string RecoverAddressFromDigest()
         {
@@ -146,24 +143,7 @@ namespace SequenceSharp.WALLET
         }
 
 
-        public bool IsValidSignature( string signature, string message)
-        {
-            byte[] messagePrefix = prefixedMessage( Encoding.UTF8.GetBytes(message));
-            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
-            
-            if (recoverble!=null)
-            {
-                SecpECDSASignature sig = recoverble.ToSignature();
-                               
-                return pubKey.SigVerify(sig, hashedMessage);
-            }
 
-
-            return false;
-
-
-        }
 
         /// <summary>
         /// 
@@ -182,11 +162,15 @@ namespace SequenceSharp.WALLET
         /// <param name="signature"></param>
         /// <returns></returns>
         public string SignMessage(byte[] message)
-        {
-                            
+        {                       
             byte[] message32 = SequenceCoder.KeccakHash(prefixedMessage(message));
-
             return EthSignature.Sign(message32, privKey);
+        }
+
+        public string SignMessage(string message)
+        {
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+            return SignMessage(messageBytes);
         }
 
         public string SignMessage(string privateKey, string message)
@@ -200,6 +184,25 @@ namespace SequenceSharp.WALLET
         
         }
 
+
+        public bool IsValidSignature(string signature, string message)
+        {
+            byte[] messagePrefix = prefixedMessage(Encoding.UTF8.GetBytes(message));
+            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
+            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
+
+            if (recoverble != null)
+            {
+                SecpECDSASignature sig = recoverble.ToSignature();
+
+                return pubKey.SigVerify(sig, hashedMessage);
+            }
+
+
+            return false;
+
+
+        }
 
 
         public string Recover(string message, string signature)
@@ -227,9 +230,16 @@ namespace SequenceSharp.WALLET
         /// <returns></returns>
         public static byte[] prefixedMessage(byte[] message)
         {
+
             byte[] message191 = SequenceCoder.HexStringToByteArray("19").Concat(Encoding.UTF8.GetBytes("Ethereum Signed Message:\n")).ToArray();
             byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
-            message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
+            if (!message.Take(message191.Length).SequenceEqual(message191))
+            {
+                
+                message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
+                
+            }
+            
             return message;
         }
 
