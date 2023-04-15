@@ -1,0 +1,194 @@
+using SequenceSharp.ABI;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+
+namespace SequenceSharp.RLP
+{
+    public class RLP
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"> If you have a string of characters and you need to represent it in UTF8 byte array</param>
+        /// <returns></returns>
+        public static byte[] Encode(object input)
+        {
+            if (input is byte[] byteArrayInput)
+            {
+
+                if (byteArrayInput.Length == 1 && byteArrayInput[0] < 128)
+                {
+                    //For a single byte whose value is in the [0x00, 0x7f] (decimal [0, 127]) range, that byte is its own RLP encoding.
+                    return byteArrayInput;
+                }
+                else
+                {
+                    byte[] head = SequenceCoder.HexStringToByteArray((EncodeLength(byteArrayInput.Length, 128)));
+                    return  head.Concat(byteArrayInput).ToArray();
+                }
+            }
+            else if (input is List<object> listInput)
+            {
+                byte[] output = { };
+                foreach (var item in listInput)
+                {
+                    output = output.Concat(Encode(item)).ToArray();
+                }
+                byte[] head = SequenceCoder.HexStringToByteArray(EncodeLength(output.Length, 192));
+                return head.Concat(output).ToArray();
+            }
+
+            return null;
+        }
+
+        private static string EncodeLength(int length, int offset)
+        {
+            if (length < 56)
+            {
+                // if a string is 0-55 bytes long, the RLP encoding consists of a single byte with value 0x80 (dec. 128) plus the length of the string followed by the string. The range of the first byte is thus [0x80, 0xb7] (dec. [128, 183]).
+                //If the total payload of a list (i.e. the combined length of all its items being RLP encoded) is 0-55 bytes long, the RLP encoding consists of a single byte with value 0xc0 plus the length of the list followed by the concatenation of the RLP encodings of the items.
+                return (length + offset).ToString("x");
+            }
+            else if (length < Math.Pow(256, 8))
+            {
+                //If a string is more than 55 bytes long, the RLP encoding consists of a single byte with value 0xb7 (dec. 183) plus the length in bytes of the length of the string in binary form, followed by the length of the string, followed by the string. 
+                //If the total payload of a list is more than 55 bytes long, the RLP encoding consists of a single byte with value 0xf7 plus the length in bytes of the length of the payload in binary form, followed by the length of the payload, followed by the concatenation of the RLP encodings of the items. 
+                string lenString = length.ToString("x");
+                if(lenString.Length % 2 !=0)
+                {
+                    //add zero 
+                    lenString = '0' + lenString;
+
+                }
+                return (((lenString.Length)/2 + offset + 55)).ToString("x") + lenString;
+            }
+            else
+                throw new Exception("Input too long");
+        }
+
+
+        public static object Decode(byte[] input)
+        {
+            if (input.Length == 0)
+            {
+                return null;
+            }
+
+            (int offset, int dataLen, Type type) = DecodeLength(input);
+
+            string output = "";
+            List<object> outputList = new List<object>();
+
+            if (type == typeof(string))
+            {
+                
+                output = Encoding.UTF8.GetString(input).Substring(offset, dataLen);
+                return output;
+            }
+            else if (type == typeof(List<object>))
+            {
+
+                while(offset<input.Length)
+                {
+                    //TODO: Optimize 
+                    byte[] restInput = new byte[dataLen];
+                    Array.Copy(input, offset, restInput, 0, dataLen);
+                    (int _offset, int _dataLen, Type _type) = DecodeLength(restInput);
+                    
+                    object rtn = Decode(restInput);
+                    outputList.Add(rtn);
+
+                    offset += _offset + _dataLen;
+                    dataLen -= _offset + _dataLen;
+
+                }
+                return outputList;
+            }
+            else
+            {
+                throw new Exception("Invalid type");
+            }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>( offset, length of the actual data, data type)</returns>
+        private static (int, int, Type) DecodeLength(byte[] input)
+        {
+            int length = input.Length;
+
+            if (length == 0)
+            {
+                throw new Exception("Input is null");
+            }
+
+            int firstByte = input[0];
+            if (firstByte <= 127)
+            {
+                //the data is a string if the range of the first byte (i.e. prefix) is [0x00, 0x7f], and the string is the first byte itself exactly;
+                return (0, 1, typeof(string));
+            }
+            else if (firstByte <= 183 && length > (firstByte - 128))
+            {
+                //the data is a string if the range of the first byte is [0x80, 0xb7], and the string whose length is equal to the first byte minus 0x80 follows the first byte;
+                int strLen = firstByte - 0x80;
+                return (1, strLen, typeof(string));
+            }
+            else if (firstByte <= 191 && length > (firstByte - 183))
+            {
+                //the data is a string if the range of the first byte is [0xb8, 0xbf], and the length of the string whose length in bytes is equal to the first byte minus 0xb7 follows the first byte, and the string follows the length of the string;
+                int lenOfStrLen = firstByte - 183;
+                byte[] lenArray = new byte[lenOfStrLen];
+                Array.Copy(input, 1, lenArray, 0, lenOfStrLen);
+                string hexString = SequenceCoder.ByteArrayToHexString(lenArray);
+                int strLen = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber); 
+                return (1 + lenOfStrLen, strLen, typeof(string));
+            }
+            else if (firstByte <= 247 && length > (firstByte - 192))
+            {
+                //the data is a list if the range of the first byte is [0xc0, 0xf7], and the concatenation of the RLP encodings of all items of the list which the total payload is equal to the first byte minus 0xc0 follows the first byte;
+                int listLen = firstByte - 192;
+                return (1, listLen, typeof(List<object>));
+            }
+            else if (firstByte <= 255 && length > (firstByte - 247 ))
+            {
+                //the data is a list if the range of the first byte is [0xf8, 0xff], and the total payload of the list whose length is equal to the first byte minus 0xf7 follows the first byte, and the concatenation of the RLP encodings of all items of the list follows the total payload of the list;
+                int lenOfListLen = firstByte - 247;
+                byte[] lenArray = new byte[lenOfListLen];
+                Array.Copy(input, 1, lenArray, 0, lenOfListLen);
+                string hexString = SequenceCoder.ByteArrayToHexString(lenArray);
+                int listLen = int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
+                return (1 + lenOfListLen, listLen, typeof(List<object>));
+            }
+            else
+            {
+                throw new Exception("Input doesn't conform to RLP encoding form");
+            }
+        }
+
+        private static int ToInteger(string b)
+        {
+            int length = b.Length;
+
+            if (length == 0)
+            {
+                throw new Exception("Input is null");
+            }
+            else if (length == 1)
+            {
+                return b[0];
+            }
+            else
+            {
+                return b[^1] + ToInteger(b.Substring(0, length - 1)) * 256;
+            }
+        }
+    }
+}
