@@ -116,13 +116,67 @@ public class RLPTest
 
     }
 
-        [Test]
+    [Test]
     public void RLPEncodingEmptyTests()
     {
+        //Empty string
+        byte[] empty_string_expected = new byte[] { 0x80 };
+        byte[] empty_string_encoded = RLP.Encode(Encoding.UTF8.GetBytes(""));
 
+        Debug.Log(SequenceCoder.ByteArrayToHexString(empty_string_expected));
+        Debug.Log(SequenceCoder.ByteArrayToHexString(empty_string_encoded));
+        CollectionAssert.AreEqual(empty_string_expected, empty_string_encoded);
+
+        //Empty list
+        byte[] empty_list_expected = new byte[] { 0xc0 };
+        byte[] empty_list_encoded = RLP.Encode(new List<object>());
+
+        Debug.Log(SequenceCoder.ByteArrayToHexString(empty_list_expected));
+        Debug.Log(SequenceCoder.ByteArrayToHexString(empty_list_encoded));
+        CollectionAssert.AreEqual(empty_list_expected, empty_list_encoded);
+
+        //Set theoretical representation of three
+        byte[] three_expected = new byte[] { 0xc7, 0xc0, 0xc1, 0xc0, 0xc3, 0xc0, 0xc1, 0xc0 };
+        byte[] three_encoded = RLP.Encode(new List<object>() { new List<object>() { }, new List<object>() { new List<object>() { } }, new List<object>() { new List<object>() { }, new List<object>() { new List<object>() { } } } });
+        Debug.Log(SequenceCoder.ByteArrayToHexString(three_expected));
+        Debug.Log(SequenceCoder.ByteArrayToHexString(three_encoded));
+        CollectionAssert.AreEqual(three_expected, three_encoded);
+    }
+    [Test]
+    public void RLPDecodingEmptyTests()
+    {
+        //Empty string
+        string empty_string_expected = "";
+        string empty_string_decoded = (string)RLP.Decode(new byte[] { 0x80 });
+        Debug.Log(empty_string_expected);
+        Debug.Log(empty_string_decoded);
+        CollectionAssert.AreEqual(empty_string_expected, empty_string_decoded);
+
+        //Empty list
+        List<object> empty_list_expected = new List<object>();
+        List<object> empty_list_decoded =(List<object>)RLP.Decode(new byte[] { 0xc0 });
+
+        Debug.Log(empty_list_expected.Count);
+        Debug.Log(empty_list_decoded.Count);
+        CollectionAssert.AreEqual(empty_list_expected, empty_list_decoded);
+
+        //Set theoretical representation of three
+        List<object> three_expected = new List<object>() { new List<object>() { }, new List<object>() { new List<object>() { } }, new List<object>() { new List<object>() { }, new List<object>() { new List<object>() { } } } };//;
+        List<object> three_decoded = (List<object>)RLP.Decode(new byte[] { 0xc7, 0xc0, 0xc1, 0xc0, 0xc3, 0xc0, 0xc1, 0xc0 });
+        Debug.Log(three_expected.Count);
+        Debug.Log(three_decoded.Count);
+        foreach (object item in three_expected)
+        {
+            Debug.Log("expected: "+ item);
+        }
+        foreach (object item in three_decoded)
+        {
+            Debug.Log("decoded: "+ item);
+        }
+        CollectionAssert.AreEqual(three_expected, three_decoded);
     }
 
-    [Test]
+        [Test]
     public void RLPEncodingBooleanTests()
     {
 
@@ -137,7 +191,7 @@ public class RLPTest
     [Test]
     public void RLPEncodingIntegerTests()
     {
-
+        
     }
 
     [Test]

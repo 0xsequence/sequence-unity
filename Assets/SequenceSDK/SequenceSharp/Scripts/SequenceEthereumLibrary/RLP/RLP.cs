@@ -19,9 +19,16 @@ namespace SequenceSharp.RLP
         {
             if (input is byte[] byteArrayInput)
             {
-
+                if(byteArrayInput.Length == 0)
+                {
+                    //Empty string
+                    return new byte[] { 0x80 };
+                }
                 if (byteArrayInput.Length == 1 && byteArrayInput[0] < 128)
                 {
+                    //Integer 0
+                    if(byteArrayInput[0] == 0) return new byte[] { 0x80 };
+
                     //For a single byte whose value is in the [0x00, 0x7f] (decimal [0, 127]) range, that byte is its own RLP encoding.
                     return byteArrayInput;
                 }
@@ -33,6 +40,11 @@ namespace SequenceSharp.RLP
             }
             else if (input is List<object> listInput)
             {
+                if(listInput.Count == 0)
+                {
+                    //empty list
+                    return new byte[] { 0xc0 };
+                }
                 byte[] output = { };
                 foreach (var item in listInput)
                 {
@@ -41,6 +53,7 @@ namespace SequenceSharp.RLP
                 byte[] head = SequenceCoder.HexStringToByteArray(EncodeLength(output.Length, 192));
                 return head.Concat(output).ToArray();
             }
+            
 
             return null;
         }
@@ -85,25 +98,49 @@ namespace SequenceSharp.RLP
 
             if (type == typeof(string))
             {
-                
                 output = Encoding.UTF8.GetString(input).Substring(offset, dataLen);
+                UnityEngine.Debug.Log("output: " + output);
                 return output;
             }
             else if (type == typeof(List<object>))
             {
-
-                while(offset<input.Length)
+                UnityEngine.Debug.Log("input length: " + input.Length);
+                while (offset<input.Length)
                 {
+                    UnityEngine.Debug.Log("Decode offset: " + offset);
+                    UnityEngine.Debug.Log("Decode dataLen: " + dataLen);
                     //TODO: Optimize 
-                    byte[] restInput = new byte[dataLen];
-                    Array.Copy(input, offset, restInput, 0, dataLen);
-                    (int _offset, int _dataLen, Type _type) = DecodeLength(restInput);
-                    
-                    object rtn = Decode(restInput);
-                    outputList.Add(rtn);
+                    object rtn = new List<object>(); 
+                    int _offset= 0, _dataLen = 1;
+                    Type _type;
+                    if (dataLen > 0)                   
+                    {
+                        byte[] restInput = new byte[dataLen];
+                        Array.Copy(input, offset, restInput, 0, dataLen);
+                        ( _offset, _dataLen,  _type) = DecodeLength(restInput);
+                        UnityEngine.Debug.Log("Decode _offset: " + _offset);
+                        UnityEngine.Debug.Log("Decode _dataLen: " + _dataLen);
+                        UnityEngine.Debug.Log("Decode _type: " + _type);
+                        rtn = Decode(restInput);
+                        UnityEngine.Debug.Log("rtn: " + rtn);
 
-                    offset += _offset + _dataLen;
-                    dataLen -= _offset + _dataLen;
+                       // outputList.Add(rtn);
+                        /*offset += _dataLen;
+                        dataLen -= _dataLen;*/
+                        offset += _offset + _dataLen;
+                        dataLen -= _offset + _dataLen;
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.Log("rtn: " + ((List<object>)rtn).Count);
+                        //outputList.Add(rtn);
+                        return outputList;
+                        
+
+                    }
+                    outputList.Add(rtn);
+                    UnityEngine.Debug.Log("Decode offset!: " + offset);
+                    UnityEngine.Debug.Log("Decode dataLen!: " + dataLen);
 
                 }
                 return outputList;
@@ -123,18 +160,20 @@ namespace SequenceSharp.RLP
         private static (int, int, Type) DecodeLength(byte[] input)
         {
             int length = input.Length;
-
+            UnityEngine.Debug.Log("Decode input length: " + length);
             if (length == 0)
             {
                 throw new Exception("Input is null");
             }
 
             int firstByte = input[0];
+            UnityEngine.Debug.Log("Decode firstbyte: " + firstByte);
             if (firstByte <= 127)
             {
+                
                 //the data is a string if the range of the first byte (i.e. prefix) is [0x00, 0x7f], and the string is the first byte itself exactly;
                 return (0, 1, typeof(string));
-            }
+            }            
             else if (firstByte <= 183 && length > (firstByte - 128))
             {
                 //the data is a string if the range of the first byte is [0x80, 0xb7], and the string whose length is equal to the first byte minus 0x80 follows the first byte;
@@ -173,22 +212,5 @@ namespace SequenceSharp.RLP
             }
         }
 
-        private static int ToInteger(string b)
-        {
-            int length = b.Length;
-
-            if (length == 0)
-            {
-                throw new Exception("Input is null");
-            }
-            else if (length == 1)
-            {
-                return b[0];
-            }
-            else
-            {
-                return b[^1] + ToInteger(b.Substring(0, length - 1)) * 256;
-            }
-        }
     }
 }
