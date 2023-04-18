@@ -208,6 +208,10 @@ namespace SequenceSharp.ABI
             {
                 hexString = hexString.Remove(0, 2);
             }
+            if(hexString.Length %2 != 0)
+            {
+                hexString = "0" + hexString;
+            }
 
             byte firstByte = Convert.ToByte(hexString.Substring(0, 2), 16);
             int firstInt = Convert.ToInt32(firstByte);

@@ -17,8 +17,14 @@ namespace SequenceSharp.RLP
         /// <returns></returns>
         public static byte[] Encode(object input)
         {
-            if (input is byte[] byteArrayInput)
+            if(input is Boolean boolInput)
             {
+                if(boolInput) return new byte[] { 0x01 };
+                return new byte[] { 0x80 };
+            }
+            else if (input is byte[] byteArrayInput)
+            {
+                UnityEngine.Debug.Log("length: " + byteArrayInput.Length);
                 if(byteArrayInput.Length == 0)
                 {
                     //Empty string

@@ -179,19 +179,93 @@ public class RLPTest
         [Test]
     public void RLPEncodingBooleanTests()
     {
-
+        //True
+        Assert.AreEqual(new byte[] { 0x01 }, RLP.Encode(true));
+        //False
+        Assert.AreEqual(new byte[] { 0x80 }, RLP.Encode(false));
     }
+
 
     [Test]
     public void RLPEncodingStringTests()
     {
+        byte[] string_1_expected = new byte[] 
+                {   0xb8,
+                    0x38,
+                    (byte)'L',
+                    (byte)'o',
+                    (byte)'r',
+                    (byte)'e',
+                    (byte)'m',
+                    (byte)' ',
+                    (byte)'i',
+                    (byte)'p',
+                    (byte)'s',
+                    (byte)'u',
+                    (byte)'m',
+                    (byte)' ',
+                    (byte)'d',
+                    (byte)'o',
+                    (byte)'l',
+                    (byte)'o',
+                    (byte)'r',
+                    (byte)' ',
+                    (byte)'s',
+                    (byte)'i',
+                    (byte)'t',
+                    (byte)' ',
+                    (byte)'a',
+                    (byte)'m',
+                    (byte)'e',
+                    (byte)'t',
+                    (byte)',',
+                    (byte)' ',
+                    (byte)'c',
+                    (byte)'o',
+                    (byte)'n',
+                    (byte)'s',
+                    (byte)'e',
+                    (byte)'c',
+                    (byte)'t',
+                    (byte)'e',
+                    (byte)'t',
+                    (byte)'u',
+                    (byte)'r',
+                    (byte)' ',
+                    (byte)'a',
+                    (byte)'d',
+                    (byte)'i',
+                    (byte)'p',
+                    (byte)'i',
+                    (byte)'s',
+                    (byte)'i',
+                    (byte)'c',
+                    (byte)'i',
+                    (byte)'n',
+                    (byte)'g',
+                    (byte)' ',
+                    (byte)'e',
+                    (byte)'l',
+                    (byte)'i',
+                    (byte)'t'
+                };
+        byte[] string_1_encoded = RLP.Encode(Encoding.UTF8.GetBytes("Lorem ipsum dolor sit amet, consectetur adipisicing elit"));
+
+        CollectionAssert.AreEqual(string_1_expected, string_1_encoded);
+
 
     }
 
     [Test]
     public void RLPEncodingIntegerTests()
     {
-        
+        byte[] integer_1_expected = new byte[] { 0x82, 0x04, 0x00 };
+        int integer_1 = 0x400;
+        string integer_1_str = integer_1.ToString("X");
+        Debug.Log(integer_1_str);
+        byte[] integer_1_encoded = RLP.Encode(SequenceCoder.HexStringToByteArray(integer_1_str));
+        Debug.Log(SequenceCoder.ByteArrayToHexString(integer_1_encoded));
+        CollectionAssert.AreEqual(integer_1_expected, integer_1_encoded);
     }
 
     [Test]
