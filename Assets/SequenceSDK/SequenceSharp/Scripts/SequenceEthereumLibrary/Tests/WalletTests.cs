@@ -12,7 +12,56 @@ using System.Linq;
 
 public class WalletTests
 {
+    const string privKey0 = "0xabc0000000000000000000000000000000000000000000000000000000000001";
+    const string privKey1 = "0xabc0000000000000000000000000000000000000000000000000000000000002";
+    const string privKey2 = "0xabc0000000000000000000000000000000000000000000000000000000000003";
+    const string privKey3 = "0xabc0000000000000000000000000000000000000000000000000000000000004";
+    const string privKey4 = "0xabc0000000000000000000000000000000000000000000000000000000000005";
+    const string privKey5 = "0xabc0000000000000000000000000000000000000000000000000000000000006";
+    [Test]
+    public void TestChain_AddressesTests()
+    {
+        string address_0_expected = "0xc683a014955b75F5ECF991d4502427c8fa1Aa249";
+        Wallet wallet0 = new Wallet(privKey0);
+        string address_0 = wallet0.Address();
+        Debug.Log("address 0 from wallet: " + address_0);
+        CollectionAssert.AreEqual(address_0_expected, address_0);
 
+
+        string address_1_expected = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
+        Wallet wallet1 = new Wallet(privKey1);
+        string address_1 = wallet1.Address();
+        Debug.Log("address 1 from wallet: " + address_1);
+        CollectionAssert.AreEqual(address_1_expected, address_1);
+
+        string address_2_expected = "0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa";
+        Wallet wallet2 = new Wallet(privKey2);
+        string address_2 = wallet2.Address();
+        Debug.Log("address 2 from wallet: " + address_2);
+        CollectionAssert.AreEqual(address_2_expected, address_2);
+
+
+        string address_3_expected = "0xb396CbD9b745Ffc4a9C9A6D43D7957b1350Be153";
+        Wallet wallet3 = new Wallet(privKey3);
+        string address_3 = wallet3.Address();
+        Debug.Log("address 3 from wallet: " + address_3);
+        CollectionAssert.AreEqual(address_3_expected, address_3);
+
+
+        string address_4_expected = "0x6F5Ddb00e3cb99Dfd9A07885Ea91303629D1DA94";
+        Wallet wallet4 = new Wallet(privKey4);
+        string address_4 = wallet4.Address();
+        Debug.Log("address 4 from wallet: " + address_4);
+        CollectionAssert.AreEqual(address_4_expected, address_4);
+
+        string address_5_expected = "0x3F96a0D6697e5E7ACEC56A21681195dC6262b06C";
+        Wallet wallet5 = new Wallet(privKey5);
+        string address_5 = wallet5.Address();
+        Debug.Log("address 5 from wallet: " + address_5);
+        CollectionAssert.AreEqual(address_5_expected, address_5);
+
+
+    }
 
     [Test]
     public void TestWalletRandom()
