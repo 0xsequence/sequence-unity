@@ -86,3 +86,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treaming[Aa]ssets/sequence/httpBasicAuth.json
 /[Aa]ssets/[Ss]treaming[Aa]ssets/sequence/httpBasicAuth.json.meta
 .DS_Store
+
+# Vscode
+.vscode
+.idea
