@@ -183,6 +183,7 @@ namespace SequenceSharp.ABI
             return hashString;
         }
 
+
         public static byte[] KeccakHash(byte[] input)
         {
             var keccak256 = new KeccakDigest(256);

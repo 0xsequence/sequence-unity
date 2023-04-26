@@ -10,8 +10,7 @@ using SequenceSharp.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
 using SequenceSharp.Signer;
- 
-
+using System.Collections.Generic;
 
 namespace SequenceSharp.WALLET
 {
@@ -142,8 +141,15 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 
+        public (string v, string r, string s) SignTx(byte[] message, int chainId)
+        {
+            return EthSignature.SignAndReturnVRS(message, privKey, chainId);
+        }
 
-
+        public (string v, string r, string s) SignTx(byte[] message)
+        {
+            return EthSignature.SignAndReturnVRS(message, privKey);
+        }
 
         /// <summary>
         /// 
@@ -167,6 +173,8 @@ namespace SequenceSharp.WALLET
             return EthSignature.Sign(message32, privKey);
         }
 
+
+
         public string SignMessage(string message)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
@@ -182,6 +190,14 @@ namespace SequenceSharp.WALLET
             ECPrivKey privKey = Context.Instance.CreateECPrivKey(SequenceCoder.HexStringToByteArray(privateKey));
             return EthSignature.Sign(message32, privKey);
         
+        }
+
+        public string SignByteArray(string privateKey, byte[] byteArray)
+        {
+            byte[] prefixed = new byte[32];
+            prefixed = SequenceCoder.KeccakHash(prefixedMessage(byteArray));
+            ECPrivKey privKey = Context.Instance.CreateECPrivKey(SequenceCoder.HexStringToByteArray(privateKey));
+            return EthSignature.Sign(prefixed, privKey);
         }
 
 
@@ -242,6 +258,7 @@ namespace SequenceSharp.WALLET
             
             return message;
         }
+
 
         private string PubkeyToAddress(byte[] pubkey)
         {

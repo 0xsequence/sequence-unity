@@ -9,7 +9,7 @@ namespace SequenceSharp.RPC
     {
         private HttpRpcClient _httpRpcClient;
         private readonly string url = "";
-        SequenceEthClient()
+        public SequenceEthClient()
         {
             _httpRpcClient = new HttpRpcClient(url);
         }

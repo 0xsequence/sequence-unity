@@ -64,6 +64,13 @@ public class WalletTests
     }
 
     [Test]
+    public void TestChain_TransactionTests()
+    {
+        //{ from: account0Address, to: account1Address, value: "12300000000000000000", gasLimit: 100000, gasPrice: 100 } 
+        
+    }
+
+    [Test]
     public void TestWalletRandom()
     {
         Wallet wallet = new Wallet();

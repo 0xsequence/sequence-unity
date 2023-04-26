@@ -22,7 +22,7 @@ module.exports = {
       // blockGasLimit: 10000000000000,
       // gasPrice: 2,
       initialBaseFeePerGas: 1,
-      chainId: 1337,
+      chainId: 31337,
 
       // loggingEnabled: true
       // verbose: true

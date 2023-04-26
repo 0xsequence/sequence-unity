@@ -16,7 +16,6 @@ namespace SequenceSharp.RPC
         public HttpRpcClient(string url)
         {
             _url = url;
-            Debug.Log("http rpc client");
         }
 
         public async Task<RpcResponse> SendRequest(RpcRequest rpcRequest)
@@ -57,7 +56,7 @@ namespace SequenceSharp.RPC
 
         public async Task<RpcResponse> SendRequest(string method, object[] parameters)
         {
-            
+            Debug.Log("current url: "+ _url);
             var request = new
             {
                 jsonrpc = "2.0",
