@@ -136,10 +136,7 @@ namespace SequenceSharp.WALLET
             throw new System.NotImplementedException();
         }
 
-        public void SignTx()
-        {
-            throw new System.NotImplementedException();
-        }
+        
 
         public (string v, string r, string s) SignTx(byte[] message, int chainId)
         {

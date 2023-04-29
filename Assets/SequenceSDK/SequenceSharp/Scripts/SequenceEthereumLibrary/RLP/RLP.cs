@@ -24,7 +24,6 @@ namespace SequenceSharp.RLP
             }
             else if (input is byte[] byteArrayInput)
             {
-                UnityEngine.Debug.Log("length: " + byteArrayInput.Length);
                 if(byteArrayInput.Length == 0)
                 {
                     //Empty string

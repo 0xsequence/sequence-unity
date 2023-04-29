@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using SequenceSharp.WALLET;
 using SequenceSharp.ABI;
+using SequenceSharp.RPC;
 using System.Text;
 using NBitcoin.Secp256k1;
 using System;
@@ -62,12 +63,49 @@ public class WalletTests
 
 
     }
+    
 
     [Test]
-    public void TestChain_TransactionTests()
+    public async void TestChain_TransactionTests()
     {
         //{ from: account0Address, to: account1Address, value: "12300000000000000000", gasLimit: 100000, gasPrice: 100 } 
-        
+        string encoded_signing = EthTransaction.RLPEncode(0, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "");
+        Debug.Log("encoded signing: " + encoded_signing);
+        string sigining_hash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
+        Debug.Log("signing hash: " + sigining_hash);
+        Wallet wallet = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+        (string v, string r, string s) = wallet.SignTx(SequenceCoder.HexStringToByteArray(sigining_hash));
+        string tx = EthTransaction.RLPEncode(0, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", v, r, s);
+        Debug.Log("tx: " + tx);
+        SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
+        string result = await client.SendRawTransaction(tx);
+        Debug.Log(result);
+    }
+
+    [Test]
+    public void EIP155SigningTxTest()
+    {
+        //Example from https://eips.ethereum.org/EIPS/eip-155#parameters
+        //Consider a transaction with nonce = 9, gasprice = 20 * 10**9, startgas = 21000, to = 0x3535353535353535353535353535353535353535, value = 10**18, data='' (empty).
+        //1. Signing data
+        string expected_signing_data = "0xec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080";
+        string encoded_signing_data = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000, "","1","0","0");
+        CollectionAssert.AreEqual(expected_signing_data,encoded_signing_data);
+
+        //signing hash
+        string expected_signing_hash = "0xdaf5a779ae972f972197303d7b574746c7ef83eadac0f2791ad23db92e4c8e53";
+        string sigining_hash =  "0x" + SequenceCoder.KeccakHash(expected_signing_data);
+        CollectionAssert.AreEqual(expected_signing_hash, sigining_hash);
+
+        //the use of 37 instead of 27. The signed tx would become:
+
+        string expected_signed_transaction = "0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83";
+        Wallet wallet = new Wallet("0x4646464646464646464646464646464646464646464646464646464646464646");
+        (string v, string r, string s) = wallet.SignTx(SequenceCoder.HexStringToByteArray(expected_signing_hash), 1);
+        string encoded_signed_transaction = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000,"", v,r, s);
+        CollectionAssert.AreEqual(expected_signed_transaction, encoded_signed_transaction);
+
+
     }
 
     [Test]

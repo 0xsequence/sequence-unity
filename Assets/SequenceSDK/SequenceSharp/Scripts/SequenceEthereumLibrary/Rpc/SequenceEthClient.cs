@@ -13,6 +13,12 @@ namespace SequenceSharp.RPC
         {
             _httpRpcClient = new HttpRpcClient(url);
         }
+
+        public SequenceEthClient(string _url)
+        {
+            _httpRpcClient = new HttpRpcClient(_url);
+        }
+    
         public async Task<BigInteger> BalanceAt(string address, string blockNumber)
         {
             //[FOCUS IMPLEMENTATION]
@@ -177,9 +183,8 @@ namespace SequenceSharp.RPC
         {
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_sendRawTransaction", new object[] { signedTransactionData });
-            //Deserialize
-            string result = JsonConvert.DeserializeObject<string>(response.result);
-            return result;
+            
+            return response.result;
         }
 
         public Task<string> SendTransaction(Transaction transaction)

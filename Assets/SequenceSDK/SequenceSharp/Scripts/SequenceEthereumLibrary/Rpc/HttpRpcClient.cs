@@ -57,6 +57,7 @@ namespace SequenceSharp.RPC
         public async Task<RpcResponse> SendRequest(string method, object[] parameters)
         {
             Debug.Log("current url: "+ _url);
+            Debug.Log("parameters:"+ parameters);
             var request = new
             {
                 jsonrpc = "2.0",
@@ -67,9 +68,9 @@ namespace SequenceSharp.RPC
             };
 
             var rpcRequestJson = JsonConvert.SerializeObject(request);
-
+            Debug.Log("request json :" + rpcRequestJson);
             var unityRequest = UnityWebRequest.Put(_url, rpcRequestJson);
-
+            
             unityRequest.SetRequestHeader("Content-Type", "application/json");
             unityRequest.SetRequestHeader("Accept", "application/json");
             unityRequest.method = UnityWebRequest.kHttpVerbPOST;
@@ -85,6 +86,7 @@ namespace SequenceSharp.RPC
             {
                 byte[] results = unityRequest.downloadHandler.data;
                 var responseJson = Encoding.UTF8.GetString(results);
+                Debug.Log("response before parsing:" + responseJson);
                 RpcResponse result = JsonConvert.DeserializeObject<RpcResponse>(responseJson);
                 unityRequest.Dispose();
                 return result;

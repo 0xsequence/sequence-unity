@@ -143,7 +143,7 @@ public class ClientTest : MonoBehaviour
             
             Debug.Log("Encoded List: " + SequenceCoder.ByteArrayToHexString(encodedList));
             byte[] hashedParam = SequenceCoder.KeccakHash(encodedList);
-
+            Debug.Log("hashed Encoded List: " + SequenceCoder.ByteArrayToHexString(hashedParam));
             //Sign:
             Wallet wallet = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             Debug.Log("addr " + wallet.Address());

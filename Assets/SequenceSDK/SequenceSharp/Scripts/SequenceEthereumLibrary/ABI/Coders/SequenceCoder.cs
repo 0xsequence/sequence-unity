@@ -130,7 +130,7 @@ namespace SequenceSharp.ABI
             {
                 address = address.Substring(2);
             }
-            string hashedAddress = KeccakHash(address);
+            string hashedAddress = KeccakHashASCII(address);
             string checksumAddress = "";
             int idx = 0;
             foreach(char c in address)
@@ -164,12 +164,12 @@ namespace SequenceSharp.ABI
 
         public static string FunctionSelector(string functionSignature)
         {
-            string hashed = KeccakHash(functionSignature);
+            string hashed = KeccakHashASCII(functionSignature);
             hashed = hashed.Substring(0, 8);
             return "0x" + hashed;
         }
 
-        public static string KeccakHash(string input)
+        public static string KeccakHashASCII(string input)
         {
 
             var keccak256 = new KeccakDigest(256);
@@ -197,13 +197,23 @@ namespace SequenceSharp.ABI
 
         }
 
-
-            // Hex string to byte array and vice versa
-            // Ref:
-            //https://stackoverflow.com/questions/311165/how-do-you-convert-a-byte-array-to-a-hexadecimal-string-and-vice-versa
-
-            public static byte[] HexStringToByteArray(string hexString)
+        public static string KeccakHash(string input)
         {
+            byte[] inputByte = HexStringToByteArray(input);
+            byte[] keccak = KeccakHash(inputByte);
+            return ByteArrayToHexString(keccak);           
+
+        }
+
+
+
+        // Hex string to byte array and vice versa
+        // Ref:
+        //https://stackoverflow.com/questions/311165/how-do-you-convert-a-byte-array-to-a-hexadecimal-string-and-vice-versa
+
+        public static byte[] HexStringToByteArray(string hexString)
+        {
+            if (hexString == "") return new byte[] { };
 
             if (hexString.StartsWith("0x"))
             {
