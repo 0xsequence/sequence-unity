@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace SequenceSharp
+namespace Sequence
 {
     public class NetworkConfig
     {

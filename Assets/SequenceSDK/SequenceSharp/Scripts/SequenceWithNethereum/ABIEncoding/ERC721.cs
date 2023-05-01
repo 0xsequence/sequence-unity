@@ -5,7 +5,7 @@ using Nethereum.Hex.HexTypes;
 using Nethereum.RPC.Eth.DTOs;
 using Nethereum.Contracts;
 
-namespace SequenceSharp
+namespace Sequence
 {
 
     public class ERC721

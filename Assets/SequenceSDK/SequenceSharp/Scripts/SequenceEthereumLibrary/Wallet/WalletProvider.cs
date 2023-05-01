@@ -1,10 +1,10 @@
-using SequenceSharp.RPC;
+using Sequence.RPC;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 
-namespace SequenceSharp.WALLET
+namespace Sequence.Wallet
 {
     public class WalletProvider
     {

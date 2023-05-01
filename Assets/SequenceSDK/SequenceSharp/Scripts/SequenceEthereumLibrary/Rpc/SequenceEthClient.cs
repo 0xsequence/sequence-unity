@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace SequenceSharp.RPC
+namespace Sequence.RPC
 {
     public class SequenceEthClient : IEthClient
     {

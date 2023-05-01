@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
 
     public class NumberCoder : ICoder

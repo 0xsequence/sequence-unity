@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 
-namespace SequenceSharp
+namespace Sequence
 {
     [System.Serializable]
     public class FeeHistoryResult

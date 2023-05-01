@@ -1,4 +1,4 @@
-using SequenceSharp.ABI;
+using Sequence.ABI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace SequenceSharp.RLP
+namespace Sequence.RLP
 {
     public class RLP
     {

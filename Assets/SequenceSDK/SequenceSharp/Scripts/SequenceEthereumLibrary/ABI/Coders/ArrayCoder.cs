@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
     /// <summary>
     /// T[k] for any T and k:

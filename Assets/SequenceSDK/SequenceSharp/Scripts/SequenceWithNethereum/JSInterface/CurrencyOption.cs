@@ -1,4 +1,4 @@
-﻿namespace SequenceSharp
+﻿namespace Sequence
 {
     public static class CurrencyOption
     {

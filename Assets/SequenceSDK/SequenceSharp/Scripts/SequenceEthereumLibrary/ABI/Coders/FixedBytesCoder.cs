@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
     public class FixedBytesCoder : ICoder
     {

@@ -4,13 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NBitcoin.Secp256k1;
-using SequenceSharp.ABI;
+using Sequence.ABI;
 using System.Text;
 using System.Linq;
 using Org.BouncyCastle.Math;
 using System;
 
-namespace SequenceSharp.Signer
+namespace Sequence.Signer
 {
     public static class EthSignature
     {

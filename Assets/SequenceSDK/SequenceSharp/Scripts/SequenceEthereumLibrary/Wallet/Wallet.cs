@@ -5,14 +5,14 @@ using System;
 using System.Linq;
 //using System.Numerics;
 using System.Threading.Tasks;
-using SequenceSharp.RPC;
-using SequenceSharp.ABI;
+using Sequence.RPC;
+using Sequence.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
-using SequenceSharp.Signer;
+using Sequence.Signer;
 using System.Collections.Generic;
 
-namespace SequenceSharp.WALLET
+namespace Sequence.Wallet
 {
 
     public struct WalletOptions

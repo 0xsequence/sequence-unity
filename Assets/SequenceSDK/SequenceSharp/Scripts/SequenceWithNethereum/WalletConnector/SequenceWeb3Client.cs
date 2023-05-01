@@ -10,7 +10,7 @@ using System.Numerics;
 using Nethereum.Web3;
 using Nethereum.JsonRpc.Client;
 
-namespace SequenceSharp
+namespace Sequence
 {
     public static class Web3Extensions
     {

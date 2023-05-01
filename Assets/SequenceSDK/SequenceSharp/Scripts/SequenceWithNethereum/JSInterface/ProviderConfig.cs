@@ -1,5 +1,5 @@
 ﻿
-namespace SequenceSharp
+namespace Sequence
 {
     [System.Serializable]
     public class ProviderConfig

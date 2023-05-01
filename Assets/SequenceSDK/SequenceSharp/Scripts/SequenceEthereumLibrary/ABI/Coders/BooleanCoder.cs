@@ -1,4 +1,4 @@
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
 
     public class BooleanCoder : ICoder

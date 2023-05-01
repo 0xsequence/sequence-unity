@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using SequenceSharp.ABI;
+using Sequence.ABI;
 using System.Numerics;
 
 public class CoderTests

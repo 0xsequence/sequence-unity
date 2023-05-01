@@ -2,10 +2,10 @@
 using UnityEngine;
 using System.Linq;
 using System;
-using SequenceSharp.WALLET;
+using Sequence.Wallet;
 using System.Text;
 using NBitcoin.Secp256k1;
-using SequenceSharp.ABI;
+using Sequence.ABI;
 
 
 using Nethereum.Web3;
@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using Nethereum.Signer;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.ABI.Encoders;
-using SequenceSharp.Signer;
+using Sequence.Signer;
 
 public class SignerTest : MonoBehaviour
 {

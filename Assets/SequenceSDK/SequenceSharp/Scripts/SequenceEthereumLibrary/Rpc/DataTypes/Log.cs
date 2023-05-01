@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace SequenceSharp
+namespace Sequence
 {
     [System.Serializable]
     public class Log

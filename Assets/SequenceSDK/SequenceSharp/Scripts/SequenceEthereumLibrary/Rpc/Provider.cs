@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SequenceSharp.RPC
+namespace Sequence.RPC
 {
     public struct ProviderOption
     {

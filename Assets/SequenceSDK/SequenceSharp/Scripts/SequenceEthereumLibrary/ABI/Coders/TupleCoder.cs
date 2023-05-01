@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
     /// <summary>
     /// (T1,...,Tk) for k >= 0 and any types T1, …, Tk

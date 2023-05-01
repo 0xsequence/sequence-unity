@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
     /// <summary>
     /// Note that in the dynamic case, head(X(i)) is well-defined since the lengths of the head parts only depend on the types and not the values. The value of head(X(i)) is the offset of the beginning of tail(X(i)) relative to the start of enc(X).

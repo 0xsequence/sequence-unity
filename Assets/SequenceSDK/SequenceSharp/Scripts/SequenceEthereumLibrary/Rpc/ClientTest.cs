@@ -1,7 +1,7 @@
 
 using UnityEngine;
-using SequenceSharp.RPC;
-using SequenceSharp.ABI;
+using Sequence.RPC;
+using Sequence.ABI;
 using System.Numerics;
 using Org.BouncyCastle.Crypto;
 using System.Globalization;
@@ -12,8 +12,8 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
-using SequenceSharp.RLP;
-using SequenceSharp.WALLET;
+using Sequence.RLP;
+using Sequence.Wallet;
 using Nethereum.Signer;
 
 public class ClientTest : MonoBehaviour

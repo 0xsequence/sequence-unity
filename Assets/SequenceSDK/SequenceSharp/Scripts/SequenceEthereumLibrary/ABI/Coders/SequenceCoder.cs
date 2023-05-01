@@ -13,7 +13,7 @@ using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Math;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
     /// <summary>
     /// https://docs.soliditylang.org/en/v0.8.13/abi-spec.html

@@ -10,7 +10,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.IO;
 
-namespace SequenceSharp
+namespace Sequence
 {
     #region Enums
 

@@ -1,5 +1,5 @@
 
-namespace SequenceSharp.RPC
+namespace Sequence.RPC
 {
     public class RpcError
     {

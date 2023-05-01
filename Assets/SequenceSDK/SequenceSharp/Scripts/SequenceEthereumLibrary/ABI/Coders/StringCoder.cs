@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
 
     public class StringCoder : ICoder

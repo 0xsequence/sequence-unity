@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using SequenceSharp.RLP;
-using SequenceSharp.ABI;
+using Sequence.RLP;
+using Sequence.ABI;
 using System.Linq;
 using System.Text;
 

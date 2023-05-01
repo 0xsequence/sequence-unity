@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace SequenceSharp
+namespace Sequence
 {
     [System.Serializable]
     public class TokenSupply

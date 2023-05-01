@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Numerics;
 
-namespace SequenceSharp.ABI
+namespace Sequence.ABI
 {
     /// <summary>
     /// address: equivalent to uint160, except for the assumed interpretation and language typing. For computing the function selector, address is used.
