@@ -20,10 +20,6 @@ namespace Sequence.ABI
             return DecodeFromString(encodedString, types);
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
 
         public byte[] Encode<T>(List<T> value)
         {
@@ -45,17 +41,12 @@ namespace Sequence.ABI
             return _tupleCoder.DecodeFromString(encodedString, types);
         }
 
-        public bool IsSupportedType()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public byte[] Encode(object value)
         {
             throw new System.NotImplementedException();
         }
 
-        object ICoder.Decode(byte[] encoded)
+        public object Decode(byte[] encoded)
         {
             throw new System.NotImplementedException();
         }

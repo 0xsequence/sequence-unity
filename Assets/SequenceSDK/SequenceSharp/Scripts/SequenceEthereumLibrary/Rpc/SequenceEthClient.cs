@@ -24,7 +24,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBalance", new object[] { address, blockNumber});
             //Deserialize
-            BigInteger balance = JsonConvert.DeserializeObject<BigInteger>(response.result);
+            BigInteger balance = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return balance;
         }
 
@@ -33,7 +33,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockByHash", new object[] { blockHash , true });
             //Deserialize
-            Block block = JsonConvert.DeserializeObject<Block>(response.result);
+            Block block = JsonConvert.DeserializeObject<Block>(response.result.ToString());
             return block;
         }
 
@@ -42,7 +42,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockByNumber", new object[] { blockNumber, true });
             //Deserialize
-            Block block = JsonConvert.DeserializeObject<Block>(response.result);
+            Block block = JsonConvert.DeserializeObject<Block>(response.result.ToString());
             return block;
         }
 
@@ -51,7 +51,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_blockNumber", new object[] {});
             //Deserialize
-            string blockNumber = JsonConvert.DeserializeObject<string>(response.result);
+            string blockNumber = JsonConvert.DeserializeObject<string>(response.result.ToString());
             return blockNumber;
         }
 
@@ -66,7 +66,7 @@ namespace Sequence.RPC
             var blockNumber = await BlockNumber();
             RpcResponse response = await _httpRpcClient.SendRequest("eth_call", new object[] { blockNumber });
             //Deserialize
-            string result = JsonConvert.DeserializeObject<string>(response.result);
+            string result = JsonConvert.DeserializeObject<string>(response.result.ToString());
             return result;
         }
 
@@ -80,7 +80,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_chainId", new object[] { });
             //Deserialize
-            string chainId = JsonConvert.DeserializeObject<string>(response.result);
+            string chainId = JsonConvert.DeserializeObject<string>(response.result.ToString());
             return chainId;
         }
 
@@ -89,7 +89,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getCode", new object[] { address, blockNumber });
             //Deserialize
-            string code = JsonConvert.DeserializeObject<string>(response.result);
+            string code = JsonConvert.DeserializeObject<string>(response.result.ToString());
             return code;
         }
 
@@ -103,7 +103,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_feeHistory", new object[] {blockCount, newestBlock, REWARDPERCENTILES });
             //Deserialize
-            FeeHistoryResult feeHistory = JsonConvert.DeserializeObject<FeeHistoryResult>(response.result);
+            FeeHistoryResult feeHistory = JsonConvert.DeserializeObject<FeeHistoryResult>(response.result.ToString());
             return feeHistory;
         }
 
@@ -117,7 +117,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockByHash", new object[] { blockHash, false });
             //Deserialize
-            Block block = JsonConvert.DeserializeObject<Block>(response.result);
+            Block block = JsonConvert.DeserializeObject<Block>(response.result.ToString());
             return block;
         }
 
@@ -126,7 +126,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockByHash", new object[] {  blockNumber, true });
             //Deserialize
-            Block block = JsonConvert.DeserializeObject<Block>(response.result);
+            Block block = JsonConvert.DeserializeObject<Block>(response.result.ToString());
             return block;
         }
 
@@ -140,7 +140,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionCount", new object[] { address, blockNumber });
             //Deserialize
-            BigInteger transactionCount = JsonConvert.DeserializeObject<BigInteger>(response.result);
+            BigInteger transactionCount = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return transactionCount;
         }
 
@@ -184,7 +184,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_sendRawTransaction", new object[] { signedTransactionData });
             
-            return response.result;
+            return response.result.ToString();
         }
 
         public Task<string> SendTransaction(Transaction transaction)
@@ -202,7 +202,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_gasPrice", new object[] { });
             //Deserialize
-            BigInteger gasPrice = JsonConvert.DeserializeObject<BigInteger>(response.result);
+            BigInteger gasPrice = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return gasPrice;
         }
 
@@ -211,7 +211,7 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_maxPriorityFeePerGas", new object[] { });
             //Deserialize
-            string cap = JsonConvert.DeserializeObject<string>(response.result);
+            string cap = JsonConvert.DeserializeObject<string>(response.result.ToString());
             return cap;
         }
 
@@ -224,7 +224,7 @@ namespace Sequence.RPC
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionByHash", new object[] { });
             //Deserialize
-            Transaction result = JsonConvert.DeserializeObject<Transaction>(response.result);
+            Transaction result = JsonConvert.DeserializeObject<Transaction>(response.result.ToString());
             return result;
         }
 
@@ -232,7 +232,7 @@ namespace Sequence.RPC
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockTransactionCountByHash", new object[] { blockHash });
             //Deserialize
-            BigInteger transactionCount = JsonConvert.DeserializeObject<BigInteger>(response.result);
+            BigInteger transactionCount = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return transactionCount;
         }
 
@@ -243,9 +243,10 @@ namespace Sequence.RPC
 
         public async Task<TransactionReceipt> TransactionReceipt(string transactionHash)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionReceipt", new object[] { });
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionReceipt", new object[] { transactionHash });
+            UnityEngine.Debug.Log("reseponse json :" + response.result.ToString());
             //Deserialize
-            TransactionReceipt receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result);
+           TransactionReceipt receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
             return receipt;
         }
 

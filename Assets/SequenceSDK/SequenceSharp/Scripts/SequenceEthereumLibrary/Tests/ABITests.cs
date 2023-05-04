@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Sequence.ABI;
 using System.Numerics;
+using UnityEngine;
 
-public class CoderTests
+public class ABITests
 {
     AddressCoder _addressCoder = new AddressCoder();
     ArrayCoder _arrayCoder = new ArrayCoder();
@@ -25,8 +26,6 @@ public class CoderTests
         //TODO Case: Address length surpasses the maximum allowed limit
         //TODO Case: Address length insufficient
         //TODO Case: Address
-
-
 
     }
     [Test]
@@ -63,15 +62,11 @@ public class CoderTests
     {
 
 
-        //Encode 
-
         List<BigInteger> parameter = new List<BigInteger> { 1, 2, 3 };
         byte[] expected = SequenceCoder.HexStringToByteArray("00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003");
 
         byte[] encoded = _arrayCoder.Encode(parameter);
         CollectionAssert.AreEqual(expected, encoded);
-
-        //Decode
 
 
     }
@@ -94,6 +89,7 @@ public class CoderTests
         }
         CollectionAssert.AreEqual(decoded, parameter);
     }
+
 
 
     [Test]
@@ -173,15 +169,6 @@ public class CoderTests
             byte[] encoded = _numberCoder.Encode(parameter);
             CollectionAssert.AreEqual(expected, encoded);
 
-
-
-        {
-            //Param Positive
-
-
-            //Decode
-
-        }
         //TODO Case: unit8, unit32, unit40 and unit256
     }
 
@@ -238,6 +225,18 @@ public class CoderTests
         Assert.AreEqual(decoded, parameter);
     }
 
+    [Test]
+    public void FloatEncoding()
+    {
+        //fixed point
+    }
+
+    [Test]
+    public void FloatDecoding()
+    {
+        //fixed point
+    }
+
 
     /*
      * Function examples are taken from 
@@ -247,7 +246,7 @@ public class CoderTests
     [Test]
     public void FunctionSelector1Hashing()
     {
-        string methodId = SequenceCoder.FunctionSelector("baz(uint32,bool)");
+        string methodId = ABI.FunctionSelector("baz(uint32,bool)");
         string expected = "0xcdcd77c0";
         Assert.AreEqual(methodId, expected);
     }
@@ -255,7 +254,7 @@ public class CoderTests
     [Test]
     public void FunctionSelector2Hashing()
     {
-        string methodId = SequenceCoder.FunctionSelector("sam(bytes,bool,uint256[])");
+        string methodId = ABI.FunctionSelector("sam(bytes,bool,uint256[])");
         string expected = "0xa5643bf2";
         Assert.AreEqual(methodId, expected);
     }
@@ -263,9 +262,32 @@ public class CoderTests
     [Test]
     public void FunctionSelector3Hashing()
     {
-        string methodId = SequenceCoder.FunctionSelector("f(uint256,uint32[],bytes10,bytes)");
+        string methodId = ABI.FunctionSelector("f(uint256,uint32[],bytes10,bytes)");
         string expected = "0x8be65246";
         Assert.AreEqual(methodId, expected);
+    }
+
+    //ABI Pack
+    [Test]
+    public void ABIPackTests()
+    {
+        string expected_data = "0x00fdd58e0000000000000000000000006615e4e985bf0d137196897dfa182dbd7127f54f0000000000000000000000000000000000000000000000000000000000000002";
+        Debug.Log("?");
+        string encoded_data ="0x" + (ABI.Pack("balanceOf(address,uint256)", "0x6615e4e985bf0d137196897dfa182dbd7127f54f", 2));
+        Debug.Log("encoded packed data:" + encoded_data);
+        CollectionAssert.AreEqual(expected_data, encoded_data);
+
+
+    }
+
+    
+
+    [Test]
+    public void ContractTests()
+    {
+        //Examples from https://docs.soliditylang.org/en/v0.8.19/abi-spec.html#examples
+        //
+
     }
 
 

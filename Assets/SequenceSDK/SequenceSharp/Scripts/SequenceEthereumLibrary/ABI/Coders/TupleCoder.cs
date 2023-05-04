@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
+
 namespace Sequence.ABI
 {
     /// <summary>
@@ -20,12 +21,11 @@ namespace Sequence.ABI
     /// </summary>
     public class TupleCoder : ICoder
     {
-        //TODO: mmmmmmm,  will refactor these coders, maybe put them in sequencecoders and make some static methods to call
-        AddressCoder _addressCoder = new AddressCoder();
-        //ArrayCoder _arrayCoder = new ArrayCoder();
+        
+        AddressCoder _addressCoder = new AddressCoder();        
         BooleanCoder _booleanCoder = new BooleanCoder();
         FixedBytesCoder _fixedBytesCoder = new FixedBytesCoder();
-        BytesCoder _bytesCoder = new BytesCoder();
+        //BytesCoder _bytesCoder = new BytesCoder();
         NumberCoder _numberCoder = new NumberCoder();
         StringCoder _stringCoder = new StringCoder();
 
@@ -34,10 +34,6 @@ namespace Sequence.ABI
             throw new System.NotImplementedException();
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
 
 
         public byte[] Encode(object value)
@@ -52,9 +48,10 @@ namespace Sequence.ABI
 
         public string EncodeToString(object value)
         {
-
-            List<object> valueTuple = (List<object>)value;
-
+            //TODO:
+            UnityEngine.Debug.Log("encode input: " + value);
+            List<object> valueTuple = ((object[])value).Cast<object>().ToList();
+            UnityEngine.Debug.Log("encode input length: " + valueTuple.Count);
             int tupleLength = valueTuple.Count;
             int headerTotalByteLength = tupleLength * 32;
             List<string> headList = new List<string>();
@@ -63,7 +60,7 @@ namespace Sequence.ABI
             for (int i = 0; i < tupleLength; i++)
             {
                 string head_i = "", tail_i = "";
-                ABIType type = SequenceCoder.GetParameterType(valueTuple[i]);
+                ABIType type = ABI.GetParameterType(valueTuple[i]);
 
 
                 switch (type)

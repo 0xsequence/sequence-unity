@@ -10,10 +10,6 @@ namespace Sequence.ABI
             return false;
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
 
         /// <summary>
         /// as in the uint8 case, where 1 is used for true and 0 for false
@@ -42,9 +38,6 @@ namespace Sequence.ABI
             return false;
         }
 
-        public bool IsSupportedType()
-        {
-            throw new System.NotImplementedException();
-        }
+
     }
 }

@@ -1,4 +1,7 @@
 
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+
 namespace Sequence.RPC
 {
     [System.Serializable]
@@ -6,7 +9,7 @@ namespace Sequence.RPC
     {
         public string jsonrpc;
         public int id;
-        public string result;
+        public JToken result;
         public RpcError error;
 
     }

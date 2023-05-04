@@ -33,10 +33,7 @@ namespace Sequence.ABI
 
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
+
 
         /// <summary>
         /// Encode signed integer, unsigend integer call EncodeUnsigned
@@ -100,10 +97,6 @@ namespace Sequence.ABI
             
         }
 
-        public bool IsSupportedType()
-        {
-            throw new System.NotImplementedException();
-        }
 
         /// <summary>
         /// int<M>: enc(X) is the big-endian two’s complement encoding of X, padded on the higher-order (left) side with 0xff bytes for negative X and with zero-bytes for non-negative X such that the length is 32 bytes.

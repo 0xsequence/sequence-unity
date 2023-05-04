@@ -13,10 +13,7 @@ namespace Sequence.ABI
             return decodedString;
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
+
         /// <summary>
         /// string: dynamic sized unicode string assumed to be UTF-8 encoded.
         /// string:
@@ -45,9 +42,6 @@ namespace Sequence.ABI
             return utf8.GetString(decoded);
         }
 
-        public bool IsSupportedType()
-        {
-            throw new System.NotImplementedException();
-        }
+
     }
 }

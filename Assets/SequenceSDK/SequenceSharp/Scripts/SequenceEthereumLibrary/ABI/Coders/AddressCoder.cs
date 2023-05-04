@@ -16,10 +16,6 @@ namespace Sequence.ABI
             return decoded;
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
 
         /// <summary>
         /// address: as in the uint160 case
@@ -53,9 +49,5 @@ namespace Sequence.ABI
             return "0x" + encodedString;
         }
 
-        public bool IsSupportedType()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

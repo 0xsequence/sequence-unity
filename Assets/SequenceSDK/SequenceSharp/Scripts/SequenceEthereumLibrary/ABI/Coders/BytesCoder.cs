@@ -17,10 +17,6 @@ namespace Sequence.ABI
             return SequenceCoder.HexStringToByteArray(DecodeFromString(encodedStr));
         }
 
-        public T DefaultValue<T>()
-        {
-            throw new System.NotImplementedException();
-        }
 
         /// <summary>
         /// bytes<M>: binary type of M bytes, 0 < M <= 3
@@ -49,9 +45,6 @@ namespace Sequence.ABI
             return _fixedBytesCoder.DecodeFromString(fixedStr);
         }
 
-        public bool IsSupportedType()
-        {
-            throw new System.NotImplementedException();
-        }
+
     }
 }
