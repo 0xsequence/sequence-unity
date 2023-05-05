@@ -25,6 +25,7 @@ namespace Sequence.ABI
         AddressCoder _addressCoder = new AddressCoder();        
         BooleanCoder _booleanCoder = new BooleanCoder();
         FixedBytesCoder _fixedBytesCoder = new FixedBytesCoder();
+        StaticBytesCoder _staticBytesCoder = new StaticBytesCoder();
         //BytesCoder _bytesCoder = new BytesCoder();
         NumberCoder _numberCoder = new NumberCoder();
         StringCoder _stringCoder = new StringCoder();
@@ -48,10 +49,15 @@ namespace Sequence.ABI
 
         public string EncodeToString(object value)
         {
-            //TODO:
-            UnityEngine.Debug.Log("encode input: " + value);
-            List<object> valueTuple = ((object[])value).Cast<object>().ToList();
-            UnityEngine.Debug.Log("encode input length: " + valueTuple.Count);
+            List<object> valueTuple = new List<object>();
+            if (value.GetType().IsArray)
+            {
+                 valueTuple = ((object[])value).Cast<object>().ToList();
+            }
+            else
+            {
+                valueTuple = (List<object>)value;
+            }
             int tupleLength = valueTuple.Count;
             int headerTotalByteLength = tupleLength * 32;
             List<string> headList = new List<string>();
@@ -74,6 +80,9 @@ namespace Sequence.ABI
                         break;
                     case ABIType.ADDRESS:
                         head_i = _addressCoder.EncodeToString(valueTuple[i]);
+                        break;
+                    case ABIType.STATICBYTES:
+                        head_i = _staticBytesCoder.EncodeToString(valueTuple[i]);
                         break;
                     //Dynamics: head(X(i)) = enc(len( head(X(1)) ... head(X(k)) tail(X(1)) ... tail(X(i-1)) )) tail(X(i)) = enc(X(i))
                     case ABIType.BYTES:

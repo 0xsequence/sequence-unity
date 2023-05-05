@@ -3,11 +3,12 @@ using NUnit.Framework;
 using Sequence.ABI;
 using System.Numerics;
 using UnityEngine;
+using System.Text;
 
 public class ABITests
 {
     AddressCoder _addressCoder = new AddressCoder();
-    ArrayCoder _arrayCoder = new ArrayCoder();
+    DynamicArrayCoder _arrayCoder = new DynamicArrayCoder();
     BooleanCoder _booleanCoder = new BooleanCoder();
     BytesCoder _bytesCoder = new BytesCoder();
     //FixedBytesCoder _fixedBytesCoder = new FixedBytesCoder();
@@ -58,7 +59,7 @@ public class ABITests
     }
 
     [Test]
-    public void ArrayEncoding()
+    public void DynamicArrayEncoding()
     {
 
 
@@ -72,7 +73,7 @@ public class ABITests
     }
 
     [Test]
-    public void ArrayDecoding()
+    public void DynamicArrayDecoding()
     {
         List<BigInteger> parameter = new List<BigInteger> { 1, 2, 3 };
         byte[] encoded = _arrayCoder.Encode(parameter);
@@ -273,7 +274,7 @@ public class ABITests
     {
         string expected_data = "0x00fdd58e0000000000000000000000006615e4e985bf0d137196897dfa182dbd7127f54f0000000000000000000000000000000000000000000000000000000000000002";
         Debug.Log("?");
-        string encoded_data ="0x" + (ABI.Pack("balanceOf(address,uint256)", "0x6615e4e985bf0d137196897dfa182dbd7127f54f", 2));
+        string encoded_data =ABI.Pack("balanceOf(address,uint256)", "0x6615e4e985bf0d137196897dfa182dbd7127f54f", 2);
         Debug.Log("encoded packed data:" + encoded_data);
         CollectionAssert.AreEqual(expected_data, encoded_data);
 
@@ -287,7 +288,24 @@ public class ABITests
     {
         //Examples from https://docs.soliditylang.org/en/v0.8.19/abi-spec.html#examples
         //
+        {
 
+            //function baz(uint32 x, bool y) public pure returns (bool r) { r = x > 32 || y; }
+
+            string expected_data = "0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001";
+            string abi_encoded_data = ABI.Pack("baz(uint32,bool)", 69, true);
+
+            CollectionAssert.AreEqual(expected_data, abi_encoded_data);
+
+        }
+        {
+            string expected_data = "0xfce353f661626300000000000000000000000000000000000000000000000000000000006465660000000000000000000000000000000000000000000000000000000000";
+            string abi_encoded_data = ABI.Pack("bar(bytes3[2])", new ABIByte[2] { new ABIByte(3, "abc"), new ABIByte(3, "def") });
+            byte[] abc = Encoding.ASCII.GetBytes("abc");
+            Debug.Log("abc length: " + abc.Length);
+            Debug.Log("stri encoded: " + abi_encoded_data);
+            CollectionAssert.AreEqual(expected_data, abi_encoded_data);
+        }
     }
 
 

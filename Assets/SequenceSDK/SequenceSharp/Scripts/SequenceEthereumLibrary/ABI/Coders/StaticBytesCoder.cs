@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace Sequence.ABI
 {
-    public class FixedBytesCoder : ICoder
+    public class StaticBytesCoder : ICoder
     {
-        NumberCoder _numberCoder = new NumberCoder();
         public object Decode(byte[] encoded)
         {
             string encodedStr = SequenceCoder.ByteArrayToHexString(encoded);
@@ -30,23 +29,9 @@ namespace Sequence.ABI
 
         public string EncodeToString(object value)
         {
-
-            int numberOfBytes = ((byte[])value).Length;
-            string valueStr = SequenceCoder.ByteArrayToHexString(((byte[])value));
-
-
-            Debug.Log("number of bytes:" + numberOfBytes);
-            string numberOfBytesStr = _numberCoder.EncodeUnsignedIntString(numberOfBytes, 64);
-            Debug.Log("number of byte string: " + numberOfBytesStr);
-            // followed by the minimum number of zero-bytes such that len(enc(X)) is a multiple of 32
-            int currentTotalLength = 64 + numberOfBytes;
-            Debug.Log("current total length:" + currentTotalLength);
-            int zeroBytesNeeded = 64 - currentTotalLength % 64;
-            Debug.Log("zerobyte needed: " + zeroBytesNeeded);
-            int totalLength = currentTotalLength + zeroBytesNeeded;
-            Debug.Log("total length: " + totalLength);
-
-            string encodedStr = (numberOfBytesStr + valueStr).PadRight(totalLength, '0');
+            
+            string valueStr = SequenceCoder.ByteArrayToHexString(((ABIByte)value).Data);                        
+            string encodedStr = ( valueStr).PadRight(64, '0');
             return encodedStr;
         }
 
@@ -59,11 +44,9 @@ namespace Sequence.ABI
                 if (encodedString[i] == '0') trailingZero++;
                 else break;
             }
-            string byteStr = encodedString.Substring(64, encodedString.Length - trailingZero - 64);
+            string byteStr = encodedString.Substring(0, encodedString.Length - trailingZero);
 
             return byteStr;
         }
-
-
     }
 }

@@ -11,7 +11,7 @@ namespace Sequence.ABI
     /// enc(X) = enc(k) enc([X[0], ..., X[k-1]])
     /// i.e. it is encoded as if it were an array of static size k, prefixed with the number of elements.
     /// </summary>
-    public class ArrayCoder : ICoder
+    public class DynamicArrayCoder : ICoder
     {
         TupleCoder _tupleCoder = new TupleCoder();
         public List<object> Decode(byte[] encoded, List<object> types)
