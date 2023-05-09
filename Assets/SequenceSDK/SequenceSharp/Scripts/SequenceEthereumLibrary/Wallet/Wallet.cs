@@ -47,37 +47,6 @@ namespace Sequence.Wallet
 
         }
 
-        public Task Encrypt()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void EncryptSync()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public static Task<Wallet> FromEncryptedJson()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public static Wallet FromEncryptedJsonSync()
-        {
-            throw new System.NotImplementedException();
-        }
-        /*
-                public static HDWallet CreatRandom()
-                {
-                    throw new System.NotImplementedException();
-                }
-
-                public static HDWallet FromPrase()
-                {
-                    throw new System.NotImplementedException();
-                }
-        */
-
         public string Address()
         {
             //TODO: Address return type 
@@ -119,7 +88,6 @@ namespace Sequence.Wallet
         {
             provider = _provider;
 
-            //throw new System.NotImplementedException();
         }
         public void Provider()
         {

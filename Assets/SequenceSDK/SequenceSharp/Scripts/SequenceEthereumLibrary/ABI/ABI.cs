@@ -16,7 +16,7 @@ namespace Sequence.ABI
         FIXEDARRAY,
         DYNAMICARRAY,
         BYTES,
-        STATICBYTES,
+        FIXEDBYTES,
         STRING,
         NUMBER,
         ADDRESS,
@@ -32,7 +32,9 @@ namespace Sequence.ABI
         public static string Pack(string method, params object[] parameters)
         {
             string methodNameEncoded = FunctionSelector(method);
+            UnityEngine.Debug.Log("encoded method name: " + methodNameEncoded);
             string parameterEncoded = _tupleCoder.EncodeToString(parameters);
+            UnityEngine.Debug.Log("encoded parameter: " + parameterEncoded);
             return (methodNameEncoded + parameterEncoded);
         }
 
@@ -74,9 +76,9 @@ namespace Sequence.ABI
 
                 return ABIType.TUPLE;
             }
-            else if((param.GetType() == typeof(ABIByte)))
+            else if((param.GetType() == typeof(FixedByte)))
             {
-                return ABIType.STATICBYTES;
+                return ABIType.FIXEDBYTES;
             }
 
             else

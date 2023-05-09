@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace Sequence.ABI
 {
-    public class ABIByte
+    public class FixedByte
     {
         public byte[] Data { get; set; }
         public int Length { get; set; }
 
-        public ABIByte(int _length, string str)
+        public FixedByte(int _length, string str)
         {
             if (_length >= 0 && _length <= 32)
             {

@@ -30,7 +30,7 @@ namespace Sequence.ABI
         public string EncodeToString(object value)
         {
             
-            string valueStr = SequenceCoder.ByteArrayToHexString(((ABIByte)value).Data);                        
+            string valueStr = SequenceCoder.ByteArrayToHexString(((FixedByte)value).Data);                        
             string encodedStr = ( valueStr).PadRight(64, '0');
             return encodedStr;
         }

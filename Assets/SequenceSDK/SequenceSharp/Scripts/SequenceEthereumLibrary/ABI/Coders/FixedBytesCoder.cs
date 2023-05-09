@@ -47,6 +47,7 @@ namespace Sequence.ABI
             Debug.Log("total length: " + totalLength);
 
             string encodedStr = (numberOfBytesStr + valueStr).PadRight(totalLength, '0');
+            Debug.Log("encoded string: " + encodedStr);
             return encodedStr;
         }
 

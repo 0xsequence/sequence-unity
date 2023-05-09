@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -49,16 +50,19 @@ namespace Sequence.ABI
 
         public string EncodeToString(object value)
         {
-            List<object> valueTuple = new List<object>();
-            if (value.GetType().IsArray)
+            //List<object> valueTuple = new List<object>();
+            IList valueTuple = (IList) value;
+            /*if (value.GetType().IsArray)
             {
+                UnityEngine.Debug.Log("input tuple is array, fixed size T[K]");
                  valueTuple = ((object[])value).Cast<object>().ToList();
             }
             else
             {
-                valueTuple = (List<object>)value;
-            }
-            int tupleLength = valueTuple.Count;
+                UnityEngine.Debug.Log("input tuple is list, T[]");
+                valueTuple = (IList)value;// (List<object>)value;
+            }*/
+            int tupleLength = (valueTuple).Count;
             int headerTotalByteLength = tupleLength * 32;
             List<string> headList = new List<string>();
             List<string> tailList = new List<string>();
@@ -73,36 +77,54 @@ namespace Sequence.ABI
                 {
                     //Statics: head(X(i)) = enc(X(i) and tail(X(i)) = "" (the empty string)
                     case ABIType.BOOLEAN:
+                        UnityEngine.Debug.Log("object in tuple array: boolean");
                         head_i = _booleanCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.NUMBER:
+                        UnityEngine.Debug.Log("object in tuple array: number");
                         head_i = _numberCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.ADDRESS:
+                        UnityEngine.Debug.Log("object in tuple array: address");
                         head_i = _addressCoder.EncodeToString(valueTuple[i]);
                         break;
-                    case ABIType.STATICBYTES:
+                    case ABIType.FIXEDBYTES:
+                        UnityEngine.Debug.Log("object in tuple array: static bytes");
                         head_i = _staticBytesCoder.EncodeToString(valueTuple[i]);
                         break;
                     //Dynamics: head(X(i)) = enc(len( head(X(1)) ... head(X(k)) tail(X(1)) ... tail(X(i-1)) )) tail(X(i)) = enc(X(i))
                     case ABIType.BYTES:
+                        UnityEngine.Debug.Log("object in tuple array: bytes");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = _fixedBytesCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.STRING:
+                        UnityEngine.Debug.Log("object in tuple array: string");
                         Encoding utf8 = Encoding.UTF8;
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = _fixedBytesCoder.EncodeToString(utf8.GetBytes((string)valueTuple[i]));
                         break;
                     case ABIType.DYNAMICARRAY:
+                        UnityEngine.Debug.Log("object in tuple array: dynamic array");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
-                        tail_i = _numberCoder.EncodeToString(((List<object>)(valueTuple[i])).Count) + EncodeToString(valueTuple[i]);
+                        UnityEngine.Debug.Log("dynamic array head: " + head_i);
+                        //intList.Cast<object>().ToList();
+                        int numberCount = ((IList)valueTuple[i]).Count;
+                        UnityEngine.Debug.Log("number count:" + numberCount);
+
+                        string numberCountEncoded = _numberCoder.EncodeToString(numberCount);
+                        UnityEngine.Debug.Log("dynamic array tail number count: " + numberCountEncoded);
+                        tail_i = numberCountEncoded + EncodeToString(valueTuple[i]);
+
+                        UnityEngine.Debug.Log("dynamic array tail: " + tail_i);
                         break;
                     case ABIType.FIXEDARRAY:
+                        UnityEngine.Debug.Log("object in tuple array: fixed array");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.TUPLE:
+                        UnityEngine.Debug.Log("object in tuple array: tuple");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = EncodeToString(valueTuple[i]);
                         break;
