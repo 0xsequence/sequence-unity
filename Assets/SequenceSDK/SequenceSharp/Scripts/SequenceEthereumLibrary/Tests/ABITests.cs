@@ -8,7 +8,7 @@ using System.Text;
 public class ABITests
 {
     AddressCoder _addressCoder = new AddressCoder();
-    DynamicArrayCoder _arrayCoder = new DynamicArrayCoder();
+    ArrayCoder _arrayCoder = new ArrayCoder();
     BooleanCoder _booleanCoder = new BooleanCoder();
     BytesCoder _bytesCoder = new BytesCoder();
     //FixedBytesCoder _fixedBytesCoder = new FixedBytesCoder();

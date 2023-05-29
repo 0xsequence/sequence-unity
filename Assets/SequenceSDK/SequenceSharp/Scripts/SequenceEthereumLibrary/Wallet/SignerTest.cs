@@ -21,7 +21,7 @@ public class SignerTest : MonoBehaviour
 
     private void Start()
     {
-        Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+        EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
 
         //test
         Debug.Log("keccak empty: " + SequenceCoder.KeccakHash(""));

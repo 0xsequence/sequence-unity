@@ -44,8 +44,12 @@ namespace Sequence.ABI
         {
 
             //The BigInteger structure does not include constructors with a parameter of type Byte, Int16, SByte, or UInt16. However, the Int32 type supports the implicit conversion of 8-bit and 16-bit signed and unsigned integers to signed 32-bit integers.
-            
-            byte[] encoded = EncodeSignedInt((BigInteger)number, 32);
+            byte[] encoded = { };
+            if ((number is int) || (number is BigInteger))
+            {
+                encoded = EncodeSignedInt((BigInteger)number, 32);
+
+            }
             // TODO: Make sure Big Endian
             /*if (BitConverter.IsLittleEndian)
             {
@@ -57,11 +61,6 @@ namespace Sequence.ABI
 
         }
 
-        public byte[] EncodeUnsigned(object number)
-        {
-            byte[] encoded = EncodeUnsignedInt(new BigInteger((int)number), 32);
-            return encoded;
-        }
 
         public string EncodeToString(object number)
         {
@@ -83,19 +82,18 @@ namespace Sequence.ABI
             return encoded;
         }
 
-        public string EncodeUnsignedToString(object number)
-        {
-            string encoded = EncodeUnsignedIntString((BigInteger)number, 64);
-            return encoded;
-        }
 
         public object DecodeFromString(string encodedString)
         {
             BigInteger decodedNumber = BigInteger.Parse(encodedString, System.Globalization.NumberStyles.HexNumber);
             return decodedNumber;
-            
-            
+              
         }
+
+        
+        
+
+
 
 
         /// <summary>
@@ -143,6 +141,30 @@ namespace Sequence.ABI
             var hex = number.ToString("x");
             string encodedString = new string('0', length - hex.Length) + hex;
             return encodedString;
+        }
+
+        public byte[] EncodeSignedFloat(float number)
+        {
+            //fixed<M>x<N>: enc(X) is enc(X * 10**N) where X * 10**N is interpreted as a int256
+            throw new NotImplementedException();
+        }
+
+        public string EncodeSignedFloatString(float number)
+        {
+            throw new NotImplementedException();
+
+        }
+
+        public byte[] EncodeUnsignedFloat(float number)
+        {
+            //ufixed<M>x<N>: enc(X) is enc(X * 10**N) where X * 10**N is interpreted as a uint256
+            throw new NotImplementedException();
+        }
+
+        public string EncodeUnsignedFloatString(float number)
+        {
+            throw new NotImplementedException();
+
         }
 
 

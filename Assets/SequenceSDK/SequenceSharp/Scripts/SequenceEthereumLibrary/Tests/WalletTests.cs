@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Numerics;
 
-public class WalletTests
+public class EthWalletTests
 {
     const string privKey0 = "0xabc0000000000000000000000000000000000000000000000000000000000001";
     const string privKey1 = "0xabc0000000000000000000000000000000000000000000000000000000000002";
@@ -34,40 +34,40 @@ public class WalletTests
     public void TestChain_AddressesTests()
     {
         string address_0_expected = "0xc683a014955b75F5ECF991d4502427c8fa1Aa249";
-        Wallet wallet0 = new Wallet(privKey0);
+        EthWallet wallet0 = new EthWallet(privKey0);
         string address_0 = wallet0.Address();
         Debug.Log("address 0 from wallet: " + address_0);
         CollectionAssert.AreEqual(address_0_expected, address_0);
 
 
         string address_1_expected = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
-        Wallet wallet1 = new Wallet(privKey1);
+        EthWallet wallet1 = new EthWallet(privKey1);
         string address_1 = wallet1.Address();
         Debug.Log("address 1 from wallet: " + address_1);
         CollectionAssert.AreEqual(address_1_expected, address_1);
 
         string address_2_expected = "0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa";
-        Wallet wallet2 = new Wallet(privKey2);
+        EthWallet wallet2 = new EthWallet(privKey2);
         string address_2 = wallet2.Address();
         Debug.Log("address 2 from wallet: " + address_2);
         CollectionAssert.AreEqual(address_2_expected, address_2);
 
 
         string address_3_expected = "0xb396CbD9b745Ffc4a9C9A6D43D7957b1350Be153";
-        Wallet wallet3 = new Wallet(privKey3);
+        EthWallet wallet3 = new EthWallet(privKey3);
         string address_3 = wallet3.Address();
         Debug.Log("address 3 from wallet: " + address_3);
         CollectionAssert.AreEqual(address_3_expected, address_3);
 
 
         string address_4_expected = "0x6F5Ddb00e3cb99Dfd9A07885Ea91303629D1DA94";
-        Wallet wallet4 = new Wallet(privKey4);
+        EthWallet wallet4 = new EthWallet(privKey4);
         string address_4 = wallet4.Address();
         Debug.Log("address 4 from wallet: " + address_4);
         CollectionAssert.AreEqual(address_4_expected, address_4);
 
         string address_5_expected = "0x3F96a0D6697e5E7ACEC56A21681195dC6262b06C";
-        Wallet wallet5 = new Wallet(privKey5);
+        EthWallet wallet5 = new EthWallet(privKey5);
         string address_5 = wallet5.Address();
         Debug.Log("address 5 from wallet: " + address_5);
         CollectionAssert.AreEqual(address_5_expected, address_5);
@@ -86,8 +86,8 @@ public class WalletTests
             Debug.Log("encoded signing: " + encoded_signing);
             string sigining_hash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Debug.Log("signing hash: " + sigining_hash);
-            Wallet wallet = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-            (string v, string r, string s) = wallet.SignTx(SequenceCoder.HexStringToByteArray(sigining_hash));
+            EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(sigining_hash));
             string tx = EthTransaction.RLPEncode(0, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", v, r, s);
             Debug.Log("tx: " + tx);
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
@@ -110,9 +110,9 @@ public class WalletTests
             Assert.IsNotNull(encoded_signing);
             string sigining_hash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Assert.IsNotNull(sigining_hash);
-            Wallet wallet = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             Assert.IsNotNull(wallet);
-            (string v, string r, string s) = wallet.SignTx(SequenceCoder.HexStringToByteArray(sigining_hash));
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(sigining_hash));
             Assert.IsNotNull(v);
             Assert.IsNotNull(r);
             Assert.IsNotNull(s);
@@ -140,7 +140,7 @@ public class WalletTests
     }
 
     [Test]
-    public async Task TestChain_InteractERC20Mock_Tests()
+    public async Task TestChain_ERC20Mock_MockMint_Test()
     {
         try
         {
@@ -149,9 +149,9 @@ public class WalletTests
             Assert.IsNotNull(encoded_signing);
             string sigining_hash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Assert.IsNotNull(sigining_hash);
-            Wallet wallet = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             Assert.IsNotNull(wallet);
-            (string v, string r, string s) = wallet.SignTx(SequenceCoder.HexStringToByteArray(sigining_hash));
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(sigining_hash));
             Assert.IsNotNull(v);
             Assert.IsNotNull(r);
             Assert.IsNotNull(s);
@@ -179,16 +179,17 @@ public class WalletTests
                 }
              */
             Thread.Sleep(1500);
-            Wallet wallet2 = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
 
+            EthWallet wallet2 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
 
+            Debug.Log("MockMint start:");
             string mockMint_data = ABI.Pack("function mockMint(address _address, uint256 _amount)", wallet2.Address(), 1);
 
             string mockMint_encoded = EthTransaction.RLPEncode(nonce_ERC20Mock + 1, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data);
 
             string mockMint_sigining_hash = "0x" + SequenceCoder.KeccakHash(mockMint_encoded);
 
-            (string mockMint_v, string mockMint_r, string mockMint_s) = wallet2.SignTx(SequenceCoder.HexStringToByteArray(mockMint_sigining_hash));
+            (string mockMint_v, string mockMint_r, string mockMint_s) = wallet2.SignTransaction(SequenceCoder.HexStringToByteArray(mockMint_sigining_hash));
 
             string mockMint_tx = EthTransaction.RLPEncode(nonce_ERC20Mock +1, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data, mockMint_v, mockMint_r, mockMint_s);
 
@@ -202,6 +203,12 @@ public class WalletTests
         {
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }
+    }
+
+    [Test]
+    public async Task TestChain_ERC20Mock_Interactions_Test()
+    {
+
     }
 
         [Test]
@@ -222,8 +229,8 @@ public class WalletTests
         //the use of 37 instead of 27. The signed tx would become:
 
         string expected_signed_transaction = "0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83";
-        Wallet wallet = new Wallet("0x4646464646464646464646464646464646464646464646464646464646464646");
-        (string v, string r, string s) = wallet.SignTx(SequenceCoder.HexStringToByteArray(expected_signing_hash), 1);
+        EthWallet wallet = new EthWallet("0x4646464646464646464646464646464646464646464646464646464646464646");
+        (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(expected_signing_hash), 1);
         string encoded_signed_transaction = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000,"", v,r, s);
         CollectionAssert.AreEqual(expected_signed_transaction, encoded_signed_transaction);
 
@@ -233,7 +240,7 @@ public class WalletTests
     [Test]
     public void TestWalletRandom()
     {
-        Wallet wallet = new Wallet();
+        EthWallet wallet = new EthWallet();
         Assert.NotNull(wallet);
         
     }
@@ -241,7 +248,7 @@ public class WalletTests
     [Test]
     public void TestWalletSignMessage()
     {
-        Wallet wallet = new Wallet();
+        EthWallet wallet = new EthWallet();
 
         string address = wallet.Address();
         Assert.NotNull(address);
@@ -256,7 +263,7 @@ public class WalletTests
     [Test]
     public void TestWalletSignMessageExistingPrefix()
     {
-        Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+        EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
         CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
         string address = wallet.Address();
@@ -274,7 +281,7 @@ public class WalletTests
     public void TestWalletSignMessageFromPrivateKey()
     {
 
-         Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+        EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
          CollectionAssert.AreEqual(  SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
         string address = wallet.Address();
@@ -292,7 +299,7 @@ public class WalletTests
     [Test]
     public void TestWalletSignAndRecover()
     {
-        Wallet wallet = new Wallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+        EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
         CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
         string address = wallet.Address();

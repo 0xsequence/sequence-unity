@@ -69,8 +69,8 @@ public class ClientTest : MonoBehaviour
             Debug.Log("hashed param length: " + hashedParam.Length);
             Debug.Log("hashed param: " + SequenceCoder.ByteArrayToHexString(hashedParam));
 
-            Wallet wallet = new Wallet("0x4646464646464646464646464646464646464646464646464646464646464646");
-            (string _v, string _r, string _s) = wallet.SignTx(hashedParam,1);
+            EthWallet wallet = new EthWallet("0x4646464646464646464646464646464646464646464646464646464646464646");
+            (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam,1);
 
             Debug.Log("v: " + _v);
             Debug.Log("r: " + _r);
@@ -145,10 +145,10 @@ public class ClientTest : MonoBehaviour
             byte[] hashedParam = SequenceCoder.KeccakHash(encodedList);
             Debug.Log("hashed Encoded List: " + SequenceCoder.ByteArrayToHexString(hashedParam));
             //Sign:
-            Wallet wallet = new Wallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             Debug.Log("addr " + wallet.Address());
 
-            (string _v, string _r, string _s) = wallet.SignTx(hashedParam);
+            (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam);
 
             Debug.Log("v: "+ _v);
             Debug.Log("r: "+ _r);

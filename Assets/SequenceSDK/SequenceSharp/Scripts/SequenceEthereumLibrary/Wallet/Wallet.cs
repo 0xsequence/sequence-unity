@@ -11,55 +11,94 @@ using System.Text;
 using NBitcoin.Secp256k1;
 using Sequence.Signer;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Sequence.Wallet
 {
 
-    public struct WalletOptions
+    public class NetworkConfig
     {
-        string derivationPath;
-        int randomWalletEntropyBitSize;
+        public string Name { get; set; }
+        public BigInteger ChainID { get; set; }
+        public string ENSAddress { get; set; }
+        public string RpcURL { get; set; }
+/*        public ethrpc.Provider Provider { get; set; }
+        public string RelayerURL { get; set; }
+        public Relayer Relayer { get; set; }*/
+        public string IndexerURL { get; set; }
+        // public Indexer Indexer { get; set; }
+        public bool IsDefaultChain { get; set; }
+        public bool IsAuthChain { get; set; }
+        public string SequenceAPIURL { get; set; }
     }
+
+
+
+    //================================================
+    public class WalletOptions
+    {
+        // Config is the wallet multi-sig configuration. Note: the first config of any wallet
+        // before it is deployed is used to derive it's the account address of the wallet.
+        public WalletConfig Config { get; set; }
+        // Context is the WalletContext of deployed wallet-contract modules for the Smart Wallet.
+        // NOTE: if a WalletContext is not provided, then `SequenceContext()` value is used.
+        public WalletContext Context { get; set; } = Wallet.sequenceContextV2;
+        // Skips config sorting and keeps signers order as-is
+        public bool SkipSortSigners { get; set; }
+        // Address used for the wallet
+        // if this value is defined, the address derived from the sequence config is ignored
+        public string Address { get; set; }
+
+    }
+
     public class Wallet
     {
-        Provider provider;
-        WalletProvider walletProvider;
+        
+        
+        public WalletContext context { get; set; }
+        public WalletConfig config { get; set; }
+        public List<EthWallet> signers { get; set; } //EOA signers
+
+        public Provider provider { get; set; } //eth provider
+        public WalletProvider walletProvider { get; set; }
+        //TODO: Relayer
+        //public Relayer relayer;
+        public BigInteger chainID { get; set; }
+        public string Address { get; set; }
+        public bool SkipSortSigners { get; set; }
+
+
+
+        // Without Relayer
+
+        public Wallet(WalletContext context, WalletConfig config, List<EthWallet> signers, Provider provider,  string address, bool skipSortSigners, BigInteger chainID)
+        {
+            this.context = context;
+            this.config = config;
+            this.signers = signers;
+            this.provider = provider;
+            this.Address = address;
+            this.SkipSortSigners = skipSortSigners;
+            this.chainID = chainID;
+        }
+
+        
+
 
         //Switch to NBitcoin.Secp256k1 functions
         //TODO: Testing, will refactor later
-        public ECPrivKey privKey;
-        public ECPubKey pubKey;
 
 
-        public Wallet()
+        public static WalletContext sequenceContextV2
+        = new WalletContext
         {
-            //TODO: ...
-            byte[] seed = Org.BouncyCastle.Security.SecureRandom.GetInstance("SHA256PRNG").GenerateSeed(64);
-            privKey = ECPrivKey.Create(seed);
-            pubKey = privKey.CreatePubKey();
+            FactoryAddress = "0xFaA5c0b14d1bED5C888Ca655B9a8A5911F78eF4A",
+            MainModuleAddress = "0xfBf8f1A5E00034762D928f46d438B947f5d4065d",
+            MainModuleUpgradableAddress = "0x4222dcA3974E39A8b41c411FeDDE9b09Ae14b911",
+            GuestModuleAddress = "0xfea230Ee243f88BC698dD8f1aE93F8301B6cdfaE"
+        };
 
-        }
-
-        public Wallet(string _privateKey)
-        {
-            privKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
-            pubKey = privKey.CreatePubKey();
-
-        }
-
-        public string Address()
-        {
-            //TODO: Address return type 
-
-            //Last 20 bytes of the Keccak-256 hash of the public key
-            byte[] publickeyBytes = pubKey.ToBytes(false);
-            byte[] publicKeyBytes64 = new byte[64];
-
-            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
-
-            return PubkeyToAddress(publicKeyBytes64);
-
-        }
+        
 
         
 
@@ -94,147 +133,11 @@ namespace Sequence.Wallet
             throw new System.NotImplementedException();
         }
 
-        public System.Numerics.BigInteger GetBalance()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public System.Numerics.BigInteger GetNonce()
-        {
-            throw new System.NotImplementedException();
-        }
+        
 
         
 
-        public (string v, string r, string s) SignTx(byte[] message, int chainId)
-        {
-            return EthSignature.SignAndReturnVRS(message, privKey, chainId);
-        }
-
-        public (string v, string r, string s) SignTx(byte[] message)
-        {
-            return EthSignature.SignAndReturnVRS(message, privKey);
-        }
-
-        /// <summary>
-        /// 
-        /// https://docs.ethers.org/v5/api/signer/#Signer-signMessage
-        /// If message is a string, it is treated as a string and converted to its representation in UTF8 bytes.
-
-        ///If and only if a message is a Bytes will it be treated as binary data.
-
-        ///For example, the string "0x1234" is 6 characters long (and in this case 6 bytes long). This is not equivalent to the array[0x12, 0x34], which is 2 bytes long.
-
-        ///A common case is to sign a hash.In this case, if the hash is a string, it must be converted to an array first, using the arrayify utility function.
-        /// 
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="signature"></param>
-        /// <returns></returns>
-        public string SignMessage(byte[] message)
-        {                       
-            byte[] message32 = SequenceCoder.KeccakHash(prefixedMessage(message));
-            return EthSignature.Sign(message32, privKey);
-        }
-
-
-
-        public string SignMessage(string message)
-        {
-            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-            return SignMessage(messageBytes);
-        }
-
-        public string SignMessage(string privateKey, string message)
-        {
-         
-            byte[] message32 = new byte[32];
-            message32 = SequenceCoder.KeccakHash(prefixedMessage(Encoding.UTF8.GetBytes(message)));
-
-            ECPrivKey privKey = Context.Instance.CreateECPrivKey(SequenceCoder.HexStringToByteArray(privateKey));
-            return EthSignature.Sign(message32, privKey);
         
-        }
-
-        public string SignByteArray(string privateKey, byte[] byteArray)
-        {
-            byte[] prefixed = new byte[32];
-            prefixed = SequenceCoder.KeccakHash(prefixedMessage(byteArray));
-            ECPrivKey privKey = Context.Instance.CreateECPrivKey(SequenceCoder.HexStringToByteArray(privateKey));
-            return EthSignature.Sign(prefixed, privKey);
-        }
-
-
-        public bool IsValidSignature(string signature, string message)
-        {
-            byte[] messagePrefix = prefixedMessage(Encoding.UTF8.GetBytes(message));
-            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
-
-            if (recoverble != null)
-            {
-                SecpECDSASignature sig = recoverble.ToSignature();
-
-                return pubKey.SigVerify(sig, hashedMessage);
-            }
-
-
-            return false;
-
-
-        }
-
-
-        public string Recover(string message, string signature)
-        {
-            byte[] messagePrefix = prefixedMessage(Encoding.UTF8.GetBytes(message));
-            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-            
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
-            ECPubKey _pubkey;
-            var ctx = Context.Instance;
-            ECPubKey.TryRecover(ctx, recoverble, hashedMessage, out _pubkey);
-
-            byte[] publickeyBytes = _pubkey.ToBytes(false);
-            byte[] publicKeyBytes64 = new byte[64];
-            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64); //trim extra 0 at the beginning...
-
-            return PubkeyToAddress(publicKeyBytes64);
-
-        }
-
-        /// <summary>
-        /// https://eips.ethereum.org/EIPS/eip-191
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        public static byte[] prefixedMessage(byte[] message)
-        {
-
-            byte[] message191 = SequenceCoder.HexStringToByteArray("19").Concat(Encoding.UTF8.GetBytes("Ethereum Signed Message:\n")).ToArray();
-            byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
-            if (!message.Take(message191.Length).SequenceEqual(message191))
-            {
-                
-                message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
-                
-            }
-            
-            return message;
-        }
-
-
-        private string PubkeyToAddress(byte[] pubkey)
-        {
-            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(pubkey));
-            int length = hashed.Length;
-            string address = hashed.Substring(length - 40);
-
-            address = SequenceCoder.AddressChecksum(address);
-            return address;
-
-        }
 
 
 
