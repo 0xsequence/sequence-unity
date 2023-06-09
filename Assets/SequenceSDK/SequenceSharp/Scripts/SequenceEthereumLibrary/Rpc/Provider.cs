@@ -22,8 +22,7 @@ namespace Sequence.RPC
        // Logger logger;
         string nodeURL;
         HttpRpcClient httpClient;
-        Breaker br; //?
-        BigInteger chainId;
+
 
         public Provider(string _nodeURL)
         {

@@ -17,6 +17,10 @@ namespace Sequence.Wallet
         public ECPrivKey privKey;
         public ECPubKey pubKey;
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EthWallet"/> class with a randomly generated private key.
+        /// </summary>
         public EthWallet()
         {
             //TODO: ...
@@ -26,6 +30,10 @@ namespace Sequence.Wallet
 
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EthWallet"/> class with the specified private key.
+        /// </summary>
+        /// <param name="_privateKey">The private key as a hexadecimal string.</param>
         public EthWallet(string _privateKey)
         {
             privKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
@@ -33,6 +41,10 @@ namespace Sequence.Wallet
 
         }
 
+        /// <summary>
+        /// Retrieves the Ethereum address associated with the wallet.
+        /// </summary>
+        /// <returns>The Ethereum address as a string.</returns>
         public string Address()
         {
             //TODO: Address return type 
@@ -79,9 +91,8 @@ namespace Sequence.Wallet
         /// 
         /// 
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="signature"></param>
-        /// <returns></returns>
+        /// <param name="message">The message to sign as a byte array.</param>
+        /// <returns>The signature as a string.</returns>
         public string SignMessage(byte[] message)
         {
             byte[] message32 = SequenceCoder.KeccakHash(PrefixedMessage(message));
@@ -89,13 +100,23 @@ namespace Sequence.Wallet
         }
 
 
-
+        /// <summary>
+        /// Signs a message with the wallet's private key.
+        /// </summary>
+        /// <param name="message">The message to sign as a string.</param>
+        /// <returns>The signature as a string.</returns>
         public string SignMessage(string message)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             return SignMessage(messageBytes);
         }
 
+        /// <summary>
+        /// Signs a message with a specific private key.
+        /// </summary>
+        /// <param name="privateKey">The private key as a hexadecimal string.</param>
+        /// <param name="message">The message to sign as a string.</param>
+        /// <returns>The signature as a string.</returns>
         public string SignMessage(string privateKey, string message)
         {
 
@@ -107,6 +128,12 @@ namespace Sequence.Wallet
 
         }
 
+        /// <summary>
+        /// Signs a byte array with a specific private key.
+        /// </summary>
+        /// <param name="privateKey">The private key as a hexadecimal string.</param>
+        /// <param name="byteArray">The byte array to sign.</param>
+        /// <returns>The signature as a string.</returns>
         public string SignByteArray(string privateKey, byte[] byteArray)
         {
             byte[] prefixed = new byte[32];
@@ -116,6 +143,12 @@ namespace Sequence.Wallet
         }
 
 
+        /// <summary>
+        /// Verifies the validity of a signature for a given message.
+        /// </summary>
+        /// <param name="signature">The signature to verify.</param>
+        /// <param name="message">The message that was signed.</param>
+        /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
         public bool IsValidSignature(string signature, string message)
         {
             byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
@@ -135,7 +168,12 @@ namespace Sequence.Wallet
 
         }
 
-
+        /// <summary>
+        /// Recovers the Ethereum address from a message and its signature.
+        /// </summary>
+        /// <param name="message">The message that was signed.</param>
+        /// <param name="signature">The signature of the message.</param>
+        /// <returns>The Ethereum address as a string.</returns>
         public string Recover(string message, string signature)
         {
             byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
@@ -154,14 +192,15 @@ namespace Sequence.Wallet
 
         }
 
+       
         /// <summary>
-        /// https://eips.ethereum.org/EIPS/eip-191
+        /// Adds the Ethereum Signed Message prefix to a message.
         /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
+        /// <param name="message">The message to prefix.</param>
+        /// <returns>The prefixed message as a byte array.</returns>
         public static byte[] PrefixedMessage(byte[] message)
         {
-
+            // https://eips.ethereum.org/EIPS/eip-191
             byte[] message191 = SequenceCoder.HexStringToByteArray("19").Concat(Encoding.UTF8.GetBytes("Ethereum Signed Message:\n")).ToArray();
             byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
             if (!message.Take(message191.Length).SequenceEqual(message191))
@@ -174,7 +213,11 @@ namespace Sequence.Wallet
             return message;
         }
 
-
+        /// <summary>
+        /// Converts a public key to an Ethereum address.
+        /// </summary>
+        /// <param name="pubkey">The public key byte array.</param>
+        /// <returns>The Ethereum address derived from the public key.</returns>
         private string PubkeyToAddress(byte[] pubkey)
         {
             string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(pubkey));

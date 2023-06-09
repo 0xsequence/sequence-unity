@@ -10,11 +10,12 @@ namespace Sequence.RLP
 {
     public class RLP
     {
+
         /// <summary>
-        /// 
+        /// Encodes the input object using Recursive Length Prefix (RLP) encoding.
         /// </summary>
-        /// <param name="input"> If you have a string of characters and you need to represent it in UTF8 byte array</param>
-        /// <returns></returns>
+        /// <param name="input">The input object to be encoded. If you have a string of characters and you need to represent it in UTF8 byte array</param>
+        /// <returns>The RLP-encoded byte array.</returns>
         public static byte[] Encode(object input)
         {
             if(input is Boolean boolInput)
@@ -63,6 +64,12 @@ namespace Sequence.RLP
             return null;
         }
 
+        /// <summary>
+        /// Helper function, encodes the length of a data element in RLP format.
+        /// </summary>
+        /// <param name="length">The length of the data element.</param>
+        /// <param name="offset">The offset value based on the encoding type.</param>
+        /// <returns>The encoded length as a hexadecimal string.</returns>
         private static string EncodeLength(int length, int offset)
         {
             if (length < 56)
@@ -88,7 +95,11 @@ namespace Sequence.RLP
                 throw new Exception("Input too long");
         }
 
-
+        /// <summary>
+        /// Decodes the RLP-encoded byte array and returns the decoded object.
+        /// </summary>
+        /// <param name="input">The RLP-encoded byte array to be decoded.</param>
+        /// <returns>The decoded object.</returns>
         public static object Decode(byte[] input)
         {
             if (input.Length == 0)
@@ -158,10 +169,10 @@ namespace Sequence.RLP
         }
 
         /// <summary>
-        /// 
+        /// Decodes the length of a data element in RLP format.
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns>( offset, length of the actual data, data type)</returns>
+        /// <param name="input">The RLP-encoded byte array.</param>
+        /// <returns>A tuple containing the offset, length of the actual data, and data type.</returns>
         private static (int, int, Type) DecodeLength(byte[] input)
         {
             int length = input.Length;

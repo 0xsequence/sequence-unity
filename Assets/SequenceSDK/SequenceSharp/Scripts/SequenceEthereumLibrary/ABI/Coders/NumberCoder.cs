@@ -1,146 +1,231 @@
 using System;
 using System.Numerics;
+using UnityEngine;
 
 namespace Sequence.ABI
 {
 
     public class NumberCoder : ICoder
     {
+        /// <summary>
+        /// Decodes the byte array into a number object.
+        /// </summary>
+        /// <param name="encoded">The byte array to decode.</param>
+        /// <returns>The decoded number object.</returns>
         public object Decode(byte[] encoded)
         {
-            int encodedLength = encoded.Length;
-            byte[] decoded = new byte[encodedLength];
-            //check sign
-            if(Convert.ToInt32(encoded[0])<0)
+            try
             {
-                //reverse two's complement
-                
-                for (int i = 0; i< encodedLength - 1;i++)
-                {                    
-                    byte onesComplement = (byte)~encoded[i];
-                    decoded[i] = onesComplement;
-                }
-                byte lastOnesComplement = (byte)~encoded[encodedLength - 1];
-                decoded[encodedLength - 1] = (byte)(lastOnesComplement + 1);
-            }
-            else
-            {
-                decoded = encoded;
-            }
-            string decodedString = SequenceCoder.ByteArrayToHexString(decoded);
-            
-            return DecodeFromString(decodedString);
+                int encodedLength = encoded.Length;
+                byte[] decoded = new byte[encodedLength];
+                //check sign
+                if (Convert.ToInt32(encoded[0]) < 0)
+                {
+                    //reverse two's complement
 
+                    for (int i = 0; i < encodedLength - 1; i++)
+                    {
+                        byte onesComplement = (byte)~encoded[i];
+                        decoded[i] = onesComplement;
+                    }
+                    byte lastOnesComplement = (byte)~encoded[encodedLength - 1];
+                    decoded[encodedLength - 1] = (byte)(lastOnesComplement + 1);
+                }
+                else
+                {
+                    decoded = encoded;
+                }
+                string decodedString = SequenceCoder.ByteArrayToHexString(decoded);
+
+                return DecodeFromString(decodedString);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error decoding number: {ex.Message}");
+                return null;
+            }
         }
 
 
 
         /// <summary>
-        /// Encode signed integer, unsigend integer call EncodeUnsigned
+        /// Encodes the number object into a byte array.
         /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
+        /// <param name="number">The number object to encode.</param>
+        /// <returns>The encoded byte array.</returns>
         public byte[] Encode(object number)
         {
-
-            //The BigInteger structure does not include constructors with a parameter of type Byte, Int16, SByte, or UInt16. However, the Int32 type supports the implicit conversion of 8-bit and 16-bit signed and unsigned integers to signed 32-bit integers.
-            byte[] encoded = { };
-            if ((number is int) || (number is BigInteger))
+            try
             {
-                encoded = EncodeSignedInt((BigInteger)number, 32);
+                //The BigInteger structure does not include constructors with a parameter of type Byte, Int16, SByte, or UInt16. However, the Int32 type supports the implicit conversion of 8-bit and 16-bit signed and unsigned integers to signed 32-bit integers.
+                byte[] encoded = { };
+                if ((number is int) || (number is BigInteger))
+                {
+                    encoded = EncodeSignedInt((BigInteger)number, 32);
 
+                }
+                // TODO: Make sure Big Endian
+                /*if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(encodedInt); 
+                }*/
+
+
+                return encoded;
             }
-            // TODO: Make sure Big Endian
-            /*if (BitConverter.IsLittleEndian)
+            catch (Exception ex)
             {
-                Array.Reverse(encodedInt); 
-            }*/
-
-
-            return encoded;
-
+                Debug.LogError($"Error encoding number: {ex.Message}");
+                return null;
+            }
         }
 
-
+        /// <summary>
+        /// Encodes the number object into a string representation.
+        /// </summary>
+        /// <param name="number">The number object to encode.</param>
+        /// <returns>The encoded string representation.</returns>
         public string EncodeToString(object number)
         {
-            BigInteger bgNumber;
-            if(number.GetType() == typeof(int))
+            try
             {
-                bgNumber = new BigInteger((int)number);
+                BigInteger bgNumber;
+                if (number.GetType() == typeof(int))
+                {
+                    bgNumber = new BigInteger((int)number);
 
+                }
+                else if (number.GetType() == typeof(uint))
+                {
+                    bgNumber = new BigInteger((uint)number);
+                }
+                else
+                {
+                    bgNumber = (BigInteger)number;
+                }
+                string encoded = EncodeSignedIntString(bgNumber, 64);
+                return encoded;
             }
-            else if(number.GetType() == typeof(uint))
+            catch (Exception ex)
             {
-                bgNumber = new BigInteger((uint)number);
+                Debug.LogError($"Error encoding number to string: {ex.Message}");
+                return null;
             }
-            else
-            {
-                bgNumber = (BigInteger)number;
-            }
-            string encoded = EncodeSignedIntString(bgNumber, 64);
-            return encoded;
         }
 
-
+        /// <summary>
+        /// Decodes the encoded string into a number object.
+        /// </summary>
+        /// <param name="encodedString">The encoded string to decode.</param>
+        /// <returns>The decoded number object.</returns>
         public object DecodeFromString(string encodedString)
         {
-            BigInteger decodedNumber = BigInteger.Parse(encodedString, System.Globalization.NumberStyles.HexNumber);
-            return decodedNumber;
-              
+            try
+            {
+                BigInteger decodedNumber = BigInteger.Parse(encodedString, System.Globalization.NumberStyles.HexNumber);
+                return decodedNumber;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error decoding number from string: {ex.Message}");
+                return null;
+            }
         }
-
-        
-        
-
-
 
 
         /// <summary>
-        /// int<M>: enc(X) is the big-endian two’s complement encoding of X, padded on the higher-order (left) side with 0xff bytes for negative X and with zero-bytes for non-negative X such that the length is 32 bytes.
+        /// Encodes the signed integer into a byte array.
         /// </summary>
-        /// <param name="number"></param>
-        /// <param name="length"></param>
-        /// <returns></returns>
+        /// <param name="number">The signed integer to encode.</param>
+        ///
         public byte[] EncodeSignedInt(BigInteger number, int length)
         {
-            string encodedString = EncodeSignedIntString(number, length * 2);
-            byte[] encoded = SequenceCoder.HexStringToByteArray(encodedString);
-            return encoded;
+            try
+            {
+                /// int<M>: enc(X) is the big-endian two’s complement encoding of X, padded on the higher-order (left) side with 0xff bytes for negative X and with zero-bytes for non-negative X such that the length is 32 bytes.
+                string encodedString = EncodeSignedIntString(number, length * 2);
+                byte[] encoded = SequenceCoder.HexStringToByteArray(encodedString);
+                return encoded;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Exception occurred during EncodeSignedInt: " + ex.Message);
+                throw;
+            }
         }
 
+
+        /// <summary>
+        /// Encodes the signed integer into a string representation.
+        /// </summary>
+        /// <param name="number">The signed integer to encode.</param>
+        /// <param name="length">The desired length of the encoded string representation.</param>
+        /// <returns>The encoded string representation.</returns>
         public string EncodeSignedIntString(BigInteger number, int length)
         {
-            var hex = number.ToString("x");
-            string encodedString;
-            if (number.Sign > 0)
+            try
             {
-                encodedString = new string('0', length - hex.Length) + hex;
+                var hex = number.ToString("x");
+                string encodedString;
+                if (number.Sign > 0)
+                {
+                    encodedString = new string('0', length - hex.Length) + hex;
+                }
+                else
+                {
+                    encodedString = new string('f', length - hex.Length) + hex;
+                }
+                return encodedString;
             }
-            else
+            catch (Exception ex)
             {
-                encodedString = new string('f', length - hex.Length) + hex;
+                Debug.LogError("Exception occurred during EncodeSignedIntString: " + ex.Message);
+                throw;
             }
-            return encodedString;
         }
 
         /// <summary>
-        /// uint<M>: enc(X) is the big-endian encoding of X, padded on the higher-order (left) side with zero-bytes such that the length is 32 bytes.
+        /// Encodes the unsigned integer into a byte array.
         /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
+        /// <param name="number">The unsigned integer to encode.</param>
+        /// <param name="length">The desired length of the encoded byte array.</param>
+        /// <returns>The encoded byte array.</returns>
         public byte[] EncodeUnsignedInt(BigInteger number, int length)
         {
-            string encodedString = EncodeUnsignedIntString(number, length * 2);
-            byte[] encoded = SequenceCoder.HexStringToByteArray(encodedString);
-            return encoded;
+            try
+            {
+                /// uint<M>: enc(X) is the big-endian encoding of X, padded on the higher-order (left) side with zero-bytes such that the length is 32 bytes.
+                string encodedString = EncodeUnsignedIntString(number, length * 2);
+                byte[] encoded = SequenceCoder.HexStringToByteArray(encodedString);
+                return encoded;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Exception occurred during EncodeUnsignedInt: " + ex.Message);
+                throw;
+            }
         }
 
+
+        /// <summary>
+        /// Encodes the unsigned integer into a string representation.
+        /// </summary>
+        /// <param name="number">The unsigned integer to encode.</param>
+        /// <param name="length">The desired length of the encoded string representation.</param>
+        /// <returns>The encoded string representation.</returns>
         public string EncodeUnsignedIntString(BigInteger number, int length)
         {
-            var hex = number.ToString("x");
-            string encodedString = new string('0', length - hex.Length) + hex;
-            return encodedString;
+            try
+            {
+                var hex = number.ToString("x");
+                string encodedString = new string('0', length - hex.Length) + hex;
+                return encodedString;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Exception occurred during EncodeUnsignedIntString: " + ex.Message);
+                throw;
+            }
         }
 
         public byte[] EncodeSignedFloat(float number)
