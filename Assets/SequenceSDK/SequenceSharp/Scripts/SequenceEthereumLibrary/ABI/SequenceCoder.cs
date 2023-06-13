@@ -34,7 +34,7 @@ namespace Sequence.ABI
                     {
                         checksumAddress += c;
                     }
-                    else if ("abcdef".Contains(c))
+                    else if ("abcdefABCDEF".Contains(c))
                     {
                         int hashedAddressNibble = Convert.ToInt32(hashedAddress[idx].ToString(), 16);
 
