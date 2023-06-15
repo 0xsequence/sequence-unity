@@ -183,7 +183,7 @@ namespace Sequence.RPC
 		/// NetworkID = net_version
 		/// </summary>
 		/// <returns></returns>
-		Task<string> NetworkID();
+		Task<string> NetworkId();
  
 		/// <summary>
 		/// BalanceAt = eth_getBalance

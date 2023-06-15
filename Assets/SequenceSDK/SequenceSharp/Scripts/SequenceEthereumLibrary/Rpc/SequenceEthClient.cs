@@ -55,9 +55,11 @@ namespace Sequence.RPC
             return blockNumber;
         }
 
-        public Task<List<Block>> BlockRange(string start = "earliest", string end = "earliest", bool? full = true)
+        public async Task<List<Block>> BlockRange(string start = "earliest", string end = "latest", bool? full = true)
         {
-            throw new System.NotImplementedException();
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockRange", new object[] {start, end, full});
+            List<Block> blocks = JsonConvert.DeserializeObject<List<Block>>(response.result.ToString());
+            return blocks;
         }
 
         public async Task<string> CallContract()
@@ -93,9 +95,11 @@ namespace Sequence.RPC
             return code;
         }
 
-        public Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber)
+        public async Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber)
         {
-            throw new System.NotImplementedException();
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { transactionCall, blockNumber });
+            BigInteger gas = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
+            return gas;
         }
 
         public async Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int? REWARDPERCENTILES)
@@ -130,9 +134,11 @@ namespace Sequence.RPC
             return block;
         }
 
-        public Task<string> NetworkID()
+        public async Task<string> NetworkId()
         {
-            throw new System.NotImplementedException();
+            RpcResponse response = await _httpRpcClient.SendRequest("net_version", new object[] {});
+            string networkId = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            return networkId;
         }
 
         public async Task<BigInteger> NonceAt(string address, string blockNumber)
