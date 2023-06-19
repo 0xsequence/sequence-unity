@@ -9,6 +9,8 @@ using Sequence.ABI;
 using System.Text;
 using System.Linq;
 using System;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Sequence.Wallet
 {
@@ -58,9 +60,13 @@ namespace Sequence.Wallet
             return PubkeyToAddress(publicKeyBytes64);
 
         }
-        public System.Numerics.BigInteger GetBalance()
+
+        public async Task<BigInteger> GetBalance()
         {
-            throw new System.NotImplementedException();
+            SequenceEthClient client = new SequenceEthClient();
+            string blockNumber = await client.BlockNumber();
+            BigInteger balance = await client.BalanceAt(Address(), blockNumber);
+            return balance;
         }
 
         public System.Numerics.BigInteger GetNonce()
