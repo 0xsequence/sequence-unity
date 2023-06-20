@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Sequence.Extensions;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -24,7 +25,8 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBalance", new object[] { address, blockNumber});
             //Deserialize
-            BigInteger balance = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
+            string balanceHex = response.result.ToString();
+            BigInteger balance = balanceHex.EnsureHexPrefix().HexStringToBigInteger();
             return balance;
         }
 
@@ -55,9 +57,11 @@ namespace Sequence.RPC
             return blockNumber;
         }
 
-        public Task<List<Block>> BlockRange(string start = "earliest", string end = "earliest", bool? full = true)
+        public async Task<List<Block>> BlockRange(string start = "earliest", string end = "latest", bool? full = true)
         {
-            throw new System.NotImplementedException();
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockRange", new object[] {start, end, full});
+            List<Block> blocks = JsonConvert.DeserializeObject<List<Block>>(response.result.ToString());
+            return blocks;
         }
 
         public async Task<string> CallContract()
@@ -93,9 +97,11 @@ namespace Sequence.RPC
             return code;
         }
 
-        public Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber)
+        public async Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber)
         {
-            throw new System.NotImplementedException();
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { transactionCall, blockNumber });
+            BigInteger gas = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
+            return gas;
         }
 
         public async Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int? REWARDPERCENTILES)
@@ -130,9 +136,11 @@ namespace Sequence.RPC
             return block;
         }
 
-        public Task<string> NetworkID()
+        public async Task<string> NetworkId()
         {
-            throw new System.NotImplementedException();
+            RpcResponse response = await _httpRpcClient.SendRequest("net_version", new object[] {});
+            string networkId = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            return networkId;
         }
 
         public async Task<BigInteger> NonceAt(string address, string blockNumber)
@@ -179,7 +187,7 @@ namespace Sequence.RPC
             throw new System.NotImplementedException();
         }
 
-        public async Task<string> SendRawTransaction(string signedTransactionData)
+        internal async Task<string> SendRawTransaction(string signedTransactionData)
         {
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_sendRawTransaction", new object[] { signedTransactionData });
@@ -244,7 +252,7 @@ namespace Sequence.RPC
         public async Task<TransactionReceipt> TransactionReceipt(string transactionHash)
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionReceipt", new object[] { transactionHash });
-            UnityEngine.Debug.Log("reseponse json :" + response.result.ToString());
+            UnityEngine.Debug.Log("Receipt response json :" + response.result.ToString());
             //Deserialize
            TransactionReceipt receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
             return receipt;

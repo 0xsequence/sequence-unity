@@ -1,18 +1,94 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.RPC;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class RPCTests
 {
-    
 
+    // Todo: Replace with a sequence RPC or local RPC endpoint
+    string clientUrl = "https://polygon-bor.publicnode.com";
+    float polygonBlockTimeInSeconds = 2f;
     
     [UnityTest]
-    public IEnumerator TestTestchainID()
+    public IEnumerator TestChainID()
     {
-        yield return null;
+        string expected = "0x89";
+        var client = new SequenceEthClient(clientUrl);
+
+        Task<string> chainIdTask = client.ChainID();
+        while (!chainIdTask.IsCompleted)
+        {
+            yield return null;
+        }
+
+        if (chainIdTask.Exception != null)
+        {
+            Assert.Fail("Unexpected exception: " + chainIdTask.Exception.Message);
+            yield break;
+        }
+        string chainId = chainIdTask.Result;
+        Assert.AreEqual(expected, chainId);
+    }
+
+    [UnityTest]
+    public IEnumerator TestNetworkId()
+    {
+        string expected = "137";
+        var client = new SequenceEthClient(clientUrl);
+
+        Task<string> networkIdTask = client.NetworkId();
+        while (!networkIdTask.IsCompleted)
+        {
+            yield return null;
+        }
+
+        if (networkIdTask.Exception != null)
+        {
+            Assert.Fail("Unexpected exception: " + networkIdTask.Exception.Message);
+            yield break;
+        }
+        string networkId = networkIdTask.Result;
+        Assert.AreEqual(expected, networkId);
+    }
+
+    [UnityTest]
+    public IEnumerator TestBlockNumber()
+    {
+            var client = new SequenceEthClient(clientUrl);
+
+            Task<string> blockNumberTask = client.BlockNumber();
+            while (!blockNumberTask.IsCompleted)
+            {
+                yield return null;
+            }
+
+            if (blockNumberTask.Exception != null)
+            {
+                Assert.Fail("Unexpected exception: " + blockNumberTask.Exception.Message);
+                yield break;
+            }
+            var blockNumber = blockNumberTask.Result;
+
+            yield return new WaitForSecondsRealtime(polygonBlockTimeInSeconds * 3); // Wait for more than the block time just in case
+
+            Task<string> blockNumberTask2 = client.BlockNumber();
+            while (!blockNumberTask2.IsCompleted)
+            {
+                yield return null;
+            }
+
+            if (blockNumberTask2.Exception != null)
+            {
+                Assert.Fail("Unexpected exception: " + blockNumberTask2.Exception.Message);
+                yield break;
+            }
+            var blockNumber2 = blockNumberTask2.Result;
+
+            Assert.Less(blockNumber, blockNumber2);
     }
 
     [UnityTest]

@@ -9,6 +9,8 @@ using Sequence.ABI;
 using System.Text;
 using System.Linq;
 using System;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Sequence.Wallet
 {
@@ -16,7 +18,6 @@ namespace Sequence.Wallet
     {
         public ECPrivKey privKey;
         public ECPubKey pubKey;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EthWallet"/> class with a randomly generated private key.
@@ -58,14 +59,22 @@ namespace Sequence.Wallet
             return PubkeyToAddress(publicKeyBytes64);
 
         }
-        public System.Numerics.BigInteger GetBalance()
+
+        public async Task<BigInteger> GetBalance(SequenceEthClient client)
         {
-            throw new System.NotImplementedException();
+            string blockNumber = await client.BlockNumber();
+            BigInteger balance = await client.BalanceAt(Address(), blockNumber);
+            return balance;
         }
 
         public System.Numerics.BigInteger GetNonce()
         {
-            throw new System.NotImplementedException();
+            return NonceService.GetNonce(this);
+        }
+
+        private void IncrementNonce()
+        {
+            NonceService.IncrementNonce(this);
         }
 
         public (string v, string r, string s) SignTransaction(byte[] message, int chainId)
@@ -76,6 +85,13 @@ namespace Sequence.Wallet
         public (string v, string r, string s) SignTransaction(byte[] message)
         {
             return EthSignature.SignAndReturnVRS(message, privKey);
+        }
+
+        public async Task<string> SendRawTransaction(SequenceEthClient client, string signedTransactionData)
+        {
+            IncrementNonce();
+            string result = await client.SendRawTransaction(signedTransactionData);
+            return result;
         }
 
         /// <summary>
