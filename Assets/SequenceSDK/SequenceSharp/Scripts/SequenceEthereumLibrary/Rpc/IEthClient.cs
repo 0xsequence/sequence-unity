@@ -326,13 +326,5 @@ namespace Sequence.RPC
 		/// <param name="transaction"></param>
 		/// <returns></returns>
 		Task<string> SendTransaction(Transaction transaction);
-
-
-		/// <summary>
-		/// SendRawTransaction = eth_sendRawTransaction
-		/// </summary>
-		/// <param name="signedTransactionData"></param>
-		/// <returns></returns>
-		Task<string> SendRawTransaction(string signedTransactionData);
 	}
 }

@@ -90,8 +90,7 @@ public class EthWalletTests
             string tx = EthTransaction.RLPEncode(wallet.GetNonce(), 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", v, r, s);
             Debug.Log("tx: " + tx);
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
-            string result = await client.SendRawTransaction(tx);
-            wallet.IncrementNonce();
+            string result = await wallet.SendRawTransaction(client, tx);
             Debug.Log(result);
         }
         catch(Exception ex)
@@ -119,8 +118,7 @@ public class EthWalletTests
             string tx = EthTransaction.RLPEncode(wallet.GetNonce(), gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, v, r, s);
 
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
-            string result = await client.SendRawTransaction(tx);
-            wallet.IncrementNonce();
+            string result = await wallet.SendRawTransaction(client, tx);
 
             Debug.Log("result: " + result);
 
@@ -159,8 +157,7 @@ public class EthWalletTests
             string tx = EthTransaction.RLPEncode(wallet.GetNonce(), gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, v, r, s);
 
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
-            string result = await client.SendRawTransaction(tx);
-            wallet.IncrementNonce();
+            string result = await wallet.SendRawTransaction(client, tx);
 
             Debug.Log("result: " + result);
 
@@ -195,8 +192,7 @@ public class EthWalletTests
 
             string mockMint_tx = EthTransaction.RLPEncode(wallet2.GetNonce(), gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data, mockMint_v, mockMint_r, mockMint_s);
 
-            string mockMint_result = await client.SendRawTransaction(mockMint_tx);
-            wallet2.IncrementNonce();
+            string mockMint_result = await wallet2.SendRawTransaction(client, mockMint_tx);
 
             Debug.Log("mockMint_result: " + mockMint_result);
 

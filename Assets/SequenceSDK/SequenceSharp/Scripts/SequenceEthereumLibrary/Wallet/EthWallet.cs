@@ -73,7 +73,7 @@ namespace Sequence.Wallet
             return NonceService.GetNonce(this);
         }
 
-        public void IncrementNonce()
+        private void IncrementNonce()
         {
             NonceService.IncrementNonce(this);
         }
@@ -86,6 +86,13 @@ namespace Sequence.Wallet
         public (string v, string r, string s) SignTransaction(byte[] message)
         {
             return EthSignature.SignAndReturnVRS(message, privKey);
+        }
+
+        public async Task<string> SendRawTransaction(SequenceEthClient client, string signedTransactionData)
+        {
+            IncrementNonce();
+            string result = await client.SendRawTransaction(signedTransactionData);
+            return result;
         }
 
         /// <summary>
