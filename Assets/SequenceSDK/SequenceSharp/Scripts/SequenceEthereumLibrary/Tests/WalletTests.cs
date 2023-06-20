@@ -115,7 +115,7 @@ public class EthWalletTests
 
             string result = await wallet.SendRawTransaction(client, tx);
 
-            Thread.Sleep(1500);
+            Thread.Sleep(3000);
 
             BigInteger balancePostTransaction = await wallet.GetBalance(client);
 
@@ -148,9 +148,9 @@ public class EthWalletTests
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             string result = await wallet.SendRawTransaction(client, tx);
 
-            Debug.Log("result: " + result);
+            Debug.Log("result: " + result); 
 
-            Thread.Sleep(1500);
+            Thread.Sleep(3000);
 
             TransactionReceipt receipt = await client.TransactionReceipt(result);
 
@@ -189,7 +189,7 @@ public class EthWalletTests
 
             Debug.Log("result: " + result);
 
-            Thread.Sleep(1500);
+            Thread.Sleep(3000);
 
             TransactionReceipt receipt = await client.TransactionReceipt(result);
 
@@ -205,7 +205,7 @@ public class EthWalletTests
                     _mint(_address, _amount);
                 }
              */
-            Thread.Sleep(1500);
+            Thread.Sleep(3000);
 
             EthWallet wallet2 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
 
