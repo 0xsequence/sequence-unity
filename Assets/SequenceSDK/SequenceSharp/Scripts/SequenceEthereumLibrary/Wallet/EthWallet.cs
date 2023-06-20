@@ -19,7 +19,6 @@ namespace Sequence.Wallet
         public ECPrivKey privKey;
         public ECPubKey pubKey;
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="EthWallet"/> class with a randomly generated private key.
         /// </summary>
@@ -71,7 +70,12 @@ namespace Sequence.Wallet
 
         public System.Numerics.BigInteger GetNonce()
         {
-            throw new System.NotImplementedException();
+            return NonceService.GetNonce(this);
+        }
+
+        public void IncrementNonce()
+        {
+            NonceService.IncrementNonce(this);
         }
 
         public (string v, string r, string s) SignTransaction(byte[] message, int chainId)

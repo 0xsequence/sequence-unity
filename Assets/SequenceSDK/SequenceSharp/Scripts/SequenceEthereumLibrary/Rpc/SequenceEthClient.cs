@@ -250,7 +250,7 @@ namespace Sequence.RPC
         public async Task<TransactionReceipt> TransactionReceipt(string transactionHash)
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionReceipt", new object[] { transactionHash });
-            UnityEngine.Debug.Log("reseponse json :" + response.result.ToString());
+            UnityEngine.Debug.Log("Receipt response json :" + response.result.ToString());
             //Deserialize
            TransactionReceipt receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
             return receipt;
