@@ -100,6 +100,34 @@ public class EthWalletTests
     }
 
     [Test]
+    public async Task TestChain_BalanceReducesAfterTransaction()
+    {
+        try
+        {
+            EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            string encoded_signing = EthTransaction.RLPEncode(wallet.GetNonce(), 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "");
+            string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
+            string tx = EthTransaction.RLPEncode(wallet.GetNonce(), 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", v, r, s);
+            SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
+
+            BigInteger balancePreTransaction = await wallet.GetBalance(client);
+
+            string result = await wallet.SendRawTransaction(client, tx);
+
+            Thread.Sleep(1500);
+
+            BigInteger balancePostTransaction = await wallet.GetBalance(client);
+
+            Assert.Less(balancePostTransaction, balancePreTransaction);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    [Test]
     public async Task TestChain_DeployERC20Mock_Tests()
     {
         

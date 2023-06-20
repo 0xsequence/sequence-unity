@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Sequence.Extensions;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -24,7 +25,8 @@ namespace Sequence.RPC
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBalance", new object[] { address, blockNumber});
             //Deserialize
-            BigInteger balance = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
+            string balanceHex = response.result.ToString();
+            BigInteger balance = balanceHex.EnsureHexPrefix().HexStringToBigInteger();
             return balance;
         }
 
