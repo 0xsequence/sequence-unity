@@ -271,22 +271,21 @@ namespace Sequence.RPC
             throw new System.NotImplementedException();
         }
 
-        public async Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHash, float maxWaitTimeInMilliseconds = 15000)
+        public async Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHash, int maxWaitTimeInMilliseconds = 15000, int timeBetweenChecksInMilliseconds = 500)
         {
             TransactionReceipt receipt = null;
             float startTime = Time.time;
-            int timeBetweenChecks = 500;
             while (receipt == null)
             {
                 receipt = await TransactionReceipt(transactionHash);
 
                 float elapsedTime = Time.time - startTime;
-                if (elapsedTime * 1000 + timeBetweenChecks >= maxWaitTimeInMilliseconds)
+                if (elapsedTime * 1000 + timeBetweenChecksInMilliseconds >= maxWaitTimeInMilliseconds)
                 {
                     return receipt;
                 }
 
-                Thread.Sleep(timeBetweenChecks);
+                Thread.Sleep(timeBetweenChecksInMilliseconds);
             }
             return receipt;
         }
