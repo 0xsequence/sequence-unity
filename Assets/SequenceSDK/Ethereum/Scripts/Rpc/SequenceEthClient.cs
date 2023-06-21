@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Sequence.RPC
+namespace Sequence.Provider
 {
     public class SequenceEthClient : IEthClient
     {

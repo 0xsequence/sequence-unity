@@ -1,7 +1,7 @@
 
 using System.Numerics;
 
-namespace Sequence.RPC
+namespace Sequence.Provider
 {
     [System.Serializable]
     public class RpcRequest

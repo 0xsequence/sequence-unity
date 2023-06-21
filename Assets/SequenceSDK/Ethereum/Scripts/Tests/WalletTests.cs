@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using Sequence.Wallet;
 using Sequence.ABI;
-using Sequence.RPC;
+using Sequence.Provider;
 using System.Text;
 using NBitcoin.Secp256k1;
 using System;

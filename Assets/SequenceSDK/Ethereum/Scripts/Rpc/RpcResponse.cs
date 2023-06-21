@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
-namespace Sequence.RPC
+namespace Sequence.Provider
 {
     [System.Serializable]
     public class RpcResponse 

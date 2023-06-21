@@ -1,4 +1,4 @@
-using Sequence.RPC;
+using Sequence.Provider;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
@@ -9,7 +9,7 @@ namespace Sequence.Wallet
     public class WalletProvider
     {
         Wallet wallet;
-        Provider provider;
+        RPCProvider provider;
 
         public BigInteger GetEtherBalanceAt() { throw new System.NotImplementedException(); }
         public BigInteger GetTransactionCount() { throw new System.NotImplementedException(); }

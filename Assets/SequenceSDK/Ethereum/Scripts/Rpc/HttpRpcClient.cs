@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 
-namespace Sequence.RPC
+namespace Sequence.Provider
 {
 
     public class HttpRpcClient

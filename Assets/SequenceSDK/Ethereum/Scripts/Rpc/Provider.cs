@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Sequence.RPC
+namespace Sequence.Provider
 {
     public struct ProviderOption
     {
@@ -17,19 +17,19 @@ namespace Sequence.RPC
     }
 
     //JsonRPC Provider at the moment
-    public class Provider
+    public class RPCProvider
     {
        // Logger logger;
         string nodeURL;
         HttpRpcClient httpClient;
 
 
-        public Provider(string _nodeURL)
+        public RPCProvider(string _nodeURL)
         {
             nodeURL = _nodeURL;
         }
 
-        public Provider(string _nodeURL, ProviderOption options)
+        public RPCProvider(string _nodeURL, ProviderOption options)
         {
             nodeURL = _nodeURL;
             httpClient = new HttpRpcClient(_nodeURL);

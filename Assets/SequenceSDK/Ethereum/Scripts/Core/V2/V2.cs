@@ -1,4 +1,4 @@
-using Sequence.RPC;
+using Sequence.Provider;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -292,7 +292,7 @@ namespace Sequence.V2
     {
         (WalletConfigTree, BigInteger) Recover(WalletContext context,
                                             Subdigest subdigest,
-                                            Provider provider,
+                                            RPCProvider provider,
                                             List<SignerSignatures> signerSignatures);
     }
 
@@ -303,7 +303,7 @@ namespace Sequence.V2
         public ISignatureTree left;
         public ISignatureTree right;
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -316,7 +316,7 @@ namespace Sequence.V2
         public ECDSASignatureType type;
         public byte[] signature = new byte[SignatureLength];
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -327,7 +327,7 @@ namespace Sequence.V2
         public int weight;
         public string address;
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -340,7 +340,7 @@ namespace Sequence.V2
         public DynamicSignatureType type;
         public byte[] signature;
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -350,7 +350,7 @@ namespace Sequence.V2
     {
         public ImageHash imageHash { get; set; }
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -359,7 +359,7 @@ namespace Sequence.V2
     {
         public Subdigest subdigest { get; set; }
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -371,7 +371,7 @@ namespace Sequence.V2
         public int threshold;
         public ISignatureTree tree;
 
-        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -393,7 +393,7 @@ namespace Sequence.V2
             throw new NotImplementedException();
         }
 
-        public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -416,7 +416,7 @@ namespace Sequence.V2
             throw new NotImplementedException();
         }
 
-        public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -439,7 +439,7 @@ namespace Sequence.V2
             throw new NotImplementedException();
         }
 
-        public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, Provider provider, List<SignerSignatures> signerSignatures)
+        public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }

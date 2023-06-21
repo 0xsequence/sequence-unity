@@ -1,6 +1,6 @@
 
 using UnityEngine;
-using Sequence.RPC;
+using Sequence.Provider;
 using Sequence.ABI;
 using System.Numerics;
 using Org.BouncyCastle.Crypto;

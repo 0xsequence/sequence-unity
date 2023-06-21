@@ -1,5 +1,5 @@
 
-namespace Sequence.RPC
+namespace Sequence.Provider
 {
     public class RpcError
     {

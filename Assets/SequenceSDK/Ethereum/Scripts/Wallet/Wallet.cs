@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 //using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.RPC;
+using Sequence.Provider;
 using Sequence.ABI;
 using System.Text;
 using NBitcoin.Secp256k1;
@@ -59,7 +59,7 @@ namespace Sequence.Wallet
         public WalletConfig config { get; set; }
         public List<EthWallet> signers { get; set; } //EOA signers
 
-        public Provider provider { get; set; } //eth provider
+        public RPCProvider provider { get; set; } //eth provider
         public WalletProvider walletProvider { get; set; }
         //TODO: Relayer
         //public Relayer relayer;
@@ -71,7 +71,7 @@ namespace Sequence.Wallet
 
         // Without Relayer
 
-        public Wallet(WalletContext context, WalletConfig config, List<EthWallet> signers, Provider provider,  string address, bool skipSortSigners, BigInteger chainID)
+        public Wallet(WalletContext context, WalletConfig config, List<EthWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
         {
             this.context = context;
             this.config = config;
@@ -123,7 +123,7 @@ namespace Sequence.Wallet
             throw new System.NotImplementedException();
         }
 
-        public void SetProvider(Provider _provider)
+        public void SetProvider(RPCProvider _provider)
         {
             provider = _provider;
 

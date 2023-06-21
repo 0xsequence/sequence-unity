@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Wallet;
-using Sequence.RPC;
+using Sequence.Provider;
 
 namespace Sequence
 {
@@ -24,7 +24,7 @@ namespace Sequence
                                             Digest digest, 
                                             string walletAddress,
                                             BigInteger chainId,
-                                            Provider provider,
+                                            RPCProvider provider,
                                             List<SignerSignatures> signerSignatures);
 
         // Data is the raw signature data.
