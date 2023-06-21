@@ -26,7 +26,7 @@ namespace Sequence.RPC
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBalance", new object[] { address, blockNumber});
             //Deserialize
             string balanceHex = response.result.ToString();
-            BigInteger balance = balanceHex.EnsureHexPrefix().HexStringToBigInteger();
+            BigInteger balance = balanceHex.HexStringToBigInteger();
             return balance;
         }
 
