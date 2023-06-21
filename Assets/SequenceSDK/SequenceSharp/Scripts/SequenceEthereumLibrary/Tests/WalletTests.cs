@@ -115,7 +115,8 @@ public class EthWalletTests
 
             string result = await wallet.SendRawTransaction(client, tx);
 
-            Thread.Sleep(3000);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            Debug.Log("Receipt: " + receipt);
 
             BigInteger balancePostTransaction = await wallet.GetBalance(client);
 
@@ -150,9 +151,8 @@ public class EthWalletTests
 
             Debug.Log("result: " + result); 
 
-            Thread.Sleep(3000);
-
-            TransactionReceipt receipt = await client.TransactionReceipt(result);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            Debug.Log("Receipt: " + receipt);
 
             Debug.Log("contract addr? " + receipt.contractAddress);
 
@@ -189,9 +189,8 @@ public class EthWalletTests
 
             Debug.Log("result: " + result);
 
-            Thread.Sleep(3000);
-
-            TransactionReceipt receipt = await client.TransactionReceipt(result);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            Debug.Log("Receipt: " + receipt);
 
             Debug.Log("contract addr? " + receipt.contractAddress);
 

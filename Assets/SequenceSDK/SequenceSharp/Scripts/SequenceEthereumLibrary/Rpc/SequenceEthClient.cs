@@ -2,7 +2,9 @@ using Newtonsoft.Json;
 using Sequence.Extensions;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Sequence.RPC
 {
@@ -251,16 +253,42 @@ namespace Sequence.RPC
 
         public async Task<TransactionReceipt> TransactionReceipt(string transactionHash)
         {
+            TransactionReceipt receipt = null;
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionReceipt", new object[] { transactionHash });
-            UnityEngine.Debug.Log("Receipt response json :" + response.result.ToString());
-            //Deserialize
-           TransactionReceipt receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
+            if (response.error != null && response.error.Message != Errors.NotFound)
+            {
+                return null;
+            }
+            if (response.result != null)
+            {
+                receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
+            }
             return receipt;
         }
 
         public Task<Transaction> TransactionSender(string blockHash, BigInteger transactionIndex)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHash, float maxWaitTimeInMilliseconds = 15000)
+        {
+            TransactionReceipt receipt = null;
+            float startTime = Time.time;
+            int timeBetweenChecks = 500;
+            while (receipt == null)
+            {
+                receipt = await TransactionReceipt(transactionHash);
+
+                float elapsedTime = Time.time - startTime;
+                if (elapsedTime * 1000 + timeBetweenChecks >= maxWaitTimeInMilliseconds)
+                {
+                    return receipt;
+                }
+
+                Thread.Sleep(timeBetweenChecks);
+            }
+            return receipt;
         }
     }
 }
