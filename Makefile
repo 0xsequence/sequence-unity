@@ -42,7 +42,7 @@ check-testchain-running:
 	|| { echo "*****"; echo "Oops! testchain is not running. Please run 'make start-testchain' in another terminal or use 'test-concurrently'."; echo "*****"; exit 1; }
 
 test-testchain: 
-	 cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && yarn test > ../chaintest.out
+	 cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && yarn test > ../chaintest.out && cd .. && make stop && cat chaintest.out
 
 stop:
 	-pkill -F ./testchain/.pid && rm testchain/.pid

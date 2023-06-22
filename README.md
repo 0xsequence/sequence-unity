@@ -17,11 +17,11 @@ tests.
 
 ### Testing the test chain
 Occasionally, it may be necessary to test the testchain to a) confirm it is 
-giving the behaviours you expect and b) to use for comparison with out 
+giving the behaviours you expect and b) to use for comparison with our 
 Unity tests. We can safely assume that ethers (which we use to test the 
-testchain) works correctly. To test please use `make test-testchain`. You 
-can terminate the test with `Control+C` and `make stop` and read the output 
-with `cat chaintest.out`.
+testchain) works correctly. To test please use `make test-testchain`. Test output will be in 
+chaintest.out and will also be printed to the terminal. If you need to end the test suite 
+early, use `Control+C` and `make stop`.
 
 ## Architecture Decision Records
 
