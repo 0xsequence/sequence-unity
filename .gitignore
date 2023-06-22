@@ -91,3 +91,6 @@ crashlytics-build.properties
 .vscode
 .idea
 .history/
+
+# Test output
+chaintest.out

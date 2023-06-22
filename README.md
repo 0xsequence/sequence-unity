@@ -15,6 +15,14 @@ Before running tests, boot up the test chain with `make start-testchain`. You ma
 that you need to stop (control + c) the testchain and restart it between some of the 
 tests.
 
+### Testing the test chain
+Occasionally, it may be necessary to test the testchain to a) confirm it is 
+giving the behaviours you expect and b) to use for comparison with out 
+Unity tests. We can safely assume that ethers (which we use to test the 
+testchain) works correctly. To test please use `make test-testchain`. You 
+can terminate the test with `Control+C` and `make stop` and read the output 
+with `cat chaintest.out`.
+
 ## Architecture Decision Records
 
 Please add any ADRs below. In the future, it may be worthwhile to move these into 
