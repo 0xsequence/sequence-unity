@@ -94,3 +94,6 @@ crashlytics-build.properties
 
 # Test output
 chaintest.out
+
+# Node
+node_modules
