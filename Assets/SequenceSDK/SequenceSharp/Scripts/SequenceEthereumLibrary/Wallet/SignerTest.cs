@@ -37,7 +37,7 @@ public class SignerTest : MonoBehaviour
         string hashedPubkey = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(publicKeyBytes64));
         Debug.Log("hashed public key: " + hashedPubkey);
 
-        string address = wallet.Address();
+        string address = wallet.GetAddress();
         Debug.Log("address: " + address);
 
 

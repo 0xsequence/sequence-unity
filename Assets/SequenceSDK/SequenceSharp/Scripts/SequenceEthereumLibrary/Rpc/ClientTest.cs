@@ -146,7 +146,7 @@ public class ClientTest : MonoBehaviour
             Debug.Log("hashed Encoded List: " + SequenceCoder.ByteArrayToHexString(hashedParam));
             //Sign:
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-            Debug.Log("addr " + wallet.Address());
+            Debug.Log("addr " + wallet.GetAddress());
 
             (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam);
 

@@ -46,7 +46,7 @@ namespace Sequence.Wallet
         /// Retrieves the Ethereum address associated with the wallet.
         /// </summary>
         /// <returns>The Ethereum address as a string.</returns>
-        public string Address()
+        public string GetAddress()
         {
             //TODO: Address return type 
 
@@ -63,7 +63,7 @@ namespace Sequence.Wallet
         public async Task<BigInteger> GetBalance(SequenceEthClient client)
         {
             string blockNumber = await client.BlockNumber();
-            BigInteger balance = await client.BalanceAt(Address(), blockNumber);
+            BigInteger balance = await client.BalanceAt(GetAddress(), blockNumber);
             return balance;
         }
 
