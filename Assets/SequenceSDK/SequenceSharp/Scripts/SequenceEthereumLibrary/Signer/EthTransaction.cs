@@ -1,5 +1,6 @@
 using Sequence.ABI;
 using Sequence.RLP;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
@@ -22,6 +23,7 @@ namespace Sequence.Wallet
 
         public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
         {
+            ValidateParams(To, Value, GasPrice, GasLimit, Nonce);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
@@ -32,6 +34,7 @@ namespace Sequence.Wallet
 
         public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string v, string r, string s)
         {
+            ValidateParams(To, Value, GasPrice, GasLimit, Nonce);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
@@ -66,6 +69,8 @@ namespace Sequence.Wallet
 
         public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
         {
+            ValidateParams(to, value, gasPrice, gasLimit, nonce);
+
             List<object> txToEncode = new List<object>();
 
             txToEncode.Add(nonce.ToByteArray(true, true));
@@ -84,6 +89,8 @@ namespace Sequence.Wallet
 
         public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string v, string r, string s)
         {
+            ValidateParams(to, value, gasPrice, gasLimit, nonce);
+
             List<object> txToEncode = new List<object>();
             txToEncode.Add(nonce.ToByteArray(true, true));
             txToEncode.Add(gasPrice.ToByteArray(true, true));
@@ -100,6 +107,43 @@ namespace Sequence.Wallet
 
             byte[] encodedList = RLP.RLP.Encode(txToEncode);
             return "0x" + SequenceCoder.ByteArrayToHexString(encodedList);
+        }
+
+        /// <summary>
+        /// Throws an ArgumentOutOfRangeException if a transaction is supplied invalid inputs
+        /// </summary>
+        /// <param name="toAddress"></param>
+        /// <param name="value"></param>
+        /// <param name="gasPrice"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="nonce"></param>
+        public static void ValidateParams(
+            string toAddress,
+            BigInteger value,
+            BigInteger gasPrice,
+            BigInteger gasLimit,
+            BigInteger nonce)
+        {
+            if (string.IsNullOrEmpty(toAddress))
+            {
+                throw new ArgumentOutOfRangeException(nameof(toAddress));
+            }
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value));
+            }
+            if (gasPrice <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(gasPrice));
+            }
+            if (gasLimit <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(gasLimit));
+            }
+            if (nonce < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(nonce));
+            }
         }
 
     }
