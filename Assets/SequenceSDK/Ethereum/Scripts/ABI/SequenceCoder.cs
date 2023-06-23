@@ -154,8 +154,10 @@ namespace Sequence.ABI
         {
             try
             {
-                if (hexString == "") return new byte[] { };
-
+                if (hexString == null || hexString == "")
+                {
+                    return new byte[] { };
+                }
                 if (hexString.StartsWith("0x"))
                 {
                     hexString = hexString.Remove(0, 2);
