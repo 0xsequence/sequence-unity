@@ -11,6 +11,5 @@ namespace Sequence.Provider
         public int id;
         public JToken result;
         public RpcError error;
-
     }
 }

@@ -9,7 +9,6 @@ using UnityEngine.Networking;
 
 namespace Sequence.Provider
 {
-
     public class HttpRpcClient
     {
         private readonly string _url;
@@ -51,7 +50,6 @@ namespace Sequence.Provider
                 unityRequest.Dispose();
                 return result;
             }
-
         }
 
         public async Task<RpcResponse> SendRequest(string method, object[] parameters)
@@ -89,14 +87,10 @@ namespace Sequence.Provider
                 unityRequest.Dispose();
                 return result;
             }
-
-            
         }
 
         public async Task<RpcResponse> SendRequest(string requestJson)
         {
-
-
             var unityRequest = UnityWebRequest.Put(_url, requestJson);
 
             unityRequest.SetRequestHeader("Content-Type", "application/json");
@@ -118,10 +112,7 @@ namespace Sequence.Provider
                 unityRequest.Dispose();
                 return result;
             }
-
-
         }
-
     }
 
     public static class ExtensionMethods
@@ -132,6 +123,7 @@ namespace Sequence.Provider
             asyncOp.completed += obj => { tcs.SetResult(null); };
             return ((Task)tcs.Task).GetAwaiter();
         }
+
         public static TaskAwaiter GetAwaiter(this UnityWebRequestAsyncOperation webReqOp)
         {
             var tcs = new TaskCompletionSource<object>();

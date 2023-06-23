@@ -24,11 +24,9 @@ namespace Sequence.Wallet
         /// </summary>
         public EthWallet()
         {
-            //TODO: ...
             byte[] seed = Org.BouncyCastle.Security.SecureRandom.GetInstance("SHA256PRNG").GenerateSeed(64);
             privKey = ECPrivKey.Create(seed);
             pubKey = privKey.CreatePubKey();
-
         }
 
         /// <summary>
@@ -39,7 +37,6 @@ namespace Sequence.Wallet
         {
             privKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
             pubKey = privKey.CreatePubKey();
-
         }
 
         /// <summary>
@@ -48,8 +45,6 @@ namespace Sequence.Wallet
         /// <returns>The Ethereum address as a string.</returns>
         public string GetAddress()
         {
-            //TODO: Address return type 
-
             //Last 20 bytes of the Keccak-256 hash of the public key
             byte[] publickeyBytes = pubKey.ToBytes(false);
             byte[] publicKeyBytes64 = new byte[64];
@@ -57,7 +52,6 @@ namespace Sequence.Wallet
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
 
             return PubkeyToAddress(publicKeyBytes64);
-
         }
 
         public async Task<BigInteger> GetBalance(SequenceEthClient client)
@@ -135,13 +129,11 @@ namespace Sequence.Wallet
         /// <returns>The signature as a string.</returns>
         public string SignMessage(string privateKey, string message)
         {
-
             byte[] message32 = new byte[32];
             message32 = SequenceCoder.KeccakHash(PrefixedMessage(Encoding.UTF8.GetBytes(message)));
 
             ECPrivKey privKey = Context.Instance.CreateECPrivKey(SequenceCoder.HexStringToByteArray(privateKey));
             return EthSignature.Sign(message32, privKey);
-
         }
 
         /// <summary>
@@ -178,10 +170,7 @@ namespace Sequence.Wallet
                 return pubKey.SigVerify(sig, hashedMessage);
             }
 
-
             return false;
-
-
         }
 
         /// <summary>
@@ -205,7 +194,6 @@ namespace Sequence.Wallet
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64); //trim extra 0 at the beginning...
 
             return PubkeyToAddress(publicKeyBytes64);
-
         }
 
        
@@ -221,9 +209,7 @@ namespace Sequence.Wallet
             byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
             if (!message.Take(message191.Length).SequenceEqual(message191))
             {
-
                 message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
-
             }
 
             return message;
@@ -242,7 +228,6 @@ namespace Sequence.Wallet
 
             address = SequenceCoder.AddressChecksum(address);
             return address;
-
         }
     }
 }

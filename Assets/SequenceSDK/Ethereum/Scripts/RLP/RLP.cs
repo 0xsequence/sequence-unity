@@ -10,7 +10,6 @@ namespace Sequence.RLP
 {
     public class RLP
     {
-
         /// <summary>
         /// Encodes the input object using Recursive Length Prefix (RLP) encoding.
         /// </summary>
@@ -59,8 +58,6 @@ namespace Sequence.RLP
                 byte[] head = SequenceCoder.HexStringToByteArray(EncodeLength(output.Length, 192));
                 return head.Concat(output).ToArray();
             }
-            
-
             return null;
         }
 

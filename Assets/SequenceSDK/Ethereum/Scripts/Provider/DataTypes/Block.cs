@@ -24,6 +24,5 @@ namespace Sequence
         public List<string> transactions;
         public string transactionsRoot;
         public List<object> uncles;
-        
     }
 }

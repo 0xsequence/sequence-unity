@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
-
+using Sequence.Extensions;
 
 namespace Sequence.ABI
 {
@@ -25,8 +25,8 @@ namespace Sequence.ABI
         ADDRESS,
         BOOLEAN,
         NONE
-
     }
+
     public class ABI
     {
         static TupleCoder _tupleCoder = new TupleCoder();
@@ -47,7 +47,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error packing data: {ex.Message}");
                 return string.Empty;
             }
@@ -78,7 +77,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error generating function selector: {ex.Message}");
                 return string.Empty;
             }
@@ -105,8 +103,8 @@ namespace Sequence.ABI
                 }
                 else if (param.GetType() == typeof(string))
                 {
-                    //TODO: make address a custom type  
-                    if (((string)param).Length == 42 && ((string)param).StartsWith("0x"))
+                    //TODO: make address a custom type
+                    if (((string)param).IsAddress())
                     {
                         return ABIType.ADDRESS;
                     }
@@ -156,7 +154,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error determining parameter type: {ex.Message}");
             }
             return ABIType.NONE;
@@ -178,7 +175,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error determining static type: {ex.Message}");
             }
             return false;
@@ -192,7 +188,7 @@ namespace Sequence.ABI
         public static bool IsDynamicType(ABIType paramType)
         {
             /*
-             Definition: The following types are called “dynamic”:
+             Definition: The following types are called ?dynamic?:
 
                 bytes
 
@@ -246,7 +242,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error retrieving parameter types from ABI: {ex.Message}");
             }
             return new List<object>();
@@ -309,13 +304,10 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error retrieving parameter type by name: {ex.Message}");
             }
 
             return string.Empty;
         }
-
-
     }
 }

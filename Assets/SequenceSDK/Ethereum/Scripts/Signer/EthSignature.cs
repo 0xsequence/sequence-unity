@@ -26,7 +26,6 @@ namespace Sequence.Signer
         /// <returns>The signature as a string.</returns>
         public static string Sign(byte[] hashedMessage, ECPrivKey privKey)
         {
-            
             SecpRecoverableECDSASignature signature;
             bool signed = privKey.TrySignRecoverable(hashedMessage, out signature);
 
@@ -139,7 +138,6 @@ namespace Sequence.Signer
                 return recoverable;
             }
             return null;
-
         }
 
 

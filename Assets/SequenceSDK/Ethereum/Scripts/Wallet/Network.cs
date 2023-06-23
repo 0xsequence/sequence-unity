@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Sequence.Wallet
 {
-    
     public class Network
     {
 

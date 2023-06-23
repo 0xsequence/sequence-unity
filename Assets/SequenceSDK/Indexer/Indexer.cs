@@ -177,7 +177,6 @@ namespace Sequence
         public static async Task<GetTokenBalancesReturn> GetTokenBalances(BigInteger chainID, GetTokenBalancesArgs args)
         {
             var responseBody = await HTTPPost(chainID, "GetTokenBalances", args);
-            //Debug.Log(responseBody);
             return BuildResponse<GetTokenBalancesReturn>(responseBody);
         }
 
@@ -242,7 +241,6 @@ namespace Sequence
             string returnText = req.downloadHandler.text;
             req.Dispose();
             return returnText;
-            // return req.downloadHandler.text;
         }
 
         /// <summary>
@@ -266,6 +264,7 @@ namespace Sequence
             asyncOp.completed += obj => { tcs.SetResult(null); };
             return ((Task)tcs.Task).GetAwaiter();
         }
+
         public static TaskAwaiter GetAwaiter(this UnityWebRequestAsyncOperation webReqOp)
         {
             var tcs = new TaskCompletionSource<object>();

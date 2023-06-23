@@ -16,7 +16,5 @@ namespace Sequence.Provider
             method = _method;
             rawParameters = _parameterList;
         }
-
-        
     }
 }

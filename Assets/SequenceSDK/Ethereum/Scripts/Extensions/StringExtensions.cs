@@ -37,7 +37,37 @@ namespace Sequence.Extensions
 
         private static bool HasHexPrefix(this string value)
         {
+            if (value == null)
+            {
+                return false;
+            }
             return value.StartsWith("0x");
+        }
+
+        public static bool IsHexFormat(this string value)
+        {
+            if (!value.HasHexPrefix())
+            {
+                return false;
+            }
+
+            value = value.Replace("0x", "");
+
+            int length = value.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (!((value[i] >= '0' && value[i] <= '9') ||
+                    (value[i] >= 'a' && value[i] <= 'f') ||
+                    (value[i] >= 'A' && value[i] <= 'F'))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool IsAddress(this string value)
+        {
+            return value.Length == 42 && value.IsHexFormat();
         }
     }
 }

@@ -19,8 +19,6 @@ namespace Sequence.ABI
         {
             try
             {
-
-
                 if (address.StartsWith("0x"))
                 {
                     address = address.Substring(2);
@@ -58,7 +56,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error computing checksum address: {ex.Message}");
                 return string.Empty;
             }
@@ -86,7 +83,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error computing Keccak-256 hash: {ex.Message}");
                 return string.Empty;
             }
@@ -112,7 +108,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error computing Keccak-256 hash: {ex.Message}");
                 return new byte[0];
             }
@@ -133,11 +128,9 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error computing Keccak-256 hash: {ex.Message}");
                 return string.Empty;
             }
-
         }
 
 
@@ -194,7 +187,6 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error converting hexadecimal string to byte array: {ex.Message}");
                 return new byte[0];
             }
@@ -217,13 +209,9 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                // Handle exception
                 Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
         }
-
-       
-
     }
 }

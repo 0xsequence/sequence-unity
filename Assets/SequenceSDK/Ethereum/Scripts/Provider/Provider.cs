@@ -39,6 +39,7 @@ namespace Sequence.Provider
         {
             httpClient = _httpClient;
         }
+
         public async Task Send(string payload)
         {
             //?

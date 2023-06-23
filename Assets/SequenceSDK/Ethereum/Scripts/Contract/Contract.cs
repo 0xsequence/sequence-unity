@@ -29,15 +29,7 @@ namespace Sequence.Contracts
         public async Task<T> GetEventLog<T>(string eventName, BigInteger blockNumber)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHash)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        
+        }        
     }
 }
 
