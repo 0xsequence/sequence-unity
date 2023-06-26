@@ -56,8 +56,6 @@ namespace Sequence.RPC
 
         public async Task<RpcResponse> SendRequest(string method, object[] parameters)
         {
-            Debug.Log("current url: "+ _url);
-            Debug.Log("parameters:"+ parameters);
             var request = new
             {
                 jsonrpc = "2.0",
