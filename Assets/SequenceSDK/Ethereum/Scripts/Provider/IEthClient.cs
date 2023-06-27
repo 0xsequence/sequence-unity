@@ -129,13 +129,19 @@ namespace Sequence.Provider
 		/// <returns></returns>
 		Task<Block> HeaderByNumber(string blockNumber);
 
-
 		/// <summary>
-		/// TransactionByHash = eth_getTransactionByHash
+		/// Continually calls eth_getTransactionReceipt until a response is received or timeout
 		/// </summary>
 		/// <param name="transactionHash"></param>
 		/// <returns></returns>
-		Task<Transaction> TransactionByHash(string transactionHash);
+		Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHashint, int maxWaitTimeInMilliseconds = 15000, int timeBetweenChecksInMilliseconds = 500);
+
+        /// <summary>
+        /// TransactionByHash = eth_getTransactionByHash
+        /// </summary>
+        /// <param name="transactionHash"></param>
+        /// <returns></returns>
+        Task<Transaction> TransactionByHash(string transactionHash);
 
 
 		/// <summary>
@@ -326,5 +332,12 @@ namespace Sequence.Provider
 		/// <param name="transaction"></param>
 		/// <returns></returns>
 		Task<string> SendTransaction(Transaction transaction);
+
+		/// <summary>
+		/// eth_sendRawTransaction on a signed transaction hash
+		/// </summary>
+		/// <param name="signedTransactionData"></param>
+		/// <returns></returns>
+		Task<string> SendRawTransaction(string signedTransactionData);
 	}
 }

@@ -61,7 +61,7 @@ namespace Sequence.Wallet
             return balance;
         }
 
-        public System.Numerics.BigInteger GetNonce()
+        public BigInteger GetNonce()
         {
             return NonceService.GetNonce(this);
         }
@@ -81,7 +81,7 @@ namespace Sequence.Wallet
             return EthSignature.SignAndReturnVRS(message, privKey);
         }
 
-        public async Task<string> SendRawTransaction(SequenceEthClient client, string signedTransactionData)
+        public async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
         {
             IncrementNonce();
             string result = await client.SendRawTransaction(signedTransactionData);

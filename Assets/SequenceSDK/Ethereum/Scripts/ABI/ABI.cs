@@ -27,7 +27,7 @@ namespace Sequence.ABI
         NONE
     }
 
-    public class ABI
+    public static class ABI
     {
         static TupleCoder _tupleCoder = new TupleCoder();
 

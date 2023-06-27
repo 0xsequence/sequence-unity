@@ -189,7 +189,7 @@ namespace Sequence.Provider
             throw new System.NotImplementedException();
         }
 
-        internal async Task<string> SendRawTransaction(string signedTransactionData)
+        public async Task<string> SendRawTransaction(string signedTransactionData)
         {
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_sendRawTransaction", new object[] { signedTransactionData });
