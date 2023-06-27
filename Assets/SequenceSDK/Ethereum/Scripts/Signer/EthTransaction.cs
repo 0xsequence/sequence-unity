@@ -125,7 +125,7 @@ namespace Sequence.Wallet
             BigInteger gasLimit,
             BigInteger nonce)
         {
-            if (toAddress.IsAddress())
+            if (!toAddress.IsAddress())
             {
                 throw new ArgumentOutOfRangeException(nameof(toAddress));
             }

@@ -1,9 +1,10 @@
-using Newtonsoft.Json;
-using Sequence.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Sequence.Extensions;
 using UnityEngine;
 
 namespace Sequence.Provider
@@ -66,12 +67,15 @@ namespace Sequence.Provider
             return blocks;
         }
 
-        public async Task<string> CallContract()
+        public async Task<string> CallContract(string contractAddress, params object[] args)
         {
-            //[FOCUS IMPLEMENTATION]
-            var blockNumber = await BlockNumber();
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_call", new object[] { blockNumber });
-            //Deserialize
+            if (!contractAddress.IsAddress())
+            {
+                throw new ArgumentOutOfRangeException(nameof(contractAddress));
+            }
+
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
+           
             string result = JsonConvert.DeserializeObject<string>(response.result.ToString());
             return result;
         }

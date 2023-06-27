@@ -271,12 +271,13 @@ namespace Sequence.Provider
 		/// <returns></returns>
 		Task<BigInteger> PendingTransactionCount();
 
-
 		/// <summary>
 		/// CallContract = eth_call (blockNumber)
 		/// </summary>
+		/// <param name="contractAddress"></param>
+		/// <param name="args"></param>
 		/// <returns></returns>
-		Task<string> CallContract();
+		Task<string> CallContract(string contractAddress, params object[] args);
 
 
 		/// <summary>
