@@ -36,7 +36,6 @@ namespace Sequence.ABI
                     else if ("abcdefABCDEF".Contains(c))
                     {
                         int hashedAddressNibble = Convert.ToInt32(hashedAddress[idx].ToString(), 16);
-
                         if (hashedAddressNibble > 7)
                         {
                             checksumAddress += Char.ToUpper(c);
@@ -44,7 +43,6 @@ namespace Sequence.ABI
                         else
                         {
                             checksumAddress += c;
-
                         }
                     }
                     else

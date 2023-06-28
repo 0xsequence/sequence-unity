@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Sequence.Provider;
 using Sequence.Wallet;
 using UnityEngine;
+using static Sequence.Contracts.Contract;
 
 namespace Sequence.Contracts
 {
@@ -14,12 +15,11 @@ namespace Sequence.Contracts
             this Contract contract,
             EthWallet wallet,
             IEthClient client,
-            string toAddress,
             BigInteger value,
             string functionName,
             params object[] functionArgs)
         {
-            ContractCall callingInfo = new ContractCall(wallet.GetAddress(), toAddress, wallet.GetNonce(), value);
+            ContractCall callingInfo = new ContractCall(wallet.GetNonce(), value);
             EthTransaction transaction = await contract.CallFunction(functionName, functionArgs)(client, callingInfo);
             string signedTransaction = transaction.SignAndEncodeTransaction(wallet);
             string result = await wallet.SendRawTransaction(client, signedTransaction);
@@ -30,12 +30,34 @@ namespace Sequence.Contracts
             this Contract contract,
             EthWallet wallet,
             IEthClient client,
-            string toAddress,
             BigInteger value,
             string functionName,
             params object[] functionArgs)
         {
-            string transactionHash = await contract.SendTransactionMethod(wallet, client, toAddress, value, functionName, functionArgs);
+            string transactionHash = await contract.SendTransactionMethod(wallet, client, value, functionName, functionArgs);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
+            return receipt;
+        }
+
+        public static async Task<string> SendTransactionMethod(
+            this CallContractFunctionTransactionCreator transactionCreator,
+            EthWallet wallet,
+            IEthClient client,
+            BigInteger? value = null)
+        {
+            EthTransaction transaction = await transactionCreator(client, new ContractCall(wallet.GetNonce(), value));
+            string signedTransaction = transaction.SignAndEncodeTransaction(wallet);
+            string result = await wallet.SendRawTransaction(client, signedTransaction);
+            return result;
+        }
+
+        public static async Task<TransactionReceipt> SendTransactionMethodAndWaitForReceipt(
+            this CallContractFunctionTransactionCreator transactionCreator,
+            EthWallet wallet,
+            IEthClient client,
+            BigInteger? value = null)
+        {
+            string transactionHash = await SendTransactionMethod(transactionCreator, wallet, client, value);
             TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
             return receipt;
         }

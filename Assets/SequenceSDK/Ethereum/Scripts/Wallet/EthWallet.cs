@@ -88,6 +88,13 @@ namespace Sequence.Wallet
             return result;
         }
 
+        public async Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData)
+        {
+            string result = await SendRawTransaction(client, signedTransactionData);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            return receipt;
+        }
+
         /// <summary>
         /// 
         /// https://docs.ethers.org/v5/api/signer/#Signer-signMessage

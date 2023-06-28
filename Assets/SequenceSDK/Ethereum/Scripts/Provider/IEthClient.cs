@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Wallet;
 using UnityEngine;
 
 namespace Sequence.Provider
@@ -274,10 +275,9 @@ namespace Sequence.Provider
 		/// <summary>
 		/// CallContract = eth_call (blockNumber)
 		/// </summary>
-		/// <param name="contractAddress"></param>
 		/// <param name="args"></param>
 		/// <returns></returns>
-		Task<string> CallContract(string contractAddress, params object[] args);
+		Task<string> CallContract(params object[] args);
 
 
 		/// <summary>
@@ -321,9 +321,8 @@ namespace Sequence.Provider
 		/// EstimateGas = eth_estimateGas
 		/// </summary>
 		/// <param name="transactionCall"></param>
-		/// <param name="blockNumber"></param>
 		/// <returns></returns>
-		Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber);
+		Task<BigInteger> EstimateGas(TransactionCall transactionCall);
 
 
 		/// <summary>

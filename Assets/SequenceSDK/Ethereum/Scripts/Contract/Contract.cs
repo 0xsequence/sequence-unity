@@ -27,19 +27,18 @@ namespace Sequence.Contracts
             throw new NotImplementedException();
         }
 
-        public CallContractFunctionTransactionCreator CallFunction(string functionName, params object[] functionArgs)
+        public CallContractFunctionTransactionCreator CallFunction(string functionSignature, params object[] functionArgs)
         {
-            string callData = ABI.ABI.Pack($"function {functionName}({functionArgs})");
+            string callData = ABI.ABI.Pack(functionSignature, functionArgs);
             return async (IEthClient client, ContractCall contractCallInfo) =>
             {
                 TransactionCall call = new TransactionCall
                 {
-                    from = contractCallInfo.fromAddress,
-                    to = contractCallInfo.toAddress,
+                    to = this.address,
                     value = contractCallInfo.value,
+                    data = callData,
                 };
-                string blockNumber = await client.BlockNumber();
-                BigInteger gasLimitEstimate = await client.EstimateGas(call, blockNumber);
+                BigInteger gasLimitEstimate = await client.EstimateGas(call);
 
                 if (contractCallInfo.gasPrice == 0)
                 {
@@ -81,13 +80,11 @@ namespace Sequence.Contracts
 
     public class ContractCall
     {
-        public string fromAddress;
-        public string toAddress;
         public BigInteger nonce;
         public BigInteger value;
         public BigInteger gasPrice;
 
-        public ContractCall(string fromAddress, string toAddress, BigInteger nonce, BigInteger? value = null, BigInteger? gasPrice = null)
+        public ContractCall(BigInteger nonce, BigInteger? value = null, BigInteger? gasPrice = null)
         {
             if (value == null)
             {
@@ -98,14 +95,6 @@ namespace Sequence.Contracts
                 gasPrice = BigInteger.Zero;
             }
 
-            if (!fromAddress.IsAddress())
-            {
-                throw new ArgumentOutOfRangeException(nameof(fromAddress));
-            }
-            if (!toAddress.IsAddress())
-            {
-                throw new ArgumentOutOfRangeException(nameof(toAddress));
-            }
             if (nonce < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(nonce));
@@ -119,8 +108,6 @@ namespace Sequence.Contracts
                 throw new ArgumentOutOfRangeException(nameof(gasPrice));
             }
 
-            this.fromAddress = fromAddress;
-            this.toAddress = toAddress;
             this.value = (BigInteger)value;
         }
     }

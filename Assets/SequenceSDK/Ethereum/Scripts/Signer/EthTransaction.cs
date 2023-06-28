@@ -158,6 +158,5 @@ namespace Sequence.Wallet
             string tx = this.RLPEncode();
             return tx;
         }
-
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Extensions;
+using Sequence.Wallet;
 using UnityEngine;
 
 namespace Sequence.Provider
@@ -68,13 +69,8 @@ namespace Sequence.Provider
             return blocks;
         }
 
-        public async Task<string> CallContract(string contractAddress, params object[] args)
+        public async Task<string> CallContract(params object[] args)
         {
-            if (!contractAddress.IsAddress())
-            {
-                throw new ArgumentOutOfRangeException(nameof(contractAddress));
-            }
-
             RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
            
             string result = response.result.ToString();
@@ -104,9 +100,15 @@ namespace Sequence.Provider
             return code;
         }
 
-        public async Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber)
+        public async Task<BigInteger> EstimateGas(TransactionCall transactionCall)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { transactionCall, blockNumber });
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                ["to"] = transactionCall.to,
+                ["value"] = transactionCall.value.BigIntegerToHexString(),
+                ["data"] = transactionCall.data
+            };
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { parameters });
             BigInteger gas = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return gas;
         }
