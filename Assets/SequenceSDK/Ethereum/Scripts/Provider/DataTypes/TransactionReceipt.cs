@@ -16,7 +16,7 @@ namespace Sequence
         public string effectiveGasPrice;
         public string gasUsed;
         public string contractAddress;
-        public List<string> logs;
+        public List<Log> logs;
         public string logsBloom;
         public string type;
         public string root;

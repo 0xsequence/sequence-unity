@@ -24,7 +24,7 @@ namespace Sequence.Wallet
 
         public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
         {
-            ValidateParams(To, Value, GasPrice, GasLimit, Nonce);
+            ValidateParams(to, value, gasPrice, gasLimit, nonce);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
@@ -35,7 +35,7 @@ namespace Sequence.Wallet
 
         public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string v, string r, string s)
         {
-            ValidateParams(To, Value, GasPrice, GasLimit, Nonce);
+            ValidateParams(to, value, gasPrice, gasLimit, nonce);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
@@ -55,7 +55,7 @@ namespace Sequence.Wallet
             txToEncode.Add(SequenceCoder.HexStringToByteArray(GasLimit.ToString("x")));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(To));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Value.ToString("x")));
-            txToEncode.Add(new byte[] { });
+            txToEncode.Add(SequenceCoder.HexStringToByteArray(Data));
 
             if (V!=null && R!= null && S!= null)
             {

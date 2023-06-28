@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using Org.BouncyCastle.Crypto.Digests;
 using UnityEngine;
 
@@ -212,6 +213,23 @@ namespace Sequence.ABI
                 Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
+        }
+
+        public static string HexStringToHumanReadable(string hexString)
+        {
+            byte[] bytes = HexStringToByteArray(hexString);
+            string hexValue = hexString.Substring(2);
+            string result = Encoding.UTF8.GetString(bytes);
+            string cleaned = RemoveControlCharacters(result).TrimStart(' ').TrimEnd(' '); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
+            return cleaned;
+        }
+
+        private static string RemoveControlCharacters(string value)
+        {
+            // Regular expression pattern to match control characters
+            string pattern = @"\p{Cc}";
+            string cleaned = Regex.Replace(value, pattern, "");
+            return cleaned;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.ABI;
 using Sequence.Extensions;
 using UnityEngine;
 
@@ -76,7 +77,8 @@ namespace Sequence.Provider
 
             RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
            
-            string result = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            string result = response.result.ToString();
+            result = SequenceCoder.HexStringToHumanReadable(result);
             return result;
         }
 
@@ -265,6 +267,7 @@ namespace Sequence.Provider
             }
             if (response.result != null)
             {
+                Debug.Log(response.result);
                 receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
             }
             return receipt;

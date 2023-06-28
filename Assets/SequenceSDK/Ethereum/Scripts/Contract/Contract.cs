@@ -7,6 +7,7 @@ using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Extensions;
 using Sequence.Wallet;
+using System.Text;
 
 namespace Sequence.Contracts
 {
@@ -18,7 +19,7 @@ namespace Sequence.Contracts
 
         public Contract(string contractAddress)
         {
-
+            address = contractAddress;
         }
 
         public async Task<string> Deploy(string bytecode, params object[] constructorArgs)
@@ -58,9 +59,30 @@ namespace Sequence.Contracts
             };
         }
 
-        public async Task<string> QueryContract(IEthClient client, params object[] args)
+        public async Task<string> QueryContract(IEthClient client, string[] args)
         {
-            return await client.CallContract(this.address, args);
+            //byte[] bytes = Encoding.UTF8.GetBytes(args);
+            byte[] concatenatedBytes = new byte[0];
+            int numberOfArgs = args.Length;
+            for (int i = 0; i < numberOfArgs; i++)
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(args[i]);
+                byte[] temp = new byte[concatenatedBytes.Length + bytes.Length];
+                concatenatedBytes.CopyTo(temp, 0);
+                bytes.CopyTo(temp, concatenatedBytes.Length);
+                concatenatedBytes = temp;
+            }
+            byte[] hashedBytes = SequenceCoder.KeccakHash(concatenatedBytes);
+            string data = SequenceCoder.ByteArrayToHexString(hashedBytes).EnsureHexPrefix();
+            string to = address;
+            object[] toSendParams = new object[] {
+                new
+                {
+                    to,
+                    data
+                }
+            };
+            return await client.CallContract(this.address, toSendParams);
         }
 
         public async Task<T> GetEventLog<T>(string eventName, BigInteger blockNumber)
