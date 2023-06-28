@@ -59,21 +59,9 @@ namespace Sequence.Contracts
             };
         }
 
-        public async Task<string> QueryContract(IEthClient client, string[] args)
+        public async Task<string> QueryContract(IEthClient client, string functionSignature, params string[] args)
         {
-            //byte[] bytes = Encoding.UTF8.GetBytes(args);
-            byte[] concatenatedBytes = new byte[0];
-            int numberOfArgs = args.Length;
-            for (int i = 0; i < numberOfArgs; i++)
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(args[i]);
-                byte[] temp = new byte[concatenatedBytes.Length + bytes.Length];
-                concatenatedBytes.CopyTo(temp, 0);
-                bytes.CopyTo(temp, concatenatedBytes.Length);
-                concatenatedBytes = temp;
-            }
-            byte[] hashedBytes = SequenceCoder.KeccakHash(concatenatedBytes);
-            string data = SequenceCoder.ByteArrayToHexString(hashedBytes).EnsureHexPrefix();
+            string data = ABI.ABI.Pack(functionSignature, args);
             string to = address;
             object[] toSendParams = new object[] {
                 new

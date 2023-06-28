@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.ABI;
 using Sequence.Provider;
 using UnityEngine;
+using Sequence.Extensions;
+using System.Numerics;
 
 namespace Sequence.Contracts
 {
@@ -20,28 +23,34 @@ namespace Sequence.Contracts
             this.contract = new Contract(contractAddress);
         }
 
-        public Task<string> Name(IEthClient client) {
-            return contract.QueryContract(client, new string[] { "name()"});
+        public async Task<string> Name(IEthClient client)
+        {
+            string result = await contract.QueryContract(client, "name()");
+            return SequenceCoder.HexStringToHumanReadable(result);
         }
 
-        public Task<string> Symbol(IEthClient client)
+        public async Task<string> Symbol(IEthClient client)
         {
-            return contract.QueryContract(client, new string[] { "symbol()" });
+            string result = await contract.QueryContract(client, "symbol()");
+            return SequenceCoder.HexStringToHumanReadable(result);
         }
 
-        public Task<string> TotalSupply(IEthClient client)
+        public async Task<BigInteger> TotalSupply(IEthClient client)
         {
-            return contract.QueryContract(client, new string[] { "totalSupply()" });
+            string result = await contract.QueryContract(client, "totalSupply()");
+            return result.HexStringToBigInteger();
         }
 
-        public Task<string> BalanceOf(IEthClient client, string address)
+        public async Task<BigInteger> BalanceOf(IEthClient client, string address)
         {
-            return contract.QueryContract(client, new string[] { "balanceOf()", address });
+            string result = await contract.QueryContract(client, "balanceOf(address)", address);
+            return result.HexStringToBigInteger();
         }
 
-        public Task<string> Allowance(IEthClient client, string ownerAddress, string spenderAddress)
+        public async Task<BigInteger> Allowance(IEthClient client, string ownerAddress, string spenderAddress)
         {
-            return contract.QueryContract(client, new string[] { $"allowance({ownerAddress}, {spenderAddress})" });
+            string result = await contract.QueryContract(client, "allowance(address,address)", ownerAddress, spenderAddress);
+            return result.HexStringToBigInteger();
         }
     }
 }

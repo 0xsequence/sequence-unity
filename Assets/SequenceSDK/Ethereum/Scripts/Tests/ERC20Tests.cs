@@ -9,6 +9,7 @@ using Sequence.Provider;
 using Sequence;
 using System;
 using Sequence.Contracts;
+using System.Numerics;
 
 public class ERC20Tests
 {
@@ -48,23 +49,18 @@ public class ERC20Tests
 
             string name = await token.Name(client);
             Assert.AreEqual("TestToken", name);
-            Debug.Log($"Name: {name}");
 
             string symbol = await token.Symbol(client);
             Assert.AreEqual("STT", symbol);
-            Debug.Log($"Symbol: {symbol}");
 
-            //string supply = await token.TotalSupply(client);
-            //Assert.AreEqual("0", supply);
-            //Debug.Log($"Supply: {supply}");
+            BigInteger supply = await token.TotalSupply(client);
+            Assert.AreEqual(BigInteger.Zero, supply);
 
-            string balance = await token.BalanceOf(client, wallet1.GetAddress());
-            Assert.AreEqual("0", balance);
-            Debug.Log($"Balance: {balance}");
+            BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
+            Assert.AreEqual(BigInteger.Zero, balance);
 
-            string allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
-            Assert.AreEqual("0", allowance);
-            Debug.Log($"Allowance: {allowance}");
+            BigInteger allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.AreEqual(BigInteger.Zero, allowance);
         }
         catch (Exception ex)
         {

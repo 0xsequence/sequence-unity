@@ -78,7 +78,6 @@ namespace Sequence.Provider
             RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
            
             string result = response.result.ToString();
-            result = SequenceCoder.HexStringToHumanReadable(result);
             return result;
         }
 
