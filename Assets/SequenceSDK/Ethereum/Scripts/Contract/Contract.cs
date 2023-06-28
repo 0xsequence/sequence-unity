@@ -59,7 +59,7 @@ namespace Sequence.Contracts
             };
         }
 
-        public async Task<string> QueryContract(IEthClient client, string functionSignature, params string[] args)
+        public async Task<string> QueryContract(IEthClient client, string functionSignature, params object[] args)
         {
             string data = ABI.ABI.Pack(functionSignature, args);
             string to = address;

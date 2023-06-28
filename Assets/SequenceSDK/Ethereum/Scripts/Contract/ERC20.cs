@@ -49,7 +49,7 @@ namespace Sequence.Contracts
 
         public async Task<BigInteger> Allowance(IEthClient client, string ownerAddress, string spenderAddress)
         {
-            string result = await contract.QueryContract(client, "allowance(address,address)", ownerAddress, spenderAddress);
+            string result = await contract.QueryContract(client, "allowance(address, address)", ownerAddress, spenderAddress);
             return result.HexStringToBigInteger();
         }
     }
