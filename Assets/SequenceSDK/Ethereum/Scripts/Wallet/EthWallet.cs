@@ -61,14 +61,9 @@ namespace Sequence.Wallet
             return balance;
         }
 
-        public BigInteger GetNonce()
+        public async Task<BigInteger> GetNonce(IEthClient client)
         {
-            return NonceService.GetNonce(this);
-        }
-
-        private void IncrementNonce()
-        {
-            NonceService.IncrementNonce(this);
+            return await client.NonceAt(GetAddress());
         }
 
         public (string v, string r, string s) SignTransaction(byte[] message, int chainId)
@@ -83,7 +78,6 @@ namespace Sequence.Wallet
 
         public async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
         {
-            IncrementNonce();
             string result = await client.SendRawTransaction(signedTransactionData);
             return result;
         }

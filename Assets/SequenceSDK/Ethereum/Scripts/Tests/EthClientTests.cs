@@ -9,6 +9,7 @@ using System;
 using Sequence.Wallet;
 using Sequence.ABI;
 using Sequence.Provider;
+using System.Numerics;
 
 public class EthClientTests 
 {
@@ -19,7 +20,9 @@ public class EthClientTests
         {
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             EthWallet wallet2 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
-            string encoded_signing = EthTransaction.RLPEncode(wallet.GetNonce(), 100, 30000000, wallet2.GetAddress(), 1, "");
+            SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
+            BigInteger nonce = await wallet.GetNonce(client);
+            string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 30000000, wallet2.GetAddress(), 1, "");
             Assert.IsNotNull(encoded_signing);
             string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Assert.IsNotNull(signingHash);
@@ -28,9 +31,8 @@ public class EthClientTests
             Assert.IsNotNull(v);
             Assert.IsNotNull(r);
             Assert.IsNotNull(s);
-            string tx = EthTransaction.RLPEncode(wallet.GetNonce(), 100, 30000000, wallet2.GetAddress(), 1, "", v, r, s);
+            string tx = EthTransaction.RLPEncode(nonce, 100, 30000000, wallet2.GetAddress(), 1, "", v, r, s);
 
-            SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             string result = await wallet.SendRawTransaction(client, tx);
 
             Debug.Log("result: " + result);

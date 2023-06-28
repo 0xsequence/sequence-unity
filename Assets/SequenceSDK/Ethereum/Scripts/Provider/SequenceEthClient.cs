@@ -152,11 +152,9 @@ namespace Sequence.Provider
             return networkId;
         }
 
-        public async Task<BigInteger> NonceAt(string address, string blockNumber)
+        public async Task<BigInteger> NonceAt(string address, string blockNumber = "latest")
         {
-            //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionCount", new object[] { address, blockNumber });
-            //Deserialize
             BigInteger transactionCount = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return transactionCount;
         }

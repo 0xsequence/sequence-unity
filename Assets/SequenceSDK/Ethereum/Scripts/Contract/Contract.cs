@@ -38,18 +38,22 @@ namespace Sequence.Contracts
                     value = contractCallInfo.value,
                     data = callData,
                 };
-                BigInteger gasLimitEstimate = await client.EstimateGas(call);
-
                 if (contractCallInfo.gasPrice == 0)
                 {
                     contractCallInfo.gasPrice = await client.SuggestGasPrice();
+                    call.gasPrice = contractCallInfo.gasPrice;
                 }
-                call.gasPrice = contractCallInfo.gasPrice;
+                if (contractCallInfo.gasLimit == 0)
+                {
+                    contractCallInfo.gasLimit = await client.EstimateGas(call);
+                }
+
+                BigInteger nonce = await client.NonceAt(contractCallInfo.fromAddress);
 
                 EthTransaction transaction = new EthTransaction(
-                    contractCallInfo.nonce,
+                    nonce,
                     call.gasPrice,
-                    gasLimitEstimate,
+                    contractCallInfo.gasLimit,
                     call.to,
                     call.value,
                     callData);
@@ -80,11 +84,12 @@ namespace Sequence.Contracts
 
     public class ContractCall
     {
-        public BigInteger nonce;
+        public string fromAddress;
         public BigInteger value;
         public BigInteger gasPrice;
+        public BigInteger gasLimit;
 
-        public ContractCall(BigInteger nonce, BigInteger? value = null, BigInteger? gasPrice = null)
+        public ContractCall(string fromAddress, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null)
         {
             if (value == null)
             {
@@ -94,10 +99,14 @@ namespace Sequence.Contracts
             {
                 gasPrice = BigInteger.Zero;
             }
-
-            if (nonce < 0)
+            if (gasLimit == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(nonce));
+                gasLimit = BigInteger.Zero;
+            }
+
+            if (!fromAddress.IsAddress())
+            {
+                throw new ArgumentOutOfRangeException(nameof(fromAddress));
             }
             if (value < 0)
             {
@@ -107,8 +116,15 @@ namespace Sequence.Contracts
             {
                 throw new ArgumentOutOfRangeException(nameof(gasPrice));
             }
+            if (gasLimit < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(gasLimit));
+            }
 
+            this.fromAddress = fromAddress;
             this.value = (BigInteger)value;
+            this.gasPrice = (BigInteger)gasPrice;
+            this.gasLimit = (BigInteger)gasLimit;
         }
     }
 }

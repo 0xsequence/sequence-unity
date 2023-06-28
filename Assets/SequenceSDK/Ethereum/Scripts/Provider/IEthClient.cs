@@ -226,7 +226,7 @@ namespace Sequence.Provider
 		/// <param name="address"></param>
 		/// <param name="blockNumber"></param>
 		/// <returns></returns>
-		Task<BigInteger> NonceAt(string address, string blockNumber);
+		Task<BigInteger> NonceAt(string address, string blockNumber = "latest");
 
 		/// <summary>
 		/// FilterLogs = eth_getLogs

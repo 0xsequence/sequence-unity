@@ -31,7 +31,8 @@ public class ERC20Tests
     {
         try
         {
-            EthTransaction deployTransaction = new EthTransaction(wallet1.GetNonce(), 1, 30000000, StringExtensions.ZeroAddress, 0, bytecode);
+            BigInteger nonce = await wallet1.GetNonce(client);
+            EthTransaction deployTransaction = new EthTransaction(nonce, 1, 30000000, StringExtensions.ZeroAddress, 0, bytecode);
             string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet1);
             string result = await wallet1.SendRawTransaction(client, signedTransaction);
             TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
@@ -89,7 +90,8 @@ public class ERC20Tests
             ERC20 token = new ERC20(contractAddress);
 
             // Owner mints to their address
-            var contractCall = new ContractCall(wallet1.GetNonce());
+            BigInteger nonce = await wallet1.GetNonce(client);
+            var contractCall = new ContractCall(wallet1.GetAddress());
             EthTransaction mintTransaction = await token.Mint(wallet1.GetAddress(), mintAmount)
                 (client, contractCall);
             string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
@@ -103,8 +105,9 @@ public class ERC20Tests
             Assert.AreEqual(BigInteger.Zero, balance2);
 
             // Non owner attempts to mint to their address
+            nonce = await wallet2.GetNonce(client);
             mintTransaction = await token.Mint(wallet2.GetAddress(), mintAmount)
-                (client, new ContractCall(wallet2.GetNonce()));
+                (client, new ContractCall(wallet2.GetAddress()));
             signed = mintTransaction.SignAndEncodeTransaction(wallet2);
             receipt = await wallet2.SendRawTransactionAndWaitForReceipt(client, signed);
 
@@ -116,8 +119,9 @@ public class ERC20Tests
             Assert.AreEqual(BigInteger.Zero, balance2);
 
             // Owner mints to another address
+            nonce = await wallet1.GetNonce(client);
             mintTransaction = await token.Mint(wallet2.GetAddress(), mintAmount)
-                (client, new ContractCall(wallet1.GetNonce()));
+                (client, new ContractCall(wallet1.GetAddress()));
             signed = mintTransaction.SignAndEncodeTransaction(wallet1);
             receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
 

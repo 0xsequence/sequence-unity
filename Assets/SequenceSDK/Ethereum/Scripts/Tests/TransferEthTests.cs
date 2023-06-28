@@ -24,7 +24,8 @@ public class TransferEthTests
             BigInteger preBalance1 = await wallet1.GetBalance(client);
             BigInteger preBalance2 = await wallet2.GetBalance(client);
 
-            TransferEth transfer = new TransferEth(wallet1, wallet2.GetAddress(), 1000000, 100, 30000000, wallet1.GetNonce());
+            BigInteger nonce = await wallet1.GetNonce(client);
+            TransferEth transfer = new TransferEth(wallet1, wallet2.GetAddress(), 1000000, 100, 30000000, nonce);
             TransactionReceipt receipt = await transfer.SendAndWaitForReceipt(client);
 
             BigInteger postBalance1 = await wallet1.GetBalance(client);
