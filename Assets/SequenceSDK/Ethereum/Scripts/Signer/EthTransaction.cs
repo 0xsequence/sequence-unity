@@ -52,7 +52,7 @@ namespace Sequence.Wallet
             List<object> txToEncode = new List<object>();
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Nonce.ToString("x")));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(GasPrice.ToString("x")));
-            txToEncode.Add(SequenceCoder.HexStringToByteArray(GasLimit.ToString("x")));
+            txToEncode.Add(GasLimit.ToByteArray(true, true));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(To));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Value.ToString("x")));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Data));

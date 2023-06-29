@@ -73,7 +73,7 @@ namespace Sequence.Contracts
                     data
                 }
             };
-            return await client.CallContract(this.address, toSendParams);
+            return await client.CallContract(toSendParams);
         }
 
         public async Task<T> GetEventLog<T>(string eventName, BigInteger blockNumber)

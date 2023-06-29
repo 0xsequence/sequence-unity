@@ -266,7 +266,6 @@ namespace Sequence.Provider
             }
             if (response.result != null)
             {
-                Debug.Log(response.result);
                 receipt = JsonConvert.DeserializeObject<TransactionReceipt>(response.result.ToString());
             }
             return receipt;
