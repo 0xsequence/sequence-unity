@@ -74,7 +74,7 @@ public class ERC20Tests
             Assert.AreEqual((BigInteger)18, decimals);
 
             string owner = await token.Owner(client);
-            Assert.AreEqual(SequenceCoder.AddressChecksum(wallet1.GetAddress()), SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress(), SequenceCoder.AddressChecksum(owner));
         }
         catch (Exception ex)
         {
@@ -142,12 +142,13 @@ public class ERC20Tests
 
     public async Task TestBurn()
     {
+        ERC20 token = new ERC20(contractAddress);
+        TransactionReceipt receipt;
         try
         {
-            ERC20 token = new ERC20(contractAddress);
 
             // Burn tokens in own account
-            TransactionReceipt receipt = await token.Burn(mintAmount)
+            receipt = await token.Burn(mintAmount)
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
 
             BigInteger supply = await token.TotalSupply(client);
@@ -157,29 +158,43 @@ public class ERC20Tests
             BigInteger balance2 = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(mintAmount, balance2);
 
-            // Attempt to burn tokens in someone else's account without allowance
             BigInteger allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, allowance);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
 
+        try
+        {
+            // Attempt to burn tokens in someone else's account without allowance
             receipt = await token.BurnFrom(wallet2.GetAddress(), mintAmount)
-                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+                    .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            Assert.Fail("Expected an exception and none was thrown");
+        }
+        catch (Exception e)
+        {
+            Assert.AreEqual("Error: VM Exception while processing transaction: reverted with reason string 'ERC20: insufficient allowance'", e.Message);
+        }
 
-            supply = await token.TotalSupply(client);
+        try {
+            BigInteger supply = await token.TotalSupply(client);
             Assert.AreEqual(mintAmount, supply);
-            balance1 = await token.BalanceOf(client, wallet1.GetAddress());
+            BigInteger balance1 = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance1);
-            balance2 = await token.BalanceOf(client, wallet2.GetAddress());
+            BigInteger balance2 = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(mintAmount, balance2);
 
             // Give token spending approval
             receipt = await token.Approve(wallet1.GetAddress(), mintAmount)
                 .SendTransactionMethodAndWaitForReceipt(wallet2, client);
 
-            allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
+            BigInteger allowance = await token.Allowance(client, wallet2.GetAddress(), wallet1.GetAddress());
             Assert.AreEqual(mintAmount, allowance);
 
             // Burn tokens in someone else's account with allowance
-            receipt = await token.BurnFrom(wallet2.GetAddress(), mintAmount * 2)
+            receipt = await token.BurnFrom(wallet2.GetAddress(), mintAmount)
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
 
             supply = await token.TotalSupply(client);

@@ -109,6 +109,10 @@ namespace Sequence.Provider
                 ["data"] = transactionCall.data
             };
             RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { parameters });
+            if (response.result == null)
+            {
+                throw new Exception(response.error.Message);
+            }
             BigInteger gas = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return gas;
         }
