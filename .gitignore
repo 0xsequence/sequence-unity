@@ -101,3 +101,4 @@ node_modules
 # Hardhat
 testchain/artifacts/@openzeppelin
 testchain/artifacts/build-info
+testchain/cache/
