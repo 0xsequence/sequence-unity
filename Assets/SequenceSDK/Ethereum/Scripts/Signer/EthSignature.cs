@@ -156,7 +156,7 @@ namespace Sequence.Signer
         /// <returns>A tuple containing the signature components (v, r, s) as strings.</returns>
         public static (string v, string r, string s) GetSignatureForTransaction()
         {
-            return (("0x" + SequenceCoder.ByteArrayToHexString(V) ,("0x" + SequenceCoder.ByteArrayToHexString(R) ), ("0x"+ SequenceCoder.ByteArrayToHexString(S))));
+            return (("0x" + SequenceCoder.ByteArrayToHexString(V).TrimStart('0') ,("0x" + SequenceCoder.ByteArrayToHexString(R).TrimStart('0')), ("0x"+ SequenceCoder.ByteArrayToHexString(S).TrimStart('0'))));
         }
     }
 
