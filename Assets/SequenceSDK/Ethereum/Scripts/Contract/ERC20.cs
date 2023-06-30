@@ -10,16 +10,16 @@ using static Sequence.Contracts.Contract;
 
 namespace Sequence.Contracts
 {
-    public class ERC20
+    public class ERC20 : Ownable
     {
         Contract contract;
 
-        public ERC20(Contract contract)
+        public ERC20(Contract contract) : base(contract)
         {
             this.contract = contract;
         }
 
-        public ERC20(string contractAddress)
+        public ERC20(string contractAddress) : base(contractAddress)
         {
             this.contract = new Contract(contractAddress);
         }
@@ -101,24 +101,6 @@ namespace Sequence.Contracts
         public CallContractFunctionTransactionCreator BurnFrom(string fromAddress, BigInteger amount)
         {
             return contract.CallFunction("burnFrom(address,uint256)", fromAddress, amount);
-        }
-        #endregion
-
-        #region ownable
-        public async Task<string> Owner(IEthClient client)
-        {
-            string result = await contract.SendQuery(client, "owner()");
-            return result.Replace("0x", "").TrimStart('0').EnsureHexPrefix();
-        }
-
-        public CallContractFunctionTransactionCreator RenounceOwnership()
-        {
-            return contract.CallFunction("renounceOwnership()");
-        }
-
-        public CallContractFunctionTransactionCreator TransferOwnership(string toAddress)
-        {
-            return contract.CallFunction("transferOwnership(address)", toAddress);
         }
         #endregion
     }
