@@ -26,37 +26,37 @@ namespace Sequence.Contracts
 
         public async Task<string> Name(IEthClient client)
         {
-            string result = await contract.QueryContract(client, "name()");
+            string result = await contract.SendQuery(client, "name()");
             return SequenceCoder.HexStringToHumanReadable(result);
         }
 
         public async Task<string> Symbol(IEthClient client)
         {
-            string result = await contract.QueryContract(client, "symbol()");
+            string result = await contract.SendQuery(client, "symbol()");
             return SequenceCoder.HexStringToHumanReadable(result);
         }
 
         public async Task<BigInteger> Decimals(IEthClient client)
         {
-            string result = await contract.QueryContract(client, "decimals()");
+            string result = await contract.SendQuery(client, "decimals()");
             return result.HexStringToBigInteger();
         }
 
         public async Task<BigInteger> TotalSupply(IEthClient client)
         {
-            string result = await contract.QueryContract(client, "totalSupply()");
+            string result = await contract.SendQuery(client, "totalSupply()");
             return result.HexStringToBigInteger();
         }
 
         public async Task<BigInteger> BalanceOf(IEthClient client, string address)
         {
-            string result = await contract.QueryContract(client, "balanceOf(address)", address);
+            string result = await contract.SendQuery(client, "balanceOf(address)", address);
             return result.HexStringToBigInteger();
         }
 
         public async Task<BigInteger> Allowance(IEthClient client, string ownerAddress, string spenderAddress)
         {
-            string result = await contract.QueryContract(client, "allowance(address, address)", ownerAddress, spenderAddress);
+            string result = await contract.SendQuery(client, "allowance(address, address)", ownerAddress, spenderAddress);
             return result.HexStringToBigInteger();
         }
 
@@ -107,7 +107,7 @@ namespace Sequence.Contracts
         #region ownable
         public async Task<string> Owner(IEthClient client)
         {
-            string result = await contract.QueryContract(client, "owner()");
+            string result = await contract.SendQuery(client, "owner()");
             return result.Replace("0x", "").TrimStart('0').EnsureHexPrefix();
         }
 

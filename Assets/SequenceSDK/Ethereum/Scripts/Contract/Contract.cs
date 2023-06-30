@@ -15,7 +15,7 @@ namespace Sequence.Contracts
     {
         string address;
         public delegate Task<EthTransaction> CallContractFunctionTransactionCreator(IEthClient client, ContractCall contractCallInfo);
-
+        public delegate Task<string> QueryContractMessageSender(IEthClient client);
 
         public Contract(string contractAddress)
         {
@@ -62,7 +62,7 @@ namespace Sequence.Contracts
             };
         }
 
-        public async Task<string> QueryContract(IEthClient client, string functionSignature, params object[] args)
+        public QueryContractMessageSender QueryContract(string functionSignature, params object[] args)
         {
             string data = ABI.ABI.Pack(functionSignature, args);
             string to = address;
@@ -73,7 +73,10 @@ namespace Sequence.Contracts
                     data
                 }
             };
-            return await client.CallContract(toSendParams);
+            return async (IEthClient client) =>
+            {
+                return await client.CallContract(toSendParams);
+            };
         }
 
         public async Task<T> GetEventLog<T>(string eventName, BigInteger blockNumber)
