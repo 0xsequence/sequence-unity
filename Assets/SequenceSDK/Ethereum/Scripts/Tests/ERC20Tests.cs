@@ -178,7 +178,8 @@ public class ERC20Tests
             Assert.AreEqual("Error: VM Exception while processing transaction: reverted with reason string 'ERC20: insufficient allowance'", e.Message);
         }
 
-        try {
+        try
+        {
             BigInteger supply = await token.TotalSupply(client);
             Assert.AreEqual(amount, supply);
             BigInteger balance1 = await token.BalanceOf(client, wallet1.GetAddress());
@@ -213,7 +214,7 @@ public class ERC20Tests
     [Test]
     public async Task TestTransfer()
     {
-            ERC20 token = new ERC20(contractAddress);
+        ERC20 token = new ERC20(contractAddress);
         try
         {
             // Mint initial tokens
@@ -290,6 +291,56 @@ public class ERC20Tests
             Assert.AreEqual(amount, balance2);
 
             await TestBurn();
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    [Test]
+    public async Task TestAllowance()
+    {
+        ERC20 token = new ERC20(contractAddress);
+        try
+        {
+            BigInteger allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.AreEqual(BigInteger.Zero, allowance);
+
+            TransactionReceipt receipt = await token.IncreaseAllowance(wallet2.GetAddress(), amount)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.AreEqual(amount, allowance);
+
+            receipt = await token.DecreaseAllowance(wallet2.GetAddress(), amount)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.AreEqual(BigInteger.Zero, allowance);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    [Test]
+    public async Task TestOwner()
+    {
+        ERC20 token = new ERC20(contractAddress);
+        try
+        {
+            string owner = await token.Owner(client);
+            Assert.AreEqual(wallet1.GetAddress(), SequenceCoder.AddressChecksum(owner));
+
+            TransactionReceipt receipt = await token.TransferOwnership(wallet2.GetAddress())
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            owner = await token.Owner(client);
+            Assert.AreEqual(wallet2.GetAddress(), SequenceCoder.AddressChecksum(owner));
+
+            receipt = await token.TransferOwnership(wallet1.GetAddress())
+                .SendTransactionMethodAndWaitForReceipt(wallet2, client);
+            owner = await token.Owner(client);
+            Assert.AreEqual(wallet1.GetAddress(), SequenceCoder.AddressChecksum(owner));
         }
         catch (Exception ex)
         {
