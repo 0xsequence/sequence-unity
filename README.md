@@ -29,6 +29,8 @@ Here are a few things to try:
 1. If you are or were using a debugger, disconnect the debugger from Unity and then reconnect
 2. Restart the test chain `Control+C` and `make start-testchain`
 3. Restart Unity
+* Also note that since tests on the testchain are being run sequentially, if a prior test fails, it may not 
+have unwound properly and may leave the next test in an unexpected state - causing it to fail.
 
 ## Component Overview
 The SDK is broken into a number of components with different responsibilities. This section will give an overview of some of the most important components for users and their intended purposes.

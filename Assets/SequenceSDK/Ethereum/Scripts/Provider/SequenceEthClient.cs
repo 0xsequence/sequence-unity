@@ -72,7 +72,11 @@ namespace Sequence.Provider
         public async Task<string> CallContract(params object[] args)
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
-           
+            if (response.result == null)
+            {
+                throw new Exception(response.error.Message);
+            }
+
             string result = response.result.ToString();
             return result;
         }
@@ -104,6 +108,7 @@ namespace Sequence.Provider
         {
             Dictionary<string, object> parameters = new Dictionary<string, object>
             {
+                ["from"] = transactionCall.from,
                 ["to"] = transactionCall.to,
                 ["value"] = transactionCall.value.BigIntegerToHexString(),
                 ["data"] = transactionCall.data

@@ -46,7 +46,6 @@ namespace Sequence.Contracts
             IEthClient client,
             BigInteger? value = null)
         {
-            BigInteger nonce = await wallet.GetNonce(client);
             EthTransaction transaction = await transactionCreator(client, new ContractCall(wallet.GetAddress(), value));
             string signedTransaction = transaction.SignAndEncodeTransaction(wallet);
             string result = await wallet.SendRawTransaction(client, signedTransaction);

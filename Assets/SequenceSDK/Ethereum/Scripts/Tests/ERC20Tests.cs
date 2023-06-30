@@ -27,7 +27,7 @@ public class ERC20Tests
 
     // Please don't remove, this test setups remaining tests by deploying the contract on the testchain
     [Test]
-    public async Task TestDeployERC20Contract()
+    public async Task _TestDeployERC20Contract()
     {
         try
         {
@@ -85,10 +85,9 @@ public class ERC20Tests
     [Test]
     public async Task TestERC20Mint()
     {
+        ERC20 token = new ERC20(contractAddress);
         try
         {
-            ERC20 token = new ERC20(contractAddress);
-
             // Owner mints to their address
             BigInteger nonce = await wallet1.GetNonce(client);
             var contractCall = new ContractCall(wallet1.GetAddress());
@@ -103,27 +102,40 @@ public class ERC20Tests
             Assert.AreEqual(amount, balance1);
             BigInteger balance2 = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance2);
-
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+        try
+        {
             // Non owner attempts to mint to their address
-            nonce = await wallet2.GetNonce(client);
-            mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
+            BigInteger nonce = await wallet2.GetNonce(client);
+            EthTransaction mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
                 (client, new ContractCall(wallet2.GetAddress()));
-            signed = mintTransaction.SignAndEncodeTransaction(wallet2);
-            receipt = await wallet2.SendRawTransactionAndWaitForReceipt(client, signed);
+            string signed = mintTransaction.SignAndEncodeTransaction(wallet2);
+            TransactionReceipt receipt = await wallet2.SendRawTransactionAndWaitForReceipt(client, signed);
+            Assert.Fail("Expected an exception and none was thrown");
+        }
+        catch (Exception e)
+        {
+            Assert.AreEqual("Error: VM Exception while processing transaction: reverted with reason string 'Ownable: caller is not the owner'", e.Message);
+        }
 
-            supply = await token.TotalSupply(client);
+        try { 
+            BigInteger supply = await token.TotalSupply(client);
             Assert.AreEqual(amount, supply);
-            balance1 = await token.BalanceOf(client, wallet1.GetAddress());
+            BigInteger balance1 = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual(amount, balance1);
-            balance2 = await token.BalanceOf(client, wallet2.GetAddress());
+            BigInteger balance2 = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance2);
 
             // Owner mints to another address
-            nonce = await wallet1.GetNonce(client);
-            mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
+            BigInteger nonce = await wallet1.GetNonce(client);
+            EthTransaction mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
                 (client, new ContractCall(wallet1.GetAddress()));
-            signed = mintTransaction.SignAndEncodeTransaction(wallet1);
-            receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
+            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
+            TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
 
             supply = await token.TotalSupply(client);
             Assert.AreEqual(amount * 2, supply);

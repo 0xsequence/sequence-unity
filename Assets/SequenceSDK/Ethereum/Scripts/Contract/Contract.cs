@@ -34,6 +34,7 @@ namespace Sequence.Contracts
             {
                 TransactionCall call = new TransactionCall
                 {
+                    from = contractCallInfo.fromAddress,
                     to = this.address,
                     value = contractCallInfo.value,
                     data = callData,
