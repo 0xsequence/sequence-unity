@@ -1,9 +1,0 @@
-{
-  "dependencies": {
-    "chai": "^4.3.7",
-    "chai-as-promised": "^7.1.1"
-  },
-  "devDependencies": {
-    "@types/chai-as-promised": "^7.1.5"
-  }
-}
