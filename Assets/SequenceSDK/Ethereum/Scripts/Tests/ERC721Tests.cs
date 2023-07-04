@@ -114,7 +114,7 @@ public class ERC721Tests
         }
     }
 
-    public async Task TestBurn(ERC721 token)
+    private async Task TestBurn(ERC721 token)
     {
         try
         {

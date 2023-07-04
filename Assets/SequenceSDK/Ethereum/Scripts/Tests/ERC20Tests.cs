@@ -152,7 +152,7 @@ public class ERC20Tests
         }
     }
 
-    public async Task TestBurn()
+    private async Task TestBurn()
     {
         ERC20 token = new ERC20(contractAddress);
         TransactionReceipt receipt;
