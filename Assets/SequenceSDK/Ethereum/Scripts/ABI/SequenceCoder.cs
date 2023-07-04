@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using Org.BouncyCastle.Crypto.Digests;
+using Sequence.Extensions;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -23,6 +24,10 @@ namespace Sequence.ABI
                 if (address.StartsWith("0x"))
                 {
                     address = address.Substring(2);
+                    if (address.Length == 0)
+                    {
+                        return StringExtensions.ZeroAddress;
+                    }
                 }
                 string hashedAddress = KeccakHashASCII(address);
                 string checksumAddress = "";
