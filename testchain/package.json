@@ -26,5 +26,8 @@
     "ganacheGasPrice": "20000000000",
     "etherBalance": "100000",
     "extra": ""
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.2"
   }
 }
