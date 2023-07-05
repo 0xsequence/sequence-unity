@@ -17,6 +17,7 @@ public class ERC721Tests
 {
     EthWallet wallet1 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
     EthWallet wallet2 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
+    EthWallet randomWallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000006");
     SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
     string contractAddress;
 
@@ -82,7 +83,7 @@ public class ERC721Tests
             ERC721 autoIncrementingToken = new ERC721(autoIncrementingContractAddress);
 
             // Mint an auto incrementing token to random address so that index starts at one like with the other contract
-            receipt = await autoIncrementingToken.SafeMint("0x123abc")
+            receipt = await autoIncrementingToken.SafeMint(randomWallet.GetAddress())
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
 
             // Basic mint

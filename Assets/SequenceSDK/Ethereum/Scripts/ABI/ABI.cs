@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Extensions;
+using System.Text.RegularExpressions;
 
 namespace Sequence.ABI
 {
@@ -43,13 +44,132 @@ namespace Sequence.ABI
             {
                 method = method.Replace(" ", ""); // Whitespace will mess with the function signature encoding and is easily left in by mistake
                 string methodNameEncoded = FunctionSelector(method);
-                string parameterEncoded = _tupleCoder.EncodeToString(parameters);
+                List<ABIType> parameterTypes = GetParameterTypes(method);
+                string parameterEncoded = _tupleCoder.EncodeToString(parameters, parameterTypes);
                 return (methodNameEncoded + parameterEncoded);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error packing data: {ex.Message}");
-                return string.Empty;
+                throw new ArgumentException($"Error packing data: {ex.Message}");
+            }
+        }
+
+        public static List<ABIType> GetParameterTypes(string functionSignature)
+        {
+            functionSignature = functionSignature.Substring(functionSignature.IndexOf('(') + 1);
+            functionSignature = functionSignature.TrimEnd(')');
+            string[] types = functionSignature.Split(',');
+            int count = types.Length;
+            List<ABIType> abiTypes = new List<ABIType>();
+
+            for (int i = 0; i < count; i++)
+            {
+                string signature = types[i];
+
+                if (IsFixedArray(signature))
+                {
+                    abiTypes.Add(ABIType.FIXEDARRAY);
+                }
+                else if (signature.EndsWith("[]"))
+                {
+                    abiTypes.Add(ABIType.DYNAMICARRAY);
+                }
+                else if (signature == "address")
+                {
+                    abiTypes.Add(ABIType.ADDRESS);
+                }
+                else if (signature == "bool")
+                {
+                    abiTypes.Add(ABIType.BOOLEAN);
+                }
+                else if (signature.StartsWith("uint") || signature.StartsWith("int"))
+                {
+                    abiTypes.Add(ABIType.NUMBER);
+                }
+                else if (signature == "string")
+                {
+                    abiTypes.Add(ABIType.STRING);
+                }
+                else if (signature.StartsWith("bytes"))
+                {
+                    if (signature == "bytes")
+                    {
+                        abiTypes.Add(ABIType.BYTES);
+                    }
+                    else
+                    {
+                        int instanceCount = GetInnerValue(signature);
+                        if (instanceCount > 0)
+                        {
+                            for (int j = 0; j < instanceCount; j++)
+                            {
+                                abiTypes.Add(ABIType.FIXEDBYTES);
+                            }
+                        }else
+                        {
+                            abiTypes.Add(ABIType.FIXEDBYTES);
+                        }
+                    }
+                }
+                else
+                {
+                    abiTypes.Add(ABIType.NONE);
+                }
+            }
+            return abiTypes;
+        }
+
+        /// <summary>
+        /// Determines if a string is of type ABIType.FIXEDARRAY
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static bool IsFixedArray(string value)
+        {
+            int start = value.IndexOf('[');
+            if (start <= 0)
+            {
+                return false;
+            }
+
+            string type = value.Substring(0, start);
+            if (!(type == "address" || type.StartsWith("uint") || type.StartsWith("int") || type == "bool"))
+            {
+                return false;
+            }
+
+            return GetInnerValue(value) > 0;
+        }
+
+        /// <summary>
+        /// Returns the int value within square brackets '[' and ']' in a string
+        /// Returns -1 if there is no int value within square brackets
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static int GetInnerValue(string value)
+        {
+            int start = value.IndexOf('[');
+            if (start <= 0)
+            {
+                return -1;
+            }
+
+            int end = value.IndexOf(']');
+            if (end <= start)
+            {
+                throw new ArgumentException($"Invalid string provided: {value}");
+            }
+
+            string inner = value.Substring(start + 1, end - start - 1);
+            bool isNumber = int.TryParse(inner, out int number);
+            if (isNumber)
+            {
+                return number;
+            }
+            else
+            {
+                return -1;
             }
         }
 
