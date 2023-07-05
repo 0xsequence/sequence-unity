@@ -48,4 +48,4 @@ stop:
 	-pkill -F ./testchain/.pid && rm testchain/.pid
 
 test:
-	cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && cd .. && Unity -runTests -projectPath "$(pwd)" && make stop && head TestResults*.xml && mv TestResults*.xml TestResults.xml
+	rm TestResults.xml && cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && cd .. && Unity -runTests -projectPath "$(pwd)" && make stop && head TestResults*.xml && mv TestResults*.xml TestResults.xml
