@@ -28,7 +28,7 @@ Then
 To run the test please use
 `make test`
 This will automatically start the testchain and open Unity to run the tests. When the tests are finished, the testchain and Unity will be shutdown.
-The test results can be found in `TestResults.xml` located in the root directory of the project. The Makefile command will automatically display the head of this file for you allowing you to quickly scan if all the test results have passed or now.
+The test results can be found in `TestResults.xml` located in the root directory of the project. The Makefile command will automatically display a summary of the test results.
 When a test fails, it is recommended that you open up Unity and test via the usual method.
 ### Testing the test chain
 Occasionally, it may be necessary to test the testchain to a) confirm it is 
