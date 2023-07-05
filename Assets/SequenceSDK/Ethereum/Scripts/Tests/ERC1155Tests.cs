@@ -140,17 +140,11 @@ public class ERC1155Tests
         {
             TransactionReceipt receipt = await token.MintBatch(wallet1.GetAddress(), tokenIds1, amounts1)
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
-            for (int i = 0; i < tokenIds1.Length; i++)
-            {
-                await AssertBurnPreConditions(token, tokenIds1[i], amounts1[i], wallet1.GetAddress());
-            }
+            await AssertBurnPreConditionsBatch(token, tokenIds1, amounts1, wallet1.GetAddress());
 
             receipt = await token.MintBatch(wallet1.GetAddress(), tokenIds2, amounts2, "something random".ToByteArray())
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
-            for (int i = 0; i < tokenIds2.Length; i++)
-            {
-                await AssertBurnPreConditions(token, tokenIds2[i], amounts2[i], wallet1.GetAddress());
-            }
+            await AssertBurnPreConditionsBatch(token, tokenIds2, amounts2, wallet1.GetAddress());
         }
         catch (Exception ex)
         {
@@ -165,14 +159,8 @@ public class ERC1155Tests
         ERC1155 token = new ERC1155(contractAddress);
         try
         {
-            for (int i = 0; i < tokenIds1.Length; i++)
-            {
-                await AssertBurnPreConditions(token, tokenIds1[i], amounts1[i], wallet1.GetAddress());
-            }
-            for (int i = 0; i < tokenIds2.Length; i++)
-            {
-                await AssertBurnPreConditions(token, tokenIds2[i], amounts2[i], wallet1.GetAddress());
-            }
+            await AssertBurnPreConditionsBatch(token, tokenIds1, amounts1, wallet1.GetAddress());
+            await AssertBurnPreConditionsBatch(token, tokenIds2, amounts2, wallet1.GetAddress());
         }
         catch (Exception ex)
         {
@@ -192,14 +180,53 @@ public class ERC1155Tests
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }
 
-        for (int i = 0; i < tokenIds1.Length; i++)
+        await AssertBurnPostConditionsBatch(token, tokenIds1, wallet1.GetAddress());
+        await AssertBurnPostConditionsBatch(token, tokenIds2, wallet1.GetAddress());
+    }
+
+    private async Task AssertBurnPreConditionsBatch(ERC1155 token, BigInteger[] tokenIds, BigInteger[] amounts, string owner)
+    {
+        string[] owners = new string[tokenIds.Length];
+        for (int i = 0; i < tokenIds.Length; i++)
         {
-            await AssertBurnPostConditions(token, tokenIds1[i], wallet1.GetAddress());
+            owners[i] = owner;
         }
 
-        for (int i = 0; i < tokenIds2.Length; i++)
+        for (int i = 0; i < tokenIds.Length; i++)
         {
-            await AssertBurnPostConditions(token, tokenIds2[i], wallet1.GetAddress());
+            bool exists = await token.Exists(client, tokenIds[i]);
+            Assert.IsTrue(exists);
+        }
+
+        BigInteger[] balances = await token.BalanceOfBatch(client, owners, tokenIds);
+        for (int i = 0; i < tokenIds.Length; i++)
+        {
+            Assert.AreEqual(amounts[i], balances[i]);
         }
     }
+
+    private async Task AssertBurnPostConditionsBatch(ERC1155 token, BigInteger[] tokenIds, string owner)
+    {
+        string[] owners = new string[tokenIds.Length];
+        for (int i = 0; i < tokenIds.Length; i++)
+        {
+            owners[i] = owner;
+        }
+
+        try
+        {
+            BigInteger[] balances = await token.BalanceOfBatch(client, owners, tokenIds);
+            for (int i = 0; i < balances.Length; i++)
+            {
+                Assert.AreEqual(BigInteger.Zero, balances[i]);
+                bool exists = await token.Exists(client, tokenIds[i]);
+                Assert.IsFalse(exists);
+            }
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -61,27 +63,39 @@ namespace Sequence.Contracts
         public async Task<BigInteger[]> BalanceOfBatch(IEthClient client, string[] addresses, BigInteger[] tokenIds)
         {
             string results = await contract.SendQuery(client, "balanceOfBatch(address[],uint256[])", addresses, tokenIds);
-            return ExtractBigIntegerFromStringArray(results);
+            return ExtractBigIntegersFromResponse(results);
         }
 
         /// <summary>
-        /// RPC returns a string array that looks something like this "[\"0x21123\",\"0x11aa2\",\"0x012023\"]"
+        /// RPC returns a string array that looks something like this "0x000000211230000000011aa20000000012023" that will be at least 192 characters (96 bytes) long
         /// This function will convert this and return a BigInteger[] for each of the values
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="result"></param>
         /// <returns></returns>
-        private BigInteger[] ExtractBigIntegerFromStringArray(string array)
+        private BigInteger[] ExtractBigIntegersFromResponse(string result)
         {
-            array = array.Substring(1, array.Length - 1);
-            string[] values = array.Split(',');
-            int valuesLength = values.Length;
-            BigInteger[] result = new BigInteger[valuesLength];
-            for (int i = 0; i < valuesLength; i++)
+            result = result.Replace("0x", "");
+
+            int resultLength = result.Length;
+            if (resultLength < 192)
             {
-                values[i] = values[i].Trim('\"');
-                result[i] = values[i].HexStringToBigInteger();
+                throw new ArgumentOutOfRangeException($"Invalid method input, must be at least 192 characters (96 bytes) long. Input: {result}");
             }
-            return result;
+
+            // Split the string into segments of 64 characters (32 bytes)
+            List<string> segments = new List<string>();
+            for (int i = 128; i < resultLength; i += 64) // Ignore first 64 bytes - first 32 bytes is an offset for where the array is described, i.e. 32 bytes - next 32 bytes is the size of the array
+            {
+                segments.Add(result.Substring(i, 64));
+            }
+
+            // Convert each segment into a BigInteger
+            BigInteger[] results = new BigInteger[segments.Count];
+            for (int i = 0; i < segments.Count; i++)
+            {
+                results[i] = BigInteger.Parse("0" + segments[i], NumberStyles.HexNumber);
+            }
+            return results;
         }
 
         public async Task<string> URI(IEthClient client, BigInteger tokenId)
