@@ -41,7 +41,7 @@ namespace Sequence.Contracts
         {
             if (data == null)
             {
-                data = "Minted using the Unity SDK".ToByteArray(); // Contract expects some data that is non empty
+                data = "Minted using the Sequence Unity SDK".ToByteArray(); // Contract expects some data that is non empty
             }
             return contract.CallFunction("mintBatch(address,uint256[],uint256[],bytes)", toAddress, tokenIds, amounts, data);
         }
@@ -104,17 +104,6 @@ namespace Sequence.Contracts
             return SequenceCoder.HexStringToHumanReadable(result);
         }
 
-        public CallContractFunctionTransactionCreator Approve(string spenderAddress, BigInteger tokenId)
-        {
-            return contract.CallFunction("approve(address,uint256)", spenderAddress, tokenId);
-        }
-
-        public async Task<string> GetApproved(IEthClient client, BigInteger tokenId)
-        {
-            string result = await contract.SendQuery(client, "getApproved(uint256)", tokenId);
-            return result.Replace("0x", "").TrimStart('0').EnsureHexPrefix();
-        }
-
         public CallContractFunctionTransactionCreator SetApprovalForAll(string operatorAddress, bool approved)
         {
             return contract.CallFunction("setApprovalForAll(address,bool)", operatorAddress, approved);
@@ -131,7 +120,7 @@ namespace Sequence.Contracts
         {
             if (data == null)
             {
-                data = new byte[0];
+                data = "Transferred using the Sequence Unity SDK".ToByteArray(); // Contract expects some data that is non empty
             }
             return contract.CallFunction("safeTransferFrom(address,address,uint256,uint256,bytes)", fromAddress, toAddress, tokenId, value, data);
         }
@@ -140,7 +129,7 @@ namespace Sequence.Contracts
         {
             if (data == null)
             {
-                data = new byte[0];
+                data = "Transferred using the Sequence Unity SDK".ToByteArray(); // Contract expects some data that is non empty
             }
             return contract.CallFunction("safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)", fromAddress, toAddress, tokenIds, values, data);
         }

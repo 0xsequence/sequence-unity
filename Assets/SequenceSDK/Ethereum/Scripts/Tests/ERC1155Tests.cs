@@ -229,4 +229,135 @@ public class ERC1155Tests
         }
     }
 
+    [Test]
+    public async Task TestURI()
+    {
+        ERC1155 token = new ERC1155(contractAddress);
+        try
+        {
+            TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), tokenId1, amount1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            string tokenUri = await token.URI(client, tokenId1);
+            Assert.AreEqual(baseUri, tokenUri);
+
+            string newUri = "my awesome URI";
+            receipt = await token.SetURI(newUri).SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            tokenUri = await token.URI(client, tokenId1);
+            Assert.AreEqual(newUri, tokenUri);
+
+            receipt = await token.SetURI(baseUri).SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            tokenUri = await token.URI(client, tokenId1);
+            Assert.AreEqual(baseUri, tokenUri);
+
+            await AssertBurnPreConditions(token, tokenId1, amount1, wallet1.GetAddress());
+            receipt = await token.Burn(wallet1.GetAddress(), tokenId1, amount1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            await AssertBurnPostConditions(token, tokenId1, wallet1.GetAddress());
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    [Test]
+    public async Task TestAllowance()
+    {
+        ERC1155 token = new ERC1155(contractAddress);
+        try
+        {
+            TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), tokenId1, amount1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            receipt = await token.Mint(wallet1.GetAddress(), tokenId2, amount2, "something random".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            bool isApprovedForAll = await token.IsApprovedForAll(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.IsFalse(isApprovedForAll);
+
+            // Set approval for all
+            receipt = await token.SetApprovalForAll(wallet2.GetAddress(), true)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            isApprovedForAll = await token.IsApprovedForAll(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.IsTrue(isApprovedForAll);
+
+            // Unset approval for all
+            receipt = await token.SetApprovalForAll(wallet2.GetAddress(), false)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            isApprovedForAll = await token.IsApprovedForAll(client, wallet1.GetAddress(), wallet2.GetAddress());
+            Assert.IsFalse(isApprovedForAll);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+
+        await TestBurn();
+    }
+
+    [Test]
+    public async Task TestTransfer()
+    {
+        ERC1155 token = new ERC1155(contractAddress);
+        try
+        {
+            TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), tokenId1, amount1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            receipt = await token.Mint(wallet1.GetAddress(), tokenId2, amount2, "something random".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            receipt = await token.SafeTransferFrom(wallet1.GetAddress(), wallet2.GetAddress(), tokenId1, amount1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            receipt = await token.SafeTransferFrom(wallet1.GetAddress(), wallet2.GetAddress(), tokenId2, amount2, "some random data".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            await AssertBurnPreConditions(token, tokenId1, amount1, wallet2.GetAddress());
+            await AssertBurnPreConditions(token, tokenId2, amount2, wallet2.GetAddress());
+
+            receipt = await token.SafeTransferFrom(wallet2.GetAddress(), wallet1.GetAddress(), tokenId1, amount1)
+                .SendTransactionMethodAndWaitForReceipt(wallet2, client);
+            receipt = await token.SafeTransferFrom(wallet2.GetAddress(), wallet1.GetAddress(), tokenId2, amount2, "some random data".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet2, client);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+
+        await TestBurn();
+    }
+
+    [Test]
+    public async Task TestTransferBatch()
+    {
+        ERC1155 token = new ERC1155(contractAddress);
+        try
+        {
+            TransactionReceipt receipt = await token.MintBatch(wallet1.GetAddress(), tokenIds1, amounts1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            receipt = await token.MintBatch(wallet1.GetAddress(), tokenIds2, amounts2, "something random".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            receipt = await token.SafeBatchTransferFrom(wallet1.GetAddress(), wallet2.GetAddress(), tokenIds1, amounts1)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+            receipt = await token.SafeBatchTransferFrom(wallet1.GetAddress(), wallet2.GetAddress(), tokenIds2, amounts2, "some random data".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
+
+            await AssertBurnPreConditionsBatch(token, tokenIds1, amounts1, wallet2.GetAddress());
+            await AssertBurnPreConditionsBatch(token, tokenIds2, amounts2, wallet2.GetAddress());
+
+            receipt = await token.SafeBatchTransferFrom(wallet2.GetAddress(), wallet1.GetAddress(), tokenIds1, amounts1)
+                .SendTransactionMethodAndWaitForReceipt(wallet2, client);
+            receipt = await token.SafeBatchTransferFrom(wallet2.GetAddress(), wallet1.GetAddress(), tokenIds2, amounts2, "some random data".ToByteArray())
+                .SendTransactionMethodAndWaitForReceipt(wallet2, client);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+
+        await TestBurnBatch();
+    }
 }
