@@ -93,7 +93,7 @@ namespace Sequence.Contracts
             BigInteger[] results = new BigInteger[segments.Count];
             for (int i = 0; i < segments.Count; i++)
             {
-                results[i] = BigInteger.Parse("0" + segments[i], NumberStyles.HexNumber);
+                results[i] = BigInteger.Parse(segments[i], NumberStyles.HexNumber);
             }
             return results;
         }
