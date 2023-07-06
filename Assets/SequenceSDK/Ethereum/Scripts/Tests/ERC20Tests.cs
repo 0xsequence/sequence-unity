@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Wallet;
-using UnityEngine;
 using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence;
@@ -11,7 +8,6 @@ using System;
 using Sequence.Contracts;
 using System.Numerics;
 using Sequence.ABI;
-using UnityEngine.TestTools;
 
 // Note - these tests are designed to be ran sequentially as they will all share the same testnet
 public class ERC20Tests

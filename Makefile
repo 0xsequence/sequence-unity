@@ -42,7 +42,11 @@ check-testchain-running:
 	|| { echo "*****"; echo "Oops! testchain is not running. Please run 'make start-testchain' in another terminal or use 'test-concurrently'."; echo "*****"; exit 1; }
 
 test-testchain: 
-	 cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && yarn test > ../chaintest.out && cd .. && make stop && cat chaintest.out
+	cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && yarn test > ../chaintest.out && cd .. && make stop && cat chaintest.out
 
 stop:
 	-pkill -F ./testchain/.pid && rm testchain/.pid
+
+test:
+	rm TestResults.xml && cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && cd .. && Unity -runTests -projectPath "$(pwd)" && make stop && mv TestResults*.xml TestResults.xml && \
+	head -n 2 TestResults.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'

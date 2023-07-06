@@ -15,6 +15,21 @@ Before running tests, boot up the test chain with `make start-testchain`. You ma
 that you need to stop (control + c) the testchain and restart it between some of the 
 tests.
 
+### Testing via command line
+It can sometimes be useful to quickly test the project via command line. This can be done without opening Unity or starting the testchain.
+#### One-Time Setup
+Add this line to your `~/.zshrc` or `~/.bashrc`
+`export PATH="/Applications/Unity/Hub/Editor/2021.3.6f1/Unity.app/Contents/MacOS:$PATH"` - note: this is an example path, the exact path may vary based on your system
+Then
+`source ~/.bashrc` or `source ~/.zshrc`
+Then
+`touch TestResults.xml` from the route directory of the project
+#### Running the test
+To run the test please use
+`make test`
+This will automatically start the testchain and open Unity to run the tests. When the tests are finished, the testchain and Unity will be shutdown.
+The test results can be found in `TestResults.xml` located in the root directory of the project. The Makefile command will automatically display a summary of the test results.
+When a test fails, it is recommended that you open up Unity and test via the usual method.
 ### Testing the test chain
 Occasionally, it may be necessary to test the testchain to a) confirm it is 
 giving the behaviours you expect and b) to use for comparison with our 
@@ -22,6 +37,31 @@ Unity tests. We can safely assume that ethers (which we use to test the
 testchain) works correctly. To test please use `make test-testchain`. Test output will be in 
 chaintest.out and will also be printed to the terminal. If you need to end the test suite 
 early, use `Control+C` and `make stop`.
+*Note: if you already have an instance of Unity running, this will open up a new instance of Unity that will terminate upon completion.
+
+### Troubleshooting
+Do you have tests that are failing that you don't think should be or were previously passing and you haven't changed anything?
+Here are a few things to try:
+1. If you are or were using a debugger, disconnect the debugger from Unity and then reconnect
+2. Restart the test chain `Control+C` and `make start-testchain`
+3. Restart Unity
+* Also note that since tests on the testchain are being run sequentially, if a prior test fails, it may not 
+have unwound properly and may leave the next test in an unexpected state - causing it to fail.
+
+## Component Overview
+The SDK is broken into a number of components with different responsibilities. This section will give an overview of some of the most important components for users and their intended purposes.
+
+### Client
+IEthClient provides an interface for clients. Clients handle the connection to blockchain networks, making various RPC requests. Any time you wish to query the blockchain or submit a transaction, you will need a client.
+
+### Wallet
+EthWallet implements a standard EOA wallet. A wallet keeps track of its own private/public key pair and address and is responsible for providing its private key to the signer when signing transactions.
+
+### Transaction
+A transaction, as implemented in EthTransaction, contains all the data and parameters for an EVM transaction. The object is used for initiating its RLP encoding (transactions must be signed and RLP encoded when submitted).
+
+### Contract
+A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
 
 ### Troubleshooting
 Do you have tests that are failing that you don't think should be or were previously passing and you haven't changed anything?
