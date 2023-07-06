@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Provider;
@@ -8,15 +7,13 @@ using UnityEngine.TestTools;
 
 public class RPCTests
 {
-
-    // Todo: Replace with a sequence RPC or local RPC endpoint
-    string clientUrl = "https://polygon-bor.publicnode.com";
+    string clientUrl = "http://localhost:8545/";
     float polygonBlockTimeInSeconds = 2f;
     
     [UnityTest]
     public IEnumerator TestChainID()
     {
-        string expected = "0x89";
+        string expected = "0x7a69";
         var client = new SequenceEthClient(clientUrl);
 
         Task<string> chainIdTask = client.ChainID();
@@ -37,7 +34,7 @@ public class RPCTests
     [UnityTest]
     public IEnumerator TestNetworkId()
     {
-        string expected = "137";
+        string expected = "31337";
         var client = new SequenceEthClient(clientUrl);
 
         Task<string> networkIdTask = client.NetworkId();
