@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/SequenceSDK/Ethereum/Scripts/Contract/ContractQuerySender.cs.meta
 guid: d3da3ea1419054a92a4ae5c2aa149fee
+========
+guid: 14db02b99aca84a67a2d988dc4390003
+>>>>>>>> origin/master:Assets/SequenceSDK/Ethereum/Scripts/Contract/ContractTransactionSender.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2

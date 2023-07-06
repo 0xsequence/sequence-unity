@@ -214,7 +214,7 @@ public class EthWalletTests
             BigInteger nonce2 = await wallet2.GetNonce(client);
 
             Debug.Log("MockMint start:");
-            string mockMint_data = ABI.Pack("function mockMint(address _address, uint256 _amount)", wallet2.GetAddress(), 1);
+            string mockMint_data = ABI.Pack("function mockMint(address , uint256)", wallet2.GetAddress(), 1);
 
             string mockMint_encoded = EthTransaction.RLPEncode(nonce2, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data);
 

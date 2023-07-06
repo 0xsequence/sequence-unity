@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Wallet;
-using UnityEngine;
 using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence;
@@ -48,10 +45,9 @@ public class ERC20Tests
     [Test]
     public async Task TestERC20Queries()
     {
+        ERC20 token = new ERC20(contractAddress);
         try
         {
-            ERC20 token = new ERC20(contractAddress);
-
             string name = await token.Name(client);
             Assert.AreEqual("TestToken", name);
 
@@ -67,9 +63,6 @@ public class ERC20Tests
             BigInteger allowance = await token.Allowance(client, wallet1.GetAddress(), wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, allowance);
 
-            BigInteger allowance2 = await token.Allowance(client, "candy", wallet2.GetAddress());
-            Assert.AreEqual(BigInteger.Zero, allowance2);
-
             BigInteger decimals = await token.Decimals(client);
             Assert.AreEqual((BigInteger)18, decimals);
 
@@ -79,6 +72,16 @@ public class ERC20Tests
         catch (Exception ex)
         {
             Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+
+        try
+        {
+            BigInteger allowance2 = await token.Allowance(client, "candy", wallet2.GetAddress());
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (Exception ex)
+        {
+            Assert.AreEqual("Error packing data: Argument type is not as expected. Expected: ADDRESS Received: STRING", ex.Message);
         }
     }
 
@@ -152,7 +155,7 @@ public class ERC20Tests
         }
     }
 
-    public async Task TestBurn()
+    private async Task TestBurn()
     {
         ERC20 token = new ERC20(contractAddress);
         TransactionReceipt receipt;

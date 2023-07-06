@@ -1,15 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System;
 
 
 namespace Sequence.ABI
 {
     /// <summary>
-    /// (T1,...,Tk) for k >= 0 and any types T1, …, Tk
+    /// (T1,...,Tk) for k >= 0 and any types T1, ?, Tk
     ///enc(X) = head(X(1)) ... head(X(k)) tail(X(1)) ... tail(X(k))
     ///where X = (X(1), ..., X(k)) and head and tail are defined for Ti as follows:
     ///if Ti is static:
@@ -43,12 +43,11 @@ namespace Sequence.ABI
             string encodedStr = EncodeToString(value);
 
             return SequenceCoder.HexStringToByteArray(encodedStr);
-
         }
 
 
 
-        public string EncodeToString(object value)
+        public string EncodeToString(object value, List<ABIType> types = null)
         {
             //List<object> valueTuple = new List<object>();
             IList valueTuple = (IList) value;
@@ -70,7 +69,19 @@ namespace Sequence.ABI
             for (int i = 0; i < tupleLength; i++)
             {
                 string head_i = "", tail_i = "";
-                ABIType type = ABI.GetParameterType(valueTuple[i]);
+                ABIType type;
+                if (types == null)
+                {
+                    type = ABI.GetParameterType(valueTuple[i]);
+                }else
+                {
+                    type = types[i];
+                    ABIType temp = ABI.GetParameterType(valueTuple[i]);
+                    if (temp != type && type != ABIType.FIXEDARRAY && type != ABIType.DYNAMICARRAY) // If it is a non-array data type, a mismatch will cause encoding issues - with arrays, a mismatch may cause encoding issues but it is difficult to predict
+                    {
+                        throw new ArgumentException($"Argument type is not as expected. Expected: {type} Received: {temp}");
+                    }
+                }
 
 
                 switch (type)
@@ -152,8 +163,6 @@ namespace Sequence.ABI
 
             return encoded;
         }
-
-
 
         public List<object> DecodeFromString(string encodedString, List<object> types)
         {

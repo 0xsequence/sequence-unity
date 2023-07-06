@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Text;
 
 namespace Sequence.Extensions
 {
@@ -70,6 +71,34 @@ namespace Sequence.Extensions
         public static bool IsAddress(this string value)
         {
             return (value != null && value.Length == 42 && value.IsHexFormat()) || value == ZeroAddress;
+        }
+
+        public static byte[] ToByteArray(this string value)
+        {
+            return Encoding.UTF8.GetBytes(value);
+        }
+
+        /// <summary>
+        /// Parse a hex string as a bool
+        /// RPCs will return a value of 1 as true and 0 as false
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool HexStringToBool(this string value)
+        {
+            BigInteger result = value.HexStringToBigInteger();
+            if (result == BigInteger.One)
+            {
+                return true;
+            }
+            else if (result == BigInteger.Zero)
+            {
+                return false;
+            }
+            else
+            {
+                throw new ArgumentException($"Cannot decode value: {value} into a bool");
+            }
         }
     }
 }
