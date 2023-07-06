@@ -15,6 +15,21 @@ Before running tests, boot up the test chain with `make start-testchain`. You ma
 that you need to stop (control + c) the testchain and restart it between some of the 
 tests.
 
+### Testing via command line
+It can sometimes be useful to quickly test the project via command line. This can be done without opening Unity or starting the testchain.
+#### One-Time Setup
+Add this line to your `~/.zshrc` or `~/.bashrc`
+`export PATH="/Applications/Unity/Hub/Editor/2021.3.6f1/Unity.app/Contents/MacOS:$PATH"` - note: this is an example path, the exact path may vary based on your system
+Then
+`source ~/.bashrc` or `source ~/.zshrc`
+Then
+`touch TestResults.xml` from the route directory of the project
+#### Running the test
+To run the test please use
+`make test`
+This will automatically start the testchain and open Unity to run the tests. When the tests are finished, the testchain and Unity will be shutdown.
+The test results can be found in `TestResults.xml` located in the root directory of the project. The Makefile command will automatically display a summary of the test results.
+When a test fails, it is recommended that you open up Unity and test via the usual method.
 ### Testing the test chain
 Occasionally, it may be necessary to test the testchain to a) confirm it is 
 giving the behaviours you expect and b) to use for comparison with our 
@@ -22,6 +37,7 @@ Unity tests. We can safely assume that ethers (which we use to test the
 testchain) works correctly. To test please use `make test-testchain`. Test output will be in 
 chaintest.out and will also be printed to the terminal. If you need to end the test suite 
 early, use `Control+C` and `make stop`.
+*Note: if you already have an instance of Unity running, this will open up a new instance of Unity that will terminate upon completion.
 
 ### Troubleshooting
 Do you have tests that are failing that you don't think should be or were previously passing and you haven't changed anything?
