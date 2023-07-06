@@ -1,9 +1,12 @@
-using Newtonsoft.Json;
-using Sequence.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Sequence.ABI;
+using Sequence.Extensions;
+using Sequence.Wallet;
 using UnityEngine;
 
 namespace Sequence.Provider
@@ -66,13 +69,15 @@ namespace Sequence.Provider
             return blocks;
         }
 
-        public async Task<string> CallContract()
+        public async Task<string> CallContract(params object[] args)
         {
-            //[FOCUS IMPLEMENTATION]
-            var blockNumber = await BlockNumber();
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_call", new object[] { blockNumber });
-            //Deserialize
-            string result = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
+            if (response.result == null)
+            {
+                throw new Exception(response.error.Message);
+            }
+
+            string result = response.result.ToString();
             return result;
         }
 
@@ -99,9 +104,20 @@ namespace Sequence.Provider
             return code;
         }
 
-        public async Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber)
+        public async Task<BigInteger> EstimateGas(TransactionCall transactionCall)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { transactionCall, blockNumber });
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                ["from"] = transactionCall.from,
+                ["to"] = transactionCall.to,
+                ["value"] = transactionCall.value.BigIntegerToHexString(),
+                ["data"] = transactionCall.data
+            };
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_estimateGas", new object[] { parameters });
+            if (response.result == null)
+            {
+                throw new Exception(response.error.Message);
+            }
             BigInteger gas = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return gas;
         }
@@ -145,11 +161,9 @@ namespace Sequence.Provider
             return networkId;
         }
 
-        public async Task<BigInteger> NonceAt(string address, string blockNumber)
+        public async Task<BigInteger> NonceAt(string address, string blockNumber = "latest")
         {
-            //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionCount", new object[] { address, blockNumber });
-            //Deserialize
             BigInteger transactionCount = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return transactionCount;
         }
@@ -189,7 +203,7 @@ namespace Sequence.Provider
             throw new System.NotImplementedException();
         }
 
-        internal async Task<string> SendRawTransaction(string signedTransactionData)
+        public async Task<string> SendRawTransaction(string signedTransactionData)
         {
             //[FOCUS IMPLEMENTATION]
             RpcResponse response = await _httpRpcClient.SendRequest("eth_sendRawTransaction", new object[] { signedTransactionData });

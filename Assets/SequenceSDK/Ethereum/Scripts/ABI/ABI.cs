@@ -27,7 +27,7 @@ namespace Sequence.ABI
         NONE
     }
 
-    public class ABI
+    public static class ABI
     {
         static TupleCoder _tupleCoder = new TupleCoder();
 
@@ -41,6 +41,7 @@ namespace Sequence.ABI
         {
             try
             {
+                method = method.Replace(" ", ""); // Whitespace will mess with the function signature encoding and is easily left in by mistake
                 string methodNameEncoded = FunctionSelector(method);
                 string parameterEncoded = _tupleCoder.EncodeToString(parameters);
                 return (methodNameEncoded + parameterEncoded);

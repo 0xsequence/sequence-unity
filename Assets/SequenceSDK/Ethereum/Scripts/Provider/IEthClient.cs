@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Wallet;
 using UnityEngine;
 
 namespace Sequence.Provider
@@ -129,13 +130,19 @@ namespace Sequence.Provider
 		/// <returns></returns>
 		Task<Block> HeaderByNumber(string blockNumber);
 
-
 		/// <summary>
-		/// TransactionByHash = eth_getTransactionByHash
+		/// Continually calls eth_getTransactionReceipt until a response is received or timeout
 		/// </summary>
 		/// <param name="transactionHash"></param>
 		/// <returns></returns>
-		Task<Transaction> TransactionByHash(string transactionHash);
+		Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHashint, int maxWaitTimeInMilliseconds = 15000, int timeBetweenChecksInMilliseconds = 500);
+
+        /// <summary>
+        /// TransactionByHash = eth_getTransactionByHash
+        /// </summary>
+        /// <param name="transactionHash"></param>
+        /// <returns></returns>
+        Task<Transaction> TransactionByHash(string transactionHash);
 
 
 		/// <summary>
@@ -219,7 +226,7 @@ namespace Sequence.Provider
 		/// <param name="address"></param>
 		/// <param name="blockNumber"></param>
 		/// <returns></returns>
-		Task<BigInteger> NonceAt(string address, string blockNumber);
+		Task<BigInteger> NonceAt(string address, string blockNumber = "latest");
 
 		/// <summary>
 		/// FilterLogs = eth_getLogs
@@ -265,12 +272,12 @@ namespace Sequence.Provider
 		/// <returns></returns>
 		Task<BigInteger> PendingTransactionCount();
 
-
 		/// <summary>
 		/// CallContract = eth_call (blockNumber)
 		/// </summary>
+		/// <param name="args"></param>
 		/// <returns></returns>
-		Task<string> CallContract();
+		Task<string> CallContract(params object[] args);
 
 
 		/// <summary>
@@ -314,9 +321,8 @@ namespace Sequence.Provider
 		/// EstimateGas = eth_estimateGas
 		/// </summary>
 		/// <param name="transactionCall"></param>
-		/// <param name="blockNumber"></param>
 		/// <returns></returns>
-		Task<BigInteger> EstimateGas(TransactionCall transactionCall, string blockNumber);
+		Task<BigInteger> EstimateGas(TransactionCall transactionCall);
 
 
 		/// <summary>
@@ -326,5 +332,12 @@ namespace Sequence.Provider
 		/// <param name="transaction"></param>
 		/// <returns></returns>
 		Task<string> SendTransaction(Transaction transaction);
+
+		/// <summary>
+		/// eth_sendRawTransaction on a signed transaction hash
+		/// </summary>
+		/// <param name="signedTransactionData"></param>
+		/// <returns></returns>
+		Task<string> SendRawTransaction(string signedTransactionData);
 	}
 }

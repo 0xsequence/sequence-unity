@@ -23,6 +23,30 @@ testchain) works correctly. To test please use `make test-testchain`. Test outpu
 chaintest.out and will also be printed to the terminal. If you need to end the test suite 
 early, use `Control+C` and `make stop`.
 
+### Troubleshooting
+Do you have tests that are failing that you don't think should be or were previously passing and you haven't changed anything?
+Here are a few things to try:
+1. If you are or were using a debugger, disconnect the debugger from Unity and then reconnect
+2. Restart the test chain `Control+C` and `make start-testchain`
+3. Restart Unity
+* Also note that since tests on the testchain are being run sequentially, if a prior test fails, it may not 
+have unwound properly and may leave the next test in an unexpected state - causing it to fail.
+
+## Component Overview
+The SDK is broken into a number of components with different responsibilities. This section will give an overview of some of the most important components for users and their intended purposes.
+
+### Client
+IEthClient provides an interface for clients. Clients handle the connection to blockchain networks, making various RPC requests. Any time you wish to query the blockchain or submit a transaction, you will need a client.
+
+### Wallet
+EthWallet implements a standard EOA wallet. A wallet keeps track of its own private/public key pair and address and is responsible for providing its private key to the signer when signing transactions.
+
+### Transaction
+A transaction, as implemented in EthTransaction, contains all the data and parameters for an EVM transaction. The object is used for initiating its RLP encoding (transactions must be signed and RLP encoded when submitted).
+
+### Contract
+A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
+
 ## Architecture Decision Records
 
 Please add any ADRs below. In the future, it may be worthwhile to move these into 

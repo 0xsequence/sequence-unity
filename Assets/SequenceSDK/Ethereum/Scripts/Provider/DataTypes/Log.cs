@@ -7,8 +7,8 @@ namespace Sequence
     public class Log
     {
         public bool removed;
-        public BigInteger logIndex;
-        public BigInteger transactionIndex;
+        public string logIndex;
+        public string transactionIndex;
         public string transactionHash;
         public string blockHash;
         public string blockNumber;

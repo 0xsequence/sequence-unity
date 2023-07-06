@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
+using Sequence.Extensions;
 
 namespace Sequence.Wallet
 {
@@ -23,7 +24,7 @@ namespace Sequence.Wallet
 
         public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
         {
-            ValidateParams(To, Value, GasPrice, GasLimit, Nonce);
+            ValidateParams(to, value, gasPrice, gasLimit, nonce);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
@@ -34,7 +35,7 @@ namespace Sequence.Wallet
 
         public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string v, string r, string s)
         {
-            ValidateParams(To, Value, GasPrice, GasLimit, Nonce);
+            ValidateParams(to, value, gasPrice, gasLimit, nonce);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
@@ -46,15 +47,15 @@ namespace Sequence.Wallet
             S = s;
         }
 
-        public byte[] RLPEncode()
+        public string RLPEncode()
         {
             List<object> txToEncode = new List<object>();
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Nonce.ToString("x")));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(GasPrice.ToString("x")));
-            txToEncode.Add(SequenceCoder.HexStringToByteArray(GasLimit.ToString("x")));
+            txToEncode.Add(GasLimit.ToByteArray(true, true));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(To));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Value.ToString("x")));
-            txToEncode.Add(new byte[] { });
+            txToEncode.Add(SequenceCoder.HexStringToByteArray(Data));
 
             if (V!=null && R!= null && S!= null)
             {
@@ -64,7 +65,7 @@ namespace Sequence.Wallet
             }
 
             byte[] encodedList = RLP.RLP.Encode(txToEncode);
-            return encodedList;
+            return SequenceCoder.ByteArrayToHexString(encodedList).EnsureHexPrefix();
         }
 
         public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
@@ -124,7 +125,7 @@ namespace Sequence.Wallet
             BigInteger gasLimit,
             BigInteger nonce)
         {
-            if (string.IsNullOrEmpty(toAddress))
+            if (!toAddress.IsAddress())
             {
                 throw new ArgumentOutOfRangeException(nameof(toAddress));
             }
@@ -146,5 +147,16 @@ namespace Sequence.Wallet
             }
         }
 
+        public string SignAndEncodeTransaction(EthWallet wallet)
+        {
+            string encoded_signing = this.RLPEncode();
+            string signingHash = SequenceCoder.KeccakHash(encoded_signing).EnsureHexPrefix();
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
+            this.V = v;
+            this.R = r;
+            this.S = s;
+            string tx = this.RLPEncode();
+            return tx;
+        }
     }
 }

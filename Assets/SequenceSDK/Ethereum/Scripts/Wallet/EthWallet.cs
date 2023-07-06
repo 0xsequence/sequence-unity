@@ -61,14 +61,9 @@ namespace Sequence.Wallet
             return balance;
         }
 
-        public System.Numerics.BigInteger GetNonce()
+        public async Task<BigInteger> GetNonce(IEthClient client)
         {
-            return NonceService.GetNonce(this);
-        }
-
-        private void IncrementNonce()
-        {
-            NonceService.IncrementNonce(this);
+            return await client.NonceAt(GetAddress());
         }
 
         public (string v, string r, string s) SignTransaction(byte[] message, int chainId)
@@ -81,11 +76,17 @@ namespace Sequence.Wallet
             return EthSignature.SignAndReturnVRS(message, privKey);
         }
 
-        public async Task<string> SendRawTransaction(SequenceEthClient client, string signedTransactionData)
+        public async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
         {
-            IncrementNonce();
             string result = await client.SendRawTransaction(signedTransactionData);
             return result;
+        }
+
+        public async Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData)
+        {
+            string result = await SendRawTransaction(client, signedTransactionData);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            return receipt;
         }
 
         /// <summary>

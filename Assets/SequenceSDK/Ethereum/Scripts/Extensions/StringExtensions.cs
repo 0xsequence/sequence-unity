@@ -5,6 +5,8 @@ namespace Sequence.Extensions
 {
     public static class StringExtensions
     {
+        public static string ZeroAddress = "0x0";
+
         /// <summary>
         /// Converts a string that represents a hex value to a BigInteger
         /// </summary>
@@ -67,7 +69,7 @@ namespace Sequence.Extensions
 
         public static bool IsAddress(this string value)
         {
-            return value.Length == 42 && value.IsHexFormat();
+            return (value != null && value.Length == 42 && value.IsHexFormat()) || value == ZeroAddress;
         }
     }
 }

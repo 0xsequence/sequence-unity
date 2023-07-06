@@ -97,3 +97,8 @@ chaintest.out
 
 # Node
 node_modules
+
+# Hardhat
+testchain/artifacts/@openzeppelin
+testchain/artifacts/build-info
+testchain/cache/

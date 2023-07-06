@@ -52,10 +52,11 @@ namespace Sequence.Signer
         /// <returns></returns>
         public async Task<string> Send(SequenceEthClient client)
         {
-            string encoded_signing = EthTransaction.RLPEncode(fromWallet.GetNonce(), gasPrice, gasLimit, to, value, null);
+            BigInteger nonce = await fromWallet.GetNonce(client);
+            string encoded_signing = EthTransaction.RLPEncode(nonce, gasPrice, gasLimit, to, value, null);
             string signingHash = SequenceCoder.KeccakHash(encoded_signing).EnsureHexPrefix();
             (string v, string r, string s) = fromWallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
-            string tx = EthTransaction.RLPEncode(fromWallet.GetNonce(), gasPrice, gasLimit, to, value, null, v, r, s);
+            string tx = EthTransaction.RLPEncode(nonce, gasPrice, gasLimit, to, value, null, v, r, s);
             string result = await fromWallet.SendRawTransaction(client, tx);
             return result;
         }

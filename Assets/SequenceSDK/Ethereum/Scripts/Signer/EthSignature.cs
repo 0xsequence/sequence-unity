@@ -102,11 +102,11 @@ namespace Sequence.Signer
                 byte[] v = new[] { (byte)(recId + 27) };
 
                 R = r.ToBytes();
-                UnityEngine.Debug.Log("R: " + r.d0 + r.d1 + r.d2 + r.d3 + r.d4 + r.d5 + r.d6 + r.d7);
+                //UnityEngine.Debug.Log("R: " + r.d0 + r.d1 + r.d2 + r.d3 + r.d4 + r.d5 + r.d6 + r.d7);
                 S = s.ToBytes();
-                UnityEngine.Debug.Log("S: " + s.d0 + s.d1 + s.d2 + s.d3 + s.d4 + s.d5 + s.d6 + s.d7);
+                //UnityEngine.Debug.Log("S: " + s.d0 + s.d1 + s.d2 + s.d3 + s.d4 + s.d5 + s.d6 + s.d7);
                 V = new BigInteger(1, v).ToByteArrayUnsigned();
-                UnityEngine.Debug.Log("V: " + SequenceCoder.ByteArrayToHexString(v));
+                //UnityEngine.Debug.Log("V: " + SequenceCoder.ByteArrayToHexString(v));
 
                 return GetSignatureForTransaction();
             }
@@ -156,7 +156,7 @@ namespace Sequence.Signer
         /// <returns>A tuple containing the signature components (v, r, s) as strings.</returns>
         public static (string v, string r, string s) GetSignatureForTransaction()
         {
-            return (("0x" + SequenceCoder.ByteArrayToHexString(V) ,("0x" + SequenceCoder.ByteArrayToHexString(R) ), ("0x"+ SequenceCoder.ByteArrayToHexString(S))));
+            return (("0x" + SequenceCoder.ByteArrayToHexString(V).TrimStart('0') ,("0x" + SequenceCoder.ByteArrayToHexString(R).TrimStart('0')), ("0x"+ SequenceCoder.ByteArrayToHexString(S).TrimStart('0'))));
         }
     }
 
