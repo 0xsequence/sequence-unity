@@ -15,6 +15,8 @@ public class SequenceEthClientTests
 {
     string clientUrl = "http://localhost:8545/";
     float polygonBlockTimeInSeconds = 2f;
+    IRpcClient failingClient = new FailingRpcClient();
+    const string validAddress = "0x3F96a0D6697e5E7ACEC56A21681195dC6262b06C";
 
     [Test]
     public async Task TestChainId() {
@@ -87,6 +89,48 @@ public class SequenceEthClientTests
         catch (Exception ex)
         {
             Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    // Note: for methods with optional parameters, we must still specify a value for each parameter
+    // This is because the tests are created reflexively and would otherwise throw an exception
+    private static object[] errorCases = {
+        new object[] { nameof(SequenceEthClient.BalanceAt), new object[] { validAddress, "latest" } },
+        new object[] { nameof(SequenceEthClient.BlockByHash), new object[] { "some hash" } },
+        new object[] { nameof(SequenceEthClient.BlockByNumber), new object[] { "latest" } },
+        new object[] { nameof(SequenceEthClient.BlockNumber), null},
+        new object[] { nameof(SequenceEthClient.BlockRange), new object[] { "earliest", "latest", false} },
+        new object[] { nameof(SequenceEthClient.CallContract), new object[] { new object[] { "latest" } } },
+        new object[] { nameof(SequenceEthClient.CallContract), new object[] { new object[] { "latest", BigInteger.One, "random stuff" } } },
+        new object[] { nameof(SequenceEthClient.CallContract), new object[] { null } },
+        new object[] { nameof(SequenceEthClient.ChainID), null},
+        new object[] { nameof(SequenceEthClient.CodeAt), new object[] { validAddress, "latest" } },
+        new object[] { nameof(SequenceEthClient.EstimateGas), new object[] { new TransactionCall() } },
+        new object[] { nameof(SequenceEthClient.FeeHistory), new object[] { "latest", "latest", 1 } },
+        new object[] { nameof(SequenceEthClient.HeaderByHash), new object[] { "some hash" } },
+        new object[] { nameof(SequenceEthClient.HeaderByNumber), new object[] { "latest" } },
+        new object[] { nameof(SequenceEthClient.NetworkId), null},
+        new object[] { nameof(SequenceEthClient.NonceAt), new object[] { validAddress, "latest" } },
+        new object[] { nameof(SequenceEthClient.SendRawTransaction), new object[] { "transaction data" } },
+        new object[] { nameof(SequenceEthClient.SuggestGasPrice), null},
+        new object[] { nameof(SequenceEthClient.SuggestGasTipCap), null},
+        new object[] { nameof(SequenceEthClient.TransactionByHash), new object[] { "some hash" } },
+        new object[] { nameof(SequenceEthClient.TransactionCount), new object[] { "some hash" } },
+        new object[] { nameof(SequenceEthClient.TransactionReceipt), new object[] { "some hash" } },
+        new object[] { nameof(SequenceEthClient.WaitForTransactionReceipt), new object[] { "some hash", 1, 1 } },
+    };
+
+    [TestCaseSource("errorCases")]
+    public async Task TestErrorResponse(string methodName, params object[] parameters) {
+        try {
+            var client = new SequenceEthClient(failingClient);
+            var method = typeof(SequenceEthClient).GetMethod(methodName);
+            var task = (Task)method.Invoke(client, parameters);
+            await task.ConfigureAwait(false);
+            Assert.Fail("Expected an exception but none was thrown");
+        }
+        catch (Exception ex) {
+            Assert.AreEqual(FailingRpcClient.ErrorMessage, ex.Message);
         }
     }
 }
