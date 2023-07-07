@@ -22,10 +22,6 @@ namespace Sequence.Transactions {
                 {
                     value = BigInteger.Zero;
                 }
-                if (gasPrice == null)
-                {
-                    gasPrice = BigInteger.Zero;
-                }
 
                 TransactionCall call = new TransactionCall
                 {
@@ -34,7 +30,7 @@ namespace Sequence.Transactions {
                     value = (BigInteger)value,
                     data = data,
                 };
-                if (gasPrice == 0)
+                if (gasPrice == null || gasPrice == BigInteger.Zero)
                 {
                     gasPrice = await client.SuggestGasPrice();
                     call.gasPrice = (BigInteger)gasPrice;
