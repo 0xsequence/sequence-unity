@@ -18,6 +18,7 @@ namespace Sequence.Wallet
     {
         public ECPrivKey privKey;
         public ECPubKey pubKey;
+        private string address;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EthWallet"/> class with a randomly generated private key.
@@ -43,7 +44,7 @@ namespace Sequence.Wallet
         /// Retrieves the Ethereum address associated with the wallet.
         /// </summary>
         /// <returns>The Ethereum address as a string.</returns>
-        public string GetAddress()
+        public string GenerateAddress()
         {
             //Last 20 bytes of the Keccak-256 hash of the public key
             byte[] publickeyBytes = pubKey.ToBytes(false);
@@ -52,6 +53,15 @@ namespace Sequence.Wallet
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
 
             return PubkeyToAddress(publicKeyBytes64);
+        }
+
+        public string GetAddress()
+        {
+            if (address == null)
+            {
+                address = GenerateAddress();
+            }
+            return address;
         }
 
         public async Task<BigInteger> GetBalance(SequenceEthClient client)
