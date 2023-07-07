@@ -7,38 +7,14 @@ namespace Sequence.Wallet {
     public static class TransactionSender {
 
         public static async Task<string> SendTransaction(this EthWallet fromWallet, IEthClient client, string to, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, string data = null) {
-            if (value == null)
-            {
-                value = BigInteger.Zero;
+            EthTransaction transaction;
+            if (gasLimit == null) {
+                GasLimitEstimator estimator = new GasLimitEstimator(client, fromWallet.GetAddress());
+                transaction = await estimator.BuildTransactionCreator(to, data, value, gasPrice)();
+            }else {
+                BigInteger nonce = await fromWallet.GetNonce(client);
+                transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data);
             }
-            if (gasPrice == null)
-            {
-                gasPrice = BigInteger.Zero;
-            }
-            if (gasLimit == null)
-            {
-                gasLimit = BigInteger.Zero;
-            }
-
-            TransactionCall call = new TransactionCall
-            {
-                from = fromWallet.GetAddress(),
-                to = to,
-                value = (BigInteger)value,
-                data = data,
-            };
-            if (gasPrice == 0)
-            {
-                gasPrice = await client.SuggestGasPrice();
-                call.gasPrice = (BigInteger)gasPrice;
-            }
-            if (gasLimit == 0)
-            {
-                gasLimit = await client.EstimateGas(call);
-            }
-            
-            BigInteger nonce = await fromWallet.GetNonce(client);
-            EthTransaction transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data);
             string tx = transaction.SignAndEncodeTransaction(fromWallet);
             string result = await fromWallet.SendRawTransaction(client, tx);
             return result;
