@@ -77,7 +77,7 @@ have unwound properly and may leave the next test in an unexpected state - causi
 The SDK is broken into a number of components with different responsibilities. This section will give an overview of some of the most important components for users and their intended purposes.
 
 ### Client
-IEthClient provides an interface for clients. Clients handle the connection to blockchain networks, making various RPC requests. Any time you wish to query the blockchain or submit a transaction, you will need a client.
+IEthClient provides an interface for clients. Clients handle the connection to blockchain networks, making various RPC requests. Any time you wish to query the blockchain or submit a transaction, you will need a client. As a rule of thumb, if a method requires a client, you should expect that you will be making a web request and will need to work with async tasks and be prepared to catch any exceptions that are thrown.
 
 ### Wallet
 EthWallet implements a standard EOA wallet. A wallet keeps track of its own private/public key pair and address and is responsible for providing its private key to the signer when signing transactions.

@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 
 namespace Sequence.Provider
 {
-    public class HttpRpcClient
+    public class HttpRpcClient : IRpcClient
     {
         private readonly string _url;
         public HttpRpcClient(string url)
