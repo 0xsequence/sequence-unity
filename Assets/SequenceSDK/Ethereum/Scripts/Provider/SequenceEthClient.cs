@@ -76,10 +76,7 @@ namespace Sequence.Provider
 
         public async Task<List<Block>> BlockRange(string start = "earliest", string end = "latest", bool? full = true)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockRange", new object[] {start, end, full});
-            ThrowIfResponseHasErrors(response);
-            List<Block> blocks = JsonConvert.DeserializeObject<List<Block>>(response.result.ToString());
-            return blocks;
+            throw new System.NotImplementedException(); // Todo: needs implementation
         }
 
         public async Task<string> CallContract(params object[] args)
