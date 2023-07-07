@@ -9,7 +9,7 @@ using Sequence.Provider;
 using Sequence.Wallet;
 using UnityEngine;
 
-namespace Sequence.Signer
+namespace Sequence.Transactions
 {
     public class TransferEth
     {

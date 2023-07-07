@@ -6,7 +6,7 @@ using System.Numerics;
 using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Extensions;
-using Sequence.Wallet;
+using Sequence.Transactions;
 using System.Text;
 
 namespace Sequence.Contracts

@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Provider;
+using Sequence.Transactions;
 
 namespace Sequence.Wallet {
     public static class TransactionSender {

@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Extensions;
+using Sequence.Wallet;
 
-namespace Sequence.Wallet
+namespace Sequence.Transactions
 {
     public class EthTransaction
     {

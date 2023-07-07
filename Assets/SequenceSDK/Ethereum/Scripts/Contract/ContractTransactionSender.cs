@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Provider;
 using Sequence.Wallet;
+using Sequence.Transactions;
 using UnityEngine;
 using static Sequence.Contracts.Contract;
 

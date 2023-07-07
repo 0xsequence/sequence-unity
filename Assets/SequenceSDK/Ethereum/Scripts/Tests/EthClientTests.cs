@@ -10,6 +10,7 @@ using Sequence.Wallet;
 using Sequence.ABI;
 using Sequence.Provider;
 using System.Numerics;
+using Sequence.Transactions;
 
 public class EthClientTests 
 {
