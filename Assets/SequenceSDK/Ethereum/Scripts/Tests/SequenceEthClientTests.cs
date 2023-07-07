@@ -10,6 +10,7 @@ using Sequence.Provider;
 using Sequence.Wallet;
 using UnityEngine;
 using UnityEngine.TestTools;
+using Sequence.Transactions;
 
 public class SequenceEthClientTests
 {
