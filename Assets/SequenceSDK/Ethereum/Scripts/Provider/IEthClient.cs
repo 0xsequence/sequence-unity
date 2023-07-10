@@ -305,7 +305,7 @@ namespace Sequence.Provider
 		/// SuggestGasTipCap = eth_maxPriorityFeePerGas
 		/// </summary>
 		/// <returns></returns>
-		Task<string> SuggestGasTipCap();
+		Task<BigInteger> SuggestGasTipCap();
 
 		/// <summary>
 		/// FeeHistory = eth_feeHistory
@@ -314,7 +314,7 @@ namespace Sequence.Provider
 		/// <param name="newestBlock"></param>
 		/// <param name="REWARDPERCENTILES"></param>
 		/// <returns></returns>
-		Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int? REWARDPERCENTILES);
+		Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int[] REWARDPERCENTILES);
 
 
 		/// <summary>

@@ -56,8 +56,7 @@ namespace Sequence.Wallet
 
         public async Task<BigInteger> GetBalance(SequenceEthClient client)
         {
-            string blockNumber = await client.BlockNumber();
-            BigInteger balance = await client.BalanceAt(GetAddress(), blockNumber);
+            BigInteger balance = await client.BalanceAt(GetAddress(), "latest");
             return balance;
         }
 
