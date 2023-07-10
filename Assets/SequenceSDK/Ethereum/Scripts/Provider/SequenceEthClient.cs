@@ -74,9 +74,26 @@ namespace Sequence.Provider
             return blockNumber;
         }
 
-        public async Task<List<Block>> BlockRange(string start = "earliest", string end = "latest", bool? full = true)
+        public async Task<List<Block>> BlockRange(string start = "earliest", string end = "earliest")
         {
-            throw new System.NotImplementedException(); // Todo: needs implementation
+            if (start == "earliest") {
+                start = "0x0";
+            }
+            if (end == "latest") {
+                end = await BlockNumber();
+            }
+
+            BigInteger startInt = start.HexStringToBigInteger();
+            BigInteger endInt = end.HexStringToBigInteger();
+
+            List<Block> blocks = new List<Block>();
+            for (BigInteger i = startInt; i <= endInt; i++)
+            {
+                Block block = await BlockByNumber(i.BigIntegerToHexString());
+                blocks.Add(block);
+            }
+
+            return blocks;
         }
 
         public async Task<string> CallContract(params object[] args)

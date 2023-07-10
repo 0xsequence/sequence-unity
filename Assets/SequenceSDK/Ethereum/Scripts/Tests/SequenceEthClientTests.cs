@@ -104,29 +104,25 @@ public class SequenceEthClientTests
         }
     }
 
-    [TestCaseSource(nameof(urls))]
-    [Ignore("Method not yet implemented")]
-    public async Task TestBlockRange(string url)
+    [Test]
+    public async Task TestBlockRange()
     {
         try
         {
-            var client = new SequenceEthClient(url);
+            var client = new SequenceEthClient(testnetUrl);
+            
+            string blockCount = "0x11";
             string blockNumber = await client.BlockNumber();
-            BigInteger number = blockNumber.HexStringToBigInteger();
-            if (number <= BigInteger.Zero)
-            {
-                await Task.Delay((int)(blockTimeInSeconds * 1000 * 3)); // Wait for more than the block time just in case - we want multiple blocks to have been produced
+            // Must have at least blockCount blocks of fee history
+            while (blockNumber.HexStringToBigInteger() < blockCount.HexStringToBigInteger()) {
+                await Task.Delay((int)(blockTimeInSeconds * 1000));
+                blockNumber = await client.BlockNumber();
             }
 
-            List<Block> blockRange = await client.BlockRange();
+            List<Block> blockRange = await client.BlockRange("0x0", blockCount);
             Assert.Greater(blockRange.Count, 1);
 
             Block startingBlock = await client.BlockByNumber("earliest");
-            Assert.AreEqual(startingBlock.ToString(), blockRange[0].ToString());
-
-            // Check that providing non-default values doesn't throw
-            blockRange = await client.BlockRange("earliest", "latest", false);
-            Assert.Greater(blockRange.Count, 1);
             Assert.AreEqual(startingBlock.ToString(), blockRange[0].ToString());
         }
         catch (Exception ex)
@@ -255,8 +251,6 @@ public class SequenceEthClientTests
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }
     }
-
-    
 
     private static object[] networkIdCases =
     {
@@ -448,6 +442,7 @@ public class SequenceEthClientTests
         new object[] { nameof(SequenceEthClient.BlockByHash), new object[] { "some hash" } },
         new object[] { nameof(SequenceEthClient.BlockByNumber), new object[] { "latest" } },
         new object[] { nameof(SequenceEthClient.BlockNumber), null},
+        new object[] { nameof(SequenceEthClient.BlockRange), new object[] { "latest", "latest" } },
         new object[] { nameof(SequenceEthClient.CallContract), new object[] { new object[] { "latest" } } },
         new object[] { nameof(SequenceEthClient.CallContract), new object[] { new object[] { "latest", BigInteger.One, "random stuff" } } },
         new object[] { nameof(SequenceEthClient.CallContract), new object[] { null } },
