@@ -17,8 +17,10 @@ using Sequence.Contracts;
 
 public class SequenceEthClientTests
 {
-    string clientUrl = "http://localhost:8545/";
-    float blockTimeInSeconds = 1f;
+    static readonly string testnetUrl = "http://localhost:8545/";
+    static readonly string publicPolygonRpc = "https://polygon-bor.publicnode.com";
+    private static string[] urls = new string[] { testnetUrl, publicPolygonRpc };
+    float blockTimeInSeconds = 2f;
     IRpcClient failingClient = new FailingRpcClient();
     const string validAddress = "0x3F96a0D6697e5E7ACEC56A21681195dC6262b06C";
     EthWallet wallet1 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
@@ -30,7 +32,7 @@ public class SequenceEthClientTests
         try
         {
             BigInteger startingBalance = 10000 * BigInteger.Pow(10, 18);
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(testnetUrl);
             BigInteger balance = await client.BalanceAt(wallet1.GetAddress(), "earliest");
             Assert.AreEqual(startingBalance, balance);
         }
@@ -40,8 +42,8 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestBlockByNumber()
+    [TestCaseSource(nameof(urls))]
+    public async Task TestBlockByNumber(string url)
     {
         try
         {
@@ -51,7 +53,7 @@ public class SequenceEthClientTests
                 nonce = "0x0000000000000000",
                 gasUsed = "0x0",
             };
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
 
             Block block = await client.BlockByNumber("earliest");
 
@@ -59,11 +61,11 @@ public class SequenceEthClientTests
             Assert.AreEqual(startingBlock.nonce, block.nonce);
             Assert.AreEqual(startingBlock.gasUsed, block.gasUsed);
 
-            await TestBlockByHash(block);
+            await TestBlockByHash(block, url);
 
             block = await client.BlockByNumber("latest");
 
-            await TestBlockByHash(block);
+            await TestBlockByHash(block, url);
         }
         catch (Exception ex)
         {
@@ -71,11 +73,11 @@ public class SequenceEthClientTests
         }
     }
 
-    public async Task TestBlockByHash(Block expectedBlock)
+    public async Task TestBlockByHash(Block expectedBlock, string url)
     {
         try
         {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             Block block = await client.BlockByHash(expectedBlock.hash);
             Assert.AreEqual(expectedBlock.ToString(), block.ToString());
         }
@@ -85,12 +87,12 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestBlockNumber()
+    [TestCaseSource(nameof(urls))]
+    public async Task TestBlockNumber(string url)
     {
         try
         {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             var blockNumber = await client.BlockNumber();
             await Task.Delay((int)(blockTimeInSeconds * 1000 * 3)); // Wait for more than the block time just in case
             var blockNumber2 = await client.BlockNumber();
@@ -102,13 +104,13 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
+    [TestCaseSource(nameof(urls))]
     [Ignore("Method not yet implemented")]
-    public async Task TestBlockRange()
+    public async Task TestBlockRange(string url)
     {
         try
         {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             string blockNumber = await client.BlockNumber();
             BigInteger number = blockNumber.HexStringToBigInteger();
             if (number <= BigInteger.Zero)
@@ -133,13 +135,18 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestChainId()
+    private static object[] chainIdCases =
+    {
+        new object[] { testnetUrl,  "0x7a69"},
+        new object[] { publicPolygonRpc, "0x89" },
+    };
+
+    [TestCaseSource(nameof(chainIdCases))]
+    public async Task TestChainId(string url, string expected)
     {
         try
         {
-            string expected = "0x7a69";
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             string chainId = await client.ChainID();
             Assert.AreEqual(expected, chainId);
         }
@@ -154,7 +161,7 @@ public class SequenceEthClientTests
     {
         try
         {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(testnetUrl);
             var bytecode = ERC20Tests.bytecode;
             TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, bytecode);
             var contractAddress = receipt.contractAddress;
@@ -171,10 +178,10 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestEstimateGas() {
+    [TestCaseSource(nameof(urls))]
+    public async Task TestEstimateGas(string url) {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             BigInteger gas = await client.EstimateGas(new TransactionCall());
             Assert.Greater(gas, BigInteger.Zero);
         }
@@ -183,10 +190,10 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestFeeHistory() {
+    [TestCaseSource(nameof(urls))]
+    public async Task TestFeeHistory(string url) {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             string blockCount = "0x11";
             string blockNumber = await client.BlockNumber();
             // Must have at least blockCount blocks of fee history
@@ -204,11 +211,11 @@ public class SequenceEthClientTests
         }
     }
 
-    public async Task TestHeaderByHash(Block expectedBlock)
+    public async Task TestHeaderByHash(Block expectedBlock, string url)
     {
         try
         {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             Block block = await client.HeaderByHash(expectedBlock.hash);
             Assert.AreEqual(expectedBlock.ToString(), block.ToString());
         }
@@ -218,8 +225,8 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestHeaderByNumber()
+    [TestCaseSource(nameof(urls))]
+    public async Task TestHeaderByNumber(string url)
     {
         try
         {
@@ -229,7 +236,7 @@ public class SequenceEthClientTests
                 nonce = "0x0000000000000000",
                 gasUsed = "0x0",
             };
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
 
             Block block = await client.HeaderByNumber("earliest");
 
@@ -237,11 +244,11 @@ public class SequenceEthClientTests
             Assert.AreEqual(startingBlock.nonce, block.nonce);
             Assert.AreEqual(startingBlock.gasUsed, block.gasUsed);
 
-            await TestHeaderByHash(block);
+            await TestHeaderByHash(block, url);
 
             block = await client.HeaderByNumber("latest");
 
-            await TestHeaderByHash(block);
+            await TestHeaderByHash(block, url);
         }
         catch (Exception ex)
         {
@@ -249,11 +256,18 @@ public class SequenceEthClientTests
         }
     }
 
-    [Test]
-    public async Task TestNetworkId() {
+    
+
+    private static object[] networkIdCases =
+    {
+        new object[] { testnetUrl,  "31337"},
+        new object[] { publicPolygonRpc, "137" },
+    };
+
+    [TestCaseSource(nameof(networkIdCases))]
+    public async Task TestNetworkId(string url, string expected) {
         try {
-            string expected = "31337";
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             string networkId = await client.NetworkId();
             Assert.AreEqual(expected, networkId);
         }
@@ -261,11 +275,11 @@ public class SequenceEthClientTests
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }
     }
-
-    [Test]
-    public async Task TestNonceAt() {
+    
+    [TestCaseSource(nameof(urls))]
+    public async Task TestNonceAt(string url) {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             BigInteger nonce = await client.NonceAt(wallet1.GetAddress(), "earliest");
             Assert.AreEqual(BigInteger.Zero, nonce);
         }
@@ -277,7 +291,7 @@ public class SequenceEthClientTests
     [Test]
     public async Task TestSendRawTransaction() {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(testnetUrl);
 
             BigInteger nonce = await wallet1.GetNonce(client);
             string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 30000000, wallet2.GetAddress(), 1, "");
@@ -289,16 +303,18 @@ public class SequenceEthClientTests
 
             Assert.IsNotNull(result);
             Assert.IsTrue(result.StartsWith("0x"));
+
+            await client.WaitForTransactionReceipt(result); // Not waiting for the transaction to process will cause the next tests to fail as they would be submitting a duplicate transaction
         }
         catch (Exception ex) {
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }
     }
 
-    [Test]
-    public async Task TestSuggestGasPrice() {
+    [TestCaseSource(nameof(urls))]
+    public async Task TestSuggestGasPrice(string url) {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(url);
             BigInteger gasPrice = await client.SuggestGasPrice();
             Assert.Greater(gasPrice, BigInteger.Zero);
         }
@@ -310,7 +326,7 @@ public class SequenceEthClientTests
     [Test]
     public async Task TestSuggestGasTipCap() {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(publicPolygonRpc); // Testnet does not support this method
             BigInteger gasTipCap = await client.SuggestGasTipCap();
             Assert.Greater(gasTipCap, BigInteger.Zero);
         }
@@ -322,7 +338,7 @@ public class SequenceEthClientTests
     [Test]
     public async Task TestTransactionByHash() {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(testnetUrl);
 
             BigInteger nonce = await wallet1.GetNonce(client);
             BigInteger gasPrice = 100;
@@ -350,6 +366,8 @@ public class SequenceEthClientTests
             Assert.AreEqual(r, transaction.r);
             Assert.AreEqual(s, transaction.s);
             Assert.AreEqual(wallet1.GetAddress(), SequenceCoder.AddressChecksum(transaction.from));
+
+            await client.WaitForTransactionReceipt(result); // Not waiting for the transaction to process will cause the next tests to fail as they would be submitting a duplicate transaction
         }
         catch (Exception ex) {
             Assert.Fail("Expected no exception, but got: " + ex.Message);
@@ -359,7 +377,7 @@ public class SequenceEthClientTests
     [Test]
     public async Task TestTransactionCount() {
         try {
-            var client = new SequenceEthClient(clientUrl);
+            var client = new SequenceEthClient(testnetUrl);
 
             Block earliestBlock = await client.BlockByNumber("earliest");
 
@@ -397,7 +415,7 @@ public class SequenceEthClientTests
     {
         try
         {
-            SequenceEthClient client = new SequenceEthClient(clientUrl);
+            SequenceEthClient client = new SequenceEthClient(testnetUrl);
             BigInteger nonce = await wallet1.GetNonce(client);
             string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 30000000, wallet2.GetAddress(), 1, "");
             Assert.IsNotNull(encoded_signing);
