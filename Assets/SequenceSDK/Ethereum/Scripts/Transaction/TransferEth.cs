@@ -14,7 +14,7 @@ namespace Sequence.Transactions
     public class TransferEth
     {
         private IEthClient client;
-        private EthWallet fromWallet;
+        private IWallet fromWallet;
         private string to;
         private BigInteger value;
         private BigInteger gasPrice;
@@ -23,7 +23,7 @@ namespace Sequence.Transactions
 
         public TransferEth(
             IEthClient client,
-            EthWallet fromWallet,
+            IWallet fromWallet,
             string toAddress,
             BigInteger value,
             BigInteger gasPrice,

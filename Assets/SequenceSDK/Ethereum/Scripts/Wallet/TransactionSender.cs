@@ -6,7 +6,7 @@ using Sequence.Transactions;
 namespace Sequence.Wallet {
     public static class TransactionSender {
 
-        public static async Task<string> SendTransaction(this EthWallet fromWallet, IEthClient client, string to, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, string data = null) {
+        public static async Task<string> SendTransaction(this IWallet fromWallet, IEthClient client, string to, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, string data = null) {
             EthTransaction transaction;
             string chainId = await client.ChainID();
             if (gasLimit == null) {
@@ -21,7 +21,7 @@ namespace Sequence.Wallet {
             return result;
         }
 
-        public static async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(this EthWallet fromWallet, IEthClient client, string to, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, string data = null) {
+        public static async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(this IWallet fromWallet, IEthClient client, string to, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, string data = null) {
             string tx = await fromWallet.SendTransaction(client, to, value, gasPrice, gasLimit, data);
             TransactionReceipt receipt = await client.WaitForTransactionReceipt(tx);
             return receipt;

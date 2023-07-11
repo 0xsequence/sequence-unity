@@ -15,7 +15,7 @@ using Sequence.Extensions;
 
 namespace Sequence.Wallet
 {
-    public class EthWallet
+    public class EthWallet : IWallet
     {
         public ECPrivKey privKey;
         public ECPubKey pubKey;
@@ -42,10 +42,10 @@ namespace Sequence.Wallet
         }
 
         /// <summary>
-        /// Retrieves the Ethereum address associated with the wallet.
+        /// Generates the Ethereum address associated with the wallet.
         /// </summary>
         /// <returns>The Ethereum address as a string.</returns>
-        public string GenerateAddress()
+        private string GenerateAddress()
         {
             //Last 20 bytes of the Keccak-256 hash of the public key
             byte[] publickeyBytes = pubKey.ToBytes(false);
@@ -65,7 +65,7 @@ namespace Sequence.Wallet
             return address;
         }
 
-        public async Task<BigInteger> GetBalance(SequenceEthClient client)
+        public async Task<BigInteger> GetBalance(IEthClient client)
         {
             BigInteger balance = await client.BalanceAt(GetAddress(), "latest");
             return balance;
@@ -203,7 +203,6 @@ namespace Sequence.Wallet
             return PubkeyToAddress(publicKeyBytes64);
         }
 
-       
         /// <summary>
         /// Adds the Ethereum Signed Message prefix to a message.
         /// </summary>
@@ -211,15 +210,7 @@ namespace Sequence.Wallet
         /// <returns>The prefixed message as a byte array.</returns>
         public static byte[] PrefixedMessage(byte[] message)
         {
-            // https://eips.ethereum.org/EIPS/eip-191
-            byte[] message191 = SequenceCoder.HexStringToByteArray("19").Concat(Encoding.UTF8.GetBytes("Ethereum Signed Message:\n")).ToArray();
-            byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
-            if (!message.Take(message191.Length).SequenceEqual(message191))
-            {
-                message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
-            }
-
-            return message;
+            return IWallet.PrefixedMessage(message);
         }
 
         /// <summary>

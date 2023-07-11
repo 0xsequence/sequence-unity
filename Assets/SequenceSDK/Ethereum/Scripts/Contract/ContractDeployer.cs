@@ -14,7 +14,7 @@ namespace Sequence.Contracts
     {
         public static async Task<TransactionReceipt> Deploy(
             IEthClient client,
-            EthWallet wallet,
+            IWallet wallet,
             string bytecode,
             BigInteger? gasPrice = null,
             BigInteger? gasLimit = null)
