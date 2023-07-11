@@ -8,6 +8,7 @@ namespace Sequence
     {
         public string oldestBlock;
         public List<string> baseFeePerGas;
+        public List<float> gasUsedRatio;
         public List<List<string>>? reward;
     }
 }
