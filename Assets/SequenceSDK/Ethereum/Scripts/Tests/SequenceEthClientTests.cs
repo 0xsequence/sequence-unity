@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -7,11 +6,8 @@ using Sequence;
 using Sequence.ABI;
 using Sequence.Mocks;
 using Sequence.Provider;
-using Sequence.Signer;
-using Sequence.Wallet;
-using UnityEngine;
-using UnityEngine.TestTools;
 using Sequence.Transactions;
+using Sequence.Wallet;
 using Sequence.Extensions;
 using System.Collections.Generic;
 using Sequence.Contracts;
