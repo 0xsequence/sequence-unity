@@ -74,11 +74,25 @@ namespace Sequence.Provider
             return blockNumber;
         }
 
-        public async Task<List<Block>> BlockRange(string start = "earliest", string end = "latest", bool? full = true)
+        public async Task<List<Block>> BlockRange(string start = "earliest", string end = "earliest")
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockRange", new object[] {start, end, full});
-            ThrowIfResponseHasErrors(response);
-            List<Block> blocks = JsonConvert.DeserializeObject<List<Block>>(response.result.ToString());
+            if (start == "earliest") {
+                start = "0x0";
+            }
+            if (end == "latest") {
+                end = await BlockNumber();
+            }
+
+            BigInteger startInt = start.HexStringToBigInteger();
+            BigInteger endInt = end.HexStringToBigInteger();
+
+            List<Block> blocks = new List<Block>();
+            for (BigInteger i = startInt; i <= endInt; i++)
+            {
+                Block block = await BlockByNumber(i.BigIntegerToHexString());
+                blocks.Add(block);
+            }
+
             return blocks;
         }
 
@@ -107,7 +121,7 @@ namespace Sequence.Provider
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getCode", new object[] { address, blockNumber });
             ThrowIfResponseHasErrors(response);
-            string code = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            string code = response.result.ToString();
             return code;
         }
 
@@ -126,7 +140,7 @@ namespace Sequence.Provider
             return gas;
         }
 
-        public async Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int? REWARDPERCENTILES)
+        public async Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int[] REWARDPERCENTILES)
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_feeHistory", new object[] {blockCount, newestBlock, REWARDPERCENTILES });
             ThrowIfResponseHasErrors(response);
@@ -141,18 +155,12 @@ namespace Sequence.Provider
 
         public async Task<Block> HeaderByHash(string blockHash)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockByHash", new object[] { blockHash, false });
-            ThrowIfResponseHasErrors(response);
-            Block block = JsonConvert.DeserializeObject<Block>(response.result.ToString());
-            return block;
+            return await BlockByHash(blockHash);
         }
 
         public async Task<Block> HeaderByNumber(string blockNumber)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_getBlockByHash", new object[] {  blockNumber, true });
-            ThrowIfResponseHasErrors(response);
-            Block block = JsonConvert.DeserializeObject<Block>(response.result.ToString());
-            return block;
+            return await BlockByNumber(blockNumber);
         }
 
         public async Task<string> NetworkId()
@@ -231,11 +239,11 @@ namespace Sequence.Provider
             return gasPrice;
         }
 
-        public async Task<string> SuggestGasTipCap()
+        public async Task<BigInteger> SuggestGasTipCap()
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_maxPriorityFeePerGas", new object[] { });
             ThrowIfResponseHasErrors(response);
-            string cap = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            BigInteger cap = JsonConvert.DeserializeObject<BigInteger>(response.result.ToString());
             return cap;
         }
 
@@ -246,7 +254,7 @@ namespace Sequence.Provider
 
         public async Task<Transaction> TransactionByHash(string transactionHash)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionByHash", new object[] { });
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionByHash", new object[] { transactionHash });
             ThrowIfResponseHasErrors(response);
             Transaction result = JsonConvert.DeserializeObject<Transaction>(response.result.ToString());
             return result;

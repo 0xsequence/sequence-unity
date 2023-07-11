@@ -99,13 +99,12 @@ namespace Sequence.Provider
 	
 		/// <summary>
 		/// BlockRange = eth_getBlockRange
-		/// https://community.optimism.io/docs/developers/build/json-rpc/#eth-getblockrange
 		/// </summary>
 		/// <param name="start"></param>
 		/// <param name="end"></param>
 		/// <param name="full"></param>
 		/// <returns></returns>
-		Task<List<Block>> BlockRange(string start = "earliest", string end = "earliest", bool? full= true );
+		Task<List<Block>> BlockRange(string start = "earliest", string end = "earliest");
 
 
 		/// <summary>
@@ -305,7 +304,7 @@ namespace Sequence.Provider
 		/// SuggestGasTipCap = eth_maxPriorityFeePerGas
 		/// </summary>
 		/// <returns></returns>
-		Task<string> SuggestGasTipCap();
+		Task<BigInteger> SuggestGasTipCap();
 
 		/// <summary>
 		/// FeeHistory = eth_feeHistory
@@ -314,7 +313,7 @@ namespace Sequence.Provider
 		/// <param name="newestBlock"></param>
 		/// <param name="REWARDPERCENTILES"></param>
 		/// <returns></returns>
-		Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int? REWARDPERCENTILES);
+		Task<FeeHistoryResult> FeeHistory(string blockCount, string newestBlock, int[] REWARDPERCENTILES);
 
 
 		/// <summary>
