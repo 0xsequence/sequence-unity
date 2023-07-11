@@ -1,19 +1,12 @@
 #define HAS_SPAN
 #define SECP256K1_LIB
 
-using System;
-using System.Linq;
-//using System.Numerics;
-using System.Threading.Tasks;
 using Sequence.Provider;
-using Sequence.ABI;
-using System.Text;
-using NBitcoin.Secp256k1;
-using Sequence.Signer;
+using Sequence.Wallet;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Sequence.Wallet
+namespace Sequence.Core.Wallet
 {
 
     public class NetworkConfig
