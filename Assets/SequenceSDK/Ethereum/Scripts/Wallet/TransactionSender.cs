@@ -8,14 +8,15 @@ namespace Sequence.Wallet {
 
         public static async Task<string> SendTransaction(this EthWallet fromWallet, IEthClient client, string to, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, string data = null) {
             EthTransaction transaction;
+            string chainId = await client.ChainID();
             if (gasLimit == null) {
                 GasLimitEstimator estimator = new GasLimitEstimator(client, fromWallet.GetAddress());
                 transaction = await estimator.BuildTransactionCreator(to, data, value, gasPrice)();
             }else {
                 BigInteger nonce = await fromWallet.GetNonce(client);
-                transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data);
+                transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data, chainId);
             }
-            string tx = transaction.SignAndEncodeTransaction(fromWallet);
+            string tx = transaction.SignAndEncodeTransaction(fromWallet, chainId);
             string result = await fromWallet.SendRawTransaction(client, tx);
             return result;
         }

@@ -30,8 +30,9 @@ public class ERC20Tests
         try
         {
             BigInteger nonce = await wallet1.GetNonce(client);
-            EthTransaction deployTransaction = new EthTransaction(nonce, 1, 30000000, StringExtensions.ZeroAddress, 0, bytecode);
-            string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet1);
+            string chainId = await client.ChainID();
+            EthTransaction deployTransaction = new EthTransaction(nonce, 1, 30000000, StringExtensions.ZeroAddress, 0, bytecode, chainId);
+            string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet1, chainId);
             string result = await wallet1.SendRawTransaction(client, signedTransaction);
             TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
             contractAddress = receipt.contractAddress;
@@ -97,7 +98,8 @@ public class ERC20Tests
             var contractCall = new ContractCall(wallet1.GetAddress());
             EthTransaction mintTransaction = await token.Mint(wallet1.GetAddress(), amount)
                 (client, contractCall);
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
+            string chainId = await client.ChainID();
+            string signed = mintTransaction.SignAndEncodeTransaction(wallet1, chainId);
             TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
 
             BigInteger supply = await token.TotalSupply(client);
@@ -117,7 +119,8 @@ public class ERC20Tests
             BigInteger nonce = await wallet2.GetNonce(client);
             EthTransaction mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
                 (client, new ContractCall(wallet2.GetAddress()));
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet2);
+            string chainId = await client.ChainID();
+            string signed = mintTransaction.SignAndEncodeTransaction(wallet2, chainId);
             TransactionReceipt receipt = await wallet2.SendRawTransactionAndWaitForReceipt(client, signed);
             Assert.Fail("Expected an exception and none was thrown");
         }
@@ -138,7 +141,8 @@ public class ERC20Tests
             BigInteger nonce = await wallet1.GetNonce(client);
             EthTransaction mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
                 (client, new ContractCall(wallet1.GetAddress()));
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
+            string chainId = await client.ChainID();
+            string signed = mintTransaction.SignAndEncodeTransaction(wallet1, chainId);
             TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
 
             supply = await token.TotalSupply(client);
@@ -238,7 +242,8 @@ public class ERC20Tests
             var contractCall = new ContractCall(wallet1.GetAddress());
             EthTransaction mintTransaction = await token.Mint(wallet1.GetAddress(), amount * 2)
                 (client, contractCall);
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
+            string chainId = await client.ChainID();
+            string signed = mintTransaction.SignAndEncodeTransaction(wallet1, chainId);
             TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
 
             BigInteger supply = await token.TotalSupply(client);

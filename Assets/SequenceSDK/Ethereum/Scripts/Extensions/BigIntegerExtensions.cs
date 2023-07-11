@@ -7,7 +7,12 @@ namespace Sequence.Extensions
     {
         public static string BigIntegerToHexString(this BigInteger value)
         {
-            return "0x" + value.ToString("x");
+            string result = value.ToString("x").TrimStart('0');
+            if (result == "")
+            {
+                result = "0";
+            }
+            return "0x" + result;
         }
     }
 }

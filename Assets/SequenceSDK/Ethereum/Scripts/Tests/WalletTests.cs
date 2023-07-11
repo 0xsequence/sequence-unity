@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Numerics;
 using Sequence.Transactions;
+using Sequence.Extensions;
 
 public class EthWalletTests
 {
@@ -85,12 +86,13 @@ public class EthWalletTests
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             BigInteger nonce = await wallet.GetNonce(client);
-            string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "");
+            string chainId = await client.ChainID();
+            string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", chainId);
             Debug.Log("encoded signing: " + encoded_signing);
             string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Debug.Log("signing hash: " + signingHash);
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
-            string tx = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", v, r, s);
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), chainId);
+            string tx = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", chainId, v, r, s);
             Debug.Log("tx: " + tx);
             string result = await wallet.SendRawTransaction(client, tx);
             Debug.Log(result);
@@ -109,10 +111,11 @@ public class EthWalletTests
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             BigInteger nonce = await wallet.GetNonce(client);
-            string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "");
+            string chainId = await client.ChainID();
+            string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", chainId);
             string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
-            string tx = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", v, r, s);
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), chainId);
+            string tx = EthTransaction.RLPEncode(nonce, 100, 100000, "0x1099542D7dFaF6757527146C0aB9E70A967f71C0", 12300000000000000000, "", chainId, v, r, s);
 
             BigInteger balancePreTransaction = await wallet.GetBalance(client);
 
@@ -140,16 +143,17 @@ public class EthWalletTests
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             BigInteger nonce = await wallet.GetNonce(client);
-            string encoded_signing = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock);
+            string chainId = await client.ChainID();
+            string encoded_signing = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, chainId);
             Assert.IsNotNull(encoded_signing);
             string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Assert.IsNotNull(signingHash);
             Assert.IsNotNull(wallet);
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), chainId);
             Assert.IsNotNull(v);
             Assert.IsNotNull(r);
             Assert.IsNotNull(s);
-            string tx = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, v, r, s);
+            string tx = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, chainId, v, r, s);
 
             string result = await wallet.SendRawTransaction(client, tx);
 
@@ -179,16 +183,17 @@ public class EthWalletTests
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             BigInteger nonce = await wallet.GetNonce(client);
-            string encoded_signing = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock);
+            string chainId = await client.ChainID();
+            string encoded_signing = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, chainId);
             Assert.IsNotNull(encoded_signing);
             string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
             Assert.IsNotNull(signingHash);
             Assert.IsNotNull(wallet);
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), chainId);
             Assert.IsNotNull(v);
             Assert.IsNotNull(r);
             Assert.IsNotNull(s);
-            string tx = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, v, r, s);
+            string tx = EthTransaction.RLPEncode(nonce, gasPrice_ERC20Mock, gasLimit_ERC20Mock, zeroAddress, 0, bytecode_ERC20Mock, chainId, v, r, s);
 
             string result = await wallet.SendRawTransaction(client, tx);
 
@@ -217,13 +222,13 @@ public class EthWalletTests
             Debug.Log("MockMint start:");
             string mockMint_data = ABI.Pack("function mockMint(address , uint256)", wallet2.GetAddress(), 1);
 
-            string mockMint_encoded = EthTransaction.RLPEncode(nonce2, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data);
+            string mockMint_encoded = EthTransaction.RLPEncode(nonce2, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data, chainId);
 
             string mockMint_signingHash = "0x" + SequenceCoder.KeccakHash(mockMint_encoded);
 
-            (string mockMint_v, string mockMint_r, string mockMint_s) = wallet2.SignTransaction(SequenceCoder.HexStringToByteArray(mockMint_signingHash));
+            (string mockMint_v, string mockMint_r, string mockMint_s) = wallet2.SignTransaction(SequenceCoder.HexStringToByteArray(mockMint_signingHash), chainId);
 
-            string mockMint_tx = EthTransaction.RLPEncode(nonce2, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data, mockMint_v, mockMint_r, mockMint_s);
+            string mockMint_tx = EthTransaction.RLPEncode(nonce2, gasPrice_ERC20Mock, gasLimit_ERC20Mock, receipt.contractAddress, 0, mockMint_data, chainId, mockMint_v, mockMint_r, mockMint_s);
 
             string mockMint_result = await wallet2.SendRawTransaction(client, mockMint_tx);
 
@@ -243,14 +248,14 @@ public class EthWalletTests
 
     }
 
-        [Test]
+    [Test]
     public void EIP155SigningTxTest()
     {
         //Example from https://eips.ethereum.org/EIPS/eip-155#parameters
         //Consider a transaction with nonce = 9, gasprice = 20 * 10**9, startgas = 21000, to = 0x3535353535353535353535353535353535353535, value = 10**18, data='' (empty).
         //1. Signing data
         string expected_signing_data = "0xec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080";
-        string encoded_signing_data = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000, "","1","0","0");
+        string encoded_signing_data = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000, "", "1");
         CollectionAssert.AreEqual(expected_signing_data,encoded_signing_data);
 
         //signing hash
@@ -262,11 +267,13 @@ public class EthWalletTests
 
         string expected_signed_transaction = "0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83";
         EthWallet wallet = new EthWallet("0x4646464646464646464646464646464646464646464646464646464646464646");
-        (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(expected_signing_hash), 1);
-        string encoded_signed_transaction = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000,"", v,r, s);
+        (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(expected_signing_hash), "1");
+        int id = "1".HexStringToInt();
+        int vInt = v.HexStringToInt();
+        Debug.Log(id);
+        Debug.Log(vInt);
+        string encoded_signed_transaction = EthTransaction.RLPEncode(9, 20000000000, 21000, "0x3535353535353535353535353535353535353535", 1000000000000000000,"", "1", v,r, s);
         CollectionAssert.AreEqual(expected_signed_transaction, encoded_signed_transaction);
-
-
     }
 
     [Test]

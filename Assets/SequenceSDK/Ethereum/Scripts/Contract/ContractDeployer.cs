@@ -34,8 +34,9 @@ namespace Sequence.Contracts
             {
                 gasLimit = await client.EstimateGas(call);
             }
-            EthTransaction deployTransaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, StringExtensions.ZeroAddress, 0, bytecode);
-            string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet);
+            string chainId = await client.ChainID();
+            EthTransaction deployTransaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, StringExtensions.ZeroAddress, 0, bytecode, chainId);
+            string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet, chainId);
             TransactionReceipt receipt = await wallet.SendRawTransactionAndWaitForReceipt(client, signedTransaction);
             return receipt;
         }

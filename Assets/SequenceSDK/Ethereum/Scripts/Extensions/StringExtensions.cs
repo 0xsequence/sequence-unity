@@ -20,6 +20,17 @@ namespace Sequence.Extensions
         }
 
         /// <summary>
+        /// Converts a string that represents a hex value to an int
+        /// </summary>
+        /// <param name="hexString"></param>
+        /// <returns></returns>
+        public static int HexStringToInt(this string hexString)
+        {
+            hexString = hexString.Replace("0x", "");
+            return int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
+        }
+
+        /// <summary>
         /// Appends '0x' to the beginning of a string if it is not already present
         /// Useful for representing strings as hex values
         /// </summary>

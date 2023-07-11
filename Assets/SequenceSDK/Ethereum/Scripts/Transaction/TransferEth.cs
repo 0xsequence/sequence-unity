@@ -13,6 +13,7 @@ namespace Sequence.Transactions
 {
     public class TransferEth
     {
+        private IEthClient client;
         private EthWallet fromWallet;
         private string to;
         private BigInteger value;
@@ -21,6 +22,7 @@ namespace Sequence.Transactions
         private BigInteger nonce;
 
         public TransferEth(
+            IEthClient client,
             EthWallet fromWallet,
             string toAddress,
             BigInteger value,
@@ -28,6 +30,10 @@ namespace Sequence.Transactions
             BigInteger gasLimit,
             BigInteger nonce)
         {
+            if (client == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(client));
+            }
             if (fromWallet == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(fromWallet));
@@ -37,6 +43,7 @@ namespace Sequence.Transactions
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
             EthTransaction.ValidateParams(toAddress, value, gasPrice, gasLimit, nonce);
+            this.client = client;
             this.fromWallet = fromWallet;
             this.to = toAddress;
             this.value = value;
@@ -48,9 +55,8 @@ namespace Sequence.Transactions
         /// <summary>
         /// Signs and sends the Eth transfer transaction
         /// </summary>
-        /// <param name="client"></param>
         /// <returns></returns>
-        public async Task<string> Send(SequenceEthClient client)
+        public async Task<string> Send()
         {
             string result = await fromWallet.SendTransaction(client, to, value, gasPrice, gasLimit);
             return result;
@@ -59,11 +65,10 @@ namespace Sequence.Transactions
         /// <summary>
         /// Signs and sends the Eth transfer transaction then waits for and returns a transaction receipt from the client
         /// </summary>
-        /// <param name="client"></param>
         /// <returns></returns>
-        public async Task<TransactionReceipt> SendAndWaitForReceipt(SequenceEthClient client)
+        public async Task<TransactionReceipt> SendAndWaitForReceipt()
         {
-            string transactionHash = await Send(client);
+            string transactionHash = await Send();
             TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
             return receipt;
         }

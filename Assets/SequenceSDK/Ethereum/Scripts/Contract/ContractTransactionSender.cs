@@ -23,7 +23,8 @@ namespace Sequence.Contracts
             BigInteger nonce = await wallet.GetNonce(client);
             ContractCall callingInfo = new ContractCall(wallet.GetAddress(), value);
             EthTransaction transaction = await contract.CallFunction(functionName, functionArgs)(client, callingInfo);
-            string signedTransaction = transaction.SignAndEncodeTransaction(wallet);
+            string chainId = await client.ChainID();
+            string signedTransaction = transaction.SignAndEncodeTransaction(wallet, chainId);
             string result = await wallet.SendRawTransaction(client, signedTransaction);
             return result;
         }
@@ -48,7 +49,8 @@ namespace Sequence.Contracts
             BigInteger? value = null)
         {
             EthTransaction transaction = await transactionCreator(client, new ContractCall(wallet.GetAddress(), value));
-            string signedTransaction = transaction.SignAndEncodeTransaction(wallet);
+            string chainId = await client.ChainID();
+            string signedTransaction = transaction.SignAndEncodeTransaction(wallet, chainId);
             string result = await wallet.SendRawTransaction(client, signedTransaction);
             return result;
         }

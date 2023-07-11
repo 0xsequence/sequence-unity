@@ -38,7 +38,8 @@ namespace Sequence.Transactions {
                 BigInteger gasLimit = await client.EstimateGas(call);
                 
                 BigInteger nonce = await client.NonceAt(wallet);
-                EthTransaction transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data);
+                string chainId = await client.ChainID();
+                EthTransaction transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data, chainId);
                 return transaction;
             };
         }

@@ -11,6 +11,7 @@ using System.Linq;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Extensions;
 
 namespace Sequence.Wallet
 {
@@ -76,14 +77,10 @@ namespace Sequence.Wallet
             return await client.NonceAt(GetAddress());
         }
 
-        public (string v, string r, string s) SignTransaction(byte[] message, int chainId)
+        public (string v, string r, string s) SignTransaction(byte[] message, string chainId)
         {
-            return EthSignature.SignAndReturnVRS(message, privKey, chainId);
-        }
-
-        public (string v, string r, string s) SignTransaction(byte[] message)
-        {
-            return EthSignature.SignAndReturnVRS(message, privKey);
+            int id = chainId.HexStringToInt();
+            return EthSignature.SignAndReturnVRS(message, privKey, id);
         }
 
         public async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
