@@ -61,7 +61,6 @@ namespace Sequence.Signer
         {
             SecpRecoverableECDSASignature signature;
             bool signed = privKey.TrySignRecoverable(hashedMessage, out signature);
-            Debug.Log($"ChainId {chainId}");
 
             if (signed)
             {

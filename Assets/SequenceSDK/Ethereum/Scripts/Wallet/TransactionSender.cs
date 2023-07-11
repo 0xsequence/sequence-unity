@@ -16,7 +16,7 @@ namespace Sequence.Wallet {
                 BigInteger nonce = await fromWallet.GetNonce(client);
                 transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data, chainId);
             }
-            string tx = transaction.SignAndEncodeTransaction(fromWallet, chainId);
+            string tx = transaction.SignAndEncodeTransaction(fromWallet);
             string result = await fromWallet.SendRawTransaction(client, tx);
             return result;
         }

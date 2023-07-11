@@ -68,24 +68,10 @@ public class SequenceEthClientTests
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             EthWallet wallet2 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
-            BigInteger nonce = await wallet.GetNonce(client);
-            string chainId = await client.ChainID();
-            string encoded_signing = EthTransaction.RLPEncode(nonce, 100, 30000000, wallet2.GetAddress(), 1, "", chainId);
-            Assert.IsNotNull(encoded_signing);
-            string signingHash = "0x" + SequenceCoder.KeccakHash(encoded_signing);
-            Assert.IsNotNull(signingHash);
-            Assert.IsNotNull(wallet);
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), chainId);
-            Assert.IsNotNull(v);
-            Assert.IsNotNull(r);
-            Assert.IsNotNull(s);
-            string tx = EthTransaction.RLPEncode(nonce, 100, 30000000, wallet2.GetAddress(), 1, "", chainId, v, r, s);
-
-            string result = await wallet.SendRawTransaction(client, tx);
-
-            Debug.Log("result: " + result);
+            string result = await wallet.SendTransaction(client, wallet2.GetAddress(), 1);
 
             TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+
             Assert.IsNotNull(receipt);
         }
         catch (Exception ex)

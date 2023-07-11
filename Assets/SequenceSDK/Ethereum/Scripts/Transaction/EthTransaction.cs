@@ -132,11 +132,11 @@ namespace Sequence.Transactions
             }
         }
 
-        public string SignAndEncodeTransaction(EthWallet wallet, string chainId)
+        public string SignAndEncodeTransaction(EthWallet wallet)
         {
             string encoded_signing = this.RLPEncode();
             string signingHash = SequenceCoder.KeccakHash(encoded_signing).EnsureHexPrefix();
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), chainId);
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), ChainId);
             this.V = v;
             this.R = r;
             this.S = s;
