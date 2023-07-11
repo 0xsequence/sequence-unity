@@ -6,6 +6,7 @@ using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Wallet;
 using UnityEngine;
+using Sequence.Transactions;
 
 namespace Sequence.Contracts
 {

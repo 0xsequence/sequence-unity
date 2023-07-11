@@ -7,7 +7,7 @@ using Sequence;
 using Sequence.ABI;
 using Sequence.Mocks;
 using Sequence.Provider;
-using Sequence.Signer;
+using Sequence.Transactions;
 using Sequence.Wallet;
 using UnityEngine;
 using UnityEngine.TestTools;

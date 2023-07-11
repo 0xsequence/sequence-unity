@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence;
 using Sequence.Provider;
-using Sequence.Signer;
 using Sequence.Wallet;
 using UnityEngine;
+using Sequence.Transactions;
 
 public class TransferEthTests
 {

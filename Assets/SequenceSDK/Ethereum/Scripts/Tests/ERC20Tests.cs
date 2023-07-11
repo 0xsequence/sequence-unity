@@ -8,6 +8,7 @@ using System;
 using Sequence.Contracts;
 using System.Numerics;
 using Sequence.ABI;
+using Sequence.Transactions;
 
 // Note - these tests are designed to be ran sequentially as they will all share the same testnet
 public class ERC20Tests

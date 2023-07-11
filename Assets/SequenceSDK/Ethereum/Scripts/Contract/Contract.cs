@@ -6,7 +6,7 @@ using System.Numerics;
 using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Extensions;
-using Sequence.Wallet;
+using Sequence.Transactions;
 using System.Text;
 
 namespace Sequence.Contracts
@@ -32,33 +32,10 @@ namespace Sequence.Contracts
             string callData = ABI.ABI.Pack(functionSignature, functionArgs);
             return async (IEthClient client, ContractCall contractCallInfo) =>
             {
-                TransactionCall call = new TransactionCall
-                {
-                    from = contractCallInfo.fromAddress,
-                    to = this.address,
-                    value = contractCallInfo.value,
-                    data = callData,
-                };
-                if (contractCallInfo.gasPrice == 0)
-                {
-                    contractCallInfo.gasPrice = await client.SuggestGasPrice();
-                    call.gasPrice = contractCallInfo.gasPrice;
-                }
-                if (contractCallInfo.gasLimit == 0)
-                {
-                    contractCallInfo.gasLimit = await client.EstimateGas(call);
-                }
+                GasLimitEstimator estimator = new GasLimitEstimator(client, contractCallInfo.fromAddress);
+                var transactionCreator = estimator.BuildTransactionCreator(this.address, callData, contractCallInfo.value, contractCallInfo.gasPrice);
 
-                BigInteger nonce = await client.NonceAt(contractCallInfo.fromAddress);
-
-                EthTransaction transaction = new EthTransaction(
-                    nonce,
-                    call.gasPrice,
-                    contractCallInfo.gasLimit,
-                    call.to,
-                    call.value,
-                    callData);
-
+                EthTransaction transaction = await transactionCreator();
                 return transaction;
             };
         }

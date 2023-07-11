@@ -14,6 +14,7 @@ using Sequence;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Numerics;
+using Sequence.Transactions;
 
 public class EthWalletTests
 {
