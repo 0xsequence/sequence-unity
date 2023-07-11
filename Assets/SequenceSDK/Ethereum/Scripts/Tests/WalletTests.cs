@@ -92,6 +92,8 @@ public class EthWalletTests
             string tx = transaction.SignAndEncodeTransaction(wallet);
             string result = await wallet.SendRawTransaction(client, tx);
             Assert.IsNotEmpty(result);
+
+            await client.WaitForTransactionReceipt(result); // Not waiting for the transaction to process will cause the next tests to fail as they would be submitting a duplicate transaction
         }
         catch(Exception ex)
         {
