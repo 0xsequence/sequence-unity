@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
-using Sequence.Wallet;
+using Sequence.Core.Wallet;
 using Sequence.Core.Provider;
 
 namespace Sequence.Core

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
-using Sequence.Core;
+using Sequence.Core.Wallet;
 
 // Sequence v2 core primitives
 namespace Sequence.Core.V2

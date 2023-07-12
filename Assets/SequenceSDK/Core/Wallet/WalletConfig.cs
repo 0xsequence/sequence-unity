@@ -1,22 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Sequence.Wallet;
-namespace Sequence.Core
-{
 
-    public class WalletContext
-    {
-        public string FactoryAddress { get; set; }
-        public string MainModuleAddress { get; set; }
-        public string MainModuleUpgradableAddress { get; set; }
-        public string GuestModuleAddress { get; set; }
-
-        public string UtilsAddress { get; set; }
-
-    }
-
+namespace Sequence.Core.Wallet {
     public class WalletConfig
     {
         public int Threshold { get; set; }
@@ -77,43 +61,5 @@ namespace Sequence.Core
             throw new NotImplementedException();
         }
 
-    }
-
-
-
-    public class WalletConfigSigner
-    {
-        public byte Weight { get; set; }
-        public string Address { get; set; }
-    }
-
-    public class WalletConfigSigners : List<WalletConfigSigner>
-    {
-        public int Len() => Count;
-
-        public bool Less(int i, int j)
-        {
-            //TODO:
-            throw new NotImplementedException();
-        }
-
-        public void Swap(int i, int j)
-        {
-            WalletConfigSigner temp = this[i];
-            this[i] = this[j];
-            this[j] = temp;
-        }
-
-        public (byte, bool) GetWeightByAddress(string address)
-        {
-            foreach (WalletConfigSigner signer in this)
-            {
-                if (signer.Address == address)
-                {
-                    return (signer.Weight, true);
-                }
-            }
-            return (0, false);
-        }
     }
 }
