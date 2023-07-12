@@ -60,7 +60,7 @@ namespace Sequence.Wallet
         {
             if (address == null)
             {
-                address = GenerateAddress();
+                address = new Address(GenerateAddress());
             }
             return address;
         }
