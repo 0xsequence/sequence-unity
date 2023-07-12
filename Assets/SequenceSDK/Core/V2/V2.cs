@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Core.Wallet;
+using Sequence.Core.Signature;
 
 // Sequence v2 core primitives
 namespace Sequence.Core.V2

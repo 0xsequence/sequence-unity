@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Sequence.Core {
+namespace Sequence.Core.Signature {
     public class SignerSignatures
     {
         //From go-sequence :

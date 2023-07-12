@@ -8,7 +8,7 @@ using System.Text;
 using System;
 using System.Linq;
 
-namespace Sequence.Core
+namespace Sequence.Core.Signature
 {
     public interface IImageHashable
     {

@@ -1,5 +1,6 @@
 using System;
 using Sequence.Core.Wallet;
+using Sequence.Core.Signature;
 
 namespace Sequence.Core {
     public class Config

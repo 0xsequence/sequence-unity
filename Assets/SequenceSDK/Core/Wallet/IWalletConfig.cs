@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Sequence.Core;
+using Sequence.Core.Signature;
 
 namespace Sequence.Core.Wallet {
     public interface IWalletConfig

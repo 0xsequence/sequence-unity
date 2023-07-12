@@ -4,7 +4,8 @@ using System.Numerics;
 using System.Text;
 using Sequence.ABI;
 
-namespace Sequence.Core {
+namespace Sequence.Core.Signature
+{
     public class Digest
     {
         public byte[] Hash { get; set; }

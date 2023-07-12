@@ -5,7 +5,7 @@ using UnityEngine;
 using Sequence.Core.Wallet;
 using Sequence.Core.Provider;
 
-namespace Sequence.Core
+namespace Sequence.Core.Signature
 {
     public interface ISignature
     {

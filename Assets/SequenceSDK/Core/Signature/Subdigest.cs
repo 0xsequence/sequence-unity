@@ -3,7 +3,8 @@ using System.Text;
 using Sequence.ABI;
 using Sequence.Wallet;
 
-namespace Sequence.Core {
+namespace Sequence.Core.Signature
+{
     public class Subdigest
     {
         public string Hash { get; set; }
