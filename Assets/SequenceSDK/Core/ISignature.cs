@@ -22,7 +22,7 @@ namespace Sequence.Core
         // If signerSignatures is provided, it will be populated with the valid signer signatures of this signature.
         (Config, BigInteger) Recover(WalletContext context, 
                                             Digest digest, 
-                                            string walletAddress,
+                                            Address wallet,
                                             BigInteger chainId,
                                             RPCProvider provider,
                                             List<SignerSignatures> signerSignatures);

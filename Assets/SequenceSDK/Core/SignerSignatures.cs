@@ -6,14 +6,14 @@ namespace Sequence.Core {
         //From go-sequence :
         //type SignerSignatures map[common.Address]map[common.Hash]SignerSignature
         //TODO: address type and hash type
-        public Dictionary<string, Dictionary<string, SignerSignature>> Data { get; set; }
+        public Dictionary<Address, Dictionary<string, SignerSignature>> Data { get; set; }
 
         public SignerSignatures()
         {
-            Data = new Dictionary<string, Dictionary<string, SignerSignature>>();
+            Data = new Dictionary<Address, Dictionary<string, SignerSignature>>();
         }
 
-        public void Insert(string signerAddress, SignerSignature signature)
+        public void Insert(Address signerAddress, SignerSignature signature)
         {
             if(!Data.ContainsKey(signerAddress))
             {

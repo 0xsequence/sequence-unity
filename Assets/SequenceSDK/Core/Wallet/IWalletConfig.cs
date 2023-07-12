@@ -15,10 +15,10 @@ namespace Sequence.Core.Wallet {
         UInt32 Checkpoint();
 
         // Signers is the set of signers in the wallet configuration.
-        Dictionary<string, UInt16> Signers();
+        Dictionary<Address, UInt16> Signers();
 
         // SignersWeight is the total weight of the signers passed to the function according to the wallet configuration.
-        UInt16 SignersWeight(string[] signers);
+        UInt16 SignersWeight(Address[] signers);
 
         // IsUsable checks if it's possible to construct signatures that meet threshold.
         bool IsUsable();

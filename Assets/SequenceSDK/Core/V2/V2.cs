@@ -393,12 +393,22 @@ namespace Sequence.Core.V2
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public ISignature Join(Subdigest subdigest, ISignature otherSignature)
+        {
+            throw new NotImplementedException();
+        }
+
+        public (Config, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
 
         public (Config, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISignature Reduce(Subdigest subdigest)
         {
             throw new NotImplementedException();
         }
@@ -421,12 +431,22 @@ namespace Sequence.Core.V2
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public ISignature Join(Subdigest subdigest, ISignature otherSignature)
+        {
+            throw new NotImplementedException();
+        }
+
+        public (Config, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
 
         public (Config, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISignature Reduce(Subdigest subdigest)
         {
             throw new NotImplementedException();
         }
@@ -449,12 +469,22 @@ namespace Sequence.Core.V2
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public ISignature Join(Subdigest subdigest, ISignature otherSignature)
+        {
+            throw new NotImplementedException();
+        }
+
+        public (Config, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
 
         public (Config, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISignature Reduce(Subdigest subdigest)
         {
             throw new NotImplementedException();
         }
