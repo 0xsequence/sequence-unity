@@ -1,12 +1,13 @@
 using System;
+using Sequence.Core.Wallet;
 
-namespace Sequence.Core.Wallet {
-    public class WalletConfig
+namespace Sequence.Core {
+    public class Config
     {
         public int Threshold { get; set; }
         public WalletConfigSigners Signers { get; set; }
 
-        public static string AddressFromWalletConfig(WalletConfig walletConfig, WalletContext context)
+        public static string AddressFromWalletConfig(Config walletConfig, WalletContext context)
         {
             
             ImageHash imageHash = ImageHashOfWalletConfig(walletConfig);
@@ -22,19 +23,19 @@ namespace Sequence.Core.Wallet {
 
         }
 
-        public static ImageHash ImageHashOfWalletConfig(WalletConfig walletConfig)
+        public static ImageHash ImageHashOfWalletConfig(Config walletConfig)
         {
             throw new NotImplementedException();
         }
 
-        private static byte[] ImageHashOfWalletConfigBytes(WalletConfig walletConfig)
+        private static byte[] ImageHashOfWalletConfigBytes(Config walletConfig)
         {
             throw new NotImplementedException();
         }
 
 
 
-        public static bool SortWalletConfig(WalletConfig walletConfig)
+        public static bool SortWalletConfig(Config walletConfig)
         {
             WalletConfigSigners signers = walletConfig.Signers;
             signers.Sort(); // Sort the signers
@@ -51,12 +52,12 @@ namespace Sequence.Core.Wallet {
             return true;
         }
 
-        public static bool IsWalletConfigUsable(WalletConfig walletConfig)
+        public static bool IsWalletConfigUsable(Config walletConfig)
         {
             throw new NotImplementedException();
         }
 
-        public static bool IsWalletConfigEqual(WalletConfig walletConfigA, WalletConfig walletConfigB)
+        public static bool IsWalletConfigEqual(Config walletConfigA, Config walletConfigB)
         {
             throw new NotImplementedException();
         }

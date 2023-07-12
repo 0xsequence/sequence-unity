@@ -18,6 +18,6 @@ namespace Sequence.Core
         public ISignature DecodeSignature(byte[] data);
 
         // DecodeWalletConfig takes a decoded JSON object and returns a WalletConfig.
-        public WalletConfig DecodeWalletConfig(object obj);
+        public Config DecodeWalletConfig(object obj);
     }
 }
