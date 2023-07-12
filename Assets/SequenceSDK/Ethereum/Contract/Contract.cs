@@ -32,7 +32,7 @@ namespace Sequence.Contracts
             string callData = ABI.ABI.Pack(functionSignature, functionArgs);
             return async (IEthClient client, ContractCall contractCallInfo) =>
             {
-                GasLimitEstimator estimator = new GasLimitEstimator(client, contractCallInfo.fromAddress);
+                GasLimitEstimator estimator = new GasLimitEstimator(client, contractCallInfo.from);
                 var transactionCreator = estimator.BuildTransactionCreator(this.address, callData, contractCallInfo.value, contractCallInfo.gasPrice);
 
                 EthTransaction transaction = await transactionCreator();
@@ -65,12 +65,12 @@ namespace Sequence.Contracts
 
     public class ContractCall
     {
-        public string fromAddress;
+        public Address from;
         public BigInteger value;
         public BigInteger gasPrice;
         public BigInteger gasLimit;
 
-        public ContractCall(string fromAddress, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null)
+        public ContractCall(Address from, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null)
         {
             if (value == null)
             {
@@ -85,9 +85,9 @@ namespace Sequence.Contracts
                 gasLimit = BigInteger.Zero;
             }
 
-            if (!fromAddress.IsAddress())
+            if (!from.Value.IsAddress())
             {
-                throw new ArgumentOutOfRangeException(nameof(fromAddress));
+                throw new ArgumentOutOfRangeException(nameof(from));
             }
             if (value < 0)
             {
@@ -102,7 +102,7 @@ namespace Sequence.Contracts
                 throw new ArgumentOutOfRangeException(nameof(gasLimit));
             }
 
-            this.fromAddress = fromAddress;
+            this.from = from;
             this.value = (BigInteger)value;
             this.gasPrice = (BigInteger)gasPrice;
             this.gasLimit = (BigInteger)gasLimit;

@@ -8,11 +8,11 @@ namespace Sequence.Transactions {
     public class GasLimitEstimator {
 
         IEthClient client;
-        string wallet;
+        Address wallet;
 
         public delegate Task<EthTransaction> TransactionCreator();
 
-        public GasLimitEstimator(IEthClient client, string wallet) {
+        public GasLimitEstimator(IEthClient client, Address wallet) {
             this.client = client;
             this.wallet = wallet;
         }
