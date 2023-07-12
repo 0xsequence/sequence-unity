@@ -51,7 +51,7 @@ namespace Sequence.Core.Wallet
         
         public WalletContext context { get; set; }
         public Config config { get; set; }
-        public List<IWallet> signers { get; set; } //EOA signers
+        public List<IWallet> signers { get; set; } // signers
 
         public RPCProvider provider { get; set; } //eth provider
         public WalletProvider walletProvider { get; set; }

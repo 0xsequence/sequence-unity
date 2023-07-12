@@ -33,8 +33,13 @@ namespace Sequence.Core
                                                     RPCProvider provider,
                                                     List<SignerSignatures> signerSignatures);
 
+        // Reduce returns an equivalent optimized signature.
+        ISignature Reduce(Subdigest subdigest);
+
+        // Join joins two signatures into one.
+        ISignature Join(Subdigest subdigest, ISignature otherSignature);
+
         // Data is the raw signature data.
         byte[] Data();
-
     }
 }
