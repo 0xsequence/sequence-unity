@@ -19,7 +19,7 @@ namespace Sequence.Wallet
     {
         public ECPrivKey privKey;
         public ECPubKey pubKey;
-        private string address;
+        private Address address;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EthWallet"/> class with a randomly generated private key.
@@ -56,7 +56,7 @@ namespace Sequence.Wallet
             return PubkeyToAddress(publicKeyBytes64);
         }
 
-        public string GetAddress()
+        public Address GetAddress()
         {
             if (address == null)
             {

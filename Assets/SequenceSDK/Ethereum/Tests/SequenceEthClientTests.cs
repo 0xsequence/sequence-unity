@@ -350,13 +350,13 @@ public class SequenceEthClientTests
             Assert.AreEqual(nonce, transaction.nonce.HexStringToBigInteger());
             Assert.AreEqual(gasPrice, transaction.gasPrice.HexStringToBigInteger());
             Assert.AreEqual(gasLimit, transaction.gas.HexStringToBigInteger());
-            Assert.AreEqual(wallet2.GetAddress(), SequenceCoder.AddressChecksum(transaction.to));
+            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(transaction.to));
             Assert.AreEqual(value, transaction.value.HexStringToBigInteger());
             Assert.AreEqual(data.EnsureHexPrefix(), transaction.input);
             Assert.AreEqual(v, transaction.v);
             Assert.AreEqual(r, transaction.r);
             Assert.AreEqual(s, transaction.s);
-            Assert.AreEqual(wallet1.GetAddress(), SequenceCoder.AddressChecksum(transaction.from));
+            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(transaction.from));
 
             await client.WaitForTransactionReceipt(result); // Not waiting for the transaction to process will cause the next tests to fail as they would be submitting a duplicate transaction
         }

@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Org.BouncyCastle.Crypto.Digests;
 using Sequence.Extensions;
 using UnityEngine;
+using Sequence;
 
 namespace Sequence.ABI
 {
@@ -60,8 +61,8 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error computing checksum address: {ex.Message}");
-                return string.Empty;
+                Debug.LogError($"Error computing checksum address({address}): {ex.Message}");
+                return address;
             }
         }
 

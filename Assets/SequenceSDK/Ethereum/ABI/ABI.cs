@@ -222,9 +222,12 @@ namespace Sequence.ABI
                 {
                     return ABIType.NUMBER;
                 }
+                else if (param.GetType() == typeof(Address))
+                {
+                    return ABIType.ADDRESS;
+                }
                 else if (param.GetType() == typeof(string))
                 {
-                    //TODO: make address a custom type
                     if (((string)param).IsAddress())
                     {
                         return ABIType.ADDRESS;
