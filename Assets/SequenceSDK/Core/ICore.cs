@@ -4,7 +4,7 @@ using System.Numerics;
 using UnityEngine;
 
 
-namespace Sequence
+namespace Sequence.Core
 {
     // Sequence core primitives, inherited from go-sequence v2
     //
@@ -19,47 +19,4 @@ namespace Sequence
         // DecodeWalletConfig takes a decoded JSON object and returns a WalletConfig.
         public WalletConfig DecodeWalletConfig(object obj);
     }
-
-    
-    public class SignerSignatures
-    {
-        //From go-sequence :
-        //type SignerSignatures map[common.Address]map[common.Hash]SignerSignature
-        //TODO: address type and hash type
-        public Dictionary<string, Dictionary<string, SignerSignature>> Data { get; set; }
-
-        public SignerSignatures()
-        {
-            Data = new Dictionary<string, Dictionary<string, SignerSignature>>();
-        }
-
-        public void Insert(string signerAddress, SignerSignature signature)
-        {
-            if(!Data.ContainsKey(signerAddress))
-            {
-                Dictionary<string, SignerSignature> value = new Dictionary<string, SignerSignature>();
-                value.Add(signature.Subdigest.Hash, signature);
-                Data.Add(signerAddress, value);
-            }
-
-        }
-    }
-
-    public class SignerSignature
-    {
-        public Subdigest Subdigest { get; set; }
-        public SignerSignatureType Type { get; set; }
-        public byte[] Signature { get; set; }
-
-    }
-
-    public enum SignerSignatureType
-    {
-        SignerSignatureTypeEIP712,
-        SignerSignatureTypeEthSign,
-        SignerSignatureTypeEIP1271
-    }
-
-    
-
 }

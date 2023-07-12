@@ -1,13 +1,13 @@
-using Sequence.Provider;
+using Sequence.Core.Provider;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
-using Sequence;
+using Sequence.Core;
 
 // Sequence v2 core primitives
-namespace Sequence.V2
+namespace Sequence.Core.V2
 {
     public class Core : ICore
     {
@@ -398,6 +398,11 @@ namespace Sequence.V2
             throw new NotImplementedException();
         }
 
+        public (WalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Threshold()
         {
             throw new NotImplementedException();
@@ -421,6 +426,11 @@ namespace Sequence.V2
             throw new NotImplementedException();
         }
 
+        public (WalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
         public int Threshold()
         {
             throw new NotImplementedException();
@@ -440,6 +450,11 @@ namespace Sequence.V2
         }
 
         public (WalletConfig, BigInteger) Recover(WalletContext context, Digest digest, string walletAddress, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
+        public (WalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }

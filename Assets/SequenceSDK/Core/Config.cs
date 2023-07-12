@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sequence.Wallet;
-namespace Sequence
+namespace Sequence.Core
 {
 
     public class WalletContext

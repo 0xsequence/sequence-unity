@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Wallet;
-using Sequence.Provider;
+using Sequence.Core.Provider;
 
-namespace Sequence
+namespace Sequence.Core
 {
     public interface ISignature
     {
@@ -26,6 +26,12 @@ namespace Sequence
                                             BigInteger chainId,
                                             RPCProvider provider,
                                             List<SignerSignatures> signerSignatures);
+
+        // Recover a signature but only using the subdigest
+        (WalletConfig, BigInteger) RecoverSubdigest(WalletContext context, 
+                                                    Subdigest subdigest, 
+                                                    RPCProvider provider,
+                                                    List<SignerSignatures> signerSignatures);
 
         // Data is the raw signature data.
         byte[] Data();

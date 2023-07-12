@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Provider;
 using UnityEngine;
 
-namespace Sequence.Provider
+namespace Sequence.Core.Provider
 {
     public struct ProviderOption
     {
