@@ -19,18 +19,16 @@ namespace Sequence.Core.Signature
     // Used for type safety and preimage recovery.
     public class ImageHash
     {
-        public string Hash { get; set; }
-        // Preimage is the ImageHashable with this ImageHash,
-        // in go-sequence :
-        // Preimage ImageHashable
+        public Hash Hash { get; set; }
+        // Preimage is the ImageHashable with this ImageHash
         public IImageHashable[] Preimage { get; set; }
 
-        public static string imageHashApprovalSalt = SequenceCoder.KeccakHash("SetImageHash(bytes32 imageHash)");
+        public static readonly string ApprovalSalt = SequenceCoder.KeccakHash("SetImageHash(bytes32 imageHash)");
 
         public Digest Approval()
         {           
 
-            return Digest.NewDigest(imageHashApprovalSalt, this.Hash);// Assuming Digest is a valid type and has a constructor accepting the approvalSalt and hashBytes as parameters
+            return Digest.NewDigest(ApprovalSalt, Hash.ToString());
         }
     }
 }
