@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Core.Signature;
-
+using Sequence.Core.Wallet;
 
 namespace Sequence.Core
 {
@@ -18,6 +18,6 @@ namespace Sequence.Core
         public ISignature DecodeSignature(byte[] data);
 
         // DecodeWalletConfig takes a decoded JSON object and returns a WalletConfig.
-        public Config DecodeWalletConfig(object obj);
+        public IWalletConfig DecodeWalletConfig(object obj);
     }
 }
