@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Sequence.Core.V2.Wallet
 {
     [System.Serializable]
-    public class WalletConfig : IWalletConfig
+    public class WalletConfig : IWalletConfig, IImageHashable
     {
         public UInt16 threshold;
         public UInt32 checkpoint;

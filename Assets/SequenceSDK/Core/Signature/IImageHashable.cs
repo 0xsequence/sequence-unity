@@ -23,8 +23,7 @@ namespace Sequence.Core.Signature
         // Preimage is the ImageHashable with this ImageHash,
         // in go-sequence :
         // Preimage ImageHashable
-        //TODO: If Preimage is set to type IImageHashable, would it be a cyclic definition? Preimage is set to byte[] for now, will modify it accordingly
-        public byte[] Preimage { get; set; }
+        public IImageHashable[] Preimage { get; set; }
 
         public static string imageHashApprovalSalt = SequenceCoder.KeccakHash("SetImageHash(bytes32 imageHash)");
 

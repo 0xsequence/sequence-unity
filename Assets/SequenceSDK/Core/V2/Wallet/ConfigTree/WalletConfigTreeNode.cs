@@ -5,7 +5,7 @@ using Sequence.Core.Signature;
 
 namespace Sequence.Core.V2.Wallet.ConfigTree
 {
-    public class WalletConfigTreeNode : IWalletConfigTree
+    public class WalletConfigTreeNode : IWalletConfigTree, IImageHashable
     {
         public IWalletConfigTree Left { get; set; }
         public IWalletConfigTree Right { get; set; }
