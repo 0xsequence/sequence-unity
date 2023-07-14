@@ -3,25 +3,21 @@ using System.Collections.Generic;
 namespace Sequence.Core.Signature {
     public class SignerSignatures
     {
-        //From go-sequence :
-        //type SignerSignatures map[common.Address]map[common.Hash]SignerSignature
-        //TODO: address type and hash type
-        public Dictionary<Address, Dictionary<string, SignerSignature>> Data { get; set; }
+        public Dictionary<Address, Dictionary<Hash, SignerSignature>> Data { get; set; }
 
         public SignerSignatures()
         {
-            Data = new Dictionary<Address, Dictionary<string, SignerSignature>>();
+            Data = new Dictionary<Address, Dictionary<Hash, SignerSignature>>();
         }
 
-        public void Insert(Address signerAddress, SignerSignature signature)
+        public void Insert(Address signer, SignerSignature signature)
         {
-            if(!Data.ContainsKey(signerAddress))
+            if(!Data.ContainsKey(signer))
             {
-                Dictionary<string, SignerSignature> value = new Dictionary<string, SignerSignature>();
-                value.Add(signature.Subdigest.Hash, signature);
-                Data.Add(signerAddress, value);
+                Dictionary<Hash, SignerSignature> value = new Dictionary<Hash, SignerSignature>();
+                Data[signer] = value;
             }
-
+            Data[signer][signature.Subdigest.Hash] = signature;
         }
     }
 
@@ -30,7 +26,6 @@ namespace Sequence.Core.Signature {
         public Subdigest Subdigest { get; set; }
         public SignerSignatureType Type { get; set; }
         public byte[] Signature { get; set; }
-
     }
 
     public enum SignerSignatureType
