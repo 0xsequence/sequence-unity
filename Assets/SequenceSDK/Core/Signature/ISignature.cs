@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Core.Wallet;
-using Sequence.Core.Provider;
+using Sequence.Core;
 using System;
 
 namespace Sequence.Core.Signature

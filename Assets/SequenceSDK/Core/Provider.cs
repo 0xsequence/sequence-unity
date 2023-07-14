@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Sequence.Provider;
 using UnityEngine;
 
-namespace Sequence.Core.Provider
+namespace Sequence.Core
 {
     public struct ProviderOption
     {

@@ -5,7 +5,7 @@ using System;
 using System.Numerics;
 using Sequence.Core.Signature;
 using Sequence.Core.Wallet;
-using Sequence.Core.Provider;
+using Sequence.Core;
 
 namespace Sequence.Core.V2.Signature
 {
@@ -29,12 +29,12 @@ namespace Sequence.Core.V2.Signature
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public (IWalletConfig, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -44,7 +44,7 @@ namespace Sequence.Core.V2.Signature
             throw new NotImplementedException();
         }
 
-        public int Threshold()
+        public UInt16 Threshold()
         {
             throw new NotImplementedException();
         }

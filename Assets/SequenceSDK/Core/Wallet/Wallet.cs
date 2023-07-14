@@ -1,7 +1,7 @@
 #define HAS_SPAN
 #define SECP256K1_LIB
 
-using Sequence.Core.Provider;
+using Sequence.Core;
 using Sequence.Wallet;
 using System.Collections.Generic;
 using System.Numerics;
@@ -9,26 +9,6 @@ using Sequence.Core;
 
 namespace Sequence.Core.Wallet
 {
-
-    public class NetworkConfig
-    {
-        public string Name { get; set; }
-        public BigInteger ChainID { get; set; }
-        public string ENSAddress { get; set; }
-        public string RpcURL { get; set; }
-/*        public ethrpc.Provider Provider { get; set; }
-        public string RelayerURL { get; set; }
-        public Relayer Relayer { get; set; }*/
-        public string IndexerURL { get; set; }
-        // public Indexer Indexer { get; set; }
-        public bool IsDefaultChain { get; set; }
-        public bool IsAuthChain { get; set; }
-        public string SequenceAPIURL { get; set; }
-    }
-
-
-
-    //================================================
     public class WalletOptions
     {
         // Config is the wallet multi-sig configuration. Note: the first config of any wallet

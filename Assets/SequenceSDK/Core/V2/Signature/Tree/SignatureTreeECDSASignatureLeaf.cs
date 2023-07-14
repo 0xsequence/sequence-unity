@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Sequence.Core.Provider;
+using Sequence.Core;
 using Sequence.Core.Signature;
 using Sequence.Core.Wallet;
 
