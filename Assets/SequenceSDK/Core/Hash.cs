@@ -8,26 +8,26 @@ namespace Sequence.Core
     public class Hash 
     {
         public static readonly int HashLength = 32;
-        byte[] Value;
+        public byte[] Bytes { get; private set; }
 
         public Hash()
         {
-            Value = new byte[HashLength];
+            Bytes = new byte[HashLength];
         }
 
         public Hash(byte[] b)
         {
             int length = Mathf.Min(HashLength, b.Length);
-            Value = new byte[HashLength];
+            Bytes = new byte[HashLength];
             for (int i = 0; i < length; i++)
             {
-                Value[i] = b[i];
+                Bytes[i] = b[i];
             }
         }
 
         public static implicit operator byte[](Hash hash)
         {
-            return hash.Value;
+            return hash.Bytes;
         }
 
         public static implicit operator string(Hash hash)
@@ -37,7 +37,7 @@ namespace Sequence.Core
 
         public override string ToString()
         {
-            return Value.ByteArrayToHexString();
+            return Bytes.ByteArrayToHexStringWithPrefix();
         }
     }
 }

@@ -412,7 +412,7 @@ public class SequenceEthClientTests
 
     // Note: for methods with optional parameters, we must still specify a value for each parameter
     // This is because the tests are created reflexively and would otherwise throw an exception
-    private static object[] errorCases = {
+    private static readonly object[] errorCases = {
         new object[] { nameof(SequenceEthClient.BalanceAt), new object[] { validAddress, "latest" } },
         new object[] { nameof(SequenceEthClient.BlockByHash), new object[] { "some hash" } },
         new object[] { nameof(SequenceEthClient.BlockByNumber), new object[] { "latest" } },

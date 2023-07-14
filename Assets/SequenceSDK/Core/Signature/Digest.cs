@@ -31,7 +31,7 @@ namespace Sequence.Core.Signature
             if (!Preimage.HasPrefix(approvalSalt) ||
                 Preimage.Length != approvalSaltLength + Hash.HashLength)
             {
-                return (null, new Exception($"Preimage {Preimage.ByteArrayToHexString()} of {Hash} is not an image hash approval"));
+                return (null, new Exception($"Preimage {Preimage.ByteArrayToHexStringWithPrefix()} of {Hash} is not an image hash approval"));
             }
 
             byte[] hashBytes = Preimage.AsSpan(approvalSaltLength).ToArray();
@@ -66,9 +66,9 @@ namespace Sequence.Core.Signature
 
             return new Subdigest
             {
-                Hash = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(data)),
+                Hash = new Hash(SequenceCoder.KeccakHash(data)),
                 Digest = this,
-                WalletAddress = walletAddress,
+                WalletAddress = new Address(walletAddress),
                 ChainID = chainID[0]
             };
         }
