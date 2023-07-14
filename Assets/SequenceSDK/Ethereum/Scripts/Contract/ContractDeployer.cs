@@ -19,22 +19,7 @@ namespace Sequence.Contracts
             BigInteger? gasPrice = null,
             BigInteger? gasLimit = null)
         {
-            BigInteger nonce = await wallet.GetNonce(client);
-            TransactionCall call = new TransactionCall
-            {
-                from = wallet.GetAddress(),
-                value = 0,
-                data = bytecode,
-            };
-            if (gasPrice == null)
-            {
-                gasPrice = await client.SuggestGasPrice();
-            }
-            if (gasLimit == null)
-            {
-                gasLimit = await client.EstimateGas(call);
-            }
-            EthTransaction deployTransaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, StringExtensions.ZeroAddress, 0, bytecode);
+            EthTransaction deployTransaction = await new GasLimitEstimator(client, wallet.GetAddress()).BuildTransaction(StringExtensions.ZeroAddress, bytecode, 0, gasPrice, gasLimit);
             string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet);
             TransactionReceipt receipt = await wallet.SendRawTransactionAndWaitForReceipt(client, signedTransaction);
             return receipt;

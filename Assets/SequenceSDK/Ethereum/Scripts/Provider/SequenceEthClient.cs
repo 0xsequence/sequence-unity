@@ -13,6 +13,7 @@ namespace Sequence.Provider
     {
         private IRpcClient _httpRpcClient;
         private readonly string url = "";
+        private string chainId = null;
         public SequenceEthClient()
         {
             _httpRpcClient = new HttpRpcClient(url);
@@ -111,9 +112,12 @@ namespace Sequence.Provider
 
         public async Task<string> ChainID()
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_chainId", new object[] { });
-            ThrowIfResponseHasErrors(response);
-            string chainId = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            if (chainId == null)
+            {
+                RpcResponse response = await _httpRpcClient.SendRequest("eth_chainId", new object[] { });
+                ThrowIfResponseHasErrors(response);
+                chainId = JsonConvert.DeserializeObject<string>(response.result.ToString());
+            }
             return chainId;
         }
 

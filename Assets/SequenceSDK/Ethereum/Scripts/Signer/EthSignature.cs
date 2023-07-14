@@ -7,8 +7,9 @@ using NBitcoin.Secp256k1;
 using Sequence.ABI;
 using System.Text;
 using System.Linq;
-using Org.BouncyCastle.Math;
 using System;
+using System.Numerics;
+using Sequence.Extensions;
 
 namespace Sequence.Signer
 {
@@ -16,7 +17,7 @@ namespace Sequence.Signer
     {
         public static byte[] R;
         public static byte[] S;
-        public static byte[] V;
+        public static string V;
 
         /// <summary>
         /// Signs a hashed message using an EC private key and returns the signature as a string.
@@ -38,11 +39,11 @@ namespace Sequence.Signer
                 int recId;
                 signature.WriteToSpanCompact(sigHash64, out recId);
                 signature.Deconstruct(out r, out s, out recId);
-                byte[] v = new[] { (byte)(recId + 27) };
+                BigInteger v = recId + 27;
 
                 R = r.ToBytes();
                 S = s.ToBytes();
-                V = new BigInteger(1, v).ToByteArrayUnsigned();
+                V = v.BigIntegerToHexString();
 
                 return GetSignatureString();
             }
@@ -69,48 +70,14 @@ namespace Sequence.Signer
                 int recId;
                 signature.WriteToSpanCompact(sigHash64, out recId);
                 signature.Deconstruct(out r, out s, out recId);
-                byte[] v = new[] { (byte)(recId +chainId*2+ 35) };
-
+                BigInteger v = recId + chainId * 2 + 35;
                 R = r.ToBytes();//new BigInteger(1, r.ToBytes()).ToByteArrayUnsigned();
                 S = s.ToBytes();//new BigInteger(1, s.ToBytes()).ToByteArrayUnsigned();
-                V = new BigInteger(1, v).ToByteArrayUnsigned();
+                V = v.BigIntegerToHexString();
 
                 return GetSignatureForTransaction();
             }
             return ("", "","");
-        }
-
-        /// <summary>
-        /// Signs a hashed message using an EC private key and returns the signature components (v, r, s) as strings.
-        /// </summary>
-        /// <param name="hashedMessage">The hashed message to sign.</param>
-        /// <param name="privKey">The EC private key to use for signing.</param>
-        /// <returns>A tuple containing the signature components (v, r, s) as strings.</returns>
-        public static (string v, string r, string s) SignAndReturnVRS(byte[] hashedMessage, ECPrivKey privKey)
-        {
-            SecpRecoverableECDSASignature signature;
-            bool signed = privKey.TrySignRecoverable(hashedMessage, out signature);
-
-            if (signed)
-            {
-                byte[] sigHash64 = new byte[64];
-
-                Scalar r, s;
-                int recId;
-                signature.WriteToSpanCompact(sigHash64, out recId);
-                signature.Deconstruct(out r, out s, out recId);
-                byte[] v = new[] { (byte)(recId + 27) };
-
-                R = r.ToBytes();
-                //UnityEngine.Debug.Log("R: " + r.d0 + r.d1 + r.d2 + r.d3 + r.d4 + r.d5 + r.d6 + r.d7);
-                S = s.ToBytes();
-                //UnityEngine.Debug.Log("S: " + s.d0 + s.d1 + s.d2 + s.d3 + s.d4 + s.d5 + s.d6 + s.d7);
-                V = new BigInteger(1, v).ToByteArrayUnsigned();
-                //UnityEngine.Debug.Log("V: " + SequenceCoder.ByteArrayToHexString(v));
-
-                return GetSignatureForTransaction();
-            }
-            return ("", "", "");
         }
 
         /// <summary>
@@ -147,7 +114,7 @@ namespace Sequence.Signer
         /// <returns>The signature as a string.</returns>
         public static string GetSignatureString()
         {
-            return "0x"+SequenceCoder.ByteArrayToHexString(R) + SequenceCoder.ByteArrayToHexString(S) + SequenceCoder.ByteArrayToHexString(V);
+            return "0x"+SequenceCoder.ByteArrayToHexString(R) + SequenceCoder.ByteArrayToHexString(S) + V.Replace("0x","");
         }
 
         /// <summary>
@@ -156,7 +123,7 @@ namespace Sequence.Signer
         /// <returns>A tuple containing the signature components (v, r, s) as strings.</returns>
         public static (string v, string r, string s) GetSignatureForTransaction()
         {
-            return (("0x" + SequenceCoder.ByteArrayToHexString(V).TrimStart('0') ,("0x" + SequenceCoder.ByteArrayToHexString(R).TrimStart('0')), ("0x"+ SequenceCoder.ByteArrayToHexString(S).TrimStart('0'))));
+            return (V, "0x" + SequenceCoder.ByteArrayToHexString(R).TrimStart('0'), "0x"+ SequenceCoder.ByteArrayToHexString(S).TrimStart('0'));
         }
     }
 

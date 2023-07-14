@@ -70,7 +70,7 @@ public class ClientTest : MonoBehaviour
             Debug.Log("hashed param: " + SequenceCoder.ByteArrayToHexString(hashedParam));
 
             EthWallet wallet = new EthWallet("0x4646464646464646464646464646464646464646464646464646464646464646");
-            (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam,1);
+            (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam,"1");
 
             Debug.Log("v: " + _v);
             Debug.Log("r: " + _r);
@@ -148,7 +148,7 @@ public class ClientTest : MonoBehaviour
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             Debug.Log("addr " + wallet.GetAddress());
 
-            (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam);
+            (string _v, string _r, string _s) = wallet.SignTransaction(hashedParam,"1");
 
             Debug.Log("v: "+ _v);
             Debug.Log("r: "+ _r);

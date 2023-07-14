@@ -9,6 +9,7 @@ using Sequence.Contracts;
 using System.Numerics;
 using Sequence.ABI;
 using Sequence.Transactions;
+using static Sequence.Contracts.ContractTransactionSender;
 
 // Note - these tests are designed to be ran sequentially as they will all share the same testnet
 public class ERC20Tests
@@ -29,11 +30,7 @@ public class ERC20Tests
     {
         try
         {
-            BigInteger nonce = await wallet1.GetNonce(client);
-            EthTransaction deployTransaction = new EthTransaction(nonce, 1, 30000000, StringExtensions.ZeroAddress, 0, bytecode);
-            string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet1);
-            string result = await wallet1.SendRawTransaction(client, signedTransaction);
-            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, bytecode);
             contractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(contractAddress);
         }
@@ -93,12 +90,8 @@ public class ERC20Tests
         try
         {
             // Owner mints to their address
-            BigInteger nonce = await wallet1.GetNonce(client);
-            var contractCall = new ContractCall(wallet1.GetAddress());
-            EthTransaction mintTransaction = await token.Mint(wallet1.GetAddress(), amount)
-                (client, contractCall);
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
-            TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
+            TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), amount)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
 
             BigInteger supply = await token.TotalSupply(client);
             Assert.AreEqual(amount, supply);
@@ -114,11 +107,8 @@ public class ERC20Tests
         try
         {
             // Non owner attempts to mint to their address
-            BigInteger nonce = await wallet2.GetNonce(client);
-            EthTransaction mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
-                (client, new ContractCall(wallet2.GetAddress()));
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet2);
-            TransactionReceipt receipt = await wallet2.SendRawTransactionAndWaitForReceipt(client, signed);
+            TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), amount)
+                   .SendTransactionMethodAndWaitForReceipt(wallet2, client);
             Assert.Fail("Expected an exception and none was thrown");
         }
         catch (Exception e)
@@ -135,11 +125,8 @@ public class ERC20Tests
             Assert.AreEqual(BigInteger.Zero, balance2);
 
             // Owner mints to another address
-            BigInteger nonce = await wallet1.GetNonce(client);
-            EthTransaction mintTransaction = await token.Mint(wallet2.GetAddress(), amount)
-                (client, new ContractCall(wallet1.GetAddress()));
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
-            TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
+            TransactionReceipt receipt = await token.Mint(wallet2.GetAddress(), amount)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
 
             supply = await token.TotalSupply(client);
             Assert.AreEqual(amount * 2, supply);
@@ -234,12 +221,8 @@ public class ERC20Tests
         try
         {
             // Mint initial tokens
-            BigInteger nonce = await wallet1.GetNonce(client);
-            var contractCall = new ContractCall(wallet1.GetAddress());
-            EthTransaction mintTransaction = await token.Mint(wallet1.GetAddress(), amount * 2)
-                (client, contractCall);
-            string signed = mintTransaction.SignAndEncodeTransaction(wallet1);
-            TransactionReceipt receipt = await wallet1.SendRawTransactionAndWaitForReceipt(client, signed);
+            TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), amount * 2)
+                .SendTransactionMethodAndWaitForReceipt(wallet1, client);
 
             BigInteger supply = await token.TotalSupply(client);
             Assert.AreEqual(amount * 2, supply);

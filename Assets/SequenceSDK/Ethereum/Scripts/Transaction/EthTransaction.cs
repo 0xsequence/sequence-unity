@@ -18,31 +18,34 @@ namespace Sequence.Transactions
         string To { get; set; }
         BigInteger Value { get; set; }
         string Data { get; set; }
+        string ChainId { get; set; }
 
         string V { get; set; }
         string R { get; set; }
         string S { get; set; }
 
-        public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
+        public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string chainId)
         {
-            ValidateParams(to, value, gasPrice, gasLimit, nonce);
+            ValidateParams(to, value, gasPrice, gasLimit, nonce, chainId);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
             To = to;
             Value = value;
             Data = data;
+            ChainId = chainId;
         }
 
-        public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string v, string r, string s)
+        public EthTransaction(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string chainId, string v, string r, string s)
         {
-            ValidateParams(to, value, gasPrice, gasLimit, nonce);
+            ValidateParams(to, value, gasPrice, gasLimit, nonce, chainId);
             Nonce = nonce;
             GasPrice = gasPrice;
             GasLimit = gasLimit;
             To = to;
             Value = value;
             Data = data;
+            ChainId = chainId;
             V = v;
             R = r;
             S = s;
@@ -57,29 +60,33 @@ namespace Sequence.Transactions
             txToEncode.Add(SequenceCoder.HexStringToByteArray(To));
             txToEncode.Add(Value.ToByteArray(true, true));
             txToEncode.Add(SequenceCoder.HexStringToByteArray(Data));
-
             if (V!=null && R!= null && S!= null)
             {
                 txToEncode.Add(SequenceCoder.HexStringToByteArray(V));
                 txToEncode.Add(SequenceCoder.HexStringToByteArray(R));
                 txToEncode.Add(SequenceCoder.HexStringToByteArray(S));
+            }else
+            {
+                txToEncode.Add(SequenceCoder.HexStringToByteArray(ChainId));
+                txToEncode.Add(BigInteger.Zero.ToByteArray(true, true));
+                txToEncode.Add(BigInteger.Zero.ToByteArray(true, true));
             }
 
             byte[] encodedList = RLP.RLP.Encode(txToEncode);
             return SequenceCoder.ByteArrayToHexString(encodedList).EnsureHexPrefix();
         }
 
-        public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data)
+        public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string chainId)
         {
-            EthTransaction transaction = new EthTransaction(nonce, gasPrice, gasLimit, to, value, data);
+            EthTransaction transaction = new EthTransaction(nonce, gasPrice, gasLimit, to, value, data, chainId);
             return transaction.RLPEncode();
         }
 
         
 
-        public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string v, string r, string s)
+        public static string RLPEncode(BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, string to, BigInteger value, string data, string chainId, string v, string r, string s)
         {
-            EthTransaction transaction = new EthTransaction(nonce, gasPrice, gasLimit, to, value, data, v, r, s);
+            EthTransaction transaction = new EthTransaction(nonce, gasPrice, gasLimit, to, value, data, chainId, v, r, s);
             return transaction.RLPEncode();
         }
 
@@ -96,7 +103,8 @@ namespace Sequence.Transactions
             BigInteger value,
             BigInteger gasPrice,
             BigInteger gasLimit,
-            BigInteger nonce)
+            BigInteger nonce,
+            string chainId = "valid")
         {
             if (!toAddress.IsAddress())
             {
@@ -118,13 +126,17 @@ namespace Sequence.Transactions
             {
                 throw new ArgumentOutOfRangeException(nameof(nonce));
             }
+            if (chainId == null || chainId == "")
+            {
+                throw new ArgumentNullException(nameof(chainId));
+            }
         }
 
         public string SignAndEncodeTransaction(EthWallet wallet)
         {
             string encoded_signing = this.RLPEncode();
             string signingHash = SequenceCoder.KeccakHash(encoded_signing).EnsureHexPrefix();
-            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash));
+            (string v, string r, string s) = wallet.SignTransaction(SequenceCoder.HexStringToByteArray(signingHash), ChainId);
             this.V = v;
             this.R = r;
             this.S = s;
