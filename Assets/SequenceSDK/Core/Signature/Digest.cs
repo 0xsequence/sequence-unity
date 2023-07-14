@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using Sequence.ABI;
@@ -42,7 +41,7 @@ namespace Sequence.Core.Signature
         }
 
         // Subdigest derives the hash to be signed by the Sequence wallet's signers to validate the digest.
-        public Subdigest Subdigest(string walletAddress, params BigInteger[] chainID)
+        public Subdigest Subdigest(Address wallet, params BigInteger[] chainID)
         {
             if (chainID.Length == 0 || chainID[0] == null)
             {
@@ -57,18 +56,18 @@ namespace Sequence.Core.Signature
             byte[] chainIDBytes = chainID[0].ToByteArray();
             Array.Reverse(chainIDBytes);
 
-            byte[] data = new byte[] { 0x19, 0x01 }
-                .Concat(chainIDBytes)
-                .Concat(Encoding.UTF8.GetBytes(walletAddress))
-                .Concat((IEnumerable<byte>)Hash)
-                .ToArray();
+            byte[] data = ByteArrayExtensions.ConcatenateByteArrays(
+                new byte[] { 0x19, 0x01 },
+                chainIDBytes,
+                wallet.Value.ToByteArray(),
+                Hash);
 
 
             return new Subdigest
             {
                 Hash = new Hash(SequenceCoder.KeccakHash(data)),
                 Digest = this,
-                WalletAddress = new Address(walletAddress),
+                WalletAddress = new Address(wallet),
                 ChainID = chainID[0]
             };
         }
