@@ -95,6 +95,24 @@ separate files, but for now since there are few ADRs, the README should suffice.
 Please use [Michael Nygard's template for 
 ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
 
+### ADR 2 - Separate assemblies for Sequence integration and Ethereum library
+July 12, 2023 - author: Quinn Purdy
+
+#### Status
+This ADR is being proposed along with a PR. Merging this PR will move the status of this ADR into Accepted.
+#### Context
+Integration of Sequence into the sequence-unity is the next step in the Unity SDK project - preparations are being made, with modifications to project structure.
+
+#### Decision
+Move the previous Sequence integration work, and all future Sequence integration work, into a separate assembly from the Ethereum libraries we're writing. The Sequence "SequenceCore" assembly will reference and depend on the Ethereum library assembly "SequenceEthereum".
+
+For now, all tests will remain in the same assembly "SequenceTests".
+
+#### Consequences
+While SequenceCore will be able to reference namespaces in SequenceEthereum, SequenceEthereum will not be able to reference anything in SequenceCore. While, on the surface, this may sound problematic as it reduces our flexibility when writing the SDK, SequenceEthereum should not need to depend on SequenceCore; this will reduce coupling leading to an overall more readable and maintainable project. This also makes it easier for us to release SequenceEthereum as a standalone package, should we ever choose to do so.
+
+By splitting SequenceCore into a separate assembly, we will not need to recompile the entire SDK whenever we make changes to SequenceCore; instead, we will only need to recompile SequenceCore. Similarly, if we were to precompile the SDK, this would give us two separate dlls (SequenceEthereum.dll and SequenceCore.dll).
+
 ### ADR 1 - sequence-unity
 June 21, 2023 - author: Quinn Purdy
 

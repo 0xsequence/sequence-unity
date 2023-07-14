@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 
-namespace Sequence.Wallet
+namespace Sequence.Core.Wallet
 {
     public class WalletProvider
     {

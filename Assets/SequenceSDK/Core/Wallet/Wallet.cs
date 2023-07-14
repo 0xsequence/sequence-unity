@@ -1,19 +1,12 @@
 #define HAS_SPAN
 #define SECP256K1_LIB
 
-using System;
-using System.Linq;
-//using System.Numerics;
-using System.Threading.Tasks;
 using Sequence.Provider;
-using Sequence.ABI;
-using System.Text;
-using NBitcoin.Secp256k1;
-using Sequence.Signer;
+using Sequence.Wallet;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Sequence.Wallet
+namespace Sequence.Core.Wallet
 {
 
     public class NetworkConfig
@@ -57,7 +50,7 @@ namespace Sequence.Wallet
         
         public WalletContext context { get; set; }
         public WalletConfig config { get; set; }
-        public List<EthWallet> signers { get; set; } //EOA signers
+        public List<IWallet> signers { get; set; } //EOA signers
 
         public RPCProvider provider { get; set; } //eth provider
         public WalletProvider walletProvider { get; set; }
@@ -71,7 +64,7 @@ namespace Sequence.Wallet
 
         // Without Relayer
 
-        public Wallet(WalletContext context, WalletConfig config, List<EthWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
+        public Wallet(WalletContext context, WalletConfig config, List<IWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
         {
             this.context = context;
             this.config = config;

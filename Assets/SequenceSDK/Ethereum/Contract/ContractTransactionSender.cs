@@ -14,7 +14,7 @@ namespace Sequence.Contracts
     {
         public static async Task<string> SendTransactionMethod(
             this Contract contract,
-            EthWallet wallet,
+            IWallet wallet,
             IEthClient client,
             BigInteger value,
             string functionName,
@@ -30,7 +30,7 @@ namespace Sequence.Contracts
 
         public static async Task<TransactionReceipt> SendTransactionMethodAndWaitForReceipt(
             this Contract contract,
-            EthWallet wallet,
+            IWallet wallet,
             IEthClient client,
             BigInteger value,
             string functionName,
@@ -43,7 +43,7 @@ namespace Sequence.Contracts
 
         public static async Task<string> SendTransactionMethod(
             this CallContractFunctionTransactionCreator transactionCreator,
-            EthWallet wallet,
+            IWallet wallet,
             IEthClient client,
             BigInteger? value = null)
         {
@@ -55,7 +55,7 @@ namespace Sequence.Contracts
 
         public static async Task<TransactionReceipt> SendTransactionMethodAndWaitForReceipt(
             this CallContractFunctionTransactionCreator transactionCreator,
-            EthWallet wallet,
+            IWallet wallet,
             IEthClient client,
             BigInteger? value = null)
         {
