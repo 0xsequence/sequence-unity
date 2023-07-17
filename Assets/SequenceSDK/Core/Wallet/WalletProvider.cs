@@ -1,4 +1,4 @@
-using Sequence.Provider;
+using Sequence.Core.Provider;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;

@@ -1,10 +1,11 @@
 #define HAS_SPAN
 #define SECP256K1_LIB
 
-using Sequence.Provider;
+using Sequence.Core.Provider;
 using Sequence.Wallet;
 using System.Collections.Generic;
 using System.Numerics;
+using Sequence.Core;
 
 namespace Sequence.Core.Wallet
 {
@@ -32,7 +33,7 @@ namespace Sequence.Core.Wallet
     {
         // Config is the wallet multi-sig configuration. Note: the first config of any wallet
         // before it is deployed is used to derive it's the account address of the wallet.
-        public WalletConfig Config { get; set; }
+        public IWalletConfig Config { get; set; }
         // Context is the WalletContext of deployed wallet-contract modules for the Smart Wallet.
         // NOTE: if a WalletContext is not provided, then `SequenceContext()` value is used.
         public WalletContext Context { get; set; } = Wallet.sequenceContextV2;
@@ -49,8 +50,8 @@ namespace Sequence.Core.Wallet
         
         
         public WalletContext context { get; set; }
-        public WalletConfig config { get; set; }
-        public List<IWallet> signers { get; set; } //EOA signers
+        public IWalletConfig config { get; set; }
+        public List<IWallet> signers { get; set; } // signers
 
         public RPCProvider provider { get; set; } //eth provider
         public WalletProvider walletProvider { get; set; }
@@ -64,7 +65,7 @@ namespace Sequence.Core.Wallet
 
         // Without Relayer
 
-        public Wallet(WalletContext context, WalletConfig config, List<IWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
+        public Wallet(WalletContext context, IWalletConfig config, List<IWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
         {
             this.context = context;
             this.config = config;

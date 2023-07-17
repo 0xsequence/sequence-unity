@@ -1,28 +1,13 @@
 using System;
-using System.Collections;
+using Sequence.Core.Wallet;
+using Sequence.Core.Signature;
 using System.Collections.Generic;
-using UnityEngine;
-using Sequence.Wallet;
-namespace Sequence
-{
 
-    public class WalletContext
+namespace Sequence.Core {
+    public static class Config
     {
-        public string FactoryAddress { get; set; }
-        public string MainModuleAddress { get; set; }
-        public string MainModuleUpgradableAddress { get; set; }
-        public string GuestModuleAddress { get; set; }
 
-        public string UtilsAddress { get; set; }
-
-    }
-
-    public class WalletConfig
-    {
-        public int Threshold { get; set; }
-        public WalletConfigSigners Signers { get; set; }
-
-        public static string AddressFromWalletConfig(WalletConfig walletConfig, WalletContext context)
+        public static string AddressFromWalletConfig(IWalletConfig walletConfig, WalletContext context)
         {
             
             ImageHash imageHash = ImageHashOfWalletConfig(walletConfig);
@@ -38,21 +23,21 @@ namespace Sequence
 
         }
 
-        public static ImageHash ImageHashOfWalletConfig(WalletConfig walletConfig)
+        public static ImageHash ImageHashOfWalletConfig(IWalletConfig walletConfig)
         {
             throw new NotImplementedException();
         }
 
-        private static byte[] ImageHashOfWalletConfigBytes(WalletConfig walletConfig)
+        private static byte[] ImageHashOfWalletConfigBytes(IWalletConfig walletConfig)
         {
             throw new NotImplementedException();
         }
 
 
 
-        public static bool SortWalletConfig(WalletConfig walletConfig)
+        public static bool V1SortWalletConfig(IWalletConfig walletConfig)
         {
-            WalletConfigSigners signers = walletConfig.Signers;
+            WalletConfigSigners signers = GetSigners(walletConfig);
             signers.Sort(); // Sort the signers
 
             // Ensure no duplicates
@@ -67,53 +52,29 @@ namespace Sequence
             return true;
         }
 
-        public static bool IsWalletConfigUsable(WalletConfig walletConfig)
+        private static WalletConfigSigners GetSigners(IWalletConfig walletConfig)
         {
-            throw new NotImplementedException();
-        }
-
-        public static bool IsWalletConfigEqual(WalletConfig walletConfigA, WalletConfig walletConfigB)
-        {
-            throw new NotImplementedException();
-        }
-
-    }
-
-
-
-    public class WalletConfigSigner
-    {
-        public byte Weight { get; set; }
-        public string Address { get; set; }
-    }
-
-    public class WalletConfigSigners : List<WalletConfigSigner>
-    {
-        public int Len() => Count;
-
-        public bool Less(int i, int j)
-        {
-            //TODO:
-            throw new NotImplementedException();
-        }
-
-        public void Swap(int i, int j)
-        {
-            WalletConfigSigner temp = this[i];
-            this[i] = this[j];
-            this[j] = temp;
-        }
-
-        public (byte, bool) GetWeightByAddress(string address)
-        {
-            foreach (WalletConfigSigner signer in this)
+            Dictionary<Address, UInt16> signers = walletConfig.Signers();
+            WalletConfigSigners walletConfigSigners = new WalletConfigSigners();
+            foreach (KeyValuePair<Address, UInt16> signer in signers)
             {
-                if (signer.Address == address)
-                {
-                    return (signer.Weight, true);
-                }
+                WalletConfigSigner walletConfigSigner = new WalletConfigSigner();
+                walletConfigSigner.Address = signer.Key;
+                walletConfigSigner.Weight = (byte)(signer.Value);
+                walletConfigSigners.Add(walletConfigSigner);
             }
-            return (0, false);
+            return walletConfigSigners;
         }
+
+        public static bool IsWalletConfigUsable(IWalletConfig walletConfig)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IsWalletConfigEqual(IWalletConfig walletConfigA, IWalletConfig walletConfigB)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

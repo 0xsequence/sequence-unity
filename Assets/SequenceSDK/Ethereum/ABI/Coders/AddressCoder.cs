@@ -60,7 +60,16 @@ namespace Sequence.ABI
         {
             try
             {
-                string address = (string)value;
+                string address;
+                // We can't explicitly cast an Address to a string, but we can implicitly cast it
+                if (value.GetType() == typeof(Address))
+                {
+                    address = (Address)value;
+                }else
+                {
+                    address = (string)value;
+                }
+
                 if (address.StartsWith("0x"))
                 {
                     address = address.Remove(0, 2);
