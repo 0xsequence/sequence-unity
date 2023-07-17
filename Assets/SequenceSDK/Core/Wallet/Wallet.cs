@@ -13,7 +13,7 @@ namespace Sequence.Core.Wallet
     {
         // Config is the wallet multi-sig configuration. Note: the first config of any wallet
         // before it is deployed is used to derive it's the account address of the wallet.
-        public Config Config { get; set; }
+        public IWalletConfig Config { get; set; }
         // Context is the WalletContext of deployed wallet-contract modules for the Smart Wallet.
         // NOTE: if a WalletContext is not provided, then `SequenceContext()` value is used.
         public WalletContext Context { get; set; } = Wallet.sequenceContextV2;
@@ -30,7 +30,7 @@ namespace Sequence.Core.Wallet
         
         
         public WalletContext context { get; set; }
-        public Config config { get; set; }
+        public IWalletConfig config { get; set; }
         public List<IWallet> signers { get; set; } // signers
 
         public RPCProvider provider { get; set; } //eth provider
@@ -45,7 +45,7 @@ namespace Sequence.Core.Wallet
 
         // Without Relayer
 
-        public Wallet(WalletContext context, Config config, List<IWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
+        public Wallet(WalletContext context, IWalletConfig config, List<IWallet> signers, RPCProvider provider,  string address, bool skipSortSigners, BigInteger chainID)
         {
             this.context = context;
             this.config = config;
