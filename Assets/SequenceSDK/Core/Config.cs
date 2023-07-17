@@ -4,7 +4,7 @@ using Sequence.Core.Signature;
 using System.Collections.Generic;
 
 namespace Sequence.Core {
-    public class Config
+    public static class Config
     {
 
         public static string AddressFromWalletConfig(IWalletConfig walletConfig, WalletContext context)

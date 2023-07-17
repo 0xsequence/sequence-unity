@@ -29,12 +29,12 @@ namespace Sequence.Core.V2.Signature
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public (IWalletConfig, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
 
-        public (Config, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
         {
             throw new NotImplementedException();
         }
