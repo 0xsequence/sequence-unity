@@ -1,14 +1,13 @@
 using System;
 using Sequence.Core.Wallet;
 using Sequence.Core.Signature;
+using System.Collections.Generic;
 
 namespace Sequence.Core {
     public class Config
     {
-        public int Threshold { get; set; }
-        public WalletConfigSigners Signers { get; set; }
 
-        public static string AddressFromWalletConfig(Config walletConfig, WalletContext context)
+        public static string AddressFromWalletConfig(IWalletConfig walletConfig, WalletContext context)
         {
             
             ImageHash imageHash = ImageHashOfWalletConfig(walletConfig);
@@ -24,21 +23,21 @@ namespace Sequence.Core {
 
         }
 
-        public static ImageHash ImageHashOfWalletConfig(Config walletConfig)
+        public static ImageHash ImageHashOfWalletConfig(IWalletConfig walletConfig)
         {
             throw new NotImplementedException();
         }
 
-        private static byte[] ImageHashOfWalletConfigBytes(Config walletConfig)
+        private static byte[] ImageHashOfWalletConfigBytes(IWalletConfig walletConfig)
         {
             throw new NotImplementedException();
         }
 
 
 
-        public static bool SortWalletConfig(Config walletConfig)
+        public static bool V1SortWalletConfig(IWalletConfig walletConfig)
         {
-            WalletConfigSigners signers = walletConfig.Signers;
+            WalletConfigSigners signers = GetSigners(walletConfig);
             signers.Sort(); // Sort the signers
 
             // Ensure no duplicates
@@ -53,12 +52,26 @@ namespace Sequence.Core {
             return true;
         }
 
-        public static bool IsWalletConfigUsable(Config walletConfig)
+        private static WalletConfigSigners GetSigners(IWalletConfig walletConfig)
+        {
+            Dictionary<Address, UInt16> signers = walletConfig.Signers();
+            WalletConfigSigners walletConfigSigners = new WalletConfigSigners();
+            foreach (KeyValuePair<Address, UInt16> signer in signers)
+            {
+                WalletConfigSigner walletConfigSigner = new WalletConfigSigner();
+                walletConfigSigner.Address = signer.Key;
+                walletConfigSigner.Weight = (byte)(signer.Value);
+                walletConfigSigners.Add(walletConfigSigner);
+            }
+            return walletConfigSigners;
+        }
+
+        public static bool IsWalletConfigUsable(IWalletConfig walletConfig)
         {
             throw new NotImplementedException();
         }
 
-        public static bool IsWalletConfigEqual(Config walletConfigA, Config walletConfigB)
+        public static bool IsWalletConfigEqual(IWalletConfig walletConfigA, IWalletConfig walletConfigB)
         {
             throw new NotImplementedException();
         }
