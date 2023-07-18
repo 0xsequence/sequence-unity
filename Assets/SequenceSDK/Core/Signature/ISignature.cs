@@ -27,13 +27,13 @@ namespace Sequence.Core.Signature
                                             Address wallet,
                                             BigInteger chainId,
                                             RPCProvider provider,
-                                            List<SignerSignatures> signerSignatures);
+                                            params SignerSignatures[] signerSignatures);
 
         // Recover a signature but only using the subdigest
         (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, 
                                                     Subdigest subdigest, 
                                                     RPCProvider provider,
-                                                    List<SignerSignatures> signerSignatures);
+                                                    params SignerSignatures[] signerSignatures);
 
         // Reduce returns an equivalent optimized signature.
         ISignature Reduce(Subdigest subdigest);

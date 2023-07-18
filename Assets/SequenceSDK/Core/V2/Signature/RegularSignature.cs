@@ -7,6 +7,8 @@ using Sequence.Core.Signature;
 using Sequence.Core.Wallet;
 using Sequence.Core;
 using System.Threading.Tasks;
+using Sequence.Core.V2.Wallet;
+using Sequence.Extensions;
 
 namespace Sequence.Core.V2.Signature
 {
@@ -17,6 +19,14 @@ namespace Sequence.Core.V2.Signature
         private UInt32 checkpoint;
         public ISignatureTree Tree { get; set; }
 
+        public RegularSignature(bool isRegular, UInt16 threshold, UInt32 checkpoint, ISignatureTree tree)
+        {
+            this.IsRegular = isRegular;
+            this.threshold = threshold;
+            this.checkpoint = checkpoint;
+            this.Tree = tree;
+        }
+
         public UInt32 Checkpoint()
         {
             return checkpoint;
@@ -24,15 +34,42 @@ namespace Sequence.Core.V2.Signature
 
         public byte[] Data()
         {
-            throw new NotImplementedException();
+            byte[] data = new byte[0];
+            if (this.IsRegular)
+            {
+                data = this.IsRegular.ToByteArray();
+            }
+            data = ByteArrayExtensions.ConcatenateByteArrays(
+                data,
+                this.threshold.ToByteArray(),
+                this.checkpoint.ToByteArray(),
+                this.Tree.Data());
+            return data;
         }
 
         public ISignature Join(Subdigest subdigest, ISignature otherSignature)
         {
-            throw new NotImplementedException();
+            if (!(otherSignature is RegularSignature other))
+            {
+                throw new ArgumentException($"{nameof(otherSignature)} Expected RegularSignature, got {otherSignature.GetType()}");
+            }
+
+            if (this.threshold != other.threshold)
+            {
+                throw new ArgumentOutOfRangeException($"Threshold mismatch: {this.threshold} != {other.threshold}");
+            }
+
+            if (this.checkpoint != other.checkpoint)
+            {
+                throw new ArgumentOutOfRangeException($"Checkpoint mismatch: {this.checkpoint} != {other.checkpoint}");
+            }
+
+            ISignatureTree tree = this.Tree.Join(other.Tree);
+
+            return new RegularSignature(this.IsRegular, this.threshold, this.checkpoint, tree);
         }
 
-        public async Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public async Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, params SignerSignatures[] signerSignatures)
         {
             if (chainId == null)
             {
@@ -47,14 +84,21 @@ namespace Sequence.Core.V2.Signature
             return RecoverSubdigest(context, digest.Subdigest(wallet, chainId), provider, signerSignatures);
         }
 
-        public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, params SignerSignatures[] signerSignatures)
         {
-            throw new NotImplementedException();
+            if (signerSignatures == null)
+            {
+                signerSignatures = new SignerSignatures[0];
+            }
+
+            (IWalletConfigTree tree, BigInteger weight) = this.Tree.Recover(context, subdigest, provider, signerSignatures);
+
+            return (new WalletConfig(this.threshold, this.checkpoint, tree), weight);
         }
 
         public ISignature Reduce(Subdigest subdigest)
         {
-            throw new NotImplementedException();
+            return new RegularSignature(this.IsRegular, this.threshold, this.checkpoint, this.Tree.Reduce());
         }
 
         public UInt16 Threshold()

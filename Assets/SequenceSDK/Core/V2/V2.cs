@@ -75,12 +75,7 @@ namespace Sequence.Core.V2
 
             IWalletConfigTree tree = WalletConfigTreeDecoder.Decode(treeDict);
 
-            return new WalletConfig
-            {
-                threshold = threshold,
-                checkpoint = checkpoint,
-                tree = tree,
-            };
+            return new WalletConfig(threshold, checkpoint, tree);
         }
     }
 }

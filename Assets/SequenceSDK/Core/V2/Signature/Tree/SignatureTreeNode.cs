@@ -12,7 +12,27 @@ namespace Sequence.Core.V2.Signature.Tree
         public ISignatureTree left;
         public ISignatureTree right;
 
-        public (IWalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public byte[] Data()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISignatureTree Join(ISignatureTree otherSignatureTree)
+        {
+            throw new NotImplementedException();
+        }
+
+        public (IWalletConfigTree, BigInteger) Recover(WalletContext context, Subdigest subdigest, RPCProvider provider, params SignerSignatures[] signerSignatures)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISignatureTree Reduce()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ImageHash ReduceImageHash()
         {
             throw new NotImplementedException();
         }

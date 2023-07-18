@@ -15,6 +15,13 @@ namespace Sequence.Core.V2.Wallet
         public UInt32 checkpoint;
         public IWalletConfigTree tree;
 
+        public WalletConfig(UInt16 threshold, UInt32 checkpoint, IWalletConfigTree tree)
+        {
+            this.threshold = threshold;
+            this.checkpoint = checkpoint;
+            this.tree = tree;
+        }
+
         public uint Checkpoint()
         {
             return checkpoint;
