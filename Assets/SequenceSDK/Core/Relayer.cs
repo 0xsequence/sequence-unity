@@ -13,7 +13,7 @@ namespace Sequence.Core
 
         BigInteger GetNonce(IWalletConfig walletConfig, WalletContext walletContext, BigInteger space, BigInteger blockNumber);
 
-        //(string, EthTransaction, TransactionReceipt, Exception) Relay(SignedTransactions signedTransactions);
+        //(string, EthTransaction, TransactionReceipt) Relay(SignedTransactions signedTransactions);
 
         TransactionReceipt Wait(string transactionID, float maxWaitTime = -1);
     }

@@ -22,7 +22,7 @@ namespace Sequence.Core
     {
        // Logger logger;
         string nodeURL;
-        HttpRpcClient httpClient;
+        IEthClient client;
 
 
         public RPCProvider(string _nodeURL)
@@ -33,18 +33,18 @@ namespace Sequence.Core
         public RPCProvider(string _nodeURL, ProviderOption options)
         {
             nodeURL = _nodeURL;
-            httpClient = new HttpRpcClient(_nodeURL);
+            client = new SequenceEthClient(_nodeURL);
         }
 
-        public void SetHTTPClient(HttpRpcClient _httpClient)
+        public void SetHTTPClient(IEthClient client)
         {
-            httpClient = _httpClient;
+            this.client = client;
         }
 
-        public async Task Send(string payload)
+        public async Task<BigInteger> ChainID()
         {
-            //?
-            await httpClient.SendRequest(payload);
+            string chainId = await client.ChainID();
+            return BigInteger.Parse(chainId);
         }
 
     }

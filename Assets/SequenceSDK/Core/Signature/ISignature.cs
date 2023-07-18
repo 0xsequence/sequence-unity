@@ -5,6 +5,7 @@ using UnityEngine;
 using Sequence.Core.Wallet;
 using Sequence.Core;
 using System;
+using System.Threading.Tasks;
 
 namespace Sequence.Core.Signature
 {
@@ -14,14 +15,14 @@ namespace Sequence.Core.Signature
         UInt16 Threshold();
 
         // Checkpoint is the nonce of the wallet configuration that the signature applies to.
-        BigInteger Checkpoint();
+        UInt32 Checkpoint();
 
         // Recover derives the wallet configuration that the signature applies to.
         // Also returns the signature's weight.
         // If chainID is not provided, provider must be provided.
         // If provider is not provided, EIP-1271 signatures are assumed to be valid.
         // If signerSignatures is provided, it will be populated with the valid signer signatures of this signature.
-        (IWalletConfig, BigInteger) Recover(WalletContext context, 
+        Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, 
                                             Digest digest, 
                                             Address wallet,
                                             BigInteger chainId,
