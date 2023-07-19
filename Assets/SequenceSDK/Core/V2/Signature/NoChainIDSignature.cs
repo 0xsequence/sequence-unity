@@ -5,46 +5,74 @@ using System;
 using System.Numerics;
 using Sequence.Core.Signature;
 using Sequence.Core.Wallet;
-using Sequence.Core;
+using Sequence.Extensions;
 using System.Threading.Tasks;
+using Sequence.Core.V2.Wallet;
 
 namespace Sequence.Core.V2.Signature
 {
     public class NoChainIDSignature : ISignature
     {
+        private UInt16 threshold;
+        private UInt32 checkpoint;
+        public ISignatureTree Tree { get; set; }
+
+        public NoChainIDSignature(UInt16 threshold, UInt32 checkpoint, ISignatureTree tree)
+        {
+            this.threshold = threshold;
+            this.checkpoint = checkpoint;
+            this.Tree = tree;
+        }
+
         public uint Checkpoint()
         {
-            throw new NotImplementedException();
+            return this.checkpoint;
         }
 
         public byte[] Data()
         {
-            throw new NotImplementedException();
+            byte[] data = ByteArrayExtensions.ConcatenateByteArrays(
+                SignatureType.NoChainID.ToByteArray(),
+                this.threshold.ToByteArray(),
+                this.checkpoint.ToByteArray(),
+                this.Tree.Data());
+            return data;
         }
 
         public ISignature Join(Subdigest subdigest, ISignature otherSignature)
         {
-            throw new NotImplementedException();
+            NoChainIDSignature other = SignatureJoinParameterValidator.ValidateParameters<NoChainIDSignature>(this, otherSignature);
+
+            ISignatureTree tree = this.Tree.Join(other.Tree);
+
+            return new NoChainIDSignature(this.threshold, this.checkpoint, tree);
         }
 
-        public Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, params SignerSignatures[] signerSignatures)
+        public async Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, params SignerSignatures[] signerSignatures)
         {
-            throw new NotImplementedException();
+            return RecoverSubdigest(context, digest.Subdigest(wallet), provider, signerSignatures);
         }
 
         public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, params SignerSignatures[] signerSignatures)
         {
-            throw new NotImplementedException();
+            if (signerSignatures == null)
+            {
+                signerSignatures = new SignerSignatures[0];
+            }
+
+            (IWalletConfigTree tree, BigInteger weight) = this.Tree.Recover(context, subdigest, provider, signerSignatures[0]);
+
+            return (new WalletConfig(this.threshold, this.checkpoint, tree), weight);
         }
 
         public ISignature Reduce(Subdigest subdigest)
         {
-            throw new NotImplementedException();
+            return new NoChainIDSignature(this.threshold, this.checkpoint, this.Tree.Reduce());
         }
 
         public ushort Threshold()
         {
-            throw new NotImplementedException();
+            return this.threshold;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Sequence.Core.V2.Signature
             byte[] data = new byte[0];
             if (this.IsRegular)
             {
-                data = this.IsRegular.ToByteArray();
+                data = SignatureType.Regular.ToByteArray();
             }
             data = ByteArrayExtensions.ConcatenateByteArrays(
                 data,
@@ -49,20 +49,7 @@ namespace Sequence.Core.V2.Signature
 
         public ISignature Join(Subdigest subdigest, ISignature otherSignature)
         {
-            if (!(otherSignature is RegularSignature other))
-            {
-                throw new ArgumentException($"{nameof(otherSignature)} Expected RegularSignature, got {otherSignature.GetType()}");
-            }
-
-            if (this.threshold != other.threshold)
-            {
-                throw new ArgumentOutOfRangeException($"Threshold mismatch: {this.threshold} != {other.threshold}");
-            }
-
-            if (this.checkpoint != other.checkpoint)
-            {
-                throw new ArgumentOutOfRangeException($"Checkpoint mismatch: {this.checkpoint} != {other.checkpoint}");
-            }
+            RegularSignature other = SignatureJoinParameterValidator.ValidateParameters<RegularSignature>(this, otherSignature);
 
             ISignatureTree tree = this.Tree.Join(other.Tree);
 
@@ -91,7 +78,7 @@ namespace Sequence.Core.V2.Signature
                 signerSignatures = new SignerSignatures[0];
             }
 
-            (IWalletConfigTree tree, BigInteger weight) = this.Tree.Recover(context, subdigest, provider, signerSignatures);
+            (IWalletConfigTree tree, BigInteger weight) = this.Tree.Recover(context, subdigest, provider, signerSignatures[0]);
 
             return (new WalletConfig(this.threshold, this.checkpoint, tree), weight);
         }

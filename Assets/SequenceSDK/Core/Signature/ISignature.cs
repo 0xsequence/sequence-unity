@@ -6,6 +6,7 @@ using Sequence.Core.Wallet;
 using Sequence.Core;
 using System;
 using System.Threading.Tasks;
+using Sequence.Core.V2;
 
 namespace Sequence.Core.Signature
 {
