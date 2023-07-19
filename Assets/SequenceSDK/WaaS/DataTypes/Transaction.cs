@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Sequence.WaaS
@@ -14,12 +13,12 @@ namespace Sequence.WaaS
         public string to;
         public string autoGas;
         public BigInteger? nonce;
-        [CanBeNull] public string value;
-        [CanBeNull] public string calldata;
-        [CanBeNull] public string tokenAddress;
-        [CanBeNull] public string tokenAmount;
-        [CanBeNull] public string[] tokenIds;
-        [CanBeNull] public string[] tokenAmounts;
+        public string value;
+        public string calldata;
+        public string tokenAddress;
+        public string tokenAmount;
+        public string[] tokenIds;
+        public string[] tokenAmounts;
 
         public Transaction(uint chainId, string from, string to, string autoGas = null, BigInteger? nonce = null, string value = null, string calldata = null, string tokenAddress = null, string tokenAmount = null, string[] tokenIds = null, string[] tokenAmounts = null)
         {

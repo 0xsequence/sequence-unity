@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using UnityEngine;
+
 
 namespace Sequence.WaaS
 {
@@ -11,10 +8,10 @@ namespace Sequence.WaaS
         public uint? pageSize { get; private set; }
         public uint? page { get; private set; }
         public uint? totalRecords { get; private set; }
-        [CanBeNull] public string column { get; private set; }
-        [CanBeNull] public object before { get; private set; }
-        [CanBeNull] public object after { get; private set; }
-        [CanBeNull] public SortBy[] sort { get; private set; }
+        public string column { get; private set; }
+        public object before { get; private set; }
+        public object after { get; private set; }
+        public SortBy[] sort { get; private set; }
         
         public Page(uint? pageSize = null, uint? page = null, uint? totalRecords = null, string column = null, object before = null, object after = null, SortBy[] sort = null)
         {

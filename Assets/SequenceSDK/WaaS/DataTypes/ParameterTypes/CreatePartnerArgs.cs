@@ -3,20 +3,19 @@
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class Partner
+    public class CreatePartnerArgs
     {
-        public uint id { get; private set; }
-        public string name;
+        public string name { get; private set; }
         public string jwtAlg { get; private set; }
         private string jwtSecret;
         public string jwtPublic { get; private set; }
-
-        public Partner(uint id, string name, string jwtAlg, string jwtSecret = null, string jwtPublic = null)
+        
+        
+        public CreatePartnerArgs(string name, string jwtAlg, string jwtSecret = null, string jwtPublic = null)
         {
-            this.id = id;
+            this.jwtSecret = jwtSecret;
             this.name = name;
             this.jwtAlg = jwtAlg;
-            this.jwtSecret = jwtSecret;
             this.jwtPublic = jwtPublic;
         }
     }

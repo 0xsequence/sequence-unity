@@ -1,20 +1,18 @@
-
-
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class Partner
+    public class UpdatePartnerArgs
     {
-        public uint id { get; private set; }
-        public string name;
+        public uint partnerId { get; private set; }
+        public string name { get; private set; }
         public string jwtAlg { get; private set; }
         private string jwtSecret;
         public string jwtPublic { get; private set; }
-
-        public Partner(uint id, string name, string jwtAlg, string jwtSecret = null, string jwtPublic = null)
+        
+        public UpdatePartnerArgs(uint partnerId, string name, string jwtAlg, string jwtSecret = null, string jwtPublic = null)
         {
-            this.id = id;
             this.name = name;
+            this.partnerId = partnerId;
             this.jwtAlg = jwtAlg;
             this.jwtSecret = jwtSecret;
             this.jwtPublic = jwtPublic;
