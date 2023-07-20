@@ -180,7 +180,7 @@ namespace Sequence.ABI
         /// <param name="abi"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Dictionary<string, (string[], string)> DecodeAbi(string abi)
+        public static Dictionary<string, (string[], string)> DecodeAbi(string abi) // TOdo make a ABI class so I can extend it
         {
             try
             {
@@ -218,6 +218,7 @@ namespace Sequence.ABI
                         returnType = returnJObject["type"].ToString();
                     }
 
+                    functionName += $"({string.Join(",", argumentTypes)})";
                     decodedAbi[functionName] = (argumentTypes, returnType);
                 }
 
