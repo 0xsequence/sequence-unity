@@ -172,7 +172,7 @@ Hd wallet
 https://docs.nethereum.com/en/latest/nethereum-block-processing-detail/
 
 ## Contracts
-Subscribe to contract events
+Subscribe to contract events - note that Nethereum doesn't offer Unity support for this https://docs.nethereum.com/en/latest/unity3d-smartcontracts-getting-started/#logs-and-events
 Code generation
 Querying previous contract states
 
