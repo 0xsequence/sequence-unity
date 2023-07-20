@@ -438,7 +438,7 @@ public class SequenceEthClientTests
         new object[] { nameof(SequenceEthClient.WaitForTransactionReceipt), new object[] { "some hash", 1, 1 } },
     };
 
-    [TestCaseSource("errorCases")]
+    [TestCaseSource(nameof(errorCases))]
     public async Task TestErrorResponse(string methodName, params object[] parameters) {
         try {
             var client = new SequenceEthClient(failingClient);

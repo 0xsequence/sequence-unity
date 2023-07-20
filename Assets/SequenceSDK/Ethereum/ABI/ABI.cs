@@ -2,6 +2,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Extensions;
@@ -174,13 +175,58 @@ namespace Sequence.ABI
         }
 
         /// <summary>
-        ///  TODO: Method for unpacking parameters from byte array data.
+        /// Decodes an ABI string into a Dictionary<string, (string[], string)> where the key is the function name and the value is a tuple (function argument types, function return type)
         /// </summary>
-        /// <param name="data">The byte array data to unpack.</param>
-        /// <returns>A list of unpacked parameters.</returns>
-        public static List<object> UnpackParameters(byte[] data)
+        /// <param name="abi"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static Dictionary<string, (string[], string)> DecodeAbi(string abi)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                JArray abiArray = JArray.Parse(abi);
+                Dictionary<string, (string[], string)> decodedAbi = new Dictionary<string, (string[], string)>();
+
+                int abiArrayLength = abiArray.Count;
+                for (int i = 0; i < abiArrayLength; i++)
+                {
+                    JObject element = abiArray[i] as JObject;
+                    if (element["type"].ToString() != "function") 
+                    {
+                        continue; // Skip everything that isn't a function (e.g. events) for now
+                    }
+
+                    string functionName = element["name"].ToString();
+                    
+                    JArray inputsArray = element["inputs"] as JArray;
+                    int inputsArrayLength = inputsArray.Count;
+                    string[] argumentTypes = new string[inputsArrayLength];
+                    for (int j = 0; j < inputsArrayLength; j++)
+                    {
+                        JObject inputItem = inputsArray[j] as JObject;
+                        argumentTypes[j] = inputItem["type"].ToString();
+                    }
+                    
+                    JObject returnJObject = element["outputs"].FirstOrDefault() as JObject;
+                    string returnType;
+                    if (returnJObject == null)
+                    {
+                        returnType = null;
+                    }
+                    else
+                    {
+                        returnType = returnJObject["type"].ToString();
+                    }
+
+                    decodedAbi[functionName] = (argumentTypes, returnType);
+                }
+
+                return decodedAbi;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Invalid ABI: {ex.Message}");
+            }
         }
 
         /// <summary>
