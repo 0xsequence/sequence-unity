@@ -180,12 +180,12 @@ namespace Sequence.ABI
         /// <param name="abi"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Dictionary<string, (string[], string)> DecodeAbi(string abi) // TOdo make a ABI class so I can extend it
+        public static FunctionAbi DecodeAbi(string abi) // TOdo make a ABI class so I can extend it
         {
             try
             {
                 JArray abiArray = JArray.Parse(abi);
-                Dictionary<string, (string[], string)> decodedAbi = new Dictionary<string, (string[], string)>();
+                Dictionary<string, List<(string[], string)>> decodedAbi = new Dictionary<string, List<(string[], string)>>();
 
                 int abiArrayLength = abiArray.Count;
                 for (int i = 0; i < abiArrayLength; i++)
@@ -218,11 +218,18 @@ namespace Sequence.ABI
                         returnType = returnJObject["type"].ToString();
                     }
 
-                    functionName += $"({string.Join(",", argumentTypes)})";
-                    decodedAbi[functionName] = (argumentTypes, returnType);
+                    if (decodedAbi.ContainsKey(functionName))
+                    {
+                        decodedAbi[functionName].Add((argumentTypes, returnType));
+                    }
+                    else
+                    {
+                        decodedAbi[functionName] = new List<(string[], string)>();
+                        decodedAbi[functionName].Add((argumentTypes, returnType));
+                    }
                 }
 
-                return decodedAbi;
+                return new FunctionAbi(decodedAbi);
             }
             catch (Exception ex)
             {

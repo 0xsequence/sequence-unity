@@ -352,87 +352,87 @@ public class ABITests
     private static readonly string erc1155Abi = "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"ApprovalForAll\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"},{\"indexed\":false,\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"}],\"name\":\"TransferBatch\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"TransferSingle\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"value\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"URI\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"accounts\",\"type\":\"address[]\"},{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"}],\"name\":\"balanceOfBatch\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"values\",\"type\":\"uint256[]\"}],\"name\":\"burnBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"exists\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"}],\"name\":\"isApprovedForAll\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"mint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"mintBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256[]\",\"name\":\"ids\",\"type\":\"uint256[]\"},{\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"safeBatchTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"setApprovalForAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"newuri\",\"type\":\"string\"}],\"name\":\"setURI\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"uri\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]";
     
     private static object[] DecodeAbiTests = {
-        new object[]
+    new object[]
+    {
+        erc20Abi, new Dictionary<string, List<(string[], string)>>
         {
-            erc20Abi, new Dictionary<string, (string[], string)>
-            {
-                { "name()", (new string[] { }, "string") },
-                { "allowance(address,address)", (new string[] { "address", "address" }, "uint256") },
-                { "approve(address,uint256)", (new string[] { "address", "uint256" }, "bool") },
-                { "balanceOf(address)", (new string[] { "address" }, "uint256") },
-                { "burn(uint256)", (new string[] { "uint256" }, null) },
-                { "burnFrom(address,uint256)", (new string[] { "address", "uint256" }, null) },
-                { "decimals()", (new string[] { }, "uint8") },
-                { "decreaseAllowance(address,uint256)", (new string[] { "address", "uint256" }, "bool") },
-                { "increaseAllowance(address,uint256)", (new string[] { "address", "uint256" }, "bool") },
-                { "mint(address,uint256)", (new string[] { "address", "uint256" }, null) },
-                { "owner()", (new string[] { }, "address") },
-                { "renounceOwnership()", (new string[] { }, null) },
-                { "symbol()", (new string[] { }, "string") },
-                { "totalSupply()", (new string[] { }, "uint256") },
-                { "transfer(address,uint256)", (new string[] { "address", "uint256" }, "bool") },
-                { "transferFrom(address,address,uint256)", (new string[] { "address", "address", "uint256" }, "bool") },
-                { "transferOwnership(address)", (new string[] { "address" }, null) },
-            },
+            { "name", new List<(string[], string)> { (new string[] { }, "string") } },
+            { "allowance", new List<(string[], string)> { (new string[] { "address", "address" }, "uint256") } },
+            { "approve", new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") } },
+            { "balanceOf", new List<(string[], string)> { (new string[] { "address" }, "uint256") } },
+            { "burn", new List<(string[], string)> { (new string[] { "uint256" }, null) } },
+            { "burnFrom", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
+            { "decimals", new List<(string[], string)> { (new string[] { }, "uint8") } },
+            { "decreaseAllowance", new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") } },
+            { "increaseAllowance", new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") } },
+            { "mint", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
+            { "owner", new List<(string[], string)> { (new string[] { }, "address") } },
+            { "renounceOwnership", new List<(string[], string)> { (new string[] { }, null) } },
+            { "symbol", new List<(string[], string)> { (new string[] { }, "string") } },
+            { "totalSupply", new List<(string[], string)> { (new string[] { }, "uint256") } },
+            { "transfer", new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") } },
+            { "transferFrom", new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, "bool") } },
+            { "transferOwnership", new List<(string[], string)> { (new string[] { "address" }, null) } },
         },
-        new object[]
+    },
+    new object[]
+    {
+        erc721Abi, new Dictionary<string, List<(string[], string)>>
         {
-            erc721Abi, new Dictionary<string, (string[], string)>
-            {
-                { "approve(address,uint256)", (new string[] { "address", "uint256" }, null) },
-                { "balanceOf(address)", (new string[] { "address" }, "uint256") },
-                { "burn(uint256)", (new string[] { "uint256" }, null) },
-                { "getApproved(uint256)", (new string[] { "uint256" }, "address") },
-                { "isApprovedForAll(address,address)", (new string[] { "address", "address" }, "bool") },
-                { "name()", (new string[] { }, "string") },
-                { "owner()", (new string[] { }, "address") },
-                { "ownerOf(uint256)", (new string[] { "uint256" }, "address") },
-                { "renounceOwnership()", (new string[] { }, null) },
-                { "safeMint(address,uint256)", (new string[] { "address", "uint256" }, null) },
-                { "safeTransferFrom(address,address,uint256)", (new string[] { "address", "address", "uint256" }, null) },
-                { "safeTransferFrom(address,address,uint256,bytes)", (new string[] { "address", "address", "uint256", "bytes" }, null) },
-                { "setApprovalForAll(address,bool)", (new string[] { "address", "bool" }, null) },
-                { "supportsInterface(bytes4)", (new string[] { "bytes4" }, "bool") },
-                { "symbol()", (new string[] { }, "string") },
-                { "tokenURI(uint256)", (new string[] { "uint256" }, "string") },
-                { "transferFrom(address,address,uint256)", (new string[] { "address", "address", "uint256" }, null) },
-                { "transferOwnership(address)", (new string[] { "address" }, null) },
-            },
+            { "approve", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
+            { "balanceOf", new List<(string[], string)> { (new string[] { "address" }, "uint256") } },
+            { "burn", new List<(string[], string)> { (new string[] { "uint256" }, null) } },
+            { "getApproved", new List<(string[], string)> { (new string[] { "uint256" }, "address") } },
+            { "isApprovedForAll", new List<(string[], string)> { (new string[] { "address", "address" }, "bool") } },
+            { "name", new List<(string[], string)> { (new string[] { }, "string") } },
+            { "owner", new List<(string[], string)> { (new string[] { }, "address") } },
+            { "ownerOf", new List<(string[], string)> { (new string[] { "uint256" }, "address") } },
+            { "renounceOwnership", new List<(string[], string)> { (new string[] { }, null) } },
+            { "safeMint", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
+            { "safeTransferFrom", new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, null), (new string[] { "address", "address", "uint256", "bytes" }, null) } },
+            { "setApprovalForAll", new List<(string[], string)> { (new string[] { "address", "bool" }, null) } },
+            { "supportsInterface", new List<(string[], string)> { (new string[] { "bytes4" }, "bool") } },
+            { "symbol", new List<(string[], string)> { (new string[] { }, "string") } },
+            { "tokenURI", new List<(string[], string)> { (new string[] { "uint256" }, "string") } },
+            { "transferFrom", new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, null) } },
+            { "transferOwnership", new List<(string[], string)> { (new string[] { "address" }, null) } },
         },
-        new object[]
+    },
+    new object[]
+    {
+        erc1155Abi, new Dictionary<string, List<(string[], string)>>
         {
-            erc1155Abi, new Dictionary<string, (string[], string)>
-            {
-                { "balanceOf(address,uint256)", (new string[] { "address", "uint256" }, "uint256") },
-                { "balanceOfBatch(address[],uint256[])", (new string[] { "address[]", "uint256[]" }, "uint256[]") },
-                { "burn(address,uint256,uint256)", (new string[] { "address", "uint256", "uint256" }, null) },
-                { "burnBatch(address,uint256[],uint256[])", (new string[] { "address", "uint256[]", "uint256[]" }, null) },
-                { "exists(uint256)", (new string[] { "uint256" }, "bool") },
-                { "isApprovedForAll(address,address)", (new string[] { "address", "address" }, "bool") },
-                { "mint(address,uint256,uint256,bytes)", (new string[] { "address", "uint256", "uint256", "bytes" }, null) },
-                { "mintBatch(address,uint256[],uint256[],bytes)", (new string[] { "address", "uint256[]", "uint256[]", "bytes" }, null) },
-                { "setApprovalForAll(address,bool)", (new string[] { "address", "bool" }, null) },
-                { "setURI(string)", (new string[] { "string" }, null) },
-                { "supportsInterface(bytes4)", (new string[] { "bytes4" }, "bool") },
-                { "totalSupply(uint256)", (new string[] { "uint256" }, "uint256") },
-                { "transferOwnership(address)", (new string[] { "address" }, null) },
-                { "uri(uint256)", (new string[] { "uint256" }, "string") },
-                { "owner()", (new string[] { }, "address") },
-                { "renounceOwnership()", (new string[] { }, null) },
-                { "safeTransferFrom(address,address,uint256,uint256,bytes)", (new string[] {"address", "address", "uint256", "uint256", "bytes" }, null) },
-                { "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)", (new string[] { "address", "address", "uint256[]", "uint256[]", "bytes" }, null) },
-            },
+            { "balanceOf", new List<(string[], string)> { (new string[] { "address", "uint256" }, "uint256") } },
+            { "balanceOfBatch", new List<(string[], string)> { (new string[] { "address[]", "uint256[]" }, "uint256[]") } },
+            { "burn", new List<(string[], string)> { (new string[] { "address", "uint256", "uint256" }, null) } },
+            { "burnBatch", new List<(string[], string)> { (new string[] { "address", "uint256[]", "uint256[]" }, null) } },
+            { "exists", new List<(string[], string)> { (new string[] { "uint256" }, "bool") } },
+            { "isApprovedForAll", new List<(string[], string)> { (new string[] { "address", "address" }, "bool") } },
+            { "mint", new List<(string[], string)> { (new string[] { "address", "uint256", "uint256", "bytes" }, null) } },
+            { "mintBatch", new List<(string[], string)> { (new string[] { "address", "uint256[]", "uint256[]", "bytes" }, null) } },
+            { "setApprovalForAll", new List<(string[], string)> { (new string[] { "address", "bool" }, null) } },
+            { "setURI", new List<(string[], string)> { (new string[] { "string" }, null) } },
+            { "supportsInterface", new List<(string[], string)> { (new string[] { "bytes4" }, "bool") } },
+            { "totalSupply", new List<(string[], string)> { (new string[] { "uint256" }, "uint256") } },
+            { "transferOwnership", new List<(string[], string)> { (new string[] { "address" }, null) } },
+            { "uri", new List<(string[], string)> { (new string[] { "uint256" }, "string") } },
+            { "owner", new List<(string[], string)> { (new string[] { }, "address") } },
+            { "renounceOwnership", new List<(string[], string)> { (new string[] { }, null) } },
+            { "safeTransferFrom", new List<(string[], string)> { (new string[] { "address", "address", "uint256", "uint256", "bytes" }, null) } },
+            { "safeBatchTransferFrom", new List<(string[], string)> { (new string[] { "address", "address", "uint256[]", "uint256[]", "bytes" }, null) } },
         },
-    };
+    },
+};
+
 
 
 
     [TestCaseSource(nameof(DecodeAbiTests))]    
-    public void TestDecodeAbi(string abi, Dictionary<string, (string[], string)> expected)
+    public void TestDecodeAbi(string abi, Dictionary<string, List<(string[], string)>> expected)
     {
         try
         {
-            Dictionary<string, (string[], string)> result = ABI.DecodeAbi(abi);
+            Dictionary<string, List<(string[], string)>> result = ABI.DecodeAbi(abi).Abi;
 
             Assert.NotNull(result);
             Assert.AreEqual(expected.Count, result.Count);
@@ -444,16 +444,20 @@ public class ABITests
                     Assert.Fail($"Key {function.Key} is not found in result Dictionary {result}");
                 }
 
-                string[] expectedArgs = function.Value.Item1;
-                int length = expectedArgs.Length;
-                string[] resultArgs = value.Item1;
-                int resultLength = resultArgs.Length;
-                Assert.AreEqual(length, resultLength);
-                for (int i = 0; i < length; i++)
+                for (int i = 0; i < function.Value.Count; i++)
                 {
-                    Assert.AreEqual(expectedArgs[i], resultArgs[i]);
+                    string[] expectedArgs = function.Value[i].Item1;
+                    int length = expectedArgs.Length;
+                    string[] resultArgs = value[i].Item1;
+                    int resultLength = resultArgs.Length;
+                    Assert.AreEqual(length, resultLength);
+                    for (int j = 0; j < length; j++)
+                    {
+                        Assert.AreEqual(expectedArgs[j], resultArgs[j]);
+                    }
+                    Assert.AreEqual(function.Value[i].Item2, value[i].Item2);
                 }
-                Assert.AreEqual(function.Value.Item2, value.Item2);
+
             }
         }
         catch (Exception ex)
