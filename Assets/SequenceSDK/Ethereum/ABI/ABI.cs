@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Extensions;
@@ -207,7 +206,12 @@ namespace Sequence.ABI
                         argumentTypes[j] = inputItem["type"].ToString();
                     }
                     
-                    JObject returnJObject = element["outputs"].FirstOrDefault() as JObject;
+                    JArray outputsArray = element["outputs"] as JArray;
+                    JObject returnJObject = null;
+                    if (outputsArray != null && outputsArray.Count > 0)
+                    {
+                        returnJObject = outputsArray[0] as JObject;
+                    }
                     string returnType;
                     if (returnJObject == null)
                     {
