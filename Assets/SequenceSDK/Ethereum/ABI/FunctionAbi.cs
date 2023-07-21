@@ -43,6 +43,14 @@ namespace Sequence.ABI
             return functionSignatures;
         }
 
+        /// <summary>
+        /// Used to determine which version of a function signature you wish to call
+        /// Throws if you have provided an invalid number of args to a function name (there doesn't exist a matching function signature in the abi)
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public int GetFunctionAbiIndex(string functionName, params object[] args)
         {
             // In Solidity, function overloading is based on the number of parameters.

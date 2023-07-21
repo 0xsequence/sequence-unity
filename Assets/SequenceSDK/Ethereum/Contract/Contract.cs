@@ -13,13 +13,33 @@ namespace Sequence.Contracts
 {
     public class Contract
     {
-        string address;
+        Address address;
         public delegate Task<EthTransaction> CallContractFunctionTransactionCreator(IEthClient client, ContractCall contractCallInfo);
         public delegate Task<string> QueryContractMessageSender(IEthClient client);
 
-        public Contract(string contractAddress)
+        private string abi;
+        private FunctionAbi functionAbi;
+
+        /// <summary>
+        /// Will throw if given an invalid abi or contractAddress
+        /// Note that providing a null abi is supported. However this is not recommended.
+        /// Using a null abi will require you to provide the full function signature when transacting/querying the contract.
+        /// Using a null abi will cause all query responses to return as a string.
+        /// </summary>
+        /// <param name="contractAddress"></param>
+        /// <param name="abi"></param>
+        public Contract(string contractAddress, string abi = null)
         {
-            address = contractAddress;
+            address = new Address(contractAddress);
+            this.abi = abi;
+            if (abi == null)
+            {
+                this.functionAbi = null;
+            }
+            else
+            {
+                this.functionAbi = ABI.ABI.DecodeAbi(abi);
+            }
         }
 
         public async Task<string> Deploy(string bytecode, params object[] constructorArgs)
@@ -27,9 +47,9 @@ namespace Sequence.Contracts
             throw new NotImplementedException();
         }
 
-        public CallContractFunctionTransactionCreator CallFunction(string functionSignature, params object[] functionArgs)
+        public CallContractFunctionTransactionCreator CallFunction(string functionName, params object[] functionArgs)
         {
-            string callData = ABI.ABI.Pack(functionSignature, functionArgs);
+            string callData = GetData(functionName, functionArgs);
             return async (IEthClient client, ContractCall contractCallInfo) =>
             {
                 GasLimitEstimator estimator = new GasLimitEstimator(client, contractCallInfo.from);
@@ -40,9 +60,9 @@ namespace Sequence.Contracts
             };
         }
 
-        public QueryContractMessageSender QueryContract(string functionSignature, params object[] args)
+        public QueryContractMessageSender QueryContract(string functionName, params object[] args)
         {
-            string data = ABI.ABI.Pack(functionSignature, args);
+            string data = GetData(functionName, args);
             string to = address;
             object[] toSendParams = new object[] {
                 new
@@ -55,6 +75,21 @@ namespace Sequence.Contracts
             {
                 return await client.CallContract(toSendParams);
             };
+        }
+
+        private string GetData(string functionName, params object[] args)
+        {
+            string data;
+            if (this.functionAbi != null)
+            {
+                int abiIndex = this.functionAbi.GetFunctionAbiIndex(functionName, args);
+                data = ABI.ABI.Pack(this.functionAbi.GetFunctionSignature(functionName, abiIndex), args);
+            }
+            else
+            {
+                data = ABI.ABI.Pack(functionName, args);
+            }
+            return data;
         }
 
         public async Task<T> GetEventLog<T>(string eventName, BigInteger blockNumber)
@@ -84,11 +119,7 @@ namespace Sequence.Contracts
             {
                 gasLimit = BigInteger.Zero;
             }
-
-            if (!from.Value.IsAddress())
-            {
-                throw new ArgumentOutOfRangeException(nameof(from));
-            }
+            
             if (value < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(value));
