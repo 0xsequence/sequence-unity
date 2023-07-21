@@ -179,7 +179,7 @@ namespace Sequence.ABI
         /// <param name="abi"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static FunctionAbi DecodeAbi(string abi) // TOdo make a ABI class so I can extend it
+        public static FunctionAbi DecodeAbi(string abi) 
         {
             try
             {
