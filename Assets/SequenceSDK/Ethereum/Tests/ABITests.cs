@@ -435,30 +435,10 @@ public class ABITests
             Dictionary<string, List<(string[], string)>> result = ABI.DecodeAbi(abi).Abi;
 
             Assert.NotNull(result);
-            Assert.AreEqual(expected.Count, result.Count);
-
-            foreach (var function in expected)
-            {
-                if (!result.TryGetValue(function.Key, out var value))
-                {
-                    Assert.Fail($"Key {function.Key} is not found in result Dictionary {result}");
-                }
-
-                for (int i = 0; i < function.Value.Count; i++)
-                {
-                    string[] expectedArgs = function.Value[i].Item1;
-                    int length = expectedArgs.Length;
-                    string[] resultArgs = value[i].Item1;
-                    int resultLength = resultArgs.Length;
-                    Assert.AreEqual(length, resultLength);
-                    for (int j = 0; j < length; j++)
-                    {
-                        Assert.AreEqual(expectedArgs[j], resultArgs[j]);
-                    }
-                    Assert.AreEqual(function.Value[i].Item2, value[i].Item2);
-                }
-
-            }
+            var expectedAbi = new FunctionAbi(expected);
+            var resultAbi = new FunctionAbi(result);
+            Assert.True(expectedAbi.IsEqualTo(resultAbi), 
+                $"{expectedAbi.GetType()} do not match. Expected: {expectedAbi.ToString()} Received: {resultAbi.ToString()}");
         }
         catch (Exception ex)
         {

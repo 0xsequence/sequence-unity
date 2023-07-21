@@ -1,4 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Sequence.Extensions;
+using UnityEditor;
 
 namespace Sequence.ABI
 {
@@ -11,9 +16,154 @@ namespace Sequence.ABI
             Abi = abi;
         }
 
-        public List<(string[], string)> GetAbiForFunction(string functionName)
+        public List<(string[], string)> GetAbisForFunction(string functionName)
         {
+            if (!this.Abi.ContainsKey(functionName))
+            {
+                return new List<(string[], string)>();
+            }
             return this.Abi[functionName];
+        }
+
+        public string GetFunctionSignature(string functionName, int abiIndex = 0)
+        {
+            return $"{functionName}({string.Join(',', this.Abi[functionName][abiIndex].Item1)})";
+        }
+
+        private string[] GetFunctionSignatures(string functionName)
+        {
+            List<(string[], string)> abis = this.Abi[functionName];
+            int abisLength = abis.Count;
+            string[] functionSignatures = new string[abisLength];
+            for (int i = 0; i < abisLength; i++)
+            {
+                functionSignatures[i] = GetFunctionSignature(functionName, i);
+            }
+
+            return functionSignatures;
+        }
+
+        public int GetFunctionAbiIndex(string functionName, params object[] args)
+        {
+            // In Solidity, function overloading is based on the number of parameters.
+            // We can distinguish which Abi the user is looking to call based on the number of arguments/parameters provided.
+            List<(string[], string)> functionAbis = GetAbisForFunction(functionName);
+            int functionAbisLength = functionAbis.Count;
+            int argsLength = 0;
+            if (args != null)
+            {
+                argsLength = args.Length;
+            }
+            for (int i = 0; i < functionAbisLength; i++)
+            {
+                if (functionAbis[i].Item1.Length == argsLength)
+                {
+                    return i;
+                }
+            }
+
+            throw new ArgumentException(
+                $"Invalid function arguments for \'{functionName}\' are invalid. Given: \'{args.ExpandToString()}\' Valid function signatures: \'{string.Join(", ", GetFunctionSignatures(functionName))}\'");
+        }
+
+        public bool IsEqualTo(FunctionAbi other)
+        {
+            if (this.Abi.Count != other.Abi.Count)
+            {
+                return false;
+            }
+
+            foreach (string function in this.Abi.Keys)
+            {
+                if (!other.Abi.ContainsKey(function))
+                {
+                    return false;
+                }
+
+                if (!SignatureIsEqualTo(this.Abi[function], other.Abi[function]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool SignatureIsEqualTo(List<(string[], string)> a, List<(string[], string)> b)
+        {
+            int thisAbisLength = a.Count;
+            int otherAbisLength = b.Count;
+            if (thisAbisLength != otherAbisLength)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < thisAbisLength; i++)
+            {
+                int thisParamsLength = a[i].Item1.Length;
+                int otherParamsLength = b[i].Item1.Length;
+                if (thisParamsLength != otherParamsLength)
+                {
+                    return false;
+                }
+
+                for (int j = 0; j < thisParamsLength; j++)
+                {
+                    if (a[i].Item1[j] != b[i].Item1[j])
+                    {
+                        return false;
+                    }
+                }
+
+                if (a[i].Item2 != b[i].Item2)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override string ToString()
+        {
+            if (Abi == null || Abi.Count == 0)
+            {
+                return "FunctionAbi: <Empty>";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("FunctionAbi: ");
+            bool first = true;
+            foreach (var entry in Abi)
+            {
+                string functionName = entry.Key;
+                if (first)
+                {
+                    first = false;
+                    sb.Append($"Function {functionName}: ");
+                }
+                else
+                {
+                    sb.Append($"| Function {functionName}: ");
+                }
+
+                sb.Append(SignatureToString(entry.Value));
+            }
+
+            return sb.ToString();
+        }
+    
+        public static string SignatureToString(List<(string[], string)> signature) 
+        {
+            int length = signature.Count;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < length; i++)
+            {
+                sb.Append(
+                    $"(Parameters: [{string.Join(", ", signature[i].Item1)}], Return: {signature[i].Item2 ?? "void"}) ");
+            }
+
+            return sb.ToString();
         }
     }
 }
