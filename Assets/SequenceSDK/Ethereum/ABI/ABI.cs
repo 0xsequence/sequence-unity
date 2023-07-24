@@ -174,7 +174,8 @@ namespace Sequence.ABI
         }
 
         /// <summary>
-        /// Decodes an ABI string into a Dictionary<string, (string[], string)> where the key is the function name and the value is a tuple (function argument types, function return type)
+        /// Decodes an ABI string into a Dictionary<string, List<(string[], string)>> where the key is the function name and the value is a list of tuple (function argument types, function return type)
+        /// Returns a FunctionAbi, a wrapper class for Dictionary<string, List<(string[], string)>> that provides a number of utility functions
         /// </summary>
         /// <param name="abi"></param>
         /// <returns></returns>
