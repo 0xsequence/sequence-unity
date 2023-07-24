@@ -84,5 +84,16 @@ public class FunctionAbiTests
                 {
                         Assert.AreEqual($"Invalid function arguments for \'safeTransferFrom\' are invalid. Given: \'random stuff\' Valid function signatures: \'safeTransferFrom(address,address,uint256), safeTransferFrom(address,address,uint256,bytes)\'", ex.Message);
                 }
+                
+                
+                try
+                {
+                        int result = abi.GetFunctionAbiIndex("invalid name", "random stuff");
+                        Assert.Fail("Expected exception but none was thrown");
+                }
+                catch (Exception ex)
+                {
+                        Assert.AreEqual($"Invalid function \'invalid name\' does not exist in contract ABI", ex.Message);
+                }
         }
 }

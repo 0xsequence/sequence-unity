@@ -18,9 +18,16 @@ namespace Sequence.Contracts
             this.contract = contract;
         }
 
-        public Ownable(string contractAddress)
+        public Ownable(string contractAddress, string abi = null)
         {
-            this.contract = new Contract(contractAddress, Abi);
+            if (abi == null)
+            {
+                this.contract = new Contract(contractAddress, Abi);
+            }
+            else
+            {
+                this.contract = new Contract(contractAddress, abi);
+            }
         }
 
         public async Task<string> Owner(IEthClient client)

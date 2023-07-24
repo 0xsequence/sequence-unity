@@ -8,6 +8,7 @@ using Sequence.Provider;
 using Sequence.Extensions;
 using Sequence.Transactions;
 using System.Text;
+using UnityEngine;
 
 namespace Sequence.Contracts
 {
@@ -34,6 +35,7 @@ namespace Sequence.Contracts
             this.abi = abi;
             if (abi == null)
             {
+                Debug.LogWarning("Creating a contract with a null ABI, while supported, is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
                 this.functionAbi = null;
             }
             else

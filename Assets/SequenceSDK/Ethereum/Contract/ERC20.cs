@@ -20,9 +20,16 @@ namespace Sequence.Contracts
             this.contract = contract;
         }
 
-        public ERC20(string contractAddress) : base(contractAddress)
+        public ERC20(string contractAddress, string abi = null) : base (contractAddress)
         {
-            this.contract = new Contract(contractAddress, Abi);
+            if (abi == null)
+            {
+                this.contract = new Contract(contractAddress, Abi);
+            }
+            else
+            {
+                this.contract = new Contract(contractAddress, abi);
+            }
         }
 
         public async Task<string> Name(IEthClient client)

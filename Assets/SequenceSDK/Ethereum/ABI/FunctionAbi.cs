@@ -56,6 +56,10 @@ namespace Sequence.ABI
             // We can distinguish which Abi the user is looking to call based on the number of arguments/parameters provided.
             List<(string[], string)> functionAbis = GetAbisForFunction(functionName);
             int functionAbisLength = functionAbis.Count;
+            if (functionAbisLength == 0)
+            {
+                throw new ArgumentException($"Invalid function \'{functionName}\' does not exist in contract ABI");
+            }
             int argsLength = 0;
             if (args != null)
             {

@@ -23,9 +23,16 @@ namespace Sequence.Contracts
             this.contract = contract;
         }
 
-        public ERC1155(string contractAddress) : base(contractAddress)
+        public ERC1155(string contractAddress, string abi = null) : base (contractAddress)
         {
-            this.contract = new Contract(contractAddress, Abi);
+            if (abi == null)
+            {
+                this.contract = new Contract(contractAddress, Abi);
+            }
+            else
+            {
+                this.contract = new Contract(contractAddress, abi);
+            }
         }
 
         #region Mintable
