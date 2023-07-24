@@ -16,7 +16,7 @@ namespace Sequence.Contracts
     {
         Address address;
         public delegate Task<EthTransaction> CallContractFunctionTransactionCreator(IEthClient client, ContractCall contractCallInfo);
-        public delegate Task<string> QueryContractMessageSender(IEthClient client);
+        public delegate Task<T> QueryContractMessageSender<T>(IEthClient client);
 
         private string abi;
         private FunctionAbi functionAbi;
@@ -62,7 +62,38 @@ namespace Sequence.Contracts
             };
         }
 
-        public QueryContractMessageSender QueryContract(string functionName, params object[] args)
+        public QueryContractMessageSender<T> QueryContract<T>(string functionName, params object[] args)
+        {
+            if (this.functionAbi == null)
+            {
+                // Return string, throw exception is anything else is provided as T
+                if (typeof(T) != typeof(string))
+                {
+                    throw new ArgumentException(
+                        "Unsupported method call. If contract ABI is null, can only return string as a query response.");
+                }
+                return (IEthClient client) => QueryContract(functionName, args)(client).ContinueWith(t => (T)(object)t.Result.ToString());
+            }
+            
+            object[] toSendParams = CreateParams(functionName, args);
+            return async (IEthClient client) =>
+            {
+                // Instead, get the string response, then use ABI (define a method in FunctionABI) to decode the hex string into the correct datatype
+                string result = await client.CallContract(toSendParams);
+                return this.functionAbi.DecodeReturnValue<T>(result, functionName, args);
+            };
+        }
+        
+        private QueryContractMessageSender<string> QueryContract(string functionName, params object[] args)
+        {
+            object[] toSendParams = CreateParams(functionName, args);
+            return async (IEthClient client) =>
+            {
+                return await client.CallContract(toSendParams);
+            };
+        }
+
+        private object[] CreateParams(string functionName, params object[] args)
         {
             string data = GetData(functionName, args);
             string to = address;
@@ -73,12 +104,8 @@ namespace Sequence.Contracts
                     data
                 }
             };
-            return async (IEthClient client) =>
-            {
-                return await client.CallContract(toSendParams);
-            };
+            return toSendParams;
         }
-
         private string GetData(string functionName, params object[] args)
         {
             string data;

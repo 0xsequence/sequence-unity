@@ -34,38 +34,38 @@ namespace Sequence.Contracts
 
         public async Task<string> Name(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "name");
-            return SequenceCoder.HexStringToHumanReadable(result);
+            string result = await contract.SendQuery<string>(client, "name");
+            return result;
         }
 
         public async Task<string> Symbol(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "symbol");
-            return SequenceCoder.HexStringToHumanReadable(result);
+            string result = await contract.SendQuery<string>(client, "symbol");
+            return result;
         }
 
         public async Task<BigInteger> Decimals(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "decimals");
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "decimals");
+            return result;
         }
 
         public async Task<BigInteger> TotalSupply(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "totalSupply");
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "totalSupply");
+            return result;
         }
 
         public async Task<BigInteger> BalanceOf(IEthClient client, string address)
         {
-            string result = await contract.SendQuery(client, "balanceOf", address);
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "balanceOf", address);
+            return result;
         }
 
         public async Task<BigInteger> Allowance(IEthClient client, string ownerAddress, string spenderAddress)
         {
-            string result = await contract.SendQuery(client, "allowance", ownerAddress, spenderAddress);
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "allowance", ownerAddress, spenderAddress);
+            return result;
         }
 
         public CallContractFunctionTransactionCreator Transfer(string toAddress, BigInteger amount)

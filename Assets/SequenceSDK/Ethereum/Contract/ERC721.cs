@@ -47,32 +47,32 @@ namespace Sequence.Contracts
 
         public async Task<BigInteger> BalanceOf(IEthClient client, string address)
         {
-            string result = await contract.SendQuery(client, "balanceOf", address);
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "balanceOf", address);
+            return result;
         }
 
         public async Task<string> OwnerOf(IEthClient client, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "ownerOf", tokenId);
-            return result.Replace("0x", "").TrimStart('0').EnsureHexPrefix();
+            string result = await contract.SendQuery<string>(client, "ownerOf", tokenId);
+            return result;
         }
 
         public async Task<string> Name(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "name");
-            return SequenceCoder.HexStringToHumanReadable(result);
+            string result = await contract.SendQuery<string>(client, "name");
+            return result;
         }
 
         public async Task<string> Symbol(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "symbol");
-            return SequenceCoder.HexStringToHumanReadable(result);
+            string result = await contract.SendQuery<string>(client, "symbol");
+            return result;
         }
 
         public async Task<string> TokenURI(IEthClient client, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "tokenURI", tokenId);
-            return SequenceCoder.HexStringToHumanReadable(result);
+            string result = await contract.SendQuery<string>(client, "tokenURI", tokenId);
+            return result;
         }
 
         public CallContractFunctionTransactionCreator Approve(string spenderAddress, BigInteger tokenId)
@@ -82,8 +82,8 @@ namespace Sequence.Contracts
 
         public async Task<string> GetApproved(IEthClient client, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "getApproved", tokenId);
-            return result.Replace("0x", "").TrimStart('0').EnsureHexPrefix();
+            string result = await contract.SendQuery<string>(client, "getApproved", tokenId);
+            return result;
         }
 
         public CallContractFunctionTransactionCreator SetApprovalForAll(string operatorAddress, bool approved)
@@ -93,8 +93,7 @@ namespace Sequence.Contracts
 
         public async Task<bool> IsApprovedForAll(IEthClient client, string ownerAddress, string operatorAddress)
         {
-            string result = await contract.SendQuery(client, "isApprovedForAll", ownerAddress, operatorAddress);
-            bool isApproved = result.HexStringToBool();
+            bool isApproved = await contract.SendQuery<bool>(client, "isApprovedForAll", ownerAddress, operatorAddress);
             return isApproved;
         }
 

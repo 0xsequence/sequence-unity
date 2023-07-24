@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 using UnityEngine;
 using Sequence.Extensions;
 using System.Text.RegularExpressions;
@@ -65,58 +66,64 @@ namespace Sequence.ABI
             for (int i = 0; i < count; i++)
             {
                 string signature = types[i];
-
-                if (IsFixedArray(signature))
+                ABIType type = GetTypeFromEvmName(signature);
+                if (type == ABIType.FIXEDBYTES)
                 {
-                    abiTypes.Add(ABIType.FIXEDARRAY);
-                }
-                else if (signature.EndsWith("[]"))
-                {
-                    abiTypes.Add(ABIType.DYNAMICARRAY);
-                }
-                else if (signature == "address")
-                {
-                    abiTypes.Add(ABIType.ADDRESS);
-                }
-                else if (signature == "bool")
-                {
-                    abiTypes.Add(ABIType.BOOLEAN);
-                }
-                else if (signature.StartsWith("uint") || signature.StartsWith("int"))
-                {
-                    abiTypes.Add(ABIType.NUMBER);
-                }
-                else if (signature == "string")
-                {
-                    abiTypes.Add(ABIType.STRING);
-                }
-                else if (signature.StartsWith("bytes"))
-                {
-                    if (signature == "bytes")
+                    int instanceCount = GetInnerValue(signature);
+                    if (instanceCount > 0)
                     {
-                        abiTypes.Add(ABIType.BYTES);
-                    }
-                    else
-                    {
-                        int instanceCount = GetInnerValue(signature);
-                        if (instanceCount > 0)
-                        {
-                            for (int j = 0; j < instanceCount; j++)
-                            {
-                                abiTypes.Add(ABIType.FIXEDBYTES);
-                            }
-                        }else
+                        for (int j = 0; j < instanceCount; j++)
                         {
                             abiTypes.Add(ABIType.FIXEDBYTES);
                         }
+                    }else
+                    {
+                        abiTypes.Add(ABIType.FIXEDBYTES);
                     }
                 }
                 else
                 {
-                    abiTypes.Add(ABIType.NONE);
+                    abiTypes.Add(type);
                 }
             }
             return abiTypes;
+        }
+
+        private static ABIType GetTypeFromEvmName(string typeName)
+        {
+            if (IsFixedArray(typeName))
+            {
+                return ABIType.FIXEDARRAY;
+            }
+            if (typeName.EndsWith("[]"))
+            {
+                return ABIType.DYNAMICARRAY;
+            }
+            if (typeName == "address")
+            {
+                return ABIType.ADDRESS;
+            }
+            if (typeName == "bool")
+            {
+                return ABIType.BOOLEAN;
+            }
+            if (typeName.StartsWith("uint") || typeName.StartsWith("int"))
+            {
+                return ABIType.NUMBER;
+            }
+            if (typeName == "string")
+            {
+                return ABIType.STRING;
+            }
+            if (typeName.StartsWith("bytes"))
+            {
+                if (typeName == "bytes")
+                {
+                    return ABIType.BYTES;
+                }
+                return ABIType.FIXEDBYTES;
+            }
+            return ABIType.NONE;
         }
 
         /// <summary>
@@ -491,6 +498,64 @@ namespace Sequence.ABI
             }
 
             return string.Empty;
+        }
+    
+        public static T Decode<T>(string value, string evmType)
+        {
+            ABIType type = GetTypeFromEvmName(evmType);
+            switch (type)
+            {
+                case ABIType.STRING:
+                    if (typeof(T) != typeof(string))
+                    {
+                        ThrowDecodeException<T>(evmType, typeof(string).ToString());
+                    }
+                    return (T)(object)SequenceCoder.HexStringToHumanReadable(value);
+                case ABIType.ADDRESS:
+                    if (typeof(T) == typeof(Address))
+                    {
+                        string address = AddressCoder.Decode(value);
+                        return (T)(object)new Address(address);
+                    }
+                    if (typeof(T) == typeof(string))
+                    {
+                        string address = AddressCoder.Decode(value);
+                        return (T)(object)address;
+                    }
+                    ThrowDecodeException<T>(evmType, typeof(Address).ToString(), typeof(string).ToString());
+                    break;
+                case ABIType.NUMBER:
+                    if (typeof(T) == typeof(BigInteger))
+                    {
+                        return (T)(object)value.HexStringToBigInteger();
+                    }
+                    if (typeof(T) == typeof(int))
+                    {
+                        return (T)(object)value.HexStringToInt();
+                    }
+                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString());
+                    break;
+                case ABIType.BOOLEAN:
+                    if (typeof(T) != typeof(bool))
+                    {
+                        ThrowDecodeException<T>(evmType, typeof(bool).ToString());
+                    }
+                    return (T)(object)value.HexStringToBool();
+                case ABIType.BYTES:
+                    if (typeof(T) != typeof(byte[]))
+                    {
+                        ThrowDecodeException<T>(evmType, typeof(byte[]).ToString());
+                    }
+                    return (T)(object)Encoding.UTF8.GetBytes(value);
+                // Todo more cases
+            }
+            return default; // todo remove
+        }
+
+        private static void ThrowDecodeException<T>(string evmType, params string[] supportedTypes)
+        {
+            throw new ArgumentException(
+                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'{evmType}\'. Supported types: {string.Join(" , ", supportedTypes)}");
         }
     }
 }

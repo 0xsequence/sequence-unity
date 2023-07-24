@@ -198,6 +198,7 @@ public class ERC1155Tests
             Assert.IsTrue(exists);
         }
 
+        
         BigInteger[] balances = await token.BalanceOfBatch(client, owners, tokenIds);
         for (int i = 0; i < tokenIds.Length; i++)
         {

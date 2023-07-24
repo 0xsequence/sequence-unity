@@ -186,7 +186,7 @@ namespace Sequence.ABI
                         offsetList.Add(0);
                         break;
                     case ABIType.ADDRESS:
-                        string decodedAddress = _addressCoder.DecodeFromString(encodedString.Substring(index * 64, 64));
+                        string decodedAddress = AddressCoder.DecodeFromString(encodedString.Substring(index * 64, 64));
                         decodedList.Add(decodedAddress);
                         offsetList.Add(0);
                         break;

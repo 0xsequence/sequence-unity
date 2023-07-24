@@ -62,7 +62,7 @@ public class ERC721Tests
             Assert.AreEqual(BigInteger.Zero, balance);
 
             string owner = await token.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
         }
         catch (Exception ex)
         {
@@ -94,7 +94,7 @@ public class ERC721Tests
             BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)1, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
             string tokenUri = await token.TokenURI(client, tokenId1);
             Assert.AreEqual(baseUri + tokenId1, tokenUri);
 
@@ -104,7 +104,7 @@ public class ERC721Tests
             balance = await autoIncrementingToken.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)1, balance);
             owner = await autoIncrementingToken.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
             tokenUri = await autoIncrementingToken.TokenURI(client, tokenId1);
             Assert.AreEqual(baseUri + tokenId1, tokenUri);
 
@@ -124,7 +124,7 @@ public class ERC721Tests
             BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)1, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
             string tokenUri = await token.TokenURI(client, tokenId1);
             Assert.AreEqual(baseUri + tokenId1, tokenUri);
         }
@@ -178,7 +178,7 @@ public class ERC721Tests
             balance = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             // Transfer token
             receipt = await token.TransferFrom(wallet1.GetAddress(), wallet2.GetAddress(), tokenId1)
@@ -188,7 +188,7 @@ public class ERC721Tests
             balance = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.One, balance);
             owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet2.GetAddress().Value, owner);
         }
         catch (Exception ex)
         {
@@ -212,7 +212,7 @@ public class ERC721Tests
             TransactionReceipt receipt = await token.Approve(wallet1.GetAddress(), tokenId1)
                 .SendTransactionMethodAndWaitForReceipt(wallet2, client);
             string approved = await token.GetApproved(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(approved));
+            Assert.AreEqual(wallet1.GetAddress().Value, approved);
 
             // Transfer token
             receipt = await token.SafeTransferFrom(wallet2.GetAddress(), wallet1.GetAddress(), tokenId1, "something random".ToByteArray())
@@ -222,7 +222,7 @@ public class ERC721Tests
             balance = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             await TestBurn(token);
         }
@@ -248,13 +248,13 @@ public class ERC721Tests
             BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)3, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             // Give approval for one token
             receipt = await token.Approve(wallet2.GetAddress(), tokenId1)
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
             string approved = await token.GetApproved(client, tokenId1);
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(approved));
+            Assert.AreEqual(wallet2.GetAddress().Value, approved);
 
             bool isApprovedForAll = await token.IsApprovedForAll(client, wallet1.GetAddress(), wallet2.GetAddress());
             Assert.IsFalse(isApprovedForAll);

@@ -29,6 +29,19 @@ namespace Sequence.ABI
             }
         }
 
+        public static string Decode(string encoded)
+        {
+            try
+            {
+                string decoded = SequenceCoder.AddressChecksum(DecodeFromString(encoded));
+                return decoded;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to decode address: {ex.Message}");
+                return null;
+            }
+        }
 
         /// <summary>
         /// Encodes the address object into a byte array. the uint160 case.
@@ -90,12 +103,12 @@ namespace Sequence.ABI
         /// </summary>
         /// <param name="encodedString">The encoded string to decode.</param>
         /// <returns>The decoded address string.</returns>
-        public string DecodeFromString(string encodedString)
+        public static string DecodeFromString(string encodedString)
         {
             try
             {
                 //cut leading zeros
-                encodedString = encodedString.TrimStart('0');
+                encodedString = encodedString.Replace("0x", "").TrimStart('0');
                 return "0x" + encodedString;
             }
             catch (Exception ex)

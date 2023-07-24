@@ -32,8 +32,8 @@ namespace Sequence.Contracts
 
         public async Task<string> Owner(IEthClient client)
         {
-            string result = await contract.SendQuery(client, "owner");
-            return result.Replace("0x", "").TrimStart('0').EnsureHexPrefix();
+            string result = await contract.SendQuery<string>(client, "owner");
+            return result;
         }
 
         public CallContractFunctionTransactionCreator RenounceOwnership()

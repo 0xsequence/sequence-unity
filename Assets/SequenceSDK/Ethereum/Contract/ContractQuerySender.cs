@@ -11,21 +11,21 @@ namespace Sequence.Contracts
 {
     public static class ContractQuerySender
     {
-        public static async Task<string> SendQuery(
+        public static async Task<T> SendQuery<T>(
             this Contract contract,
             IEthClient client,
             string functionSignature,
             params object[] functionArgs)
         {
-            string result = await contract.QueryContract(functionSignature, functionArgs)(client);
+            T result = await contract.QueryContract<T>(functionSignature, functionArgs)(client);
             return result;
         }
 
-        public static async Task<string> SendQuery(
-            this QueryContractMessageSender querySender,
+        public static async Task<T> SendQuery<T>(
+            this QueryContractMessageSender<T> querySender,
             IEthClient client)
         {
-            string result = await querySender(client);
+            T result = await querySender(client);
             return result;
         }
     }

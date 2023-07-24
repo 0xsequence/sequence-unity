@@ -176,5 +176,17 @@ namespace Sequence.ABI
 
             return sb.ToString();
         }
+
+        public T DecodeReturnValue<T>(string value, string functionName, params object[] args)
+        {
+            string returnType = GetReturnType(functionName, args);
+            return ABI.Decode<T>(value, returnType);
+        }
+
+        private string GetReturnType(string functionName, params object[] args)
+        {
+            int index = GetFunctionAbiIndex(functionName, args);
+            return this.Abi[functionName][index].Item2;
+        }
     }
 }

@@ -64,15 +64,15 @@ namespace Sequence.Contracts
 
         public async Task<BigInteger> BalanceOf(IEthClient client, string address, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "balanceOf", address, tokenId);
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "balanceOf", address, tokenId);
+            return result;
         }
 
-        public async Task<BigInteger[]> BalanceOfBatch(IEthClient client, string[] addresses, BigInteger[] tokenIds)
-        {
-            string results = await contract.SendQuery(client, "balanceOfBatch", addresses, tokenIds);
-            return ExtractBigIntegersFromResponse(results);
-        }
+        // public async Task<BigInteger[]> BalanceOfBatch(IEthClient client, string[] addresses, BigInteger[] tokenIds)
+        // {
+        //     string results = await contract.SendQuery(client, "balanceOfBatch", addresses, tokenIds);
+        //     return ExtractBigIntegersFromResponse(results);
+        // }
 
         /// <summary>
         /// RPC returns a string array that looks something like this "0x000000211230000000011aa20000000012023" that will be at least 192 characters (96 bytes) long
@@ -108,8 +108,8 @@ namespace Sequence.Contracts
 
         public async Task<string> URI(IEthClient client, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "uri", tokenId);
-            return SequenceCoder.HexStringToHumanReadable(result);
+            string result = await contract.SendQuery<string>(client, "uri", tokenId);
+            return result;
         }
 
         public CallContractFunctionTransactionCreator SetApprovalForAll(string operatorAddress, bool approved)
@@ -119,8 +119,7 @@ namespace Sequence.Contracts
 
         public async Task<bool> IsApprovedForAll(IEthClient client, string ownerAddress, string operatorAddress)
         {
-            string result = await contract.SendQuery(client, "isApprovedForAll", ownerAddress, operatorAddress);
-            bool isApproved = result.HexStringToBool();
+            bool isApproved = await contract.SendQuery<bool>(client, "isApprovedForAll", ownerAddress, operatorAddress);
             return isApproved;
         }
 
@@ -157,14 +156,14 @@ namespace Sequence.Contracts
         #region Supply Tracking
         public async Task<BigInteger> TotalSupply(IEthClient client, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "totalSupply", tokenId);
-            return result.HexStringToBigInteger();
+            BigInteger result = await contract.SendQuery<BigInteger>(client, "totalSupply", tokenId);
+            return result;
         }
 
         public async Task<bool> Exists(IEthClient client, BigInteger tokenId)
         {
-            string result = await contract.SendQuery(client, "exists", tokenId);
-            return result.HexStringToBool();
+            bool result = await contract.SendQuery<bool>(client, "exists", tokenId);
+            return result;
         }
         #endregion
     }
