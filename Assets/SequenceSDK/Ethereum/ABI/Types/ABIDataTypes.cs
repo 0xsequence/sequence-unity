@@ -10,6 +10,7 @@ namespace Sequence.ABI
     {
         public byte[] Data { get; set; }
         public int Length { get; set; }
+        private static readonly string ConstructorExceptionMessage = "ABIByte type length should be [0,32]";
 
         public FixedByte(int _length, string str)
         {
@@ -22,7 +23,20 @@ namespace Sequence.ABI
             }
             else
             {
-                throw new ABITypeException("ABIByte type length should be [0,32]");
+                throw new ABITypeException(ConstructorExceptionMessage);
+            }
+        }
+        
+        public FixedByte(int _length, byte[] bytes)
+        {
+            if (_length >= 0 && _length <= 32)
+            {
+                Length = _length;
+                Data = bytes;
+            }
+            else
+            {
+                throw new ABITypeException(ConstructorExceptionMessage);
             }
         }
         

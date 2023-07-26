@@ -699,4 +699,160 @@ and in that case, my mission will be complete.";
         }
     }
 
+    public static object[] DecodeFixedBytesTests =
+    {
+        new object[] { 8, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 }, "0x0000000000000000000000000000000000000000000000000000000000000008" + "0102030405060708" },
+        new object[] { 8, new byte[] { 0x00, 0xFF, 0xAA, 0x55, 0x99, 0x66, 0x33, 0x22 }, "0x0000000000000000000000000000000000000000000000000000000000000008" + "00FFAA5599663322" },
+        new object[] { 8, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, "0x0000000000000000000000000000000000000000000000000000000000000008" + "FFFFFFFFFFFFFFFF" },
+        new object[] { 16, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 }, "0x0000000000000000000000000000000000000000000000000000000000000010" + "0102030405060708090A0B0C0D0E0F10" },
+        new object[] { 0, new byte[0], "0x0000000000000000000000000000000000000000000000000000000000000000" },
+        new object[] { 2, new byte[] { 0x01, 0x02 }, "0x0000000000000000000000000000000000000000000000000000000000000002" + "0102" },
+        new object[] { 32, new byte[]
+            {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
+                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20
+            },
+            "0x0000000000000000000000000000000000000000000000000000000000000020" +
+            "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20" },
+        new object[]
+        {
+            8,
+            new FixedByte(8, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 }),
+            "0x0000000000000000000000000000000000000000000000000000000000000008" + "0102030405060708"
+        },
+        new object[]
+        {
+            8,
+            new FixedByte(8, new byte[] { 0x00, 0xFF, 0xAA, 0x55, 0x99, 0x66, 0x33, 0x22 }),
+            "0x0000000000000000000000000000000000000000000000000000000000000008" + "00FFAA5599663322"
+        },
+        new object[]
+        {
+            8,
+            new FixedByte(8, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }),
+            "0x0000000000000000000000000000000000000000000000000000000000000008" + "FFFFFFFFFFFFFFFF"
+        },
+        new object[]
+        {
+            16,
+            new FixedByte(16, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 }),
+            "0x0000000000000000000000000000000000000000000000000000000000000010" + "0102030405060708090A0B0C0D0E0F10"
+        },
+        new object[]
+        {
+            0,
+            new FixedByte(0, new byte[0]),
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        new object[]
+        {
+            2,
+            new FixedByte(2, new byte[] { 0x01, 0x02 }),
+            "0x0000000000000000000000000000000000000000000000000000000000000002" + "0102"
+        },
+        new object[]
+        {
+            32,
+            new FixedByte(32, new byte[]
+            {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
+                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20
+            }),
+            "0x0000000000000000000000000000000000000000000000000000000000000020" +
+            "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20"
+        },
+        new object[]
+        {
+            64,
+            new byte[]
+            {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
+                0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+                0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20,
+                0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28,
+                0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30,
+                0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+                0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40
+            },
+            "0x0000000000000000000000000000000000000000000000000000000000000040" +
+            "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F40"
+        },
+
+    };
+
+    [TestCaseSource(nameof(DecodeFixedBytesTests))]
+    public void TestDecodeFixedBytes<T>(int length, T expected, string value)
+    {
+        try
+        {
+            T result = ABI.Decode<T>(value, $"bytes[{length}]");
+            if (typeof(T) == typeof(byte[]))
+            {
+                CollectionAssert.AreEqual(expected as byte[], result as byte[]);
+            }
+            else if (typeof(T) == typeof(FixedByte))
+            {
+                FixedByte expectedFB = expected as FixedByte;
+                FixedByte resultFB = result as FixedByte;
+                Assert.AreEqual(expectedFB.Length, resultFB.Length);
+                CollectionAssert.AreEqual(expectedFB.Data, resultFB.Data);
+            }
+            else
+            {
+                Assert.Fail($"Unexpected type {typeof(T)} received");
+            }
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    [Test]
+    public void TestDecodeFixedBytes_maxSizeOf32ForFixedBytes()
+    {
+        try
+        {
+            string value = "0x0000000000000000000000000000000000000000000000000000000000000021" +
+                           "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021";
+            FixedByte result = ABI.Decode<FixedByte>(value, "bytes[33]");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (Exception ex)
+        {
+            Assert.AreEqual($"ABIByte type length should be [0,32]", ex.Message);
+        }
+    }
+
+    private static object[] DecodeFixedBytesThrowsTests =
+    {
+        new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+        new object[] { BigInteger.One },
+        new object[] { 5 },
+        new object[] {"SDK by Horizon"},
+        new object[] {true},
+    };
+    [TestCaseSource(nameof(DecodeFixedBytesThrowsTests))]
+    public void TestDecodeFixedBytes_throwsOnInvalidType<T>(T type)
+    {
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "bytes[1]");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual($"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bytes[1]\'. Supported types: {typeof(byte[])}, {typeof(FixedByte)}", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+    }
+
 }

@@ -547,7 +547,19 @@ namespace Sequence.ABI
                         ThrowDecodeException<T>(evmType, typeof(byte[]).ToString());
                     }
                     return (T)(object)Encoding.UTF8.GetBytes(value);
-                // Todo more cases
+                case ABIType.FIXEDBYTES:
+                    if (typeof(T) == typeof(byte[]))
+                    {
+                        return (T)(object)FixedBytesCoderWrapper.Decode(value);
+                    }
+                    if (typeof(T) == typeof(FixedByte))
+                    {
+                        byte[] bytes = FixedBytesCoderWrapper.Decode(value);
+                        int length = bytes.Length;
+                        return (T)(object)new FixedByte(length, bytes);
+                    }
+                    ThrowDecodeException<T>(evmType, typeof(byte[]).ToString(), typeof(FixedByte).ToString());
+                    break;
             }
             return default; // todo remove
         }

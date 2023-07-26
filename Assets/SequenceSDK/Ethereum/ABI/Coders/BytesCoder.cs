@@ -86,7 +86,13 @@ namespace Sequence.ABI
         {
             try
             {
-                string fixedStr = encodedString.Substring(64, encodedString.Length - 64);
+                int trailingZero = 0;
+                for (int i = encodedString.Length - 1; i > 64; i--)
+                {
+                    if (encodedString[i] == '0') trailingZero++;
+                    else break;
+                }
+                string fixedStr = encodedString.Substring(64, encodedString.Length - trailingZero - 64);
                 return _fixedBytesCoder.DecodeFromString(fixedStr);
             }
             catch (Exception ex)
