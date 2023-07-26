@@ -15,7 +15,8 @@ Managed accounts - private key in keystore
 Hd wallet
 
 ## Besu
-I'm not really sure what the intended use for this namespace is. It doesn't appear useful for our needs.
+Besu management API
+https://besu.hyperledger.org/
 
 ## BigInteger
 A bunch of BigInteger extensions
