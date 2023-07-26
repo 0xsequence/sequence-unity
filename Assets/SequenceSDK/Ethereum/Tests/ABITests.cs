@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Text;
 using Sequence.Extensions;
 using System;
+using Sequence;
 using Sequence.Contracts;
 using UnityEngine.TestTools;
 
@@ -465,17 +466,24 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         }
     }
 
-    [Test]
-    public void TestDecodeString_throwsOnInvalidType()
+    private static object[] DecodeStringThrowsTests =
+    {
+        new object[] { BigInteger.One },
+        new object[] { Encoding.UTF8.GetBytes("banana") },
+        new object[] { 5 },
+        new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+    };
+    [TestCaseSource(nameof(DecodeStringThrowsTests))]
+    public void TestDecodeString_throwsOnInvalidType<T>(T type)
     {
         try
         {
-            var result = ABI.Decode<BigInteger>("0x123", "string");
+            var result = ABI.Decode<T>("0x123", "string");
             Assert.Fail("Expected exception but none was thrown");
         }
         catch (ArgumentException ex)
         {
-            Assert.AreEqual($"Unable to decode to type \'{typeof(BigInteger)}\' when ABI expects to decode to type \'string\'. Supported types: {typeof(string)}", ex.Message);
+            Assert.AreEqual($"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'string\'. Supported types: {typeof(string)}", ex.Message);
         }
         catch (Exception ex)
         {
@@ -483,5 +491,53 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         }
     }
 
+    private static IEnumerable<TestCaseData> DecodeAddressTests()
+    {
+        yield return new TestCaseData(new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249"),
+            "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+        yield return new TestCaseData("0xc683a014955B75F5ECF991D4502427C8FA1AA249",
+            "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+        yield return new TestCaseData(new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249"),
+            "0x0000000c683a014955b75F5ECF991d4502427c8fa1Aa249");
+        yield return new TestCaseData("0xc683a014955B75F5ECF991D4502427C8FA1AA249",
+            "0x00000000000c683a014955b75F5ECF991d4502427c8fa1Aa249");
+    }
+    [TestCaseSource(nameof(DecodeAddressTests))]
+    public void TestDecodeAddress<T>(T expected, string value)
+    {
+        try
+        {
+            T result = ABI.Decode<T>(value, "address");
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    private static object[] DecodeAddressThrowsTests =
+    {
+        new object[] { BigInteger.One },
+        new object[] { Encoding.UTF8.GetBytes("banana") },
+        new object[] { 5 },
+    };
+    [TestCaseSource(nameof(DecodeAddressThrowsTests))]
+    public void TestDecodeAddress_throwsOnInvalidType<T>(T type)
+    {
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "address");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual($"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'address\'. Supported types: {typeof(Address)}, {typeof(string)}", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+    }
 
 }

@@ -555,7 +555,7 @@ namespace Sequence.ABI
         private static void ThrowDecodeException<T>(string evmType, params string[] supportedTypes)
         {
             throw new ArgumentException(
-                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'{evmType}\'. Supported types: {string.Join(" , ", supportedTypes)}");
+                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'{evmType}\'. Supported types: {string.Join(", ", supportedTypes)}");
         }
     }
 }
