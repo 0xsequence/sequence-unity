@@ -602,4 +602,51 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         }
     }
 
+    private static object[] DecodeBoolTests =
+    {
+        new object[] { true, "0x1" },
+        new object[] { false, "0x0" },
+        new object[] { true, "0x0001" },
+        new object[] { false, "0x0000" },
+        new object[] { true, "0x0000000000000000000000000000000000000000000000000000000000000001" },
+        new object[] { false, "0x0000000000000000000000000000000000000000000000000000000000000000" },
+    };
+    [TestCaseSource(nameof(DecodeBoolTests))]
+    public void TestDecodeBool<T>(T expected, string value)
+    {
+        try
+        {
+            T result = ABI.Decode<T>(value, "bool");
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    private static object[] DecodeBoolThrowsTests =
+    {
+        new object[] { Encoding.UTF8.GetBytes("banana") },
+        new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+        new object[] {"SDK by Horizon"},
+    };
+    [TestCaseSource(nameof(DecodeBoolThrowsTests))]
+    public void TestDecodeBool_throwsOnInvalidType<T>(T type)
+    {
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "bool");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual($"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bool\'. Supported types: {typeof(bool)}", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+    }
+
 }
