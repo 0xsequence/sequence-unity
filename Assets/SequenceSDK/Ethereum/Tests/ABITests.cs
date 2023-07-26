@@ -439,18 +439,20 @@ public class ABITests
         }
     }
 
-    private static object[] DecodeStringTests =
-    {
-        new string[] { "banana", "0x62616e616e61" },
-        new string[] {"welcome to Horizon", "0x77656c636f6d6520746f20486f72697a6f6e"},
-        new string[] { @"this is a
+    private static string longMultiLineString = @"this is a
 multi-line string
 that is also rather long and pointless
 but if I just keep typing maybe it will make for an interesting test case
 and maybe,
 just maybe,
 you as a reader will develop an ever so slight smile on your face
-and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c74692d6c696e6520737472696e670d0a7468617420697320616c736f20726174686572206c6f6e6720616e6420706f696e746c6573730d0a6275742069662049206a757374206b65657020747970696e67206d617962652069742077696c6c206d616b6520666f7220616e20696e746572657374696e67207465737420636173650d0a616e64206d617962652c0d0a6a757374206d617962652c0d0a796f752061732061207265616465722077696c6c20646576656c6f7020616e206576657220736f20736c6967687420736d696c65206f6e20796f757220666163650d0a616e6420696e207468617420636173652c206d79206d697373696f6e2077696c6c20626520636f6d706c6574652e"},
+and in that case, my mission will be complete.";
+
+    private static object[] DecodeStringTests =
+    {
+        new string[] { "banana", "0x62616e616e61" },
+        new string[] {"welcome to Horizon", "0x77656c636f6d6520746f20486f72697a6f6e"},
+        new string[] { longMultiLineString, "0x7468697320697320610d0a6d756c74692d6c696e6520737472696e670d0a7468617420697320616c736f20726174686572206c6f6e6720616e6420706f696e746c6573730d0a6275742069662049206a757374206b65657020747970696e67206d617962652069742077696c6c206d616b6520666f7220616e20696e746572657374696e67207465737420636173650d0a616e64206d617962652c0d0a6a757374206d617962652c0d0a796f752061732061207265616465722077696c6c20646576656c6f7020616e206576657220736f20736c6967687420736d696c65206f6e20796f757220666163650d0a616e6420696e207468617420636173652c206d79206d697373696f6e2077696c6c20626520636f6d706c6574652e"},
     };
     [TestCaseSource(nameof(DecodeStringTests))]
     public void TestDecodeString(string expected, string value)
@@ -472,6 +474,7 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         new object[] { Encoding.UTF8.GetBytes("banana") },
         new object[] { 5 },
         new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+        new object[] {true},
     };
     [TestCaseSource(nameof(DecodeStringThrowsTests))]
     public void TestDecodeString_throwsOnInvalidType<T>(T type)
@@ -533,7 +536,7 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         new object[] { BigInteger.One },
         new object[] { Encoding.UTF8.GetBytes("banana") },
         new object[] { 5 },
-        new object[] {"SDK by Horizon"},
+        new object[] {true},
     };
     [TestCaseSource(nameof(DecodeAddressThrowsTests))]
     public void TestDecodeAddress_throwsOnInvalidType<T>(T type)
@@ -583,6 +586,7 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         new object[] { Encoding.UTF8.GetBytes("banana") },
         new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
         new object[] {"SDK by Horizon"},
+        new object[] {true},
     };
     [TestCaseSource(nameof(DecodeNumberThrowsTests))]
     public void TestDecodeNumber_throwsOnInvalidType<T>(T type)
@@ -642,6 +646,52 @@ and in that case, my mission will be complete.", "0x7468697320697320610d0a6d756c
         catch (ArgumentException ex)
         {
             Assert.AreEqual($"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bool\'. Supported types: {typeof(bool)}", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+    }
+
+    private static object[] DecodeBytesTests =
+    {
+        new object[] { Encoding.UTF8.GetBytes("SDK by Horizon"), "SDK by Horizon" },
+        new object[] { Encoding.UTF8.GetBytes(""), "" },
+        new object[] { Encoding.UTF8.GetBytes(longMultiLineString), longMultiLineString},
+    };
+    [TestCaseSource(nameof(DecodeBytesTests))]
+    public void TestDecodeBytes<T>(T expected, string value)
+    {
+        try
+        {
+            T result = ABI.Decode<T>(value, "bytes");
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    private static object[] DecodeBytesThrowsTests =
+    {
+        new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+        new object[] { BigInteger.One },
+        new object[] { 5 },
+        new object[] {"SDK by Horizon"},
+        new object[] {true},
+    };
+    [TestCaseSource(nameof(DecodeBytesThrowsTests))]
+    public void TestDecodeBytes_throwsOnInvalidType<T>(T type)
+    {
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "bytes");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual($"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bytes\'. Supported types: {typeof(byte[])}", ex.Message);
         }
         catch (Exception ex)
         {
