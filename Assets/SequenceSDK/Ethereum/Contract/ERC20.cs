@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Provider;
 using UnityEngine;
-using Sequence.Extensions;
 using System.Numerics;
 using static Sequence.Contracts.Contract;
 

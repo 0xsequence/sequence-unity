@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Wallet;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence;
 using System;

@@ -4,10 +4,10 @@ using Sequence.ABI;
 using System.Numerics;
 using UnityEngine;
 using System.Text;
-using Sequence.Extensions;
 using System;
 using Sequence;
 using Sequence.Contracts;
+using Sequence.Utils;
 using UnityEngine.TestTools;
 
 public class ABITests

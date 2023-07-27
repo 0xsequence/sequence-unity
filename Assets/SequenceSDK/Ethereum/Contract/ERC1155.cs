@@ -6,8 +6,8 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.ABI;
-using Sequence.Extensions;
 using Sequence.Provider;
+using Sequence.Utils;
 using UnityEngine;
 using static Sequence.Contracts.Contract;
 
@@ -70,8 +70,8 @@ namespace Sequence.Contracts
 
         // public async Task<BigInteger[]> BalanceOfBatch(IEthClient client, string[] addresses, BigInteger[] tokenIds)
         // {
-        //     string results = await contract.SendQuery(client, "balanceOfBatch", addresses, tokenIds);
-        //     return ExtractBigIntegersFromResponse(results);
+        //     BigInteger[] results = await contract.SendQuery<BigInteger[]>(client, "balanceOfBatch", addresses, tokenIds);
+        //     return results;
         // }
 
         /// <summary>

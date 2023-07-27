@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Provider;
 using Sequence.Wallet;
-using Sequence.Extensions;
+using Sequence.Utils;
 
 namespace Sequence.Transactions {
     public class GasLimitEstimator {

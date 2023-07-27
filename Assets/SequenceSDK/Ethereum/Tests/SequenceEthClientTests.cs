@@ -8,9 +8,9 @@ using Sequence.Mocks;
 using Sequence.Provider;
 using Sequence.Transactions;
 using Sequence.Wallet;
-using Sequence.Extensions;
 using System.Collections.Generic;
 using Sequence.Contracts;
+using Sequence.Utils;
 
 public class SequenceEthClientTests
 {

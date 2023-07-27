@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Sequence.Extensions;
+using Sequence.Utils;
 using UnityEditor;
 
 namespace Sequence.ABI

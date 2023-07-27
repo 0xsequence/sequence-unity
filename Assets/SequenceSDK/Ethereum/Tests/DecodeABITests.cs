@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
@@ -6,6 +7,7 @@ using NUnit.Framework;
 using Sequence;
 using Sequence.ABI;
 using Sequence.Contracts;
+using Sequence.Utils;
 
 public class DecodeABITests
 {
@@ -610,6 +612,118 @@ and in that case, my mission will be complete.";
         {
             Assert.AreEqual(
                 $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bytes[1]\'. Supported types: {typeof(byte[])}, {typeof(FixedByte)}",
+                ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+    }
+    
+    private static object[] DecodeArrayTests =
+    {
+        new object[]
+        {
+            "0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000",
+            new bool[] { true, false },
+            "bool[]"
+        },
+        new object[]
+        {
+            "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+            new bool[] { true, false, true },
+            "bool[3]"
+        },
+        new object[]
+        {
+            "0x0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004",
+            new BigInteger[] { 1, 2, 3, 4 },
+            "uint256[4]"
+        },
+        new object[]
+        {
+            "0x00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000004",
+            new BigInteger[] { 1, 2, 3, 4 },
+            "uint256[]"
+        },
+        new object[]
+        {
+            "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000001099542D7dFaF6757527146C0aB9E70A967f71C0",
+            new Address[] { new Address(SequenceCoder.AddressChecksum("0x1099542D7dFaF6757527146C0aB9E70A967f71C0")) },
+            "address[]"
+        },
+        new object[]
+        {
+            "0x000000000000000000000000c683a014955b75F5ECF991d4502427c8fa1Aa2490000000000000000000000000000000000000000000000000000000000000000",
+            new Address[] { new Address(SequenceCoder.AddressChecksum("0xc683a014955b75F5ECF991d4502427c8fa1Aa249")), Address.ZeroAddress, },
+            "address[2]"
+        },
+    };
+
+    [TestCaseSource(nameof(DecodeArrayTests))]
+    public void TestDecodeArray<T>(string value, T expected, string evmType)
+    {
+        try
+        {
+            T result = ABI.Decode<T>(value, evmType);
+            if (typeof(T) == typeof(Address[]))
+            {
+                var resultArray = result as Address[];
+                var expectedArray = expected as Address[];
+                int length = resultArray.Length;
+                Assert.AreEqual(expectedArray.Length, length);
+                for (int i = 0; i < length; i++)
+                {
+                    Assert.AreEqual(expectedArray[i].ToString(), resultArray[i].ToString());
+                }
+            }
+            else
+            {
+                CollectionAssert.AreEqual(expected as IEnumerable, result as IEnumerable);
+            }
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    private static object[] DecodeArrayThrowsTests =
+    {
+        new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+        new object[] { BigInteger.One },
+        new object[] { 5 },
+        new object[] { "SDK by Horizon" },
+        new object[] { true },
+    };
+
+    [TestCaseSource(nameof(DecodeArrayThrowsTests))]
+    public void TestDecodeArray_throwsOnInvalidType<T>(T type)
+    {
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "uint256[]");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual(
+                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'uint256[]\'. Supported types: {typeof(IEnumerable)}",
+                ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "uint256[5]");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual(
+                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'uint256[5]\'. Supported types: {typeof(IEnumerable)}",
                 ex.Message);
         }
         catch (Exception ex)

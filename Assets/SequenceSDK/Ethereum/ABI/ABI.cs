@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using UnityEngine;
-using Sequence.Extensions;
 using System.Text.RegularExpressions;
+using Sequence.Utils;
 
 namespace Sequence.ABI
 {
@@ -122,6 +122,10 @@ namespace Sequence.ABI
                     return ABIType.BYTES;
                 }
                 return ABIType.FIXEDBYTES;
+            }
+            if (typeName.StartsWith("("))
+            {
+                return ABIType.TUPLE;
             }
             return ABIType.NONE;
         }
@@ -357,17 +361,7 @@ namespace Sequence.ABI
         /// <returns>True if the ABIType is static; otherwise, false.</returns>
         public static bool IsStaticType(ABIType paramType)
         {
-            try
-            {
-                //Boolean, Integer, Unsigned integer, Address
-                if ((paramType == ABIType.BOOLEAN) || (paramType == ABIType.NUMBER) || (paramType == ABIType.ADDRESS))
-                    return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error determining static type: {ex.Message}");
-            }
-            return false;
+            return ((paramType == ABIType.BOOLEAN) || (paramType == ABIType.NUMBER) || (paramType == ABIType.ADDRESS));
         }
 
         /// <summary>
@@ -390,17 +384,9 @@ namespace Sequence.ABI
 
                 (T1,...,Tk) if Ti is dynamic for some 1 <= i <= k
             */
-            try
-            {
-                if ((paramType == ABIType.BYTES) || (paramType == ABIType.STRING) || (paramType == ABIType.DYNAMICARRAY) || (paramType == ABIType.FIXEDARRAY) || (paramType == ABIType.TUPLE))
-                    return true;
-            }
-            catch (Exception ex)
-            {
-                // Handle exception
-                Debug.LogError($"Error determining dynamic type: {ex.Message}");
-            }
-            return false;
+            return ((paramType == ABIType.BYTES) || (paramType == ABIType.STRING) ||
+                    (paramType == ABIType.DYNAMICARRAY) || (paramType == ABIType.FIXEDARRAY) ||
+                    (paramType == ABIType.TUPLE));
         }
 
         /// <summary>
@@ -560,8 +546,97 @@ namespace Sequence.ABI
                     }
                     ThrowDecodeException<T>(evmType, typeof(byte[]).ToString(), typeof(FixedByte).ToString());
                     break;
+                case ABIType.FIXEDARRAY:
+                    if (!CollectionUtils.IsCollection<T>())
+                    {
+                        ThrowDecodeException<T>(evmType, typeof(IEnumerable).ToString());
+                    }
+
+                    value = value.WithoutHexPrefix();
+
+                    ABIType underlying = GetUnderlyingCollectionType(evmType);
+                    if (IsStaticType(underlying))
+                    {
+                        int instanceCount = GetInnerValue(evmType);
+                        
+                        // Sanity check - condition should never be met
+                        if (instanceCount == -1)
+                        {
+                            throw new Exception(
+                                $"Unexpected exception. System state is unexpected. Received {nameof(ABIType.FIXEDARRAY)} from {evmType} with instance count of -1");
+                        }
+
+                        Type instanceType = CollectionUtils.GetUnderlyingType<T>();
+                        var returnValue = Array.CreateInstance(instanceType, instanceCount);
+                        for (int i = 0; i < instanceCount; i++)
+                        {
+                            string nextChunk = value.Substring(i * 64, 64);
+                            object nextChunkValue = DecodeBaseTypes(nextChunk, underlying);
+                            returnValue.SetValue(Convert.ChangeType(nextChunkValue, instanceType), i);
+                        }
+
+                        return (T)(object)returnValue;
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Only static types are supported for now");
+                    }
+                    
+                    break;
+                case ABIType.DYNAMICARRAY:
+                    if (!CollectionUtils.IsCollection<T>())
+                    {
+                        ThrowDecodeException<T>(evmType, typeof(IEnumerable).ToString());
+                    }
+
+                    value = value.WithoutHexPrefix();
+
+                    BigInteger size = (BigInteger)DecodeBaseTypes(value.Substring(0, 64), ABIType.NUMBER);
+                    return Decode<T>(value.Substring(64), $"{GetUnderlyingCollectionTypeName(evmType)}[{size}]");
+                case ABIType.TUPLE:
+                    if (!TupleUtils.IsTuple<T>())
+                    {
+                        ThrowDecodeException<T>(evmType, typeof(Tuple<>).ToString(), typeof(ValueTuple<>).ToString());
+                    }
+
+                    throw new NotImplementedException();
+                    break;
+                case ABIType.NONE:
+                    throw new ArgumentException($"EVM type \'{evmType}\' is unsupported");
             }
             return default; // todo remove
+        }
+
+        private static object DecodeBaseTypes(string value, ABIType type)
+        {
+            switch (type)
+            {
+                case ABIType.STRING:
+                    return SequenceCoder.HexStringToHumanReadable(value);
+                case ABIType.ADDRESS:
+                    return new Address(AddressCoder.Decode(value));
+                case ABIType.NUMBER:
+                    return value.HexStringToBigInteger();
+                case ABIType.BOOLEAN:
+                    return value.HexStringToBool();
+                case ABIType.BYTES:
+                    return Encoding.UTF8.GetBytes(value);
+                case ABIType.FIXEDBYTES:
+                    return FixedBytesCoderWrapper.Decode(value);
+            }
+
+            throw new ArgumentException($"ABIType {type} is not a base type");
+        }
+
+        private static ABIType GetUnderlyingCollectionType(string evmType)
+        {
+            string typeNonCollection = GetUnderlyingCollectionTypeName(evmType);
+            return GetTypeFromEvmName(typeNonCollection);
+        }
+        
+        private static string GetUnderlyingCollectionTypeName(string evmType)
+        {
+            return evmType.Substring(0, evmType.IndexOf('['));
         }
 
         private static void ThrowDecodeException<T>(string evmType, params string[] supportedTypes)

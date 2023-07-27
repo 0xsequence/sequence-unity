@@ -2,9 +2,9 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using Org.BouncyCastle.Crypto.Digests;
-using Sequence.Extensions;
 using UnityEngine;
 using Sequence;
+using Sequence.Utils;
 
 namespace Sequence.ABI
 {

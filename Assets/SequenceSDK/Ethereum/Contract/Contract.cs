@@ -5,7 +5,6 @@ using System;
 using System.Numerics;
 using Sequence.ABI;
 using Sequence.Provider;
-using Sequence.Extensions;
 using Sequence.Transactions;
 using System.Text;
 using UnityEngine;

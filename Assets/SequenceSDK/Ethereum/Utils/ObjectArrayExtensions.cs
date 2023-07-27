@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Sequence.Extensions
+namespace Sequence.Utils
 {
     public static class ObjectArrayExtensions
     {

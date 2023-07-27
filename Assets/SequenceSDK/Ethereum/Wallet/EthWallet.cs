@@ -11,7 +11,7 @@ using System.Linq;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.Extensions;
+using Sequence.Utils;
 
 namespace Sequence.Wallet
 {
