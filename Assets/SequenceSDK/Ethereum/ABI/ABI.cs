@@ -492,7 +492,7 @@ namespace Sequence.ABI
                     {
                         ThrowDecodeException<T>(evmType, typeof(string).ToString());
                     }
-                    return (T)(object)SequenceCoder.HexStringToHumanReadable(value);
+                    return (T)(object)StringCoderExtensions.DecodeFromString(value);
                 case ABIType.ADDRESS:
                     if (typeof(T) == typeof(Address))
                     {
