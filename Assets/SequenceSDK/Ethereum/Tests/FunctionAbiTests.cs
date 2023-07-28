@@ -12,7 +12,7 @@ public class FunctionAbiTests
 
         private static readonly object[] GetAbisForFunctionTests = 
         {
-                new object[] {"name", new List<(string[], string)> { (new string[] { }, "string") }},
+                new object[] {"name", new List<(string[], string)> { (new string[] { }, "(string)") }},
                 new object[] {"safeTransferFrom", new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, null), (new string[] { "address", "address", "uint256", "bytes" }, null) }},
                 new object[] {"something random that isn't on there", new List<(string[], string)>()},
         };

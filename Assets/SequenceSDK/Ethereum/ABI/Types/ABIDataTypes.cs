@@ -6,19 +6,23 @@ using UnityEngine;
 
 namespace Sequence.ABI
 {
-    public class FixedByte
+    public class FixedByte : IList
     {
         public byte[] Data { get; set; }
-        public int Length { get; set; }
+        public int Count { get; set; }
+        public bool IsSynchronized { get; }
+        public object SyncRoot { get; }
+        public bool IsFixedSize { get; } = true;
+        public bool IsReadOnly { get; }
         private static readonly string ConstructorExceptionMessage = "ABIByte type length should be [0,32]";
 
-        public FixedByte(int _length, string str)
+        public FixedByte(int count, string str)
         {
-            if (_length >= 0 && _length <= 32)
+            if (count >= 0 && count <= 32)
             {
-                Length = _length;
+                Count = count;
 
-                Data = new byte[_length];
+                Data = new byte[count];
                 Data = Encoding.ASCII.GetBytes(str);
             }
             else
@@ -27,11 +31,11 @@ namespace Sequence.ABI
             }
         }
         
-        public FixedByte(int _length, byte[] bytes)
+        public FixedByte(int count, byte[] bytes)
         {
-            if (_length >= 0 && _length <= 32)
+            if (count >= 0 && count <= 32)
             {
-                Length = _length;
+                Count = count;
                 Data = bytes;
             }
             else
@@ -39,7 +43,57 @@ namespace Sequence.ABI
                 throw new ABITypeException(ConstructorExceptionMessage);
             }
         }
+
+        public IEnumerator GetEnumerator()
+        {
+            return Data.GetEnumerator();
+        }
         
+        public void CopyTo(Array array, int index)
+        {
+            Data.CopyTo(array, index);
+        }
+        
+        public int Add(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains(object value)
+        {
+            return Array.IndexOf(Data, value) >= 0;
+        }
+
+        public int IndexOf(object value)
+        {
+            return Array.IndexOf(Data, value);
+        }
+
+        public void Insert(int index, object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove(object value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object this[int index]
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
     }
     
 

@@ -92,4 +92,13 @@ namespace Sequence.ABI
 
 
     }
+
+    public static class StringCoderExtensions
+    {
+        private static StringCoder _stringCoder = new StringCoder();
+        public static string DecodeFromString(string encodedString)
+        {
+            return _stringCoder.DecodeFromString(encodedString);
+        }
+    }
 }

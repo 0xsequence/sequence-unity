@@ -17,30 +17,30 @@ public class DecodeABITests
         {
             ERC20.Abi, new Dictionary<string, List<(string[], string)>>
             {
-                { "name", new List<(string[], string)> { (new string[] { }, "string") } },
-                { "allowance", new List<(string[], string)> { (new string[] { "address", "address" }, "uint256") } },
-                { "approve", new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") } },
-                { "balanceOf", new List<(string[], string)> { (new string[] { "address" }, "uint256") } },
+                { "name", new List<(string[], string)> { (new string[] { }, "(string)") } },
+                { "allowance", new List<(string[], string)> { (new string[] { "address", "address" }, "(uint256)") } },
+                { "approve", new List<(string[], string)> { (new string[] { "address", "uint256" }, "(bool)") } },
+                { "balanceOf", new List<(string[], string)> { (new string[] { "address" }, "(uint256)") } },
                 { "burn", new List<(string[], string)> { (new string[] { "uint256" }, null) } },
                 { "burnFrom", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
-                { "decimals", new List<(string[], string)> { (new string[] { }, "uint8") } },
+                { "decimals", new List<(string[], string)> { (new string[] { }, "(uint8)") } },
                 {
                     "decreaseAllowance",
-                    new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") }
+                    new List<(string[], string)> { (new string[] { "address", "uint256" }, "(bool)") }
                 },
                 {
                     "increaseAllowance",
-                    new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") }
+                    new List<(string[], string)> { (new string[] { "address", "uint256" }, "(bool)") }
                 },
                 { "mint", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
-                { "owner", new List<(string[], string)> { (new string[] { }, "address") } },
+                { "owner", new List<(string[], string)> { (new string[] { }, "(address)") } },
                 { "renounceOwnership", new List<(string[], string)> { (new string[] { }, null) } },
-                { "symbol", new List<(string[], string)> { (new string[] { }, "string") } },
-                { "totalSupply", new List<(string[], string)> { (new string[] { }, "uint256") } },
-                { "transfer", new List<(string[], string)> { (new string[] { "address", "uint256" }, "bool") } },
+                { "symbol", new List<(string[], string)> { (new string[] { }, "(string)") } },
+                { "totalSupply", new List<(string[], string)> { (new string[] { }, "(uint256)") } },
+                { "transfer", new List<(string[], string)> { (new string[] { "address", "uint256" }, "(bool)") } },
                 {
                     "transferFrom",
-                    new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, "bool") }
+                    new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, "(bool)") }
                 },
                 { "transferOwnership", new List<(string[], string)> { (new string[] { "address" }, null) } },
             },
@@ -50,15 +50,15 @@ public class DecodeABITests
             ERC721.Abi, new Dictionary<string, List<(string[], string)>>
             {
                 { "approve", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
-                { "balanceOf", new List<(string[], string)> { (new string[] { "address" }, "uint256") } },
+                { "balanceOf", new List<(string[], string)> { (new string[] { "address" }, "(uint256)") } },
                 { "burn", new List<(string[], string)> { (new string[] { "uint256" }, null) } },
-                { "getApproved", new List<(string[], string)> { (new string[] { "uint256" }, "address") } },
+                { "getApproved", new List<(string[], string)> { (new string[] { "uint256" }, "(address)") } },
                 {
-                    "isApprovedForAll", new List<(string[], string)> { (new string[] { "address", "address" }, "bool") }
+                    "isApprovedForAll", new List<(string[], string)> { (new string[] { "address", "address" }, "(bool)") }
                 },
-                { "name", new List<(string[], string)> { (new string[] { }, "string") } },
-                { "owner", new List<(string[], string)> { (new string[] { }, "address") } },
-                { "ownerOf", new List<(string[], string)> { (new string[] { "uint256" }, "address") } },
+                { "name", new List<(string[], string)> { (new string[] { }, "(string)") } },
+                { "owner", new List<(string[], string)> { (new string[] { }, "(address)") } },
+                { "ownerOf", new List<(string[], string)> { (new string[] { "uint256" }, "(address)") } },
                 { "renounceOwnership", new List<(string[], string)> { (new string[] { }, null) } },
                 { "safeMint", new List<(string[], string)> { (new string[] { "address", "uint256" }, null) } },
                 {
@@ -70,9 +70,9 @@ public class DecodeABITests
                     }
                 },
                 { "setApprovalForAll", new List<(string[], string)> { (new string[] { "address", "bool" }, null) } },
-                { "supportsInterface", new List<(string[], string)> { (new string[] { "bytes4" }, "bool") } },
-                { "symbol", new List<(string[], string)> { (new string[] { }, "string") } },
-                { "tokenURI", new List<(string[], string)> { (new string[] { "uint256" }, "string") } },
+                { "supportsInterface", new List<(string[], string)> { (new string[] { "bytes4" }, "(bool)") } },
+                { "symbol", new List<(string[], string)> { (new string[] { }, "(string)") } },
+                { "tokenURI", new List<(string[], string)> { (new string[] { "uint256" }, "(string)") } },
                 {
                     "transferFrom",
                     new List<(string[], string)> { (new string[] { "address", "address", "uint256" }, null) }
@@ -84,19 +84,19 @@ public class DecodeABITests
         {
             ERC1155.Abi, new Dictionary<string, List<(string[], string)>>
             {
-                { "balanceOf", new List<(string[], string)> { (new string[] { "address", "uint256" }, "uint256") } },
+                { "balanceOf", new List<(string[], string)> { (new string[] { "address", "uint256" }, "(uint256)") } },
                 {
                     "balanceOfBatch",
-                    new List<(string[], string)> { (new string[] { "address[]", "uint256[]" }, "uint256[]") }
+                    new List<(string[], string)> { (new string[] { "address[]", "uint256[]" }, "(uint256[])") }
                 },
                 { "burn", new List<(string[], string)> { (new string[] { "address", "uint256", "uint256" }, null) } },
                 {
                     "burnBatch",
                     new List<(string[], string)> { (new string[] { "address", "uint256[]", "uint256[]" }, null) }
                 },
-                { "exists", new List<(string[], string)> { (new string[] { "uint256" }, "bool") } },
+                { "exists", new List<(string[], string)> { (new string[] { "uint256" }, "(bool)") } },
                 {
-                    "isApprovedForAll", new List<(string[], string)> { (new string[] { "address", "address" }, "bool") }
+                    "isApprovedForAll", new List<(string[], string)> { (new string[] { "address", "address" }, "(bool)") }
                 },
                 {
                     "mint",
@@ -109,11 +109,11 @@ public class DecodeABITests
                 },
                 { "setApprovalForAll", new List<(string[], string)> { (new string[] { "address", "bool" }, null) } },
                 { "setURI", new List<(string[], string)> { (new string[] { "string" }, null) } },
-                { "supportsInterface", new List<(string[], string)> { (new string[] { "bytes4" }, "bool") } },
-                { "totalSupply", new List<(string[], string)> { (new string[] { "uint256" }, "uint256") } },
+                { "supportsInterface", new List<(string[], string)> { (new string[] { "bytes4" }, "(bool)") } },
+                { "totalSupply", new List<(string[], string)> { (new string[] { "uint256" }, "(uint256)") } },
                 { "transferOwnership", new List<(string[], string)> { (new string[] { "address" }, null) } },
-                { "uri", new List<(string[], string)> { (new string[] { "uint256" }, "string") } },
-                { "owner", new List<(string[], string)> { (new string[] { }, "address") } },
+                { "uri", new List<(string[], string)> { (new string[] { "uint256" }, "(string)") } },
+                { "owner", new List<(string[], string)> { (new string[] { }, "(address)") } },
                 { "renounceOwnership", new List<(string[], string)> { (new string[] { }, null) } },
                 {
                     "safeTransferFrom",
@@ -552,7 +552,7 @@ and in that case, my mission will be complete.";
     {
         try
         {
-            T result = ABI.Decode<T>(value, $"bytes[{length}]");
+            T result = ABI.Decode<T>(value, $"bytes{length}");
             if (typeof(T) == typeof(byte[]))
             {
                 CollectionAssert.AreEqual(expected as byte[], result as byte[]);
@@ -561,7 +561,7 @@ and in that case, my mission will be complete.";
             {
                 FixedByte expectedFB = expected as FixedByte;
                 FixedByte resultFB = result as FixedByte;
-                Assert.AreEqual(expectedFB.Length, resultFB.Length);
+                Assert.AreEqual(expectedFB.Count, resultFB.Count);
                 CollectionAssert.AreEqual(expectedFB.Data, resultFB.Data);
             }
             else
@@ -582,7 +582,7 @@ and in that case, my mission will be complete.";
         {
             string value = "0x0000000000000000000000000000000000000000000000000000000000000021" +
                            "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021";
-            FixedByte result = ABI.Decode<FixedByte>(value, "bytes[33]");
+            FixedByte result = ABI.Decode<FixedByte>(value, "bytes33");
             Assert.Fail("Expected exception but none was thrown");
         }
         catch (Exception ex)
@@ -605,13 +605,13 @@ and in that case, my mission will be complete.";
     {
         try
         {
-            var result = ABI.Decode<T>("0x123", "bytes[1]");
+            var result = ABI.Decode<T>("0x123", "bytes1");
             Assert.Fail("Expected exception but none was thrown");
         }
         catch (ArgumentException ex)
         {
             Assert.AreEqual(
-                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bytes[1]\'. Supported types: {typeof(byte[])}, {typeof(FixedByte)}",
+                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'bytes1\'. Supported types: {typeof(byte[])}, {typeof(FixedByte)}",
                 ex.Message);
         }
         catch (Exception ex)

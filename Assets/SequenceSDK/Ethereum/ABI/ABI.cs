@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using Org.BouncyCastle.Utilities;
 using Sequence.Utils;
 
 namespace Sequence.ABI
@@ -91,6 +92,18 @@ namespace Sequence.ABI
 
         private static ABIType GetTypeFromEvmName(string typeName)
         {
+            if (typeName.StartsWith("("))
+            {
+                return ABIType.TUPLE;
+            }
+            if (typeName.StartsWith("bytes"))
+            {
+                if (typeName == "bytes")
+                {
+                    return ABIType.BYTES;
+                }
+                return ABIType.FIXEDBYTES;
+            }
             if (IsFixedArray(typeName))
             {
                 return ABIType.FIXEDARRAY;
@@ -115,18 +128,6 @@ namespace Sequence.ABI
             {
                 return ABIType.STRING;
             }
-            if (typeName.StartsWith("bytes"))
-            {
-                if (typeName == "bytes")
-                {
-                    return ABIType.BYTES;
-                }
-                return ABIType.FIXEDBYTES;
-            }
-            if (typeName.StartsWith("("))
-            {
-                return ABIType.TUPLE;
-            }
             return ABIType.NONE;
         }
 
@@ -137,14 +138,8 @@ namespace Sequence.ABI
         /// <returns></returns>
         private static bool IsFixedArray(string value)
         {
-            int start = value.IndexOf('[');
+            int start = value.IndexOf('['); 
             if (start <= 0)
-            {
-                return false;
-            }
-
-            string type = value.Substring(0, start);
-            if (!(type == "address" || type.StartsWith("uint") || type.StartsWith("int") || type == "bool"))
             {
                 return false;
             }
@@ -219,19 +214,17 @@ namespace Sequence.ABI
                     }
                     
                     JArray outputsArray = element["outputs"] as JArray;
-                    JObject returnJObject = null;
+                    string returnType = null;
                     if (outputsArray != null && outputsArray.Count > 0)
                     {
-                        returnJObject = outputsArray[0] as JObject;
-                    }
-                    string returnType;
-                    if (returnJObject == null)
-                    {
-                        returnType = null;
-                    }
-                    else
-                    {
-                        returnType = returnJObject["type"].ToString();
+                        int outputsArrayLength = outputsArray.Count;
+                        string[] outputTypes = new string[outputsArrayLength];
+                        for (int j = 0; j < outputsArrayLength; j++)
+                        {
+                            JObject outputItem = outputsArray[j] as JObject;
+                            outputTypes[j] = outputItem["type"].ToString();
+                        }
+                        returnType = $"({string.Join(", ", outputTypes)})";
                     }
 
                     if (decodedAbi.ContainsKey(functionName))
@@ -489,6 +482,9 @@ namespace Sequence.ABI
         public static T Decode<T>(string value, string evmType)
         {
             ABIType type = GetTypeFromEvmName(evmType);
+            value = value.WithoutHexPrefix();
+            Queue<int> offsets = new Queue<int>();
+            Queue<ABIType> dynamicTypes = new Queue<ABIType>();
             switch (type)
             {
                 case ABIType.STRING:
@@ -552,8 +548,6 @@ namespace Sequence.ABI
                         ThrowDecodeException<T>(evmType, typeof(IEnumerable).ToString());
                     }
 
-                    value = value.WithoutHexPrefix();
-
                     ABIType underlying = GetUnderlyingCollectionType(evmType);
                     if (IsStaticType(underlying))
                     {
@@ -581,30 +575,73 @@ namespace Sequence.ABI
                     {
                         throw new NotImplementedException("Only static types are supported for now");
                     }
-                    
-                    break;
                 case ABIType.DYNAMICARRAY:
                     if (!CollectionUtils.IsCollection<T>())
                     {
                         ThrowDecodeException<T>(evmType, typeof(IEnumerable).ToString());
                     }
 
-                    value = value.WithoutHexPrefix();
-
                     BigInteger size = (BigInteger)DecodeBaseTypes(value.Substring(0, 64), ABIType.NUMBER);
                     return Decode<T>(value.Substring(64), $"{GetUnderlyingCollectionTypeName(evmType)}[{size}]");
                 case ABIType.TUPLE:
-                    if (!TupleUtils.IsTuple<T>())
+                    string[] internalTypes = GetTupleTypes(evmType);
+                    int count = internalTypes.Length;
+                    if (count > 1)
                     {
-                        ThrowDecodeException<T>(evmType, typeof(Tuple<>).ToString(), typeof(ValueTuple<>).ToString());
+                        throw new NotImplementedException("Multiple return types are not yet supported");
+                        // int tupleSize = GetTupleSize(typeof(T));
+                        // if (tupleSize != count)
+                        // {
+                        //     throw new ArgumentException(
+                        //         $"Unable to decode type \'{evmType}\' to a tuple of size {tupleSize}, requires tuple of size {count}");
+                        // }
+                        // for (int i = 0; i < count; i++)
+                        // {
+                        //     string chunk = value.Substring(0, 64);
+                        //     ABIType internalType = GetTypeFromEvmName(internalTypes[i]);
+                        //     if (IsDynamicType(internalType))
+                        //     {
+                        //         offsets.Enqueue(GetOffset(chunk, internalType));
+                        //         dynamicTypes.Enqueue(internalType);
+                        //     }
+                        //     else
+                        //     {
+                        //         
+                        //     }
+                        // }
+                    }
+                    else
+                    {
+                        ABIType internalType = GetTypeFromEvmName(internalTypes[0]);
+                        if (IsDynamicType(internalType))
+                        {
+                            string chunk = value.Substring(0, 64);
+                            offsets.Enqueue(GetOffset(chunk, internalType));
+                            dynamicTypes.Enqueue(internalType);
+                        }
+                        else
+                        {
+                            return Decode<T>(value, internalTypes[0]);
+                        }
+
+                        int offset = offsets.Dequeue();
+                        return Decode<T>(value.Substring(offset, value.Length - offset), internalTypes[0]);
                     }
 
-                    throw new NotImplementedException();
                     break;
                 case ABIType.NONE:
                     throw new ArgumentException($"EVM type \'{evmType}\' is unsupported");
             }
             return default; // todo remove
+        }
+
+        private static int GetOffset(string value, ABIType type)
+        {
+            if (!IsDynamicType(type))
+            {
+                throw new ArgumentException("Invalid method use. Please only use on dynamic ABITypes");
+            }
+            return value.Substring(0, 64).HexStringToInt();
         }
 
         private static object DecodeBaseTypes(string value, ABIType type)
@@ -643,6 +680,18 @@ namespace Sequence.ABI
         {
             throw new ArgumentException(
                 $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'{evmType}\'. Supported types: {string.Join(", ", supportedTypes)}");
+        }
+
+        private static string[] GetTupleTypes(string evmType)
+        {
+            if (GetTypeFromEvmName(evmType) != ABIType.TUPLE)
+            {
+                throw new ArgumentException("Invalid method use. Expects a tuple evm type");
+            }
+
+            string withoutParenthesis = evmType.Substring(1, evmType.Length - 2);
+            string[] types = withoutParenthesis.Split(", ");
+            return types;
         }
     }
 }
