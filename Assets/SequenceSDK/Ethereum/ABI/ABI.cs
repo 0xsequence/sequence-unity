@@ -549,16 +549,16 @@ namespace Sequence.ABI
                     }
 
                     ABIType underlying = GetUnderlyingCollectionType(evmType);
+                    int instanceCount = GetInnerValue(evmType);
+                        
+                    // Sanity check - condition should never be met
+                    if (instanceCount == -1)
+                    {
+                        throw new Exception(
+                             $"Unexpected exception. System state is unexpected. Received {nameof(ABIType.FIXEDARRAY)} from {evmType} with instance count of -1");
+                    }
                     if (IsStaticType(underlying))
                     {
-                        int instanceCount = GetInnerValue(evmType);
-                        
-                        // Sanity check - condition should never be met
-                        if (instanceCount == -1)
-                        {
-                            throw new Exception(
-                                $"Unexpected exception. System state is unexpected. Received {nameof(ABIType.FIXEDARRAY)} from {evmType} with instance count of -1");
-                        }
 
                         Type instanceType = CollectionUtils.GetUnderlyingType<T>();
                         var returnValue = Array.CreateInstance(instanceType, instanceCount);
@@ -573,7 +573,23 @@ namespace Sequence.ABI
                     }
                     else
                     {
-                        throw new NotImplementedException("Only static types are supported for now");
+                        for (int i = 0; i < instanceCount; i++)
+                        {
+                            string chunk = value.Substring(0, 64);
+                            offsets.Enqueue(GetOffset(chunk, underlying));
+                            dynamicTypes.Enqueue(underlying);
+                        }
+                        
+                        Type instanceType = CollectionUtils.GetUnderlyingType<T>();
+                        var returnValue = Array.CreateInstance(instanceType, instanceCount);
+                        for (int i = 0; i < instanceCount; i++)
+                        {
+                            string nextChunk = value.Substring(offsets.Dequeue() * 2);
+                            object nextChunkValue = DecodeBaseTypes(nextChunk, dynamicTypes.Dequeue());
+                            returnValue.SetValue(Convert.ChangeType(nextChunkValue, instanceType), i);
+                        }
+
+                        return (T)(object)returnValue;
                     }
                 case ABIType.DYNAMICARRAY:
                     if (!CollectionUtils.IsCollection<T>())
@@ -624,7 +640,7 @@ namespace Sequence.ABI
                             return Decode<T>(value, internalTypes[0]);
                         }
 
-                        int offset = offsets.Dequeue();
+                        int offset = offsets.Dequeue() * 2;
                         return Decode<T>(value.Substring(offset, value.Length - offset), internalTypes[0]);
                     }
 
@@ -649,7 +665,7 @@ namespace Sequence.ABI
             switch (type)
             {
                 case ABIType.STRING:
-                    return SequenceCoder.HexStringToHumanReadable(value);
+                    return StringCoderExtensions.DecodeFromString(value);
                 case ABIType.ADDRESS:
                     return new Address(AddressCoder.Decode(value));
                 case ABIType.NUMBER:

@@ -68,11 +68,11 @@ namespace Sequence.Contracts
             return result;
         }
 
-        // public async Task<BigInteger[]> BalanceOfBatch(IEthClient client, string[] addresses, BigInteger[] tokenIds)
-        // {
-        //     BigInteger[] results = await contract.SendQuery<BigInteger[]>(client, "balanceOfBatch", addresses, tokenIds);
-        //     return results;
-        // }
+        public async Task<BigInteger[]> BalanceOfBatch(IEthClient client, string[] addresses, BigInteger[] tokenIds)
+        {
+            BigInteger[] results = await contract.SendQuery<BigInteger[]>(client, "balanceOfBatch", addresses, tokenIds);
+            return results;
+        }
 
         /// <summary>
         /// RPC returns a string array that looks something like this "0x000000211230000000011aa20000000012023" that will be at least 192 characters (96 bytes) long
