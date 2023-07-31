@@ -92,6 +92,10 @@ namespace Sequence.ABI
                     else break;
                 }
                 string fixedStr = encodedString.Substring(0, encodedString.Length - trailingZero);
+                if (fixedStr.Length % 2 == 1)
+                {
+                    fixedStr = fixedStr + "0";
+                }
                 return _fixedBytesCoder.DecodeFromString(fixedStr);
             }
             catch (Exception ex)

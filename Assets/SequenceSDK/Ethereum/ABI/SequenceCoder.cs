@@ -223,7 +223,7 @@ namespace Sequence.ABI
         {
             byte[] bytes = HexStringToByteArray(hexString);
             string result = Encoding.UTF8.GetString(bytes);
-            string cleaned = RemoveControlCharactersExceptNewline(result).TrimStart(' ').TrimEnd(' '); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
+            string cleaned = RemoveControlCharactersExceptNewline(result); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
             return cleaned;
         }
 

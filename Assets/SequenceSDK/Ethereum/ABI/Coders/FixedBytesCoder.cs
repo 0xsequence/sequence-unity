@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -86,7 +87,9 @@ namespace Sequence.ABI
         {
             try
             {
-                string byteStr = encodedString.Substring(64, encodedString.Length - 64);
+                string lengthString = encodedString.Substring(0, 64);
+                var length = (BigInteger)_numberCoder.DecodeFromString(lengthString);
+                string byteStr = encodedString.Substring(64, (int)length * 2);
 
                 return byteStr;
             }

@@ -550,6 +550,8 @@ namespace Sequence.ABI
 
                     ABIType underlying = GetUnderlyingCollectionType(evmType);
                     int instanceCount = GetInnerValue(evmType);
+                    Type instanceType = CollectionUtils.GetUnderlyingType<T>();
+                    var returnValue = Array.CreateInstance(instanceType, instanceCount);
                         
                     // Sanity check - condition should never be met
                     if (instanceCount == -1)
@@ -559,9 +561,6 @@ namespace Sequence.ABI
                     }
                     if (IsStaticType(underlying))
                     {
-
-                        Type instanceType = CollectionUtils.GetUnderlyingType<T>();
-                        var returnValue = Array.CreateInstance(instanceType, instanceCount);
                         for (int i = 0; i < instanceCount; i++)
                         {
                             string nextChunk = value.Substring(i * 64, 64);
@@ -575,13 +574,11 @@ namespace Sequence.ABI
                     {
                         for (int i = 0; i < instanceCount; i++)
                         {
-                            string chunk = value.Substring(0, 64);
+                            string chunk = value.Substring(i * 64, 64);
                             offsets.Enqueue(GetOffset(chunk, underlying));
                             dynamicTypes.Enqueue(underlying);
                         }
                         
-                        Type instanceType = CollectionUtils.GetUnderlyingType<T>();
-                        var returnValue = Array.CreateInstance(instanceType, instanceCount);
                         for (int i = 0; i < instanceCount; i++)
                         {
                             string nextChunk = value.Substring(offsets.Dequeue() * 2);
@@ -648,7 +645,7 @@ namespace Sequence.ABI
                 case ABIType.NONE:
                     throw new ArgumentException($"EVM type \'{evmType}\' is unsupported");
             }
-            return default; // todo remove
+            throw new ArgumentException($"EVM type \'{evmType}\' is unsupported");
         }
 
         private static int GetOffset(string value, ABIType type)
