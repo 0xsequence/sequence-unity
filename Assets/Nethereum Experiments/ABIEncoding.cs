@@ -51,17 +51,30 @@ public class ABIEncoding : MonoBehaviour
         result = abiEncode.GetABIEncoded(new ABIValue("uint256[][]", nestedBigIntegerArray)).ToHex();
         Debug.Log(result);
 
-        string[][] nestedStringArray =
-        {
-            toEncode,
-            toEncode2,
-            toEncode3,
-            toEncode4,
-            new string[] { },
-            new string[] { longString, "SDK by Horizon" },
+        // Todo figure out why this throws
+        // string[][] nestedStringArray =
+        // {
+        //     toEncode,
+        //     toEncode2,
+        //     toEncode3,
+        //     toEncode4,
+        //     new string[] { },
+        //     new string[] { longString, "SDK by Horizon" },
+        // };
+        // Debug.Log("Encoding nested string array");
+        // result = abiEncode.GetABIEncoded(new ABIValue("string[][]", nestedBigIntegerArray)).ToHex();
+        // Debug.Log(result);
+        
+        BigInteger[][][] nestedBigIntegerArray2 =
+        { 
+            new BigInteger[][] {
+                new BigInteger[] { 1, 2, 3000, 4, 5 },
+            },
+            new BigInteger[][]{},
+            nestedBigIntegerArray,
         };
-        Debug.Log("Encoding nested string array");
-        result = abiEncode.GetABIEncoded(new ABIValue("string[][]", nestedBigIntegerArray)).ToHex();
+        Debug.Log("Encoding nested big integer array");
+        result = abiEncode.GetABIEncoded(new ABIValue("uint256[][][]", nestedBigIntegerArray2)).ToHex();
         Debug.Log(result);
     }
 }
