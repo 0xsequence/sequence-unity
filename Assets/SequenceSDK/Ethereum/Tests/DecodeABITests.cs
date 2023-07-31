@@ -8,6 +8,8 @@ using Sequence;
 using Sequence.ABI;
 using Sequence.Contracts;
 using Sequence.Utils;
+using UnityEngine;
+using Object = System.Object;
 
 public class DecodeABITests
 {
@@ -801,7 +803,48 @@ and in that case, my mission will be complete.";
         try
         {
             T result = ABI.Decode<T>(value, "(string[])");
+
             CollectionAssert.AreEqual(expected as IEnumerable, result as IEnumerable);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected no exception, but got: " + ex.Message);
+        }
+    }
+
+    private static object[] DecodeNestedArrayTests =
+    {
+        new object[]
+        {
+            "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000300000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000",
+            new object[][]
+            {
+                new object[] { (BigInteger)1, (BigInteger)2, (BigInteger)3, (BigInteger)4, (BigInteger)5 },
+                new object[] { },
+                new object[] { BigInteger.Zero, },
+            },
+            "(uint[][])",
+        },
+    };
+
+    [TestCaseSource(nameof(DecodeNestedArrayTests))]
+    public void TestDecodeNestedArray(string value, object[][] expected, string evmType)
+    {
+        try
+        {
+            object[][] result = ABI.Decode<object[][]>(value, evmType);
+
+            Assert.AreEqual(expected.Length, result.Length, "Arrays have different lengths.");
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                Assert.AreEqual(expected[i].Length, result[i].Length, $"Nested array {i} has different length.");
+
+                for (int j = 0; j < expected[i].Length; j++)
+                {
+                    Assert.AreEqual(expected[i][j], result[i][j], $"Element at position [{i}][{j}] is different.");
+                }
+            }
         }
         catch (Exception ex)
         {

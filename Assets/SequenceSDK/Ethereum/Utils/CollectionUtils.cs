@@ -9,7 +9,11 @@ namespace Sequence.Utils
         public static bool IsCollection<T>()
         {
             Type type = typeof(T);
+            return IsCollection(type);
+        }
 
+        public static bool IsCollection(Type type)
+        {
             return type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
         }
         

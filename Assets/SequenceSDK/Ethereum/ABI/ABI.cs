@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using Org.BouncyCastle.Asn1.Esf;
 using Org.BouncyCastle.Utilities;
 using Sequence.Utils;
 
@@ -138,7 +139,7 @@ namespace Sequence.ABI
         /// <returns></returns>
         private static bool IsFixedArray(string value)
         {
-            int start = value.IndexOf('['); 
+            int start = value.IndexOf('[');
             if (start <= 0)
             {
                 return false;
@@ -549,8 +550,18 @@ namespace Sequence.ABI
                     }
 
                     ABIType underlying = GetUnderlyingCollectionType(evmType);
+                    string typeNonCollection = GetUnderlyingCollectionTypeName(evmType);
                     int instanceCount = GetInnerValue(evmType);
                     Type instanceType = CollectionUtils.GetUnderlyingType<T>();
+                    if (instanceType == typeof(object))
+                    {
+                        instanceType = TryAndInferType(typeNonCollection);
+                    }
+                    if (CollectionUtils.IsCollection(instanceType))
+                    {
+                        instanceType = typeof(object[]);
+                    }
+                    
                     var returnValue = Array.CreateInstance(instanceType, instanceCount);
                         
                     // Sanity check - condition should never be met
@@ -564,8 +575,13 @@ namespace Sequence.ABI
                         for (int i = 0; i < instanceCount; i++)
                         {
                             string nextChunk = value.Substring(i * 64, 64);
-                            object nextChunkValue = DecodeBaseTypes(nextChunk, underlying);
+                            object nextChunkValue = DecodeAsObject(nextChunk, typeNonCollection);
                             returnValue.SetValue(Convert.ChangeType(nextChunkValue, instanceType), i);
+                        }
+
+                        if (typeof(T) == typeof(object[]))
+                        {
+                            return (T)(object)ConvertToObjectArray(returnValue);
                         }
 
                         return (T)(object)returnValue;
@@ -576,14 +592,25 @@ namespace Sequence.ABI
                         {
                             string chunk = value.Substring(i * 64, 64);
                             offsets.Enqueue(GetOffset(chunk, underlying));
-                            dynamicTypes.Enqueue(underlying);
                         }
                         
                         for (int i = 0; i < instanceCount; i++)
                         {
                             string nextChunk = value.Substring(offsets.Dequeue() * 2);
-                            object nextChunkValue = DecodeBaseTypes(nextChunk, dynamicTypes.Dequeue());
-                            returnValue.SetValue(Convert.ChangeType(nextChunkValue, instanceType), i);
+                            object nextChunkValue = DecodeAsObject(nextChunk, typeNonCollection);
+                            if (instanceType != typeof(object))
+                            {
+                                returnValue.SetValue(Convert.ChangeType(nextChunkValue, instanceType), i);
+                            }
+                            else
+                            {
+                                returnValue.SetValue(nextChunkValue, i);
+                            }
+                        }
+
+                        if (typeof(T) == typeof(object[]))
+                        {
+                            return (T)(object)ConvertToObjectArray(returnValue);
                         }
 
                         return (T)(object)returnValue;
@@ -594,8 +621,13 @@ namespace Sequence.ABI
                         ThrowDecodeException<T>(evmType, typeof(IEnumerable).ToString());
                     }
 
-                    BigInteger size = (BigInteger)DecodeBaseTypes(value.Substring(0, 64), ABIType.NUMBER);
-                    return Decode<T>(value.Substring(64), $"{GetUnderlyingCollectionTypeName(evmType)}[{size}]");
+                    BigInteger size = (BigInteger)DecodeAsObject(value.Substring(0, 64), "uint");
+                    if (size <= 0)
+                    {
+                        instanceType = CollectionUtils.GetUnderlyingType<T>();
+                        return (T)(object)Array.CreateInstance(instanceType, 0);
+                    }
+                    return Decode<T>(value.Substring(64), evmType.WithFixedSize(size));
                 case ABIType.TUPLE:
                     string[] internalTypes = GetTupleTypes(evmType);
                     int count = internalTypes.Length;
@@ -657,25 +689,32 @@ namespace Sequence.ABI
             return value.Substring(0, 64).HexStringToInt();
         }
 
-        private static object DecodeBaseTypes(string value, ABIType type)
+        private static object DecodeAsObject(string value, string evmType)
         {
+            ABIType type = GetTypeFromEvmName(evmType);
             switch (type)
             {
                 case ABIType.STRING:
-                    return StringCoderExtensions.DecodeFromString(value);
+                    return Decode<string>(value, evmType);
                 case ABIType.ADDRESS:
-                    return new Address(AddressCoder.Decode(value));
+                    return Decode<Address>(value, evmType);
                 case ABIType.NUMBER:
-                    return value.HexStringToBigInteger();
+                    return Decode<BigInteger>(value, evmType);
                 case ABIType.BOOLEAN:
-                    return value.HexStringToBool();
+                    return Decode<bool>(value, evmType);
                 case ABIType.BYTES:
-                    return Encoding.UTF8.GetBytes(value);
+                    return Decode<byte[]>(value, evmType);
                 case ABIType.FIXEDBYTES:
-                    return FixedBytesCoderWrapper.Decode(value);
+                    return Decode<byte[]>(value, evmType);
+                case ABIType.FIXEDARRAY:
+                    return Decode<object[]>(value, evmType);
+                case ABIType.DYNAMICARRAY:
+                    return Decode<object[]>(value, evmType);
+                case ABIType.TUPLE:
+                    return Decode<object[]>(value, evmType);
             }
 
-            throw new ArgumentException($"ABIType {type} is not a base type");
+            throw new ArgumentException($"ABIType {type} is not supported");
         }
 
         private static ABIType GetUnderlyingCollectionType(string evmType)
@@ -686,7 +725,82 @@ namespace Sequence.ABI
         
         private static string GetUnderlyingCollectionTypeName(string evmType)
         {
-            return evmType.Substring(0, evmType.IndexOf('['));
+            string prefix = evmType.Substring(0, evmType.IndexOf('['));
+            string postfix = "";
+            int postfixIndex = evmType.IndexOf(']');
+            if (postfixIndex + 1 < evmType.Length)
+            {
+                postfix = evmType.Substring(postfixIndex + 1);
+            }
+            string underlying = prefix + postfix;
+            return underlying;
+        }
+
+        /// <summary>
+        /// WithFixedSize will modify value such that
+        /// if value contains an instance of '[' immediately followed by an instance of ']', it will replace the first
+        /// occurrence of this phenomenon with $"[{size}]" and return the result
+        /// 
+        /// Examples:
+        /// value = uint[5][][couch] , size = 11 => uint[5][11][couch]
+        /// value = banana[house] , size = 2 => banana[house]
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        private static string WithFixedSize(this string value, BigInteger size)
+        {
+            int valueLength = value.Length;
+            int startIndex = -2;
+            for (int i = 0; i < valueLength; i++)
+            {
+                if (startIndex + 1 == i)
+                {
+                    if (value[i] != ']')
+                    {
+                        startIndex = -2;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (value[i] == '[')
+                {
+                    startIndex = i;
+                }
+            }
+
+            if (startIndex == -2)
+            {
+                return value;
+            }
+
+            string prefix = value.Substring(0, startIndex + 1);
+            string postfix = value.Substring(startIndex + 1);
+            return prefix + size + postfix;
+        }
+
+        private static Type TryAndInferType(string evmType)
+        {
+            ABIType type = GetTypeFromEvmName(evmType);
+            switch (type)
+            {
+                case ABIType.STRING:
+                    return typeof(string);
+                case ABIType.ADDRESS:
+                    return typeof(Address);
+                case ABIType.NUMBER:
+                    return typeof(BigInteger);
+                case ABIType.BOOLEAN:
+                    return typeof(bool);
+                case ABIType.BYTES:
+                    return typeof(byte[]);
+                case ABIType.FIXEDBYTES:
+                    return typeof(byte[]);
+            }
+
+            return typeof(object);
         }
 
         private static void ThrowDecodeException<T>(string evmType, params string[] supportedTypes)
@@ -705,6 +819,30 @@ namespace Sequence.ABI
             string withoutParenthesis = evmType.Substring(1, evmType.Length - 2);
             string[] types = withoutParenthesis.Split(", ");
             return types;
+        }
+
+        private static object[] ConvertToObjectArray<T>(this T value)
+        {
+            return value.ConvertToTArray<object,T>();
+        }
+
+        private static T[] ConvertToTArray<T,T2>(this T2 value)
+        {
+            if (value is Array array)
+            {
+                int length = array.Length;
+                T[] converted = new T[length];
+
+                for (int i = 0; i < length; i++)
+                {
+                    converted[i] = (T)array.GetValue(i);
+                }
+
+                return converted;
+            }
+
+            throw new ArgumentException(
+                $"Value {value} with type {value.GetType()} is not an array as expected.");
         }
     }
 }
