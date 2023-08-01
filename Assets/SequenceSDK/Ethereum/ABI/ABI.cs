@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using UnityEngine;
-using System.Text.RegularExpressions;
-using Org.BouncyCastle.Asn1.Esf;
-using Org.BouncyCastle.Utilities;
 using Sequence.Utils;
 
 namespace Sequence.ABI
@@ -387,119 +384,9 @@ namespace Sequence.ABI
         /// <returns>True if the ABIType is dynamic; otherwise, false.</returns>
         public static bool IsDynamicType(ABIType paramType)
         {
-            /*
-             Definition: The following types are called ?dynamic?:
-
-                bytes
-
-                string
-
-                T[] for any T
-
-                T[k] for any dynamic T and any k >= 0
-
-                (T1,...,Tk) if Ti is dynamic for some 1 <= i <= k
-            */
             return ((paramType == ABIType.BYTES) || (paramType == ABIType.STRING) ||
                     (paramType == ABIType.DYNAMICARRAY) || (paramType == ABIType.FIXEDARRAY) ||
                     (paramType == ABIType.TUPLE));
-        }
-
-        /// <summary>
-        /// Retrieves the parameter types from an ABI JSON string.
-        /// </summary>
-        /// <param name="abi">The ABI JSON string.</param>
-        /// <returns>A list of parameter types.</returns>
-        public static List<object> GetParameterTypesFromABI(string abi)
-        {
-            try
-            {
-                List<object> parameterTypes = new List<object>();
-                // Parse ABI JSON string
-                JObject abiJson = JObject.Parse(abi);
-
-                // Access properties of ABI JSON
-                string name = (string)abiJson["name"];
-                JArray inputs = (JArray)abiJson["inputs"];
-
-                foreach (JObject input in inputs)
-                {
-                    string inputName = (string)input["name"];
-                    string inputType = (string)input["type"];
-                    object type = GetParameterTypeByName(inputType);
-                    parameterTypes.Add(type);
-                }
-
-                return parameterTypes;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error retrieving parameter types from ABI: {ex.Message}");
-            }
-
-            return new List<object>();
-        }
-
-        /// <summary>
-        /// Retrieves the parameter type based on its name.
-        /// </summary>
-        /// <param name="paramName">The name of the parameter type.</param>
-        /// <returns>The corresponding ABIType.</returns>
-        private static object GetParameterTypeByName(string paramName)
-        {
-            try
-            {
-                switch (paramName)
-                {
-                    case "uint256":
-                        return ABIType.NUMBER;
-                    case "string":
-                        return ABIType.STRING;
-                    case "bytes":
-                        return ABIType.BYTES;
-                    case "bool":
-                        return ABIType.BOOLEAN;
-                    case "address":
-                        return ABIType.ADDRESS;
-                    default:
-                        break;
-                }
-
-                if (paramName.Contains("[]"))
-                {
-                    switch (paramName)
-                    {
-                        case "uint256[]":
-                            List<ABIType> numberList = new List<ABIType>(new ABIType[] { ABIType.NUMBER });
-                            return numberList;
-
-                        case "string[]":
-                            List<ABIType> stringList = new List<ABIType>(new ABIType[] { ABIType.STRING });
-                            return stringList;
-
-                        case "bytes[]":
-                            List<ABIType> byteList = new List<ABIType>(new ABIType[] { ABIType.BYTES });
-                            return byteList;
-
-                        case "bool[]":
-                            List<ABIType> boolList = new List<ABIType>(new ABIType[] { ABIType.BOOLEAN });
-                            return boolList;
-
-                        case "address[]":
-                            List<ABIType> addressList = new List<ABIType>(new ABIType[] { ABIType.ADDRESS });
-                            return addressList;
-
-                        default:
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error retrieving parameter type by name: {ex.Message}");
-            }
-
-            return string.Empty;
         }
 
         public static T Decode<T>(string value, string evmType)

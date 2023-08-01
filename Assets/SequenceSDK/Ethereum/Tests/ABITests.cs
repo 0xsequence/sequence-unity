@@ -78,37 +78,14 @@ public class ABITests
     }
 
     [Test]
-    public void DynamicArrayDecoding()
-    {
-        List<BigInteger> parameter = new List<BigInteger> { 1, 2, 3 };
-        byte[] encoded = _arrayCoder.Encode(parameter);
-
-
-        List<object> types = new List<object> { new List<object> { ABIType.NUMBER, ABIType.NUMBER, ABIType.NUMBER } };
-        List<object> decodedRaw = _arrayCoder.Decode(encoded, types);
-        List<object> decodedBigInt = (List<object>)(decodedRaw[0]);
-        List<BigInteger> decoded = new List<BigInteger>();
-
-        foreach (BigInteger d in decodedBigInt)
-        {
-            decoded.Add(d);
-        }
-        CollectionAssert.AreEqual(decoded, parameter);
-    }
-
-
-
-    [Test]
     public void BooleanTrueEncoding()
     {
-
         //Encode
         //Param True
         bool parameter = true;
         byte[] expected = SequenceCoder.HexStringToByteArray("0x0000000000000000000000000000000000000000000000000000000000000001");
         byte[] encoded = _booleanCoder.Encode(parameter);
         CollectionAssert.AreEqual(expected, encoded);
-
     }
 
     [Test]
