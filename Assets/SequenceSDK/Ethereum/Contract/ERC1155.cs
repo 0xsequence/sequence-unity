@@ -74,38 +74,6 @@ namespace Sequence.Contracts
             return results;
         }
 
-        /// <summary>
-        /// RPC returns a string array that looks something like this "0x000000211230000000011aa20000000012023" that will be at least 192 characters (96 bytes) long
-        /// This function will convert this and return a BigInteger[] for each of the values
-        /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        private BigInteger[] ExtractBigIntegersFromResponse(string result)
-        {
-            result = result.Replace("0x", "");
-
-            int resultLength = result.Length;
-            if (resultLength < 192)
-            {
-                throw new ArgumentOutOfRangeException($"Invalid method input, must be at least 192 characters (96 bytes) long. Input: {result}");
-            }
-
-            // Split the string into segments of 64 characters (32 bytes)
-            List<string> segments = new List<string>();
-            for (int i = 128; i < resultLength; i += 64) // Ignore first 64 bytes - first 32 bytes is an offset for where the array is described, i.e. 32 bytes - next 32 bytes is the size of the array
-            {
-                segments.Add(result.Substring(i, 64));
-            }
-
-            // Convert each segment into a BigInteger
-            BigInteger[] results = new BigInteger[segments.Count];
-            for (int i = 0; i < segments.Count; i++)
-            {
-                results[i] = BigInteger.Parse(segments[i], NumberStyles.HexNumber);
-            }
-            return results;
-        }
-
         public async Task<string> URI(IEthClient client, BigInteger tokenId)
         {
             string result = await contract.SendQuery<string>(client, "uri", tokenId);

@@ -91,11 +91,7 @@ namespace Sequence.ABI
                     if (encodedString[i] == '0') trailingZero++;
                     else break;
                 }
-                string fixedStr = encodedString.Substring(0, encodedString.Length - trailingZero);
-                if (fixedStr.Length % 2 == 1)
-                {
-                    fixedStr = fixedStr + "0";
-                }
+                string fixedStr = EnsureEvenLength(encodedString.Substring(0, encodedString.Length - trailingZero));
                 return _fixedBytesCoder.DecodeFromString(fixedStr);
             }
             catch (Exception ex)
@@ -105,6 +101,14 @@ namespace Sequence.ABI
             }
         }
 
+        private string EnsureEvenLength(string value)
+        {
+            if (value.Length % 2 == 1)
+            {
+                value += "0";
+            }
 
+            return value;
+        }
     }
 }

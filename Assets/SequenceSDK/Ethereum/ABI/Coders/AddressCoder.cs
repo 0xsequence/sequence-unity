@@ -29,20 +29,6 @@ namespace Sequence.ABI
             }
         }
 
-        public static string Decode(string encoded)
-        {
-            try
-            {
-                string decoded = SequenceCoder.AddressChecksum(DecodeFromString(encoded));
-                return decoded;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to decode address: {ex.Message}");
-                return null;
-            }
-        }
-
         /// <summary>
         /// Encodes the address object into a byte array. the uint160 case.
         /// </summary>
@@ -103,7 +89,7 @@ namespace Sequence.ABI
         /// </summary>
         /// <param name="encodedString">The encoded string to decode.</param>
         /// <returns>The decoded address string.</returns>
-        public static string DecodeFromString(string encodedString)
+        public string DecodeFromString(string encodedString)
         {
             try
             {
@@ -117,6 +103,24 @@ namespace Sequence.ABI
                 return string.Empty;
             }
         }
+    }
 
+    public static class AddressCoderExtensions
+    {
+        private static AddressCoder _addressCoder = new AddressCoder();
+        public static string Decode(string encodedString)
+        {
+            
+            try
+            {
+                string decoded = SequenceCoder.AddressChecksum(_addressCoder.DecodeFromString(encodedString));
+                return decoded;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to decode address: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

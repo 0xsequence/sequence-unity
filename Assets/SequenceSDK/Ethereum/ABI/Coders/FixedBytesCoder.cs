@@ -101,7 +101,7 @@ namespace Sequence.ABI
         }
     }
 
-    public static class FixedBytesCoderWrapper
+    public static class FixedBytesCoderExtensions
     {
         private static FixedBytesCoder _coder = new FixedBytesCoder();
         public static byte[] Decode(string encoded)

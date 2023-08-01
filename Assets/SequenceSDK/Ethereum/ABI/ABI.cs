@@ -496,12 +496,12 @@ namespace Sequence.ABI
                 case ABIType.ADDRESS:
                     if (typeof(T) == typeof(Address))
                     {
-                        string address = AddressCoder.Decode(value);
+                        string address = AddressCoderExtensions.Decode(value);
                         return (T)(object)new Address(address);
                     }
                     if (typeof(T) == typeof(string))
                     {
-                        string address = AddressCoder.Decode(value);
+                        string address = AddressCoderExtensions.Decode(value);
                         return (T)(object)address;
                     }
                     ThrowDecodeException<T>(evmType, typeof(Address).ToString(), typeof(string).ToString());
@@ -532,11 +532,11 @@ namespace Sequence.ABI
                 case ABIType.FIXEDBYTES:
                     if (typeof(T) == typeof(byte[]))
                     {
-                        return (T)(object)FixedBytesCoderWrapper.Decode(value);
+                        return (T)(object)FixedBytesCoderExtensions.Decode(value);
                     }
                     if (typeof(T) == typeof(FixedByte))
                     {
-                        byte[] bytes = FixedBytesCoderWrapper.Decode(value);
+                        byte[] bytes = FixedBytesCoderExtensions.Decode(value);
                         int length = bytes.Length;
                         return (T)(object)new FixedByte(length, bytes);
                     }
