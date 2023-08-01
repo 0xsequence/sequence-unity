@@ -485,7 +485,6 @@ namespace Sequence.ABI
             ABIType type = GetTypeFromEvmName(evmType);
             value = value.WithoutHexPrefix();
             Queue<int> offsets = new Queue<int>();
-            Queue<ABIType> dynamicTypes = new Queue<ABIType>();
             switch (type)
             {
                 case ABIType.STRING:
@@ -633,27 +632,36 @@ namespace Sequence.ABI
                     int count = internalTypes.Length;
                     if (count > 1)
                     {
-                        throw new NotImplementedException("Multiple return types are not yet supported");
-                        // int tupleSize = GetTupleSize(typeof(T));
-                        // if (tupleSize != count)
-                        // {
-                        //     throw new ArgumentException(
-                        //         $"Unable to decode type \'{evmType}\' to a tuple of size {tupleSize}, requires tuple of size {count}");
-                        // }
-                        // for (int i = 0; i < count; i++)
-                        // {
-                        //     string chunk = value.Substring(0, 64);
-                        //     ABIType internalType = GetTypeFromEvmName(internalTypes[i]);
-                        //     if (IsDynamicType(internalType))
-                        //     {
-                        //         offsets.Enqueue(GetOffset(chunk, internalType));
-                        //         dynamicTypes.Enqueue(internalType);
-                        //     }
-                        //     else
-                        //     {
-                        //         
-                        //     }
-                        // }
+                        if (typeof(T) != typeof(object[]))
+                        {
+                            ThrowDecodeException<T>(evmType, typeof(object[]).ToString());
+                        }
+                        object[] retValue = new object[count];
+                        for (int i = 0; i < count; i++)
+                        {
+                            string chunk = value.Substring(i * 64, 64);
+                            ABIType internalType = GetTypeFromEvmName(internalTypes[i]);
+                            if (IsDynamicType(internalType))
+                            {
+                                offsets.Enqueue(GetOffset(chunk, internalType));
+                            }
+                            else
+                            {
+                                retValue[i] = DecodeAsObject(chunk, internalTypes[i]);
+                            }
+                        }
+                        
+                        for (int i = 0; i < count; i++)
+                        {
+                            ABIType internalType = GetTypeFromEvmName(internalTypes[i]);
+                            if (IsDynamicType(internalType))
+                            {
+                                string nextChunk = value.Substring(offsets.Dequeue() * 2);
+                                retValue[i] = DecodeAsObject(nextChunk, internalTypes[i]);
+                            }
+                        }
+
+                        return (T)(object)retValue;
                     }
                     else
                     {
@@ -662,7 +670,6 @@ namespace Sequence.ABI
                         {
                             string chunk = value.Substring(0, 64);
                             offsets.Enqueue(GetOffset(chunk, internalType));
-                            dynamicTypes.Enqueue(internalType);
                         }
                         else
                         {
@@ -672,10 +679,6 @@ namespace Sequence.ABI
                         int offset = offsets.Dequeue() * 2;
                         return Decode<T>(value.Substring(offset, value.Length - offset), internalTypes[0]);
                     }
-
-                    break;
-                case ABIType.NONE:
-                    throw new ArgumentException($"EVM type \'{evmType}\' is unsupported");
             }
             throw new ArgumentException($"EVM type \'{evmType}\' is unsupported");
         }
@@ -826,7 +829,7 @@ namespace Sequence.ABI
             return value.ConvertToTArray<object,T>();
         }
 
-        private static T[] ConvertToTArray<T,T2>(this T2 value)
+        public static T[] ConvertToTArray<T,T2>(this T2 value)
         {
             if (value is Array array)
             {

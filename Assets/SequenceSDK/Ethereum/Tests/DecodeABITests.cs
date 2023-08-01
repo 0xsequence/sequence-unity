@@ -912,4 +912,54 @@ and in that case, my mission will be complete.";
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }
     }
+
+    [Test]
+    public void TestDecodeTuple()
+    {
+        string value =
+            "0x000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e53444b20627920486f72697a6f6e0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003";
+        Tuple<string, BigInteger[], BigInteger> expected =
+            new Tuple<string, BigInteger[], BigInteger>("SDK by Horizon", new BigInteger[] { 1, 2, 3 },
+                BigInteger.Zero);
+
+        object[] result = ABI.Decode<object[]>(value, "(string, uint256[], uint256)");
+
+        Tuple<string, BigInteger[], BigInteger> resultTuple = new Tuple<string, BigInteger[], BigInteger>(
+            (string)result[0],
+            result[1].ConvertToTArray<BigInteger, object>(),
+            (BigInteger)result[2]);
+        
+        Assert.AreEqual(expected.Item1, resultTuple.Item1);
+        CollectionAssert.AreEqual(expected.Item2, resultTuple.Item2);
+        Assert.AreEqual(expected.Item3, resultTuple.Item3);
+    }
+    
+    private static object[] DecodeTupleThrowsTests =
+    {
+        new object[] { new Address("0xc683a014955B75F5ECF991D4502427C8FA1AA249") },
+        new object[] { BigInteger.One },
+        new object[] { 5 },
+        new object[] { "SDK by Horizon" },
+        new object[] { true },
+    };
+
+    [TestCaseSource(nameof(DecodeTupleThrowsTests))]
+    public void TestDecodeTuple_throwsOnInvalidType<T>(T type)
+    {
+        try
+        {
+            var result = ABI.Decode<T>("0x123", "(uint256, string)");
+            Assert.Fail("Expected exception but none was thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            Assert.AreEqual(
+                $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'(uint256, string)\'. Supported types: {typeof(object[])}",
+                ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Assert.Fail("Expected ArgumentException, but got: " + ex.GetType());
+        }
+    }
 }

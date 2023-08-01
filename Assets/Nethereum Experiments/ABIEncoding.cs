@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Numerics;
 using Nethereum.ABI;
 using Nethereum.ABI.Encoders;
+using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.Contracts;
 using Nethereum.Hex.HexConvertors.Extensions;
 
 public class ABIEncoding : MonoBehaviour
@@ -76,5 +79,37 @@ public class ABIEncoding : MonoBehaviour
         Debug.Log("Encoding nested big integer array");
         result = abiEncode.GetABIEncoded(new ABIValue("uint256[][][]", nestedBigIntegerArray2)).ToHex();
         Debug.Log(result);
+
+        Tuple<string, BigInteger[], BigInteger> testTuple =
+            new Tuple<string, BigInteger[], BigInteger>("SDK by Horizon", new BigInteger[] { 1, 2, 3 },
+                BigInteger.Zero);
+        Debug.Log("Encoding tuple "+ testTuple);
+        TupleTypeEncoder tupleEncoder = new TupleTypeEncoder();
+        string encodedTuple = tupleEncoder.Encode(testTuple).ToHex();
+        Debug.Log(encodedTuple); // yields empty string
+        
+        // Not supported
+        // result = abiEncode.GetABIEncoded(new ABIValue("(string, uint256[], uint256)", testTuple)).ToHex();
+        // Debug.Log(result);
+
+        var testTuple2 = new MyTuple()
+            { Item1 = "SDK by Horizon", Item2 = new BigInteger[] { 1, 2, 3 }, Item3 = BigInteger.Zero };
+        result = abiEncode.GetABIEncoded(testTuple2).ToHex();
+        Debug.Log(result); // yields empty string
+        result = abiEncode.GetABIParamsEncoded(testTuple2).ToHex();
+        Debug.Log(result);
+    }
+
+    [FunctionOutput]
+    public class MyTuple
+    {
+        [Parameter("string", 1)]
+        public string Item1 { get; set; }
+
+        [Parameter("uint256[]", 2)]
+        public BigInteger[] Item2 { get; set; }
+
+        [Parameter("uint256", 3)]
+        public BigInteger Item3 { get; set; }
     }
 }
