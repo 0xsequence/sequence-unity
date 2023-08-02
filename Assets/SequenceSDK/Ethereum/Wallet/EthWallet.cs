@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Wallet
 {
@@ -56,8 +57,13 @@ namespace Sequence.Wallet
             return PubkeyToAddress(publicKeyBytes64);
         }
 
-        public Address GetAddress()
+        public Address GetAddress(uint accountIndex = 0)
         {
+            if (accountIndex != 0)
+            {
+                Debug.LogWarning("EthWallet has no concept of accountIndex. There is only one Address/account per EthWallet.");
+            }
+            
             if (address == null)
             {
                 address = new Address(GenerateAddress());

@@ -12,7 +12,7 @@ namespace Sequence.Wallet
 {
     public interface IWallet 
     {
-        public Address GetAddress();
+        public Address GetAddress(uint accountIndex = 0);
         public Task<BigInteger> GetBalance(IEthClient client);
         public Task<BigInteger> GetNonce(IEthClient client);
         public (string v, string r, string s) SignTransaction(byte[] message, string chainId);
