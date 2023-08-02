@@ -1,9 +1,11 @@
 using System;
-using Sequence.Extensions;
+using Sequence.Utils;
 
 namespace Sequence {
     public class Address {
         public readonly string Value;
+
+        public static readonly Address ZeroAddress = new Address(StringExtensions.ZeroAddress);
 
         /// <summary>
         /// Caution: this constructor will throw an exception if you supply an invalid address string

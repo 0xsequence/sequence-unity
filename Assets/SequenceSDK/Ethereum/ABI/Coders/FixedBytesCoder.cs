@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -28,8 +29,7 @@ namespace Sequence.ABI
             }
         }
 
-
-        /// <summary>
+            /// <summary>
         /// Encodes the byte array value into a byte array.
         /// </summary>
         /// <param name="value">The byte array value to encode.</param>
@@ -87,13 +87,9 @@ namespace Sequence.ABI
         {
             try
             {
-                int trailingZero = 0;
-                for (int i = encodedString.Length - 1; i > 64; i--)
-                {
-                    if (encodedString[i] == '0') trailingZero++;
-                    else break;
-                }
-                string byteStr = encodedString.Substring(64, encodedString.Length - trailingZero - 64);
+                string lengthString = encodedString.Substring(0, 64);
+                var length = (BigInteger)_numberCoder.DecodeFromString(lengthString);
+                string byteStr = encodedString.Substring(64, (int)length * 2);
 
                 return byteStr;
             }
@@ -103,7 +99,14 @@ namespace Sequence.ABI
                 return null;
             }
         }
+    }
 
-
+    public static class FixedBytesCoderExtensions
+    {
+        private static FixedBytesCoder _coder = new FixedBytesCoder();
+        public static byte[] Decode(string encoded)
+        {
+            return SequenceCoder.HexStringToByteArray(_coder.DecodeFromString(encoded.Replace("0x", "")));
+        }
     }
 }

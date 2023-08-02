@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using Sequence.ABI;
 using Sequence.Extensions;
+using Sequence.Utils;
 
 namespace Sequence.Core.Signature
 {

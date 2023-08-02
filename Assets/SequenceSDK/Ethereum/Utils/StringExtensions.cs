@@ -2,7 +2,7 @@
 using System.Numerics;
 using System.Text;
 
-namespace Sequence.Extensions
+namespace Sequence.Utils
 {
     public static class StringExtensions
     {
@@ -110,6 +110,11 @@ namespace Sequence.Extensions
             {
                 throw new ArgumentException($"Cannot decode value: {value} into a bool");
             }
+        }
+
+        public static string WithoutHexPrefix(this string value)
+        {
+            return value.Replace("0x", "");
         }
     }
 }

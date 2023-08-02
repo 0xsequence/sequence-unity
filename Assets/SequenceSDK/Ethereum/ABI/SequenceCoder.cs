@@ -2,9 +2,9 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using Org.BouncyCastle.Crypto.Digests;
-using Sequence.Extensions;
 using UnityEngine;
 using Sequence;
+using Sequence.Utils;
 
 namespace Sequence.ABI
 {
@@ -222,18 +222,22 @@ namespace Sequence.ABI
         public static string HexStringToHumanReadable(string hexString)
         {
             byte[] bytes = HexStringToByteArray(hexString);
-            string hexValue = hexString.Substring(2);
             string result = Encoding.UTF8.GetString(bytes);
-            string cleaned = RemoveControlCharacters(result).TrimStart(' ').TrimEnd(' '); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
+            string cleaned = RemoveControlCharactersExceptNewline(result); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
             return cleaned;
         }
 
-        private static string RemoveControlCharacters(string value)
+        private static string RemoveControlCharactersExceptNewline(string value)
         {
-            // Regular expression pattern to match control characters
-            string pattern = @"\p{Cc}";
-            string cleaned = Regex.Replace(value, pattern, "");
-            return cleaned;
+            StringBuilder result = new StringBuilder();
+            foreach (char c in value)
+            {
+                if (!char.IsControl(c) || c == '\n')
+                {
+                    result.Append(c);
+                }
+            }
+            return result.ToString();
         }
     }
 }

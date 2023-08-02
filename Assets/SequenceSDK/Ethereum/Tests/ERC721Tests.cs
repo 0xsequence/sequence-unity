@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Wallet;
 using UnityEngine;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence;
 using System;
 using Sequence.Contracts;
 using System.Numerics;
 using Sequence.ABI;
+using Sequence.Utils;
 
 // Note - these tests are designed to be ran sequentially as they will all share the same testnet
 public class ERC721Tests
@@ -62,7 +62,7 @@ public class ERC721Tests
             Assert.AreEqual(BigInteger.Zero, balance);
 
             string owner = await token.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
         }
         catch (Exception ex)
         {
@@ -73,6 +73,8 @@ public class ERC721Tests
     [Test]
     public async Task TestERC721Mint()
     {
+        var autoIncrementingAbi = "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"approved\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"ApprovalForAll\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"getApproved\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"}],\"name\":\"isApprovedForAll\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"name\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"ownerOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"safeMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"safeTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"operator\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"}],\"name\":\"setApprovalForAll\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"symbol\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"tokenURI\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]";
+
         ERC721 token = new ERC721(contractAddress);
         try
         {
@@ -80,7 +82,7 @@ public class ERC721Tests
             TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, autoIncrementingIdVersionBytecode);
             string autoIncrementingContractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(autoIncrementingContractAddress);
-            ERC721 autoIncrementingToken = new ERC721(autoIncrementingContractAddress);
+            ERC721 autoIncrementingToken = new ERC721(autoIncrementingContractAddress, autoIncrementingAbi);
 
             // Mint an auto incrementing token to random address so that index starts at one like with the other contract
             receipt = await autoIncrementingToken.SafeMint(randomWallet.GetAddress())
@@ -92,7 +94,7 @@ public class ERC721Tests
             BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)1, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
             string tokenUri = await token.TokenURI(client, tokenId1);
             Assert.AreEqual(baseUri + tokenId1, tokenUri);
 
@@ -102,7 +104,7 @@ public class ERC721Tests
             balance = await autoIncrementingToken.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)1, balance);
             owner = await autoIncrementingToken.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
             tokenUri = await autoIncrementingToken.TokenURI(client, tokenId1);
             Assert.AreEqual(baseUri + tokenId1, tokenUri);
 
@@ -122,7 +124,7 @@ public class ERC721Tests
             BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)1, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
             string tokenUri = await token.TokenURI(client, tokenId1);
             Assert.AreEqual(baseUri + tokenId1, tokenUri);
         }
@@ -176,7 +178,7 @@ public class ERC721Tests
             balance = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             // Transfer token
             receipt = await token.TransferFrom(wallet1.GetAddress(), wallet2.GetAddress(), tokenId1)
@@ -186,7 +188,7 @@ public class ERC721Tests
             balance = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.One, balance);
             owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet2.GetAddress().Value, owner);
         }
         catch (Exception ex)
         {
@@ -210,7 +212,7 @@ public class ERC721Tests
             TransactionReceipt receipt = await token.Approve(wallet1.GetAddress(), tokenId1)
                 .SendTransactionMethodAndWaitForReceipt(wallet2, client);
             string approved = await token.GetApproved(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(approved));
+            Assert.AreEqual(wallet1.GetAddress().Value, approved);
 
             // Transfer token
             receipt = await token.SafeTransferFrom(wallet2.GetAddress(), wallet1.GetAddress(), tokenId1, "something random".ToByteArray())
@@ -220,7 +222,7 @@ public class ERC721Tests
             balance = await token.BalanceOf(client, wallet2.GetAddress());
             Assert.AreEqual(BigInteger.Zero, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             await TestBurn(token);
         }
@@ -246,13 +248,13 @@ public class ERC721Tests
             BigInteger balance = await token.BalanceOf(client, wallet1.GetAddress());
             Assert.AreEqual((BigInteger)3, balance);
             string owner = await token.OwnerOf(client, tokenId1);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             // Give approval for one token
             receipt = await token.Approve(wallet2.GetAddress(), tokenId1)
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
             string approved = await token.GetApproved(client, tokenId1);
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(approved));
+            Assert.AreEqual(wallet2.GetAddress().Value, approved);
 
             bool isApprovedForAll = await token.IsApprovedForAll(client, wallet1.GetAddress(), wallet2.GetAddress());
             Assert.IsFalse(isApprovedForAll);

@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Wallet;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence;
 using System;
@@ -65,7 +64,7 @@ public class ERC20Tests
             Assert.AreEqual((BigInteger)18, decimals);
 
             string owner = await token.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
         }
         catch (Exception ex)
         {
@@ -329,17 +328,17 @@ public class ERC20Tests
         try
         {
             string owner = await token.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             TransactionReceipt receipt = await token.TransferOwnership(wallet2.GetAddress())
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
             owner = await token.Owner(client);
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet2.GetAddress().Value, owner);
 
             receipt = await token.TransferOwnership(wallet1.GetAddress())
                 .SendTransactionMethodAndWaitForReceipt(wallet2, client);
             owner = await token.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
         }
         catch (Exception ex)
         {

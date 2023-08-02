@@ -5,8 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
-using Sequence.Extensions;
 using Sequence.Wallet;
+using Sequence.Utils;
 
 namespace Sequence.Transactions
 {

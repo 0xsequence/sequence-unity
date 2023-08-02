@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.ABI;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Wallet;
 using UnityEngine;
