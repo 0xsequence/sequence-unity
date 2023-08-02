@@ -81,9 +81,7 @@ namespace Sequence.ABI
             try
             {
                 string decodedStr = _bytesCoder.DecodeFromString(encodedString);
-                byte[] decoded = SequenceCoder.HexStringToByteArray(decodedStr);
-                Encoding utf8 = Encoding.UTF8;
-                return utf8.GetString(decoded);
+                return SequenceCoder.HexStringToHumanReadable(decodedStr);
             }
             catch (Exception ex)
             {
@@ -93,5 +91,14 @@ namespace Sequence.ABI
         }
 
 
+    }
+
+    public static class StringCoderExtensions
+    {
+        private static StringCoder _stringCoder = new StringCoder();
+        public static string DecodeFromString(string encodedString)
+        {
+            return _stringCoder.DecodeFromString(encodedString);
+        }
     }
 }

@@ -1,7 +1,6 @@
-using System;
 using System.Numerics;
 
-namespace Sequence.Extensions
+namespace Sequence.Utils
 {
     public static class BigIntegerExtensions
     {

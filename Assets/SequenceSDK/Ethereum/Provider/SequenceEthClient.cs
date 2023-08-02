@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.Extensions;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.Provider

@@ -29,7 +29,6 @@ namespace Sequence.ABI
             }
         }
 
-
         /// <summary>
         /// Encodes the address object into a byte array. the uint160 case.
         /// </summary>
@@ -95,7 +94,7 @@ namespace Sequence.ABI
             try
             {
                 //cut leading zeros
-                encodedString = encodedString.TrimStart('0');
+                encodedString = encodedString.Replace("0x", "").TrimStart('0');
                 return "0x" + encodedString;
             }
             catch (Exception ex)
@@ -104,6 +103,24 @@ namespace Sequence.ABI
                 return string.Empty;
             }
         }
+    }
 
+    public static class AddressCoderExtensions
+    {
+        private static AddressCoder _addressCoder = new AddressCoder();
+        public static string Decode(string encodedString)
+        {
+            
+            try
+            {
+                string decoded = SequenceCoder.AddressChecksum(_addressCoder.DecodeFromString(encodedString));
+                return decoded;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to decode address: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

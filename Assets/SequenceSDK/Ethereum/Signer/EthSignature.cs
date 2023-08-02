@@ -9,7 +9,7 @@ using System.Text;
 using System.Linq;
 using System;
 using System.Numerics;
-using Sequence.Extensions;
+using Sequence.Utils;
 
 namespace Sequence.Signer
 {

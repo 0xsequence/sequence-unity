@@ -65,9 +65,8 @@ namespace Sequence.ABI
         {
             try
             {
-                string headStr = _numberCoder.EncodeToString(32);
                 string bytesStr = _fixedBytesCoder.EncodeToString(value);
-                return headStr + bytesStr;
+                return bytesStr;
             }
             catch (Exception ex)
             {
@@ -86,7 +85,13 @@ namespace Sequence.ABI
         {
             try
             {
-                string fixedStr = encodedString.Substring(64, encodedString.Length - 64);
+                int trailingZero = 0;
+                for (int i = encodedString.Length - 1; i > 64; i--)
+                {
+                    if (encodedString[i] == '0') trailingZero++;
+                    else break;
+                }
+                string fixedStr = EnsureEvenLength(encodedString.Substring(0, encodedString.Length - trailingZero));
                 return _fixedBytesCoder.DecodeFromString(fixedStr);
             }
             catch (Exception ex)
@@ -96,6 +101,14 @@ namespace Sequence.ABI
             }
         }
 
+        private string EnsureEvenLength(string value)
+        {
+            if (value.Length % 2 == 1)
+            {
+                value += "0";
+            }
 
+            return value;
+        }
     }
 }

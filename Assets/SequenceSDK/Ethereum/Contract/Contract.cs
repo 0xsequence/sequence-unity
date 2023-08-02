@@ -5,21 +5,42 @@ using System;
 using System.Numerics;
 using Sequence.ABI;
 using Sequence.Provider;
-using Sequence.Extensions;
 using Sequence.Transactions;
 using System.Text;
+using UnityEngine;
 
 namespace Sequence.Contracts
 {
     public class Contract
     {
-        string address;
+        Address address;
         public delegate Task<EthTransaction> CallContractFunctionTransactionCreator(IEthClient client, ContractCall contractCallInfo);
-        public delegate Task<string> QueryContractMessageSender(IEthClient client);
+        public delegate Task<T> QueryContractMessageSender<T>(IEthClient client);
 
-        public Contract(string contractAddress)
+        private string abi;
+        private FunctionAbi functionAbi;
+
+        /// <summary>
+        /// Will throw if given an invalid abi or contractAddress
+        /// Note that providing a null abi is supported. However this is not recommended.
+        /// Using a null abi will require you to provide the full function signature when transacting/querying the contract.
+        /// Using a null abi will cause all query responses to return as a string.
+        /// </summary>
+        /// <param name="contractAddress"></param>
+        /// <param name="abi"></param>
+        public Contract(string contractAddress, string abi = null)
         {
-            address = contractAddress;
+            address = new Address(contractAddress);
+            this.abi = abi;
+            if (abi == null)
+            {
+                Debug.LogWarning("Creating a contract with a null ABI is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
+                this.functionAbi = null;
+            }
+            else
+            {
+                this.functionAbi = ABI.ABI.DecodeAbi(abi);
+            }
         }
 
         public async Task<string> Deploy(string bytecode, params object[] constructorArgs)
@@ -27,9 +48,9 @@ namespace Sequence.Contracts
             throw new NotImplementedException();
         }
 
-        public CallContractFunctionTransactionCreator CallFunction(string functionSignature, params object[] functionArgs)
+        public CallContractFunctionTransactionCreator CallFunction(string functionName, params object[] functionArgs)
         {
-            string callData = ABI.ABI.Pack(functionSignature, functionArgs);
+            string callData = GetData(functionName, functionArgs);
             return async (IEthClient client, ContractCall contractCallInfo) =>
             {
                 GasLimitEstimator estimator = new GasLimitEstimator(client, contractCallInfo.from);
@@ -40,9 +61,40 @@ namespace Sequence.Contracts
             };
         }
 
-        public QueryContractMessageSender QueryContract(string functionSignature, params object[] args)
+        public QueryContractMessageSender<T> QueryContract<T>(string functionName, params object[] args)
         {
-            string data = ABI.ABI.Pack(functionSignature, args);
+            if (this.functionAbi == null)
+            {
+                // Return string, throw exception is anything else is provided as T
+                if (typeof(T) != typeof(string))
+                {
+                    throw new ArgumentException(
+                        "Unsupported method call. If contract ABI is null, can only return string as a query response.");
+                }
+                return (IEthClient client) => QueryContract(functionName, args)(client).ContinueWith(t => (T)(object)t.Result.ToString());
+            }
+            
+            object[] toSendParams = CreateParams(functionName, args);
+            return async (IEthClient client) =>
+            {
+                // Instead, get the string response, then use ABI (define a method in FunctionABI) to decode the hex string into the correct datatype
+                string result = await client.CallContract(toSendParams);
+                return this.functionAbi.DecodeReturnValue<T>(result, functionName, args);
+            };
+        }
+        
+        private QueryContractMessageSender<string> QueryContract(string functionName, params object[] args)
+        {
+            object[] toSendParams = CreateParams(functionName, args);
+            return async (IEthClient client) =>
+            {
+                return await client.CallContract(toSendParams);
+            };
+        }
+
+        private object[] CreateParams(string functionName, params object[] args)
+        {
+            string data = GetData(functionName, args);
             string to = address;
             object[] toSendParams = new object[] {
                 new
@@ -51,10 +103,21 @@ namespace Sequence.Contracts
                     data
                 }
             };
-            return async (IEthClient client) =>
+            return toSendParams;
+        }
+        private string GetData(string functionName, params object[] args)
+        {
+            string data;
+            if (this.functionAbi != null)
             {
-                return await client.CallContract(toSendParams);
-            };
+                int abiIndex = this.functionAbi.GetFunctionAbiIndex(functionName, args);
+                data = ABI.ABI.Pack(this.functionAbi.GetFunctionSignature(functionName, abiIndex), args);
+            }
+            else
+            {
+                data = ABI.ABI.Pack(functionName, args);
+            }
+            return data;
         }
 
         public async Task<T> GetEventLog<T>(string eventName, BigInteger blockNumber)
@@ -84,11 +147,7 @@ namespace Sequence.Contracts
             {
                 gasLimit = BigInteger.Zero;
             }
-
-            if (!from.Value.IsAddress())
-            {
-                throw new ArgumentOutOfRangeException(nameof(from));
-            }
+            
             if (value < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(value));

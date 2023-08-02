@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Wallet;
 using UnityEngine;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence;
 using System;
 using Sequence.Contracts;
 using System.Numerics;
 using Sequence.ABI;
+using Sequence.Utils;
 
 // Note - these tests are designed to be ran sequentially as they will all share the same testnet
 public class OwnableTests
@@ -46,22 +46,22 @@ public class OwnableTests
         try
         {
             string owner = await ownable.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             TransactionReceipt receipt = await ownable.TransferOwnership(wallet2.GetAddress())
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
             owner = await ownable.Owner(client);
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet2.GetAddress().Value, owner);
 
             receipt = await ownable.TransferOwnership(wallet1.GetAddress())
                 .SendTransactionMethodAndWaitForReceipt(wallet2, client);
             owner = await ownable.Owner(client);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(wallet1.GetAddress().Value, owner);
 
             receipt = await ownable.RenounceOwnership()
                 .SendTransactionMethodAndWaitForReceipt(wallet1, client);
             owner = await ownable.Owner(client);
-            Assert.AreEqual(StringExtensions.ZeroAddress, SequenceCoder.AddressChecksum(owner));
+            Assert.AreEqual(StringExtensions.ZeroAddress, owner);
         }
         catch (Exception ex)
         {

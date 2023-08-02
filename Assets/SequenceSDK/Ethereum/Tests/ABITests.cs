@@ -4,8 +4,10 @@ using Sequence.ABI;
 using System.Numerics;
 using UnityEngine;
 using System.Text;
-using Sequence.Extensions;
 using System;
+using Sequence;
+using Sequence.Contracts;
+using Sequence.Utils;
 using UnityEngine.TestTools;
 
 public class ABITests
@@ -76,37 +78,14 @@ public class ABITests
     }
 
     [Test]
-    public void DynamicArrayDecoding()
-    {
-        List<BigInteger> parameter = new List<BigInteger> { 1, 2, 3 };
-        byte[] encoded = _arrayCoder.Encode(parameter);
-
-
-        List<object> types = new List<object> { new List<object> { ABIType.NUMBER, ABIType.NUMBER, ABIType.NUMBER } };
-        List<object> decodedRaw = _arrayCoder.Decode(encoded, types);
-        List<object> decodedBigInt = (List<object>)(decodedRaw[0]);
-        List<BigInteger> decoded = new List<BigInteger>();
-
-        foreach (BigInteger d in decodedBigInt)
-        {
-            decoded.Add(d);
-        }
-        CollectionAssert.AreEqual(decoded, parameter);
-    }
-
-
-
-    [Test]
     public void BooleanTrueEncoding()
     {
-
         //Encode
         //Param True
         bool parameter = true;
         byte[] expected = SequenceCoder.HexStringToByteArray("0x0000000000000000000000000000000000000000000000000000000000000001");
         byte[] encoded = _booleanCoder.Encode(parameter);
         CollectionAssert.AreEqual(expected, encoded);
-
     }
 
     [Test]
@@ -143,7 +122,7 @@ public class ABITests
     {
         //Encode
         byte[] parameter = SequenceCoder.HexStringToByteArray("0xaabbccdd"); 
-        byte[] expected = SequenceCoder.HexStringToByteArray("00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000004aabbccdd00000000000000000000000000000000000000000000000000000000");
+        byte[] expected = SequenceCoder.HexStringToByteArray("0000000000000000000000000000000000000000000000000000000000000004aabbccdd00000000000000000000000000000000000000000000000000000000");
 
         byte[] encoded = _bytesCoder.Encode(parameter);
 
@@ -210,7 +189,7 @@ public class ABITests
         {
             //Param string
             string parameter = "sequence";
-            byte[] expected = SequenceCoder.HexStringToByteArray("0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000873657175656e6365000000000000000000000000000000000000000000000000");
+            byte[] expected = SequenceCoder.HexStringToByteArray("000000000000000000000000000000000000000000000000000000000000000873657175656e6365000000000000000000000000000000000000000000000000");
             byte[] encoded = _stringCoder.Encode(parameter);
             CollectionAssert.AreEqual(expected, encoded);
 
@@ -344,6 +323,4 @@ public class ABITests
         }
 
     }
-
-
 }

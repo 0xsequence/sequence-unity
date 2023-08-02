@@ -8,9 +8,9 @@ using Sequence.Mocks;
 using Sequence.Provider;
 using Sequence.Transactions;
 using Sequence.Wallet;
-using Sequence.Extensions;
 using System.Collections.Generic;
 using Sequence.Contracts;
+using Sequence.Utils;
 
 public class SequenceEthClientTests
 {
@@ -438,7 +438,7 @@ public class SequenceEthClientTests
         new object[] { nameof(SequenceEthClient.WaitForTransactionReceipt), new object[] { "some hash", 1, 1 } },
     };
 
-    [TestCaseSource("errorCases")]
+    [TestCaseSource(nameof(errorCases))]
     public async Task TestErrorResponse(string methodName, params object[] parameters) {
         try {
             var client = new SequenceEthClient(failingClient);
