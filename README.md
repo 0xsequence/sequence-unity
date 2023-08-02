@@ -71,11 +71,33 @@ separate files, but for now since there are few ADRs, the README should suffice.
 Please use [Michael Nygard's template for 
 ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
 
+### ADR 3 - WaaS Client
+August 2, 2023 - author: Quinn Purdy
+
+#### Status
+Pending - approval of the accompanying PR will constitute approval of this ADR.
+
+#### Context
+A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http.
+
+#### Decision
+In order to save time on the integration, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
+
+Similar to ADR 2, the WaaS client will be implemented in a separate assembly from "SequenceEthereum". This assembly will be called "SequenceWaaS" and will reference and depend on the Ethereum library assembly "SequenceEthereum".
+
+For now, all tests will remain in the same assembly "SequenceTests".
+
+#### Consequences
+As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved, justifying the trade-off.
+
+Remaining consequences follow those from ADR 2 (with respect to assemblies).
+
 ### ADR 2 - Separate assemblies for Sequence integration and Ethereum library
 July 12, 2023 - author: Quinn Purdy
 
 #### Status
 Accepted - July 14, 2023
+
 #### Context
 Integration of Sequence into the sequence-unity is the next step in the Unity SDK project - preparations are being made, with modifications to project structure.
 
