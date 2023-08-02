@@ -90,6 +90,8 @@ For now, all tests will remain in the same assembly "SequenceTests".
 #### Consequences
 As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved, justifying the trade-off.
 
+Additionally, since the WaaS client relies on network requests, we must add additional async Tasks to the SequenceEthereum IWallet interface. This will require additional await statements throughout, harming readability.
+
 Remaining consequences follow those from ADR 2 (with respect to assemblies).
 
 ### ADR 2 - Separate assemblies for Sequence integration and Ethereum library
