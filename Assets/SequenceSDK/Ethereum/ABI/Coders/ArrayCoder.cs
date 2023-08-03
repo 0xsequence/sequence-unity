@@ -23,11 +23,11 @@ namespace Sequence.ABI
         /// <typeparam name="T">The type of objects in the list.</typeparam>
         /// <param name="value">The list of objects to encode.</param>
         /// <returns>The encoded byte array.</returns>
-        public byte[] Encode<T>(List<T> value)
+        public byte[] Encode<T>(List<T> value, string evmType)
         {
             try
             {
-                string encodedStr = EncodeToString(value);
+                string encodedStr = EncodeToString(value, evmType);
                 return SequenceCoder.HexStringToByteArray(encodedStr);
             }
             catch (Exception ex)
@@ -43,14 +43,14 @@ namespace Sequence.ABI
         /// <typeparam name="T">The type of objects in the list.</typeparam>
         /// <param name="value">The list of objects to encode.</param>
         /// <returns>The encoded string representation.</returns>
-        public string EncodeToString<T>(List<T> value)
+        public string EncodeToString<T>(List<T> value, string evmType)
         {
             try
             {
                 List<object> valueWrapper = new List<object>();
                 var valueList = value.Cast<object>().ToList();
                 valueWrapper.Add(valueList);
-                return _tupleCoder.EncodeToString(valueWrapper);
+                return _tupleCoder.EncodeToString(valueWrapper, new string[]{evmType});
             }
             catch (Exception ex)
             {

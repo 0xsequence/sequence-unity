@@ -84,12 +84,12 @@ namespace Sequence.ABI
             try
             {
                 int trailingZero = 0;
-                for (int i = encodedString.Length - 1; i > 64; i--)
+                for (int i = encodedString.Length - 1; i > 0; i--)
                 {
                     if (encodedString[i] == '0') trailingZero++;
                     else break;
                 }
-                string byteStr = encodedString.Substring(0, encodedString.Length - trailingZero);
+                string byteStr = EnsureEvenLength(encodedString.Substring(0, encodedString.Length - trailingZero));
 
                 return byteStr;
             }
@@ -99,6 +99,25 @@ namespace Sequence.ABI
                 Debug.LogError("Exception occurred during DecodeFromString: " + ex.Message);
                 throw;
             }
+        }
+
+        private string EnsureEvenLength(string value)
+        {
+            if (value.Length % 2 == 1)
+            {
+                value += "0";
+            }
+
+            return value;
+        }
+    }
+
+    public static class StaticBytesCoderExtensions
+    {
+        private static StaticBytesCoder _coder = new StaticBytesCoder();
+        public static byte[] Decode(string encoded)
+        {
+            return SequenceCoder.HexStringToByteArray(_coder.DecodeFromString(encoded.Replace("0x", "")));
         }
     }
 }

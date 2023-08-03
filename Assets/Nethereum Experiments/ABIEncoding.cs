@@ -5,7 +5,9 @@ using UnityEngine;
 using System.Numerics;
 using Nethereum.ABI;
 using Nethereum.ABI.Encoders;
+using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.ABI.Model;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexConvertors.Extensions;
 
@@ -96,6 +98,24 @@ public class ABIEncoding : MonoBehaviour
         result = abiEncode.GetABIEncoded(testTuple2).ToHex();
         Debug.Log(result); // yields empty string
         result = abiEncode.GetABIParamsEncoded(testTuple2).ToHex();
+        Debug.Log(result);
+        
+        BigInteger expectedNumber = 5;
+        string expectedWord = "SDK by Horizon";
+        BigInteger[] expectedNumbers = new BigInteger[] { 1, 2, 3, 4, 5 };
+        string[][] expectedDoubleNestedWords = new string[][]
+        {
+            new string[] { },
+            new string[]
+                { "SDK by Horizon", "", "Hello World!", DecodeABITests.longMultiLineString, "", "SDK by Horizon" },
+            new string[] { "", "", "" },
+            new string[] { "" }
+        };
+
+        result = abiEncode.GetABIEncoded(new ABIValue("uint256", expectedNumber), new ABIValue("string", expectedWord),
+            new ABIValue("uint256[]", expectedNumbers), new ABIValue("string[][]", expectedDoubleNestedWords)).ToHex();
+        
+        Debug.Log("Encoding function call to testPart1");
         Debug.Log(result);
     }
 

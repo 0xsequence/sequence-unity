@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence;
+using Sequence.ABI;
 using Sequence.Contracts;
 using Sequence.Provider;
 using Sequence.Utils;
@@ -58,7 +59,8 @@ public class ContractIntegrationTests
         bool expectedBoolean = true;
         bool[] expectedBools = new bool[] { true, true, false, true };
         byte[] expectedByteArray = Encoding.UTF8.GetBytes("SDK by Horizon");
-        byte[] expectedMoreBytes = Encoding.UTF8.GetBytes("Hello World!");
+        byte[] moreBytes = Encoding.UTF8.GetBytes("Hello World!");
+        FixedByte expectedMoreBytes = new FixedByte(32, moreBytes);
         Address[] expectedAddresses = new Address[]
             { wallet1.GetAddress(), wallet2.GetAddress(), wallet3.GetAddress() };
 
@@ -83,10 +85,10 @@ public class ContractIntegrationTests
         {
             Assert.Fail($"Expected an array but got: {resultPart1[3]}");
         }
-        Assert.AreEqual(expectedBoolean, (bool)resultPart1[0]);
+        Assert.AreEqual(expectedBoolean, (bool)resultPart2[0]);
         CollectionAssert.AreEqual(expectedBools, resultPart2[1].ConvertToTArray<bool, object>());
         CollectionAssert.AreEqual(expectedByteArray, (byte[])resultPart2[2]);
-        CollectionAssert.AreEqual(expectedMoreBytes, (byte[])resultPart2[3]);
+        CollectionAssert.AreEqual(expectedMoreBytes.Data, (byte[])resultPart2[3]);
         CollectionAssert.AreEqual(expectedAddresses, resultPart2[4].ConvertToTArray<Address, object>());
     }
 }
