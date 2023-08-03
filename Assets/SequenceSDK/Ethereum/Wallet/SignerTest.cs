@@ -11,6 +11,7 @@ using Sequence.ABI;
 using Nethereum.Web3;
 using Nethereum.Util;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Nethereum.Signer;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.ABI.Encoders;
@@ -19,7 +20,7 @@ using Sequence.Signer;
 public class SignerTest : MonoBehaviour
 {
 
-    private void Start()
+    private async Task Start()
     {
         EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
 
@@ -45,7 +46,7 @@ public class SignerTest : MonoBehaviour
         string sig = wallet.SignMessage(testMessage);
         Debug.Log("signature: " + sig);
 
-        bool valid = wallet.IsValidSignature(sig, "this is a test");
+        bool valid = await wallet.IsValidSignature(sig, "this is a test");
         Debug.Log("isValid? :" + valid);
 
         //Recover

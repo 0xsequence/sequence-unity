@@ -54,7 +54,7 @@ namespace Sequence.Wallet
 
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
 
-            return PubkeyToAddress(publicKeyBytes64);
+            return IWallet.PubkeyToAddress(publicKeyBytes64);
         }
 
         public Address GetAddress(uint accountIndex = 0)
@@ -170,43 +170,20 @@ namespace Sequence.Wallet
         /// <param name="signature">The signature to verify.</param>
         /// <param name="message">The message that was signed.</param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public bool IsValidSignature(string signature, string message)
+        public async Task<bool> IsValidSignature(string signature, string message, uint accountIndex = 0, string chainId = "")
         {
             byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
             byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
+            SecpRecoverableECDSASignature recoverable = EthSignature.GetSignature(signature);
 
-            if (recoverble != null)
+            if (recoverable != null)
             {
-                SecpECDSASignature sig = recoverble.ToSignature();
+                SecpECDSASignature sig = recoverable.ToSignature();
 
                 return pubKey.SigVerify(sig, hashedMessage);
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Recovers the Ethereum address from a message and its signature.
-        /// </summary>
-        /// <param name="message">The message that was signed.</param>
-        /// <param name="signature">The signature of the message.</param>
-        /// <returns>The Ethereum address as a string.</returns>
-        public string Recover(string message, string signature)
-        {
-            byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
-            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
-            ECPubKey _pubkey;
-            var ctx = Context.Instance;
-            ECPubKey.TryRecover(ctx, recoverble, hashedMessage, out _pubkey);
-
-            byte[] publickeyBytes = _pubkey.ToBytes(false);
-            byte[] publicKeyBytes64 = new byte[64];
-            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64); //trim extra 0 at the beginning...
-
-            return PubkeyToAddress(publicKeyBytes64);
         }
 
         /// <summary>
@@ -219,19 +196,9 @@ namespace Sequence.Wallet
             return IWallet.PrefixedMessage(message);
         }
 
-        /// <summary>
-        /// Converts a public key to an Ethereum address.
-        /// </summary>
-        /// <param name="pubkey">The public key byte array.</param>
-        /// <returns>The Ethereum address derived from the public key.</returns>
-        private string PubkeyToAddress(byte[] pubkey)
+        public string Recover(string message, string signature)
         {
-            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(pubkey));
-            int length = hashed.Length;
-            string address = hashed.Substring(length - 40);
-
-            address = SequenceCoder.AddressChecksum(address);
-            return address;
+            return IWallet.Recover(message, signature);
         }
     }
 }

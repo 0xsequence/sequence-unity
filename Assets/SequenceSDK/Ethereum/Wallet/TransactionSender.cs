@@ -12,8 +12,9 @@ namespace Sequence.Wallet {
             if (gasLimit == null) {
                 GasLimitEstimator estimator = new GasLimitEstimator(client, fromWallet.GetAddress());
                 transaction = await estimator.BuildTransactionCreator(to, data, value, gasPrice)();
-            }else {
-                BigInteger nonce = await fromWallet.GetNonce(client);
+            }else
+            {
+                BigInteger nonce = await client.NonceAt(fromWallet.GetAddress());
                 transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data, chainId);
             }
             string tx = transaction.SignAndEncodeTransaction(fromWallet);

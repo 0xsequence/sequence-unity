@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Sequence;
 using Sequence.Provider;
 using Sequence.WaaS;
+using System;
 
 namespace SequenceSDK.WaaS
 {
@@ -38,16 +39,6 @@ namespace SequenceSDK.WaaS
             return _walletAddressesByAccountIndex[accountIndex];
         }
 
-        public Task<BigInteger> GetBalance(IEthClient client)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<BigInteger> GetNonce(IEthClient client)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public (string v, string r, string s) SignTransaction(byte[] message, string chainId)
         {
             throw new System.NotImplementedException();
@@ -73,14 +64,11 @@ namespace SequenceSDK.WaaS
             throw new System.NotImplementedException();
         }
 
-        public bool IsValidSignature(string signature, string message)
+        public async Task<bool> IsValidSignature(string signature, string message, uint accountIndex, string chainId)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public string Recover(string message, string signature)
-        {
-            throw new System.NotImplementedException();
+            var args = new IsValidMessageSignatureArgs(chainId, GetAddress(accountIndex), message, signature);
+            var result = await _wallet.IsValidMessageSignature(args);
+            return result.isValid;
         }
     }
 }

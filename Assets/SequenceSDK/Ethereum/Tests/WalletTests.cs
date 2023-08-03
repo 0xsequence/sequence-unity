@@ -221,7 +221,7 @@ public class EthWalletTests
     }
 
     [Test]
-    public void TestWalletSignMessage()
+    public async Task TestWalletSignMessage()
     {
         EthWallet wallet = new EthWallet();
 
@@ -231,7 +231,7 @@ public class EthWalletTests
         string sig = wallet.SignMessage("hi");
         Assert.NotNull(sig);
 
-        bool valid = wallet.IsValidSignature(sig, "hi");
+        bool valid = await wallet.IsValidSignature(sig, "hi");
         Assert.IsTrue(valid);
     }
 
