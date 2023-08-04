@@ -22,10 +22,14 @@ jobs:
       - name: Install Dependencies
         run: yarn Install
 
-      - name: Setup Unity
-        uses: game-ci/setup-unity@v2
-        with:
-          unity-version: '2021.3.6f1'
+      - name: Download Unity 2021.3.6f1
+        run: |
+          curl -o UnityInstaller.pkg https://download.unity3d.com/download_unity/d691e07d38ef/MacEditorInstaller/Unity.pkg
+          sudo installer -dumplog -package UnityInstaller.pkg -target /
+
+      - name: Install Unity dependencies
+        run: |
+          sudo /Applications/Unity/Unity.app/Contents/MacOS/Unity -installStandardAssets
 
       - name: Start Testchain
         run: |
@@ -34,7 +38,7 @@ jobs:
           cd ..
 
       - name: Run Test Suite
-        run: Unity -runTests -projectPath "$(pwd)"
+        run: /Applications/Unity/Unity.app/Contents/MacOS/Unity -runTests -projectPath "$(pwd)"
 
       - name: Stop Testchain
         if: always()  # Ensure this step runs even if tests fail
