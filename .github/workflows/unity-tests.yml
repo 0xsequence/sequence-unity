@@ -22,7 +22,7 @@ jobs:
       - name: Download Unity 2021.3.6f1
         run: |
           curl -o UnityInstaller.pkg https://download.unity3d.com/download_unity/d691e07d38ef/MacEditorInstaller/Unity.pkg
-          sudo usr/sbin/installer -dumplog -package UnityInstaller.pkg -target /
+          sudo /usr/sbin/installer -dumplog -package UnityInstaller.pkg -target /
 
       - name: Install Unity dependencies
         run: |
