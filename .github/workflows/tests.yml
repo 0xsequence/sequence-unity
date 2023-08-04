@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: '14'
 
+<<<<<<< Updated upstream
       - name: Install Dependencies
         run: yarn Install
 
@@ -30,10 +31,18 @@ jobs:
       - name: Install Unity dependencies
         run: |
           sudo /Applications/Unity/Unity.app/Contents/MacOS/Unity -installStandardAssets
+=======
+      - name: Setup Unity
+        uses: game-ci/setup-unity@v2
+        with:
+          unity-version: '2021.3.6f1'
+>>>>>>> Stashed changes
+
+      - name: Install Dependencies
+        run: cd ./testchain && yarn Install
 
       - name: Start Testchain
         run: |
-          cd ./testchain
           yarn start:hardhat & echo $! > .pid
           cd ..
 
