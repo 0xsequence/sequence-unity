@@ -54,42 +54,6 @@ namespace Sequence.ABI
             }
         }
 
-        public static List<ABIType> GetParameterTypes(string functionSignature)
-        {
-            functionSignature = functionSignature.Substring(functionSignature.IndexOf('(') + 1);
-            functionSignature = functionSignature.TrimEnd(')');
-            string[] types = functionSignature.Split(',');
-            int count = types.Length;
-            List<ABIType> abiTypes = new List<ABIType>();
-
-            for (int i = 0; i < count; i++)
-            {
-                string signature = types[i];
-                ABIType type = GetTypeFromEvmName(signature);
-                if (type == ABIType.FIXEDBYTES)
-                {
-                    int instanceCount = GetInnerValue(signature);
-                    if (instanceCount > 0)
-                    {
-                        for (int j = 0; j < instanceCount; j++)
-                        {
-                            abiTypes.Add(ABIType.FIXEDBYTES);
-                        }
-                    }
-                    else
-                    {
-                        abiTypes.Add(ABIType.FIXEDBYTES);
-                    }
-                }
-                else
-                {
-                    abiTypes.Add(type);
-                }
-            }
-
-            return abiTypes;
-        }
-
         public static ABIType GetTypeFromEvmName(string typeName)
         {
             if (typeName.StartsWith("("))
