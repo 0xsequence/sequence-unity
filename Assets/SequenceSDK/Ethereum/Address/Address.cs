@@ -28,5 +28,16 @@ namespace Sequence {
         {
             return Value;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Address))
+            {
+                return false;
+            }
+
+            Address address = (Address)obj;
+            return this.Value == address.Value;
+        }
     }
 }

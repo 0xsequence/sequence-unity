@@ -111,4 +111,13 @@ namespace Sequence.ABI
             return value;
         }
     }
+
+    public static class BytesCoderExtensions
+    {
+        private static BytesCoder _coder = new BytesCoder();
+        public static byte[] Decode(string encoded)
+        {
+            return SequenceCoder.HexStringToByteArray(_coder.DecodeFromString(encoded.Replace("0x", "")));
+        }
+    }
 }

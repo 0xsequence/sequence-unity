@@ -397,18 +397,18 @@ and in that case, my mission will be complete.";
 
     private static object[] DecodeBytesTests =
     {
-        new object[] { Encoding.UTF8.GetBytes("SDK by Horizon"), "SDK by Horizon" },
-        new object[] { Encoding.UTF8.GetBytes(""), "" },
-        new object[] { Encoding.UTF8.GetBytes(longMultiLineString), longMultiLineString },
+        new object[] { "0x000000000000000000000000000000000000000000000000000000000000000e" + "53444b20627920486f72697a6f6e000000000000000000000000000000000000", Encoding.UTF8.GetBytes("SDK by Horizon") },
+        new object[] { "0x0000000000000000000000000000000000000000000000000000000000000000" + "0000000000000000000000000000000000000000000000000000000000000000", Encoding.UTF8.GetBytes("")},
+        new object[] { "0x0000000000000000000000000000000000000000000000000000000000000114" + "7468697320697320610a6d756c74692d6c696e6520737472696e670a7468617420697320616c736f20726174686572206c6f6e6720616e6420706f696e746c6573730a6275742069662049206a757374206b65657020747970696e67206d617962652069742077696c6c206d616b6520666f7220616e20696e746572657374696e67207465737420636173650a616e64206d617962652c0a6a757374206d617962652c0a796f752061732061207265616465722077696c6c20646576656c6f7020616e206576657220736f20736c6967687420736d696c65206f6e20796f757220666163650a616e6420696e207468617420636173652c206d79206d697373696f6e2077696c6c20626520636f6d706c6574652e000000000000000000000000", Encoding.UTF8.GetBytes(longMultiLineString) },
     };
 
     [TestCaseSource(nameof(DecodeBytesTests))]
-    public void TestDecodeBytes<T>(T expected, string value)
+    public void TestDecodeBytes(string value, byte[] expected)
     {
         try
         {
-            T result = ABI.Decode<T>(value, "bytes");
-            Assert.AreEqual(expected.ToString(), result.ToString());
+            byte[] result = ABI.Decode<byte[]>(value, "bytes");
+            Assert.AreEqual(expected,  result);
         }
         catch (Exception ex)
         {
@@ -450,17 +450,17 @@ and in that case, my mission will be complete.";
         new object[]
         {
             8, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 },
-            "0x0000000000000000000000000000000000000000000000000000000000000008" + "0102030405060708"
+            "0x" + "0102030405060708"
         },
         new object[]
         {
             8, new byte[] { 0x00, 0xFF, 0xAA, 0x55, 0x99, 0x66, 0x33, 0x22 },
-            "0x0000000000000000000000000000000000000000000000000000000000000008" + "00FFAA5599663322"
+            "0x" + "00FFAA5599663322"
         },
         new object[]
         {
             8, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF },
-            "0x0000000000000000000000000000000000000000000000000000000000000008" + "FFFFFFFFFFFFFFFF"
+            "0x" + "FFFFFFFFFFFFFFFF"
         },
         new object[]
         {
@@ -469,12 +469,12 @@ and in that case, my mission will be complete.";
             {
                 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10
             },
-            "0x0000000000000000000000000000000000000000000000000000000000000010" + "0102030405060708090A0B0C0D0E0F10"
+            "0x" + "0102030405060708090A0B0C0D0E0F10"
         },
-        new object[] { 0, new byte[0], "0x0000000000000000000000000000000000000000000000000000000000000000" },
+        new object[] { 0, new byte[0], "0x" },
         new object[]
         {
-            2, new byte[] { 0x01, 0x02 }, "0x0000000000000000000000000000000000000000000000000000000000000002" + "0102"
+            2, new byte[] { 0x01, 0x02 }, "0x" + "0102"
         },
         new object[]
         {
@@ -485,26 +485,26 @@ and in that case, my mission will be complete.";
                 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
                 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20
             },
-            "0x0000000000000000000000000000000000000000000000000000000000000020" +
+            "0x" +
             "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20"
         },
         new object[]
         {
             8,
             new FixedByte(8, new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 }),
-            "0x0000000000000000000000000000000000000000000000000000000000000008" + "0102030405060708"
+            "0x" + "0102030405060708"
         },
         new object[]
         {
             8,
             new FixedByte(8, new byte[] { 0x00, 0xFF, 0xAA, 0x55, 0x99, 0x66, 0x33, 0x22 }),
-            "0x0000000000000000000000000000000000000000000000000000000000000008" + "00FFAA5599663322"
+            "0x" + "00FFAA5599663322"
         },
         new object[]
         {
             8,
             new FixedByte(8, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }),
-            "0x0000000000000000000000000000000000000000000000000000000000000008" + "FFFFFFFFFFFFFFFF"
+            "0x" + "FFFFFFFFFFFFFFFF"
         },
         new object[]
         {
@@ -514,19 +514,19 @@ and in that case, my mission will be complete.";
                 {
                     0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10
                 }),
-            "0x0000000000000000000000000000000000000000000000000000000000000010" + "0102030405060708090A0B0C0D0E0F10"
+            "0x" + "0102030405060708090A0B0C0D0E0F10"
         },
         new object[]
         {
             0,
             new FixedByte(0, new byte[0]),
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            "0x"
         },
         new object[]
         {
             2,
             new FixedByte(2, new byte[] { 0x01, 0x02 }),
-            "0x0000000000000000000000000000000000000000000000000000000000000002" + "0102"
+            "0x" + "0102"
         },
         new object[]
         {
@@ -538,7 +538,7 @@ and in that case, my mission will be complete.";
                 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
                 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20
             }),
-            "0x0000000000000000000000000000000000000000000000000000000000000020" +
+            "0x" +
             "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20"
         },
         new object[]
@@ -555,7 +555,7 @@ and in that case, my mission will be complete.";
                 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
                 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 0x40
             },
-            "0x0000000000000000000000000000000000000000000000000000000000000040" +
+            "0x" +
             "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F40"
         },
     };

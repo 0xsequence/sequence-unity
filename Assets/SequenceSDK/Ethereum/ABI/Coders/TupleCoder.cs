@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System;
+using Sequence.Utils;
 
 
 namespace Sequence.ABI
@@ -35,33 +36,31 @@ namespace Sequence.ABI
         {
             throw new System.NotImplementedException();
         }
-
-
-
+        
         public byte[] Encode(object value)
         {
-            string encodedStr = EncodeToString(value);
-
-            return SequenceCoder.HexStringToByteArray(encodedStr);
+            throw new System.NotImplementedException();
         }
-
-
-
-        public string EncodeToString(object value, List<ABIType> types = null)
+        
+        public string EncodeToString(object value, string[] evmTypes)
         {
-            //List<object> valueTuple = new List<object>();
-            IList valueTuple = (IList) value;
-            /*if (value.GetType().IsArray)
+            if (evmTypes == null)
             {
-                UnityEngine.Debug.Log("input tuple is array, fixed size T[K]");
-                 valueTuple = ((object[])value).Cast<object>().ToList();
+                throw new ArgumentException($"{nameof(evmTypes)} must not be null");
             }
-            else
+
+            IList valueTuple = (IList)value;
+            if (evmTypes.Length == 1 && (ABI.GetTypeFromEvmName(evmTypes[0]) == ABIType.FIXEDARRAY ||
+                                         ABI.GetTypeFromEvmName(evmTypes[0]) == ABIType.DYNAMICARRAY) &&
+                valueTuple.Count > 1)
             {
-                UnityEngine.Debug.Log("input tuple is list, T[]");
-                valueTuple = (IList)value;// (List<object>)value;
-            }*/
+                valueTuple = (IList)new object[] { value };
+            }
             int tupleLength = (valueTuple).Count;
+            if (evmTypes.Length != tupleLength)
+            {
+                throw new ArgumentException($"{nameof(evmTypes)} must have as many elements as {nameof(value)}. {nameof(evmTypes)} has {evmTypes.Length} elements while {nameof(value)} has {tupleLength} elements");
+            }
             int headerTotalByteLength = tupleLength * 32;
             List<string> headList = new List<string>();
             List<string> tailList = new List<string>();
@@ -69,20 +68,12 @@ namespace Sequence.ABI
             for (int i = 0; i < tupleLength; i++)
             {
                 string head_i = "", tail_i = "";
-                ABIType type;
-                if (types == null)
+                ABIType type = ABI.GetTypeFromEvmName(evmTypes[i]);
+                ABIType temp = ABI.GetParameterType(valueTuple[i]);
+                if (temp != type && type != ABIType.FIXEDARRAY && type != ABIType.DYNAMICARRAY) // If it is a non-array data type, a mismatch will cause encoding issues - with arrays, a mismatch may cause encoding issues but it is difficult to predict
                 {
-                    type = ABI.GetParameterType(valueTuple[i]);
-                }else
-                {
-                    type = types[i];
-                    ABIType temp = ABI.GetParameterType(valueTuple[i]);
-                    if (temp != type && type != ABIType.FIXEDARRAY && type != ABIType.DYNAMICARRAY) // If it is a non-array data type, a mismatch will cause encoding issues - with arrays, a mismatch may cause encoding issues but it is difficult to predict
-                    {
-                        throw new ArgumentException($"Argument type is not as expected. Expected: {type} Received: {temp}");
-                    }
+                    throw new ArgumentException($"Argument type is not as expected. Expected: {type} Received: {temp}");
                 }
-
 
                 switch (type)
                 {
@@ -125,43 +116,55 @@ namespace Sequence.ABI
 
                         string numberCountEncoded = _numberCoder.EncodeToString(numberCount);
                         UnityEngine.Debug.Log("dynamic array tail number count: " + numberCountEncoded);
-                        tail_i = numberCountEncoded + EncodeToString(valueTuple[i]);
+                        tail_i = numberCountEncoded + EncodeToString(valueTuple[i], 
+                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount));
 
                         UnityEngine.Debug.Log("dynamic array tail: " + tail_i);
                         break;
                     case ABIType.FIXEDARRAY:
                         UnityEngine.Debug.Log("object in tuple array: fixed array");
-                        head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
-                        tail_i = EncodeToString(valueTuple[i]);
+                        numberCount = ABI.GetInnerValue(evmTypes[i]);
+                        head_i = EncodeToString(valueTuple[i], 
+                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount));
                         break;
                     case ABIType.TUPLE:
                         UnityEngine.Debug.Log("object in tuple array: tuple");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
-                        tail_i = EncodeToString(valueTuple[i]);
+                        tail_i = EncodeToString(valueTuple[i], ABI.GetTupleTypes(evmTypes[i]));
                         break;
-                    default:
-                        break;
+                    case ABIType.NONE:
+                        throw new ArgumentException(
+                            $"Must be a valid ABIType not {nameof(ABIType.NONE)}, given {valueTuple[i]}");
                 }
                 tailLength += tail_i.Length / 2; // 64 hex str-> 32 bytes
 
                 headList.Add(head_i);
                 tailList.Add(tail_i);
-
-
             }
 
-            //concat head list and tail list
-            string encoded = "";
-            foreach (string headstr in headList)
+            return ConcatenateHeadsAndTails(headList, tailList);
+        }
+
+        private string ConcatenateHeadsAndTails(List<string> head, List<string> tail)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            int length = head.Count;
+            if (tail.Count != length)
             {
-                encoded += headstr;
-            }
-            foreach (string tailstr in tailList)
-            {
-                encoded += tailstr;
+                throw new ArgumentException("Head and Tail lists must be the same length");
             }
 
-            return encoded;
+            for (int i = 0; i < length; i++)
+            {
+                stringBuilder.Append(head[i]);
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                stringBuilder.Append(tail[i]);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

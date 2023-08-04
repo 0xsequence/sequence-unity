@@ -22,5 +22,16 @@ namespace Sequence.Utils
             throw new ArgumentException(
                 $"Value {value} with type {value.GetType()} is not an array as expected.");
         }
+
+        public static T[] BuildArrayWithRepeatedValue<T>(T value, int repetitions)
+        {
+            T[] array = new T[repetitions];
+            for (int i = 0; i < repetitions; i++)
+            {
+                array[i] = value;
+            }
+
+            return array;
+        }
     }
 }

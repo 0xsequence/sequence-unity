@@ -44,8 +44,8 @@ namespace Sequence.ABI
                 method = method.Replace(" ",
                     ""); // Whitespace will mess with the function signature encoding and is easily left in by mistake
                 string methodNameEncoded = FunctionSelector(method);
-                List<ABIType> parameterTypes = GetParameterTypes(method);
-                string parameterEncoded = _tupleCoder.EncodeToString(parameters, parameterTypes);
+                string[] evmTypes = GetTupleTypes(method.Substring(method.IndexOf('(')));
+                string parameterEncoded = _tupleCoder.EncodeToString(parameters, evmTypes);
                 return (methodNameEncoded + parameterEncoded);
             }
             catch (Exception ex)
@@ -54,57 +54,11 @@ namespace Sequence.ABI
             }
         }
 
-        public static List<ABIType> GetParameterTypes(string functionSignature)
-        {
-            functionSignature = functionSignature.Substring(functionSignature.IndexOf('(') + 1);
-            functionSignature = functionSignature.TrimEnd(')');
-            string[] types = functionSignature.Split(',');
-            int count = types.Length;
-            List<ABIType> abiTypes = new List<ABIType>();
-
-            for (int i = 0; i < count; i++)
-            {
-                string signature = types[i];
-                ABIType type = GetTypeFromEvmName(signature);
-                if (type == ABIType.FIXEDBYTES)
-                {
-                    int instanceCount = GetInnerValue(signature);
-                    if (instanceCount > 0)
-                    {
-                        for (int j = 0; j < instanceCount; j++)
-                        {
-                            abiTypes.Add(ABIType.FIXEDBYTES);
-                        }
-                    }
-                    else
-                    {
-                        abiTypes.Add(ABIType.FIXEDBYTES);
-                    }
-                }
-                else
-                {
-                    abiTypes.Add(type);
-                }
-            }
-
-            return abiTypes;
-        }
-
-        private static ABIType GetTypeFromEvmName(string typeName)
+        public static ABIType GetTypeFromEvmName(string typeName)
         {
             if (typeName.StartsWith("("))
             {
                 return ABIType.TUPLE;
-            }
-
-            if (typeName.StartsWith("bytes"))
-            {
-                if (typeName == "bytes")
-                {
-                    return ABIType.BYTES;
-                }
-
-                return ABIType.FIXEDBYTES;
             }
 
             if (IsFixedArray(typeName))
@@ -115,6 +69,16 @@ namespace Sequence.ABI
             if (typeName.EndsWith("[]"))
             {
                 return ABIType.DYNAMICARRAY;
+            }
+
+            if (typeName.StartsWith("bytes"))
+            {
+                if (typeName == "bytes")
+                {
+                    return ABIType.BYTES;
+                }
+
+                return ABIType.FIXEDBYTES;
             }
 
             if (typeName == "address")
@@ -162,7 +126,7 @@ namespace Sequence.ABI
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static int GetInnerValue(string value)
+        public static int GetInnerValue(string value)
         {
             int start = value.IndexOf('[');
             if (start <= 0)
@@ -443,16 +407,16 @@ namespace Sequence.ABI
                         ThrowDecodeException<T>(evmType, typeof(byte[]).ToString());
                     }
 
-                    return (T)(object)Encoding.UTF8.GetBytes(value);
+                    return (T)(object)BytesCoderExtensions.Decode(value);
                 case ABIType.FIXEDBYTES:
                     if (typeof(T) == typeof(byte[]))
                     {
-                        return (T)(object)FixedBytesCoderExtensions.Decode(value);
+                        return (T)(object)StaticBytesCoderExtensions.Decode(value);
                     }
 
                     if (typeof(T) == typeof(FixedByte))
                     {
-                        byte[] bytes = FixedBytesCoderExtensions.Decode(value);
+                        byte[] bytes = StaticBytesCoderExtensions.Decode(value);
                         int length = bytes.Length;
                         return (T)(object)new FixedByte(length, bytes);
                     }
@@ -658,7 +622,7 @@ namespace Sequence.ABI
             return GetTypeFromEvmName(typeNonCollection);
         }
 
-        private static string GetUnderlyingCollectionTypeName(string evmType)
+        public static string GetUnderlyingCollectionTypeName(string evmType)
         {
             string prefix = evmType.Substring(0, evmType.IndexOf('['));
             string postfix = "";
@@ -746,7 +710,7 @@ namespace Sequence.ABI
                 $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'{evmType}\'. Supported types: {string.Join(", ", supportedTypes)}");
         }
 
-        private static string[] GetTupleTypes(string evmType)
+        public static string[] GetTupleTypes(string evmType)
         {
             if (GetTypeFromEvmName(evmType) != ABIType.TUPLE)
             {
@@ -754,7 +718,12 @@ namespace Sequence.ABI
             }
 
             string withoutParenthesis = evmType.Substring(1, evmType.Length - 2);
-            string[] types = withoutParenthesis.Split(", ");
+            withoutParenthesis = withoutParenthesis.Replace(" ", "");
+            if (withoutParenthesis == "")
+            {
+                return new string[] { };
+            }
+            string[] types = withoutParenthesis.Split(",");
             return types;
         }
 
