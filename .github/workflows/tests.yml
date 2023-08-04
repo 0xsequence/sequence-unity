@@ -1,0 +1,50 @@
+name: tests
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Dependencies
+        run: yarn Install
+
+      - name: Setup Unity
+        uses: game-ci/setup-unity@v2
+        with:
+          unity-version: '2021.3.6f1'
+
+      - name: Start Testchain
+        run: |
+          cd ./testchain
+          yarn start:hardhat & echo $! > .pid
+          cd ..
+
+      - name: Run Test Suite
+        run: Unity -runTests -projectPath "$(pwd)"
+
+      - name: Stop Testchain
+        if: always()  # Ensure this step runs even if tests fail
+        run: make stop
+
+      - name: Rename Test Results
+        if: always()  # Ensure this step runs even if tests fail
+        run: mv TestResults*.xml TestResults.xml
+
+      - name: Print Summary
+        if: always()  # Ensure this step runs even if tests fail
+        run: |
+          head -n 2 TestResults.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'
