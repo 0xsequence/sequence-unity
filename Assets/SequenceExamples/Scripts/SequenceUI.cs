@@ -9,19 +9,9 @@ namespace Sequence.Demo
     {
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
-        
-        public enum UIState
-        {
-            Connect,
-            Login,
-            TwoFactorAuthentication,
-            Wallet,
-            Default,
-        }
 
-        public UIState State { get; private set; } = UIState.Default;
-
-        private Stack<UIState> _stateStack = new Stack<UIState>();
+        private UIPage _page;
+        private Stack<UIPage> _pageStack = new Stack<UIPage>();
 
         private void Awake()
         {
@@ -31,67 +21,34 @@ namespace Sequence.Demo
 
         private void Start()
         {
-            SetUIState(UIState.Connect);
+            SetInitialUIPage(_connectPage);
         }
 
-        public void SetUIState(UIState desiredState)
+        private void SetInitialUIPage(UIPage page)
         {
-            ClosePage();
-            State = desiredState;
-            _stateStack.Push(desiredState);
-            OpenPage();
+            _page = page;
+            _pageStack.Push(page);
+            _page.Open();
         }
 
-        private void ClosePage()
+        public void SetUIPage(UIPage page)
         {
-            switch (State)
-            {
-                case UIState.Connect:
-                    _connectPage.Close();
-                    break;
-                case UIState.Login:
-                    _loginPage.Close();
-                    break;
-                case UIState.TwoFactorAuthentication:
-                    break;
-                case UIState.Wallet:
-                    break;
-            }
-        }
-
-        private void OpenPage()
-        {
-            switch (State)
-            {
-                case UIState.Connect:
-                    _connectPage.Open();
-                    break;
-                case UIState.Login:
-                    _loginPage.Open();
-                    break;
-                case UIState.TwoFactorAuthentication:
-                    break;
-                case UIState.Wallet:
-                    break;
-            }
+            _page.Close();
+            _page = page;
+            _pageStack.Push(page);
+            _page.Open();
         }
 
         public void Back()
         {
-            if (_stateStack.Count <= 1)
+            if (_pageStack.Count <= 1)
             {
                 return;
             }
 
-            ClosePage();
-            _stateStack.Pop();
-            State = _stateStack.Peek();
-            OpenPage();
-        }
-
-        public void OpenLoginPage()
-        {
-            SetUIState(UIState.Login);
+            _pageStack.Pop().Close();
+            _page = _pageStack.Peek();
+            _page.Open();
         }
     }
 }
