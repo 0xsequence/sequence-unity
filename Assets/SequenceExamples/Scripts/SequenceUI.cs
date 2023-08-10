@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class SequenceUI : MonoBehaviour
+    public class SequenceUI : UIPage
     {
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
@@ -13,19 +14,23 @@ namespace Sequence.Demo
         private UIPage _page;
         private Stack<UIPage> _pageStack = new Stack<UIPage>();
 
-        private void Awake()
+        protected override void Awake()
         {
-            _connectPage = FindObjectOfType<ConnectPage>();
-            _loginPage = FindObjectOfType<LoginPage>();
+            base.Awake();
+            _connectPage = GetComponentInChildren<ConnectPage>();
+            _loginPage = GetComponentInChildren<LoginPage>();
         }
 
-        private void Start()
+        protected override void Start()
         {
-            SetInitialUIPage(_connectPage);
+            base.Start();
+            Open();
+            StartCoroutine(SetInitialUIPage(_connectPage));
         }
 
-        private void SetInitialUIPage(UIPage page)
+        private IEnumerator SetInitialUIPage(UIPage page)
         {
+            yield return new WaitUntil(() => page.SetupComplete);
             _page = page;
             _pageStack.Push(page);
             _page.Open();

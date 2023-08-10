@@ -11,19 +11,20 @@ namespace Sequence.Demo
         [SerializeField] private float _closeAnimationDurationInSeconds;
         private GameObject _gameObject;
         private Scale _scale;
+        public bool SetupComplete { get; private set; } = false;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             _transform = GetComponent<RectTransform>();
             _gameObject = gameObject;
             _scale = _gameObject.AddComponent<Scale>();
             _scale.Initialize(_transform);
-            _transform.localScale = new Vector3(0, 0, 0);
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             _gameObject.SetActive(false);
+            SetupComplete = true;
         }
 
         public void Open()

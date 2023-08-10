@@ -11,6 +11,7 @@ namespace Sequence.Demo.Tweening
         public void Initialize(RectTransform rectTransform)
         {
             this._transform = rectTransform;
+            _transform.localScale = new Vector3(0, 0, 0);
         }
 
         public void ScaleOverTime(float target, float durationInSeconds)
