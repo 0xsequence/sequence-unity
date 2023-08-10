@@ -9,16 +9,23 @@ namespace Sequence.Demo
         private RectTransform _transform;
         [SerializeField] private float _openAnimationDurationInSeconds;
         [SerializeField] private float _closeAnimationDurationInSeconds;
+        [SerializeField] private AnimationType _animation;
         private GameObject _gameObject;
-        private Scale _scale;
+        private ITween _animator;
         public bool SetupComplete { get; private set; } = false;
+
+        public enum AnimationType
+        {
+            ScaleIn,
+            FromBottom,
+        }
 
         protected virtual void Awake()
         {
             _transform = GetComponent<RectTransform>();
             _gameObject = gameObject;
-            _scale = _gameObject.AddComponent<Scale>();
-            _scale.Initialize(_transform);
+            AddAppropriateAnimator();
+            _animator.Initialize(_transform);
         }
 
         protected virtual void Start()
@@ -30,18 +37,31 @@ namespace Sequence.Demo
         public void Open()
         {
             _gameObject.SetActive(true);
-            _scale.ScaleOverTime(1, _openAnimationDurationInSeconds);
+            _animator.Animate( _openAnimationDurationInSeconds);
         }
 
         public void Close()
         {
-            _scale.ScaleOverTime(0, _closeAnimationDurationInSeconds);
+            _animator.Animate(_closeAnimationDurationInSeconds);
             Invoke(nameof(Deactivate), _closeAnimationDurationInSeconds);
         }
 
         private void Deactivate()
         {
             _gameObject.SetActive(false);
+        }
+
+        private void AddAppropriateAnimator()
+        {
+            switch (_animation)
+            {
+                case AnimationType.ScaleIn:
+                    _animator = _gameObject.AddComponent<Scale>();
+                    break;
+                case AnimationType.FromBottom:
+                    _animator = _gameObject.AddComponent<FromBottom>();
+                    break;
+            }
         }
     }
 }

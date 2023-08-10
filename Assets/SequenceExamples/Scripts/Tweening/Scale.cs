@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Sequence.Demo.Tweening
 {
-    public class Scale : MonoBehaviour
+    public class Scale : MonoBehaviour, ITween
     {
         private RectTransform _transform;
 
@@ -14,7 +14,12 @@ namespace Sequence.Demo.Tweening
             _transform.localScale = new Vector3(0, 0, 0);
         }
 
-        public void ScaleOverTime(float target, float durationInSeconds)
+        public void Animate(float durationInSeconds)
+        {
+            ScaleOverTime(1, durationInSeconds);
+        }
+
+        private void ScaleOverTime(float target, float durationInSeconds)
         {
             Vector3 startingScale = _transform.localScale;
             Vector3 targetScale = new Vector3(target, target, 1);

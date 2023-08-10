@@ -1083,8 +1083,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b0ac54a9a11e4ccd84e77feec2f9cdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _openAnimationDurationInSeconds: 0.5
-  _closeAnimationDurationInSeconds: 0.25
+  _openAnimationDurationInSeconds: 0.75
+  _closeAnimationDurationInSeconds: 0.375
+  _animation: 1
 --- !u!114 &863633308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1446,6 +1447,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
+  _animation: 0
 --- !u!1 &1543021399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1498,6 +1500,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
+  _animation: 0
 --- !u!1 &1648647572
 GameObject:
   m_ObjectHideFlags: 0
