@@ -7,8 +7,8 @@ namespace Sequence.Demo
     public class UIPage : MonoBehaviour
     {
         private RectTransform _transform;
-        [SerializeField] private float _openAnimationDurationInSeconds;
-        [SerializeField] private float _closeAnimationDurationInSeconds;
+        [SerializeField] protected float _openAnimationDurationInSeconds;
+        [SerializeField] protected float _closeAnimationDurationInSeconds;
         [SerializeField] private AnimationType _animation;
         private GameObject _gameObject;
         private ITween _animator;

@@ -30,6 +30,7 @@ namespace Sequence.Demo
 
         private IEnumerator SetInitialUIPage(UIPage page)
         {
+            yield return new WaitForSecondsRealtime(base._openAnimationDurationInSeconds);
             yield return new WaitUntil(() => page.SetupComplete);
             _page = page;
             _pageStack.Push(page);
