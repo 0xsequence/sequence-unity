@@ -25,7 +25,7 @@ namespace Sequence.Demo
         {
             base.Start();
             Open();
-            StartCoroutine(SetInitialUIPage(_connectPage));
+            StartCoroutine(SetInitialUIPage(_loginPage));
         }
 
         private IEnumerator SetInitialUIPage(UIPage page)
