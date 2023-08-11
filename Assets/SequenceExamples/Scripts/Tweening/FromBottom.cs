@@ -8,6 +8,7 @@ namespace Sequence.Demo.Tweening
         private RectTransform _transform;
         private Vector3 _targetPosition;
         private Vector3 _startPosition;
+
         public void Initialize(RectTransform rectTransform)
         {
             this._transform = rectTransform;
@@ -18,10 +19,15 @@ namespace Sequence.Demo.Tweening
 
         public void Animate(float durationInSeconds)
         {
-            StartCoroutine(DoSlideInFromBottom(durationInSeconds));
+            StartCoroutine(DoSlide(durationInSeconds, _startPosition, _targetPosition));
         }
 
-        private IEnumerator DoSlideInFromBottom(float durationInSeconds)
+        public void AnimateOut(float durationInSeconds)
+        {
+            StartCoroutine(DoSlide(durationInSeconds, _targetPosition, _startPosition));
+        }
+
+        private IEnumerator DoSlide(float durationInSeconds, Vector3 startPosition, Vector3 targetPosition)
         {
             float startTime = Time.time;
             float deltaTime = Time.time - startTime;
@@ -29,7 +35,7 @@ namespace Sequence.Demo.Tweening
             while (deltaTime < durationInSeconds)
             {
                 float progress = deltaTime / durationInSeconds;
-                Vector3 newPosition = Vector3.Lerp(_startPosition, _targetPosition, progress);
+                Vector3 newPosition = Vector3.Lerp(startPosition, targetPosition, progress);
                 _transform.anchoredPosition = newPosition;
                 deltaTime = Time.time - startTime;
                 yield return null;

@@ -42,7 +42,7 @@ namespace Sequence.Demo
 
         public void Close()
         {
-            _animator.Animate(_closeAnimationDurationInSeconds);
+            _animator.AnimateOut(_closeAnimationDurationInSeconds);
             Invoke(nameof(Deactivate), _closeAnimationDurationInSeconds);
         }
 

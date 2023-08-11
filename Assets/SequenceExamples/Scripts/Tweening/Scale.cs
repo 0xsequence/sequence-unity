@@ -19,6 +19,11 @@ namespace Sequence.Demo.Tweening
             ScaleOverTime(1, durationInSeconds);
         }
 
+        public void AnimateOut(float durationInSeconds)
+        {
+            ScaleOverTime(0, durationInSeconds);
+        }
+
         private void ScaleOverTime(float target, float durationInSeconds)
         {
             Vector3 startingScale = _transform.localScale;

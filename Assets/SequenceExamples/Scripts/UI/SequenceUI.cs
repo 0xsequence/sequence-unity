@@ -10,6 +10,7 @@ namespace Sequence.Demo
     {
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
+        private LoginSuccessPage _loginSuccessPage;
 
         private UIPage _page;
         private Stack<UIPage> _pageStack = new Stack<UIPage>();
@@ -17,11 +18,15 @@ namespace Sequence.Demo
         protected override void Awake()
         {
             base.Awake();
+            
             _connectPage = GetComponentInChildren<ConnectPage>();
+            
             _loginPage = GetComponentInChildren<LoginPage>();
             _loginPage.SetupLogin(new MockLogin());
             _loginPage.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             _loginPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
+
+            _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
         }
 
         protected override void Start()
@@ -33,16 +38,17 @@ namespace Sequence.Demo
 
         private IEnumerator SetInitialUIPage(UIPage page)
         {
-            yield return new WaitForSecondsRealtime(base._openAnimationDurationInSeconds);
+            yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
             yield return new WaitUntil(() => page.SetupComplete);
             _page = page;
             _pageStack.Push(page);
             _page.Open();
         }
 
-        public void SetUIPage(UIPage page)
+        public IEnumerator SetUIPage(UIPage page)
         {
             _page.Close();
+            yield return new WaitUntil(() => !_page.isActiveAndEnabled);
             _page = page;
             _pageStack.Push(page);
             _page.Open();
@@ -62,12 +68,13 @@ namespace Sequence.Demo
 
         private void OnLoginSuccessHandler(string userId)
         {
-            Debug.Log("successful login");
+            Debug.Log($"Successful login as user ID: {userId}");
+            StartCoroutine(SetUIPage(_loginSuccessPage));
         }
 
         private void OnLoginFailedHandler(string error)
         {
-            Debug.Log("failed login");
+            Debug.Log($"Failed login: {error}");
         }
     }
 }

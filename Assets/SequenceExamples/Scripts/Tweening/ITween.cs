@@ -6,5 +6,6 @@ namespace Sequence.Demo.Tweening
     {
         public void Initialize(RectTransform rectTransform);
         public void Animate(float durationInSeconds);
+        public void AnimateOut(float durationInSeconds);
     }
 }
