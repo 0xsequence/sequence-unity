@@ -19,6 +19,9 @@ namespace Sequence.Demo
             base.Awake();
             _connectPage = GetComponentInChildren<ConnectPage>();
             _loginPage = GetComponentInChildren<LoginPage>();
+            _loginPage.SetupLogin(new MockLogin());
+            _loginPage.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
+            _loginPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
         }
 
         protected override void Start()
@@ -55,6 +58,16 @@ namespace Sequence.Demo
             _pageStack.Pop().Close();
             _page = _pageStack.Peek();
             _page.Open();
+        }
+
+        private void OnLoginSuccessHandler(string userId)
+        {
+            Debug.Log("successful login");
+        }
+
+        private void OnLoginFailedHandler(string error)
+        {
+            Debug.Log("failed login");
         }
     }
 }
