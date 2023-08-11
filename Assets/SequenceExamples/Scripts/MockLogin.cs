@@ -6,9 +6,14 @@ namespace Sequence.Demo
     {
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
+        private IValidator _validator = new MockValidator();
 
         public async Task Login(string email)
         {
+            if (!_validator.ValidateEmail(email))
+            {
+                OnLoginFailed?.Invoke("Login failed because of invalid email");
+            }
             await Task.Delay(3000);
             if (email == "fail")
             {
