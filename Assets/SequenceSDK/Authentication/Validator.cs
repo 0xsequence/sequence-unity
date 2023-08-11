@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Sequence.Demo
+namespace Sequence.Authentication
 {
     public class Validator : IValidator
     {

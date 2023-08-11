@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Sequence.Demo
+namespace Sequence.Authentication
 {
     public interface ILogin
     {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sequence.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
 

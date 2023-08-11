@@ -1,3 +1,4 @@
+using Sequence.Authentication;
 using Sequence.Demo.Tweening;
 using TMPro;
 using UnityEngine;

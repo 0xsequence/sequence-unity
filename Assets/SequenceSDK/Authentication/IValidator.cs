@@ -1,4 +1,4 @@
-namespace Sequence.Demo
+namespace Sequence.Authentication
 {
     public interface IValidator
     {

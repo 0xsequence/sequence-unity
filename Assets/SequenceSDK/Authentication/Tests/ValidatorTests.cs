@@ -1,6 +1,7 @@
 using NUnit.Framework;
+using Sequence.Authentication;
 
-namespace Sequence.Demo.Tests
+namespace Sequence.Authenticator.Tests
 {
     public class ValidatorTests
     {
