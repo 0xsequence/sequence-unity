@@ -236,6 +236,21 @@ public class EthWalletTests
     }
 
     [Test]
+    public async Task TestWalletSignMessageWithChainId()
+    {
+        EthWallet wallet = new EthWallet();
+
+        string address = wallet.GetAddress();
+        Assert.NotNull(address);
+
+        string sig = wallet.SignMessage("hi", "1");
+        Assert.NotNull(sig);
+
+        bool valid = await wallet.IsValidSignature(sig, "hi", chainId: "1");
+        Assert.IsTrue(valid);
+    }
+
+    [Test]
     public void TestWalletSignMessageExistingPrefix()
     {
         EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");

@@ -54,12 +54,12 @@ namespace SequenceSDK.WaaS
             throw new System.NotImplementedException();
         }
 
-        public string SignMessage(byte[] message)
+        public string SignMessage(byte[] message, byte[] chainId = null)
         {
             throw new System.NotImplementedException();
         }
 
-        public string SignMessage(string message)
+        public string SignMessage(string message, string chainId = null)
         {
             throw new System.NotImplementedException();
         }

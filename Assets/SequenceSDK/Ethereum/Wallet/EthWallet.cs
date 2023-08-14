@@ -11,6 +11,7 @@ using System.Linq;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Extensions;
 using Sequence.Utils;
 using UnityEngine;
 
@@ -116,8 +117,12 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a byte array.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(byte[] message)
+        public string SignMessage(byte[] message, byte[] chainId = null)
         {
+            if (chainId != null && chainId.Length > 0)
+            {
+                message = ByteArrayExtensions.ConcatenateByteArrays(message, chainId);
+            }
             byte[] message32 = SequenceCoder.KeccakHash(PrefixedMessage(message));
             return EthSignature.Sign(message32, privKey);
         }
@@ -128,10 +133,15 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string message)
+        public string SignMessage(string message, string chainId = null)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-            return SignMessage(messageBytes);
+            byte[] chainIdBytes = null;
+            if (chainId != null)
+            {
+                chainIdBytes = Encoding.UTF8.GetBytes(chainId);
+            }
+            return SignMessage(messageBytes, chainIdBytes);
         }
 
         /// <summary>
@@ -140,7 +150,7 @@ namespace Sequence.Wallet
         /// <param name="privateKey">The private key as a hexadecimal string.</param>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string privateKey, string message)
+        public string SignMessageWithPrivateKey(string privateKey, string message)
         {
             byte[] message32 = new byte[32];
             message32 = SequenceCoder.KeccakHash(PrefixedMessage(Encoding.UTF8.GetBytes(message)));
@@ -172,7 +182,12 @@ namespace Sequence.Wallet
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
         public async Task<bool> IsValidSignature(string signature, string message, uint accountIndex = 0, string chainId = "")
         {
-            byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+            if (chainId != null && chainId.Length > 0)
+            {
+                messageBytes = ByteArrayExtensions.ConcatenateByteArrays(messageBytes, Encoding.UTF8.GetBytes(chainId));
+            }
+            byte[] messagePrefix = PrefixedMessage(messageBytes);
             byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
             SecpRecoverableECDSASignature recoverable = EthSignature.GetSignature(signature);
 
