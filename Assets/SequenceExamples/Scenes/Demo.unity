@@ -1315,7 +1315,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: "\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1324,8 +1324,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 3289650
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 0
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4206,6 +4206,15 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
+  _inputField: {fileID: 2021293621}
+  _inputBoxes:
+  - {fileID: 653053625}
+  - {fileID: 572281963}
+  - {fileID: 1029767646}
+  - {fileID: 749568919}
+  - {fileID: 101988595}
+  - {fileID: 1040568985}
+  _enterCodeText: {fileID: 633065257}
 --- !u!1 &1088167297
 GameObject:
   m_ObjectHideFlags: 0
@@ -5328,8 +5337,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1543021401}
-        m_TargetAssemblyTypeName: Sequence.Demo.LoginPage, Assembly-CSharp
+      - m_Target: {fileID: 1076743421}
+        m_TargetAssemblyTypeName: Sequence.Demo.MultifactorAuthenticationPage, SequenceExamples
         m_MethodName: Login
         m_Mode: 1
         m_Arguments:
@@ -6829,14 +6838,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 0
+  m_ContentType: 2
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 4
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 0

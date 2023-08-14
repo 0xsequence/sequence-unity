@@ -11,6 +11,7 @@ namespace Sequence.Demo
     {
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
+        private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
 
         private UIPage _page;
@@ -22,10 +23,17 @@ namespace Sequence.Demo
             
             _connectPage = GetComponentInChildren<ConnectPage>();
             
+            ILogin loginHandler = new MockLogin();
+            
             _loginPage = GetComponentInChildren<LoginPage>();
-            _loginPage.SetupLogin(new MockLogin());
-            _loginPage.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
-            _loginPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
+            _loginPage.SetupLogin(loginHandler);
+            _loginPage.LoginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
+            _loginPage.LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
+
+            _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
+            _mfaPage.SetupLogin(loginHandler);
+            _mfaPage.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
+            _mfaPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
         }
@@ -46,13 +54,13 @@ namespace Sequence.Demo
             _page.Open();
         }
 
-        public IEnumerator SetUIPage(UIPage page)
+        public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
         {
             _page.Close();
             yield return new WaitUntil(() => !_page.isActiveAndEnabled);
             _page = page;
             _pageStack.Push(page);
-            _page.Open();
+            _page.Open(openArgs);
         }
 
         public void Back()
@@ -76,6 +84,17 @@ namespace Sequence.Demo
         private void OnLoginFailedHandler(string error)
         {
             Debug.Log($"Failed login: {error}");
+        }
+
+        private void OnMFAEmailSentHandler(string email)
+        {
+            Debug.Log($"Successfully sent MFA email to {email}");
+            StartCoroutine(SetUIPage(_mfaPage, email));
+        }
+
+        private void OnMFAEmailFailedToSendHandler(string email, string error)
+        {
+            Debug.Log($"Failed to send MFA email to {email} with error: {error}");
         }
     }
 }

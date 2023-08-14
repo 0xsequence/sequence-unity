@@ -10,6 +10,23 @@ namespace Sequence.Authentication
         public delegate void OnLoginFailedHandler(string error);
         public event OnLoginFailedHandler OnLoginFailed;
 
+        public delegate void OnMFAEmailSentHandler(string email);
+
+        public event OnMFAEmailSentHandler OnMFAEmailSent;
+
+        public delegate void OnMFAEmailFailedToSendHandler(string email, string error);
+
+        public event OnMFAEmailFailedToSendHandler OnMFAEmailFailedToSend;
+
+        /// <summary>
+        /// Attempt to send the user an MFA email
+        /// Emits an OnMFAEmailSent event when successful
+        /// Emits an OnMFAEmailFailedToSend event when unsuccessful
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public Task Login(string email);
+
         /// <summary>
         /// Attempt to log the user in
         /// Emits an OnLoginSuccess event when successful
@@ -17,6 +34,6 @@ namespace Sequence.Authentication
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Task Login(string email);
+        public Task Login(string email, string code);
     }
 }

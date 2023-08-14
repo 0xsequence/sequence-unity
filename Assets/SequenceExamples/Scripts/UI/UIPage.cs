@@ -34,7 +34,7 @@ namespace Sequence.Demo
             SetupComplete = true;
         }
 
-        public void Open()
+        public virtual void Open(params object[] args)
         {
             _gameObject.SetActive(true);
             _animator.Animate( _openAnimationDurationInSeconds);
