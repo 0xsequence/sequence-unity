@@ -48,7 +48,7 @@ namespace Sequence.Demo
         private void SetTextColor(Transform t)
         {
             TextMeshProUGUI text = t.GetComponent<TextMeshProUGUI>();
-            if (text != null)
+            if (text != null && text.color.a > 0.01f) // Transparent text should remain transparent
             {
                 text.color = _colorScheme.textColor;
             }
