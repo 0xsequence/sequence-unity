@@ -64,6 +64,15 @@ A transaction, as implemented in EthTransaction, contains all the data and param
 ### Contract
 A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
 
+## Example UI
+A sample UI scene can be found under `Assets > SequenceExamples > Scenes > Demo.unity`
+This scene contains sample Sequence UI (with integration) for login flow and wallet view, settings, and transaction flow.
+
+### Customizations + Color Schemes
+As a Made-With-Unity UI, the sample UI is cross platform and easily customizable.
+To make customization even easier, the sample UI comes equipped with a Color Scheme Manager. This monobehaviour script is attached to the `SequenceCanvas` gameObject. By attaching a `ColorScheme` scriptable object and clicking the `Apply` button in the Inspector, the `ColorSchemeManager` will quickly apply the desired color scheme, allowing for faster UI iterations.
+To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence > Color Scheme`. From here, you can give the color scheme a name, move it to the desired directory, and choose your colors.
+
 ## Architecture Decision Records
 
 Please add any ADRs below. In the future, it may be worthwhile to move these into 
