@@ -32,12 +32,17 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
-            if (args.Length != 1 || args[0] is not string)
+            if (email == null && (args.Length != 1 || args[0] is not string))
             {
                 throw new ArgumentException($"Expected exactly one argument of type {typeof(string)}");
             }
-            email = (string)args[0];
+
+            if (args.Length > 0)
+            {
+                email = (string)args[0];
+            }
             _enterCodeText.text = $"Enter the code sent to\n<b>{email}</b>";
+            _inputField.text = "";
         }
 
         private void OnInputValueChanged(string newValue)
