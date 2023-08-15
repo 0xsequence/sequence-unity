@@ -672,6 +672,7 @@ GameObject:
   - component: {fileID: 171231627}
   - component: {fileID: 171231626}
   - component: {fileID: 171231630}
+  - component: {fileID: 171231631}
   m_Layer: 5
   m_Name: SequenceCanvas
   m_TagString: Untagged
@@ -774,6 +775,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _colorScheme: {fileID: 11400000, guid: 406e85e5d7f2f4cc89d458f23fc4eaed, type: 2}
+--- !u!114 &171231631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171231625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b0ac54a9a11e4ccd84e77feec2f9cdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &220330147
 GameObject:
   m_ObjectHideFlags: 0
@@ -3581,7 +3594,7 @@ GameObject:
   - component: {fileID: 863633306}
   - component: {fileID: 863633309}
   - component: {fileID: 863633308}
-  - component: {fileID: 863633307}
+  - component: {fileID: 863633310}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -3613,21 +3626,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 300, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &863633307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 863633305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b0ac54a9a11e4ccd84e77feec2f9cdb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _openAnimationDurationInSeconds: 0.75
-  _closeAnimationDurationInSeconds: 0.375
-  _animation: 1
 --- !u!114 &863633308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3666,6 +3664,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 863633305}
   m_CullTransparentMesh: 1
+--- !u!114 &863633310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863633305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7565bbdec957453d8fd007d6825c493a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _openAnimationDurationInSeconds: 0.75
+  _closeAnimationDurationInSeconds: 0.375
+  _animation: 1
 --- !u!1 &982350860
 GameObject:
   m_ObjectHideFlags: 0
@@ -5016,8 +5029,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 863633307}
-        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, Assembly-CSharp
+      - m_Target: {fileID: 171231631}
+        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, SequenceExamples
         m_MethodName: Back
         m_Mode: 1
         m_Arguments:
@@ -5742,7 +5755,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 863633307}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Sequence.Demo.UIPage, SequenceExamples
         m_MethodName: Close
         m_Mode: 1
@@ -6071,7 +6084,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 863633307}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, Assembly-CSharp
         m_MethodName: SetUIPage
         m_Mode: 2
@@ -7262,8 +7275,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 863633307}
-        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, Assembly-CSharp
+      - m_Target: {fileID: 171231631}
+        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, SequenceExamples
         m_MethodName: Back
         m_Mode: 1
         m_Arguments:

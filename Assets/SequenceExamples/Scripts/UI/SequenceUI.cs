@@ -7,8 +7,9 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class SequenceUI : UIPage
+    public class SequenceUI : MonoBehaviour
     {
+        private LoginPanel _loginPanel;
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
@@ -17,9 +18,9 @@ namespace Sequence.Demo
         private UIPage _page;
         private Stack<UIPage> _pageStack = new Stack<UIPage>();
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
+            _loginPanel = GetComponentInChildren<LoginPanel>();
             
             _connectPage = GetComponentInChildren<ConnectPage>();
             
@@ -38,20 +39,19 @@ namespace Sequence.Demo
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
         }
 
-        protected override void Start()
+        private void Start()
         {
-            base.Start();
-            Open();
-            StartCoroutine(SetInitialUIPage(_loginPage));
+            StartCoroutine(SetInitialUIPage(_loginPanel, _loginPage));
         }
 
-        private IEnumerator SetInitialUIPage(UIPage page)
+        private IEnumerator SetInitialUIPage(UIPanel panel, UIPage page)
         {
-            yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
+            yield return new WaitUntil(() => panel.SetupComplete);
+            panel.Open();
             yield return new WaitUntil(() => page.SetupComplete);
             _page = page;
             _pageStack.Push(page);
-            _page.Open();
+            StartCoroutine(panel.OpenInitialPage(page));
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
