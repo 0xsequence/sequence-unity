@@ -9,6 +9,8 @@ namespace Sequence.Demo
 {
     public class SequenceUI : MonoBehaviour
     {
+        public static bool IsTesting = false;
+        
         private LoginPanel _loginPanel;
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
@@ -39,16 +41,29 @@ namespace Sequence.Demo
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
         }
 
-        private void Start()
+        public void Start()
         {
-            StartCoroutine(SetInitialUIPage(_loginPanel, _loginPage));
+            if (IsTesting)
+            {
+                return;
+            }
+            DisableAllUIPages();
+            SetInitialUIPage(_loginPanel, _loginPage);
         }
 
-        private IEnumerator SetInitialUIPage(UIPanel panel, UIPage page)
+        private void DisableAllUIPages()
         {
-            yield return new WaitUntil(() => panel.SetupComplete);
+            UIPage[] pages = GetComponentsInChildren<UIPage>();
+            int count = pages.Length;
+            for (int i = 0; i < count; i++)
+            {
+                pages[i].gameObject.SetActive(false);
+            }
+        }
+
+        private void SetInitialUIPage(UIPanel panel, UIPage page)
+        {
             panel.Open();
-            yield return new WaitUntil(() => page.SetupComplete);
             _page = page;
             _pageStack.Push(page);
             StartCoroutine(panel.OpenInitialPage(page));

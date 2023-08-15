@@ -12,7 +12,6 @@ namespace Sequence.Demo
         [SerializeField] private AnimationType _animation;
         private GameObject _gameObject;
         private ITween _animator;
-        public bool SetupComplete { get; private set; } = false;
 
         public enum AnimationType
         {
@@ -30,8 +29,7 @@ namespace Sequence.Demo
 
         protected virtual void Start()
         {
-            _gameObject.SetActive(false);
-            SetupComplete = true;
+            
         }
 
         public virtual void Open(params object[] args)
