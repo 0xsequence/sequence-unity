@@ -117,7 +117,7 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a byte array.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(byte[] message, byte[] chainId = null)
+        public async Task<string> SignMessage(byte[] message, byte[] chainId = null)
         {
             if (chainId != null && chainId.Length > 0)
             {
@@ -133,7 +133,7 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string message, string chainId = null)
+        public Task<string> SignMessage(string message, string chainId = null)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             byte[] chainIdBytes = null;

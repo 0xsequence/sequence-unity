@@ -228,7 +228,7 @@ public class EthWalletTests
         string address = wallet.GetAddress();
         Assert.NotNull(address);
 
-        string sig = wallet.SignMessage("hi");
+        string sig = await wallet.SignMessage("hi");
         Assert.NotNull(sig);
 
         bool valid = await wallet.IsValidSignature(sig, "hi");
@@ -243,7 +243,7 @@ public class EthWalletTests
         string address = wallet.GetAddress();
         Assert.NotNull(address);
 
-        string sig = wallet.SignMessage("hi", "1");
+        string sig = await wallet.SignMessage("hi", "1");
         Assert.NotNull(sig);
 
         bool valid = await wallet.IsValidSignature(sig, "hi", chainId: "1");
@@ -251,7 +251,7 @@ public class EthWalletTests
     }
 
     [Test]
-    public void TestWalletSignMessageExistingPrefix()
+    public async Task TestWalletSignMessageExistingPrefix()
     {
         EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
         CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
@@ -262,13 +262,13 @@ public class EthWalletTests
         byte[] _19 = SequenceCoder.HexStringToByteArray("19");
         byte[] testMessage = Encoding.ASCII.GetBytes("Ethereum Signed Message:\n" +"this is a test".Length + "this is a test");
         testMessage = _19.Concat(testMessage).ToArray();
-        string sig = wallet.SignMessage(testMessage);
+        string sig = await wallet.SignMessage(testMessage);
 
         Assert.AreEqual("0x45c666ac1fc5faae5639014d2c163c1ac4863fb78a4bd23c3785f7db99cf553666191da4cad5968d018287e784ceabc7f5565b5375a4b7e35cba897d0b666f0f1b", sig);
     }
 
     [Test]
-    public void TestWalletSignMessageFromPrivateKey()
+    public async Task TestWalletSignMessageFromPrivateKey()
     {
 
         EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
@@ -280,14 +280,14 @@ public class EthWalletTests
 
         byte[] testMessage = Encoding.ASCII.GetBytes("this is a test");
 
-        string sig = wallet.SignMessage(testMessage);
+        string sig = await wallet.SignMessage(testMessage);
 
         Assert.AreEqual("0x45c666ac1fc5faae5639014d2c163c1ac4863fb78a4bd23c3785f7db99cf553666191da4cad5968d018287e784ceabc7f5565b5375a4b7e35cba897d0b666f0f1b", sig);
        
     }
 
     [Test]
-    public void TestWalletSignAndRecover()
+    public async Task TestWalletSignAndRecover()
     {
         EthWallet wallet = new EthWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
         CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
@@ -298,7 +298,7 @@ public class EthWalletTests
 
         byte[] testMessage = Encoding.ASCII.GetBytes("this is a test");
 
-        string sig = wallet.SignMessage(testMessage);
+        string sig = await wallet.SignMessage(testMessage);
 
         string recoveredAddr = wallet.Recover("this is a test", sig);
 

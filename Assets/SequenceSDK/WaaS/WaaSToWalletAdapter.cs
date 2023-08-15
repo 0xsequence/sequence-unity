@@ -5,6 +5,8 @@ using Sequence;
 using Sequence.Provider;
 using Sequence.WaaS;
 using System;
+using Sequence.ABI;
+using Sequence.Extensions;
 
 namespace SequenceSDK.WaaS
 {
@@ -54,14 +56,27 @@ namespace SequenceSDK.WaaS
             throw new System.NotImplementedException();
         }
 
-        public string SignMessage(byte[] message, byte[] chainId = null)
+        public async Task<string> SignMessage(byte[] message, byte[] chainId = null)
         {
-            throw new System.NotImplementedException();
+            string messageString = SequenceCoder.HexStringToHumanReadable(SequenceCoder.ByteArrayToHexString(message));
+            string chainIdString =
+                SequenceCoder.HexStringToHumanReadable(SequenceCoder.ByteArrayToHexString(chainId));
+
+            return await SignMessage(messageString, chainIdString);
         }
 
-        public string SignMessage(string message, string chainId = null)
+        public async Task<string> SignMessage(string message, string chainId = null)
         {
-            throw new System.NotImplementedException();
+            if (uint.TryParse(chainId, out uint chain))
+            {
+                SignMessageArgs args = new SignMessageArgs(chain, GetAddress(), message);
+                var result = await _wallet.SignMessage(args);
+                return result.signature;
+            }
+            else
+            {
+                throw new ArgumentException($"{nameof(chainId)} must be parseable to an {typeof(uint)}, given: {chainId}");
+            }
         }
 
         public async Task<bool> IsValidSignature(string signature, string message, uint accountIndex, string chainId)

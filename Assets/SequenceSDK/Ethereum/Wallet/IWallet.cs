@@ -36,14 +36,14 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a byte array.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(byte[] message, byte[] chainId = null);
+        public Task<string> SignMessage(byte[] message, byte[] chainId = null);
 
         /// <summary>
         /// Signs a message with the wallet's private key.
         /// </summary>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string message, string chainId = null);
+        public Task<string> SignMessage(string message, string chainId = null);
 
         /// <summary>
         /// Verifies the validity of a signature for a given message.

@@ -43,7 +43,7 @@ public class SignerTest : MonoBehaviour
 
 
         byte[] testMessage = Encoding.ASCII.GetBytes("this is a test");
-        string sig = wallet.SignMessage(testMessage);
+        string sig = await wallet.SignMessage(testMessage);
         Debug.Log("signature: " + sig);
 
         bool valid = await wallet.IsValidSignature(sig, "this is a test");
