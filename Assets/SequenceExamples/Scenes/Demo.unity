@@ -2029,7 +2029,7 @@ GameObject:
   - component: {fileID: 626252205}
   - component: {fileID: 626252204}
   m_Layer: 5
-  m_Name: InputField (TMP)
+  m_Name: EmailField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6923,7 +6923,7 @@ GameObject:
   - component: {fileID: 2021293622}
   - component: {fileID: 2021293621}
   m_Layer: 5
-  m_Name: InputField (TMP)
+  m_Name: MFACodeField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
