@@ -17,7 +17,7 @@ namespace SequenceExamples.Scripts.Tests
         private LoginSuccessPage _loginSuccessPage;
         
         [UnitySetUp]
-        public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
+        private IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
         {
             SequenceUI.IsTesting = true;
             SceneManager.LoadScene("SequenceExamples/Scenes/Demo");
@@ -36,9 +36,32 @@ namespace SequenceExamples.Scripts.Tests
             _ui.Start();
             yield return new WaitForSeconds(3f); // Wait a few seconds to allow for UI to animate into place
         }
+
+        [UnityTearDown]
+        private IEnumerator DropMajorElements()
+        {
+            _ui = null;
+            _loginPanel = null;
+            _connectPage = null;
+            _loginPage = null;
+            _mfaPage = null;
+            _loginSuccessPage = null;
+            yield return null;
+        }
         
         [UnityTest]
         public IEnumerator InitialExpectationsTest()
+        {
+            Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
+            Assert.IsTrue(_loginPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
+            yield return null;
+        }
+        
+        [UnityTest]
+        public IEnumerator InitialExpectationsTest_2()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
             Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
