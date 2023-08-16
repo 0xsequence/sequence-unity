@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NUnit.Framework.Internal;
-using Sequence;
-using Sequence.WaaS;
 
 namespace Sequence.WaaS
 {
@@ -11,9 +8,9 @@ namespace Sequence.WaaS
         private HttpClient _httpClient;
         private Address _address;
 
-        public WaaSWallet(HttpClient client, string jwt)
+        public WaaSWallet(string jwt)
         {
-            this._httpClient = client;
+            this._httpClient = new HttpClient();
             this._address = JwtHelper.GetWalletAddressFromJwt(jwt);
             this._httpClient.AddDefaultHeader("Authorization", $"Bearer {jwt}");
         }
