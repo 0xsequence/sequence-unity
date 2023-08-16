@@ -7,6 +7,7 @@ using Sequence.WaaS;
 using System;
 using Sequence.ABI;
 using Sequence.Extensions;
+using Sequence.Transactions;
 
 namespace Sequence.WaaS
 {
@@ -41,19 +42,14 @@ namespace Sequence.WaaS
             return _walletAddressesByAccountIndex[accountIndex];
         }
 
-        public (string v, string r, string s) SignTransaction(byte[] message, string chainId)
+        public Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
-        public Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
+        public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData)
-        {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public async Task<string> SignMessage(byte[] message, byte[] chainId = null)

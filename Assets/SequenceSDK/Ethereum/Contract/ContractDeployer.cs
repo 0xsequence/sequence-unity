@@ -20,8 +20,7 @@ namespace Sequence.Contracts
             BigInteger? gasLimit = null)
         {
             EthTransaction deployTransaction = await new GasLimitEstimator(client, wallet.GetAddress()).BuildTransaction(StringExtensions.ZeroAddress, bytecode, 0, gasPrice, gasLimit);
-            string signedTransaction = deployTransaction.SignAndEncodeTransaction(wallet);
-            TransactionReceipt receipt = await wallet.SendRawTransactionAndWaitForReceipt(client, signedTransaction);
+            TransactionReceipt receipt = await wallet.SendTransactionAndWaitForReceipt(client, deployTransaction);
             return receipt;
         }
     }

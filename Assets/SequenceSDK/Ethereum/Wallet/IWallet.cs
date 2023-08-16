@@ -9,6 +9,7 @@ using Sequence.ABI;
 using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Signer;
+using Sequence.Transactions;
 using SequenceSDK.Ethereum.Utils;
 using UnityEngine;
 
@@ -17,9 +18,8 @@ namespace Sequence.Wallet
     public interface IWallet 
     {
         public Address GetAddress(uint accountIndex = 0);
-        public (string v, string r, string s) SignTransaction(byte[] message, string chainId);
-        public Task<string> SendRawTransaction(IEthClient client, string signedTransactionData);
-        public Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData);
+        public Task<string> SendTransaction(IEthClient client, EthTransaction transaction);
+        public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction);
 
         /// <summary>
         /// 

@@ -12,6 +12,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Extensions;
+using Sequence.Transactions;
 using Sequence.Utils;
 using UnityEngine;
 
@@ -83,23 +84,29 @@ namespace Sequence.Wallet
             return await client.NonceAt(GetAddress());
         }
 
+        public Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
+        {
+            string signedTransaction = transaction.SignAndEncodeTransaction(this);
+            return SendRawTransaction(client, signedTransaction);
+        }
+
+        public async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
+        {
+            string result = await SendTransaction(client, transaction);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            return receipt;
+        }
+
         public (string v, string r, string s) SignTransaction(byte[] message, string chainId)
         {
             int id = chainId.HexStringToInt();
             return EthSignature.SignAndReturnVRS(message, privKey, id);
         }
 
-        public async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
+        private async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
         {
             string result = await client.SendRawTransaction(signedTransactionData);
             return result;
-        }
-
-        public async Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData)
-        {
-            string result = await SendRawTransaction(client, signedTransactionData);
-            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
-            return receipt;
         }
 
         /// <summary>

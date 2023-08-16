@@ -89,8 +89,7 @@ public class EthWalletTests
             string to = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
             BigInteger value = 12300000000;
             EthTransaction transaction = await new GasLimitEstimator(client, wallet.GetAddress()).BuildTransaction(to, null, value);
-            string tx = transaction.SignAndEncodeTransaction(wallet);
-            string result = await wallet.SendRawTransaction(client, tx);
+            string result = await wallet.SendTransaction(client, transaction);
             Assert.IsNotEmpty(result);
 
             await client.WaitForTransactionReceipt(result); // Not waiting for the transaction to process will cause the next tests to fail as they would be submitting a duplicate transaction
