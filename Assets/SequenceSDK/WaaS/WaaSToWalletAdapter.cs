@@ -42,14 +42,19 @@ namespace Sequence.WaaS
             return _walletAddressesByAccountIndex[accountIndex];
         }
 
-        public Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
+        public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
-            throw new NotImplementedException();
+            Transaction waasTransaction = new Transaction(Convert.ToUInt32(transaction.ChainId), GetAddress(), transaction.To, null, transaction.Nonce, transaction.Value.ToString(), transaction.Data);
+            SendTransactionArgs args = new SendTransactionArgs(waasTransaction);
+            SendTransactionReturn result = await _wallet.SendTransaction(args);
+            return result.txHash;
         }
 
-        public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
+        public async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
         {
-            throw new NotImplementedException();
+            string transactionHash = await SendTransaction(client, transaction);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
+            return receipt;
         }
 
         public async Task<string> SignMessage(byte[] message, byte[] chainId = null)

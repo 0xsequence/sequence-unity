@@ -12,13 +12,13 @@ namespace Sequence.Transactions
 {
     public class EthTransaction
     {
-        BigInteger Nonce{ get; set; }
-        BigInteger GasPrice { get; set; }
-        BigInteger GasLimit { get; set; }
-        string To { get; set; }
-        BigInteger Value { get; set; }
-        string Data { get; set; }
-        string ChainId { get; set; }
+        public BigInteger Nonce{ get; private set; }
+        public BigInteger GasPrice { get; private set; }
+        public BigInteger GasLimit { get; private set; }
+        public string To { get; private set; }
+        public BigInteger Value { get; private set; }
+        public string Data { get; private set; }
+        public string ChainId { get; private set; }
 
         string V { get; set; }
         string R { get; set; }
