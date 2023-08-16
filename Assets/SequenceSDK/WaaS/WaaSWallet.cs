@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NUnit.Framework.Internal;
 using Sequence;
 using Sequence.WaaS;
 
@@ -8,7 +9,15 @@ namespace SequenceSDK.WaaS
     public class WaaSWallet : IWallet
     {
         private HttpClient _httpClient;
-        
+        private Address _address;
+
+        public WaaSWallet(HttpClient client, string jwt)
+        {
+            this._httpClient = client;
+            this._address = JwtHelper.GetWalletAddressFromJwt(jwt);
+            this._httpClient.AddDefaultHeader("Authorization", $"Bearer {jwt}");
+        }
+
         public Task<CreatePartnerReturn> CreatePartner(CreatePartnerArgs args, Dictionary<string, string> headers = null)
         {
             return _httpClient.SendRequest<CreatePartnerArgs, CreatePartnerReturn>(args, headers);
@@ -61,7 +70,8 @@ namespace SequenceSDK.WaaS
 
         public Task<GetWalletAddressReturn> GetWalletAddress(GetWalletAddressArgs args, Dictionary<string, string> headers = null)
         {
-            return _httpClient.SendRequest<GetWalletAddressArgs, GetWalletAddressReturn>(args, headers);
+            GetWalletAddressReturn result = new GetWalletAddressReturn(this._address.Value);
+            return Task.FromResult(result);
         }
 
         public Task<DeployWalletReturn> DeployWallet(DeployWalletArgs args, Dictionary<string, string> headers = null)

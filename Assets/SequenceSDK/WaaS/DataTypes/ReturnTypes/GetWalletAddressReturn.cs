@@ -4,5 +4,10 @@ namespace Sequence.WaaS
     public class GetWalletAddressReturn
     {
         public string address;
+
+        public GetWalletAddressReturn(string address)
+        {
+            this.address = address;
+        }
     }
 }

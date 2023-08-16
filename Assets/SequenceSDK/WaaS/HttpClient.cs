@@ -14,12 +14,15 @@ namespace SequenceSDK.WaaS
         private readonly string _url;
         private Dictionary<string, string> _defaultHeaders;
 
-        public HttpClient(string url, string partnerId, string wallet)
+        public HttpClient(string url)
         {
             this._url = url;
             this._defaultHeaders = new Dictionary<string, string>();
-            this._defaultHeaders["partner_id"] = partnerId;
-            this._defaultHeaders["wallet"] = wallet;
+        }
+
+        public void AddDefaultHeader(string key, string value)
+        {
+            this._defaultHeaders[key] = value;
         }
 
         public async Task<T2> SendRequest<T, T2>(T args, [CanBeNull] Dictionary<string, string> headers = null)
