@@ -73,6 +73,7 @@ ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/m
 
 ### ADR 3 - WaaS Client
 August 2, 2023 - author: Quinn Purdy
+Updated Aug 16, 2023 - author: Quinn Purdy
 
 #### Status
 Pending - approval of the accompanying PR will constitute approval of this ADR.
@@ -83,6 +84,8 @@ A direct integration of Sequence into sequence-unity is a time-intensive process
 #### Decision
 In order to save time on the integration, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
 
+For authentication, sequence-unity will be provided with a JWT from the game backend that contains as a payload, the partner_id and the wallet address for the authenticated user. Requests made to the WaaS service will require inclusion of the JWT that was provided.
+
 Similar to ADR 2, the WaaS client will be implemented in a separate assembly from "SequenceEthereum". This assembly will be called "SequenceWaaS" and will reference and depend on the Ethereum library assembly "SequenceEthereum".
 
 For now, all tests will remain in the same assembly "SequenceTests".
@@ -91,6 +94,8 @@ For now, all tests will remain in the same assembly "SequenceTests".
 As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved, justifying the trade-off.
 
 Additionally, since the WaaS client relies on network requests, we must add additional async Tasks to the SequenceEthereum IWallet interface. This will require additional await statements throughout, harming readability.
+
+For authenticating into the WaaS service, the game developers will be required to have a backend that supports some form of authentication in addition to at least a partial integration with the WaaS server, as required to provide the game client with a JWT for authentication with the WaaS service.
 
 Remaining consequences follow those from ADR 2 (with respect to assemblies).
 
