@@ -1,8 +1,10 @@
 using System;
+using System.Text;
+using System.Web;
 using Sequence;
 using UnityEngine;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     public static class JwtHelper
     {
@@ -21,8 +23,9 @@ namespace SequenceSDK.WaaS
                 throw new ArgumentException("Invalid JWT format");
             }
 
-            byte[] payloadBytes = Convert.FromBase64String(parts[1]);
-            string payloadJson = System.Text.Encoding.UTF8.GetString(payloadBytes);
+            string payloadBase64 = PadToBase64(parts[1]);
+            byte[] payloadBytes = Convert.FromBase64String(payloadBase64);
+            string payloadJson = Encoding.UTF8.GetString(payloadBytes);
 
             JwtPayload payload;
             try
@@ -35,6 +38,18 @@ namespace SequenceSDK.WaaS
             }
 
             return new Address(payload.wallet);
+        }
+
+        private static string PadToBase64(string value)
+        {
+            int length = value.Length;
+            int padLength = 4 - length % 4;
+            if (padLength < 4)
+            {
+                value += new string('=', padLength);
+            }
+
+            return value;
         }
     }
 }

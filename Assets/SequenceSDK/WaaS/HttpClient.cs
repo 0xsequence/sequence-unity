@@ -7,16 +7,15 @@ using Sequence.Provider;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     public class HttpClient
     {
-        private readonly string _url;
+        private readonly string _url = "https://next-api.sequence.app/rpc/Wallet";
         private Dictionary<string, string> _defaultHeaders;
 
-        public HttpClient(string url)
+        public HttpClient()
         {
-            this._url = url;
             this._defaultHeaders = new Dictionary<string, string>();
         }
 

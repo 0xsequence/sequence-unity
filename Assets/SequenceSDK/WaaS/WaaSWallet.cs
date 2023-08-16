@@ -4,7 +4,7 @@ using NUnit.Framework.Internal;
 using Sequence;
 using Sequence.WaaS;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     public class WaaSWallet : IWallet
     {

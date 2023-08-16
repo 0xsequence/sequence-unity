@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.WaaS;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {   
     public interface IWallet
     {

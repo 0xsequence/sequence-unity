@@ -8,7 +8,7 @@ using System;
 using Sequence.ABI;
 using Sequence.Extensions;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     public class WaaSToWalletAdapter : Sequence.Wallet.IWallet
     {
