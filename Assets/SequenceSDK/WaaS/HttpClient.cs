@@ -55,7 +55,7 @@ namespace Sequence.WaaS
             
             if (request.error != null || request.result != UnityWebRequest.Result.Success)
             {
-                throw new Exception($"Error sending request to {url} with args {args}: {request.error}");
+                throw new Exception($"Error sending request to {url}: {request.error}");
             }
             else
             {

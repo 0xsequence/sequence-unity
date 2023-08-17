@@ -97,6 +97,37 @@ namespace Sequence.Wallet
             return receipt;
         }
 
+        public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
+        {
+            int transactionCount = transactions.Length;
+            string[] transactionHashes = new string[transactionCount];
+            for (int i = 0; i < transactionCount; i++)
+            {
+                transactions[i].IncrementNonceBy(i);
+                transactionHashes[i] = await SendTransaction(client, transactions[i]);
+            }
+            
+            return transactionHashes;
+        }
+
+        public async Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client, EthTransaction[] transactions)
+        {
+            string[] transactionHashes = await SendTransactionBatch(client, transactions);
+            int transactionCount = transactions.Length;
+            if (transactionCount != transactionHashes.Length)
+            {
+                throw new SystemException("Invalid system state: didn't receive as many transaction hashes as transactions");
+            }
+
+            TransactionReceipt[] receipts = new TransactionReceipt[transactionCount];
+            for (int i = 0; i < transactionCount; i++)
+            {
+                receipts[i] = await client.WaitForTransactionReceipt(transactionHashes[i]);
+            }
+
+            return receipts;
+        }
+
         public (string v, string r, string s) SignTransaction(byte[] message, string chainId)
         {
             int id = chainId.HexStringToInt();

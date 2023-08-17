@@ -4,6 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
+using Sequence.Provider;
 using UnityEngine;
 using Sequence.Wallet;
 using Sequence.Utils;
@@ -142,6 +144,11 @@ namespace Sequence.Transactions
             this.S = s;
             string tx = this.RLPEncode();
             return tx;
+        }
+
+        public void IncrementNonceBy(int i)
+        {
+            this.Nonce += i;
         }
     }
 }

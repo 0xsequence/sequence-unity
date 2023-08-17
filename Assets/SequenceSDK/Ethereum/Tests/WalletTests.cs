@@ -304,6 +304,42 @@ public class EthWalletTests
         Assert.AreEqual(address, recoveredAddr);
     }
 
+    [Test]
+    public async Task TestSendTransactionBatchAndWaitForReceipts()
+    {
+        EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+        SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
+        string recipient1 = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
+        string recipient2 = "0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa";
+        BigInteger startingBalance = await client.BalanceAt(wallet.GetAddress());
+        BigInteger startingBalance1 = await client.BalanceAt(recipient1);
+        BigInteger startingBalance2 = await client.BalanceAt(recipient2);
 
+        EthTransaction transaction1 = await TransferEth.CreateTransaction(client, wallet, recipient1, 1000);
+        EthTransaction transaction2 = await TransferEth.CreateTransaction(client, wallet, recipient2, 1000);
+        EthTransaction[] transactions = new EthTransaction[] { transaction1, transaction2 };
+
+        TransactionReceipt[] receipts = await wallet.SendTransactionBatchAndWaitForReceipts(client, transactions);
+        
+        BigInteger endingBalance = await client.BalanceAt(wallet.GetAddress());
+        BigInteger endingBalance1 = await client.BalanceAt(recipient1);
+        BigInteger endingBalance2 = await client.BalanceAt(recipient2);
+        
+        Assert.Less(endingBalance, startingBalance);
+        Assert.Greater(endingBalance1, startingBalance1);
+        Assert.Greater(endingBalance2, startingBalance2);
+    }
+
+    [Test]
+    public async Task TestSendTransactionBatchAndWaitForReceipts_emptyBatch()
+    {
+        EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+        SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
+        EthTransaction[] transactions = new EthTransaction[] {};
+
+        TransactionReceipt[] receipts = await wallet.SendTransactionBatchAndWaitForReceipts(client, transactions);
+        
+        Assert.AreEqual(0, receipts.Length);
+    }
 
 }

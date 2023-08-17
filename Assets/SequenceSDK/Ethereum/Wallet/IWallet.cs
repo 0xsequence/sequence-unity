@@ -20,6 +20,10 @@ namespace Sequence.Wallet
         public Address GetAddress(uint accountIndex = 0);
         public Task<string> SendTransaction(IEthClient client, EthTransaction transaction);
         public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction);
+        public Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions);
+
+        public Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client,
+            EthTransaction[] transactions);
 
         /// <summary>
         /// 

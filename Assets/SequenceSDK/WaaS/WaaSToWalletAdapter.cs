@@ -66,6 +66,33 @@ namespace Sequence.WaaS
             return receipt;
         }
 
+        public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
+        {
+            int transactionCount = transactions.Length;
+            Transaction[] waasTransactions = new Transaction[transactionCount];
+            for (int i = 0; i < transactionCount; i++)
+            {
+                waasTransactions[i] = new Transaction((uint)transactions[i].ChainId.HexStringToInt(), GetAddress(), transactions[i].To, null, transactions[i].Nonce, transactions[i].Value.ToString(), transactions[i].Data);
+            }
+
+            SendTransactionBatchArgs args = new SendTransactionBatchArgs(waasTransactions);
+            SendTransactionBatchReturn result = await _wallet.SendTransactionBatch(args);
+            return new string[]{result.txHash};
+        }
+
+        public async Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client, EthTransaction[] transactions)
+        {
+            string[] transactionHashes = await SendTransactionBatch(client, transactions);
+            int transactionCount = transactionHashes.Length;
+            TransactionReceipt[] receipts = new TransactionReceipt[transactionCount];
+            for (int i = 0; i < transactionCount; i++)
+            {
+                receipts[i] = await client.WaitForTransactionReceipt(transactionHashes[i]);
+            }
+
+            return receipts;
+        }
+
         public async Task<string> SignMessage(byte[] message, byte[] chainId = null)
         {
             string messageString = SequenceCoder.HexStringToHumanReadable(SequenceCoder.ByteArrayToHexString(message));
