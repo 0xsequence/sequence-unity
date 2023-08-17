@@ -66,7 +66,6 @@ namespace Sequence.WaaS
                 return result;
             }
         }
-        
 
         private string ExtractHeaders(UnityWebRequest request)
         {

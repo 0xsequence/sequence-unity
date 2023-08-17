@@ -1,16 +1,18 @@
+using UnityEngine.Serialization;
+
 namespace Sequence.WaaS
 {
     [System.Serializable]
     public class SignMessageArgs
     {
         public uint chainId;
-        public string accountAddress;
+        public string walletAddress;
         public string message;
 
-        public SignMessageArgs(uint chainId, string accountAddress, string message)
+        public SignMessageArgs(uint chainId, string walletAddress, string message)
         {
             this.chainId = chainId;
-            this.accountAddress = accountAddress;
+            this.walletAddress = walletAddress;
             this.message = message;
         }
     }
