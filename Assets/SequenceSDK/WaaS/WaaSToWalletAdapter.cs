@@ -8,6 +8,7 @@ using System;
 using Sequence.ABI;
 using Sequence.Extensions;
 using Sequence.Transactions;
+using Sequence.Utils;
 
 namespace Sequence.WaaS
 {
@@ -44,7 +45,7 @@ namespace Sequence.WaaS
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
-            Transaction waasTransaction = new Transaction(Convert.ToUInt32(transaction.ChainId), GetAddress(), transaction.To, null, transaction.Nonce, transaction.Value.ToString(), transaction.Data);
+            Transaction waasTransaction = new Transaction((uint)transaction.ChainId.HexStringToInt(), GetAddress(), transaction.To, null, transaction.Nonce, transaction.Value.ToString(), transaction.Data);
             SendTransactionArgs args = new SendTransactionArgs(waasTransaction);
             SendTransactionReturn result = await _wallet.SendTransaction(args);
             return result.txHash;

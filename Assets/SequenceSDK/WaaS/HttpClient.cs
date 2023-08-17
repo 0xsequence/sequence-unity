@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,13 +25,17 @@ namespace Sequence.WaaS
             this._defaultHeaders[key] = value;
         }
 
-        public async Task<T2> SendRequest<T, T2>(T args, [CanBeNull] Dictionary<string, string> headers = null)
+        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null)
         {
+            string url = _url + "/" + path;
             string requestJson = JsonConvert.SerializeObject(args);
-            UnityWebRequest request = UnityWebRequest.Post(_url, requestJson);
+            UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Accept", "application/json");
             request.method = UnityWebRequest.kHttpVerbPOST;
+            byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
+            request.uploadHandler = new UploadHandlerRaw(requestData);
+            request.uploadHandler.contentType = "application/json";
 
             if (headers == null)
             {
@@ -42,13 +47,15 @@ namespace Sequence.WaaS
                 request.SetRequestHeader(key, headers[key]);
             }
 
-            await request.SendWebRequest();
+            request.SendWebRequest();
+            while (!request.isDone)
+            {
+                await Task.Yield();
+            }
             
             if (request.error != null || request.result != UnityWebRequest.Result.Success)
             {
-                Debug.Log($"Error sending request to {_url} with args {args}: {request.error}");
-                request.Dispose();
-                return default;
+                throw new Exception($"Error sending request to {url} with args {args}: {request.error}");
             }
             else
             {
@@ -58,6 +65,18 @@ namespace Sequence.WaaS
                 request.Dispose();
                 return result;
             }
+        }
+        
+
+        private string ExtractHeaders(UnityWebRequest request)
+        {
+            StringBuilder headerBuilder = new StringBuilder();
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization"})
+            {
+                string headerValue = request.GetRequestHeader(headerKey);
+                headerBuilder.Append($"-H '{headerKey}: {headerValue}' ");
+            }
+            return headerBuilder.ToString();
         }
     }
 }
