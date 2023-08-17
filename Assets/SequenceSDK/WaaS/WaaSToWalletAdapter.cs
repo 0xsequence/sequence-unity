@@ -93,7 +93,7 @@ namespace Sequence.WaaS
             return receipts;
         }
 
-        public async Task<string> SignMessage(byte[] message, byte[] chainId = null)
+        public async Task<string> SignMessage(byte[] message, byte[] chainId)
         {
             string messageString = SequenceCoder.HexStringToHumanReadable(SequenceCoder.ByteArrayToHexString(message));
             string chainIdString =
@@ -102,7 +102,7 @@ namespace Sequence.WaaS
             return await SignMessage(messageString, chainIdString);
         }
 
-        public async Task<string> SignMessage(string message, string chainId = null)
+        public async Task<string> SignMessage(string message, string chainId)
         {
             if (uint.TryParse(chainId, out uint chain))
             {
@@ -116,7 +116,7 @@ namespace Sequence.WaaS
             }
         }
 
-        public async Task<bool> IsValidSignature(string signature, string message, uint accountIndex, string chainId)
+        public async Task<bool> IsValidSignature(string signature, string message, string chainId, uint accountIndex = 0)
         {
             var args = new IsValidMessageSignatureArgs(chainId, GetAddress(accountIndex), message, signature);
             var result = await _wallet.IsValidMessageSignature(args);

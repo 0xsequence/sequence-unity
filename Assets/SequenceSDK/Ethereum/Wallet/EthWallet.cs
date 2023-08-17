@@ -218,7 +218,7 @@ namespace Sequence.Wallet
         /// <param name="signature">The signature to verify.</param>
         /// <param name="message">The message that was signed.</param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public async Task<bool> IsValidSignature(string signature, string message, uint accountIndex = 0, string chainId = "")
+        public async Task<bool> IsValidSignature(string signature, string message, string chainId = "", uint accountIndex = 0)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             if (chainId != null && chainId.Length > 0)
