@@ -15,8 +15,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestTransferOnTestnet()
         {
             Wallet.IWallet wallet = await WaaSToWalletAdapter.CreateAsync(new WaaSWallet(
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0bmVyX2lkIjoyLCJ3YWxsZXQiOiIweDY2MDI1MDczNGYzMTY0NDY4MWFlMzJkMDViZDdlOGUyOWZlYTI5ZTEifQ.FC8WmaC_hW4svdrs4rxyKcvoekfVYFkFFvGwUOXzcHA"),
-                new uint[]{0});
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0bmVyX2lkIjoyLCJ3YWxsZXQiOiIweDY2MDI1MDczNGYzMTY0NDY4MWFlMzJkMDViZDdlOGUyOWZlYTI5ZTEifQ.FC8WmaC_hW4svdrs4rxyKcvoekfVYFkFFvGwUOXzcHA"));
 
             IEthClient client = new SequenceEthClient("https://polygon-mumbai-bor.publicnode.com");
             EthTransaction transaction = await TransferEth.CreateTransaction(client, wallet, "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",  1);

@@ -17,6 +17,14 @@ namespace Sequence.WaaS
         private IWallet _wallet;
         private Dictionary<uint, Address> _walletAddressesByAccountIndex;
 
+        public static async Task<WaaSToWalletAdapter> CreateAsync(WaaSWallet wallet)
+        {
+            var walletAddressesByAccountIndex = new Dictionary<uint, Address>();
+            var address = await wallet.GetWalletAddress(null);
+            walletAddressesByAccountIndex[0] = new Address(address.address);
+            return new WaaSToWalletAdapter(wallet, walletAddressesByAccountIndex);
+        }
+
         private WaaSToWalletAdapter(IWallet wallet, Dictionary<uint, Address> walletAddressesByAccountIndex)
         {
             _wallet = wallet;
