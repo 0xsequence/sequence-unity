@@ -51,6 +51,20 @@ namespace Sequence.Transactions
             this.nonce = nonce;
         }
 
+        public static async Task<EthTransaction> CreateTransaction(
+            IEthClient client,
+            IWallet fromWallet,
+            string toAddress,
+            BigInteger value,
+            BigInteger? gasPrice = null,
+            BigInteger? gasLimit = null,
+            BigInteger? nonce = null)
+        {
+            GasLimitEstimator estimator = new GasLimitEstimator(client, fromWallet.GetAddress());
+            EthTransaction transaction = await estimator.BuildTransaction(toAddress, null, value, gasPrice, gasLimit, nonce);
+            return transaction;
+        }
+
         /// <summary>
         /// Signs and sends the Eth transfer transaction
         /// </summary>

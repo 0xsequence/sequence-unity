@@ -19,10 +19,7 @@ namespace Sequence.WaaS.Tests
                 new uint[]{0});
 
             IEthClient client = new SequenceEthClient("https://polygon-mumbai-bor.publicnode.com");
-
-            GasLimitEstimator estimator = new GasLimitEstimator(client, wallet.GetAddress());
-            EthTransaction transaction = await 
-                estimator.BuildTransactionCreator("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", null, 1)();
+            EthTransaction transaction = await TransferEth.CreateTransaction(client, wallet, "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",  1);
 
             BigInteger startingBalance = await client.BalanceAt("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f");
             BigInteger startingBalance2 = await client.BalanceAt(wallet.GetAddress().Value);
