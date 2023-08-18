@@ -250,23 +250,27 @@ public class EthWalletTests
 
     private static IEnumerable<object[]> iWalletTestCases()
     {
-        yield return new object[] { new EthWallet() };
         var adapter = WaaSToWalletAdapter.CreateAsync(new WaaSWallet(
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0bmVyX2lkIjoyLCJ3YWxsZXQiOiIweDY2MDI1MDczNGYzMTY0NDY4MWFlMzJkMDViZDdlOGUyOWZlYTI5ZTEifQ.FC8WmaC_hW4svdrs4rxyKcvoekfVYFkFFvGwUOXzcHA")).Result;
-        yield return new object[] { adapter };
+        yield return new object[] { new EthWallet(), "SDK by Horizon" };
+        yield return new object[] { adapter, "SDK by Horizon" };
+        yield return new object[] { new EthWallet(), "" };
+        yield return new object[] { adapter, "" };
+        yield return new object[] { new EthWallet(), DecodeABITests.longMultiLineString };
+        yield return new object[] { adapter, DecodeABITests.longMultiLineString };
     }
 
 
     [TestCaseSource(nameof(iWalletTestCases))]
-    public async Task TestWalletSignMessageWithChainId(IWallet wallet)
+    public async Task TestWalletSignMessageWithChainId(IWallet wallet, string message)
     {
         string address = wallet.GetAddress();
         Assert.NotNull(address);
 
-        string sig = await wallet.SignMessage("hi", "0x89");
+        string sig = await wallet.SignMessage(message, "0x89");
         Assert.NotNull(sig);
 
-        bool valid = await wallet.IsValidSignature(sig, "hi", chainId: "0x89");
+        bool valid = await wallet.IsValidSignature(sig, message, chainId: "0x89");
         Assert.IsTrue(valid);
     }
 
