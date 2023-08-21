@@ -55,7 +55,7 @@ namespace Sequence.Demo
                 return;
             }
             DisableAllUIPages();
-            SetInitialUI(_loginPanel);
+            SetInitialUI(_walletPanel);
         }
 
         private void DisableAllUIPages()
