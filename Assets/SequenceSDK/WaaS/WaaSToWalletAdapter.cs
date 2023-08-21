@@ -53,7 +53,7 @@ namespace Sequence.WaaS
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
-            Transaction waasTransaction = new Transaction((uint)transaction.ChainId.HexStringToInt(), GetAddress(), transaction.To, null, transaction.Nonce, transaction.Value.ToString(), transaction.Data);
+            Transaction waasTransaction = new Transaction((uint)transaction.ChainId.HexStringToInt(), GetAddress(), transaction.To, null, null, transaction.Value.ToString(), transaction.Data);
             SendTransactionArgs args = new SendTransactionArgs(waasTransaction);
             SendTransactionReturn result = await _wallet.SendTransaction(args);
             return result.txHash;
@@ -72,7 +72,7 @@ namespace Sequence.WaaS
             Transaction[] waasTransactions = new Transaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
-                waasTransactions[i] = new Transaction((uint)transactions[i].ChainId.HexStringToInt(), GetAddress(), transactions[i].To, null, transactions[i].Nonce, transactions[i].Value.ToString(), transactions[i].Data);
+                waasTransactions[i] = new Transaction((uint)transactions[i].ChainId.HexStringToInt(), GetAddress(), transactions[i].To, null, null, transactions[i].Value.ToString(), transactions[i].Data);
             }
 
             SendTransactionBatchArgs args = new SendTransactionBatchArgs(waasTransactions);

@@ -14,6 +14,10 @@ namespace Sequence.WaaS
     {
         private readonly string _url = "https://next-api.sequence.app/rpc/Wallet";
         private Dictionary<string, string> _defaultHeaders;
+        private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
 
         public HttpClient()
         {
@@ -28,7 +32,7 @@ namespace Sequence.WaaS
         public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null)
         {
             string url = _url + "/" + path;
-            string requestJson = JsonConvert.SerializeObject(args);
+            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Accept", "application/json");
@@ -46,6 +50,11 @@ namespace Sequence.WaaS
             {
                 request.SetRequestHeader(key, headers[key]);
             }
+            
+            string method = request.method;
+            string headersString = ExtractHeaders(request);
+            string curlCommand = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
+            Debug.Log("Equivalent curl command: " + curlCommand);
 
             request.SendWebRequest();
             while (!request.isDone)
