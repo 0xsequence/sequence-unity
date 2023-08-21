@@ -5,10 +5,12 @@ namespace Sequence.Demo
 {
     public class UIPanel : UIPage
     {
-        public IEnumerator OpenInitialPage(UIPage page)
+        public UIPage InitialPage;
+        
+        public IEnumerator OpenInitialPage()
         {
             yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
-            page.Open();
+            InitialPage.Open();
         }
     }
 }

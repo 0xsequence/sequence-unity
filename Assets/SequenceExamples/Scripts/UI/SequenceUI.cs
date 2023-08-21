@@ -17,6 +17,9 @@ namespace Sequence.Demo
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
 
+        private WalletPanel _walletPanel;
+        private WalletPage _walletPage;
+
         private UIPage _page;
         private Stack<UIPage> _pageStack = new Stack<UIPage>();
 
@@ -39,6 +42,10 @@ namespace Sequence.Demo
             _mfaPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
+
+            _walletPanel = GetComponentInChildren<WalletPanel>();
+
+            _walletPage = GetComponentInChildren<WalletPage>();
         }
 
         public void Start()
@@ -48,7 +55,7 @@ namespace Sequence.Demo
                 return;
             }
             DisableAllUIPages();
-            SetInitialUIPage(_loginPanel, _loginPage);
+            SetInitialUI(_loginPanel);
         }
 
         private void DisableAllUIPages()
@@ -61,12 +68,12 @@ namespace Sequence.Demo
             }
         }
 
-        private void SetInitialUIPage(UIPanel panel, UIPage page)
+        private void SetInitialUI(UIPanel panel)
         {
             panel.Open();
-            _page = page;
-            _pageStack.Push(page);
-            StartCoroutine(panel.OpenInitialPage(page));
+            _page = panel.InitialPage;
+            _pageStack.Push(panel.InitialPage);
+            StartCoroutine(panel.OpenInitialPage());
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
