@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.Contracts;
 using Sequence.Provider;
 using Sequence.Transactions;
 using UnityEngine;
@@ -87,6 +88,43 @@ namespace Sequence.WaaS.Tests
             catch (Exception ex)
             {
                 Assert.AreEqual("Error sending request to https://next-api.sequence.app/rpc/Wallet/SendTransactionBatch: HTTP/1.1 500 Internal Server Error", ex.Message);
+            }
+        }
+
+        [Test]
+        public async Task TestContractDeploymentAndInteractions()
+        {
+            Wallet.IWallet wallet = await WaaSToWalletAdapter.CreateAsync(new WaaSWallet(
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXJ0bmVyX2lkIjoyLCJ3YWxsZXQiOiIweDY2MDI1MDczNGYzMTY0NDY4MWFlMzJkMDViZDdlOGUyOWZlYTI5ZTEifQ.FC8WmaC_hW4svdrs4rxyKcvoekfVYFkFFvGwUOXzcHA"));
+            IEthClient client = new SequenceEthClient("https://polygon-mumbai-bor.publicnode.com");
+
+            BigInteger amount = 100;
+            
+            try
+            {
+                TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet, ERC20Tests.bytecode);
+                string contractAddress = receipt.contractAddress;
+                Assert.IsNotEmpty(contractAddress);
+                
+                ERC20 token = new ERC20(contractAddress);
+
+                BigInteger balance = await token.BalanceOf(client, wallet.GetAddress());
+                Assert.AreEqual(BigInteger.Zero, balance);
+
+                string owner = await token.Owner(client);
+                Assert.AreEqual(wallet.GetAddress().Value, owner);
+                
+                receipt = await token.Mint(wallet.GetAddress(), amount)
+                    .SendTransactionMethodAndWaitForReceipt(wallet, client);
+
+                BigInteger supply = await token.TotalSupply(client);
+                Assert.AreEqual(amount, supply);
+                BigInteger balance1 = await token.BalanceOf(client, wallet.GetAddress());
+                Assert.AreEqual(amount, balance1);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Expected no exception, but got: " + ex.Message);
             }
         }
     }
