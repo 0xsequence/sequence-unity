@@ -7,10 +7,10 @@ namespace Sequence.Demo
     {
         public UIPage InitialPage;
         
-        public IEnumerator OpenInitialPage()
+        public virtual IEnumerator OpenInitialPage(params object[] openArgs)
         {
             yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
-            InitialPage.Open();
+            InitialPage.Open(openArgs);
         }
     }
 }

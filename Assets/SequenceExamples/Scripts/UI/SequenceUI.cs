@@ -55,7 +55,7 @@ namespace Sequence.Demo
                 return;
             }
             DisableAllUIPages();
-            SetInitialUI(_walletPanel);
+            OpenUIPanel(_walletPanel);
         }
 
         private void DisableAllUIPages()
@@ -68,12 +68,12 @@ namespace Sequence.Demo
             }
         }
 
-        private void SetInitialUI(UIPanel panel)
+        private void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open();
             _page = panel.InitialPage;
             _pageStack.Push(panel.InitialPage);
-            StartCoroutine(panel.OpenInitialPage());
+            StartCoroutine(panel.OpenInitialPage(openArgs));
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)

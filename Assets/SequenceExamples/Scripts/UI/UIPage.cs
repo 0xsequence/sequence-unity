@@ -38,7 +38,7 @@ namespace Sequence.Demo
             _animator.Animate( _openAnimationDurationInSeconds);
         }
 
-        public void Close()
+        public virtual void Close()
         {
             _animator.AnimateOut(_closeAnimationDurationInSeconds);
             Invoke(nameof(Deactivate), _closeAnimationDurationInSeconds);
