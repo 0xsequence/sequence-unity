@@ -90,7 +90,7 @@ namespace Sequence.WaaS.Tests
                 Assert.AreEqual("Error sending request to https://next-api.sequence.app/rpc/Wallet/SendTransactionBatch: HTTP/1.1 500 Internal Server Error", ex.Message);
             }
         }
-
+        
         [Test]
         public async Task TestContractDeploymentAndInteractions()
         {
@@ -102,9 +102,9 @@ namespace Sequence.WaaS.Tests
             
             try
             {
-                TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet, ERC20Tests.bytecode);
-                string contractAddress = receipt.contractAddress;
-                Assert.IsNotEmpty(contractAddress);
+                ContractDeploymentResult result = await ContractDeployer.Deploy(client, wallet, ERC20Tests.bytecode);
+                TransactionReceipt receipt = result.Receipt;
+                string contractAddress = result.PreCalculatedContractAddress;
                 
                 ERC20 token = new ERC20(contractAddress);
 

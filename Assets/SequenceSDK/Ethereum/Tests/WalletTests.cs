@@ -139,10 +139,12 @@ public class EthWalletTests
         {
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet, bytecode_ERC20Mock,
+            ContractDeploymentResult result = await ContractDeployer.Deploy(client, wallet, bytecode_ERC20Mock,
                 gasPrice_ERC20Mock, gasLimit_ERC20Mock);
+            TransactionReceipt receipt = result.Receipt;
 
             Assert.IsNotNull(receipt.contractAddress);
+            Assert.AreEqual(receipt.contractAddress, result.PreCalculatedContractAddress);
         }
         catch (Exception ex)
         {
@@ -159,10 +161,12 @@ public class EthWalletTests
             //Deploy First
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             EthWallet wallet = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet, bytecode_ERC20Mock,
+            ContractDeploymentResult deployResult = await ContractDeployer.Deploy(client, wallet, bytecode_ERC20Mock,
                 gasPrice_ERC20Mock, gasLimit_ERC20Mock);
+            TransactionReceipt receipt = deployResult.Receipt;
 
             Assert.IsNotNull(receipt.contractAddress);
+            Assert.AreEqual(receipt.contractAddress, deployResult.PreCalculatedContractAddress);
 
             //Interaction (mock mint)
 

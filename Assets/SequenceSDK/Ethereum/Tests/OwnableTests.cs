@@ -29,9 +29,11 @@ public class OwnableTests
     {
         try
         {
-            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, bytecode);
+            ContractDeploymentResult result = await ContractDeployer.Deploy(client, wallet1, bytecode);
+            TransactionReceipt receipt = result.Receipt;
             contractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(contractAddress);
+            Assert.AreEqual(contractAddress, result.PreCalculatedContractAddress);
         }
         catch (Exception ex)
         {

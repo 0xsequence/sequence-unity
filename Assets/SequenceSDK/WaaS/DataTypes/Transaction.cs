@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Numerics;
 using Sequence.Transactions;
 using UnityEngine;
+using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.WaaS
 {
     [System.Serializable]
     public class Transaction
     {
+        public static readonly string WaaSZeroAddress = "0x0000000000000000000000000000000000000000";
         public uint chainId;
         public string from;
         public string to;
@@ -26,6 +28,10 @@ namespace Sequence.WaaS
         {
             this.chainId = chainId;
             this.from = from;
+            if (to == StringExtensions.ZeroAddress)
+            {
+                to = WaaSZeroAddress;
+            }
             this.to = to;
             this.autoGas = autoGas;
             this.nonce = nonce;
