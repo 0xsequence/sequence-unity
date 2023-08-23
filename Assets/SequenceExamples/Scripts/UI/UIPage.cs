@@ -10,7 +10,7 @@ namespace Sequence.Demo
         [SerializeField] protected float _openAnimationDurationInSeconds;
         [SerializeField] protected float _closeAnimationDurationInSeconds;
         [SerializeField] private AnimationType _animation;
-        private GameObject _gameObject;
+        protected GameObject _gameObject;
         private ITween _animator;
 
         public enum AnimationType

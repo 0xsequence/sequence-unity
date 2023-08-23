@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
@@ -11,14 +12,15 @@ namespace Sequence.Demo
         [SerializeField] private int numberOfNftPlaceholdersToInstantiate = 10;
         [SerializeField] private GameObject NftPlaceHolderPrefab;
         [SerializeField] private int numberOfNftsToFetchAtOnce = 1;
+        [SerializeField] private Transform _scrollviewContentParent;
         private ObjectPool _pool;
         private INftContentFetcher _nftFetcher;
-        private List<Texture2D> _nftContent;
+        private List<Texture2D> _nftContent = new List<Texture2D>();
 
         protected override void Awake()
         {
             base.Awake();
-            _pool = ObjectPool.ActivateObjectPool(NftPlaceHolderPrefab, numberOfNftPlaceholdersToInstantiate);
+            _pool = ObjectPool.ActivateObjectPool(base._gameObject, NftPlaceHolderPrefab, numberOfNftPlaceholdersToInstantiate);
         }
 
         public override void Open(params object[] args)
@@ -52,6 +54,14 @@ namespace Sequence.Demo
             for (int i = 0; i < count; i++)
             {
                 _nftContent.Add(textures[i]);
+                Transform nftContainer = _pool.GetNextAvailable();
+                if (nftContainer != null)
+                {
+                    Image nftImage = nftContainer.GetComponent<Image>();
+                    nftImage.sprite = Sprite.Create(textures[i], new Rect(0, 0, textures[i].width, textures[i].height),
+                        new Vector2(.5f, .5f));
+                    nftContainer.parent = _scrollviewContentParent;
+                }
             }
 
             if (result.MoreToFetch)

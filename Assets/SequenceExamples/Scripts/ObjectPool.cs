@@ -3,35 +3,31 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class ObjectPool
+    public class ObjectPool : MonoBehaviour
     {
         private GameObject _prefab;
         private int _objectCount;
         private GameObject[] _objects;
         private Queue<GameObject> _available;
 
-        private ObjectPool(GameObject toInstantiate, int count)
+        public static ObjectPool ActivateObjectPool(GameObject caller, GameObject toInstantiate, int count, Transform parent = null)
         {
-            this._prefab = toInstantiate;
-            this._objectCount = count;
-            this._objects = new GameObject[count];
-            _available = new Queue<GameObject>();
-        }
-
-        public static ObjectPool ActivateObjectPool(GameObject toInstantiate, int count, Transform parent = null)
-        {
-            ObjectPool pool = new ObjectPool(toInstantiate, count);
+            ObjectPool pool = caller.AddComponent<ObjectPool>();
+            pool._prefab = toInstantiate;
+            pool._objectCount = count;
+            pool._objects = new GameObject[count];
+            pool._available = new Queue<GameObject>();
             for (int i = 0; i < count; i++)
             {
                 GameObject newObject;
                 if (parent != null)
                 {
                     
-                    newObject = GameObject.Instantiate(toInstantiate, parent);
+                    newObject = Instantiate(toInstantiate, parent);
                 }
                 else
                 {
-                    newObject = GameObject.Instantiate(toInstantiate);
+                    newObject = Instantiate(toInstantiate, new Vector3(0, -1000000, 1), Quaternion.identity);
                 }
                 pool._objects[i] = newObject;
                 pool._available.Enqueue(newObject);
@@ -42,6 +38,10 @@ namespace Sequence.Demo
 
         public Transform GetNextAvailable()
         {
+            if (_available.Count == 0)
+            {
+                return null;
+            }
             GameObject next = _available.Dequeue();
             next.SetActive(true);
             return next.transform;
