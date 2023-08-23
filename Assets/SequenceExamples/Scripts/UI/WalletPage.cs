@@ -16,11 +16,14 @@ namespace Sequence.Demo
         private ObjectPool _pool;
         private INftContentFetcher _nftFetcher;
         private List<Texture2D> _nftContent = new List<Texture2D>();
+        private ScrollRect _scrollRect;
 
         protected override void Awake()
         {
             base.Awake();
             _pool = ObjectPool.ActivateObjectPool(NftPlaceHolderPrefab, numberOfNftPlaceholdersToInstantiate);
+            _scrollRect = GetComponentInChildren<ScrollRect>();
+            _scrollRect.onValueChanged.AddListener(OnScroll);
         }
 
         public override void Open(params object[] args)
@@ -69,6 +72,11 @@ namespace Sequence.Demo
             {
                 _nftFetcher.FetchContent(numberOfNftsToFetchAtOnce);
             }
+        }
+
+        private void OnScroll(Vector2 scrollPosition)
+        {
+            Debug.Log($"Scrolling to x: {scrollPosition.x} y: {scrollPosition.y}");
         }
     }
 }
