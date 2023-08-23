@@ -61,6 +61,7 @@ namespace Sequence.Demo
                     nftImage.sprite = Sprite.Create(textures[i], new Rect(0, 0, textures[i].width, textures[i].height),
                         new Vector2(.5f, .5f));
                     nftContainer.parent = _scrollviewContentParent;
+                    nftContainer.localScale = new Vector3(1, 1, 1);
                 }
             }
 
