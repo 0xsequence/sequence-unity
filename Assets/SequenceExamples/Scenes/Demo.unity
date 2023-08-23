@@ -655,9 +655,9 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0
   _closeAnimationDurationInSeconds: 0
   _animation: 0
-  numberOfNftPlaceholdersToInstantiate: 10
-  NftPlaceHolderPrefab: {fileID: 1878011362095268920, guid: 0ad74f6689ca94f53b758794927d6133, type: 3}
-  numberOfNftsToFetchAtOnce: 1
+  _numberOfNftPlaceholdersToInstantiate: 10
+  _nftPlaceHolderPrefab: {fileID: 1878011362095268920, guid: 0ad74f6689ca94f53b758794927d6133, type: 3}
+  _numberOfNftsToFetchAtOnce: 1
   _scrollviewContentParent: {fileID: 1186155058}
 --- !u!1 &159475124
 GameObject:

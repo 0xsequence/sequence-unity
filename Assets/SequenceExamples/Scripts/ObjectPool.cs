@@ -42,6 +42,10 @@ namespace Sequence.Demo
 
         public Transform GetNextAvailable()
         {
+            if (_available.Count == 0)
+            {
+                return null;
+            }
             GameObject next = _available.Dequeue();
             next.SetActive(true);
             return next.transform;

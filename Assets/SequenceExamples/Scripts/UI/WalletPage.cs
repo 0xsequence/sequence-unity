@@ -3,27 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
     public class WalletPage : UIPage
     {
-        [SerializeField] private int numberOfNftPlaceholdersToInstantiate = 10;
-        [SerializeField] private GameObject NftPlaceHolderPrefab;
-        [SerializeField] private int numberOfNftsToFetchAtOnce = 1;
+        [SerializeField] private int _numberOfNftPlaceholdersToInstantiate = 10;
+        [SerializeField] private GameObject _nftPlaceHolderPrefab;
+        [SerializeField] private int _numberOfNftsToFetchAtOnce = 1;
         [SerializeField] private Transform _scrollviewContentParent;
         private ObjectPool _pool;
         private INftContentFetcher _nftFetcher;
         private List<Texture2D> _nftContent = new List<Texture2D>();
         private ScrollRect _scrollRect;
+        private int _widthInItems = 2;
+        private GridLayoutGroup _grid;
 
         protected override void Awake()
         {
             base.Awake();
-            _pool = ObjectPool.ActivateObjectPool(NftPlaceHolderPrefab, numberOfNftPlaceholdersToInstantiate);
+            _pool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
             _scrollRect = GetComponentInChildren<ScrollRect>();
             _scrollRect.onValueChanged.AddListener(OnScroll);
+            _grid = GetComponentInChildren<GridLayoutGroup>();
         }
 
         public override void Open(params object[] args)
@@ -35,12 +39,13 @@ namespace Sequence.Demo
                 throw new SystemException($"{nameof(_nftFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
             }
 
-            _nftFetcher.FetchContent(numberOfNftsToFetchAtOnce);
+            _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
         }
 
         public override void Close()
         {
             base.Close();
+            _nftFetcher.OnNftFetchSuccess -= HandleNftFetchSuccess;
             _nftFetcher = null;
         }
 
@@ -57,26 +62,42 @@ namespace Sequence.Demo
             for (int i = 0; i < count; i++)
             {
                 _nftContent.Add(textures[i]);
-                Transform nftContainer = _pool.GetNextAvailable();
-                if (nftContainer != null)
-                {
-                    Image nftImage = nftContainer.GetComponent<Image>();
-                    nftImage.sprite = Sprite.Create(textures[i], new Rect(0, 0, textures[i].width, textures[i].height),
-                        new Vector2(.5f, .5f));
-                    nftContainer.parent = _scrollviewContentParent;
-                    nftContainer.localScale = new Vector3(1, 1, 1);
-                }
+                ApplyTexture(textures[i]);
+                UpdateScrollViewSize();
             }
 
             if (result.MoreToFetch)
             {
-                _nftFetcher.FetchContent(numberOfNftsToFetchAtOnce);
+                _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
             }
+        }
+
+        private void ApplyTexture(Texture2D texture)
+        {
+            Transform nftContainer = _pool.GetNextAvailable();
+            if (nftContainer != null)
+            {
+                Image nftImage = nftContainer.GetComponent<Image>();
+                nftImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
+                    new Vector2(.5f, .5f));
+                nftContainer.parent = _scrollviewContentParent;
+                nftContainer.localScale = new Vector3(1, 1, 1);
+            }
+        }
+
+        private void UpdateScrollViewSize()
+        {
+            int itemCount = _nftContent.Count;
+            int rowCount = Mathf.CeilToInt((float)itemCount / _widthInItems);
+            float contentHeight = rowCount * _grid.cellSize.y + (rowCount - 1) * _grid.spacing.y;
+
+            RectTransform content = _scrollRect.content;
+            content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight);
         }
 
         private void OnScroll(Vector2 scrollPosition)
         {
-            Debug.Log($"Scrolling to x: {scrollPosition.x} y: {scrollPosition.y}");
+            int imageCount = _scrollviewContentParent.childCount;
         }
     }
 }
