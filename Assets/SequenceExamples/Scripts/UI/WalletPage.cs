@@ -20,7 +20,7 @@ namespace Sequence.Demo
         protected override void Awake()
         {
             base.Awake();
-            _pool = ObjectPool.ActivateObjectPool(base._gameObject, NftPlaceHolderPrefab, numberOfNftPlaceholdersToInstantiate);
+            _pool = ObjectPool.ActivateObjectPool(NftPlaceHolderPrefab, numberOfNftPlaceholdersToInstantiate);
         }
 
         public override void Open(params object[] args)
