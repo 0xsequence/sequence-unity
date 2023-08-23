@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -9,10 +10,11 @@ namespace Sequence.Demo
     {
         [SerializeField] private int numberOfNftPlaceholdersToInstantiate = 10;
         [SerializeField] private GameObject NftPlaceHolderPrefab;
+        [SerializeField] private int numberOfNftsToFetchAtOnce = 1;
         private ObjectPool _pool;
         private INftContentFetcher _nftFetcher;
-        private Texture2D[] _nftContent;
-        
+        private List<Texture2D> _nftContent;
+
         protected override void Awake()
         {
             base.Awake();
@@ -28,7 +30,7 @@ namespace Sequence.Demo
                 throw new SystemException($"{nameof(_nftFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
             }
 
-            StartCoroutine(FetchNftContent());
+            _nftFetcher.FetchContent(numberOfNftsToFetchAtOnce);
         }
 
         public override void Close()
@@ -40,27 +42,22 @@ namespace Sequence.Demo
         public void SetupContentFetchers(INftContentFetcher nftContentFetcher)
         {
             _nftFetcher = nftContentFetcher;
+            _nftFetcher.OnNftFetchSuccess += HandleNftFetchSuccess;
         }
 
-        private IEnumerator FetchNftContent()
+        private void HandleNftFetchSuccess(FetchNftContentResult result)
         {
-            Task<Texture2D[]> fetch = _nftFetcher.FetchContent();
-
-            yield return new WaitUntil(() => fetch.IsCompleted);
-
-            if (fetch.Exception != null)
+            Texture2D[] textures = result.Content;
+            int count = textures.Length;
+            for (int i = 0; i < count; i++)
             {
-                Debug.LogError("Error fetching tokens: " + fetch.Exception);
+                _nftContent.Add(textures[i]);
             }
 
-            Texture2D[] content = fetch.Result;
-            if (content == null || content.Length == 0)
+            if (result.MoreToFetch)
             {
-                Debug.LogError("Error fetching tokens: none found");
-                yield break;
+                _nftFetcher.FetchContent(numberOfNftsToFetchAtOnce);
             }
-
-            _nftContent = content;
         }
     }
 }

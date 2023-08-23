@@ -1,13 +1,20 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Sequence.Demo
 {
     public class MockContentFetcher : INftContentFetcher
     {
-        public async Task<Texture2D[]> FetchContent()
+        private int _totalFetchable = 30;
+        private int _fetched = 0;
+        public event Action<FetchNftContentResult> OnNftFetchSuccess;
+
+        public async Task FetchContent(int maxToFetch)
         {
-            int count = 30;
+            int count = Math.Min(maxToFetch, _totalFetchable - _fetched);
+            _fetched += count;
             Texture2D[] mockTextures = new Texture2D[count];
             for (int i = 0; i < count; i++)
             {
@@ -15,7 +22,9 @@ namespace Sequence.Demo
                 await Task.Delay(100);
             }
 
-            return mockTextures;
+            bool moreToFetch = _totalFetchable - _fetched > 0;
+
+            OnNftFetchSuccess?.Invoke(new FetchNftContentResult(mockTextures, moreToFetch));
         }
 
         private Texture2D CreateMockTexture()
