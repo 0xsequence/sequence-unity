@@ -17,16 +17,16 @@ namespace Sequence.Demo
         private ObjectPool _pool;
         private INftContentFetcher _nftFetcher;
         private List<Texture2D> _nftContent = new List<Texture2D>();
-        private ScrollRect _scrollRect;
+        private RectTransform _scrollRectContent;
         private int _widthInItems = 2;
         private GridLayoutGroup _grid;
+        private float _brandingBuffer = 60;
 
         protected override void Awake()
         {
             base.Awake();
             _pool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
-            _scrollRect = GetComponentInChildren<ScrollRect>();
-            _scrollRect.onValueChanged.AddListener(OnScroll);
+            _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
         }
 
@@ -91,13 +91,8 @@ namespace Sequence.Demo
             int rowCount = Mathf.CeilToInt((float)itemCount / _widthInItems);
             float contentHeight = rowCount * _grid.cellSize.y + (rowCount - 1) * _grid.spacing.y;
 
-            RectTransform content = _scrollRect.content;
-            content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight);
-        }
-
-        private void OnScroll(Vector2 scrollPosition)
-        {
-            int imageCount = _scrollviewContentParent.childCount;
+            RectTransform content = _scrollRectContent;
+            content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight + _brandingBuffer);
         }
     }
 }
