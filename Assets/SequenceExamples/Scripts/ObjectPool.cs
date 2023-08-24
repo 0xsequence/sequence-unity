@@ -7,6 +7,7 @@ namespace Sequence.Demo
     {
         private GameObject _prefab;
         private int _objectCount;
+        private List<GameObject> _objects;
         private Queue<GameObject> _available;
         private bool _canGrow;
         private Transform _parent;
@@ -17,6 +18,7 @@ namespace Sequence.Demo
             this._objectCount = count;
             this._canGrow = canGrow;
             this._parent = parent;
+            _objects = new List<GameObject>();
             _available = new Queue<GameObject>();
         }
 
@@ -59,6 +61,7 @@ namespace Sequence.Demo
             {
                 newObject = GameObject.Instantiate(_prefab);
             }
+            _objects.Add(newObject);
             _available.Enqueue(newObject);
             newObject.SetActive(false);
         }
@@ -67,6 +70,18 @@ namespace Sequence.Demo
         {
             item.SetActive(false);
             _available.Enqueue(item);
+        }
+
+        public void Cleanup()
+        {
+            int objectCount = _objects.Count;
+            for (int i = 0; i < objectCount; i++)
+            {
+                GameObject.Destroy(_objects[i]);
+            }
+
+            _objects = new List<GameObject>();
+            _available = new Queue<GameObject>();
         }
     }
 }

@@ -25,7 +25,6 @@ namespace Sequence.Demo
         protected override void Awake()
         {
             base.Awake();
-            _pool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
         }
@@ -38,6 +37,8 @@ namespace Sequence.Demo
             {
                 throw new SystemException($"{nameof(_nftFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
             }
+            
+            _pool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
 
             _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
         }
@@ -47,6 +48,7 @@ namespace Sequence.Demo
             base.Close();
             _nftFetcher.OnNftFetchSuccess -= HandleNftFetchSuccess;
             _nftFetcher = null;
+            _pool.Cleanup();
         }
 
         public void SetupContentFetchers(INftContentFetcher nftContentFetcher)
