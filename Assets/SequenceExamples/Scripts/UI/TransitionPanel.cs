@@ -3,21 +3,21 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class LoginPanel : UIPanel
+    public class TransitionPanel : UIPanel
     {
         private SequenceUI _ui;
-        private TransitionPanel _transitionPanel;
+        private WalletPanel _walletPanel;
         protected override void Awake()
         {
             base.Awake();
             _ui = FindObjectOfType<SequenceUI>();
-            _transitionPanel = FindObjectOfType<TransitionPanel>();
+            _walletPanel = FindObjectOfType<WalletPanel>();
         }
 
         public override void Close()
         {
             base.Close();
-            _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
+            _walletPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
     }
 }

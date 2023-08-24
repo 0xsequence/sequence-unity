@@ -82,7 +82,7 @@ namespace Sequence.Demo
                 Image nftImage = nftContainer.GetComponent<Image>();
                 nftImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
                     new Vector2(.5f, .5f));
-                nftContainer.parent = _scrollviewContentParent;
+                nftContainer.SetParent(_scrollviewContentParent);
                 nftContainer.localScale = new Vector3(1, 1, 1);
             }
         }

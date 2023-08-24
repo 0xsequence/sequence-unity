@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Sequence.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace Sequence.Demo
 {
@@ -55,7 +56,7 @@ namespace Sequence.Demo
                 return;
             }
             DisableAllUIPages();
-            OpenUIPanel(_walletPanel);
+            OpenUIPanel(_loginPanel);
         }
 
         private void DisableAllUIPages()
@@ -68,12 +69,11 @@ namespace Sequence.Demo
             }
         }
 
-        private void OpenUIPanel(UIPanel panel, params object[] openArgs)
+        public void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open();
             _page = panel.InitialPage;
             _pageStack.Push(panel.InitialPage);
-            StartCoroutine(panel.OpenInitialPage(openArgs));
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
