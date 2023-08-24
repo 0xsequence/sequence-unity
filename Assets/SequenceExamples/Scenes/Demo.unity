@@ -2672,7 +2672,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 595488890}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1094787529}
+        m_TargetAssemblyTypeName: Sequence.Demo.TransitionPanel, SequenceExamples
+        m_MethodName: Close
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &595488890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5086,12 +5098,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1094787527}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e6bc5953f9649eb949978c0c7c984c4, type: 3}
+  m_Script: {fileID: 11500000, guid: e603b76b3ca44b23a2e717208be17ece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _openAnimationDurationInSeconds: 0
   _closeAnimationDurationInSeconds: 0
-  _animation: 1
+  _animation: 0
   InitialPage: {fileID: 1094787529}
 --- !u!1 &1138305251
 GameObject:
