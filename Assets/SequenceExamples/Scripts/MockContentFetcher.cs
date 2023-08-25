@@ -7,9 +7,15 @@ namespace Sequence.Demo
 {
     public class MockContentFetcher : INftContentFetcher
     {
-        private int _totalFetchable = 30;
+        private int _totalFetchable;
         private int _fetched = 0;
         public event Action<FetchNftContentResult> OnNftFetchSuccess;
+        public readonly int DelayInMilliseconds = 100;
+
+        public MockContentFetcher(int totalFetchable = 30)
+        {
+            this._totalFetchable = totalFetchable;
+        }
 
         public async Task FetchContent(int maxToFetch)
         {
@@ -19,7 +25,7 @@ namespace Sequence.Demo
             for (int i = 0; i < count; i++)
             {
                 mockTextures[i] = CreateMockTexture();
-                await Task.Delay(100);
+                await Task.Delay(DelayInMilliseconds);
             }
 
             bool moreToFetch = _totalFetchable - _fetched > 0;

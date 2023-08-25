@@ -14,8 +14,21 @@ namespace Sequence.Demo
 
         public override IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            _walletPage.SetupContentFetchers(new MockContentFetcher());
+            SetupContentFetchers(openArgs);
             return base.OpenInitialPage(openArgs);
+        }
+
+        private void SetupContentFetchers(params object[] args)
+        {
+            INftContentFetcher nftFetcher = new MockContentFetcher();
+            if (args.Length > 0)
+            {
+                if (args[0] is INftContentFetcher fetcher)
+                {
+                    nftFetcher = fetcher;
+                }
+            }
+            _walletPage.SetupContentFetchers(nftFetcher);
         }
     }
 }

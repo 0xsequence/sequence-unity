@@ -20,6 +20,7 @@ namespace SequenceExamples.Scripts.Tests
         private LoginSuccessPage _loginSuccessPage;
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
+        private TransitionPanel _transitionPanel;
 
         [UnitySetUp]
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
@@ -37,6 +38,7 @@ namespace SequenceExamples.Scripts.Tests
                 _loginSuccessPage = FindObjectOfType<LoginSuccessPage>();
                 _walletPanel = FindObjectOfType<WalletPanel>();
                 _walletPage = FindObjectOfType<WalletPage>();
+                _transitionPanel = FindObjectOfType<TransitionPanel>();
             }
 
             GameObject testObject = new GameObject("TestObject");
@@ -48,8 +50,8 @@ namespace SequenceExamples.Scripts.Tests
             _ui.Start();
             yield return new WaitForSeconds(3f); // Wait a few seconds to allow for UI to animate into place
             
-            _loginFlowUITests.Setup(_ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel, _testMonobehaviour);
-            _walletFlowUITests.Setup(_ui, _walletPanel, _walletPage, _loginPanel, _testMonobehaviour);
+            _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
+            _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel);
         }
 
         [UnityTearDown]
@@ -63,6 +65,7 @@ namespace SequenceExamples.Scripts.Tests
             _loginSuccessPage = null;
             _walletPanel = null;
             _walletPage = null;
+            _transitionPanel = null;
             yield return null;
         }
 

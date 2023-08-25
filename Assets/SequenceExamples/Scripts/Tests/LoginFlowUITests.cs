@@ -21,9 +21,10 @@ namespace SequenceExamples.Scripts.Tests
         private LoginSuccessPage _loginSuccessPage;
         private WalletPanel _walletPanel;
 
-        public void Setup(SequenceUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
-            MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel, MonoBehaviour testMonobehaviour)
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
+            MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel)
         {
+            _testMonobehaviour = testMonobehaviour;
             _ui = ui;
             _loginPanel = loginPanel;
             _connectPage = connectPage;
@@ -31,7 +32,6 @@ namespace SequenceExamples.Scripts.Tests
             _mfaPage = mfaPage;
             _loginSuccessPage = loginSuccessPage;
             _walletPanel = walletPanel;
-            _testMonobehaviour = testMonobehaviour;
         }
 
         public IEnumerator EndToEndTest()
