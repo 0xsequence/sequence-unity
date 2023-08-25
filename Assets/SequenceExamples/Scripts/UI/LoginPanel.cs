@@ -14,9 +14,8 @@ namespace Sequence.Demo
             _transitionPanel = FindObjectOfType<TransitionPanel>();
         }
 
-        public override void Close()
+        public void OpenTransitionPanel()
         {
-            base.Close();
             _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
     }

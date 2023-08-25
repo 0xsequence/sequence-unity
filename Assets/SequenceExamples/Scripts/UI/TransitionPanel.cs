@@ -14,9 +14,8 @@ namespace Sequence.Demo
             _walletPanel = FindObjectOfType<WalletPanel>();
         }
 
-        public override void Close()
+        public void OpenWalletPanel()
         {
-            base.Close();
             _walletPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
     }
