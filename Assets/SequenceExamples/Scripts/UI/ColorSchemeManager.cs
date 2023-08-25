@@ -66,7 +66,7 @@ namespace Sequence.Demo
                 }
             }
 
-            SequenceUI panel = t.GetComponent<SequenceUI>();
+            UIPanel panel = t.GetComponent<UIPanel>();
             if (panel != null)
             {
                 Image image = panel.GetComponent<Image>();
