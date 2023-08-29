@@ -45,7 +45,7 @@ namespace SequenceExamples.Scripts.Tests
             Button openWalletButton = openWalletButtonGameObject.GetComponent<Button>();
             Assert.IsNotNull(openWalletButton);
 
-            _transitionPanel.NftFetcher = new MockContentFetcher(_randomNumberOfNftsToFetch);
+            _transitionPanel.NftFetcher = new MockNftContentFetcher(_randomNumberOfNftsToFetch);
             Debug.Log($"Will fetch {_randomNumberOfNftsToFetch} NFTs");
             
             openWalletButton.onClick.Invoke();
@@ -63,13 +63,13 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator AssertWeLoadEnoughContent()
         {
-            if (_transitionPanel.NftFetcher is MockContentFetcher mockFetcher)
+            if (_transitionPanel.NftFetcher is MockNftContentFetcher mockFetcher)
             {
                 yield return new WaitForSeconds(_randomNumberOfNftsToFetch * (float)mockFetcher.DelayInMilliseconds / 1000);
             }
             else
             {
-                NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.NftFetcher)} type. Expected {typeof(MockContentFetcher)}");
+                NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.NftFetcher)} type. Expected {typeof(MockNftContentFetcher)}");
             }
             
             GameObject grid = GameObject.Find("Grid");

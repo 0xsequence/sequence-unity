@@ -1857,7 +1857,7 @@ GameObject:
   m_Component:
   - component: {fileID: 374660870}
   m_Layer: 5
-  m_Name: Sliding Area
+  m_Name: SlidingArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5670,7 +5670,7 @@ GameObject:
   - component: {fileID: 1215485328}
   - component: {fileID: 1215485327}
   m_Layer: 5
-  m_Name: Scroll View
+  m_Name: ScrollView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6834,7 +6834,7 @@ GameObject:
   - component: {fileID: 1507322825}
   - component: {fileID: 1507322824}
   m_Layer: 5
-  m_Name: Scrollbar Vertical
+  m_Name: ScrollbarVertical
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

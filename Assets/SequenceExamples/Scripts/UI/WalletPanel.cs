@@ -1,4 +1,5 @@
 using System.Collections;
+using Sequence.Utils;
 
 namespace Sequence.Demo
 {
@@ -20,15 +21,19 @@ namespace Sequence.Demo
 
         private void SetupContentFetchers(params object[] args)
         {
-            INftContentFetcher nftFetcher = new MockContentFetcher();
-            if (args.Length > 0)
+            ITokenContentFetcher tokenFetcher = args.GetObjectOfTypeIfExists<ITokenContentFetcher>();
+            if (tokenFetcher == null)
             {
-                if (args[0] is INftContentFetcher fetcher)
-                {
-                    nftFetcher = fetcher;
-                }
+                tokenFetcher = new MockTokenContentFetcher();
             }
-            _walletPage.SetupContentFetchers(nftFetcher);
+
+            INftContentFetcher nftFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
+            if (nftFetcher == null)
+            {
+                nftFetcher = new MockNftContentFetcher();
+            }
+            
+            _walletPage.SetupContentFetchers(tokenFetcher, nftFetcher);
         }
     }
 }

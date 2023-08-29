@@ -5,14 +5,14 @@ using Random = UnityEngine.Random;
 
 namespace Sequence.Demo
 {
-    public class MockContentFetcher : INftContentFetcher
+    public class MockNftContentFetcher : INftContentFetcher
     {
         private int _totalFetchable;
         private int _fetched = 0;
         public event Action<FetchNftContentResult> OnNftFetchSuccess;
         public readonly int DelayInMilliseconds = 100;
 
-        public MockContentFetcher(int totalFetchable = 30)
+        public MockNftContentFetcher(int totalFetchable = 30)
         {
             this._totalFetchable = totalFetchable;
         }
@@ -33,7 +33,7 @@ namespace Sequence.Demo
             OnNftFetchSuccess?.Invoke(new FetchNftContentResult(mockTextures, moreToFetch));
         }
 
-        private Texture2D CreateMockTexture()
+        public static Texture2D CreateMockTexture()
         {
             int width = 100;
             int height = 100;

@@ -61,23 +61,23 @@ namespace Sequence
         private static readonly Dictionary<BigInteger, string> IndexerNames
         = new Dictionary<BigInteger, string>
     {
-        { Chain.Ethereum, "mainnet" },
-        { Chain.Polygon, "polygon" },
-        { Chain.PolygonZkEvm, "polygon-zkevm" },
-        { Chain.BNBSmartChain, "bsc" },
-        { Chain.ArbitrumOne, "arbitrum" },
-        { Chain.ArbitrumNova, "arbitrum-nova" },
-        { Chain.Optimism, "optimism" },
-        { Chain.Avalanche, "avalanche" },
-        { Chain.Gnosis, "gnosis" },
-        { Chain.Base, "base"},
+        { (int)Chain.Ethereum, "mainnet" },
+        { (int)Chain.Polygon, "polygon" },
+        { (int)Chain.PolygonZkEvm, "polygon-zkevm" },
+        { (int)Chain.BNBSmartChain, "bsc" },
+        { (int)Chain.ArbitrumOne, "arbitrum" },
+        { (int)Chain.ArbitrumNova, "arbitrum-nova" },
+        { (int)Chain.Optimism, "optimism" },
+        { (int)Chain.Avalanche, "avalanche" },
+        { (int)Chain.Gnosis, "gnosis" },
+        { (int)Chain.Base, "base"},
 
-        { Chain.TestnetGoerli, "goerli" },
-        { Chain.TestnetSepolia, "sepolia" },
-        { Chain.TestnetPolygonMumbai, "mumbai" },
-        { Chain.TestnetArbitrumGoerli, "arbitrum-goerli" },
-        { Chain.TestnetBNBSmartChain, "bsc-testnet" },
-        { Chain.TestnetBaseGoerli, "base-goerli" },
+        { (int)Chain.TestnetGoerli, "goerli" },
+        { (int)Chain.TestnetSepolia, "sepolia" },
+        { (int)Chain.TestnetPolygonMumbai, "mumbai" },
+        { (int)Chain.TestnetArbitrumGoerli, "arbitrum-goerli" },
+        { (int)Chain.TestnetBNBSmartChain, "bsc-testnet" },
+        { (int)Chain.TestnetBaseGoerli, "base-goerli" },
     };
 
         /// <summary>

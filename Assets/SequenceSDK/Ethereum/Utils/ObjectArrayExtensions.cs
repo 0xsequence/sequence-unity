@@ -21,5 +21,26 @@ namespace Sequence.Utils
 
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Returns the first instance of an object of type T in args
+        /// Returns default otherwise
+        /// </summary>
+        /// <param name="args"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetObjectOfTypeIfExists<T>(this object[] args)
+        {
+            int length = args.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (args[i] is T item)
+                {
+                    return item;
+                }
+            }
+
+            return default;
+        }
     }
 }
