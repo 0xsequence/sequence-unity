@@ -655,6 +655,9 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0
   _closeAnimationDurationInSeconds: 0
   _animation: 0
+  _numberOfTokenPlaceholdersToInstantiate: 3
+  _tokenPlaceHolderPrefab: {fileID: 6706636487979383531, guid: 5046b36227b8f41dc898c9e90a98e655, type: 3}
+  _numberOfTokensToFetchAtOnce: 1
   _numberOfNftPlaceholdersToInstantiate: 10
   _nftPlaceHolderPrefab: {fileID: 1878011362095268920, guid: 0ad74f6689ca94f53b758794927d6133, type: 3}
   _numberOfNftsToFetchAtOnce: 1
