@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Sequence.Demo;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace SequenceExamples.Scripts.Tests
 {
@@ -18,6 +20,7 @@ namespace SequenceExamples.Scripts.Tests
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
 
+        private int _randomNumberOfTokensToFetch;
         private int _randomNumberOfNftsToFetch;
 
         public void Setup(MonoBehaviour testMonobehaviour, SequenceUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel)
@@ -32,10 +35,12 @@ namespace SequenceExamples.Scripts.Tests
 
         public IEnumerator EndToEndTest()
         {
+            _randomNumberOfTokensToFetch = Random.Range(0, 100);
             _randomNumberOfNftsToFetch = Random.Range(0, 1000);
             yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
             yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
             AssertBrandingIsBelowContent();
+            yield return _testMonobehaviour.StartCoroutine(AssertValueChangeDisplayedCorrectly());
         }
 
         private IEnumerator TransitionToWalletPageTest()
@@ -45,8 +50,9 @@ namespace SequenceExamples.Scripts.Tests
             Button openWalletButton = openWalletButtonGameObject.GetComponent<Button>();
             Assert.IsNotNull(openWalletButton);
 
+            _transitionPanel.TokenFetcher = new MockTokenContentFetcher(_randomNumberOfTokensToFetch);
             _transitionPanel.NftFetcher = new MockNftContentFetcher(_randomNumberOfNftsToFetch);
-            Debug.Log($"Will fetch {_randomNumberOfNftsToFetch} NFTs");
+            Debug.Log($"Will fetch {_randomNumberOfTokensToFetch} tokens and {_randomNumberOfNftsToFetch} NFTs");
             
             openWalletButton.onClick.Invoke();
             yield return new WaitForSeconds(3f); // Wait for next page to animate in
@@ -63,9 +69,18 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator AssertWeLoadEnoughContent()
         {
-            if (_transitionPanel.NftFetcher is MockNftContentFetcher mockFetcher)
+            if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
             {
-                yield return new WaitForSeconds(_randomNumberOfNftsToFetch * (float)mockFetcher.DelayInMilliseconds / 1000);
+                yield return new WaitForSeconds(_randomNumberOfNftsToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
+            }
+            else
+            {
+                NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.TokenFetcher)} type. Expected {typeof(MockTokenContentFetcher)}");
+            }
+            
+            if (_transitionPanel.NftFetcher is MockNftContentFetcher mockNftFetcher)
+            {
+                yield return new WaitForSeconds(_randomNumberOfNftsToFetch * (float)mockNftFetcher.DelayInMilliseconds / 1000);
             }
             else
             {
@@ -75,7 +90,8 @@ namespace SequenceExamples.Scripts.Tests
             GameObject grid = GameObject.Find("Grid");
             Assert.IsNotNull(grid);
             int contentLoaded = grid.transform.childCount;
-            Assert.AreEqual(_randomNumberOfNftsToFetch, contentLoaded);
+            Assert.AreEqual(_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch, contentLoaded);
+            Assert.AreEqual(_randomNumberOfTokensToFetch, _walletPage.CountFungibleTokensDisplayed());
         }
 
         private void AssertBrandingIsBelowContent()
@@ -86,7 +102,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(grid);
 
             RectTransform bottomContent =
-                grid.transform.GetChild(_randomNumberOfNftsToFetch - 1).GetComponent<RectTransform>();
+                grid.transform.GetChild(_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch - 1).GetComponent<RectTransform>();
             RectTransform brandingTransform = branding.GetComponent<RectTransform>();
             Vector3[] corners = new Vector3[4];
             bottomContent.GetWorldCorners(corners);
@@ -94,6 +110,11 @@ namespace SequenceExamples.Scripts.Tests
             brandingTransform.GetWorldCorners(corners);
             float topOfBrandingYPosition = corners[1].y;
             Assert.IsTrue(topOfBrandingYPosition < bottomOfContentYPosition);
+        }
+
+        private IEnumerator AssertValueChangeDisplayedCorrectly()
+        {
+            throw new NotImplementedException();
         }
     }
 }

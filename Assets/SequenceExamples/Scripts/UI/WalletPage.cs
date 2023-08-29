@@ -171,5 +171,10 @@ namespace Sequence.Demo
                 }
             }
         }
+
+        public int CountFungibleTokensDisplayed()
+        {
+            return _tokenUIElements.Count;
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace Sequence.Demo
 {
     public class TransitionPanel : UIPanel
     {
+        public ITokenContentFetcher TokenFetcher = new MockTokenContentFetcher(); // Todo inject a real fetcher in Awake
         public INftContentFetcher NftFetcher = new MockNftContentFetcher(30); // Todo inject a real fetcher in Awake
         private SequenceUI _ui;
         private WalletPanel _walletPanel;
@@ -17,7 +18,7 @@ namespace Sequence.Demo
 
         public void OpenWalletPanel()
         {
-            _walletPanel.OpenWithDelay(_closeAnimationDurationInSeconds, NftFetcher);
+            _walletPanel.OpenWithDelay(_closeAnimationDurationInSeconds, TokenFetcher, NftFetcher);
         }
     }
 }
