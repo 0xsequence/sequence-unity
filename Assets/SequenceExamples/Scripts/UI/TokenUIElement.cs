@@ -20,6 +20,13 @@ namespace Sequence.Demo
 
         private bool _isAssembled = false;
 
+        private Color _baseColor;
+
+        private void Awake()
+        {
+            _baseColor = _percentChangeText.color;
+        }
+
         public void Assemble(TokenElement tokenElement)
         {
             _tokenElement = tokenElement;
@@ -30,21 +37,55 @@ namespace Sequence.Demo
             
             _isAssembled = true;
             
-            RefreshWithBalance(_tokenElement.Balance);
+            SetInitialValueAndBalanceText();
         }
 
         public void RefreshWithBalance(uint balance)
         {
             ThrowIfNotAssembled();
+            if (balance == _tokenElement.Balance)
+            {
+                return;
+            }
             _tokenElement.Balance = balance;
+            
+            SetInitialValueAndBalanceText();
+        }
+
+        private void SetInitialValueAndBalanceText()
+        {
+            _balanceText.text = $"{_tokenElement.Balance} {_tokenElement.Symbol}";
             
             CurrencyValue currencyValue = _tokenElement.CurrencyConverter.ConvertToCurrency(_tokenElement.Balance, _tokenElement.Erc20);
             float amount = currencyValue.Amount;
+            _tokenElement.PreviousCurrencyValue = amount;
             
-            _balanceText.text = $"{_tokenElement.Balance} {_tokenElement.Symbol}";
             _currencyValueText.text = $"{currencyValue.Symbol}{amount:N2}";
+            _percentChangeText.text = "0.00%";
+            _percentChangeText.color = _baseColor;
+        }
+
+        public void RefreshCurrencyValue()
+        {
+            ThrowIfNotAssembled();
+            CurrencyValue currencyValue = _tokenElement.CurrencyConverter.ConvertToCurrency(_tokenElement.Balance, _tokenElement.Erc20);
+            float amount = currencyValue.Amount;
+            
+            _currencyValueText.text = $"{currencyValue.Symbol}{amount:N2}";
+            float change = amount - _tokenElement.PreviousCurrencyValue;
             _percentChangeText.text =
-                $"{amount.GetSignAsString()}{(amount - _tokenElement.PreviousCurrencyValue) / _tokenElement.PreviousCurrencyValue * 100}%";
+                $"{amount.GetSignAsString()}{(change) / _tokenElement.PreviousCurrencyValue * 100:N2}%";
+            if (change > 0)
+            {
+                _percentChangeText.color = Color.green;
+            } else if (change == 0)
+            {
+                _percentChangeText.color = _baseColor;
+            }
+            else
+            {
+                _percentChangeText.color = Color.red;
+            }
 
             _tokenElement.PreviousCurrencyValue = amount;
         }

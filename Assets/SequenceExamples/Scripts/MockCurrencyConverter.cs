@@ -1,4 +1,5 @@
 using Sequence.Contracts;
+using UnityEngine;
 
 namespace Sequence.Demo
 {
@@ -6,7 +7,7 @@ namespace Sequence.Demo
     {
         public CurrencyValue ConvertToCurrency(float amount, ERC20 token)
         {
-            return new CurrencyValue("$", amount);
+            return new CurrencyValue("$", amount + Random.Range(-amount * .25f, amount * .25f));
         }
     }
 }

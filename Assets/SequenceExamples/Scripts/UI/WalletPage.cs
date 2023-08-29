@@ -17,6 +17,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _nftPlaceHolderPrefab;
         [SerializeField] private int _numberOfNftsToFetchAtOnce = 1;
         [SerializeField] private Transform _scrollviewContentParent;
+        [SerializeField] private float _timeBetweenTokenValueRefreshesInSeconds = 5;
         private ObjectPool _tokenPool;
         private ObjectPool _nftPool;
         private ITokenContentFetcher _tokenFetcher;
@@ -27,6 +28,7 @@ namespace Sequence.Demo
         private int _widthInItems = 2;
         private GridLayoutGroup _grid;
         private float _brandingBuffer = 60;
+        private List<TokenUIElement> _tokenUIElements = new List<TokenUIElement>();
 
         protected override void Awake()
         {
@@ -54,6 +56,8 @@ namespace Sequence.Demo
             _nftPool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
 
             _tokenFetcher.FetchContent(_numberOfTokensToFetchAtOnce);
+
+            StartCoroutine(RefreshTokenValues());
         }
 
         public override void Close()
@@ -63,6 +67,7 @@ namespace Sequence.Demo
             _nftFetcher = null;
             _tokenPool.Cleanup();
             _nftPool.Cleanup();
+            _tokenUIElements = new List<TokenUIElement>();
         }
 
         public void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)
@@ -105,6 +110,7 @@ namespace Sequence.Demo
 
             TokenUIElement uiElement = tokenContainer.GetComponent<TokenUIElement>();
             uiElement.Assemble(element);
+            _tokenUIElements.Add(uiElement);
             tokenContainer.SetParent(_scrollviewContentParent);
             tokenContainer.localScale = new Vector3(1, 1, 1);
         }
@@ -150,6 +156,20 @@ namespace Sequence.Demo
 
             RectTransform content = _scrollRectContent;
             content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight + _brandingBuffer);
+        }
+
+        private IEnumerator RefreshTokenValues()
+        {
+            var waitForRefresh = new WaitForSecondsRealtime(_timeBetweenTokenValueRefreshesInSeconds);
+            while (true) // Terminates on Close() (as this gameObject will be disabled)
+            {
+                yield return waitForRefresh;
+                int count = _tokenUIElements.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    _tokenUIElements[i].RefreshCurrencyValue();
+                }
+            }
         }
     }
 }
