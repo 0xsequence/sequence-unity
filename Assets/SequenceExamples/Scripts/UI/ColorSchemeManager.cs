@@ -2,6 +2,7 @@ using System;
 using System.Net.Mime;
 using Sequence.Demo.ScriptableObjects;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +11,11 @@ namespace Sequence.Demo
     public class ColorSchemeManager : MonoBehaviour
     {
         [SerializeField] private ColorScheme _colorScheme;
+        [SerializeField] private GameObject _tokenUIElementPrefab;
         public void ApplyColorScheme()
         {
             ApplyColorSchemeToChildren(transform);
+            ApplyColorSchemeToChildren(_tokenUIElementPrefab.transform);
         }
 
         private void ApplyColorSchemeToChildren(Transform parent)
