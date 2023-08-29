@@ -15,7 +15,10 @@ namespace Sequence.Demo
         public void ApplyColorScheme()
         {
             ApplyColorSchemeToChildren(transform);
-            ApplyColorSchemeToChildren(_tokenUIElementPrefab.transform);
+            GameObject prefabInstance = PrefabUtility.InstantiatePrefab(_tokenUIElementPrefab) as GameObject;
+            ApplyColorSchemeToChildren(prefabInstance.transform);
+            PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
+            DestroyImmediate(prefabInstance);
         }
 
         private void ApplyColorSchemeToChildren(Transform parent)
