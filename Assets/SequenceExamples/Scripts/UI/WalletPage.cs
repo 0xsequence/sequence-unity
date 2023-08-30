@@ -63,6 +63,8 @@ namespace Sequence.Demo
         public override void Close()
         {
             base.Close();
+            _tokenFetcher.OnTokenFetchSuccess -= HandleTokenFetchSuccess;
+            _tokenFetcher = null;
             _nftFetcher.OnNftFetchSuccess -= HandleNftFetchSuccess;
             _nftFetcher = null;
             _tokenPool.Cleanup();

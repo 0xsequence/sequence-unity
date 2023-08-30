@@ -6,11 +6,19 @@ namespace Sequence.Demo
     public class WalletPanel : UIPanel
     {
         private WalletPage _walletPage;
+        private TransitionPanel _transitionPanel;
 
         protected override void Awake()
         {
             base.Awake();
             _walletPage = GetComponentInChildren<WalletPage>();
+            _transitionPanel = FindObjectOfType<TransitionPanel>();
+        }
+
+        public override void Close()
+        {
+            base.Close();
+            _walletPage.Close();
         }
 
         public override IEnumerator OpenInitialPage(params object[] openArgs)
@@ -34,6 +42,11 @@ namespace Sequence.Demo
             }
             
             _walletPage.SetupContentFetchers(tokenFetcher, nftFetcher);
+        }
+
+        public void OpenTransitionPanel()
+        {
+            _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
     }
 }

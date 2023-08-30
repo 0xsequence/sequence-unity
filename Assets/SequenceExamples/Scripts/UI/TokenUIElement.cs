@@ -74,7 +74,7 @@ namespace Sequence.Demo
             _currencyValueText.text = $"{currencyValue.Symbol}{amount:N2}";
             float change = amount - _tokenElement.PreviousCurrencyValue;
             _percentChangeText.text =
-                $"{amount.GetSignAsString()}{(change) / _tokenElement.PreviousCurrencyValue * 100:N2}%";
+                $"{change.AppendSignIfNeeded()}{(change) / _tokenElement.PreviousCurrencyValue * 100:N2}%";
             if (change > 0)
             {
                 _percentChangeText.color = Color.green;
