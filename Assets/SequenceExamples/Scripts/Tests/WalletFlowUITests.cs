@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using Sequence.Demo;
+using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -114,7 +116,50 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator AssertValueChangeDisplayedCorrectly()
         {
-            throw new NotImplementedException();
+            TokenUIElement token = FindObjectOfType<TokenUIElement>();
+            Assert.IsNotNull(token);
+            Transform percentChange = token.transform.Find("PercentChangeText");
+            Assert.IsNotNull(percentChange);
+            TextMeshProUGUI percentChangeText = percentChange.GetComponent<TextMeshProUGUI>();
+            Assert.IsNotNull(percentChangeText);
+            Transform balance = token.transform.Find("BalanceText");
+            Assert.IsNotNull(balance);
+            TextMeshProUGUI balanceText = balance.GetComponent<TextMeshProUGUI>();
+            Assert.IsNotNull(balanceText);
+            
+            AssertAppropriateColorPercentChangeText(percentChangeText);
+
+            yield return new WaitForSecondsRealtime(_walletPage.TimeBetweenTokenValueRefreshesInSeconds);
+            
+            AssertAppropriateColorPercentChangeText(percentChangeText);
+            
+            token.RefreshWithBalance(5);
+            
+            AssertAppropriateColorPercentChangeText(percentChangeText);
+            Assert.AreEqual("0.00%", percentChangeText.text);
+            
+            balanceText.text.AssertStartsWith("5 ");
+
+            yield return new WaitForSecondsRealtime(_walletPage.TimeBetweenTokenValueRefreshesInSeconds);
+            
+            AssertAppropriateColorPercentChangeText(percentChangeText);
+            Assert.AreNotEqual("0.00%", percentChangeText.text);
+        }
+
+        private void AssertAppropriateColorPercentChangeText(TextMeshProUGUI text)
+        {
+            if (text.text[0] == '+')
+            {
+                Assert.AreEqual(Color.green, text.color);
+            }else if (text.text[0] == '-')
+            {
+                Assert.AreEqual(Color.red, text.color);
+            }
+            else
+            {
+                Assert.AreNotEqual(Color.green, text.color);
+                Assert.AreNotEqual(Color.red, text.color);
+            }
         }
     }
 }

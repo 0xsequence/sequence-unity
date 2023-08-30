@@ -17,7 +17,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _nftPlaceHolderPrefab;
         [SerializeField] private int _numberOfNftsToFetchAtOnce = 1;
         [SerializeField] private Transform _scrollviewContentParent;
-        [SerializeField] private float _timeBetweenTokenValueRefreshesInSeconds = 5;
+        public float TimeBetweenTokenValueRefreshesInSeconds = 5;
         private ObjectPool _tokenPool;
         private ObjectPool _nftPool;
         private ITokenContentFetcher _tokenFetcher;
@@ -160,7 +160,7 @@ namespace Sequence.Demo
 
         private IEnumerator RefreshTokenValues()
         {
-            var waitForRefresh = new WaitForSecondsRealtime(_timeBetweenTokenValueRefreshesInSeconds);
+            var waitForRefresh = new WaitForSecondsRealtime(TimeBetweenTokenValueRefreshesInSeconds);
             while (true) // Terminates on Close() (as this gameObject will be disabled)
             {
                 yield return waitForRefresh;
