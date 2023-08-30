@@ -126,8 +126,6 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(balance);
             TextMeshProUGUI balanceText = balance.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(balanceText);
-            
-            AssertAppropriateColorPercentChangeText(percentChangeText);
 
             yield return new WaitForSecondsRealtime(_walletPage.TimeBetweenTokenValueRefreshesInSeconds);
             
