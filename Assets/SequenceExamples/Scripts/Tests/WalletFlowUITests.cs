@@ -39,10 +39,23 @@ namespace SequenceExamples.Scripts.Tests
         {
             _randomNumberOfTokensToFetch = Random.Range(0, 100);
             _randomNumberOfNftsToFetch = Random.Range(0, 1000);
+            AssertWeAreOnTransitionPanel();
             yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
-            yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
-            AssertBrandingIsBelowContent();
-            yield return _testMonobehaviour.StartCoroutine(AssertValueChangeDisplayedCorrectly());
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+            yield return _testMonobehaviour.StartCoroutine(CloseWalletPanelTest());
+            AssertWeAreOnTransitionPanel();
+            _randomNumberOfTokensToFetch = Random.Range(0, 10);
+            _randomNumberOfNftsToFetch = Random.Range(0, 100);
+            yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+        }
+
+        private void AssertWeAreOnTransitionPanel()
+        {
+            Assert.IsFalse(_walletPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_walletPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
+            Assert.IsTrue(_transitionPanel.gameObject.activeInHierarchy);
         }
 
         private IEnumerator TransitionToWalletPageTest()
@@ -67,6 +80,15 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsTrue(_walletPanel.gameObject.activeInHierarchy);
             Assert.IsTrue(_walletPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_transitionPanel.gameObject.activeInHierarchy);
+        }
+
+        private IEnumerator AssertWalletPageIsAsExpected()
+        {
+            AssertWeAreOnWalletPage();
+            yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
+            AssertBrandingIsBelowContent();
+            yield return _testMonobehaviour.StartCoroutine(AssertValueChangeDisplayedCorrectly());
         }
 
         private IEnumerator AssertWeLoadEnoughContent()
@@ -92,6 +114,8 @@ namespace SequenceExamples.Scripts.Tests
             GameObject grid = GameObject.Find("Grid");
             Assert.IsNotNull(grid);
             int contentLoaded = grid.transform.childCount;
+            Debug.Log($"Fetched {_walletPage.CountFungibleTokensDisplayed()} tokens and a total of {contentLoaded} content");
+            Debug.Log($"Expected to fetch {_randomNumberOfTokensToFetch} tokens, {_randomNumberOfNftsToFetch} NFTs, and {_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch} total content");
             Assert.AreEqual(_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch, contentLoaded);
             Assert.AreEqual(_randomNumberOfTokensToFetch, _walletPage.CountFungibleTokensDisplayed());
         }
@@ -158,6 +182,19 @@ namespace SequenceExamples.Scripts.Tests
                 Assert.AreNotEqual(Color.green, text.color);
                 Assert.AreNotEqual(Color.red, text.color);
             }
+        }
+
+        private IEnumerator CloseWalletPanelTest()
+        {
+            GameObject closeWallet = GameObject.Find("CloseWalletButton");
+            Assert.IsNotNull(closeWallet);
+            Button closeWalletButton = closeWallet.GetComponent<Button>();
+            Assert.IsNotNull(closeWalletButton);
+            
+            closeWalletButton.onClick.Invoke();
+            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            
+            AssertWeAreOnTransitionPanel();
         }
     }
 }
