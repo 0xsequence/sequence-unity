@@ -1,6 +1,6 @@
 namespace Sequence.Demo
 {
-    public class NftInfoPage
+    public class TokenInfoPage : UIPage
     {
         
     }
