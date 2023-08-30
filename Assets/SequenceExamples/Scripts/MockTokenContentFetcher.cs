@@ -13,7 +13,7 @@ namespace Sequence.Demo
 
         private int _totalFetchable;
         private int _fetched = 0;
-        public readonly int DelayInMilliseconds = 100;
+        public readonly int DelayInMilliseconds = 10;
 
         public MockTokenContentFetcher(int totalFetchable = 5)
         {
