@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4acfe4d6535741c891550bcf89942191, type: 3}
+  m_Name: NetworkIcons
+  m_EditorClassIdentifier: 
+  NetworkIconMapping:
+  - Key: 1
+    Value: {fileID: 21300000, guid: 5513222c06aa042c3a944c5c99b29917, type: 3}
+  - Key: 10
+    Value: {fileID: 21300000, guid: 389031f01c97946f8858f93a77141e4d, type: 3}
+  - Key: 56
+    Value: {fileID: 21300000, guid: f7aec5a46e6274725b23fcd8ccec20a2, type: 3}
+  - Key: 100
+    Value: {fileID: 21300000, guid: a690107e8ef6c44fc86d647a0bdf5618, type: 3}
+  - Key: 137
+    Value: {fileID: 21300000, guid: 5e4d0c5cb453e4172b9d7b9c1f0a3460, type: 3}
+  - Key: 1101
+    Value: {fileID: 21300000, guid: a49359ffc18f248f9b72d0b458063f56, type: 3}
+  - Key: 8453
+    Value: {fileID: 21300000, guid: 5bf8473f1514f4006a18cfcda8cc2d87, type: 3}
+  - Key: 42161
+    Value: {fileID: 21300000, guid: 314f158aa6f854a0baa897d03391e98f, type: 3}
+  - Key: 42170
+    Value: {fileID: 21300000, guid: 94a63c1dd26c84a52bfabb6b7dd2d98b, type: 3}
+  - Key: 43114
+    Value: {fileID: 21300000, guid: 891437ed26d4f45749823490e9bccdc3, type: 3}
+  - Key: 5
+    Value: {fileID: 21300000, guid: 5513222c06aa042c3a944c5c99b29917, type: 3}
+  - Key: 11155111
+    Value: {fileID: 21300000, guid: 5513222c06aa042c3a944c5c99b29917, type: 3}
+  - Key: 80001
+    Value: {fileID: 21300000, guid: 5e4d0c5cb453e4172b9d7b9c1f0a3460, type: 3}
+  - Key: 421613
+    Value: {fileID: 21300000, guid: 314f158aa6f854a0baa897d03391e98f, type: 3}
+  - Key: 97
+    Value: {fileID: 21300000, guid: f7aec5a46e6274725b23fcd8ccec20a2, type: 3}
+  - Key: 43113
+    Value: {fileID: 21300000, guid: 891437ed26d4f45749823490e9bccdc3, type: 3}
+  - Key: 84531
+    Value: {fileID: 21300000, guid: 5bf8473f1514f4006a18cfcda8cc2d87, type: 3}

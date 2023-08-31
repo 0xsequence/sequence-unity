@@ -87,6 +87,7 @@ namespace SequenceExamples.Scripts.Tests
         {
             AssertWeAreOnWalletPage();
             yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
+            AssertWeHaveAppropriateNetworkIcons();
             AssertBrandingIsBelowContent();
             yield return _testMonobehaviour.StartCoroutine(AssertValueChangeDisplayedCorrectly());
         }
@@ -118,6 +119,22 @@ namespace SequenceExamples.Scripts.Tests
             Debug.Log($"Expected to fetch {_randomNumberOfTokensToFetch} tokens, {_randomNumberOfNftsToFetch} NFTs, and {_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch} total content");
             Assert.AreEqual(_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch, contentLoaded);
             Assert.AreEqual(_randomNumberOfTokensToFetch, _walletPage.CountFungibleTokensDisplayed());
+        }
+
+        private void AssertWeHaveAppropriateNetworkIcons()
+        {
+            GameObject grid = GameObject.Find("Grid");
+            Assert.IsNotNull(grid);
+            TokenUIElement[] tokenUIElements = grid.GetComponentsInChildren<TokenUIElement>();
+            int elements = tokenUIElements.Length;
+            for (int i = 0; i < elements; i++)
+            {
+                Transform tokenInfoGroup = tokenUIElements[i].transform.Find("TokenInfoGroup");
+                Assert.IsNotNull(tokenInfoGroup);
+                Image networkIconImage = tokenInfoGroup.GetComponentInChildren<Image>();
+                Assert.IsNotNull(networkIconImage);
+                Assert.AreEqual(tokenUIElements[i].NetworkIcons.GetIcon(tokenUIElements[i].GetNetwork()), networkIconImage.sprite);
+            }
         }
 
         private void AssertBrandingIsBelowContent()
