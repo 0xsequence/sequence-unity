@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using Sequence.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace Sequence.Demo
 
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
+        private TokenInfoPage _tokenInfoPage;
 
         private UIPage _page;
         private Stack<UIPage> _pageStack = new Stack<UIPage>();
@@ -47,6 +49,7 @@ namespace Sequence.Demo
             _walletPanel = GetComponentInChildren<WalletPanel>();
 
             _walletPage = GetComponentInChildren<WalletPage>();
+            _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
         }
 
         public void Start()
@@ -71,15 +74,16 @@ namespace Sequence.Demo
 
         public void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
-            panel.Open();
-            _page = panel.InitialPage;
-            _pageStack.Push(panel.InitialPage);
+            panel.Open(openArgs);
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
         {
-            _page.Close();
-            yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+            if (_page != null)
+            {
+                _page.Close();
+                yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+            }
             _page = page;
             _pageStack.Push(page);
             _page.Open(openArgs);
@@ -117,6 +121,17 @@ namespace Sequence.Demo
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.Log($"Failed to send MFA email to {email} with error: {error}");
+        }
+
+        public void SwitchToTokenInfoPage(TokenElement tokenElement)
+        {
+            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement));
+        }
+
+        public void ClearStack()
+        {
+            _pageStack = new Stack<UIPage>();
+            _page = null;
         }
     }
 }

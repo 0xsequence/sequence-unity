@@ -31,11 +31,4 @@ namespace Sequence.Demo.ScriptableObjects
             return default;
         }
     }
-
-    [System.Serializable]
-    public class SerializableKeyValuePair<TKey, TValue>
-    {
-        public TKey Key;
-        public TValue Value;
-    }
 }
