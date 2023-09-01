@@ -34,7 +34,7 @@ namespace Sequence.Demo
             _tokenElement = tokenElement;
             
             _tokenIconImage.sprite = _tokenElement.TokenIconSprite;
-            _tokenNameSetter.SetText(_tokenElement.TokenName);
+            _tokenNameSetter.SetText(_tokenElement.TokenName, resizeWidth: true);
             _networkIcon.sprite = NetworkIcons.GetIcon(_tokenElement.Network);
             
             _balanceCurrencyTextSetter = new BalanceCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement, _percentChangeText, _baseColor);
