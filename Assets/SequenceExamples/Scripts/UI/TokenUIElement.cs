@@ -74,7 +74,7 @@ namespace Sequence.Demo
                 _sequenceUI = FindObjectOfType<SequenceUI>();
             }
 
-            _sequenceUI.SwitchToTokenInfoPage(_tokenElement);
+            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons);
         }
     }
 }

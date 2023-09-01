@@ -59,5 +59,10 @@ namespace Sequence.Demo
                 potentialSymbols.GetRandomObjectFromArray(),
                 new MockCurrencyConverter());
         }
+
+        public void Refresh()
+        {
+            _fetched = 0;
+        }
     }
 }

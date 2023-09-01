@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using Sequence.Authentication;
+using Sequence.Demo.ScriptableObjects;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -24,7 +25,19 @@ namespace Sequence.Demo
         private TokenInfoPage _tokenInfoPage;
 
         private UIPage _page;
-        private Stack<UIPage> _pageStack = new Stack<UIPage>();
+        private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
+        
+        private struct PageWithArgs
+        {
+            public UIPage page;
+            public object[] args;
+
+            public PageWithArgs(UIPage page, object[] args)
+            {
+                this.page = page;
+                this.args = args;
+            }
+        }
 
         private void Awake()
         {
@@ -85,7 +98,7 @@ namespace Sequence.Demo
                 yield return new WaitUntil(() => !_page.isActiveAndEnabled);
             }
             _page = page;
-            _pageStack.Push(page);
+            _pageStack.Push(new PageWithArgs(page, openArgs));
             _page.Open(openArgs);
         }
 
@@ -96,9 +109,10 @@ namespace Sequence.Demo
                 return;
             }
 
-            _pageStack.Pop().Close();
-            _page = _pageStack.Peek();
-            _page.Open();
+            _pageStack.Pop().page.Close();
+            PageWithArgs previous = _pageStack.Peek();
+            _page = previous.page;
+            _page.Open(previous.args);
         }
 
         private void OnLoginSuccessHandler(string userId)
@@ -123,14 +137,14 @@ namespace Sequence.Demo
             Debug.Log($"Failed to send MFA email to {email} with error: {error}");
         }
 
-        public void SwitchToTokenInfoPage(TokenElement tokenElement)
+        public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons)
         {
-            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement));
+            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement, networkIcons));
         }
 
         public void ClearStack()
         {
-            _pageStack = new Stack<UIPage>();
+            _pageStack = new Stack<PageWithArgs>();
             _page = null;
         }
     }

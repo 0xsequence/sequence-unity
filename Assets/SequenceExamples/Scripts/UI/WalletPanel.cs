@@ -23,25 +23,25 @@ namespace Sequence.Demo
 
         public override IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            SetupContentFetchers(openArgs);
+            openArgs = SetupContentFetchers(openArgs);
             return base.OpenInitialPage(openArgs);
         }
 
-        private void SetupContentFetchers(params object[] args)
+        private object[] SetupContentFetchers(params object[] args)
         {
             ITokenContentFetcher tokenFetcher = args.GetObjectOfTypeIfExists<ITokenContentFetcher>();
             if (tokenFetcher == null)
             {
-                tokenFetcher = new MockTokenContentFetcher();
+                args.AppendObject(new MockTokenContentFetcher());
             }
 
             INftContentFetcher nftFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
             if (nftFetcher == null)
             {
-                nftFetcher = new MockNftContentFetcher();
+                args.AppendObject(new MockNftContentFetcher());
             }
-            
-            _walletPage.SetupContentFetchers(tokenFetcher, nftFetcher);
+
+            return args;
         }
 
         public void OpenTransitionPanel()

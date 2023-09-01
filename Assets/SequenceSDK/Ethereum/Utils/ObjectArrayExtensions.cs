@@ -42,5 +42,19 @@ namespace Sequence.Utils
 
             return default;
         }
+
+        public static object[] AppendObject(this object[] arr, object obj)
+        {
+            int length = arr.Length;
+            object[] newArr = new object[length + 1];
+            for (int i = 0; i < length; i++)
+            {
+                newArr[i] = arr[i];
+            }
+
+            newArr[length] = obj;
+
+            return newArr;
+        }
     }
 }

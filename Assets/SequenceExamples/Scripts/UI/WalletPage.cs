@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -43,13 +44,25 @@ namespace Sequence.Demo
 
             if (_tokenFetcher == null)
             {
-                throw new SystemException($"{nameof(_tokenFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
+                _tokenFetcher = args.GetObjectOfTypeIfExists<ITokenContentFetcher>();
+                if (_tokenFetcher == default)
+                {
+                    throw new SystemException(
+                        $"Invalid use. {nameof(WalletPage)} must be opened with a {typeof(ITokenContentFetcher)} as an argument.");
+                }
             }
 
             if (_nftFetcher == null)
             {
-                throw new SystemException($"{nameof(_nftFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
+                _nftFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
+                if (_nftFetcher == default)
+                {
+                    throw new SystemException(
+                        $"Invalid use. {nameof(WalletPage)} must be opened with a {typeof(INftContentFetcher)} as an argument.");
+                }
             }
+
+            SetupContentFetchers(_tokenFetcher, _nftFetcher);
 
             _tokenPool =
                 ObjectPool.ActivateObjectPool(_tokenPlaceHolderPrefab, _numberOfTokenPlaceholdersToInstantiate);
@@ -72,12 +85,14 @@ namespace Sequence.Demo
             _tokenUIElements = new List<TokenUIElement>();
         }
 
-        public void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)
+        private void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)
         {
             _tokenFetcher = tokenContentFetcher;
             _tokenFetcher.OnTokenFetchSuccess += HandleTokenFetchSuccess;
+            _tokenFetcher.Refresh();;
             _nftFetcher = nftContentFetcher;
             _nftFetcher.OnNftFetchSuccess += HandleNftFetchSuccess;
+            _nftFetcher.Refresh();
         }
 
         private void HandleTokenFetchSuccess(FetchTokenContentResult result)

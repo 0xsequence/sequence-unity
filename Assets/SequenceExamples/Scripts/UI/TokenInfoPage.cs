@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
 using TMPro;
@@ -15,7 +16,8 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _networkNameText;
         [SerializeField] private TextMeshProUGUI _balanceText;
         [SerializeField] private TextMeshProUGUI _currencyValueText;
-        [SerializeField] private NetworkIcons _networkIconsMapper;
+        public float TimeBetweenTokenValueRefreshesInSeconds = 5;
+        private NetworkIcons _networkIconsMapper;
         
         private TokenElement _tokenElement;
         private BalanceCurrencyTextSetter _balanceCurrencyTextSetter;
@@ -29,9 +31,17 @@ namespace Sequence.Demo
                 throw new SystemException(
                     $"Invalid use. {nameof(TokenInfoPage)} must be opened with a {typeof(TokenElement)} as an argument");
             }
+            NetworkIcons networkIcons = args.GetObjectOfTypeIfExists<NetworkIcons>();
+            if (tokenElement == default)
+            {
+                throw new SystemException(
+                    $"Invalid use. {nameof(TokenInfoPage)} must be opened with a {typeof(NetworkIcons)} as an argument");
+            }
 
             _tokenElement = tokenElement;
+            _networkIconsMapper = networkIcons;
             Assemble();
+            StartCoroutine(RefreshTokenValueRepeatedly());
         }
 
         private void Assemble()
@@ -64,6 +74,21 @@ namespace Sequence.Demo
                 throw new SystemException(
                     $"{typeof(TokenInfoPage)} must be assembled via {nameof(Assemble)} before use.");
             }
+        }
+
+        private IEnumerator RefreshTokenValueRepeatedly()
+        {
+            var waitForRefresh = new WaitForSecondsRealtime(TimeBetweenTokenValueRefreshesInSeconds);
+            while (true) // Terminates on Close() (as this gameObject will be disabled)
+            {
+                yield return waitForRefresh;
+                RefreshCurrencyValue();
+            }
+        }
+
+        public Sprite GetNetworkIcon(Chain network)
+        {
+            return _networkIconsMapper.GetIcon(network);
         }
     }
 }

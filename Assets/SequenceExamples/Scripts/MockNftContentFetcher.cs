@@ -57,5 +57,10 @@ namespace Sequence.Demo
             mockTexture.Apply();
             return mockTexture;
         }
+
+        public void Refresh()
+        {
+            _fetched = 0;
+        }
     }
 }

@@ -7301,7 +7301,7 @@ MonoBehaviour:
   _networkNameText: {fileID: 1785959077}
   _balanceText: {fileID: 247746590}
   _currencyValueText: {fileID: 934077646}
-  _networkIconsMapper: {fileID: 11400000, guid: 4f5830589703041ad83c0461eaedfd37, type: 2}
+  TimeBetweenTokenValueRefreshesInSeconds: 5
 --- !u!1 &1352771640
 GameObject:
   m_ObjectHideFlags: 0
