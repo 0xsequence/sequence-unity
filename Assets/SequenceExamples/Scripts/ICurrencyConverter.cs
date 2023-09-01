@@ -5,6 +5,7 @@ namespace Sequence.Demo
     public interface ICurrencyConverter
     {
         public CurrencyValue ConvertToCurrency(float amount, ERC20 token);
+        public CurrencyValue ConvertToCurrency(float amount, string tokenAddress);
     }
 
     public class CurrencyValue

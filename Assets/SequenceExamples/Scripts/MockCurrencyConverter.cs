@@ -9,5 +9,10 @@ namespace Sequence.Demo
         {
             return new CurrencyValue("$", amount + Random.Range(-amount * .25f, amount * .25f));
         }
+
+        public CurrencyValue ConvertToCurrency(float amount, string tokenAddress)
+        {
+            return ConvertToCurrency(amount, new ERC20(tokenAddress));
+        }
     }
 }
