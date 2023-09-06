@@ -20,7 +20,6 @@ namespace Sequence.Contracts
             string functionName,
             params object[] functionArgs)
         {
-            BigInteger nonce = await wallet.GetNonce(client);
             ContractCall callingInfo = new ContractCall(wallet.GetAddress(), value);
             EthTransaction transaction = await contract.CallFunction(functionName, functionArgs)(client, callingInfo);
             string signedTransaction = transaction.SignAndEncodeTransaction(wallet);
