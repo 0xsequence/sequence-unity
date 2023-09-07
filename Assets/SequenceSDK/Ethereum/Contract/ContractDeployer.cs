@@ -36,7 +36,9 @@ namespace Sequence.Contracts
             byte[] encoded = RLP.RLP.Encode(toEncode);
             byte[] hashed = SequenceCoder.KeccakHash(encoded);
             string hashedString = SequenceCoder.ByteArrayToHexString(hashed).EnsureHexPrefix();
-            return hashedString.Substring(hashedString.Length - 40, 40).EnsureHexPrefix();
+            string address = hashedString.Substring(hashedString.Length - 40, 40).EnsureHexPrefix();
+            Debug.Log($"Deployer {senderAddress}, nonce {nonce} - deployed to {address}");
+            return address;
         }
     }
 
