@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Provider;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.Wallet
@@ -68,11 +68,11 @@ namespace Sequence.Wallet
         public static byte[] PrefixedMessage(byte[] message)
         {
             // https://eips.ethereum.org/EIPS/eip-191
-            byte[] message191 = SequenceCoder.HexStringToByteArray("19").Concat(Encoding.UTF8.GetBytes("Ethereum Signed Message:\n")).ToArray();
+            byte[] message191 = ByteArrayExtensions.ConcatenateByteArrays(SequenceCoder.HexStringToByteArray("19"), Encoding.UTF8.GetBytes("Ethereum Signed Message:\n"));
             byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
             if (!message.Take(message191.Length).SequenceEqual(message191))
             {
-                message = (message191.Concat(messageLen).ToArray()).Concat((message)).ToArray();
+                message = ByteArrayExtensions.ConcatenateByteArrays(message191 , messageLen, message);
             }
 
             return message;
