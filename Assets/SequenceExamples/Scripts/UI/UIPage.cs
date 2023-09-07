@@ -1,3 +1,4 @@
+using System.Collections;
 using Sequence.Demo.Tweening;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace Sequence.Demo
         [SerializeField] protected float _openAnimationDurationInSeconds;
         [SerializeField] protected float _closeAnimationDurationInSeconds;
         [SerializeField] private AnimationType _animation;
-        private GameObject _gameObject;
+        protected GameObject _gameObject;
         private ITween _animator;
 
         public enum AnimationType
@@ -38,7 +39,7 @@ namespace Sequence.Demo
             _animator.Animate( _openAnimationDurationInSeconds);
         }
 
-        public void Close()
+        public virtual void Close()
         {
             _animator.AnimateOut(_closeAnimationDurationInSeconds);
             Invoke(nameof(Deactivate), _closeAnimationDurationInSeconds);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Sequence.Authentication;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace Sequence.Demo
 {
@@ -16,6 +17,9 @@ namespace Sequence.Demo
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
+
+        private WalletPanel _walletPanel;
+        private WalletPage _walletPage;
 
         private UIPage _page;
         private Stack<UIPage> _pageStack = new Stack<UIPage>();
@@ -39,6 +43,10 @@ namespace Sequence.Demo
             _mfaPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
+
+            _walletPanel = GetComponentInChildren<WalletPanel>();
+
+            _walletPage = GetComponentInChildren<WalletPage>();
         }
 
         public void Start()
@@ -48,7 +56,7 @@ namespace Sequence.Demo
                 return;
             }
             DisableAllUIPages();
-            SetInitialUIPage(_loginPanel, _loginPage);
+            OpenUIPanel(_loginPanel);
         }
 
         private void DisableAllUIPages()
@@ -61,12 +69,11 @@ namespace Sequence.Demo
             }
         }
 
-        private void SetInitialUIPage(UIPanel panel, UIPage page)
+        public void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open();
-            _page = page;
-            _pageStack.Push(page);
-            StartCoroutine(panel.OpenInitialPage(page));
+            _page = panel.InitialPage;
+            _pageStack.Push(panel.InitialPage);
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)

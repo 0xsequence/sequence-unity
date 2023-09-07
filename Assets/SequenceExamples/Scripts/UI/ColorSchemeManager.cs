@@ -2,6 +2,7 @@ using System;
 using System.Net.Mime;
 using Sequence.Demo.ScriptableObjects;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +11,14 @@ namespace Sequence.Demo
     public class ColorSchemeManager : MonoBehaviour
     {
         [SerializeField] private ColorScheme _colorScheme;
+        [SerializeField] private GameObject _tokenUIElementPrefab;
         public void ApplyColorScheme()
         {
             ApplyColorSchemeToChildren(transform);
+            GameObject prefabInstance = PrefabUtility.InstantiatePrefab(_tokenUIElementPrefab) as GameObject;
+            ApplyColorSchemeToChildren(prefabInstance.transform);
+            PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
+            DestroyImmediate(prefabInstance);
         }
 
         private void ApplyColorSchemeToChildren(Transform parent)
@@ -66,7 +72,7 @@ namespace Sequence.Demo
                 }
             }
 
-            SequenceUI panel = t.GetComponent<SequenceUI>();
+            UIPanel panel = t.GetComponent<UIPanel>();
             if (panel != null)
             {
                 Image image = panel.GetComponent<Image>();

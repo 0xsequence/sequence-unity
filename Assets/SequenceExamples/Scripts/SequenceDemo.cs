@@ -25,7 +25,7 @@ public class SequenceDemo : MonoBehaviour
                     true,
                     new Page { page = pageNumber }
                 );
-                var balances = await Indexer.GetTokenBalances(Chain.Polygon, tokenBalancesArgs);
+                var balances = await Indexer.GetTokenBalances((int)Chain.Polygon, tokenBalancesArgs);
 
                 return (balances.page, balances.balances);
             },
@@ -44,7 +44,7 @@ public class SequenceDemo : MonoBehaviour
                         new Page { page = pageNumber }
                     );
                     var balances = await Indexer.GetTokenBalances(
-                        Chain.Polygon,
+                        (int)Chain.Polygon,
                         tokenBalancesArgs
                     );
 
