@@ -94,7 +94,8 @@ crashlytics-build.properties
 
 # Test output
 chaintest.out
-TestResults.xml
+TestResults_Edit.xml
+TestResults_Play.xml
 
 # Node
 node_modules

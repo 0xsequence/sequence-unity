@@ -48,5 +48,12 @@ stop:
 	-pkill -F ./testchain/.pid && rm testchain/.pid
 
 test:
-	rm TestResults.xml && cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && cd .. && Unity -runTests -projectPath "$(pwd)" && make stop && mv TestResults*.xml TestResults.xml && \
-	head -n 2 TestResults.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'
+	rm TestResults*.xml ; cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && cd .. && \
+	Unity -batchmode -runTests -projectPath "$(pwd)" -testPlatform editmode -testResults TestResults_Edit.xml ; Unity -quit && \
+	Unity -runTests -projectPath "$(pwd)" -testPlatform playmode -testResults TestResults_Play.xml ; \
+	make stop && \
+	echo "Edit mode Test results: " && \
+	head -n 2 TestResults_Edit.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/' && \
+	echo "" && \
+	echo "Play mode Test results: " && \
+	head -n 2 TestResults_Play.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'

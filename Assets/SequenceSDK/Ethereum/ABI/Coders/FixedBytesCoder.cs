@@ -65,11 +65,13 @@ namespace Sequence.ABI
                 string valueStr = SequenceCoder.ByteArrayToHexString(((byte[])value));
                 string numberOfBytesStr = _numberCoder.EncodeUnsignedIntString(numberOfBytes, 64);
                 // followed by the minimum number of zero-bytes such that len(enc(X)) is a multiple of 32
-                int currentTotalLength = 64 + numberOfBytes;
+                int currentTotalLength = numberOfBytes;
                 int zeroBytesNeeded = 64 - currentTotalLength % 64;
                 int totalLength = currentTotalLength + zeroBytesNeeded;
 
-                string encodedStr = (numberOfBytesStr + valueStr).PadRight(totalLength, '0');
+                valueStr = valueStr.PadRight(totalLength, '0');
+
+                string encodedStr = numberOfBytesStr + valueStr;
                 return encodedStr;
             }
             catch (Exception ex)
@@ -98,15 +100,6 @@ namespace Sequence.ABI
                 Debug.LogError($"Error decoding byte array from string: {ex.Message}");
                 return null;
             }
-        }
-    }
-
-    public static class FixedBytesCoderExtensions
-    {
-        private static FixedBytesCoder _coder = new FixedBytesCoder();
-        public static byte[] Decode(string encoded)
-        {
-            return SequenceCoder.HexStringToByteArray(_coder.DecodeFromString(encoded.Replace("0x", "")));
         }
     }
 }

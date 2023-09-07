@@ -64,6 +64,15 @@ A transaction, as implemented in EthTransaction, contains all the data and param
 ### Contract
 A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
 
+## Example UI
+A sample UI scene can be found under `Assets > SequenceExamples > Scenes > Demo.unity`
+This scene contains sample Sequence UI (with integration) for login flow and wallet view, settings, and transaction flow.
+
+### Customizations + Color Schemes
+As a Made-With-Unity UI, the sample UI is cross platform and easily customizable.
+To make customization even easier, the sample UI comes equipped with a Color Scheme Manager. This monobehaviour script is attached to the `SequenceCanvas` gameObject. By attaching a `ColorScheme` scriptable object and clicking the `Apply` button in the Inspector, the `ColorSchemeManager` will quickly apply the desired color scheme, allowing for faster UI iterations.
+To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence > Color Scheme`. From here, you can give the color scheme a name, move it to the desired directory, and choose your colors.
+
 ## Architecture Decision Records
 
 Please add any ADRs below. In the future, it may be worthwhile to move these into 
@@ -71,11 +80,40 @@ separate files, but for now since there are few ADRs, the README should suffice.
 Please use [Michael Nygard's template for 
 ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
 
+### ADR 3 - WaaS Client
+August 2, 2023 - author: Quinn Purdy
+Updated Aug 16, 2023 - author: Quinn Purdy
+
+#### Status
+Pending - approval of the accompanying PR will constitute approval of this ADR.
+
+#### Context
+A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http.
+
+#### Decision
+In order to save time on the integration, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
+
+For authentication, sequence-unity will be provided with a JWT from the game backend that contains as a payload, the partner_id and the wallet address for the authenticated user. Requests made to the WaaS service will require inclusion of the JWT that was provided.
+
+Similar to ADR 2, the WaaS client will be implemented in a separate assembly from "SequenceEthereum". This assembly will be called "SequenceWaaS" and will reference and depend on the Ethereum library assembly "SequenceEthereum".
+
+For now, all tests will remain in the same assembly "SequenceTests".
+
+#### Consequences
+As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved, justifying the trade-off.
+
+Additionally, since the WaaS client relies on network requests, we must add additional async Tasks to the SequenceEthereum IWallet interface. This will require additional await statements throughout, harming readability.
+
+For authenticating into the WaaS service, the game developers will be required to have a backend that supports some form of authentication in addition to at least a partial integration with the WaaS server, as required to provide the game client with a JWT for authentication with the WaaS service.
+
+Remaining consequences follow those from ADR 2 (with respect to assemblies).
+
 ### ADR 2 - Separate assemblies for Sequence integration and Ethereum library
 July 12, 2023 - author: Quinn Purdy
 
 #### Status
 Accepted - July 14, 2023
+
 #### Context
 Integration of Sequence into the sequence-unity is the next step in the Unity SDK project - preparations are being made, with modifications to project structure.
 

@@ -7,7 +7,6 @@ using Sequence.Signer;
 using Sequence.Provider;
 using Sequence.ABI;
 using System.Text;
-using System.Linq;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;

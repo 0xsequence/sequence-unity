@@ -10,7 +10,7 @@ using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Transactions;
-using SequenceSDK.Ethereum.Utils;
+using Sequence.Ethereum.Utils;
 using UnityEngine;
 
 namespace Sequence.Wallet

@@ -142,7 +142,7 @@ namespace Sequence.ABI
         {
             try
             {
-                /// int<M>: enc(X) is the big-endian two’s complement encoding of X, padded on the higher-order (left) side with 0xff bytes for negative X and with zero-bytes for non-negative X such that the length is 32 bytes.
+                /// int<M>: enc(X) is the big-endian twoï¿½s complement encoding of X, padded on the higher-order (left) side with 0xff bytes for negative X and with zero-bytes for non-negative X such that the length is 32 bytes.
                 string encodedString = EncodeSignedIntString(number, length * 2);
                 byte[] encoded = SequenceCoder.HexStringToByteArray(encodedString);
                 return encoded;
@@ -167,7 +167,7 @@ namespace Sequence.ABI
             {
                 var hex = number.ToString("x");
                 string encodedString;
-                if (number.Sign > 0)
+                if (number.Sign > -1)
                 {
                     encodedString = new string('0', length - hex.Length) + hex;
                 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace SequenceSDK.Ethereum.Utils
+namespace Sequence.Ethereum.Utils
 {
     public static class GenericHelpers
     {
