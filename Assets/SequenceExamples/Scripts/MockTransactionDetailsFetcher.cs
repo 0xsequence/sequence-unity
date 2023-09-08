@@ -88,7 +88,7 @@ namespace Sequence.Demo
             int daysInMonth = DateTime.DaysInMonth(randomYear, randomMonth);
             int randomDay = Random.Range(1, daysInMonth + 1);
             DateTime randomDate = new DateTime(randomYear, randomMonth, randomDay);
-            string randomDateString = randomDate.ToString("yyyy-MM-dd");
+            string randomDateString = randomDate.ToString("MMMM d, yyyy");
 
             return new TransactionDetails(potentialTypes.GetRandomObjectFromArray(),
                 EnumExtensions.GetRandomEnumValue<Chain>(),

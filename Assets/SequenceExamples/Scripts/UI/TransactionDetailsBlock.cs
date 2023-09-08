@@ -31,6 +31,7 @@ namespace Sequence.Demo
 
         public void Assemble(TransactionDetails transactionDetails, NetworkIcons networkIcons)
         {
+            StopAllCoroutines();
             _transactionDetails = transactionDetails;
             _networkIconsMapper = networkIcons;
             

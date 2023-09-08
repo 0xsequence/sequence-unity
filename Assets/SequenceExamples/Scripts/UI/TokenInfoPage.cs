@@ -29,6 +29,7 @@ namespace Sequence.Demo
         private ObjectPool _transactionPool;
         private ITransactionDetailsFetcher _transactionDetailsFetcher;
         private List<TransactionDetails> _transactionDetails = new List<TransactionDetails>();
+        private List<TransactionDetailsBlock> _transactionDetailsBlocks = new List<TransactionDetailsBlock>();
 
         private RectTransform _scrollRectContent;
         private VerticalLayoutGroup _verticalLayoutGroup;
@@ -86,6 +87,7 @@ namespace Sequence.Demo
             _transactionDetailsFetcher = null;
             _transactionPool.Cleanup();
             _transactionDetails = new List<TransactionDetails>();
+            _transactionDetailsBlocks = new List<TransactionDetailsBlock>();
         }
 
         private void Assemble()
@@ -142,8 +144,10 @@ namespace Sequence.Demo
             for (int i = 0; i < count; i++)
             {
                 _transactionDetails.Add(elements[i]);
-                ApplyTransactionDetailsContent(elements[i]);
+                CreateTransactionDetailsBlock();
                 UpdateScrollViewSize();
+                SortTransactionDetails();
+                PopulateTransactionDetailsBlocks();
             }
 
             if (result.MoreToFetch)
@@ -152,7 +156,7 @@ namespace Sequence.Demo
             }
         }
 
-        private void ApplyTransactionDetailsContent(TransactionDetails details)
+        private void CreateTransactionDetailsBlock()
         {
             Transform transactionContainer = _transactionPool.GetNextAvailable();
             if (transactionContainer == null)
@@ -161,10 +165,10 @@ namespace Sequence.Demo
                     $"{nameof(transactionContainer)} should not be null. {nameof(_transactionPool)} should expand.");
             }
 
-            TransactionDetailsBlock uiElement = transactionContainer.GetComponent<TransactionDetailsBlock>();
-            uiElement.Assemble(details, _networkIcons);
             transactionContainer.SetParent(_scrollRectContent);
             transactionContainer.localScale = new Vector3(1, 1, 1);
+            TransactionDetailsBlock uiElement = transactionContainer.GetComponent<TransactionDetailsBlock>();
+            _transactionDetailsBlocks.Add(uiElement);
         }
 
         private void UpdateScrollViewSize()
@@ -173,6 +177,43 @@ namespace Sequence.Demo
 
             RectTransform content = _scrollRectContent;
             content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight);
+        }
+
+        private void SortTransactionDetails()
+        {
+            int count = _transactionDetails.Count;
+
+            for (int i = 0; i < count - 1; i++)
+            {
+                for (int j = 0; j < count - i - 1; j++)
+                {
+                    DateTime date1, date2;
+
+                    if (DateTime.TryParse(_transactionDetails[j].Date, out date1) &&
+                        DateTime.TryParse(_transactionDetails[j + 1].Date, out date2))
+                    {
+                        if (date1 < date2)
+                        {
+                            TransactionDetails temp = _transactionDetails[j];
+                            _transactionDetails[j] = _transactionDetails[j + 1];
+                            _transactionDetails[j + 1] = temp;
+                        }
+                    }
+                    else
+                    {
+                        throw new SystemException($"{nameof(_transactionDetails)} contains an invalid date");
+                    }
+                }
+            }
+        }
+
+        private void PopulateTransactionDetailsBlocks()
+        {
+            int length = _transactionDetailsBlocks.Count;
+            for (int i = 0; i < length; i++)
+            {
+                _transactionDetailsBlocks[i].Assemble(_transactionDetails[i], _networkIcons);
+            }
         }
     }
 }
