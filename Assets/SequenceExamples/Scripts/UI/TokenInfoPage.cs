@@ -20,7 +20,7 @@ namespace Sequence.Demo
         private NetworkIcons _networkIconsMapper;
         
         private TokenElement _tokenElement;
-        private BalanceCurrencyTextSetter _balanceCurrencyTextSetter;
+        private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
 
         public override void Open(params object[] args)
         {
@@ -51,25 +51,25 @@ namespace Sequence.Demo
             _networkIconImage.sprite = _networkIconsMapper.GetIcon(_tokenElement.Network);
             _networkNameText.text = ChainNames.NameOf[_tokenElement.Network];
 
-            _balanceCurrencyTextSetter = new BalanceCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement);
-            _balanceCurrencyTextSetter.SetInitialValueAndBalanceText();
+            _amountAndCurrencyTextSetter = new AmountAndCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement);
+            _amountAndCurrencyTextSetter.SetInitialValueAndAmountText();
         }
 
         public void RefreshCurrencyValue()
         {
             ThrowIfNotAssembled();
-            _balanceCurrencyTextSetter.RefreshCurrencyValue();
+            _amountAndCurrencyTextSetter.RefreshCurrencyValue();
         }
         
         public void RefreshWithBalance(uint balance)
         {
             ThrowIfNotAssembled();
-            _balanceCurrencyTextSetter.RefreshWithBalance(balance);
+            _amountAndCurrencyTextSetter.RefreshWithAmount(balance);
         }
 
         private void ThrowIfNotAssembled()
         {
-            if (_balanceCurrencyTextSetter == null)
+            if (_amountAndCurrencyTextSetter == null)
             {
                 throw new SystemException(
                     $"{typeof(TokenInfoPage)} must be assembled via {nameof(Assemble)} before use.");

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Demo.Utils;
 using TMPro;
@@ -16,10 +17,12 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _amountText;
         [SerializeField] private TextMeshProUGUI _dateText;
         [SerializeField] private TextMeshProUGUI _currencyValueText;
+        public float TimeBetweenTokenValueRefreshesInSeconds = 5;
         
         private RectTransform _arrowIconRectTransform;
         private TransactionDetails _transactionDetails;
         private NetworkIcons _networkIconsMapper;
+        private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
 
         private void Awake()
         {
@@ -34,11 +37,12 @@ namespace Sequence.Demo
             _sentReceivedText.SetText(_transactionDetails.Type, resizeWidth: true);
             _networkIcon.sprite = _networkIconsMapper.GetIcon(_transactionDetails.Network);
             _tokenIcon.sprite = _transactionDetails.TokenIcon;
-            _amountText.text =
-                $"{_transactionDetails.Amount.AppendSignIfNeeded()}{_transactionDetails.Amount:N2} {_transactionDetails.Symbol}";
             _dateText.text = _transactionDetails.Date;
-            CurrencyValue currencyValue = _transactionDetails.CurrencyConverter.ConvertToCurrency(_transactionDetails.Amount, _transactionDetails.ContractAddress);
-            _currencyValueText.text = $"{currencyValue.Symbol}{currencyValue.Amount:N2}";
+
+            _amountAndCurrencyTextSetter = new AmountAndCurrencyTextSetter(_amountText, _currencyValueText, _transactionDetails);
+            _amountAndCurrencyTextSetter.SetInitialValueAndAmountText();
+
+            StartCoroutine(ContinuouslyRefreshCurrencyValue());
         }
 
         private void ThrowIfNotAssembled()
@@ -47,6 +51,22 @@ namespace Sequence.Demo
             {
                 throw new SystemException(
                     $"{typeof(TransactionDetailsBlock)} must be assembled via {nameof(Assemble)} before use.");
+            }
+        }
+
+        public void RefreshCurrencyValue()
+        {
+            ThrowIfNotAssembled();
+            _amountAndCurrencyTextSetter.RefreshCurrencyValue();
+        }
+
+        private IEnumerator ContinuouslyRefreshCurrencyValue()
+        {
+            var wait = new WaitForSecondsRealtime(TimeBetweenTokenValueRefreshesInSeconds);
+            while (true)
+            {
+                yield return wait;
+                RefreshCurrencyValue();
             }
         }
     }

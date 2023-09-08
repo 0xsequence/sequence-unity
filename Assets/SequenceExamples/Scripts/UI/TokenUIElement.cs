@@ -20,7 +20,7 @@ namespace Sequence.Demo
         public NetworkIcons NetworkIcons;
 
         private TokenElement _tokenElement;
-        private BalanceCurrencyTextSetter _balanceCurrencyTextSetter;
+        private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
         private Color _baseColor;
         private SequenceUI _sequenceUI;
 
@@ -37,25 +37,25 @@ namespace Sequence.Demo
             _tokenNameSetter.SetText(_tokenElement.TokenName, resizeWidth: true);
             _networkIcon.sprite = NetworkIcons.GetIcon(_tokenElement.Network);
             
-            _balanceCurrencyTextSetter = new BalanceCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement, _percentChangeText, _baseColor);
-            _balanceCurrencyTextSetter.SetInitialValueAndBalanceText();
+            _amountAndCurrencyTextSetter = new AmountAndCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement, _percentChangeText, _baseColor);
+            _amountAndCurrencyTextSetter.SetInitialValueAndAmountText();
         }
 
         public void RefreshCurrencyValue()
         {
             ThrowIfNotAssembled();
-            _balanceCurrencyTextSetter.RefreshCurrencyValue();
+            _amountAndCurrencyTextSetter.RefreshCurrencyValue();
         }
         
         public void RefreshWithBalance(uint balance)
         {
             ThrowIfNotAssembled();
-            _balanceCurrencyTextSetter.RefreshWithBalance(balance);
+            _amountAndCurrencyTextSetter.RefreshWithAmount(balance);
         }
 
         private void ThrowIfNotAssembled()
         {
-            if (_balanceCurrencyTextSetter == null)
+            if (_amountAndCurrencyTextSetter == null)
             {
                 throw new SystemException(
                     $"{typeof(TokenUIElement)} must be assembled via {nameof(Assemble)} before use.");

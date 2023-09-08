@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class TokenElement
+    public class TokenElement : ICurrencyRepository
     {
         public ERC20 Erc20;
         public Sprite TokenIconSprite;
@@ -37,6 +37,41 @@ namespace Sequence.Demo
             Symbol = symbol;
             CurrencyConverter = currencyConverter;
             PreviousCurrencyValue = currencyConverter.ConvertToCurrency(balance, Erc20).Amount;
+        }
+
+        public uint GetAmount()
+        {
+            return Balance;
+        }
+
+        public void SetAmount(uint value)
+        {
+            Balance = value;
+        }
+
+        public string GetAddress()
+        {
+            return Erc20.GetAddress();
+        }
+
+        public string GetSymbol()
+        {
+            return Symbol;
+        }
+
+        public float GetPreviousCurrencyValue()
+        {
+            return PreviousCurrencyValue;
+        }
+
+        public void SetPreviousCurrencyValue(float value)
+        {
+            PreviousCurrencyValue = value;
+        }
+
+        public Currency GetCurrency()
+        {
+            return CurrencyConverter.ConvertToCurrency(GetAmount(), GetAddress());
         }
     }
 }
