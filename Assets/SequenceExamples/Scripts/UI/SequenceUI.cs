@@ -137,9 +137,9 @@ namespace Sequence.Demo
             Debug.Log($"Failed to send MFA email to {email} with error: {error}");
         }
 
-        public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons)
+        public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
         {
-            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement, networkIcons));
+            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher));
         }
 
         public void ClearStack()

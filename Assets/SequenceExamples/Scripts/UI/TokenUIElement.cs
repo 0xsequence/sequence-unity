@@ -74,7 +74,7 @@ namespace Sequence.Demo
                 _sequenceUI = FindObjectOfType<SequenceUI>();
             }
 
-            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons);
+            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons, new MockTransactionDetailsFetcher(15)); // Todo: replace mock with concrete implementation
         }
     }
 }

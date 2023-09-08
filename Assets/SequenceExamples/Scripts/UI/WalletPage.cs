@@ -83,6 +83,8 @@ namespace Sequence.Demo
             _tokenPool.Cleanup();
             _nftPool.Cleanup();
             _tokenUIElements = new List<TokenUIElement>();
+            _tokenContent = new List<TokenElement>();
+            _nftContent = new List<Texture2D>();
         }
 
         private void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)

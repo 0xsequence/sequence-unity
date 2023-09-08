@@ -18,7 +18,7 @@ namespace Sequence.Demo
 
         public TransactionDetails(string type, Chain network, Sprite tokenIcon, Address contractAddress, Address toAddress, Address fromAddress, uint amount, string symbol, string date, ICurrencyConverter currencyConverter)
         {
-            if (type != "Received" || type != "Sent")
+            if (type != "Received" && type != "Sent")
             {
                 throw new ArgumentException($"Invalid value for {nameof(type)}");
             }

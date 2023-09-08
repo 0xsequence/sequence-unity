@@ -33,5 +33,19 @@ namespace Sequence.Utils
 
             return array;
         }
+
+        public static bool IsIn<T>(this T value, T[] arr)
+        {
+            int length = arr.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (arr[i].Equals(value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
