@@ -67,12 +67,12 @@ namespace SequenceExamples.Scripts.Tests
             Button openWalletButton = openWalletButtonGameObject.GetComponent<Button>();
             Assert.IsNotNull(openWalletButton);
 
-            _transitionPanel.TokenFetcher = new MockTokenContentFetcher(_randomNumberOfTokensToFetch);
-            _transitionPanel.NftFetcher = new MockNftContentFetcher(_randomNumberOfNftsToFetch);
+            _transitionPanel.TokenFetcher = new MockTokenContentFetcher(_randomNumberOfTokensToFetch, 0);
+            _transitionPanel.NftFetcher = new MockNftContentFetcher(_randomNumberOfNftsToFetch, 0);
             Debug.Log($"Will fetch {_randomNumberOfTokensToFetch} tokens and {_randomNumberOfNftsToFetch} NFTs");
             
             openWalletButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertWeAreOnWalletPage();
         }
@@ -258,7 +258,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(closeWalletButton);
             
             closeWalletButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertWeAreOnTransitionPanel();
         }
@@ -286,18 +286,18 @@ namespace SequenceExamples.Scripts.Tests
                 }
                 
                 int randomNumberOfTransactionsToFetch = Random.Range(0, 30);
-                token.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch);
+                token.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
                 MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)token.TransactionDetailsFetcher;
                 Button button = token.GetComponent<Button>();
                 Assert.IsNotNull(button);
                 
                 button.onClick.Invoke();
-                yield return new WaitForSeconds(3f); // Wait for next page to animate in
+                yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
 
                 yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(token.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
                 
                 _ui.Back();
-                yield return new WaitForSeconds(3f); // Wait for next page to animate in
+                yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
                 
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)

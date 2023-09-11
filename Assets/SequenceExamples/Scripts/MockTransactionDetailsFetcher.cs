@@ -13,11 +13,12 @@ namespace Sequence.Demo
 
         private int _totalFetchable;
         private int _fetched = 0;
-        public readonly int DelayInMilliseconds = 10;
+        public readonly int DelayInMilliseconds = 100;
 
-        public MockTransactionDetailsFetcher(int totalFetchable = 5)
+        public MockTransactionDetailsFetcher(int totalFetchable = 5, int delayInMilliseconds = 100)
         {
-            _totalFetchable = totalFetchable;
+            this._totalFetchable = totalFetchable;
+            this.DelayInMilliseconds = delayInMilliseconds;
         }
         
         public async Task FetchTransactions(int maxToFetch)

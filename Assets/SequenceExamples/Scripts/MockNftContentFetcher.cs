@@ -10,11 +10,12 @@ namespace Sequence.Demo
         private int _totalFetchable;
         private int _fetched = 0;
         public event Action<FetchNftContentResult> OnNftFetchSuccess;
-        public readonly int DelayInMilliseconds = 10;
+        public readonly int DelayInMilliseconds = 100;
 
-        public MockNftContentFetcher(int totalFetchable = 30)
+        public MockNftContentFetcher(int totalFetchable = 30, int delayInMilliseconds = 100)
         {
             this._totalFetchable = totalFetchable;
+            this.DelayInMilliseconds = delayInMilliseconds;
         }
 
         public async Task FetchContent(int maxToFetch)

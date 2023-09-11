@@ -1,5 +1,6 @@
 using System.Collections;
 using Sequence.Demo;
+using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -21,6 +22,8 @@ namespace SequenceExamples.Scripts.Tests
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
+
+        public static float WaitForAnimationTime = 1.5f;
 
         [UnitySetUp]
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
@@ -45,6 +48,8 @@ namespace SequenceExamples.Scripts.Tests
             _testMonobehaviour = testObject.AddComponent<TestClass>();
             _loginFlowUITests = testObject.AddComponent<LoginFlowUITests>();
             _walletFlowUITests = testObject.AddComponent<WalletFlowUITests>();
+            MockDelayOverrider mockDelayOverrider = testObject.AddComponent<MockDelayOverrider>();
+            mockDelayOverrider.OverrideAnimationTimes(WaitForAnimationTime / 1000);
             
             SequenceUI.IsTesting = false;
             _ui.Start();
