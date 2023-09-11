@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -7,6 +8,21 @@ namespace Sequence.Demo
     {
         public UIPage InitialPage;
         private SequenceUI _sequenceUI;
+        
+        private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
+        private UIPage _page;
+        
+        private struct PageWithArgs
+        {
+            public UIPage page;
+            public object[] args;
+
+            public PageWithArgs(UIPage page, object[] args)
+            {
+                this.page = page;
+                this.args = args;
+            }
+        }
 
         public override void Open(params object[] args)
         {
@@ -21,14 +37,14 @@ namespace Sequence.Demo
         public override void Close()
         {
             base.Close();
-            _sequenceUI.ClearStack();
+            ClearStack();
         }
 
         public virtual IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            _sequenceUI.ClearStack();
+            ClearStack();
             yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
-            yield return StartCoroutine(_sequenceUI.SetUIPage(InitialPage, openArgs));
+            yield return StartCoroutine(SetUIPage(InitialPage, openArgs));
         }
         
         public virtual void OpenWithDelay(float delayInSeconds, params object[] args)
@@ -41,6 +57,37 @@ namespace Sequence.Demo
         {
             yield return new WaitForSeconds(delayInSeconds);
             Open(args);
+        }
+        
+        public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
+        {
+            if (_page != null)
+            {
+                _page.Close();
+                yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+            }
+            _page = page;
+            _pageStack.Push(new PageWithArgs(page, openArgs));
+            _page.Open(openArgs);
+        }
+
+        public void Back()
+        {
+            if (_pageStack.Count <= 1)
+            {
+                return;
+            }
+
+            _pageStack.Pop().page.Close();
+            PageWithArgs previous = _pageStack.Peek();
+            _page = previous.page;
+            _page.Open(previous.args);
+        }
+
+        public void ClearStack()
+        {
+            _pageStack = new Stack<PageWithArgs>();
+            _page = null;
         }
     }
 }

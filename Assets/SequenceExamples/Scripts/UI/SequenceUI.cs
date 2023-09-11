@@ -24,21 +24,6 @@ namespace Sequence.Demo
         private WalletPage _walletPage;
         private TokenInfoPage _tokenInfoPage;
 
-        private UIPage _page;
-        private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
-        
-        private struct PageWithArgs
-        {
-            public UIPage page;
-            public object[] args;
-
-            public PageWithArgs(UIPage page, object[] args)
-            {
-                this.page = page;
-                this.args = args;
-            }
-        }
-
         private void Awake()
         {
             _loginPanel = GetComponentInChildren<LoginPanel>();
@@ -85,40 +70,15 @@ namespace Sequence.Demo
             }
         }
 
-        public void OpenUIPanel(UIPanel panel, params object[] openArgs)
+        private void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open(openArgs);
-        }
-
-        public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
-        {
-            if (_page != null)
-            {
-                _page.Close();
-                yield return new WaitUntil(() => !_page.isActiveAndEnabled);
-            }
-            _page = page;
-            _pageStack.Push(new PageWithArgs(page, openArgs));
-            _page.Open(openArgs);
-        }
-
-        public void Back()
-        {
-            if (_pageStack.Count <= 1)
-            {
-                return;
-            }
-
-            _pageStack.Pop().page.Close();
-            PageWithArgs previous = _pageStack.Peek();
-            _page = previous.page;
-            _page.Open(previous.args);
         }
 
         private void OnLoginSuccessHandler(string userId)
         {
             Debug.Log($"Successful login as user ID: {userId}");
-            StartCoroutine(SetUIPage(_loginSuccessPage));
+            StartCoroutine(_loginPanel.SetUIPage(_loginSuccessPage));
         }
 
         private void OnLoginFailedHandler(string error)
@@ -129,7 +89,7 @@ namespace Sequence.Demo
         private void OnMFAEmailSentHandler(string email)
         {
             Debug.Log($"Successfully sent MFA email to {email}");
-            StartCoroutine(SetUIPage(_mfaPage, email));
+            StartCoroutine(_loginPanel.SetUIPage(_mfaPage, email));
         }
 
         private void OnMFAEmailFailedToSendHandler(string email, string error)
@@ -139,14 +99,8 @@ namespace Sequence.Demo
 
         public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
         {
-            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher));
+            StartCoroutine(_walletPanel.SetUIPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher));
             _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Back);
-        }
-
-        public void ClearStack()
-        {
-            _pageStack = new Stack<PageWithArgs>();
-            _page = null;
         }
     }
 }

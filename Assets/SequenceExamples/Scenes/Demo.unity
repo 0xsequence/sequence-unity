@@ -1452,8 +1452,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 171231631}
-        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, SequenceExamples
+      - m_Target: {fileID: 595273816}
+        m_TargetAssemblyTypeName: Sequence.Demo.UIPanel, SequenceExamples
         m_MethodName: Back
         m_Mode: 1
         m_Arguments:
@@ -7706,8 +7706,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 171231631}
-        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, SequenceExamples
+      - m_Target: {fileID: 863633310}
+        m_TargetAssemblyTypeName: Sequence.Demo.UIPanel, SequenceExamples
         m_MethodName: Back
         m_Mode: 1
         m_Arguments:
@@ -11825,8 +11825,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 171231631}
-        m_TargetAssemblyTypeName: Sequence.Demo.SequenceUI, SequenceExamples
+      - m_Target: {fileID: 863633310}
+        m_TargetAssemblyTypeName: Sequence.Demo.UIPanel, SequenceExamples
         m_MethodName: Back
         m_Mode: 1
         m_Arguments:
