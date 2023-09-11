@@ -71,7 +71,7 @@ namespace Sequence.Demo
             _page.Open(openArgs);
         }
 
-        public void Back()
+        public virtual void Back()
         {
             if (_pageStack.Count <= 1)
             {

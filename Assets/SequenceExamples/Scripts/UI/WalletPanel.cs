@@ -1,4 +1,5 @@
 using System.Collections;
+using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace Sequence.Demo
         
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
+        private TokenInfoPage _tokenInfoPage;
 
         public enum TopBarMode
         {
@@ -23,12 +25,19 @@ namespace Sequence.Demo
             base.Awake();
             _walletPage = GetComponentInChildren<WalletPage>();
             _transitionPanel = FindObjectOfType<TransitionPanel>();
+            _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
         }
 
         public override void Close()
         {
             base.Close();
             _walletPage.Close();
+        }
+
+        public override void Back()
+        {
+            base.Back();
+            SetTopBarMode(TopBarMode.Search);
         }
 
         public override IEnumerator OpenInitialPage(params object[] openArgs)
@@ -72,6 +81,17 @@ namespace Sequence.Demo
                     _backButton.SetActive(true);
                     break;
             }
+        }
+
+        public void OpenTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
+        {
+            OpenInfoPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher);
+        }
+
+        private void OpenInfoPage(UIPage infoPage, params object[] openArgs)
+        {
+            StartCoroutine(SetUIPage(infoPage, openArgs));
+            SetTopBarMode(TopBarMode.Back);
         }
     }
 }

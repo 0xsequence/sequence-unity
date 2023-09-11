@@ -22,7 +22,6 @@ namespace Sequence.Demo
 
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
-        private TokenInfoPage _tokenInfoPage;
 
         private void Awake()
         {
@@ -47,7 +46,6 @@ namespace Sequence.Demo
             _walletPanel = GetComponentInChildren<WalletPanel>();
 
             _walletPage = GetComponentInChildren<WalletPage>();
-            _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
         }
 
         public void Start()
@@ -95,12 +93,6 @@ namespace Sequence.Demo
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.Log($"Failed to send MFA email to {email} with error: {error}");
-        }
-
-        public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
-        {
-            StartCoroutine(_walletPanel.SetUIPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher));
-            _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Back);
         }
     }
 }

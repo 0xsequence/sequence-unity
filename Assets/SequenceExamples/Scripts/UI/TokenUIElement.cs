@@ -24,7 +24,7 @@ namespace Sequence.Demo
         private TokenElement _tokenElement;
         private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
         private Color _baseColor;
-        private SequenceUI _sequenceUI;
+        private WalletPanel _walletPanel;
 
         public ITransactionDetailsFetcher TransactionDetailsFetcher = new MockTransactionDetailsFetcher(15); // Todo: replace mock with concrete implementation
 
@@ -73,12 +73,12 @@ namespace Sequence.Demo
 
         public void SwitchToInfoPage()
         {
-            if (_sequenceUI == null)
+            if (_walletPanel == null)
             {
-                _sequenceUI = FindObjectOfType<SequenceUI>();
+                _walletPanel = FindObjectOfType<WalletPanel>();
             }
-
-            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons, TransactionDetailsFetcher); 
+            
+            _walletPanel.OpenTokenInfoPage(_tokenElement, NetworkIcons, TransactionDetailsFetcher);
         }
     }
 }
