@@ -7,7 +7,6 @@ namespace Sequence.Demo
     public class UIPanel : UIPage
     {
         public UIPage InitialPage;
-        private SequenceSampleUI _sequenceSampleUI;
         
         private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
         private UIPage _page;
@@ -27,10 +26,6 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
-            if (_sequenceSampleUI == null)
-            {
-                _sequenceSampleUI = FindObjectOfType<SequenceSampleUI>();
-            }
             StartCoroutine(OpenInitialPage(args));
         }
 
