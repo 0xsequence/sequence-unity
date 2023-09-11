@@ -45,6 +45,7 @@ namespace SequenceExamples.Scripts.Tests
             string[] currencyValueStrings = new string[count];
             for (int i = 0; i < count; i++)
             {
+                AssertValidReceivedSentText(blocks[i]);
                 AssertCorrectNetworkIcon(blocks[i]);
                 dates[i] = GetDate(blocks[i]);
                 currencyValueStrings[i] = GetCurrencyValueString(blocks[i]);
@@ -57,6 +58,15 @@ namespace SequenceExamples.Scripts.Tests
             {
                 Assert.AreNotEqual(currencyValueStrings[i], GetCurrencyValueString(blocks[i]));
             }
+        }
+
+        private void AssertValidReceivedSentText(TransactionDetailsBlock block)
+        {
+            Transform sentReceivedTextTransform = block.transform.FindAmongDecendants("SentReceivedText");
+            Assert.IsNotNull(sentReceivedTextTransform);
+            TextMeshProUGUI sentReceivedText = sentReceivedTextTransform.GetComponent<TextMeshProUGUI>();
+            Assert.IsNotNull(sentReceivedText);
+            Assert.IsTrue(sentReceivedText.text == "<b>↑</b>Sent" || sentReceivedText.text == "<b>↓</b>Received");
         }
 
         private void AssertCorrectNetworkIcon(TransactionDetailsBlock block)

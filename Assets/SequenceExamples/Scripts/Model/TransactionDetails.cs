@@ -22,6 +22,13 @@ namespace Sequence.Demo
             {
                 throw new ArgumentException($"Invalid value for {nameof(type)}");
             }
+            if (type == "Received")
+            {
+                type = "<b>↓</b>Received";
+            }else if (type == "Sent")
+            {
+                type = "<b>↑</b>Sent";
+            }
             Type = type;
             Network = network;
             TokenIcon = tokenIcon;

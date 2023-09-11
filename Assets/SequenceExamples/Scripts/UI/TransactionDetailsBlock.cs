@@ -10,7 +10,6 @@ namespace Sequence.Demo
 {
     public class TransactionDetailsBlock : MonoBehaviour
     {
-        [SerializeField] private Image _arrowIcon;
         [SerializeField] private TextExtender _sentReceivedText;
         [SerializeField] private Image _networkIcon;
         [SerializeField] private Image _tokenIcon;
@@ -23,11 +22,6 @@ namespace Sequence.Demo
         private TransactionDetails _transactionDetails;
         private NetworkIcons _networkIconsMapper;
         private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
-
-        private void Awake()
-        {
-            _arrowIconRectTransform = _arrowIcon.GetComponent<RectTransform>();
-        }
 
         public void Assemble(TransactionDetails transactionDetails, NetworkIcons networkIcons)
         {
