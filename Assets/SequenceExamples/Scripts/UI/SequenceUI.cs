@@ -140,6 +140,7 @@ namespace Sequence.Demo
         public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
         {
             StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher));
+            _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Back);
         }
 
         public void ClearStack()

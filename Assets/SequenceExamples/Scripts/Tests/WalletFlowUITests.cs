@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Sequence;
 using Sequence.Demo;
+using SequenceExamples.Scripts.Tests.Utils;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -87,12 +88,21 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator AssertWalletPageIsAsExpected()
         {
+            AssertPanelAssumptions_WalletPage();
             AssertWeAreOnWalletPage();
             yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
             AssertTokensAreAboveNFTs();
             AssertWeHaveAppropriateNetworkIcons();
             AssertBrandingIsBelowContent();
             yield return _testMonobehaviour.StartCoroutine(AssertValueChangeDisplayedCorrectly());
+        }
+
+        private void AssertPanelAssumptions_WalletPage()
+        {
+            Transform searchButtonTransform = _walletPanel.transform.FindAmongDecendants("SearchButton");
+            Assert.IsTrue(searchButtonTransform.gameObject.activeInHierarchy);
+            Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
+            Assert.IsFalse(backButtonTransform.gameObject.activeInHierarchy);
         }
 
         private IEnumerator AssertWeLoadEnoughContent()
@@ -293,11 +303,19 @@ namespace SequenceExamples.Scripts.Tests
                 
                 button.onClick.Invoke();
                 yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-
+                
                 yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(token.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
                 
-                _ui.Back();
+                AssertPanelAssumptions_InfoPage();
+                Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
+                Assert.IsNotNull(backButtonTransform);
+                Button backButton = backButtonTransform.GetComponent<Button>();
+                Assert.IsNotNull(backButton);
+                backButton.onClick.Invoke();
+                
                 yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+                
+                AssertPanelAssumptions_WalletPage();
                 
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
@@ -311,6 +329,14 @@ namespace SequenceExamples.Scripts.Tests
             }
 
             yield return null;
+        }
+
+        private void AssertPanelAssumptions_InfoPage()
+        {
+            Transform searchButtonTransform = _walletPanel.transform.FindAmongDecendants("SearchButton");
+            Assert.IsFalse(searchButtonTransform.gameObject.activeInHierarchy);
+            Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
+            Assert.IsTrue(backButtonTransform.gameObject.activeInHierarchy);
         }
 
         private IEnumerator AssertTokenInfoPageIsAsExpected(Chain network, int randomNumberOfTransactionsToFetch, int delayInMillisecondsBetweenFetches)

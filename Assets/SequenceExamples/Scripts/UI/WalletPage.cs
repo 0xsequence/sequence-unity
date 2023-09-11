@@ -30,17 +30,21 @@ namespace Sequence.Demo
         private GridLayoutGroup _grid;
         private float _brandingBuffer = 60;
         private List<TokenUIElement> _tokenUIElements = new List<TokenUIElement>();
+        private WalletPanel _walletPanel;
 
         protected override void Awake()
         {
             base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
+            _walletPanel = FindObjectOfType<WalletPanel>();
         }
 
         public override void Open(params object[] args)
         {
             base.Open();
+            
+            _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Search);
 
             if (_tokenFetcher == null)
             {
