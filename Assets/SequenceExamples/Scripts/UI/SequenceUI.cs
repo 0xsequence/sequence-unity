@@ -1,12 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
-using Sequence.Authentication;
-using Sequence.Demo.ScriptableObjects;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace Sequence.Demo
 {
@@ -48,6 +40,11 @@ namespace Sequence.Demo
         private void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open(openArgs);
+        }
+
+        public void OpenWalletPanelWithDelay(float delayInSeconds, params object[] openArgs)
+        {
+            _walletPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
     }
 }
