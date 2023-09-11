@@ -15,37 +15,14 @@ namespace Sequence.Demo
         public static bool IsTesting = false;
         
         private LoginPanel _loginPanel;
-        private ConnectPage _connectPage;
-        private LoginPage _loginPage;
-        private MultifactorAuthenticationPage _mfaPage;
-        private LoginSuccessPage _loginSuccessPage;
-
+        private TransitionPanel _transitionPanel;
         private WalletPanel _walletPanel;
-        private WalletPage _walletPage;
 
         private void Awake()
         {
             _loginPanel = GetComponentInChildren<LoginPanel>();
-            
-            _connectPage = GetComponentInChildren<ConnectPage>();
-            
-            ILogin loginHandler = new MockLogin();
-            
-            _loginPage = GetComponentInChildren<LoginPage>();
-            _loginPage.SetupLogin(loginHandler);
-            _loginPage.LoginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
-            _loginPage.LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
-
-            _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
-            _mfaPage.SetupLogin(loginHandler);
-            _mfaPage.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
-            _mfaPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
-
-            _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
-
+            _transitionPanel = GetComponentInChildren<TransitionPanel>();
             _walletPanel = GetComponentInChildren<WalletPanel>();
-
-            _walletPage = GetComponentInChildren<WalletPage>();
         }
 
         public void Start()
@@ -71,28 +48,6 @@ namespace Sequence.Demo
         private void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open(openArgs);
-        }
-
-        private void OnLoginSuccessHandler(string userId)
-        {
-            Debug.Log($"Successful login as user ID: {userId}");
-            StartCoroutine(_loginPanel.SetUIPage(_loginSuccessPage));
-        }
-
-        private void OnLoginFailedHandler(string error)
-        {
-            Debug.Log($"Failed login: {error}");
-        }
-
-        private void OnMFAEmailSentHandler(string email)
-        {
-            Debug.Log($"Successfully sent MFA email to {email}");
-            StartCoroutine(_loginPanel.SetUIPage(_mfaPage, email));
-        }
-
-        private void OnMFAEmailFailedToSendHandler(string email, string error)
-        {
-            Debug.Log($"Failed to send MFA email to {email} with error: {error}");
         }
     }
 }
