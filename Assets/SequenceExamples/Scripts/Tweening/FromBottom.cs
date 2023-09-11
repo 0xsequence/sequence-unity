@@ -17,7 +17,7 @@ namespace Sequence.Demo.Tweening
             _transform.anchoredPosition = _startPosition;
         }
 
-        public void Animate(float durationInSeconds)
+        public void AnimateIn(float durationInSeconds)
         {
             StartCoroutine(DoSlide(durationInSeconds, _startPosition, _targetPosition));
         }

@@ -13,7 +13,7 @@ namespace SequenceExamples.Scripts.Tests
         private LoginFlowUITests _loginFlowUITests;
         private WalletFlowUITests _walletFlowUITests;
             
-        private SequenceUI _ui;
+        private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
@@ -28,12 +28,12 @@ namespace SequenceExamples.Scripts.Tests
         [UnitySetUp]
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
         {
-            SequenceUI.IsTesting = true;
+            SequenceSampleUI.IsTesting = true;
             SceneManager.LoadScene("SequenceExamples/Scenes/Demo");
             while (_ui == null)
             {
                 yield return null; // Allow object to load
-                _ui = FindObjectOfType<SequenceUI>();
+                _ui = FindObjectOfType<SequenceSampleUI>();
                 _loginPanel = FindObjectOfType<LoginPanel>();
                 _connectPage = FindObjectOfType<ConnectPage>();
                 _loginPage = FindObjectOfType<LoginPage>();
@@ -51,7 +51,7 @@ namespace SequenceExamples.Scripts.Tests
             MockDelayOverrider mockDelayOverrider = testObject.AddComponent<MockDelayOverrider>();
             mockDelayOverrider.OverrideAnimationTimes(WaitForAnimationTime / 1000);
             
-            SequenceUI.IsTesting = false;
+            SequenceSampleUI.IsTesting = false;
             _ui.Start();
             yield return new WaitForSeconds(3f); // Wait a few seconds to allow for UI to animate into place
             

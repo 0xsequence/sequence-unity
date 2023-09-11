@@ -36,7 +36,7 @@ namespace Sequence.Demo
         public virtual void Open(params object[] args)
         {
             _gameObject.SetActive(true);
-            _animator.Animate( _openAnimationDurationInSeconds);
+            _animator.AnimateIn( _openAnimationDurationInSeconds);
         }
 
         public virtual void Close()

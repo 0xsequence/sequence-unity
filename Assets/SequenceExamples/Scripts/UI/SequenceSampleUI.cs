@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class SequenceUI : MonoBehaviour
+    public class SequenceSampleUI : MonoBehaviour
     {
         public static bool IsTesting = false;
         

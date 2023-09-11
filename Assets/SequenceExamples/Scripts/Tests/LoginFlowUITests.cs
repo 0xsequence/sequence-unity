@@ -13,7 +13,7 @@ namespace SequenceExamples.Scripts.Tests
     {
         private MonoBehaviour _testMonobehaviour;
             
-        private SequenceUI _ui;
+        private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
@@ -21,7 +21,7 @@ namespace SequenceExamples.Scripts.Tests
         private LoginSuccessPage _loginSuccessPage;
         private WalletPanel _walletPanel;
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
             MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel)
         {
             _testMonobehaviour = testMonobehaviour;

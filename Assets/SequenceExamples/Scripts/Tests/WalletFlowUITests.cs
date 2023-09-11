@@ -18,7 +18,7 @@ namespace SequenceExamples.Scripts.Tests
     {
         private MonoBehaviour _testMonobehaviour;
             
-        private SequenceUI _ui;
+        private SequenceSampleUI _ui;
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
         private LoginPanel _loginPanel;
@@ -27,7 +27,7 @@ namespace SequenceExamples.Scripts.Tests
         private int _randomNumberOfTokensToFetch;
         private int _randomNumberOfNftsToFetch;
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel)
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;

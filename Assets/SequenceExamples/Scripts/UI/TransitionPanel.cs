@@ -4,11 +4,11 @@ namespace Sequence.Demo
     {
         public ITokenContentFetcher TokenFetcher = new MockTokenContentFetcher(); // Todo inject a real fetcher in Awake
         public INftContentFetcher NftFetcher = new MockNftContentFetcher(30); // Todo inject a real fetcher in Awake
-        private SequenceUI _ui;
+        private SequenceSampleUI _ui;
         protected override void Awake()
         {
             base.Awake();
-            _ui = FindObjectOfType<SequenceUI>();
+            _ui = FindObjectOfType<SequenceSampleUI>();
         }
 
         public void OpenWalletPanel()
