@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using Sequence.Contracts;
 using Sequence.Demo.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Sequence.Demo.Utils;
+using Sequence.Utils;
 using UnityEngine.Serialization;
 
 namespace Sequence.Demo
@@ -23,6 +25,8 @@ namespace Sequence.Demo
         private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
         private Color _baseColor;
         private SequenceUI _sequenceUI;
+
+        public ITransactionDetailsFetcher TransactionDetailsFetcher = new MockTransactionDetailsFetcher(15); // Todo: replace mock with concrete implementation
 
         private void Awake()
         {
@@ -74,7 +78,7 @@ namespace Sequence.Demo
                 _sequenceUI = FindObjectOfType<SequenceUI>();
             }
 
-            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons, new MockTransactionDetailsFetcher(15)); // Todo: replace mock with concrete implementation
+            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons, TransactionDetailsFetcher); 
         }
     }
 }

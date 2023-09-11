@@ -284,14 +284,17 @@ namespace SequenceExamples.Scripts.Tests
                     // Test is complete - we have gone through all the TokenUIElements (they should be displayed first before NFTs)
                     break;
                 }
-
+                
+                int randomNumberOfTransactionsToFetch = Random.Range(0, 30);
+                token.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch);
+                MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)token.TransactionDetailsFetcher;
                 Button button = token.GetComponent<Button>();
                 Assert.IsNotNull(button);
                 
                 button.onClick.Invoke();
                 yield return new WaitForSeconds(3f); // Wait for next page to animate in
 
-                yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(token.GetNetwork()));
+                yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(token.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
                 
                 _ui.Back();
                 yield return new WaitForSeconds(3f); // Wait for next page to animate in
@@ -310,7 +313,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return null;
         }
 
-        private IEnumerator AssertTokenInfoPageIsAsExpected(Chain network)
+        private IEnumerator AssertTokenInfoPageIsAsExpected(Chain network, int randomNumberOfTransactionsToFetch, int delayInMillisecondsBetweenFetches)
         {
             TokenInfoPage tokenInfo = FindObjectOfType<TokenInfoPage>();
             Assert.IsNotNull(tokenInfo);
@@ -335,6 +338,10 @@ namespace SequenceExamples.Scripts.Tests
             string currentCurrencyValue = currencyValueText.text;
             yield return new WaitForSecondsRealtime(tokenInfo.TimeBetweenTokenValueRefreshesInSeconds);
             Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
+
+            TransactionDetailsBlocksUITests transactionDetailsBlocksUITests =
+                new TransactionDetailsBlocksUITests(_testMonobehaviour);
+            yield return _testMonobehaviour.StartCoroutine(transactionDetailsBlocksUITests.AssertTransactionDetailsBlocksAreAsExpected(randomNumberOfTransactionsToFetch, delayInMillisecondsBetweenFetches));
         }
     }
 }

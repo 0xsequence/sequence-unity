@@ -36,7 +36,7 @@ namespace Sequence.Demo
             _networkIconsMapper = networkIcons;
             
             _sentReceivedText.SetText(_transactionDetails.Type, resizeWidth: true);
-            _networkIcon.sprite = _networkIconsMapper.GetIcon(_transactionDetails.Network);
+            _networkIcon.sprite = GetNetworkIcon();
             _tokenIcon.sprite = _transactionDetails.TokenIcon;
             _dateText.text = _transactionDetails.Date;
 
@@ -69,6 +69,12 @@ namespace Sequence.Demo
                 yield return wait;
                 RefreshCurrencyValue();
             }
+        }
+
+        public Sprite GetNetworkIcon()
+        {
+            ThrowIfNotAssembled();
+            return _networkIconsMapper.GetIcon(_transactionDetails.Network);
         }
     }
 }
