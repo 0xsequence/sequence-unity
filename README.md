@@ -80,7 +80,7 @@ An `ITween` is an interface for an animation (in/out) that can be applied to a `
 
 #### UIPanel
 Inherriting from `UIPage`, a `UIPanel` is the base implementation of a "panel" in the sample UI. Example panels: `LoginPanel`, `WalletPanel`
-In addition to `UIPage` responsibilities, UIPanels maintain a stack of UIPages and object[] (open arguments) and are responsible for managing any required event listeners and UI transitions between their child pages (according to Scene inspector heirarchy), including handling the "Back" button.
+In addition to `UIPage` responsibilities, UIPanels maintain a stack of UIPages and `object[]` (open arguments) and are responsible for managing any required event listeners and UI transitions between their child pages (according to Scene inspector heirarchy), including handling the "Back" button.
 
 #### SequenceSampleUI
 `SequenceSampleUI` can be thought of as the "manager" of the sample UI. It holds a reference to all the UIPanels and is responsible for opening them as needed, including at `Start()`. If you are integrating all or part of the provided sample UI into your project, you may find it more practical to replace `SequenceSampleUI` with your own UI "manager".
