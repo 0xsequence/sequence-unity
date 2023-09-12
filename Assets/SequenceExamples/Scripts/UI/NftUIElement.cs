@@ -29,5 +29,10 @@ namespace Sequence.Demo
             
             _walletPanel.OpenNftInfoPage(_nftElement, NetworkIcons, TransactionDetailsFetcher);
         }
+
+        public Chain GetNetwork()
+        {
+            return _nftElement.Network;
+        }
     }
 }

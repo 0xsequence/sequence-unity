@@ -18,15 +18,10 @@ namespace SequenceExamples.Scripts.Tests
             _testMonoBehaviour = testMonoBehaviour;
         }
 
-        public IEnumerator AssertTransactionDetailsBlocksAreAsExpected(int expected, int delayInMillisecondsBetweenFetches)
+        public IEnumerator AssertTransactionDetailsBlocksAreAsExpected(VerticalLayoutGroup transactionVerticalLayoutGroup, int expected, int delayInMillisecondsBetweenFetches)
         {
             yield return new WaitForSeconds(expected * (float)delayInMillisecondsBetweenFetches / 1000); // Allow content to load
             
-            GameObject transactionScrollView = GameObject.Find("TransactionsScrollView");
-            Assert.IsNotNull(transactionScrollView);
-            VerticalLayoutGroup transactionVerticalLayoutGroup =
-                transactionScrollView.GetComponentInChildren<VerticalLayoutGroup>();
-            Assert.IsNotNull(transactionVerticalLayoutGroup);
             int transactionDetailsBlocksCount = transactionVerticalLayoutGroup.transform.childCount;
             Assert.AreEqual(expected, transactionDetailsBlocksCount);
 
@@ -53,6 +48,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsTrue(IsSorted(dates));
 
             yield return new WaitForSeconds(blocks[0].TimeBetweenTokenValueRefreshesInSeconds);
+            yield return null; // Wait a frame for UI to update
 
             for (int i = 0; i < count; i++)
             {
