@@ -134,3 +134,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deaa278414364aa78fe6dd20e315a721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _nftImage: {fileID: 4291578054636979227}

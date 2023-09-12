@@ -147,7 +147,7 @@ namespace SequenceExamples.Scripts.Tests
             {
                 Transform child = grid.transform.GetChild(i);
                 TokenUIElement token = child.GetComponent<TokenUIElement>();
-                NFTUIElement nft = child.GetComponent<NFTUIElement>();
+                NftUIElement nft = child.GetComponent<NftUIElement>();
                 if (nft != null && token != null)
                 {
                     throw new AssertionException("Encountered an element that is both a token and an NFT",
