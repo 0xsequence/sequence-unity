@@ -9002,12 +9002,13 @@ MonoBehaviour:
   _numberOfTransactionDetailsBlockPlaceholdersToInstantiate: 1
   _numberOfTransactionDetailsToFetchAtOnce: 1
   _transactionDetailsBlockLayoutGroup: {fileID: 34841353}
+  _amountText: {fileID: 247746590}
+  _currencyValueText: {fileID: 934077646}
+  TimeBetweenTokenValueRefreshesInSeconds: 5
   _tokenIconImage: {fileID: 1636248219}
   _tokenNameText: {fileID: 1771427515}
   _networkIconImage: {fileID: 2044791458}
   _networkNameText: {fileID: 1785959077}
-  _balanceText: {fileID: 247746590}
-  _currencyValueText: {fileID: 934077646}
   TimeBetweenTokenValueRefreshesInSeconds: 5
 --- !u!1 &1352771640
 GameObject:
@@ -10331,14 +10332,15 @@ MonoBehaviour:
   _numberOfTransactionDetailsBlockPlaceholdersToInstantiate: 1
   _numberOfTransactionDetailsToFetchAtOnce: 1
   _transactionDetailsBlockLayoutGroup: {fileID: 1522387192}
+  _amountText: {fileID: 1344033257}
+  _currencyValueText: {fileID: 948191735}
+  TimeBetweenTokenValueRefreshesInSeconds: 5
   _collectionIcon: {fileID: 712696896}
   _collectionNameText: {fileID: 1907514278}
   _networkIcon: {fileID: 386223873}
   _nftNameText: {fileID: 1624184410}
   _nftNumberText: {fileID: 1166266896}
   _nftImage: {fileID: 2007117439}
-  _ethValueText: {fileID: 1344033256}
-  _currencyValueText: {fileID: 948191735}
   TimeBetweenEthValueRefreshesInSeconds: 5
 --- !u!1 &1521696043
 GameObject:

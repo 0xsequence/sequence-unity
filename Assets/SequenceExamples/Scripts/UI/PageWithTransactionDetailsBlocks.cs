@@ -15,7 +15,7 @@ namespace Sequence.Demo
         [SerializeField] private VerticalLayoutGroup _transactionDetailsBlockLayoutGroup;
 
         protected NetworkIcons _networkIcons;
-        private ICurrencyRepository _currencyRepository;
+        protected ICurrencyRepository _currencyRepository;
         private ObjectPool _transactionPool;
         private ITransactionDetailsFetcher _transactionDetailsFetcher;
         private List<TransactionDetails> _transactionDetails = new List<TransactionDetails>();

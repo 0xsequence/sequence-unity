@@ -363,7 +363,7 @@ namespace SequenceExamples.Scripts.Tests
             TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(currencyValueText);
             string currentCurrencyValue = currencyValueText.text;
-            yield return new WaitForSecondsRealtime(tokenInfo.TimeBetweenTokenValueRefreshesInSeconds);
+            yield return new WaitForSecondsRealtime(tokenInfo.TimeBetweenCurrencyValueRefreshesInSeconds);
             Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
 
             GameObject transactionScrollView = GameObject.Find("TransactionsScrollView");
@@ -452,7 +452,7 @@ namespace SequenceExamples.Scripts.Tests
             TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(currencyValueText);
             string currentCurrencyValue = currencyValueText.text;
-            yield return new WaitForSecondsRealtime(nftInfoPage.TimeBetweenEthValueRefreshesInSeconds);
+            yield return new WaitForSecondsRealtime(nftInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
             Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
 
             Transform transactionDetailsBlockLayoutGroupTransform =

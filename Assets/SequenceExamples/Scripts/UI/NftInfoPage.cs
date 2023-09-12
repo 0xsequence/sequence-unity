@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
-    public class NftInfoPage : PageWithTransactionDetailsBlocks
+    public class NftInfoPage : InfoPage
     {
         [SerializeField] private Image _collectionIcon;
         [SerializeField] private TextExtender _collectionNameText;
@@ -17,12 +17,8 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _nftNameText;
         [SerializeField] private TextMeshProUGUI _nftNumberText;
         [SerializeField] private Image _nftImage;
-        [SerializeField] private TextExtender _ethValueText;
-        [SerializeField] private TextMeshProUGUI _currencyValueText;
-        public float TimeBetweenEthValueRefreshesInSeconds = 5;
 
         private NftElement _nftElement;
-        private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
         
         private RectTransform _scrollRectContent;
         private VerticalLayoutGroup _verticalLayoutGroup;
@@ -47,7 +43,6 @@ namespace Sequence.Demo
             _nftElement = nftElement;
             
             Assemble();
-            StartCoroutine(RefreshEthValueRepeatedly());
         }
 
         private void Assemble()
@@ -58,45 +53,6 @@ namespace Sequence.Demo
             _nftNameText.text = _nftElement.TokenName;
             _nftNumberText.text = $"#{_nftElement.TokenNumber}";
             _nftImage.sprite = _nftElement.TokenIconSprite;
-            
-            _amountAndCurrencyTextSetter = new AmountAndCurrencyTextSetter(_ethValueText, _currencyValueText, _nftElement);
-            _amountAndCurrencyTextSetter.SetInitialValueAndAmountText();
-        }
-
-        private IEnumerator RefreshEthValueRepeatedly()
-        {
-            var waitForRefresh = new WaitForSecondsRealtime(TimeBetweenEthValueRefreshesInSeconds);
-            while (true) // Terminates on Close() (as this gameObject will be disabled)
-            {
-                yield return waitForRefresh;
-                RefreshCurrencyValue();
-            }
-        }
-
-        public void RefreshCurrencyValue()
-        {
-            ThrowIfNotAssembled();
-            _amountAndCurrencyTextSetter.RefreshCurrencyValue();
-        }
-        
-        public void RefreshWithBalance(uint balance)
-        {
-            ThrowIfNotAssembled();
-            _amountAndCurrencyTextSetter.RefreshWithAmount(balance);
-        }
-
-        private void ThrowIfNotAssembled()
-        {
-            if (_amountAndCurrencyTextSetter == null)
-            {
-                throw new SystemException(
-                    $"{typeof(NftInfoPage)} must be assembled via {nameof(Assemble)} before use.");
-            }
-        }
-
-        public Sprite GetNetworkIcon(Chain network)
-        {
-            return _networkIcons.GetIcon(network);
         }
 
         protected override void UpdateScrollViewSize()
