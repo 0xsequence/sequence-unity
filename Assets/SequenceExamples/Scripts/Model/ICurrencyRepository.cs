@@ -11,5 +11,6 @@ namespace Sequence.Demo
         public float GetPreviousCurrencyValue();
         public void SetPreviousCurrencyValue(float value);
         public Currency GetCurrency();
+        public Address GetContractAddress();
     }
 }

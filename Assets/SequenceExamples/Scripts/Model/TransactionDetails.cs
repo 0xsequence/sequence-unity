@@ -75,5 +75,10 @@ namespace Sequence.Demo
         {
             return _currencyConverter.ConvertToCurrency(GetAmount(), GetAddress());
         }
+
+        public Address GetContractAddress()
+        {
+            return ContractAddress;
+        }
     }
 }

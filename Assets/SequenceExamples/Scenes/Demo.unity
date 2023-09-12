@@ -8998,15 +8998,16 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
+  _transactionDetailsBlockPlaceholderPrefab: {fileID: 1493846748156044188, guid: 4656816dabb234be99269d464e3aafae, type: 3}
+  _numberOfTransactionDetailsBlockPlaceholdersToInstantiate: 1
+  _numberOfTransactionDetailsToFetchAtOnce: 1
+  _transactionDetailsBlockLayoutGroup: {fileID: 34841353}
   _tokenIconImage: {fileID: 1636248219}
   _tokenNameText: {fileID: 1771427515}
   _networkIconImage: {fileID: 2044791458}
   _networkNameText: {fileID: 1785959077}
   _balanceText: {fileID: 247746590}
   _currencyValueText: {fileID: 934077646}
-  _transactionDetailsBlockPlaceholderPrefab: {fileID: 1493846748156044188, guid: 4656816dabb234be99269d464e3aafae, type: 3}
-  _numberOfTransactionDetailsBlockPlaceholdersToInstantiate: 1
-  _numberOfTransactionDetailsToFetchAtOnce: 1
   TimeBetweenTokenValueRefreshesInSeconds: 5
 --- !u!1 &1352771640
 GameObject:
@@ -10326,6 +10327,10 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
+  _transactionDetailsBlockPlaceholderPrefab: {fileID: 1493846748156044188, guid: 4656816dabb234be99269d464e3aafae, type: 3}
+  _numberOfTransactionDetailsBlockPlaceholdersToInstantiate: 1
+  _numberOfTransactionDetailsToFetchAtOnce: 1
+  _transactionDetailsBlockLayoutGroup: {fileID: 1522387192}
   _collectionIcon: {fileID: 712696896}
   _collectionNameText: {fileID: 1907514278}
   _networkIcon: {fileID: 386223873}
@@ -10334,10 +10339,6 @@ MonoBehaviour:
   _nftImage: {fileID: 2007117439}
   _ethValueText: {fileID: 1344033256}
   _currencyValueText: {fileID: 948191735}
-  _transactionDetailsBlockPlaceholderPrefab: {fileID: 1493846748156044188, guid: 4656816dabb234be99269d464e3aafae, type: 3}
-  _numberOfTransactionDetailsBlockPlaceholdersToInstantiate: 1
-  _numberOfTransactionDetailsToFetchAtOnce: 1
-  _transactionDetailsBlockLayoutGroup: {fileID: 1522387192}
   TimeBetweenEthValueRefreshesInSeconds: 5
 --- !u!1 &1521696043
 GameObject:

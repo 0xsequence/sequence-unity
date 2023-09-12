@@ -73,5 +73,10 @@ namespace Sequence.Demo
         {
             return CurrencyConverter.ConvertToCurrency(GetAmount(), GetAddress());
         }
+
+        public Address GetContractAddress()
+        {
+            return Erc20.GetAddress();
+        }
     }
 }

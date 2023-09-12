@@ -63,5 +63,10 @@ namespace Sequence.Demo
         {
             return CurrencyConverter.ConvertToCurrency(EthValue, "ETH");
         }
+
+        public Address GetContractAddress()
+        {
+            return ContractAddress;
+        }
     }
 }
