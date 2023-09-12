@@ -46,7 +46,7 @@ namespace Sequence.Demo
 
         public string GetSymbol()
         {
-            return "";
+            return "ETH";
         }
 
         public float GetPreviousCurrencyValue()

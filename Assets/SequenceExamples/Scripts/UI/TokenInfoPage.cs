@@ -51,7 +51,7 @@ namespace Sequence.Demo
                     $"Invalid use. {nameof(TokenInfoPage)} must be opened with a {typeof(TokenElement)} as an argument");
             }
             NetworkIcons networkIcons = args.GetObjectOfTypeIfExists<NetworkIcons>();
-            if (tokenElement == default)
+            if (networkIcons == default)
             {
                 throw new SystemException(
                     $"Invalid use. {nameof(TokenInfoPage)} must be opened with a {typeof(NetworkIcons)} as an argument");

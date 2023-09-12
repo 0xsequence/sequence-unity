@@ -7,15 +7,27 @@ namespace Sequence.Demo
 {
     public class AmountAndCurrencyTextSetter
     {
-        private TextMeshProUGUI _amountText;
+        private ITextSetter _amountText;
         private TextMeshProUGUI _currencyValueText;
         private ICurrencyRepository _currencyRepository;
         private TextMeshProUGUI _percentChangeText;
         private Color _baseColor;
 
-        public AmountAndCurrencyTextSetter(TextMeshProUGUI amountText, TextMeshProUGUI currencyValueText, ICurrencyRepository currencyRepository, [CanBeNull] TextMeshProUGUI percentChangeText = null, Color? baseColor = null)
+        public AmountAndCurrencyTextSetter(ITextSetter amountText, TextMeshProUGUI currencyValueText, ICurrencyRepository currencyRepository, [CanBeNull] TextMeshProUGUI percentChangeText = null, Color? baseColor = null)
         {
             _amountText = amountText;
+            _currencyValueText = currencyValueText;
+            _currencyRepository = currencyRepository;
+            _percentChangeText = percentChangeText;
+            if (baseColor != null)
+            {
+                _baseColor = (Color)baseColor;
+            }
+        }
+        
+        public AmountAndCurrencyTextSetter(TextMeshProUGUI amountText, TextMeshProUGUI currencyValueText, ICurrencyRepository currencyRepository, [CanBeNull] TextMeshProUGUI percentChangeText = null, Color? baseColor = null)
+        {
+            _amountText = new TextSetter(amountText);
             _currencyValueText = currencyValueText;
             _currencyRepository = currencyRepository;
             _percentChangeText = percentChangeText;
@@ -27,7 +39,7 @@ namespace Sequence.Demo
 
         public void SetInitialValueAndAmountText()
         {
-            _amountText.text = $"{_currencyRepository.GetAmount():#,##0} {_currencyRepository.GetSymbol()}";
+            _amountText.SetText($"{_currencyRepository.GetAmount():#,##0} {_currencyRepository.GetSymbol()}", true);
             
             Currency currency = _currencyRepository.GetCurrency();
             float amount = currency.Amount;

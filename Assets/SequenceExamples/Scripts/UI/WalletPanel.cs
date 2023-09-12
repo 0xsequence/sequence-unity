@@ -13,6 +13,7 @@ namespace Sequence.Demo
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
         private TokenInfoPage _tokenInfoPage;
+        private NftInfoPage _nftInfoPage;
 
         public enum TopBarMode
         {
@@ -26,6 +27,7 @@ namespace Sequence.Demo
             _walletPage = GetComponentInChildren<WalletPage>();
             _transitionPanel = FindObjectOfType<TransitionPanel>();
             _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
+            _nftInfoPage = GetComponentInChildren<NftInfoPage>();
         }
 
         public override void Close()
@@ -86,6 +88,11 @@ namespace Sequence.Demo
         public void OpenTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
         {
             OpenInfoPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher);
+        }
+        
+        public void OpenNftInfoPage(NftElement nftElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
+        {
+            OpenInfoPage(_nftInfoPage, nftElement, networkIcons, transactionDetailsFetcher);
         }
 
         private void OpenInfoPage(UIPage infoPage, params object[] openArgs)

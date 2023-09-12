@@ -7,12 +7,12 @@ namespace Sequence.Demo
     {
         public Currency ConvertToCurrency(float amount, ERC20 token)
         {
-            return new Currency("$", amount + Random.Range(-amount * .25f, amount * .25f));
+            return ConvertToCurrency(amount, token.GetAddress());
         }
 
         public Currency ConvertToCurrency(float amount, string tokenAddress)
         {
-            return ConvertToCurrency(amount, new ERC20(tokenAddress));
+            return new Currency("$", amount + Random.Range(-amount * .25f, amount * .25f));
         }
     }
 }
