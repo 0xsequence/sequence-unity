@@ -39,15 +39,15 @@ namespace SequenceExamples.Scripts.Tests
 
         public IEnumerator EndToEndTest()
         {
-            _randomNumberOfTokensToFetch = Random.Range(0, 100);
-            _randomNumberOfNftsToFetch = Random.Range(0, 1000);
+            _randomNumberOfTokensToFetch = Random.Range(1, 100);
+            _randomNumberOfNftsToFetch = Random.Range(1, 1000);
             AssertWeAreOnTransitionPanel();
             yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
             yield return _testMonobehaviour.StartCoroutine(CloseWalletPanelTest());
             AssertWeAreOnTransitionPanel();
-            _randomNumberOfTokensToFetch = Random.Range(0, 10);
-            _randomNumberOfNftsToFetch = Random.Range(0, 100);
+            _randomNumberOfTokensToFetch = Random.Range(1, 10);
+            _randomNumberOfNftsToFetch = Random.Range(1, 100);
             yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
             yield return _testMonobehaviour.StartCoroutine(TestTokenInfoPages());

@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 
 namespace Sequence.Demo
 {
-    public class TokenUIElement : MonoBehaviour
+    public class TokenUIElement : WalletUIElement
     {
         [SerializeField] private Image _tokenIconImage;
         [SerializeField] private TextExtender _tokenNameSetter;
@@ -19,14 +19,11 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _balanceText;
         [SerializeField] private TextMeshProUGUI _currencyValueText;
         [SerializeField] private TextMeshProUGUI _percentChangeText;
-        public NetworkIcons NetworkIcons;
 
         private TokenElement _tokenElement;
         private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
         private Color _baseColor;
         private WalletPanel _walletPanel;
-
-        public ITransactionDetailsFetcher TransactionDetailsFetcher = new MockTransactionDetailsFetcher(15); // Todo: replace mock with concrete implementation
 
         private void Awake()
         {
@@ -66,7 +63,7 @@ namespace Sequence.Demo
             }
         }
 
-        public Chain GetNetwork()
+        public override Chain GetNetwork()
         {
             return _tokenElement.Network;
         }

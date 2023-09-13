@@ -4,12 +4,10 @@ using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
-    public class NftUIElement : MonoBehaviour
+    public class NftUIElement : WalletUIElement
     {
         [SerializeField] private Image _nftImage;
         
-        public NetworkIcons NetworkIcons;
-        public ITransactionDetailsFetcher TransactionDetailsFetcher = new MockTransactionDetailsFetcher(15); // Todo: replace mock with concrete implementation
         private NftElement _nftElement;
         private WalletPanel _walletPanel;
 
@@ -30,7 +28,7 @@ namespace Sequence.Demo
             _walletPanel.OpenNftInfoPage(_nftElement, NetworkIcons, TransactionDetailsFetcher);
         }
 
-        public Chain GetNetwork()
+        public override Chain GetNetwork()
         {
             return _nftElement.Network;
         }
