@@ -295,28 +295,8 @@ namespace SequenceExamples.Scripts.Tests
                     // Test is complete - we have gone through all the TokenUIElements (they should be displayed first before NFTs)
                     break;
                 }
-                
-                int randomNumberOfTransactionsToFetch = Random.Range(1, 30);
-                token.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
-                MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)token.TransactionDetailsFetcher;
-                Button button = token.GetComponent<Button>();
-                Assert.IsNotNull(button);
-                
-                button.onClick.Invoke();
-                yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-                
-                yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(token.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
-                
-                AssertPanelAssumptions_InfoPage();
-                Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
-                Assert.IsNotNull(backButtonTransform);
-                Button backButton = backButtonTransform.GetComponent<Button>();
-                Assert.IsNotNull(backButton);
-                backButton.onClick.Invoke();
-                
-                yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-                
-                AssertPanelAssumptions_WalletPage();
+
+                yield return _testMonobehaviour.StartCoroutine(TestInfoPage(token));
                 
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
@@ -330,6 +310,42 @@ namespace SequenceExamples.Scripts.Tests
             }
 
             yield return null;
+        }
+
+        private IEnumerator TestInfoPage(WalletUIElement element)
+        {
+            int randomNumberOfTransactionsToFetch = Random.Range(1, 30);
+            element.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
+            MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)element.TransactionDetailsFetcher;
+            Button button = element.GetComponent<Button>();
+            Assert.IsNotNull(button);
+                
+            button.onClick.Invoke();
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+
+            if (element is NftUIElement)
+            {
+                yield return _testMonobehaviour.StartCoroutine(AssertNftInfoPageIsAsExpected(element.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
+            }
+            else if (element is TokenUIElement)
+            {
+                yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(element.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
+            }
+            else
+            {
+                NUnit.Framework.Assert.Fail($"Unexpected {typeof(WalletUIElement)} type");
+            }
+                
+            AssertPanelAssumptions_InfoPage();
+            Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
+            Assert.IsNotNull(backButtonTransform);
+            Button backButton = backButtonTransform.GetComponent<Button>();
+            Assert.IsNotNull(backButton);
+            backButton.onClick.Invoke();
+                
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+                
+            AssertPanelAssumptions_WalletPage();
         }
 
         private void AssertPanelAssumptions_InfoPage()
@@ -398,27 +414,7 @@ namespace SequenceExamples.Scripts.Tests
                     continue;
                 }
 
-                int randomNumberOfTransactionsToFetch = Random.Range(1, 30);
-                nft.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
-                MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)nft.TransactionDetailsFetcher;
-                Button button = nft.GetComponent<Button>();
-                Assert.IsNotNull(button);
-                
-                button.onClick.Invoke();
-                yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-                
-                yield return _testMonobehaviour.StartCoroutine(AssertNftInfoPageIsAsExpected(nft.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
-                
-                AssertPanelAssumptions_InfoPage();
-                Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
-                Assert.IsNotNull(backButtonTransform);
-                Button backButton = backButtonTransform.GetComponent<Button>();
-                Assert.IsNotNull(backButton);
-                backButton.onClick.Invoke();
-                
-                yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-                
-                AssertPanelAssumptions_WalletPage();
+                yield return _testMonobehaviour.StartCoroutine(TestInfoPage(nft));
                 
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
