@@ -51,11 +51,6 @@ namespace Sequence.Demo
             throw new NotSupportedException($"A {nameof(TransactionDetails)} cannot have its amount modified after creation");
         }
 
-        public string GetAddress()
-        {
-            return ContractAddress;
-        }
-
         public string GetSymbol()
         {
             return Symbol;
@@ -73,7 +68,7 @@ namespace Sequence.Demo
 
         public Currency GetCurrency()
         {
-            return _currencyConverter.ConvertToCurrency(GetAmount(), GetAddress());
+            return _currencyConverter.ConvertToCurrency(GetAmount(), GetContractAddress());
         }
 
         public Address GetContractAddress()

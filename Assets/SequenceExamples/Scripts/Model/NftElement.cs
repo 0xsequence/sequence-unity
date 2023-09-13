@@ -4,26 +4,35 @@ namespace Sequence.Demo
 {
     public class NftElement : ICurrencyRepository
     {
-        public Address ContractAddress;
+        public CollectionInfo Collection;
         public Sprite TokenIconSprite;
         public string TokenName;
-        public Sprite CollectionIconSprite;
-        public string CollectionName;
         public uint TokenNumber;
-        public Chain Network;
         public uint Balance;
         public float EthValue;
         public ICurrencyConverter CurrencyConverter;
 
-        public NftElement(Address contractAddress, Sprite tokenIconSprite, string tokenName, Sprite collectionIconSprite, string collectionName, uint tokenNumber, Chain network, uint balance, float ethValue, ICurrencyConverter currencyConverter)
+        public NftElement(CollectionInfo collection, Sprite tokenIconSprite, string tokenName, uint tokenNumber, uint balance, float ethValue, ICurrencyConverter currencyConverter)
         {
-            ContractAddress = contractAddress;
+            Collection = collection;
             TokenIconSprite = tokenIconSprite;
             TokenName = tokenName;
-            CollectionIconSprite = collectionIconSprite;
-            CollectionName = collectionName;
             TokenNumber = tokenNumber;
-            Network = network;
+            Balance = balance;
+            EthValue = ethValue;
+            CurrencyConverter = currencyConverter;
+        }
+
+        public NftElement(Address contractAddress, Sprite tokenIconSprite, string tokenName,
+            Sprite collectionIconSprite, string collectionName, uint tokenNumber, Chain network, uint balance,
+            float ethValue, ICurrencyConverter currencyConverter)
+        {
+            CollectionInfo collection = new CollectionInfo(contractAddress, collectionIconSprite, collectionName, network);
+            
+            Collection = collection;
+            TokenIconSprite = tokenIconSprite;
+            TokenName = tokenName;
+            TokenNumber = tokenNumber;
             Balance = balance;
             EthValue = ethValue;
             CurrencyConverter = currencyConverter;
@@ -37,11 +46,6 @@ namespace Sequence.Demo
         public void SetAmount(uint value)
         {
             Balance = value;
-        }
-
-        public string GetAddress()
-        {
-            return ContractAddress;
         }
 
         public string GetSymbol()
@@ -66,7 +70,7 @@ namespace Sequence.Demo
 
         public Address GetContractAddress()
         {
-            return ContractAddress;
+            return Collection.ContractAddress;
         }
     }
 }

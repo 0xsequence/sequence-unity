@@ -47,9 +47,9 @@ namespace Sequence.Demo
 
         private void Assemble()
         {
-            _collectionIcon.sprite = _nftElement.CollectionIconSprite;
-            _collectionNameText.SetText(_nftElement.CollectionName, true);
-            _networkIcon.sprite = _networkIcons.GetIcon(_nftElement.Network);
+            _collectionIcon.sprite = _nftElement.Collection.IconSprite;
+            _collectionNameText.SetText(_nftElement.Collection.Name, true);
+            _networkIcon.sprite = _networkIcons.GetIcon(_nftElement.Collection.Network);
             _nftNameText.text = _nftElement.TokenName;
             _nftNumberText.text = $"#{_nftElement.TokenNumber}";
             _nftImage.sprite = _nftElement.TokenIconSprite;

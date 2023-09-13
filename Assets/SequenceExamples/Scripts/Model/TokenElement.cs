@@ -49,11 +49,6 @@ namespace Sequence.Demo
             Balance = value;
         }
 
-        public string GetAddress()
-        {
-            return Erc20.GetAddress();
-        }
-
         public string GetSymbol()
         {
             return Symbol;
@@ -71,7 +66,7 @@ namespace Sequence.Demo
 
         public Currency GetCurrency()
         {
-            return CurrencyConverter.ConvertToCurrency(GetAmount(), GetAddress());
+            return CurrencyConverter.ConvertToCurrency(GetAmount(), GetContractAddress());
         }
 
         public Address GetContractAddress()

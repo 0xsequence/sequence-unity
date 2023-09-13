@@ -6,7 +6,6 @@ namespace Sequence.Demo
     {
         public uint GetAmount();
         public void SetAmount(uint value);
-        public string GetAddress();
         public string GetSymbol();
         public float GetPreviousCurrencyValue();
         public void SetPreviousCurrencyValue(float value);

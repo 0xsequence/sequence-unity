@@ -30,7 +30,7 @@ namespace Sequence.Demo
 
         public override Chain GetNetwork()
         {
-            return _nftElement.Network;
+            return _nftElement.Collection.Network;
         }
     }
 }
