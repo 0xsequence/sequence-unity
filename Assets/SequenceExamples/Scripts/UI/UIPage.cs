@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Sequence.Demo
 {
     [RequireComponent(typeof(RectTransform))]
-    public class UIPage : MonoBehaviour
+    public abstract class UIPage : MonoBehaviour
     {
         private RectTransform _transform;
         [SerializeField] protected float _openAnimationDurationInSeconds;

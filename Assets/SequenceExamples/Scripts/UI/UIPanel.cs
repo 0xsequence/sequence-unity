@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class UIPanel : UIPage
+    public abstract class UIPanel : UIPage
     {
         public UIPage InitialPage;
         

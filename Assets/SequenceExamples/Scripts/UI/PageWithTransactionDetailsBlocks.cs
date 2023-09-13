@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
-    public class PageWithTransactionDetailsBlocks : UIPage
+    public abstract class PageWithTransactionDetailsBlocks : UIPage
     {
         [SerializeField] private GameObject _transactionDetailsBlockPlaceholderPrefab;
         [SerializeField] private int _numberOfTransactionDetailsBlockPlaceholdersToInstantiate = 1;

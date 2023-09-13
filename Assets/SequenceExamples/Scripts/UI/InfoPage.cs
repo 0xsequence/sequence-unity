@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 namespace Sequence.Demo
 {
-    public class InfoPage : PageWithTransactionDetailsBlocks
+    public abstract class InfoPage : PageWithTransactionDetailsBlocks
     {
         [SerializeField] private TextMeshProUGUI _amountText;
         [SerializeField] private TextMeshProUGUI _currencyValueText;
