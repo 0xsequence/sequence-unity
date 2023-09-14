@@ -511,7 +511,7 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 142, y: 180}
+  m_CellSize: {x: 142, y: 182}
   m_Spacing: {x: 5, y: 5}
   m_Constraint: 1
   m_ConstraintCount: 2
@@ -966,6 +966,7 @@ MonoBehaviour:
   - {fileID: 1878011362095268920, guid: 0ad74f6689ca94f53b758794927d6133, type: 3}
   - {fileID: 6706636487979383531, guid: 5046b36227b8f41dc898c9e90a98e655, type: 3}
   - {fileID: 1493846748156044188, guid: 4656816dabb234be99269d464e3aafae, type: 3}
+  - {fileID: 7555216198460347099, guid: 6668f5089b71c4c2daff155d673ac2dd, type: 3}
 --- !u!114 &171231631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6278,7 +6279,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 950.0659}
+  m_SizeDelta: {x: 0, y: 2701}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &783428374
 GameObject:
@@ -6462,6 +6463,7 @@ GameObject:
   m_Component:
   - component: {fileID: 849304320}
   - component: {fileID: 849304321}
+  - component: {fileID: 849304322}
   m_Layer: 5
   m_Name: CollectionNameLayoutGroup
   m_TagString: Untagged
@@ -6518,6 +6520,62 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &849304322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849304319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 0}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1509566229}
+        m_TargetAssemblyTypeName: Sequence.Demo.NftInfoPage, SequenceExamples
+        m_MethodName: SwitchToCollectionInfoPage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &863633305
 GameObject:
   m_ObjectHideFlags: 0
@@ -10969,6 +11027,15 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
+  _collectionIcon: {fileID: 889602025}
+  _collectionNameText: {fileID: 279080086}
+  _networkIcon: {fileID: 7901028449822201669}
+  _networkName: {fileID: 5054486093993381806}
+  _uniqueCollectiblesOwnedText: {fileID: 1442714867}
+  _totalOwnedText: {fileID: 1081626749}
+  _nftWithInfoTextPrefab: {fileID: 7555216198460347099, guid: 6668f5089b71c4c2daff155d673ac2dd, type: 3}
+  _numberOfNftWithInfoTextPlaceholdersToInstantiate: 1
+  _nftsWithInfoGridLayoutGroup: {fileID: 87257569}
 --- !u!1 &1507322822
 GameObject:
   m_ObjectHideFlags: 0
@@ -11053,7 +11120,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 368732233}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.33681872
+  m_Size: 0.11847464
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13786,7 +13853,7 @@ MonoBehaviour:
   m_fontSizeMin: 8
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0

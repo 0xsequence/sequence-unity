@@ -18,6 +18,8 @@ namespace Sequence.Demo
             _nftElement = nftElement;
 
             _nftImage.sprite = nftElement.TokenIconSprite;
+            _nftNameText.text = _nftElement.TokenName;
+            _numberOwnedText.text = $"{_nftElement.Balance} Owned";
         }
 
         public void SwitchToInfoPage()

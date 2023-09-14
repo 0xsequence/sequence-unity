@@ -27,7 +27,7 @@ namespace Sequence.Demo
             Sprite collectionIconSprite, string collectionName, uint tokenNumber, Chain network, uint balance,
             float ethValue, ICurrencyConverter currencyConverter)
         {
-            CollectionInfo collection = new CollectionInfo(contractAddress, collectionIconSprite, collectionName, network);
+            CollectionInfo collection = CollectionInfo.GetCollectionInfo(contractAddress, collectionIconSprite, collectionName, network);
             
             Collection = collection;
             TokenIconSprite = tokenIconSprite;

@@ -23,6 +23,8 @@ namespace Sequence.Demo
         private RectTransform _scrollRectContent;
         private VerticalLayoutGroup _verticalLayoutGroup;
         
+        private WalletPanel _walletPanel;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -60,6 +62,16 @@ namespace Sequence.Demo
             base.UpdateScrollViewSize();
             float contentHeight = _verticalLayoutGroup.preferredHeight;
             _scrollRectContent.sizeDelta = new Vector2(_scrollRectContent.sizeDelta.x, contentHeight);
+        }
+
+        public void SwitchToCollectionInfoPage()
+        {
+            if (_walletPanel == null)
+            {
+                _walletPanel = FindObjectOfType<WalletPanel>();
+            }
+            
+            _walletPanel.OpenCollectionInfoPage(_networkIcons, _nftElement.Collection);
         }
     }
 }

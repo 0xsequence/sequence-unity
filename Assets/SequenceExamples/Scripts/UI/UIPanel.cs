@@ -9,7 +9,7 @@ namespace Sequence.Demo
         public UIPage InitialPage;
         
         private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
-        private UIPage _page;
+        protected UIPage _page;
         
         private struct PageWithArgs
         {

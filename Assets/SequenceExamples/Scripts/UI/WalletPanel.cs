@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
 using UnityEngine;
@@ -14,6 +15,9 @@ namespace Sequence.Demo
         private TransitionPanel _transitionPanel;
         private TokenInfoPage _tokenInfoPage;
         private NftInfoPage _nftInfoPage;
+        private CollectionNftMapper _collectionNftMapper;
+        private INftContentFetcher _nftContentFetcher;
+        private CollectionInfoPage _collectionInfoPage;
 
         public enum TopBarMode
         {
@@ -28,22 +32,30 @@ namespace Sequence.Demo
             _transitionPanel = FindObjectOfType<TransitionPanel>();
             _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
             _nftInfoPage = GetComponentInChildren<NftInfoPage>();
+            _collectionInfoPage = GetComponentInChildren<CollectionInfoPage>();
+            _collectionNftMapper = new CollectionNftMapper();
         }
 
         public override void Close()
         {
             base.Close();
             _walletPage.Close();
+            _nftContentFetcher.OnNftFetchSuccess -= _collectionNftMapper.HandleNftFetch;
+            _collectionNftMapper.Evict();
         }
 
         public override void Back()
         {
             base.Back();
-            SetTopBarMode(TopBarMode.Search);
+            if (_page is WalletPage)
+            {
+                SetTopBarMode(TopBarMode.Search);
+            }
         }
 
         public override IEnumerator OpenInitialPage(params object[] openArgs)
         {
+            _collectionNftMapper.Evict();
             openArgs = SetupContentFetchers(openArgs);
             return base.OpenInitialPage(openArgs);
         }
@@ -61,6 +73,8 @@ namespace Sequence.Demo
             {
                 args.AppendObject(new MockNftContentFetcher());
             }
+            _nftContentFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
+            _nftContentFetcher.OnNftFetchSuccess += _collectionNftMapper.HandleNftFetch;
 
             return args;
         }
@@ -95,10 +109,20 @@ namespace Sequence.Demo
             OpenInfoPage(_nftInfoPage, nftElement, networkIcons, transactionDetailsFetcher);
         }
 
+        public void OpenCollectionInfoPage(NetworkIcons networkIcons, CollectionInfo collectionInfo)
+        {
+            OpenInfoPage(_collectionInfoPage, networkIcons, collectionInfo);
+        }
+
         private void OpenInfoPage(UIPage infoPage, params object[] openArgs)
         {
             StartCoroutine(SetUIPage(infoPage, openArgs));
             SetTopBarMode(TopBarMode.Back);
         }
+
+        public List<NftElement> GetNftsFromCollection(CollectionInfo collection)
+        {
+            return _collectionNftMapper.GetNftsFromCollection(collection);
+        } 
     }
 }

@@ -58,7 +58,7 @@ namespace Sequence.Demo
                 potentialNames.GetRandomObjectFromArray(),
                 (uint)Random.Range(0, 10000),
                 EnumExtensions.GetRandomEnumValue<Chain>(),
-                1,
+                (uint)Random.Range(1, 30),
                 Random.Range(0, 10000),
                 new MockCurrencyConverter());
         }
