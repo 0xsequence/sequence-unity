@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -71,6 +72,17 @@ namespace Sequence.Demo
         public Address GetContractAddress()
         {
             return Collection.ContractAddress;
+        }
+        
+        public static uint CalculateTotalNftsOwned(List<NftElement> nfts)
+        {
+            int count = nfts.Count;
+            uint owned = 0;
+            for (int i = 0; i < count; i++)
+            {
+                owned += nfts[i].Balance;
+            }
+            return owned;
         }
     }
 }

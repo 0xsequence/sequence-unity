@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
@@ -19,6 +20,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _nftWithInfoTextPrefab;
         [SerializeField] private int _numberOfNftWithInfoTextPlaceholdersToInstantiate = 1;
         [SerializeField] private GridLayoutGroup _nftsWithInfoGridLayoutGroup;
+        [SerializeField] private RectTransform _scrollRectContentTransform;
 
         private NetworkIcons _networkIcons;
         private CollectionInfo _collectionInfo;
@@ -26,6 +28,7 @@ namespace Sequence.Demo
         private ObjectPool _nftWithInfoTextObjectPool;
         private WalletPanel _walletPanel;
         private RectTransform _nftsWithInfoGridLayoutGroupTransform;
+        private float _totalOwnedTextBuffer = 15f;
 
         public override void Open(params object[] args)
         {
@@ -73,19 +76,9 @@ namespace Sequence.Demo
             }
             List<NftElement> nftsInCollection = _walletPanel.GetNftsFromCollection(_collectionInfo);
             _uniqueCollectiblesOwnedText.text = $"{nftsInCollection.Count} Unique Collectibles";
-            _totalOwnedText.text = $"Owned({CalculateTotalNftsOwned(nftsInCollection)})";
+            _totalOwnedText.text = $"Owned({NftElement.CalculateTotalNftsOwned(nftsInCollection)})";
             PopulateNftUIElements(nftsInCollection);
-        }
-
-        private uint CalculateTotalNftsOwned(List<NftElement> nfts)
-        {
-            int count = nfts.Count;
-            uint owned = 0;
-            for (int i = 0; i < count; i++)
-            {
-                owned += nfts[i].Balance;
-            }
-            return owned;
+            StartCoroutine(UpdateScrollViewSize());
         }
 
         private void PopulateNftUIElements(List<NftElement> nfts)
@@ -105,6 +98,18 @@ namespace Sequence.Demo
                 NftWithInfoTextUIElement uiElement = nftWithTextTransform.GetComponent<NftWithInfoTextUIElement>();
                 uiElement.Assemble(nfts[i]);
             }
+        }
+        
+        private IEnumerator UpdateScrollViewSize()
+        {
+            yield return new WaitForSeconds(_openAnimationDurationInSeconds);
+            
+            int itemCount = _nftsWithInfoGridLayoutGroupTransform.childCount;
+            int rowCount = Mathf.CeilToInt((float)itemCount / _nftsWithInfoGridLayoutGroup.constraintCount);
+            float contentHeight = rowCount * _nftsWithInfoGridLayoutGroup.cellSize.y + (rowCount - 1) * _nftsWithInfoGridLayoutGroup.spacing.y;
+
+            RectTransform content = _scrollRectContentTransform;
+            content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight + _totalOwnedTextBuffer + _nftsWithInfoGridLayoutGroup.padding.top);
         }
     }
 }

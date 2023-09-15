@@ -14,7 +14,12 @@ namespace Sequence.Demo
 
         public List<NftElement> GetNftsFromCollection(CollectionInfo collection)
         {
-            return _collections[collection];
+            if (_collections.TryGetValue(collection, out var fromCollection))
+            {
+                return fromCollection;
+            }
+
+            return new List<NftElement>();
         }
 
         public void HandleNftFetch(FetchNftContentResult result)

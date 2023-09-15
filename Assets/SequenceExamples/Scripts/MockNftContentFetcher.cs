@@ -48,16 +48,16 @@ namespace Sequence.Demo
             Sprite tokenIconSprite = Sprite.Create(tokenIconTexture, new Rect(0, 0, tokenIconTexture.width, tokenIconTexture.height),
                 new Vector2(.5f, .5f));
             Texture2D collectionIconTexture = CreateMockTexture();
-            Sprite collectionIconSprite = Sprite.Create(tokenIconTexture, new Rect(0, 0, tokenIconTexture.width, tokenIconTexture.height),
+            Sprite collectionIconSprite = Sprite.Create(collectionIconTexture, new Rect(0, 0, collectionIconTexture.width, collectionIconTexture.height),
                 new Vector2(.5f, .5f));
-
-            return new NftElement(new Address(potentialMockAddresses.GetRandomObjectFromArray()),
+            
+            return new NftElement(new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"), 
                 tokenIconSprite,
                 potentialNames.GetRandomObjectFromArray(),
                 collectionIconSprite,
-                potentialNames.GetRandomObjectFromArray(),
+                "MyCollection",
                 (uint)Random.Range(0, 10000),
-                EnumExtensions.GetRandomEnumValue<Chain>(),
+                Chain.Ethereum,
                 (uint)Random.Range(1, 30),
                 Random.Range(0, 10000),
                 new MockCurrencyConverter());

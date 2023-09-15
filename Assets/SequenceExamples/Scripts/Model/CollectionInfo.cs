@@ -25,7 +25,6 @@ namespace Sequence.Demo
             if (obj is CollectionInfo info)
             {
                 return ContractAddress.Value == info.ContractAddress.Value &&
-                       IconSprite == info.IconSprite &&
                        Name == info.Name &&
                        Network == info.Network;
             }
@@ -33,6 +32,16 @@ namespace Sequence.Demo
             return false;
         }
 
+        /// <summary>
+        /// Returns the CollectionInfo that matches the provided params or creates a new one if none exists
+        /// Note: iconSprite is not used to match with a CollectionInfo. If you provide an iconSprite that diverges from what has already been provided,
+        /// which is unlikely for most use cases, then you will overwrite the iconSprite associated with the corresponding CollectionInfo
+        /// </summary>
+        /// <param name="contractAddress"></param>
+        /// <param name="iconSprite"></param>
+        /// <param name="name"></param>
+        /// <param name="network"></param>
+        /// <returns></returns>
         public static CollectionInfo GetCollectionInfo(Address contractAddress, Sprite iconSprite, string name, Chain network)
         {
             CollectionInfo temp = new CollectionInfo(contractAddress, iconSprite, name, network);
@@ -41,6 +50,7 @@ namespace Sequence.Demo
             {
                 if (temp.Equals(_collections[i]))
                 {
+                    _collections[i].IconSprite = iconSprite;
                     return _collections[i];
                 }
             }
