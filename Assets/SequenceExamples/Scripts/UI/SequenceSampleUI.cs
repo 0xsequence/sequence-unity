@@ -4,7 +4,11 @@ namespace Sequence.Demo
 {
     public class SequenceSampleUI : MonoBehaviour
     {
+        #region TestConfig
         public static bool IsTesting = false;
+        public static UIPanel InitialPanel;
+        public static object[] InitialPanelOpenArgs;
+            #endregion
         
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
@@ -15,6 +19,11 @@ namespace Sequence.Demo
             _loginPanel = GetComponentInChildren<LoginPanel>();
             _transitionPanel = GetComponentInChildren<TransitionPanel>();
             _walletPanel = GetComponentInChildren<WalletPanel>();
+
+            if (!IsTesting)
+            {
+                InitialPanel = _loginPanel;
+            }
         }
 
         public void Start()
@@ -24,7 +33,7 @@ namespace Sequence.Demo
                 return;
             }
             DisableAllUIPages();
-            OpenUIPanel(_loginPanel);
+            OpenUIPanel(InitialPanel, InitialPanelOpenArgs);
         }
 
         private void DisableAllUIPages()

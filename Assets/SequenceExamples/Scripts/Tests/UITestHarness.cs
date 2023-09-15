@@ -50,10 +50,15 @@ namespace SequenceExamples.Scripts.Tests
             _walletFlowUITests = testObject.AddComponent<WalletFlowUITests>();
             MockDelayOverrider mockDelayOverrider = testObject.AddComponent<MockDelayOverrider>();
             mockDelayOverrider.OverrideAnimationTimes(WaitForAnimationTime / 1000);
-            
-            SequenceSampleUI.IsTesting = false;
+        }
+
+        private IEnumerator InitiateTest(UIPanel initialPanel, params object[] args)
+        {
+            SequenceSampleUI.InitialPanel = initialPanel;
+            SequenceSampleUI.InitialPanelOpenArgs = args;
+            SequenceSampleUI.IsTesting = false; // Allows test to run
             _ui.Start();
-            yield return new WaitForSeconds(3f); // Wait a few seconds to allow for UI to animate into place
+            yield return new WaitForSeconds(WaitForAnimationTime); // Wait a few seconds to allow for UI to animate into place
             
             _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
             _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel);
@@ -77,12 +82,14 @@ namespace SequenceExamples.Scripts.Tests
         [UnityTest]
         public IEnumerator LoginFlowTest()
         {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
             yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EndToEndTest());
         }
 
         [UnityTest]
         public IEnumerator WalletFlowTest()
         {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
             yield return
                 _testMonobehaviour.StartCoroutine(_loginFlowUITests.NavigateToLoginSuccessPageAndDismissTest());
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTest());
