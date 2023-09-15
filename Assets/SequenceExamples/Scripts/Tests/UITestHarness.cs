@@ -87,12 +87,36 @@ namespace SequenceExamples.Scripts.Tests
         }
 
         [UnityTest]
-        public IEnumerator WalletFlowTest()
+        public IEnumerator NavigateToWalletPageFromLoginTest()
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
             yield return
                 _testMonobehaviour.StartCoroutine(_loginFlowUITests.NavigateToLoginSuccessPageAndDismissTest());
-            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.NavigateToWalletPageTest());
+        }
+
+        [UnityTest]
+        public IEnumerator WalletPanelCloseAndReopenTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.CloseAndReopenWalletPanelTest());
+        }
+
+        private IEnumerator InitiateWalletPanelTest()
+        {
+            _walletFlowUITests.RandomNumberOfTokensToFetch = Random.Range(1, 10);
+            _walletFlowUITests.RandomNumberOfNftsToFetch = Random.Range(1, 100);
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
+                new MockTokenContentFetcher(_walletFlowUITests.RandomNumberOfTokensToFetch, 0),
+                new MockNftContentFetcher(_walletFlowUITests.RandomNumberOfNftsToFetch, 0)));
+        }
+
+        [UnityTest]
+        public IEnumerator TokenInfoPageTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestTokenInfoPage());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestNftInfoPage());
         }
     }
 }

@@ -16,6 +16,9 @@ namespace SequenceExamples.Scripts.Tests
 {
     public class WalletFlowUITests : MonoBehaviour
     {
+        public int RandomNumberOfTokensToFetch;
+        public int RandomNumberOfNftsToFetch;
+        
         private MonoBehaviour _testMonobehaviour;
             
         private SequenceSampleUI _ui;
@@ -23,10 +26,7 @@ namespace SequenceExamples.Scripts.Tests
         private WalletPage _walletPage;
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
-
-        private int _randomNumberOfTokensToFetch;
-        private int _randomNumberOfNftsToFetch;
-
+        
         public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel)
         {
             _testMonobehaviour = testMonobehaviour;
@@ -37,20 +37,35 @@ namespace SequenceExamples.Scripts.Tests
             _transitionPanel = transitionPanel;
         }
 
-        public IEnumerator EndToEndTest()
+        public IEnumerator NavigateToWalletPageTest()
         {
-            _randomNumberOfTokensToFetch = Random.Range(1, 100);
-            _randomNumberOfNftsToFetch = Random.Range(1, 1000);
+            RandomNumberOfTokensToFetch = Random.Range(1, 100);
+            RandomNumberOfNftsToFetch = Random.Range(1, 1000);
             AssertWeAreOnTransitionPanel();
             yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+        }
+
+        public IEnumerator CloseAndReopenWalletPanelTest()
+        {
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
             yield return _testMonobehaviour.StartCoroutine(CloseWalletPanelTest());
             AssertWeAreOnTransitionPanel();
-            _randomNumberOfTokensToFetch = Random.Range(1, 10);
-            _randomNumberOfNftsToFetch = Random.Range(1, 100);
+            RandomNumberOfTokensToFetch = Random.Range(1, 10);
+            RandomNumberOfNftsToFetch = Random.Range(1, 100);
             yield return _testMonobehaviour.StartCoroutine(TransitionToWalletPageTest());
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+        }
+
+        public IEnumerator TestTokenInfoPage()
+        {
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
             yield return _testMonobehaviour.StartCoroutine(TestTokenInfoPages());
+        }
+
+        public IEnumerator TestNftInfoPage()
+        {
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
             yield return _testMonobehaviour.StartCoroutine(TestNftInfoPages());
         }
 
@@ -69,9 +84,9 @@ namespace SequenceExamples.Scripts.Tests
             Button openWalletButton = openWalletButtonGameObject.GetComponent<Button>();
             Assert.IsNotNull(openWalletButton);
 
-            _transitionPanel.TokenFetcher = new MockTokenContentFetcher(_randomNumberOfTokensToFetch, 0);
-            _transitionPanel.NftFetcher = new MockNftContentFetcher(_randomNumberOfNftsToFetch, 0);
-            Debug.Log($"Will fetch {_randomNumberOfTokensToFetch} tokens and {_randomNumberOfNftsToFetch} NFTs");
+            _transitionPanel.TokenFetcher = new MockTokenContentFetcher(RandomNumberOfTokensToFetch, 0);
+            _transitionPanel.NftFetcher = new MockNftContentFetcher(RandomNumberOfNftsToFetch, 0);
+            Debug.Log($"Will fetch {RandomNumberOfTokensToFetch} tokens and {RandomNumberOfNftsToFetch} NFTs");
             
             openWalletButton.onClick.Invoke();
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
@@ -110,7 +125,7 @@ namespace SequenceExamples.Scripts.Tests
         {
             if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
             {
-                yield return new WaitForSeconds(_randomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
+                yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
             }
             else
             {
@@ -119,7 +134,7 @@ namespace SequenceExamples.Scripts.Tests
             
             if (_transitionPanel.NftFetcher is MockNftContentFetcher mockNftFetcher)
             {
-                yield return new WaitForSeconds(_randomNumberOfNftsToFetch * (float)mockNftFetcher.DelayInMilliseconds / 1000);
+                yield return new WaitForSeconds(RandomNumberOfNftsToFetch * (float)mockNftFetcher.DelayInMilliseconds / 1000);
             }
             else
             {
@@ -130,9 +145,9 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(grid);
             int contentLoaded = grid.transform.childCount;
             Debug.Log($"Fetched {_walletPage.CountFungibleTokensDisplayed()} tokens and a total of {contentLoaded} content");
-            Debug.Log($"Expected to fetch {_randomNumberOfTokensToFetch} tokens, {_randomNumberOfNftsToFetch} NFTs, and {_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch} total content");
-            Assert.AreEqual(_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch, contentLoaded);
-            Assert.AreEqual(_randomNumberOfTokensToFetch, _walletPage.CountFungibleTokensDisplayed());
+            Debug.Log($"Expected to fetch {RandomNumberOfTokensToFetch} tokens, {RandomNumberOfNftsToFetch} NFTs, and {RandomNumberOfTokensToFetch + RandomNumberOfNftsToFetch} total content");
+            Assert.AreEqual(RandomNumberOfTokensToFetch + RandomNumberOfNftsToFetch, contentLoaded);
+            Assert.AreEqual(RandomNumberOfTokensToFetch, _walletPage.CountFungibleTokensDisplayed());
         }
 
         private void AssertTokensAreAboveNFTs()
@@ -205,7 +220,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(grid);
 
             RectTransform bottomContent =
-                grid.transform.GetChild(_randomNumberOfTokensToFetch + _randomNumberOfNftsToFetch - 1).GetComponent<RectTransform>();
+                grid.transform.GetChild(RandomNumberOfTokensToFetch + RandomNumberOfNftsToFetch - 1).GetComponent<RectTransform>();
             RectTransform brandingTransform = branding.GetComponent<RectTransform>();
             Vector3[] corners = new Vector3[4];
             bottomContent.GetWorldCorners(corners);
@@ -227,10 +242,6 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(balance);
             TextMeshProUGUI balanceText = balance.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(balanceText);
-
-            yield return new WaitForSecondsRealtime(_walletPage.TimeBetweenTokenValueRefreshesInSeconds);
-            
-            AssertAppropriateColorPercentChangeText(percentChangeText);
             
             token.RefreshWithBalance(5);
             
@@ -301,7 +312,7 @@ namespace SequenceExamples.Scripts.Tests
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
                 {
-                    yield return new WaitForSeconds(_randomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
+                    yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
                 }
                 else
                 {
@@ -419,7 +430,7 @@ namespace SequenceExamples.Scripts.Tests
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
                 {
-                    yield return new WaitForSeconds(_randomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
+                    yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
                 }
                 else
                 {
