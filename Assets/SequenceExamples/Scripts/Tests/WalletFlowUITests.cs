@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Sequence;
 using Sequence.Demo;
+using Sequence.Demo.ScriptableObjects;
 using SequenceExamples.Scripts.Tests.Utils;
 using TMPro;
 using UnityEditor;
@@ -26,6 +28,7 @@ namespace SequenceExamples.Scripts.Tests
         private WalletPage _walletPage;
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
+        private CollectionInfoPage _collectionInfoPage;
         
         public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel)
         {
@@ -115,6 +118,7 @@ namespace SequenceExamples.Scripts.Tests
 
         private void AssertPanelAssumptions_WalletPage()
         {
+            AssertWeAreOnWalletPage();
             Transform searchButtonTransform = _walletPanel.transform.FindAmongDecendants("SearchButton");
             Assert.IsTrue(searchButtonTransform.gameObject.activeInHierarchy);
             Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
@@ -327,6 +331,13 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator TestInfoPage(WalletUIElement element)
         {
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumtions(element));
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
+            AssertPanelAssumptions_WalletPage();
+        }
+
+        private IEnumerator NavigateToInfoPageAndAssertAssumtions(WalletUIElement element)
+        {
             int randomNumberOfTransactionsToFetch = Random.Range(1, 30);
             element.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
             MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)element.TransactionDetailsFetcher;
@@ -336,7 +347,7 @@ namespace SequenceExamples.Scripts.Tests
             button.onClick.Invoke();
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
 
-            if (element is NftUIElement)
+            if (element is NftUIElement || element is NftWithInfoTextUIElement)
             {
                 yield return _testMonobehaviour.StartCoroutine(AssertNftInfoPageIsAsExpected(element.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
             }
@@ -350,6 +361,10 @@ namespace SequenceExamples.Scripts.Tests
             }
                 
             AssertPanelAssumptions_InfoPage();
+        }
+
+        private IEnumerator HitUIBackButton()
+        {
             Transform backButtonTransform = _walletPanel.transform.FindAmongDecendants("BackButton");
             Assert.IsNotNull(backButtonTransform);
             Button backButton = backButtonTransform.GetComponent<Button>();
@@ -357,8 +372,6 @@ namespace SequenceExamples.Scripts.Tests
             backButton.onClick.Invoke();
                 
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-                
-            AssertPanelAssumptions_WalletPage();
         }
 
         private void AssertPanelAssumptions_InfoPage()
@@ -433,6 +446,111 @@ namespace SequenceExamples.Scripts.Tests
             TransactionDetailsBlocksUITests transactionDetailsBlocksUITests =
                 new TransactionDetailsBlocksUITests(_testMonobehaviour);
             yield return _testMonobehaviour.StartCoroutine(transactionDetailsBlocksUITests.AssertTransactionDetailsBlocksAreAsExpected(transactionDetailsBlockLayoutGroup, randomNumberOfTransactionsToFetch, delayInMillisecondsBetweenFetches));
+        }
+
+        public IEnumerator TestCollectionInfoPages_transitioningFromNftInfoPage()
+        {
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+            
+            GameObject grid = GameObject.Find("Grid");
+            Assert.IsNotNull(grid);
+            int contentLoaded = grid.transform.childCount;
+
+            int tested = 0;
+            for (int i = 0; i < contentLoaded; i++)
+            {
+                if (tested >= 3)
+                {
+                    // Finish after testing the first three to save time - if it works for the first few, it should work for the remainder
+                    break;
+                }
+                
+                Transform child = grid.transform.GetChild(i);
+                NftUIElement item = child.GetComponent<NftUIElement>();
+                if (item == null)
+                {
+                    continue;
+                }
+                
+                yield return _testMonobehaviour.StartCoroutine(TestCollectionInfoPage(item));
+
+                // Wait for tokens to load again
+                if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
+                {
+                    yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
+                }
+                else
+                {
+                    NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.TokenFetcher)} type. Expected {typeof(MockTokenContentFetcher)}");
+                }
+                
+                tested++;
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator TestCollectionInfoPage(NftUIElement nft)
+        {
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumtions(nft));
+            yield return _testMonobehaviour.StartCoroutine(NavigateToCollectionInfoPage_fromNftInfoPage());
+            yield return _testMonobehaviour.StartCoroutine(AssertCollectionInfoPageIsAsExpected(nft.GetCollection(), nft.NetworkIcons));
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton()); // Take us to NftInfoPage
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton()); // Take us to WalletPage
+            AssertPanelAssumptions_WalletPage();
+        }
+
+        private IEnumerator NavigateToCollectionInfoPage_fromNftInfoPage()
+        {
+            GameObject collectionGroup = GameObject.Find("CollectionNameLayoutGroup");
+            Assert.IsNotNull(collectionGroup);
+            Button collectionGroupNavigationButton = collectionGroup.GetComponent<Button>();
+            Assert.IsNotNull(collectionGroupNavigationButton);
+            collectionGroupNavigationButton.onClick.Invoke();
+                
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+        }
+
+        private IEnumerator AssertCollectionInfoPageIsAsExpected(CollectionInfo collection, NetworkIcons networkIcons)
+        {
+            _collectionInfoPage = FindObjectOfType<CollectionInfoPage>();
+            Assert.IsNotNull(_collectionInfoPage);
+            
+            TestExtensions.AssertImageWithNameHasSprite(_collectionInfoPage.transform, "CollectionIcon", collection.IconSprite);
+            TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "CollectionNameText", collection.Name);
+            TestExtensions.AssertImageWithNameHasSprite(_collectionInfoPage.transform, "NetworkIcon", networkIcons.GetIcon(collection.Network));
+            TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "NetworkName", ChainNames.NameOf[collection.Network]);
+            TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "UniqueCollectiblesOwnedText", $"{_walletPanel.GetNftsFromCollection(collection).Count} Unique Collectibles");
+            TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "TotalOwnedText", $"Owned ({NftElement.CalculateTotalNftsOwned(_walletPanel.GetNftsFromCollection(collection))})");
+
+            yield return _testMonobehaviour.StartCoroutine(AssertNftWithInfoTextsAreAsExpected(collection));
+        }
+
+        private IEnumerator AssertNftWithInfoTextsAreAsExpected(CollectionInfo collection)
+        {
+            Transform ownedElementsGroup = _collectionInfoPage.transform.FindAmongDecendants("OwnedElementsGroup");
+            Assert.IsNotNull(ownedElementsGroup);
+            
+            List<NftElement> expected = _walletPanel.GetNftsFromCollection(collection);
+            int childCount = ownedElementsGroup.childCount;
+            Assert.AreEqual(expected.Count, childCount);
+            
+            for (int i = 0; i < childCount; i++)
+            {
+                TestExtensions.AssertImageWithNameHasSprite(ownedElementsGroup.GetChild(i), "NFT", expected[i].TokenIconSprite);
+                TestExtensions.AssertTextWithNameHasText(ownedElementsGroup.GetChild(i), "NftNameText", expected[i].TokenName);
+                TestExtensions.AssertTextWithNameHasText(ownedElementsGroup.GetChild(i), "NumberOwnedText", $"{expected[i].Balance} Owned");
+                
+                if (i >= 3)
+                {
+                    continue; // Can skip remainder of test when i >= 3 to save time
+                }
+
+                NftWithInfoTextUIElement element = ownedElementsGroup.GetChild(i).GetComponent<NftWithInfoTextUIElement>();
+                Assert.IsNotNull(element);
+                yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumtions(element));
+                yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
+            }
         }
     }
 }

@@ -32,5 +32,10 @@ namespace Sequence.Demo
         {
             return _nftElement.Collection.Network;
         }
+
+        public CollectionInfo GetCollection()
+        {
+            return _nftElement.Collection;
+        }
     }
 }

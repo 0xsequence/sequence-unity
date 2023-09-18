@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using Sequence.Demo;
 using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
@@ -117,6 +118,15 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestTokenInfoPage());
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestNftInfoPage());
+        }
+
+        [UnityTest]
+        [Timeout(1500000)]
+        public IEnumerator CollectionInfoPageTest_navigatingThroughNftInfoPages()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests
+                .TestCollectionInfoPages_transitioningFromNftInfoPage());
         }
     }
 }

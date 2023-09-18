@@ -76,7 +76,7 @@ namespace Sequence.Demo
             }
             List<NftElement> nftsInCollection = _walletPanel.GetNftsFromCollection(_collectionInfo);
             _uniqueCollectiblesOwnedText.text = $"{nftsInCollection.Count} Unique Collectibles";
-            _totalOwnedText.text = $"Owned({NftElement.CalculateTotalNftsOwned(nftsInCollection)})";
+            _totalOwnedText.text = $"Owned ({NftElement.CalculateTotalNftsOwned(nftsInCollection)})";
             PopulateNftUIElements(nftsInCollection);
             StartCoroutine(UpdateScrollViewSize());
         }
