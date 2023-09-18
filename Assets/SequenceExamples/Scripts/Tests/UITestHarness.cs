@@ -121,7 +121,6 @@ namespace SequenceExamples.Scripts.Tests
         }
 
         [UnityTest]
-        [Timeout(1500000)]
         public IEnumerator CollectionInfoPageTest_navigatingThroughNftInfoPages()
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());

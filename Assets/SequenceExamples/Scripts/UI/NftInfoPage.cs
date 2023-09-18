@@ -73,5 +73,10 @@ namespace Sequence.Demo
             
             _walletPanel.OpenCollectionInfoPage(_networkIcons, _nftElement.Collection);
         }
+
+        public NftElement GetNftElement()
+        {
+            return _nftElement;
+        }
     }
 }

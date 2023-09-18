@@ -341,11 +341,7 @@ namespace SequenceExamples.Scripts.Tests
             int randomNumberOfTransactionsToFetch = Random.Range(1, 30);
             element.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
             MockTransactionDetailsFetcher fetcher = (MockTransactionDetailsFetcher)element.TransactionDetailsFetcher;
-            Button button = element.GetComponent<Button>();
-            Assert.IsNotNull(button);
-                
-            button.onClick.Invoke();
-            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageFromWalletPage(element));
 
             if (element is NftUIElement || element is NftWithInfoTextUIElement)
             {
@@ -361,6 +357,14 @@ namespace SequenceExamples.Scripts.Tests
             }
                 
             AssertPanelAssumptions_InfoPage();
+        }
+
+        private IEnumerator NavigateToInfoPageFromWalletPage(WalletUIElement element)
+        {
+            Button button = element.GetComponent<Button>();
+            Assert.IsNotNull(button);
+            button.onClick.Invoke();
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
         }
 
         private IEnumerator HitUIBackButton()
@@ -548,9 +552,26 @@ namespace SequenceExamples.Scripts.Tests
 
                 NftWithInfoTextUIElement element = ownedElementsGroup.GetChild(i).GetComponent<NftWithInfoTextUIElement>();
                 Assert.IsNotNull(element);
-                yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumptions(element));
+                yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageFromWalletPage(element));
+                AssertNftInfoPageIsAssembledCorrectly(expected[i]);
                 yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
             }
+        }
+
+        private void AssertNftInfoPageIsAssembledCorrectly(NftElement nft)
+        {
+            Assert.IsTrue(_walletPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_walletPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_transitionPanel.gameObject.activeInHierarchy);
+
+            NftInfoPage nftInfoPage = FindObjectOfType<NftInfoPage>();
+            Assert.IsNotNull(nftInfoPage);
+            Assert.IsTrue(nftInfoPage.gameObject.activeInHierarchy);
+            
+            AssertPanelAssumptions_InfoPage();
+            
+            Assert.AreEqual(nft, nftInfoPage.GetNftElement());
         }
     }
 }
