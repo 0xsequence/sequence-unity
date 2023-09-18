@@ -331,12 +331,12 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator TestInfoPage(WalletUIElement element)
         {
-            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumtions(element));
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumptions(element));
             yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
             AssertPanelAssumptions_WalletPage();
         }
 
-        private IEnumerator NavigateToInfoPageAndAssertAssumtions(WalletUIElement element)
+        private IEnumerator NavigateToInfoPageAndAssertAssumptions(WalletUIElement element)
         {
             int randomNumberOfTransactionsToFetch = Random.Range(1, 30);
             element.TransactionDetailsFetcher = new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
@@ -492,7 +492,7 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator TestCollectionInfoPage(NftUIElement nft)
         {
-            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumtions(nft));
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumptions(nft));
             yield return _testMonobehaviour.StartCoroutine(NavigateToCollectionInfoPage_fromNftInfoPage());
             yield return _testMonobehaviour.StartCoroutine(AssertCollectionInfoPageIsAsExpected(nft.GetCollection(), nft.NetworkIcons));
             yield return _testMonobehaviour.StartCoroutine(HitUIBackButton()); // Take us to NftInfoPage
@@ -548,7 +548,7 @@ namespace SequenceExamples.Scripts.Tests
 
                 NftWithInfoTextUIElement element = ownedElementsGroup.GetChild(i).GetComponent<NftWithInfoTextUIElement>();
                 Assert.IsNotNull(element);
-                yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumtions(element));
+                yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumptions(element));
                 yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
             }
         }
