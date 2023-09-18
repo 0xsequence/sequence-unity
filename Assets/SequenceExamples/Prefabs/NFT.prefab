@@ -146,5 +146,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deaa278414364aa78fe6dd20e315a721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _nftImage: {fileID: 4291578054636979227}
   NetworkIcons: {fileID: 11400000, guid: 336e794589b27475696558ccbfcfe84f, type: 2}
+  _nftImage: {fileID: 4291578054636979227}
