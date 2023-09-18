@@ -732,13 +732,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5971104261ec442d8f735ad0fc2fba0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NetworkIcons: {fileID: 11400000, guid: 336e794589b27475696558ccbfcfe84f, type: 2}
   _tokenIconImage: {fileID: 6706636486998369197}
   _tokenNameSetter: {fileID: 5681705507677456872}
   _networkIcon: {fileID: 6706636487549307954}
   _balanceText: {fileID: 7032520247527707376}
   _currencyValueText: {fileID: 6374321062728606160}
   _percentChangeText: {fileID: 109493202167498320}
-  NetworkIcons: {fileID: 11400000, guid: 336e794589b27475696558ccbfcfe84f, type: 2}
 --- !u!114 &6864446990929879168
 MonoBehaviour:
   m_ObjectHideFlags: 0
