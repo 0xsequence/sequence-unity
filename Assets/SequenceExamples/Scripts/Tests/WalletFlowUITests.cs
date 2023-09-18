@@ -60,13 +60,13 @@ namespace SequenceExamples.Scripts.Tests
         public IEnumerator TestTokenInfoPage()
         {
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
-            yield return _testMonobehaviour.StartCoroutine(TestTokenInfoPages());
+            yield return _testMonobehaviour.StartCoroutine(TestInfoPages<TokenUIElement>());
         }
 
         public IEnumerator TestNftInfoPage()
         {
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
-            yield return _testMonobehaviour.StartCoroutine(TestNftInfoPages());
+            yield return _testMonobehaviour.StartCoroutine(TestInfoPages<NftUIElement>());
         }
 
         private void AssertWeAreOnTransitionPanel()
@@ -285,30 +285,30 @@ namespace SequenceExamples.Scripts.Tests
             AssertWeAreOnTransitionPanel();
         }
 
-        private IEnumerator TestTokenInfoPages()
+        private IEnumerator TestInfoPages<T>() where T : WalletUIElement
         {
             GameObject grid = GameObject.Find("Grid");
             Assert.IsNotNull(grid);
             int contentLoaded = grid.transform.childCount;
 
+            int tested = 0;
             for (int i = 0; i < contentLoaded; i++)
             {
-                if (i >= 5)
+                if (tested >= 5)
                 {
                     // Finish after testing the first five to save time - if it works for the first few, it should work for the remainder
                     break;
                 }
                 
                 Transform child = grid.transform.GetChild(i);
-                TokenUIElement token = child.GetComponent<TokenUIElement>();
-                if (token == null)
+                T item = child.GetComponent<T>();
+                if (item == null)
                 {
-                    // Test is complete - we have gone through all the TokenUIElements (they should be displayed first before NFTs)
-                    break;
+                    continue;
                 }
-
-                yield return _testMonobehaviour.StartCoroutine(TestInfoPage(token));
                 
+                yield return _testMonobehaviour.StartCoroutine(TestInfoPage(item));
+
                 // Wait for tokens to load again
                 if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
                 {
@@ -318,6 +318,8 @@ namespace SequenceExamples.Scripts.Tests
                 {
                     NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.TokenFetcher)} type. Expected {typeof(MockTokenContentFetcher)}");
                 }
+                
+                tested++;
             }
 
             yield return null;
@@ -401,46 +403,6 @@ namespace SequenceExamples.Scripts.Tests
             TransactionDetailsBlocksUITests transactionDetailsBlocksUITests =
                 new TransactionDetailsBlocksUITests(_testMonobehaviour);
             yield return _testMonobehaviour.StartCoroutine(transactionDetailsBlocksUITests.AssertTransactionDetailsBlocksAreAsExpected(transactionVerticalLayoutGroup, randomNumberOfTransactionsToFetch, delayInMillisecondsBetweenFetches));
-        }
-
-        private IEnumerator TestNftInfoPages()
-        {
-            GameObject grid = GameObject.Find("Grid");
-            Assert.IsNotNull(grid);
-            int contentLoaded = grid.transform.childCount;
-
-            int tested = 0;
-            for (int i = 0; i < contentLoaded; i++)
-            {
-                if (tested >= 5)
-                {
-                    // Finish after testing the first five to save time - if it works for the first few, it should work for the remainder
-                    break;
-                }
-                
-                Transform child = grid.transform.GetChild(i);
-                NftUIElement nft = child.GetComponent<NftUIElement>();
-                if (nft == null)
-                {
-                    continue;
-                }
-
-                yield return _testMonobehaviour.StartCoroutine(TestInfoPage(nft));
-                
-                // Wait for tokens to load again
-                if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
-                {
-                    yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
-                }
-                else
-                {
-                    NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.TokenFetcher)} type. Expected {typeof(MockTokenContentFetcher)}");
-                }
-                
-                tested++;
-            }
-
-            yield return null;
         }
 
         private IEnumerator AssertNftInfoPageIsAsExpected(Chain network, int randomNumberOfTransactionsToFetch, int delayInMillisecondsBetweenFetches)
