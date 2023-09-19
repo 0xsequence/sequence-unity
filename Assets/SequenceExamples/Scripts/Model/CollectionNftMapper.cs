@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Sequence.Utils;
 
 namespace Sequence.Demo
 {
@@ -43,6 +44,11 @@ namespace Sequence.Demo
                 _collections[collection] = new List<NftElement>();
                 _collections[collection].Add(nft);
             }
+        }
+
+        public CollectionInfo[] GetCollections()
+        {
+            return _collections.Keys.GetEnumerator().ConvertToTArray<CollectionInfo, Dictionary<CollectionInfo, List<NftElement>>.KeyCollection.Enumerator>();
         }
     }
 }
