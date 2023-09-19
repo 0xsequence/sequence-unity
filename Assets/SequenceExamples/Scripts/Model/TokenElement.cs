@@ -73,5 +73,20 @@ namespace Sequence.Demo
         {
             return Erc20.GetAddress();
         }
+
+        public Sprite GetIcon()
+        {
+            return TokenIconSprite;
+        }
+
+        public string GetName()
+        {
+            return TokenName;
+        }
+
+        public Chain GetNetwork()
+        {
+            return Network;
+        }
     }
 }

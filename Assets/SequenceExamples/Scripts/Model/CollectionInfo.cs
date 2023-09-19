@@ -62,5 +62,20 @@ namespace Sequence.Demo
         {
             _collections = new List<CollectionInfo>();
         }
+
+        public Sprite GetIcon()
+        {
+            return IconSprite;
+        }
+
+        public string GetName()
+        {
+            return Name;
+        }
+
+        public Chain GetNetwork()
+        {
+            return Network;
+        }
     }
 }
