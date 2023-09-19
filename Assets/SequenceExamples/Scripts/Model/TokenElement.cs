@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class TokenElement : ICurrencyRepository
+    public class TokenElement : ICurrencyRepository, ISearchable
     {
         public ERC20 Erc20;
         public Sprite TokenIconSprite;

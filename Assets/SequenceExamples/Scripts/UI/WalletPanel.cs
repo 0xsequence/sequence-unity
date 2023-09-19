@@ -123,6 +123,11 @@ namespace Sequence.Demo
         public List<NftElement> GetNftsFromCollection(CollectionInfo collection)
         {
             return _collectionNftMapper.GetNftsFromCollection(collection);
-        } 
+        }
+
+        public CollectionInfo[] GetCollections()
+        {
+            return _collectionNftMapper.GetCollections();
+        }
     }
 }

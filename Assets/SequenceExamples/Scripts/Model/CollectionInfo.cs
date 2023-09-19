@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class CollectionInfo
+    public class CollectionInfo : ISearchable
     {
         public Address ContractAddress;
         public Sprite IconSprite;
