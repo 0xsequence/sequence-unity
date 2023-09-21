@@ -68,9 +68,9 @@ namespace Sequence.Demo
             int tokensToReturn = Math.Min(idealRatio, availableTokens);
             
             // If there aren't enough availableCollections or availableTokens to return the ideal ratio, return extra of the other (if possible)
-            collectionsToReturn = Math.Min(collectionsToReturn + _maxSearchablesToReturn - tokensToReturn,
+            collectionsToReturn = Math.Min(_maxSearchablesToReturn - tokensToReturn,
                 availableCollections);
-            tokensToReturn = Math.Min(tokensToReturn + _maxSearchablesToReturn - collectionsToReturn, availableTokens);
+            tokensToReturn = Math.Min(_maxSearchablesToReturn - collectionsToReturn, availableTokens);
             
             return (collectionsToReturn, tokensToReturn);
         }
@@ -90,7 +90,12 @@ namespace Sequence.Demo
 
         public ISearchable GetNextValid()
         {
-            return _nextSearchables.Dequeue();
+            if (_nextSearchables.TryDequeue(out ISearchable next))
+            {
+                return next;
+            }
+
+            return null;
         }
     }
 }

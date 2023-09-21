@@ -100,6 +100,10 @@ namespace Sequence.Demo
                 searchElementTransform.localScale = new Vector3(1, 1, 1);
                 SearchElement searchElement = searchElementTransform.GetComponent<SearchElement>();
                 ISearchable element = GetNextValidElement();
+                if (element == null)
+                {
+                    throw new SystemException($"{nameof(element)} should not be null.");
+                }
                 SetAndIncrementSiblingIndex(searchElementTransform, element);
                 searchElement.Assemble(element);
             }
