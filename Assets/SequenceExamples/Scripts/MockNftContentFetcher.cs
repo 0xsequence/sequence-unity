@@ -55,7 +55,7 @@ namespace Sequence.Demo
                 tokenIconSprite,
                 potentialNames.GetRandomObjectFromArray(),
                 collectionIconSprite,
-                "MyCollection",
+                potentialNames.GetRandomObjectFromArray(),
                 (uint)Random.Range(0, 10000),
                 Chain.Ethereum,
                 (uint)Random.Range(1, 30),
