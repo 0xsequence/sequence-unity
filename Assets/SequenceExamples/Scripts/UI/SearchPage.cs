@@ -18,11 +18,11 @@ namespace Sequence.Demo
 
         private ObjectPool _searchElementPool;
         
-        private CollectionInfo[] _collections;
+        private SearchableCollection[] _searchableCollections;
         private TokenElement[] _tokenElements;
         private NetworkIcons _networkIcons;
+        private SearchableQuerier _searchableQuerier;
         
-        private List<SearchElement> _elementsMeetingCriteria;
         private RectTransform _collectionCountTextTransform;
         private RectTransform _tokenCountTextTransform;
         private int _nextCollectionSiblingIndex;
@@ -39,11 +39,11 @@ namespace Sequence.Demo
         {
             base.Open(args);
             
-            CollectionInfo[] collections = args.GetObjectOfTypeIfExists<CollectionInfo[]>();
+            SearchableCollection[] collections = args.GetObjectOfTypeIfExists<SearchableCollection[]>();
             if (collections == default)
             {
                 throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(CollectionInfo[])} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(SearchableCollection[])} as an argument");
             }
             TokenElement[] tokenElements =
                 args.GetObjectOfTypeIfExists<TokenElement[]>();
@@ -59,15 +59,17 @@ namespace Sequence.Demo
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(NetworkIcons)} as an argument");
             }
 
-            _collections = collections;
+            _searchableCollections = collections;
             _tokenElements = tokenElements;
             _networkIcons = networkIcons;
+            _searchableQuerier =
+                new SearchableQuerier(_searchableCollections, _tokenElements, _maxSearchElementsDisplayed);
 
             _searchElementPool =
                 ObjectPool.ActivateObjectPool(_searchElementPrefab, _numberOfSearchElementPrefabsToInstantiate);
 
-            _nextCollectionSiblingIndex = _collectionCountTextTransform.GetSiblingIndex() + 1;
-            _nextTokenSiblingIndex = _tokenCountTextTransform.GetSiblingIndex() + 1;
+            _nextCollectionSiblingIndex = _collectionCountTextTransform.parent.GetSiblingIndex() + 1;
+            _nextTokenSiblingIndex = _tokenCountTextTransform.parent.GetSiblingIndex() + 1;
             
             Assemble();
             PopulateInitialSearchResults();
@@ -86,13 +88,13 @@ namespace Sequence.Demo
 
         private void Assemble()
         {
-            _collectionCountText.text = $"Collections ({_collections.Length})";
+            _collectionCountText.text = $"Collections ({_searchableCollections.Length})";
             _tokenCountText.text = $"Coins ({_tokenElements.Length})";
         }
 
         private void PopulateInitialSearchResults()
         {
-            int collections = _collections.Length;
+            int collections = _searchableCollections.Length;
             int tokens = _tokenElements.Length;
             int totalElements = collections + tokens;
             int toSpawn = Math.Min(totalElements, _maxSearchElementsDisplayed);
@@ -109,30 +111,34 @@ namespace Sequence.Demo
                 searchElementTransform.localScale = new Vector3(1, 1, 1);
                 SearchElement searchElement = searchElementTransform.GetComponent<SearchElement>();
                 ISearchable element = GetNextValidElement();
-                if (element is CollectionInfo)
-                {
-                    searchElementTransform.SetSiblingIndex(_nextCollectionSiblingIndex);
-                    _nextCollectionSiblingIndex++;
-                    _nextTokenSiblingIndex++;
-                }
-                else if (element is TokenElement)
-                {
-                    searchElementTransform.SetSiblingIndex(_nextTokenSiblingIndex);
-                    _nextTokenSiblingIndex++;
-                }
-                else
-                {
-                    throw new SystemException(
-                        $"{nameof(element)} of type {element.GetType()} is an unexpected implementation type of {nameof(ISearchable)}");
-                }
+                SetAndIncrementSiblingIndex(searchElementTransform, element);
                 searchElement.Assemble(element, _networkIcons);
-                _elementsMeetingCriteria.Add(searchElement);
+            }
+        }
+
+        private void SetAndIncrementSiblingIndex(Transform searchElementTransform, ISearchable element)
+        {
+            if (element is SearchableCollection)
+            {
+                searchElementTransform.SetSiblingIndex(_nextCollectionSiblingIndex);
+                _nextCollectionSiblingIndex++;
+                _nextTokenSiblingIndex++;
+            }
+            else if (element is TokenElement)
+            {
+                searchElementTransform.SetSiblingIndex(_nextTokenSiblingIndex);
+                _nextTokenSiblingIndex++;
+            }
+            else
+            {
+                throw new SystemException(
+                    $"{nameof(element)} of type {element.GetType()} is an unexpected implementation type of {nameof(ISearchable)}");
             }
         }
 
         private ISearchable GetNextValidElement()
         {
-            throw new NotImplementedException();
+            return _searchableQuerier.GetNextValid();
         }
     }
 }

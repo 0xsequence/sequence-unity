@@ -10,14 +10,18 @@ namespace Sequence.Demo
     {
         [SerializeField] private GameObject _searchButton;
         [SerializeField] private GameObject _backButton;
+        [SerializeField] private NetworkIcons _networkIcons;
         
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
         private TokenInfoPage _tokenInfoPage;
         private NftInfoPage _nftInfoPage;
+        private SearchPage _searchPage;
         private CollectionNftMapper _collectionNftMapper;
         private INftContentFetcher _nftContentFetcher;
         private CollectionInfoPage _collectionInfoPage;
+        private ITokenContentFetcher _tokenContentFetcher;
+        private List<TokenElement> _fetchedTokenElements;
 
         public enum TopBarMode
         {
@@ -33,13 +37,21 @@ namespace Sequence.Demo
             _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
             _nftInfoPage = GetComponentInChildren<NftInfoPage>();
             _collectionInfoPage = GetComponentInChildren<CollectionInfoPage>();
+            _searchPage = GetComponentInChildren<SearchPage>();
             _collectionNftMapper = new CollectionNftMapper();
+        }
+
+        public override void Open(params object[] args)
+        {
+            base.Open(args);
+            _fetchedTokenElements = new List<TokenElement>();
         }
 
         public override void Close()
         {
             base.Close();
             _walletPage.Close();
+            _tokenContentFetcher.OnTokenFetchSuccess -= HandleTokenFetchSuccess;
             _nftContentFetcher.OnNftFetchSuccess -= _collectionNftMapper.HandleNftFetch;
             _collectionNftMapper.Evict();
         }
@@ -65,15 +77,21 @@ namespace Sequence.Demo
             ITokenContentFetcher tokenFetcher = args.GetObjectOfTypeIfExists<ITokenContentFetcher>();
             if (tokenFetcher == null)
             {
-                args.AppendObject(new MockTokenContentFetcher());
+                tokenFetcher = new MockTokenContentFetcher();
+                args.AppendObject(tokenFetcher);
             }
 
             INftContentFetcher nftFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
             if (nftFetcher == null)
             {
-                args.AppendObject(new MockNftContentFetcher());
+                nftFetcher = new MockNftContentFetcher();
+                args.AppendObject(nftFetcher);
             }
-            _nftContentFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
+
+            _tokenContentFetcher = tokenFetcher;
+            _tokenContentFetcher.OnTokenFetchSuccess += HandleTokenFetchSuccess;
+
+            _nftContentFetcher = nftFetcher;
             _nftContentFetcher.OnNftFetchSuccess += _collectionNftMapper.HandleNftFetch;
 
             return args;
@@ -128,6 +146,30 @@ namespace Sequence.Demo
         public CollectionInfo[] GetCollections()
         {
             return _collectionNftMapper.GetCollections();
+        }
+
+        private void HandleTokenFetchSuccess(FetchTokenContentResult result)
+        {
+            TokenElement[] tokens = result.Content;
+            int count = tokens.Length;
+            for (int i = 0; i < count; i++)
+            {
+                _fetchedTokenElements.Add(tokens[i]);
+            }
+        }
+
+        public void OpenSearchPage()
+        {
+            CollectionInfo[] collections = _collectionNftMapper.GetCollections();
+            int collectionsLength = collections.Length;
+            SearchableCollection[] searchableCollections = new SearchableCollection[collectionsLength];
+            for (int i = 0; i < collectionsLength; i++)
+            {
+                searchableCollections[i] = new SearchableCollection(collections[i], _collectionNftMapper);
+            }
+
+            StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray(), _networkIcons));
+            SetTopBarMode(TopBarMode.Back);
         }
     }
 }

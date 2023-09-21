@@ -7,5 +7,6 @@ namespace Sequence.Demo
         public Sprite GetIcon();
         public string GetName();
         public Chain GetNetwork();
+        public uint GetNumberOwned();
     }
 }

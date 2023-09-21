@@ -88,5 +88,10 @@ namespace Sequence.Demo
         {
             return Network;
         }
+
+        public uint GetNumberOwned()
+        {
+            return Balance;
+        }
     }
 }

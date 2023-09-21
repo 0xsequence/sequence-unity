@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class CollectionInfo : ISearchable
+    public class CollectionInfo
     {
         public Address ContractAddress;
         public Sprite IconSprite;
@@ -56,26 +56,6 @@ namespace Sequence.Demo
             }
             _collections.Add(temp);
             return temp;
-        }
-
-        public static void EvictCollections()
-        {
-            _collections = new List<CollectionInfo>();
-        }
-
-        public Sprite GetIcon()
-        {
-            return IconSprite;
-        }
-
-        public string GetName()
-        {
-            return Name;
-        }
-
-        public Chain GetNetwork()
-        {
-            return Network;
         }
     }
 }
