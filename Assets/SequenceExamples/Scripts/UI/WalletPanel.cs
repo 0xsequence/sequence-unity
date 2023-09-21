@@ -171,5 +171,10 @@ namespace Sequence.Demo
             StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray(), _networkIcons));
             SetTopBarMode(TopBarMode.Back);
         }
+
+        public TokenElement[] GetFetchedTokenElements()
+        {
+            return _fetchedTokenElements.ToArray();
+        }
     }
 }

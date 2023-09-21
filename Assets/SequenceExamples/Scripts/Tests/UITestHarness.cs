@@ -23,6 +23,7 @@ namespace SequenceExamples.Scripts.Tests
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
+        private SearchPage _searchPage;
 
         public static float WaitForAnimationTime = 1.5f;
 
@@ -43,6 +44,7 @@ namespace SequenceExamples.Scripts.Tests
                 _walletPanel = FindObjectOfType<WalletPanel>();
                 _walletPage = FindObjectOfType<WalletPage>();
                 _transitionPanel = FindObjectOfType<TransitionPanel>();
+                _searchPage = FindObjectOfType<SearchPage>();
             }
 
             GameObject testObject = new GameObject("TestObject");
@@ -62,7 +64,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return new WaitForSeconds(WaitForAnimationTime); // Wait a few seconds to allow for UI to animate into place
             
             _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
-            _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel);
+            _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel, _searchPage);
         }
 
         [UnityTearDown]
@@ -126,6 +128,13 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests
                 .TestCollectionInfoPages_transitioningFromNftInfoPage());
+        }
+
+        [UnityTest]
+        public IEnumerator SearchTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestSearchFlow());
         }
     }
 }

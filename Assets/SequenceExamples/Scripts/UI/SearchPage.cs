@@ -4,16 +4,18 @@ using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Sequence.Demo
 {
     public class SearchPage : UIPage
     {
+        public int MaxSearchElementsDisplayed = 6; // Size of panel only permits showing so many SearchElements
+        
         [SerializeField] private TextMeshProUGUI _collectionCountText;
         [SerializeField] private TextMeshProUGUI _tokenCountText;
         [SerializeField] private GameObject _searchElementPrefab;
         [SerializeField] private int _numberOfSearchElementPrefabsToInstantiate = 1;
-        [SerializeField] private int _maxSearchElementsDisplayed = 6; // Size of panel only permits showing so many SearchElements
         [SerializeField] private RectTransform _elementLayoutGroupTransform;
 
         private ObjectPool _searchElementPool;
@@ -63,7 +65,7 @@ namespace Sequence.Demo
             _tokenElements = tokenElements;
             _networkIcons = networkIcons;
             _searchableQuerier =
-                new SearchableQuerier(_searchableCollections, _tokenElements, _maxSearchElementsDisplayed);
+                new SearchableQuerier(_searchableCollections, _tokenElements, MaxSearchElementsDisplayed);
 
             _searchElementPool =
                 ObjectPool.ActivateObjectPool(_searchElementPrefab, _numberOfSearchElementPrefabsToInstantiate);
@@ -97,7 +99,7 @@ namespace Sequence.Demo
             int collections = _searchableCollections.Length;
             int tokens = _tokenElements.Length;
             int totalElements = collections + tokens;
-            int toSpawn = Math.Min(totalElements, _maxSearchElementsDisplayed);
+            int toSpawn = Math.Min(totalElements, MaxSearchElementsDisplayed);
             for (int spawned = 0; spawned < toSpawn; spawned++)
             {
                 Transform searchElementTransform = _searchElementPool.GetNextAvailable();

@@ -24,5 +24,20 @@ namespace SequenceExamples.Scripts.Tests.Utils
             Assert.IsNotNull(text);
             Assert.AreEqual(expected, text.text);
         }
+        
+        public static void AssertStartsWith(this string value, string startsWith)
+        {
+            int length = startsWith.Length;
+            Assert.AreEqual(startsWith, value.Substring(0, length));
+        }
+
+        public static void ClickButtonWithName(Transform parent, string name)
+        {
+            Transform buttonTransform = parent.FindAmongDecendants(name);
+            Assert.IsNotNull(buttonTransform);
+            Button button = buttonTransform.GetComponent<Button>();
+            Assert.IsNotNull(button);
+            button.onClick.Invoke();
+        }
     }
 }

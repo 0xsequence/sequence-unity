@@ -29,8 +29,9 @@ namespace SequenceExamples.Scripts.Tests
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
         private CollectionInfoPage _collectionInfoPage;
-        
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel)
+        private SearchPage _searchPage;
+
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;
@@ -38,6 +39,7 @@ namespace SequenceExamples.Scripts.Tests
             _walletPage = walletPage;
             _loginPanel = loginPanel;
             _transitionPanel = transitionPanel;
+            _searchPage = searchPage;
         }
 
         public IEnumerator NavigateToWalletPageTest()
@@ -572,6 +574,13 @@ namespace SequenceExamples.Scripts.Tests
             AssertPanelAssumptions_InfoPage();
             
             Assert.AreEqual(nft, nftInfoPage.GetNftElement());
+        }
+
+        public IEnumerator TestSearchFlow()
+        {
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+            SearchTests searchTests = new SearchTests(_testMonobehaviour, _walletPanel, _searchPage);
+            yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToSearchPageTest());
         }
     }
 }
