@@ -31,8 +31,9 @@ namespace SequenceExamples.Scripts.Tests
         private SearchPage _searchPage;
         private CollectionInfoPage _collectionInfoPage;
         private NftInfoPage _nftInfoPage;
+        private TokenInfoPage _tokenInfoPage;
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage,NftInfoPage nftInfoPage)
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;
@@ -43,6 +44,7 @@ namespace SequenceExamples.Scripts.Tests
             _searchPage = searchPage;
             _collectionInfoPage = collectionInfoPage;
             _nftInfoPage = nftInfoPage;
+            _tokenInfoPage = tokenInfoPage;
         }
 
         public IEnumerator NavigateToWalletPageTest()
@@ -354,7 +356,8 @@ namespace SequenceExamples.Scripts.Tests
             }
             else if (element is TokenUIElement)
             {
-                yield return _testMonobehaviour.StartCoroutine(AssertTokenInfoPageIsAsExpected(element.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
+                TokenInfoPageTests tokenTests = new TokenInfoPageTests(_testMonobehaviour, _tokenInfoPage);
+                yield return _testMonobehaviour.StartCoroutine(tokenTests.AssertTokenInfoPageIsAsExpected(element.GetNetwork(), randomNumberOfTransactionsToFetch, fetcher.DelayInMilliseconds));
             }
             else
             {
@@ -391,63 +394,26 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsTrue(backButtonTransform.gameObject.activeInHierarchy);
         }
 
-        private IEnumerator AssertTokenInfoPageIsAsExpected(Chain network, int randomNumberOfTransactionsToFetch, int delayInMillisecondsBetweenFetches)
-        {
-            TokenInfoPage tokenInfo = FindObjectOfType<TokenInfoPage>();
-            Assert.IsNotNull(tokenInfo);
-
-            Transform networkBanner = tokenInfo.transform.Find("NetworkBanner");
-            Assert.IsNotNull(networkBanner);
-            Transform networkIcon = networkBanner.transform.Find("NetworkIcon");
-            Assert.IsNotNull(networkIcon);
-            Image networkIconImage = networkIcon.GetComponent<Image>();
-            Assert.IsNotNull(networkIconImage);
-            Assert.AreEqual(tokenInfo.GetNetworkIcon(network), networkIconImage.sprite);
-            Transform networkName = networkBanner.transform.Find("NetworkName");
-            Assert.IsNotNull(networkName);
-            TextMeshProUGUI networkNameText = networkName.GetComponent<TextMeshProUGUI>();
-            Assert.IsNotNull(networkNameText);
-            Assert.AreEqual(ChainNames.NameOf[network], networkNameText.text);
-
-            Transform currencyValue = tokenInfo.transform.Find("CurrencyValueText");
-            Assert.IsNotNull(currencyValue);
-            TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
-            Assert.IsNotNull(currencyValueText);
-            string currentCurrencyValue = currencyValueText.text;
-            yield return new WaitForSecondsRealtime(tokenInfo.TimeBetweenCurrencyValueRefreshesInSeconds);
-            Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
-
-            GameObject transactionScrollView = GameObject.Find("TransactionsScrollView");
-            Assert.IsNotNull(transactionScrollView);
-            VerticalLayoutGroup transactionVerticalLayoutGroup =
-                transactionScrollView.GetComponentInChildren<VerticalLayoutGroup>();
-            Assert.IsNotNull(transactionVerticalLayoutGroup);
-            TransactionDetailsBlocksUITests transactionDetailsBlocksUITests =
-                new TransactionDetailsBlocksUITests(_testMonobehaviour);
-            yield return _testMonobehaviour.StartCoroutine(transactionDetailsBlocksUITests.AssertTransactionDetailsBlocksAreAsExpected(transactionVerticalLayoutGroup, randomNumberOfTransactionsToFetch, delayInMillisecondsBetweenFetches));
-        }
-
         private IEnumerator AssertNftInfoPageIsAsExpected(Chain network, int randomNumberOfTransactionsToFetch, int delayInMillisecondsBetweenFetches)
         {
-            NftInfoPage nftInfoPage = FindObjectOfType<NftInfoPage>();
-            Assert.IsNotNull(nftInfoPage);
+            Assert.IsNotNull(_nftInfoPage);
 
-            Transform networkIcon = nftInfoPage.transform.FindAmongDecendants("NetworkIcon");
+            Transform networkIcon = _nftInfoPage.transform.FindAmongDecendants("NetworkIcon");
             Assert.IsNotNull(networkIcon);
             Image networkIconImage = networkIcon.GetComponent<Image>();
             Assert.IsNotNull(networkIconImage);
-            Assert.AreEqual(nftInfoPage.GetNetworkIcon(network), networkIconImage.sprite);
+            Assert.AreEqual(_nftInfoPage.GetNetworkIcon(network), networkIconImage.sprite);
 
-            Transform currencyValue = nftInfoPage.transform.FindAmongDecendants("CurrencyValueText");
+            Transform currencyValue = _nftInfoPage.transform.FindAmongDecendants("CurrencyValueText");
             Assert.IsNotNull(currencyValue);
             TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(currencyValueText);
             string currentCurrencyValue = currencyValueText.text;
-            yield return new WaitForSecondsRealtime(nftInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
+            yield return new WaitForSecondsRealtime(_nftInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
             Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
 
             Transform transactionDetailsBlockLayoutGroupTransform =
-                nftInfoPage.transform.FindAmongDecendants("TransactionDetailsBlockLayoutGroup");
+                _nftInfoPage.transform.FindAmongDecendants("TransactionDetailsBlockLayoutGroup");
             Assert.IsNotNull(transactionDetailsBlockLayoutGroupTransform);
             VerticalLayoutGroup transactionDetailsBlockLayoutGroup =
                 transactionDetailsBlockLayoutGroupTransform.GetComponent<VerticalLayoutGroup>();
