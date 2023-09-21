@@ -42,6 +42,15 @@ namespace SequenceExamples.Scripts.Tests
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
         }
 
+        internal IEnumerator NavigateToCollectionInfoPage_fromSearchPage(SearchElement element)
+        {
+            Button button = element.GetComponent<Button>();
+            Assert.IsNotNull(button);
+            button.onClick.Invoke();
+                
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+        }
+
         internal IEnumerator AssertCollectionInfoPageIsAsExpected(CollectionInfo collection, NetworkIcons networkIcons)
         {
             Assert.IsNotNull(_collectionInfoPage);

@@ -32,5 +32,10 @@ namespace Sequence.Demo
         {
             return (uint)_mapper.GetNftsFromCollection(_collection).Count;
         }
+
+        public CollectionInfo GetCollection()
+        {
+            return _collection;
+        }
     }
 }

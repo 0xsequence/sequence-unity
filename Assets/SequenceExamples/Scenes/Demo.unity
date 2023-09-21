@@ -4817,7 +4817,6 @@ MonoBehaviour:
   InitialPage: {fileID: 146496091}
   _searchButton: {fileID: 1729974111}
   _backButton: {fileID: 277746594}
-  _networkIcons: {fileID: 11400000, guid: 336e794589b27475696558ccbfcfe84f, type: 2}
 --- !u!114 &595273817
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,7 +10,6 @@ namespace Sequence.Demo
     {
         [SerializeField] private GameObject _searchButton;
         [SerializeField] private GameObject _backButton;
-        [SerializeField] private NetworkIcons _networkIcons;
         
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
@@ -168,7 +167,7 @@ namespace Sequence.Demo
                 searchableCollections[i] = new SearchableCollection(collections[i], _collectionNftMapper);
             }
 
-            StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray(), _networkIcons));
+            StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray()));
             SetTopBarMode(TopBarMode.Back);
         }
 

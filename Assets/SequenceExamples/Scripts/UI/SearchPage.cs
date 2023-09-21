@@ -22,7 +22,6 @@ namespace Sequence.Demo
         
         private SearchableCollection[] _searchableCollections;
         private TokenElement[] _tokenElements;
-        private NetworkIcons _networkIcons;
         private SearchableQuerier _searchableQuerier;
         
         private RectTransform _collectionCountTextTransform;
@@ -54,16 +53,9 @@ namespace Sequence.Demo
                 throw new SystemException(
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(TokenElement[])} as an argument");
             }
-            NetworkIcons networkIcons = args.GetObjectOfTypeIfExists<NetworkIcons>();
-            if (networkIcons == default)
-            {
-                throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(NetworkIcons)} as an argument");
-            }
 
             _searchableCollections = collections;
             _tokenElements = tokenElements;
-            _networkIcons = networkIcons;
             _searchableQuerier =
                 new SearchableQuerier(_searchableCollections, _tokenElements, MaxSearchElementsDisplayed);
 
@@ -81,11 +73,6 @@ namespace Sequence.Demo
         {
             base.Close();
             _searchElementPool.Cleanup();
-        }
-        
-        public Sprite GetNetworkIcon(Chain network)
-        {
-            return _networkIcons.GetIcon(network);
         }
 
         private void Assemble()
@@ -114,7 +101,7 @@ namespace Sequence.Demo
                 SearchElement searchElement = searchElementTransform.GetComponent<SearchElement>();
                 ISearchable element = GetNextValidElement();
                 SetAndIncrementSiblingIndex(searchElementTransform, element);
-                searchElement.Assemble(element, _networkIcons);
+                searchElement.Assemble(element);
             }
         }
 

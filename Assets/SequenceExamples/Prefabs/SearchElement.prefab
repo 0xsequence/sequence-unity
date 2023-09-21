@@ -199,7 +199,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8593803819976901705}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8767134116575584631}
+        m_TargetAssemblyTypeName: Sequence.Demo.SearchElement, SequenceExamples
+        m_MethodName: OpenInfoPage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8767134116575584631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e83a1b3b19440cebd5096065958b696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NetworkIcons: {fileID: 11400000, guid: 336e794589b27475696558ccbfcfe84f, type: 2}
   _icon: {fileID: 3228473208267865772}
   _name: {fileID: 8404494790984271497}
   _networkIcon: {fileID: 2084521515060500725}

@@ -4,25 +4,39 @@ using Sequence.Demo;
 using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace SequenceExamples.Scripts.Tests
 {
     public class SearchTests
     {
         private MonoBehaviour _testMonoBehaviour;
-        private WalletPanel _panel;
+        private WalletPanel _walletPanel;
         private SearchPage _searchPage;
+        private CollectionInfoPage _collectionInfoPage;
+        private NftInfoPage _nftInfoPage;
+        private WalletPage _walletPage;
+        private TransitionPanel _transitionPanel;
+        private LoginPanel _loginPanel;
+        private TokenInfoPage _tokenInfoPage;
 
-        public SearchTests(MonoBehaviour testMonoBehaviour, WalletPanel panel, SearchPage searchPage)
+        public SearchTests(MonoBehaviour testMonoBehaviour, WalletPanel walletPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, WalletPage walletPage, TransitionPanel transitionPanel, LoginPanel loginPanel, TokenInfoPage tokenInfoPage)
         {
             _testMonoBehaviour = testMonoBehaviour;
-            _panel = panel;
+            _walletPanel = walletPanel;
             _searchPage = searchPage;
+            _collectionInfoPage = collectionInfoPage;
+            _nftInfoPage = nftInfoPage;
+            _walletPage = walletPage;
+            _transitionPanel = transitionPanel;
+            _loginPanel = loginPanel;
+            _tokenInfoPage = tokenInfoPage;
         }
 
         public IEnumerator NavigateToSearchPageTest()
         {
-            TestExtensions.ClickButtonWithName(_panel.transform, "SearchButton");
+            TestExtensions.ClickButtonWithName(_walletPanel.transform, "SearchButton");
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertSearchPageIsAsExpected();
@@ -30,13 +44,13 @@ namespace SequenceExamples.Scripts.Tests
 
         private void AssertSearchPageIsAsExpected()
         {
-            Transform elementLayoutGroup = _panel.transform.FindAmongDecendants("ElementLayoutGroup");
+            Transform elementLayoutGroup = _walletPanel.transform.FindAmongDecendants("ElementLayoutGroup");
             Assert.IsNotNull(elementLayoutGroup);
             int otherElements = 3; // ViewAllCollectionsButton, Spacer, ViewAllTokensButton
             Assert.IsTrue(_searchPage.MaxSearchElementsDisplayed >= elementLayoutGroup.childCount - otherElements);
             
-            TestExtensions.AssertTextWithNameHasText(_panel.transform, "CollectionCountText", $"Collections ({_panel.GetCollections().Length})");
-            TestExtensions.AssertTextWithNameHasText(_panel.transform, "TokenCountText", $"Coins ({_panel.GetFetchedTokenElements().Length})");
+            TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "CollectionCountText", $"Collections ({_walletPanel.GetCollections().Length})");
+            TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "TokenCountText", $"Coins ({_walletPanel.GetFetchedTokenElements().Length})");
 
             AssertSearchElementsAreAssembledCorrectly(elementLayoutGroup, otherElements);
             AssertSearchElementsAreOrderedCorrectly(elementLayoutGroup);
@@ -91,7 +105,7 @@ namespace SequenceExamples.Scripts.Tests
         {
             AssertSearchPageIsAsExpected();
             
-            Transform elementLayoutGroup = _panel.transform.FindAmongDecendants("ElementLayoutGroup");
+            Transform elementLayoutGroup = _walletPanel.transform.FindAmongDecendants("ElementLayoutGroup");
             Assert.IsNotNull(elementLayoutGroup);
             int childCount = elementLayoutGroup.childCount;
             for (int i = 0; i < childCount; i++)
@@ -107,18 +121,48 @@ namespace SequenceExamples.Scripts.Tests
             {
                 if (searchElement.Searchable is SearchableCollection collection)
                 {
-                    yield return null;
+                    CollectionInfoPageTests collectionTests = new CollectionInfoPageTests(_testMonoBehaviour, _collectionInfoPage,
+                        _walletPanel, _walletPage, _transitionPanel, _loginPanel, _nftInfoPage);
+                    yield return _testMonoBehaviour.StartCoroutine(
+                        collectionTests.NavigateToCollectionInfoPage_fromSearchPage(searchElement));
+                    yield return _testMonoBehaviour.StartCoroutine(
+                        collectionTests.AssertCollectionInfoPageIsAsExpected(collection.GetCollection(), searchElement.NetworkIcons));
                 }
                 else if (searchElement.Searchable is TokenElement token)
                 {
-                    yield return null;
+                    TokenInfoPageTests tokenTests = new TokenInfoPageTests(_testMonoBehaviour, _tokenInfoPage);
+                    int randomNumberOfTransactionsToFetch = Random.Range(1, 10);
+                    yield return _testMonoBehaviour.StartCoroutine(NavigateToTokenInfoPage(searchElement, randomNumberOfTransactionsToFetch));
+                    yield return _testMonoBehaviour.StartCoroutine(
+                        tokenTests.AssertTokenInfoPageIsAsExpected(token.Network, randomNumberOfTransactionsToFetch,
+                            0));
                 }
                 else
                 {
                     throw new SystemException(
                         $"Encountered unexpected type of {nameof(ISearchable)}, given {searchElement.Searchable.GetType()}");
                 }
+                yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
             }
+        }
+        
+        private IEnumerator HitUIBackButton()
+        {
+            TestExtensions.ClickButtonWithName(_walletPanel.transform, "BackButton");
+                
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+        }
+
+        private IEnumerator NavigateToTokenInfoPage(SearchElement searchElement, int randomNumberOfTransactionsToFetch)
+        {
+            searchElement.TransactionDetailsFetcher =
+                new MockTransactionDetailsFetcher(randomNumberOfTransactionsToFetch, 0);
+            
+            Button button = searchElement.GetComponent<Button>();
+            Assert.IsNotNull(button);
+            button.onClick.Invoke();
+                
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
         }
     }
 }
