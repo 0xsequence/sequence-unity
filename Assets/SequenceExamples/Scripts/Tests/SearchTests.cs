@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Sequence.Demo;
 using SequenceExamples.Scripts.Tests.Utils;
@@ -82,6 +83,40 @@ namespace SequenceExamples.Scripts.Tests
                 if (enteredTokenRegion)
                 {
                     Assert.IsTrue(searchElement.Searchable is not SearchableCollection);
+                }
+            }
+        }
+
+        public IEnumerator NavigateToInfoPagesViaSearchElementsTest()
+        {
+            AssertSearchPageIsAsExpected();
+            
+            Transform elementLayoutGroup = _panel.transform.FindAmongDecendants("ElementLayoutGroup");
+            Assert.IsNotNull(elementLayoutGroup);
+            int childCount = elementLayoutGroup.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                yield return _testMonoBehaviour.StartCoroutine(NavigateToInfoPageAndBackTest(elementLayoutGroup.GetChild(i)));
+            }
+        }
+
+        private IEnumerator NavigateToInfoPageAndBackTest(Transform element)
+        {
+            SearchElement searchElement = element.GetComponent<SearchElement>();
+            if (searchElement != null)
+            {
+                if (searchElement.Searchable is SearchableCollection collection)
+                {
+                    yield return null;
+                }
+                else if (searchElement.Searchable is TokenElement token)
+                {
+                    yield return null;
+                }
+                else
+                {
+                    throw new SystemException(
+                        $"Encountered unexpected type of {nameof(ISearchable)}, given {searchElement.Searchable.GetType()}");
                 }
             }
         }
