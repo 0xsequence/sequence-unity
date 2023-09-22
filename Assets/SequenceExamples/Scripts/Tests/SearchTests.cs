@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using Sequence.Demo;
 using SequenceExamples.Scripts.Tests.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -163,6 +164,57 @@ namespace SequenceExamples.Scripts.Tests
             button.onClick.Invoke();
                 
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+        }
+
+        public IEnumerator SearchingTest()
+        {
+            TMP_InputField searchBar = _searchPage.GetComponentInChildren<TMP_InputField>();
+            Assert.IsNotNull(searchBar);
+            Transform elementLayoutGroup = _searchPage.transform.FindAmongDecendants("ElementLayoutGroup");
+            Assert.IsNotNull(elementLayoutGroup);
+            int children = GetEnabledChildCount(elementLayoutGroup);
+
+            string nothingMatchesWith = "@!$^&GD&SBGsuwdgfyuasb*(#QRNidnsf89w";
+            searchBar.text = nothingMatchesWith;
+            yield return new WaitForEndOfFrame();
+            Assert.AreNotEqual(children, GetEnabledChildCount(elementLayoutGroup));
+
+            searchBar.text = "";
+            yield return new WaitForEndOfFrame();
+            Assert.AreEqual(children, GetEnabledChildCount(elementLayoutGroup));
+
+            string[] potentialStartingValues = new[] { "s", "m", "a" };
+            int childrenNow = 0;
+            for (int i = 0; i < potentialStartingValues.Length; i++)
+            {
+                searchBar.text = potentialStartingValues[i];
+                yield return new WaitForEndOfFrame();
+                childrenNow = GetEnabledChildCount(elementLayoutGroup);
+                if (childrenNow > 0 && childrenNow < children)
+                {
+                    break;
+                }
+            }
+            Assert.IsTrue(childrenNow > 0 && childrenNow < children);
+
+            yield return _testMonoBehaviour.StartCoroutine(NavigateToInfoPageAndBackTest(elementLayoutGroup.GetChild(0)));
+            
+            Assert.AreEqual(childrenNow, GetEnabledChildCount(elementLayoutGroup));
+        }
+
+        private int GetEnabledChildCount(Transform t)
+        {
+            int children = t.childCount;
+            int enabled = 0;
+            for (int i = 0; i < children; i++)
+            {
+                if (t.GetChild(i).gameObject.activeInHierarchy)
+                {
+                    enabled++;
+                }
+            }
+
+            return enabled;
         }
     }
 }

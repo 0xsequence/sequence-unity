@@ -489,6 +489,7 @@ namespace SequenceExamples.Scripts.Tests
             SearchTests searchTests = new SearchTests(_testMonobehaviour, _walletPanel, _searchPage, _collectionInfoPage, _nftInfoPage, _walletPage, _transitionPanel, _loginPanel, _tokenInfoPage);
             yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToSearchPageTest());
             yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToInfoPagesViaSearchElementsTest());
+            yield return _testMonobehaviour.StartCoroutine(searchTests.SearchingTest());
         }
     }
 }
