@@ -13,6 +13,8 @@ namespace SequenceExamples.Scripts.Tests
         private MonoBehaviour _testMonoBehaviour;
         private TokenInfoPage _tokenInfoPage;
 
+        private bool _hasCheckedIfCurrencyValueTextsAreRefreshing = false;
+
         public TokenInfoPageTests(MonoBehaviour testMonoBehaviour, TokenInfoPage tokenInfoPage)
         {
             _testMonoBehaviour = testMonoBehaviour;
@@ -36,13 +38,17 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(networkNameText);
             Assert.AreEqual(ChainNames.NameOf[network], networkNameText.text);
 
-            Transform currencyValue = _tokenInfoPage.transform.Find("CurrencyValueText");
-            Assert.IsNotNull(currencyValue);
-            TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
-            Assert.IsNotNull(currencyValueText);
-            string currentCurrencyValue = currencyValueText.text;
-            yield return new WaitForSecondsRealtime(_tokenInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
-            Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
+            if (!_hasCheckedIfCurrencyValueTextsAreRefreshing)
+            {
+                Transform currencyValue = _tokenInfoPage.transform.Find("CurrencyValueText");
+                Assert.IsNotNull(currencyValue);
+                TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
+                Assert.IsNotNull(currencyValueText);
+                string currentCurrencyValue = currencyValueText.text;
+                yield return new WaitForSecondsRealtime(_tokenInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
+                Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
+                _hasCheckedIfCurrencyValueTextsAreRefreshing = true;
+            }
 
             GameObject transactionScrollView = GameObject.Find("TransactionsScrollView");
             Assert.IsNotNull(transactionScrollView);

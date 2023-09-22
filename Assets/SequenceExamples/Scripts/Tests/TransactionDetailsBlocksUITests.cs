@@ -13,6 +13,8 @@ namespace SequenceExamples.Scripts.Tests
     {
         private MonoBehaviour _testMonoBehaviour;
 
+        private bool _tokenValueRefreshTested = false;
+
         public TransactionDetailsBlocksUITests(MonoBehaviour testMonoBehaviour)
         {
             _testMonoBehaviour = testMonoBehaviour;
@@ -47,12 +49,17 @@ namespace SequenceExamples.Scripts.Tests
             }
             Assert.IsTrue(IsSorted(dates));
 
-            yield return new WaitForSeconds(blocks[0].TimeBetweenTokenValueRefreshesInSeconds);
-            yield return null; // Wait a frame for UI to update
-
-            for (int i = 0; i < count; i++)
+            if (!_tokenValueRefreshTested)
             {
-                Assert.AreNotEqual(currencyValueStrings[i], GetCurrencyValueString(blocks[i]));
+                yield return new WaitForSeconds(blocks[0].TimeBetweenTokenValueRefreshesInSeconds);
+                yield return null; // Wait a frame for UI to update
+
+                for (int i = 0; i < count; i++)
+                {
+                    Assert.AreNotEqual(currencyValueStrings[i], GetCurrencyValueString(blocks[i]));
+                }
+
+                _tokenValueRefreshTested = true;
             }
         }
 

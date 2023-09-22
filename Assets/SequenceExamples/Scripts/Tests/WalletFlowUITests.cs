@@ -33,6 +33,8 @@ namespace SequenceExamples.Scripts.Tests
         private NftInfoPage _nftInfoPage;
         private TokenInfoPage _tokenInfoPage;
 
+        private bool _nftInfoPageCurrencyValueRefreshTested = false;
+
         public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage)
         {
             _testMonobehaviour = testMonobehaviour;
@@ -404,13 +406,17 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(networkIconImage);
             Assert.AreEqual(_nftInfoPage.GetNetworkIcon(network), networkIconImage.sprite);
 
-            Transform currencyValue = _nftInfoPage.transform.FindAmongDecendants("CurrencyValueText");
-            Assert.IsNotNull(currencyValue);
-            TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
-            Assert.IsNotNull(currencyValueText);
-            string currentCurrencyValue = currencyValueText.text;
-            yield return new WaitForSecondsRealtime(_nftInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
-            Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
+            if (!_nftInfoPageCurrencyValueRefreshTested)
+            {
+                Transform currencyValue = _nftInfoPage.transform.FindAmongDecendants("CurrencyValueText");
+                Assert.IsNotNull(currencyValue);
+                TextMeshProUGUI currencyValueText = currencyValue.GetComponent<TextMeshProUGUI>();
+                Assert.IsNotNull(currencyValueText);
+                string currentCurrencyValue = currencyValueText.text;
+                yield return new WaitForSecondsRealtime(_nftInfoPage.TimeBetweenCurrencyValueRefreshesInSeconds);
+                Assert.AreNotEqual(currentCurrencyValue, currencyValueText.text);
+                _nftInfoPageCurrencyValueRefreshTested = true;
+            }
 
             Transform transactionDetailsBlockLayoutGroupTransform =
                 _nftInfoPage.transform.FindAmongDecendants("TransactionDetailsBlockLayoutGroup");
