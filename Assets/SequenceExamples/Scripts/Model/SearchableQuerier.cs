@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Demo
 {
@@ -34,10 +36,11 @@ namespace Sequence.Demo
         
         private void FilterCollectionsAndTokens(string criteria)
         {
+            criteria = criteria.ToLower().NoWhitespace();
             _collectionsMeetingCriteria = new List<SearchableCollection>();
             for (int i = 0; i < _totalCollections; i++)
             {
-                if (_allCollections[i].GetName().StartsWith(criteria))
+                if (_allCollections[i].GetName().ToLower().NoWhitespace().StartsWith(criteria))
                 {
                     _collectionsMeetingCriteria.Add(_allCollections[i]);
                 }
@@ -46,7 +49,7 @@ namespace Sequence.Demo
             _tokensMeetingCriteria = new List<TokenElement>();
             for (int i = 0; i < _totalTokens; i++)
             {
-                if (_allTokens[i].GetName().StartsWith(criteria))
+                if (_allTokens[i].GetName().ToLower().NoWhitespace().StartsWith(criteria))
                 {
                     _tokensMeetingCriteria.Add(_allTokens[i]);
                 }

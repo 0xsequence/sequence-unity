@@ -15464,6 +15464,7 @@ MonoBehaviour:
   _searchElementPrefab: {fileID: 1337275585367182384, guid: 8301eb71144554914a53cddabff35e63, type: 3}
   _numberOfSearchElementPrefabsToInstantiate: 1
   _elementLayoutGroupTransform: {fileID: 1408430504}
+  _searchBar: {fileID: 997920013}
 --- !u!1 &1995973477
 GameObject:
   m_ObjectHideFlags: 0

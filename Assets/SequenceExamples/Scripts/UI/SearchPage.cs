@@ -17,6 +17,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _searchElementPrefab;
         [SerializeField] private int _numberOfSearchElementPrefabsToInstantiate = 1;
         [SerializeField] private RectTransform _elementLayoutGroupTransform;
+        [SerializeField] private TMP_InputField _searchBar;
 
         private ObjectPool _searchElementPool;
         
@@ -29,11 +30,14 @@ namespace Sequence.Demo
         private int _nextCollectionSiblingIndex;
         private int _nextTokenSiblingIndex;
 
+        private Queue<SearchElement> _activeElements;
+
         protected override void Awake()
         {
             base.Awake();
             _collectionCountTextTransform = _collectionCountText.GetComponent<RectTransform>();
             _tokenCountTextTransform = _tokenCountText.GetComponent<RectTransform>();
+            _searchBar.onValueChanged.AddListener(OnInputValueChanged);
         }
 
         public override void Open(params object[] args)
@@ -61,12 +65,12 @@ namespace Sequence.Demo
 
             _searchElementPool =
                 ObjectPool.ActivateObjectPool(_searchElementPrefab, _numberOfSearchElementPrefabsToInstantiate);
-
-            _nextCollectionSiblingIndex = _collectionCountTextTransform.parent.GetSiblingIndex() + 1;
-            _nextTokenSiblingIndex = _tokenCountTextTransform.parent.GetSiblingIndex() + 1;
+            
+            _activeElements = new Queue<SearchElement>();
             
             Assemble();
-            PopulateInitialSearchResults();
+            
+            OnInputValueChanged(_searchBar.text);
         }
 
         public override void Close()
@@ -81,7 +85,7 @@ namespace Sequence.Demo
             _tokenCountText.text = $"Coins ({_tokenElements.Length})";
         }
 
-        private void PopulateInitialSearchResults()
+        private void PopulateSearchElements()
         {
             int collections = _searchableCollections.Length;
             int tokens = _tokenElements.Length;
@@ -89,6 +93,12 @@ namespace Sequence.Demo
             int toSpawn = Math.Min(totalElements, MaxSearchElementsDisplayed);
             for (int spawned = 0; spawned < toSpawn; spawned++)
             {
+                ISearchable element = GetNextValidElement();
+                if (element == null)
+                {
+                    break; // We have run out of ISearchables that meet the search criteria
+                }
+                
                 Transform searchElementTransform = _searchElementPool.GetNextAvailable();
                 if (searchElementTransform == null)
                 {
@@ -99,13 +109,9 @@ namespace Sequence.Demo
                 searchElementTransform.SetParent(_elementLayoutGroupTransform);
                 searchElementTransform.localScale = new Vector3(1, 1, 1);
                 SearchElement searchElement = searchElementTransform.GetComponent<SearchElement>();
-                ISearchable element = GetNextValidElement();
-                if (element == null)
-                {
-                    throw new SystemException($"{nameof(element)} should not be null.");
-                }
                 SetAndIncrementSiblingIndex(searchElementTransform, element);
                 searchElement.Assemble(element);
+                _activeElements.Enqueue(searchElement);
             }
         }
 
@@ -132,6 +138,25 @@ namespace Sequence.Demo
         private ISearchable GetNextValidElement()
         {
             return _searchableQuerier.GetNextValid();
+        }
+
+        private void OnInputValueChanged(string newValue)
+        {
+            _searchableQuerier.SetNewCriteria(newValue);
+            ResetSearchElements();
+            PopulateSearchElements();
+        }
+
+        private void ResetSearchElements()
+        {
+            while (_activeElements.Count > 0)
+            {
+                SearchElement element = _activeElements.Dequeue();
+                _searchElementPool.DeactivateObject(element.gameObject);
+            }
+            
+            _nextCollectionSiblingIndex = _collectionCountTextTransform.parent.GetSiblingIndex() + 1;
+            _nextTokenSiblingIndex = _tokenCountTextTransform.parent.GetSiblingIndex() + 1;
         }
     }
 }
