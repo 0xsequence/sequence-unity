@@ -15,7 +15,8 @@ namespace Sequence.Demo
         private List<TokenElement> _tokensMeetingCriteria;
         private int _maxSearchablesToReturn;
 
-        private Queue<ISearchable> _nextSearchables;
+        private Queue<SearchableCollection> _nextSearchableCollection;
+        private Queue<TokenElement> _nextSearchableToken;
 
         public SearchableQuerier(SearchableCollection[] allCollections, TokenElement[] allTokens, int maxSearchablesToReturn)
         {
@@ -80,22 +81,44 @@ namespace Sequence.Demo
 
         private void AssembleNextSearchable(int collectionsToReturn, int tokensToReturn)
         {
-            _nextSearchables = new Queue<ISearchable>();
+            _nextSearchableCollection = new Queue<SearchableCollection>();
+            _nextSearchableToken = new Queue<TokenElement>();
             for (int i = 0; i < collectionsToReturn; i++)
             {
-                _nextSearchables.Enqueue(_collectionsMeetingCriteria[i]);
+                _nextSearchableCollection.Enqueue(_collectionsMeetingCriteria[i]);
             }
             for (int i = 0; i < tokensToReturn; i++)
             {
-                _nextSearchables.Enqueue(_tokensMeetingCriteria[i]);
+                _nextSearchableToken.Enqueue(_tokensMeetingCriteria[i]);
             }
         }
 
         public ISearchable GetNextValid()
         {
-            if (_nextSearchables.TryDequeue(out ISearchable next))
+            ISearchable next = GetNextValidCollection();
+            if (next == null)
             {
-                return next;
+                next = GetNextValidToken();
+            }
+
+            return next;
+        }
+
+        public ISearchable GetNextValidCollection()
+        {
+            if (_nextSearchableCollection.TryDequeue(out SearchableCollection nextCollection))
+            {
+                return nextCollection;
+            }
+
+            return null;
+        }
+
+        public ISearchable GetNextValidToken()
+        {
+            if (_nextSearchableToken.TryDequeue(out TokenElement nextToken))
+            {
+                return nextToken;
             }
 
             return null;

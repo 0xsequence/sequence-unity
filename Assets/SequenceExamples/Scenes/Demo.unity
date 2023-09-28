@@ -707,7 +707,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 56263620}
   toggleTransition: 1
   graphic: {fileID: 56263620}
   m_Group: {fileID: 1397573455}
@@ -7086,6 +7086,11 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0.25
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
+  MaxSearchElementsDisplayed: 2147483647
+  _searchElementPrefab: {fileID: 1337275585367182384, guid: 8301eb71144554914a53cddabff35e63, type: 3}
+  _numberOfSearchElementPrefabsToInstantiate: 1
+  _elementLayoutGroupTransform: {fileID: 1797005465}
+  _searchBar: {fileID: 1736178405}
 --- !u!1 &683919798
 GameObject:
   m_ObjectHideFlags: 0
@@ -17265,12 +17270,12 @@ MonoBehaviour:
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
   MaxSearchElementsDisplayed: 6
-  _collectionCountText: {fileID: 147611453}
-  _tokenCountText: {fileID: 201159220}
   _searchElementPrefab: {fileID: 1337275585367182384, guid: 8301eb71144554914a53cddabff35e63, type: 3}
   _numberOfSearchElementPrefabsToInstantiate: 1
   _elementLayoutGroupTransform: {fileID: 1408430504}
   _searchBar: {fileID: 997920013}
+  _collectionCountText: {fileID: 147611453}
+  _tokenCountText: {fileID: 201159220}
 --- !u!1 &1995973477
 GameObject:
   m_ObjectHideFlags: 0
@@ -17559,7 +17564,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 2013291607}
   toggleTransition: 1
   graphic: {fileID: 2013291607}
   m_Group: {fileID: 1397573455}
