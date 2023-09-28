@@ -21,7 +21,8 @@ namespace SequenceExamples.Scripts.Tests
         private TransitionPanel _transitionPanel;
         private LoginPanel _loginPanel;
         private TokenInfoPage _tokenInfoPage;
-
+        int _otherElementsCount = 3; // ViewAllCollectionsButton, Spacer, ViewAllTokensButton
+        
         public SearchTests(MonoBehaviour testMonoBehaviour, WalletPanel walletPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, WalletPage walletPage, TransitionPanel transitionPanel, LoginPanel loginPanel, TokenInfoPage tokenInfoPage)
         {
             _testMonoBehaviour = testMonoBehaviour;
@@ -47,13 +48,12 @@ namespace SequenceExamples.Scripts.Tests
         {
             Transform elementLayoutGroup = _walletPanel.transform.FindAmongDecendants("ElementLayoutGroup");
             Assert.IsNotNull(elementLayoutGroup);
-            int otherElements = 3; // ViewAllCollectionsButton, Spacer, ViewAllTokensButton
-            Assert.IsTrue(_searchPage.MaxSearchElementsDisplayed >= elementLayoutGroup.childCount - otherElements);
+            Assert.IsTrue(_searchPage.MaxSearchElementsDisplayed >= elementLayoutGroup.childCount - _otherElementsCount);
             
             TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "CollectionCountText", $"Collections ({_walletPanel.GetCollections().Length})");
             TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "TokenCountText", $"Coins ({_walletPanel.GetFetchedTokenElements().Length})");
 
-            AssertSearchElementsAreAssembledCorrectly(elementLayoutGroup, otherElements);
+            AssertSearchElementsAreAssembledCorrectly(elementLayoutGroup, _otherElementsCount);
             AssertSearchElementsAreOrderedCorrectly(elementLayoutGroup);
         }
 
@@ -168,20 +168,26 @@ namespace SequenceExamples.Scripts.Tests
 
         public IEnumerator SearchingTest()
         {
+            AssertAppropriateAmountTexts();
+            
             TMP_InputField searchBar = _searchPage.GetComponentInChildren<TMP_InputField>();
             Assert.IsNotNull(searchBar);
             Transform elementLayoutGroup = _searchPage.transform.FindAmongDecendants("ElementLayoutGroup");
             Assert.IsNotNull(elementLayoutGroup);
             int children = GetEnabledChildCount(elementLayoutGroup);
-
+            
             string nothingMatchesWith = "@!$^&GD&SBGsuwdgfyuasb*(#QRNidnsf89w";
             searchBar.text = nothingMatchesWith;
             yield return new WaitForEndOfFrame();
             Assert.AreNotEqual(children, GetEnabledChildCount(elementLayoutGroup));
+            Assert.AreEqual(_otherElementsCount, GetEnabledChildCount(elementLayoutGroup));
+            Assert.AreEqual(0, _searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria() + _searchPage.GetQuerier().GetNumberOfTokensMatchingCriteria());
+            AssertAppropriateAmountTexts();
 
             searchBar.text = "";
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(children, GetEnabledChildCount(elementLayoutGroup));
+            AssertAppropriateAmountTexts();
 
             string[] potentialStartingValues = new[] { "s", "m", "a" };
             int childrenNow = 0;
@@ -196,10 +202,12 @@ namespace SequenceExamples.Scripts.Tests
                 }
             }
             Assert.IsTrue(childrenNow > 0 && childrenNow < children);
+            AssertAppropriateAmountTexts();
 
             yield return _testMonoBehaviour.StartCoroutine(NavigateToInfoPageAndBackTest(elementLayoutGroup.GetChild(0)));
             
             Assert.AreEqual(childrenNow, GetEnabledChildCount(elementLayoutGroup));
+            AssertAppropriateAmountTexts();
         }
 
         private int GetEnabledChildCount(Transform t)
@@ -215,6 +223,12 @@ namespace SequenceExamples.Scripts.Tests
             }
 
             return enabled;
+        }
+
+        private void AssertAppropriateAmountTexts()
+        {
+            TestExtensions.AssertTextWithNameHasText(_searchPage.transform, "CollectionCountText", $"Collections ({_searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria()})");
+            TestExtensions.AssertTextWithNameHasText(_searchPage.transform, "TokenCountText", $"Coins ({_searchPage.GetQuerier().GetNumberOfTokensMatchingCriteria()})");
         }
     }
 }

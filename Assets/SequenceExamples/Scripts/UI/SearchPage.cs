@@ -68,9 +68,9 @@ namespace Sequence.Demo
             
             _activeElements = new Queue<SearchElement>();
             
-            Assemble();
-            
             OnInputValueChanged(_searchBar.text);
+            
+            SetCountTexts();
         }
 
         public override void Close()
@@ -79,10 +79,10 @@ namespace Sequence.Demo
             _searchElementPool.Cleanup();
         }
 
-        private void Assemble()
+        private void SetCountTexts()
         {
-            _collectionCountText.text = $"Collections ({_searchableCollections.Length})";
-            _tokenCountText.text = $"Coins ({_tokenElements.Length})";
+            _collectionCountText.text = $"Collections ({_searchableQuerier.GetNumberOfCollectionsMatchingCriteria()})";
+            _tokenCountText.text = $"Coins ({_searchableQuerier.GetNumberOfTokensMatchingCriteria()})";
         }
 
         private void PopulateSearchElements()
@@ -145,6 +145,7 @@ namespace Sequence.Demo
             _searchableQuerier.SetNewCriteria(newValue);
             ResetSearchElements();
             PopulateSearchElements();
+            SetCountTexts();
         }
 
         private void ResetSearchElements()
@@ -157,6 +158,11 @@ namespace Sequence.Demo
             
             _nextCollectionSiblingIndex = _collectionCountTextTransform.parent.GetSiblingIndex() + 1;
             _nextTokenSiblingIndex = _tokenCountTextTransform.parent.GetSiblingIndex() + 1;
+        }
+
+        public SearchableQuerier GetQuerier()
+        {
+            return _searchableQuerier;
         }
     }
 }

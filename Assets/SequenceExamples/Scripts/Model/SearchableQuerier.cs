@@ -100,5 +100,15 @@ namespace Sequence.Demo
 
             return null;
         }
+
+        public int GetNumberOfCollectionsMatchingCriteria()
+        {
+            return _collectionsMeetingCriteria.Count;
+        }
+
+        public int GetNumberOfTokensMatchingCriteria()
+        {
+            return _tokensMeetingCriteria.Count;
+        }
     }
 }
