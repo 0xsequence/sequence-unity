@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -349,7 +350,58 @@ namespace SequenceExamples.Scripts.Tests
 
         public IEnumerator ToggleViewAllPageTest()
         {
-            yield return null;
+            Transform collectionToggleTransform = _searchViewAllPage.transform.FindAmongDecendants("CollectionToggle");
+            Assert.IsNotNull(collectionToggleTransform);
+            Toggle collectionToggle = collectionToggleTransform.GetComponent<Toggle>();
+            Assert.IsNotNull(collectionToggle);
+            Transform tokenToggleTransform = _searchViewAllPage.transform.FindAmongDecendants("TokenToggle");
+            Assert.IsNotNull(tokenToggleTransform);
+            Toggle tokenToggle = tokenToggleTransform.GetComponent<Toggle>();
+            Assert.IsNotNull(tokenToggle);
+            Transform elementLayoutGroup = _searchViewAllPage.transform.FindAmongDecendants("SearchableContent");
+            Assert.IsNotNull(elementLayoutGroup);
+            
+            Assert.IsTrue(collectionToggle.isOn);
+            Assert.IsFalse(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
+            
+            tokenToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            
+            Assert.IsFalse(collectionToggle.isOn);
+            Assert.IsTrue(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
+            
+            collectionToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            
+            Assert.IsTrue(collectionToggle.isOn);
+            Assert.IsFalse(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
+
+            yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
+            yield return _testMonoBehaviour.StartCoroutine(NavigateToViewAllTokensPageTest());
+            
+            Assert.IsFalse(collectionToggle.isOn);
+            Assert.IsTrue(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
+            
+            collectionToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            
+            Assert.IsTrue(collectionToggle.isOn);
+            Assert.IsFalse(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
+            
+            tokenToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            
+            Assert.IsFalse(collectionToggle.isOn);
+            Assert.IsTrue(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
+
+            yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
+            yield return _testMonoBehaviour.StartCoroutine(NavigateToViewAllCollectionsPageTest());
+            
+            Assert.IsTrue(collectionToggle.isOn);
+            Assert.IsFalse(tokenToggle.isOn);
+            AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
         }
     }
 }
