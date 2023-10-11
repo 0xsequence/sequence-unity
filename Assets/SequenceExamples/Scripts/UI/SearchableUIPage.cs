@@ -12,7 +12,7 @@ namespace Sequence.Demo
         
         [SerializeField] private GameObject _searchElementPrefab;
         [SerializeField] private int _numberOfSearchElementPrefabsToInstantiate = 1;
-        [SerializeField] private RectTransform _elementLayoutGroupTransform;
+        [SerializeField] protected RectTransform _elementLayoutGroupTransform;
         [SerializeField] protected TMP_InputField _searchBar;
         [SerializeField] protected TextMeshProUGUI _collectionCountText;
         [SerializeField] protected TextMeshProUGUI _tokenCountText;
@@ -117,7 +117,7 @@ namespace Sequence.Demo
         protected abstract void SetAndIncrementSiblingIndex(Transform searchElementTransform, ISearchable element);
         protected abstract ISearchable GetNextValidElement();
 
-        protected void OnInputValueChanged(string newValue)
+        protected virtual void OnInputValueChanged(string newValue)
         {
             _searchableQuerier.SetNewCriteria(newValue);
             ResetSearchElements();

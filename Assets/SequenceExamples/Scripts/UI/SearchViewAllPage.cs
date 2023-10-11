@@ -1,11 +1,15 @@
 using System;
+using System.Collections;
 using Sequence.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
     public class SearchViewAllPage : SearchableUIPage
     {
+        private VerticalLayoutGroup _searchElementsLayoutGroup;
         public enum SearchToggleStatus
         {
             Default,
@@ -14,7 +18,18 @@ namespace Sequence.Demo
         }
 
         private SearchToggleStatus _searchToggleStatus;
-        
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _searchElementsLayoutGroup = _elementLayoutGroupTransform.GetComponent<VerticalLayoutGroup>();
+            if (_searchElementsLayoutGroup == null)
+            {
+                throw new SystemException(
+                    $"{GetType().Name} has been assembled incorrectly. {nameof(_elementLayoutGroupTransform)} must have a {typeof(VerticalLayoutGroup)} as a component");
+            }
+        }
+
         protected override void SetAndIncrementSiblingIndex(Transform searchElementTransform, ISearchable element)
         {
             // Not needed for this page
@@ -46,6 +61,21 @@ namespace Sequence.Demo
             _searchToggleStatus = toggleStatus;
             
             base.Open(args);
+        }
+
+        protected override void OnInputValueChanged(string newValue)
+        {
+            base.OnInputValueChanged(newValue);
+            StartCoroutine(UpdateScrollViewSize());
+        }
+
+        private IEnumerator UpdateScrollViewSize()
+        {
+            yield return new WaitForEndOfFrame(); // Allow UI time to update so that the search elements can be populated
+            
+            float contentHeight = _searchElementsLayoutGroup.preferredHeight;
+            _elementLayoutGroupTransform.sizeDelta =
+                new Vector2(_elementLayoutGroupTransform.sizeDelta.x, contentHeight);
         }
     }
 }
