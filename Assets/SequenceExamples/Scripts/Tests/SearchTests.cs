@@ -366,12 +366,14 @@ namespace SequenceExamples.Scripts.Tests
             AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
             
             tokenToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            yield return new WaitForEndOfFrame(); // Allow UI to update
             
             Assert.IsFalse(collectionToggle.isOn);
             Assert.IsTrue(tokenToggle.isOn);
             AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
             
             collectionToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            yield return new WaitForEndOfFrame(); // Allow UI to update
             
             Assert.IsTrue(collectionToggle.isOn);
             Assert.IsFalse(tokenToggle.isOn);
@@ -385,12 +387,14 @@ namespace SequenceExamples.Scripts.Tests
             AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
             
             collectionToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            yield return new WaitForEndOfFrame(); // Allow UI to update
             
             Assert.IsTrue(collectionToggle.isOn);
             Assert.IsFalse(tokenToggle.isOn);
             AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
             
             tokenToggle.OnPointerClick(new PointerEventData(EventSystem.current));
+            yield return new WaitForEndOfFrame(); // Allow UI to update
             
             Assert.IsFalse(collectionToggle.isOn);
             Assert.IsTrue(tokenToggle.isOn);
