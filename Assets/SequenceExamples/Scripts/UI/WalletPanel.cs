@@ -55,9 +55,9 @@ namespace Sequence.Demo
             _collectionNftMapper.Evict();
         }
 
-        public override void Back()
+        public override void Back(params object[] injectAdditionalParams)
         {
-            base.Back();
+            base.Back(injectAdditionalParams);
             if (_page is WalletPage)
             {
                 SetTopBarMode(TopBarMode.Search);
@@ -142,11 +142,6 @@ namespace Sequence.Demo
             return _collectionNftMapper.GetNftsFromCollection(collection);
         }
 
-        public CollectionInfo[] GetCollections()
-        {
-            return _collectionNftMapper.GetCollections();
-        }
-
         private void HandleTokenFetchSuccess(FetchTokenContentResult result)
         {
             TokenElement[] tokens = result.Content;
@@ -169,11 +164,6 @@ namespace Sequence.Demo
 
             StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray()));
             SetTopBarMode(TopBarMode.Back);
-        }
-
-        public TokenElement[] GetFetchedTokenElements()
-        {
-            return _fetchedTokenElements.ToArray();
         }
     }
 }

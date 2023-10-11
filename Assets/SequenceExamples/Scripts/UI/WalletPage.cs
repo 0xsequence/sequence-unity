@@ -42,7 +42,7 @@ namespace Sequence.Demo
 
         public override void Open(params object[] args)
         {
-            base.Open();
+            base.Open(args);
             
             _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Search);
 

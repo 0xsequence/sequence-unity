@@ -32,10 +32,11 @@ namespace SequenceExamples.Scripts.Tests
         private CollectionInfoPage _collectionInfoPage;
         private NftInfoPage _nftInfoPage;
         private TokenInfoPage _tokenInfoPage;
+        private SearchViewAllPage _searchViewAllPage;
 
         private bool _nftInfoPageCurrencyValueRefreshTested = false;
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage)
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage, SearchViewAllPage searchViewAllPage)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;
@@ -47,6 +48,7 @@ namespace SequenceExamples.Scripts.Tests
             _collectionInfoPage = collectionInfoPage;
             _nftInfoPage = nftInfoPage;
             _tokenInfoPage = tokenInfoPage;
+            _searchViewAllPage = searchViewAllPage;
         }
 
         public IEnumerator NavigateToWalletPageTest()
@@ -483,13 +485,28 @@ namespace SequenceExamples.Scripts.Tests
             AssertPanelAssumptions_WalletPage();
         }
 
-        public IEnumerator TestSearchFlow()
+        public IEnumerator TestSearchPage()
         {
             yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
-            SearchTests searchTests = new SearchTests(_testMonobehaviour, _walletPanel, _searchPage, _collectionInfoPage, _nftInfoPage, _walletPage, _transitionPanel, _loginPanel, _tokenInfoPage);
+            SearchTests searchTests = new SearchTests(_testMonobehaviour, _walletPanel, _searchPage, _collectionInfoPage, _nftInfoPage, _walletPage, _transitionPanel, _loginPanel, _tokenInfoPage, _searchViewAllPage);
             yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToSearchPageTest());
             yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToInfoPagesViaSearchElementsTest());
             yield return _testMonobehaviour.StartCoroutine(searchTests.SearchingTest());
+        }
+
+        public IEnumerator TestSearchViewAllPage()
+        {
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected());
+            SearchTests searchTests = new SearchTests(_testMonobehaviour, _walletPanel, _searchPage, _collectionInfoPage, _nftInfoPage, _walletPage, _transitionPanel, _loginPanel, _tokenInfoPage, _searchViewAllPage);
+            yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToSearchPageTest());
+            yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToViewAllCollectionsPageTest());
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton()); // Take us to SearchPage
+            yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToViewAllTokensPageTest());
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton()); // Take us to SearchPage
+            yield return _testMonobehaviour.StartCoroutine(searchTests
+                .TestSearchBarEntriesRemainWhenMovingBackAndForthBetweenSearchPages());
+            yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToViewAllCollectionsPageTest());
+            yield return _testMonobehaviour.StartCoroutine(searchTests.ToggleViewAllPageTest());
         }
     }
 }

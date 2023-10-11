@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -23,9 +24,16 @@ namespace Sequence.Demo
             }
         }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            _panel = this;
+        }
+
         public override void Open(params object[] args)
         {
-            base.Open(args);
+            _gameObject.SetActive(true);
+            _animator.AnimateIn( _openAnimationDurationInSeconds);
             StartCoroutine(OpenInitialPage(args));
         }
 
@@ -63,10 +71,10 @@ namespace Sequence.Demo
             }
             _page = page;
             _pageStack.Push(new PageWithArgs(page, openArgs));
-            _page.Open(openArgs);
+            _page.Open(openArgs.AppendObject(this));
         }
 
-        public virtual void Back()
+        public virtual void Back(params object[] injectAdditionalParams)
         {
             if (_pageStack.Count <= 1)
             {
@@ -76,7 +84,12 @@ namespace Sequence.Demo
             _pageStack.Pop().page.Close();
             PageWithArgs previous = _pageStack.Peek();
             _page = previous.page;
-            _page.Open(previous.openArgs);
+            _page.Open(previous.openArgs.AppendArray(injectAdditionalParams.AppendObject(this)));
+        }
+
+        public void GoBack()
+        {
+            _page.Back();
         }
 
         public void ClearStack()

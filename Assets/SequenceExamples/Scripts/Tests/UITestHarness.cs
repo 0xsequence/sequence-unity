@@ -27,6 +27,7 @@ namespace SequenceExamples.Scripts.Tests
         private CollectionInfoPage _collectionInfoPage;
         private NftInfoPage _nftInfoPage;
         private TokenInfoPage _tokenInfoPage;
+        private SearchViewAllPage _searchViewAllPage;
 
         public static float WaitForAnimationTime = 1.5f;
 
@@ -51,6 +52,7 @@ namespace SequenceExamples.Scripts.Tests
                 _collectionInfoPage = FindObjectOfType<CollectionInfoPage>();
                 _nftInfoPage = FindObjectOfType<NftInfoPage>();
                 _tokenInfoPage = FindObjectOfType<TokenInfoPage>();
+                _searchViewAllPage = FindObjectOfType<SearchViewAllPage>();
             }
 
             GameObject testObject = new GameObject("TestObject");
@@ -71,7 +73,7 @@ namespace SequenceExamples.Scripts.Tests
             
             _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
             _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel,
-                _searchPage, _collectionInfoPage, _nftInfoPage, _tokenInfoPage);
+                _searchPage, _collectionInfoPage, _nftInfoPage, _tokenInfoPage, _searchViewAllPage);
         }
 
         [UnityTearDown]
@@ -141,7 +143,14 @@ namespace SequenceExamples.Scripts.Tests
         public IEnumerator SearchTest()
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
-            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestSearchFlow());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestSearchPage());
+        }
+
+        [UnityTest]
+        public IEnumerator SearchViewAllTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestSearchViewAllPage());
         }
     }
 }

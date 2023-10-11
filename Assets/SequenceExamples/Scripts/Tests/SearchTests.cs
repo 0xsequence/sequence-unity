@@ -4,6 +4,7 @@ using Sequence.Demo;
 using SequenceExamples.Scripts.Tests.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -21,9 +22,10 @@ namespace SequenceExamples.Scripts.Tests
         private TransitionPanel _transitionPanel;
         private LoginPanel _loginPanel;
         private TokenInfoPage _tokenInfoPage;
+        private SearchViewAllPage _searchViewAllPage;
         int _otherElementsCount = 3; // ViewAllCollectionsButton, Spacer, ViewAllTokensButton
         
-        public SearchTests(MonoBehaviour testMonoBehaviour, WalletPanel walletPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, WalletPage walletPage, TransitionPanel transitionPanel, LoginPanel loginPanel, TokenInfoPage tokenInfoPage)
+        public SearchTests(MonoBehaviour testMonoBehaviour, WalletPanel walletPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, WalletPage walletPage, TransitionPanel transitionPanel, LoginPanel loginPanel, TokenInfoPage tokenInfoPage, SearchViewAllPage searchViewAllPage)
         {
             _testMonoBehaviour = testMonoBehaviour;
             _walletPanel = walletPanel;
@@ -34,6 +36,7 @@ namespace SequenceExamples.Scripts.Tests
             _transitionPanel = transitionPanel;
             _loginPanel = loginPanel;
             _tokenInfoPage = tokenInfoPage;
+            _searchViewAllPage = searchViewAllPage;
         }
 
         public IEnumerator NavigateToSearchPageTest()
@@ -50,8 +53,8 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(elementLayoutGroup);
             Assert.IsTrue(_searchPage.MaxSearchElementsDisplayed >= elementLayoutGroup.childCount - _otherElementsCount);
             
-            TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "CollectionCountText", $"Collections ({_walletPanel.GetCollections().Length})");
-            TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "TokenCountText", $"Coins ({_walletPanel.GetFetchedTokenElements().Length})");
+            TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "CollectionCountText", $"Collections ({_searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria()})");
+            TestExtensions.AssertTextWithNameHasText(_walletPanel.transform, "TokenCountText", $"Coins ({_searchPage.GetQuerier().GetNumberOfTokensMatchingCriteria()})");
 
             AssertSearchElementsAreAssembledCorrectly(elementLayoutGroup, _otherElementsCount);
             AssertSearchElementsAreOrderedCorrectly(elementLayoutGroup);
@@ -229,6 +232,124 @@ namespace SequenceExamples.Scripts.Tests
         {
             TestExtensions.AssertTextWithNameHasText(_searchPage.transform, "CollectionCountText", $"Collections ({_searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria()})");
             TestExtensions.AssertTextWithNameHasText(_searchPage.transform, "TokenCountText", $"Coins ({_searchPage.GetQuerier().GetNumberOfTokensMatchingCriteria()})");
+        }
+
+        public IEnumerator NavigateToViewAllCollectionsPageTest()
+        {
+            AssertSearchPageIsAsExpected();
+            
+            TestExtensions.ClickButtonWithName(_searchPage.transform, "ViewAllCollectionsButton");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+
+            yield return _testMonoBehaviour.StartCoroutine(AssertViewAllCollectionsPageIsAsExpected());
+        }
+
+        private IEnumerator AssertViewAllCollectionsPageIsAsExpected()
+        {
+            yield return _testMonoBehaviour.StartCoroutine(
+                AssertViewAllPageIsAsExpected<SearchableCollection>(_searchPage.GetQuerier()
+                    .GetNumberOfCollectionsMatchingCriteria()));
+        }
+
+        private IEnumerator AssertViewAllPageIsAsExpected<ExpectedSearchableType>(
+            int expectedSearchablesMatchingCriteria)
+        {
+            AssertCorrectToggleText();
+
+            Transform elementLayoutGroup = _searchViewAllPage.transform.FindAmongDecendants("SearchableContent");
+            Assert.IsNotNull(elementLayoutGroup);
+            Assert.AreEqual(expectedSearchablesMatchingCriteria, elementLayoutGroup.childCount);
+
+            AssertAllDisplayedSearchablesAreOfTypeT<ExpectedSearchableType>(elementLayoutGroup);
+
+            int randomInfoPageToTest = Random.Range(0, elementLayoutGroup.childCount);
+            yield return _testMonoBehaviour.StartCoroutine(
+                NavigateToInfoPageAndBackTest(elementLayoutGroup.GetChild(randomInfoPageToTest)));
+        }
+
+        private void AssertCorrectToggleText()
+        {
+            TestExtensions.AssertTextWithNameHasText(_searchViewAllPage.transform, "CollectionToggleText", 
+                $"Collections ({_searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria()})");
+            TestExtensions.AssertTextWithNameHasText(_searchViewAllPage.transform, "TokenToggleText",
+                $"Coins ({_searchPage.GetQuerier().GetNumberOfTokensMatchingCriteria()})");
+        }
+
+        private void AssertAllDisplayedSearchablesAreOfTypeT<T>(Transform layoutGroup)
+        {
+            int childCount = layoutGroup.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                SearchElement element = layoutGroup.GetChild(i).GetComponent<SearchElement>();
+                Assert.IsNotNull(element);
+                Assert.IsTrue(element.Searchable is T);
+            }
+        }
+
+        public IEnumerator NavigateToViewAllTokensPageTest()
+        {
+            AssertSearchPageIsAsExpected();
+            
+            TestExtensions.ClickButtonWithName(_searchPage.transform, "ViewAllTokensButton");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+
+            yield return _testMonoBehaviour.StartCoroutine(AssertViewAllTokensPageIsAsExpected());
+        }
+
+        private IEnumerator AssertViewAllTokensPageIsAsExpected()
+        {
+            yield return _testMonoBehaviour.StartCoroutine(
+                AssertViewAllPageIsAsExpected<TokenElement>(_searchPage.GetQuerier()
+                    .GetNumberOfTokensMatchingCriteria()));
+        }
+
+        public IEnumerator TestSearchBarEntriesRemainWhenMovingBackAndForthBetweenSearchPages()
+        {
+            AssertSearchPageIsAsExpected();
+            
+            TMP_InputField mainSearchBar = _searchPage.GetComponentInChildren<TMP_InputField>();
+            Assert.IsNotNull(mainSearchBar);
+            
+            mainSearchBar.text = "s";
+            TestExtensions.ClickButtonWithName(_searchPage.transform, "ViewAllCollectionsButton");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+
+            TMP_InputField viewAllPageSearchBar = _searchViewAllPage.GetComponentInChildren<TMP_InputField>();
+            Assert.IsNotNull(viewAllPageSearchBar);
+            Assert.AreEqual("s", viewAllPageSearchBar.text);
+
+            int expectedSearchablesMatchingCriteria = _searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria();
+            Transform elementLayoutGroup = _searchViewAllPage.transform.FindAmongDecendants("SearchableContent");
+            Assert.IsNotNull(elementLayoutGroup);
+            Assert.AreEqual(expectedSearchablesMatchingCriteria, elementLayoutGroup.childCount);
+
+            if (expectedSearchablesMatchingCriteria > 0)
+            {
+                int randomInfoPageToTest = Random.Range(0, expectedSearchablesMatchingCriteria);
+                yield return _testMonoBehaviour.StartCoroutine(
+                    NavigateToInfoPageAndBackTest(elementLayoutGroup.GetChild(randomInfoPageToTest)));
+            }
+            
+            Assert.AreEqual("s", viewAllPageSearchBar.text);
+            viewAllPageSearchBar.text = "m";
+            yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
+
+            Assert.AreEqual("m", mainSearchBar.text);
+            mainSearchBar.text = "se";
+            TestExtensions.ClickButtonWithName(_searchPage.transform, "ViewAllCollectionsButton");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+
+            Assert.AreEqual("se", viewAllPageSearchBar.text);
+            expectedSearchablesMatchingCriteria = _searchPage.GetQuerier().GetNumberOfCollectionsMatchingCriteria();
+            Assert.AreEqual(expectedSearchablesMatchingCriteria, elementLayoutGroup.childCount);
+            
+            yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
+            Assert.AreEqual("se", mainSearchBar.text);
+        }
+
+        public IEnumerator ToggleViewAllPageTest()
+        {
+            yield return null;
         }
     }
 }

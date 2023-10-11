@@ -13,12 +13,14 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _searchElementPrefab;
         [SerializeField] private int _numberOfSearchElementPrefabsToInstantiate = 1;
         [SerializeField] private RectTransform _elementLayoutGroupTransform;
-        [SerializeField] private TMP_InputField _searchBar;
+        [SerializeField] protected TMP_InputField _searchBar;
+        [SerializeField] protected TextMeshProUGUI _collectionCountText;
+        [SerializeField] protected TextMeshProUGUI _tokenCountText;
 
         private ObjectPool _searchElementPool;
         
-        private SearchableCollection[] _searchableCollections;
-        private TokenElement[] _tokenElements;
+        protected SearchableCollection[] _searchableCollections;
+        protected TokenElement[] _tokenElements;
         protected SearchableQuerier _searchableQuerier;
 
         private Queue<SearchElement> _activeElements;
@@ -57,6 +59,17 @@ namespace Sequence.Demo
             
             _activeElements = new Queue<SearchElement>();
             
+            SetInitialSearchBarText(args.GetObjectOfTypeIfExists<string>());
+            
+            SetCountTexts();
+        }
+
+        private void SetInitialSearchBarText(string initialText)
+        {
+            if (initialText != default)
+            {
+                _searchBar.text = initialText;
+            }
             OnInputValueChanged(_searchBar.text);
         }
 
@@ -64,6 +77,11 @@ namespace Sequence.Demo
         {
             base.Close();
             _searchElementPool.Cleanup();
+        }
+
+        public override void Back()
+        {
+            _panel.Back(_searchBar.text);
         }
 
         private void PopulateSearchElements()
@@ -99,11 +117,12 @@ namespace Sequence.Demo
         protected abstract void SetAndIncrementSiblingIndex(Transform searchElementTransform, ISearchable element);
         protected abstract ISearchable GetNextValidElement();
 
-        protected virtual void OnInputValueChanged(string newValue)
+        protected void OnInputValueChanged(string newValue)
         {
             _searchableQuerier.SetNewCriteria(newValue);
             ResetSearchElements();
             PopulateSearchElements();
+            SetCountTexts();
         }
 
         protected virtual void ResetSearchElements()
@@ -113,6 +132,12 @@ namespace Sequence.Demo
                 SearchElement element = _activeElements.Dequeue();
                 _searchElementPool.DeactivateObject(element.gameObject);
             }
+        }
+
+        private void SetCountTexts()
+        {
+            _collectionCountText.text = $"Collections ({_searchableQuerier.GetNumberOfCollectionsMatchingCriteria()})";
+            _tokenCountText.text = $"Coins ({_searchableQuerier.GetNumberOfTokensMatchingCriteria()})";
         }
 
         public SearchableQuerier GetQuerier()

@@ -10,8 +10,8 @@ namespace Sequence.Demo
 {
     public class SearchPage : SearchableUIPage
     {
-        [SerializeField] private TextMeshProUGUI _collectionCountText;
-        [SerializeField] private TextMeshProUGUI _tokenCountText;
+
+        private SearchViewAllPage _viewAllPage;
         
         private RectTransform _collectionCountTextTransform;
         private RectTransform _tokenCountTextTransform;
@@ -25,19 +25,7 @@ namespace Sequence.Demo
             base.Awake();
             _collectionCountTextTransform = _collectionCountText.GetComponent<RectTransform>();
             _tokenCountTextTransform = _tokenCountText.GetComponent<RectTransform>();
-        }
-
-        public override void Open(params object[] args)
-        {
-            base.Open(args);
-            
-            SetCountTexts();
-        }
-
-        private void SetCountTexts()
-        {
-            _collectionCountText.text = $"Collections ({_searchableQuerier.GetNumberOfCollectionsMatchingCriteria()})";
-            _tokenCountText.text = $"Coins ({_searchableQuerier.GetNumberOfTokensMatchingCriteria()})";
+            _viewAllPage = FindObjectOfType<SearchViewAllPage>();
         }
 
         protected override void SetAndIncrementSiblingIndex(Transform searchElementTransform, ISearchable element)
@@ -65,17 +53,26 @@ namespace Sequence.Demo
             return _searchableQuerier.GetNextValid();
         }
 
-        protected override void OnInputValueChanged(string newValue)
-        {
-            base.OnInputValueChanged(newValue);
-            SetCountTexts();
-        }
-
         protected override void ResetSearchElements()
         {
             base.ResetSearchElements();
             _nextCollectionSiblingIndex = _collectionCountTextTransform.parent.GetSiblingIndex() + 1;
             _nextTokenSiblingIndex = _tokenCountTextTransform.parent.GetSiblingIndex() + 1;
+        }
+
+        public void ViewAllCollections()
+        {
+            OpenViewAllPage(SearchViewAllPage.SearchToggleStatus.Collection);
+        }
+
+        public void ViewAllTokens()
+        {
+            OpenViewAllPage(SearchViewAllPage.SearchToggleStatus.Token);
+        }
+
+        private void OpenViewAllPage(SearchViewAllPage.SearchToggleStatus toggleStatus)
+        {
+            _panel.StartCoroutine(_panel.SetUIPage(_viewAllPage, _searchableCollections, _tokenElements, _searchBar.text, toggleStatus));
         }
     }
 }
