@@ -13,22 +13,19 @@ namespace Sequence.Demo
         private NftElement _nftElement;
         private WalletPanel _walletPanel;
 
-        public void Assemble(NftElement nftElement)
+        public void Assemble(NftElement nftElement, WalletPanel panel)
         {
             _nftElement = nftElement;
 
             _nftImage.sprite = nftElement.TokenIconSprite;
             _nftNameText.text = _nftElement.TokenName;
             _numberOwnedText.text = $"{_nftElement.Balance} Owned";
+
+            _walletPanel = panel;
         }
 
         public void SwitchToInfoPage()
         {
-            if (_walletPanel == null)
-            {
-                _walletPanel = FindObjectOfType<WalletPanel>();
-            }
-            
             _walletPanel.OpenNftInfoPage(_nftElement, NetworkIcons, TransactionDetailsFetcher);
         }
 

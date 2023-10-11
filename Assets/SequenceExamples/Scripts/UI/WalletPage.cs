@@ -37,13 +37,13 @@ namespace Sequence.Demo
             base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
-            _walletPanel = FindObjectOfType<WalletPanel>();
         }
 
         public override void Open(params object[] args)
         {
             base.Open(args);
-            
+
+            _walletPanel = (WalletPanel)_panel;
             _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Search);
 
             if (_tokenFetcher == null)
@@ -132,7 +132,7 @@ namespace Sequence.Demo
             }
 
             TokenUIElement uiElement = tokenContainer.GetComponent<TokenUIElement>();
-            uiElement.Assemble(element);
+            uiElement.Assemble(element, _walletPanel);
             _tokenUIElements.Add(uiElement);
             tokenContainer.SetParent(_scrollviewContentParent);
             tokenContainer.localScale = new Vector3(1, 1, 1);
@@ -165,7 +165,7 @@ namespace Sequence.Demo
             }
             
             NftUIElement nftUIElement = nftContainer.GetComponent<NftUIElement>();
-            nftUIElement.Assemble(nft);
+            nftUIElement.Assemble(nft, _walletPanel);
             nftContainer.SetParent(_scrollviewContentParent);
             nftContainer.localScale = new Vector3(1, 1, 1);
         }

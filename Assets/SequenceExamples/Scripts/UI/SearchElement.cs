@@ -16,13 +16,14 @@ namespace Sequence.Demo
         public ISearchable Searchable;
         private WalletPanel _walletPanel;
         
-        public void Assemble(ISearchable searchable)
+        public void Assemble(ISearchable searchable, WalletPanel panel)
         {
             Searchable = searchable;
             _icon.sprite = searchable.GetIcon();
             _name.text = searchable.GetName();
             _networkIcon.sprite = GetNetworkIcon();
             _numberOwnedText.text = $"{searchable.GetNumberOwned()} >";
+            _walletPanel = panel;
         }
 
         public Sprite GetNetworkIcon()
@@ -32,11 +33,6 @@ namespace Sequence.Demo
 
         public void OpenInfoPage()
         {
-            if (_walletPanel == null)
-            {
-                _walletPanel = FindObjectOfType<WalletPanel>();
-            }
-
             if (Searchable is SearchableCollection searchableCollection)
             {
                 _walletPanel.OpenCollectionInfoPage(NetworkIcons, searchableCollection.GetCollection());

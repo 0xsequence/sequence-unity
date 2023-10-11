@@ -68,7 +68,7 @@ namespace Sequence.Demo
         {
             if (_walletPanel == null)
             {
-                _walletPanel = FindObjectOfType<WalletPanel>();
+                _walletPanel = (WalletPanel)_panel;
             }
             
             _walletPanel.OpenCollectionInfoPage(_networkIcons, _nftElement.Collection);

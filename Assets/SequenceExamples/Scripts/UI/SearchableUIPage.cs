@@ -109,7 +109,7 @@ namespace Sequence.Demo
                 searchElementTransform.localScale = new Vector3(1, 1, 1);
                 SearchElement searchElement = searchElementTransform.GetComponent<SearchElement>();
                 SetAndIncrementSiblingIndex(searchElementTransform, element);
-                searchElement.Assemble(element);
+                searchElement.Assemble(element, (WalletPanel)_panel);
                 _activeElements.Enqueue(searchElement);
             }
         }

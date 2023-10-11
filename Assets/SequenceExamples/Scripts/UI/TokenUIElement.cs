@@ -30,7 +30,7 @@ namespace Sequence.Demo
             _baseColor = _percentChangeText.color;
         }
 
-        public void Assemble(TokenElement tokenElement)
+        public void Assemble(TokenElement tokenElement, WalletPanel panel)
         {
             _tokenElement = tokenElement;
             
@@ -40,6 +40,8 @@ namespace Sequence.Demo
             
             _amountAndCurrencyTextSetter = new AmountAndCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement, _percentChangeText, _baseColor);
             _amountAndCurrencyTextSetter.SetInitialValueAndAmountText();
+
+            _walletPanel = panel;
         }
 
         public void RefreshCurrencyValue()
@@ -70,11 +72,6 @@ namespace Sequence.Demo
 
         public void SwitchToInfoPage()
         {
-            if (_walletPanel == null)
-            {
-                _walletPanel = FindObjectOfType<WalletPanel>();
-            }
-            
             _walletPanel.OpenTokenInfoPage(_tokenElement, NetworkIcons, TransactionDetailsFetcher);
         }
     }

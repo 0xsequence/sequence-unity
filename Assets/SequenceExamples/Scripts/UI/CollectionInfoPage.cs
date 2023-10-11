@@ -54,6 +54,8 @@ namespace Sequence.Demo
 
             _nftsWithInfoGridLayoutGroupTransform = _nftsWithInfoGridLayoutGroup.GetComponent<RectTransform>();
 
+            _walletPanel = (WalletPanel)_panel;
+
             Assemble();
         }
 
@@ -69,11 +71,7 @@ namespace Sequence.Demo
             _collectionNameText.text = _collectionInfo.Name;
             _networkIcon.sprite = _networkIcons.GetIcon(_collectionInfo.Network);
             _networkName.text = ChainNames.NameOf[_collectionInfo.Network];
-
-            if (_walletPanel == null)
-            {
-                _walletPanel = FindObjectOfType<WalletPanel>();
-            }
+            
             List<NftElement> nftsInCollection = _walletPanel.GetNftsFromCollection(_collectionInfo);
             _uniqueCollectiblesOwnedText.text = $"{nftsInCollection.Count} Unique Collectibles";
             _totalOwnedText.text = $"Owned ({NftElement.CalculateTotalNftsOwned(nftsInCollection)})";
@@ -96,7 +94,7 @@ namespace Sequence.Demo
                 nftWithTextTransform.SetParent(_nftsWithInfoGridLayoutGroupTransform);
                 nftWithTextTransform.localScale = new Vector3(1, 1, 1);
                 NftWithInfoTextUIElement uiElement = nftWithTextTransform.GetComponent<NftWithInfoTextUIElement>();
-                uiElement.Assemble(nfts[i]);
+                uiElement.Assemble(nfts[i], _walletPanel);
             }
         }
         
