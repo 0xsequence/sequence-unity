@@ -4,6 +4,7 @@ using Sequence.Demo.ScriptableObjects;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Sequence.Demo
@@ -11,14 +12,18 @@ namespace Sequence.Demo
     public class ColorSchemeManager : MonoBehaviour
     {
         [SerializeField] private ColorScheme _colorScheme;
-        [SerializeField] private GameObject _tokenUIElementPrefab;
+        [SerializeField] private GameObject[] _uiElementPrefabs;
         public void ApplyColorScheme()
         {
             ApplyColorSchemeToChildren(transform);
-            GameObject prefabInstance = PrefabUtility.InstantiatePrefab(_tokenUIElementPrefab) as GameObject;
-            ApplyColorSchemeToChildren(prefabInstance.transform);
-            PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
-            DestroyImmediate(prefabInstance);
+            int prefabs = _uiElementPrefabs.Length;
+            for (int i = 0; i < prefabs; i++)
+            {
+                GameObject prefabInstance = PrefabUtility.InstantiatePrefab(_uiElementPrefabs[i]) as GameObject;
+                ApplyColorSchemeToChildren(prefabInstance.transform);
+                PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
+                DestroyImmediate(prefabInstance);
+            }
         }
 
         private void ApplyColorSchemeToChildren(Transform parent)

@@ -7,6 +7,7 @@ namespace Sequence.Demo
     {
         public event Action<FetchTokenContentResult> OnTokenFetchSuccess; 
         public Task FetchContent(int maxToFetch);
+        public void Refresh();
     }
 
     public class FetchTokenContentResult

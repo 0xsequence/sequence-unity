@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using Sequence.Authentication;
+using Sequence.Demo.ScriptableObjects;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -20,9 +22,22 @@ namespace Sequence.Demo
 
         private WalletPanel _walletPanel;
         private WalletPage _walletPage;
+        private TokenInfoPage _tokenInfoPage;
 
         private UIPage _page;
-        private Stack<UIPage> _pageStack = new Stack<UIPage>();
+        private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
+        
+        private struct PageWithArgs
+        {
+            public UIPage page;
+            public object[] args;
+
+            public PageWithArgs(UIPage page, object[] args)
+            {
+                this.page = page;
+                this.args = args;
+            }
+        }
 
         private void Awake()
         {
@@ -47,6 +62,7 @@ namespace Sequence.Demo
             _walletPanel = GetComponentInChildren<WalletPanel>();
 
             _walletPage = GetComponentInChildren<WalletPage>();
+            _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
         }
 
         public void Start()
@@ -71,17 +87,18 @@ namespace Sequence.Demo
 
         public void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
-            panel.Open();
-            _page = panel.InitialPage;
-            _pageStack.Push(panel.InitialPage);
+            panel.Open(openArgs);
         }
 
         public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
         {
-            _page.Close();
-            yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+            if (_page != null)
+            {
+                _page.Close();
+                yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+            }
             _page = page;
-            _pageStack.Push(page);
+            _pageStack.Push(new PageWithArgs(page, openArgs));
             _page.Open(openArgs);
         }
 
@@ -92,9 +109,10 @@ namespace Sequence.Demo
                 return;
             }
 
-            _pageStack.Pop().Close();
-            _page = _pageStack.Peek();
-            _page.Open();
+            _pageStack.Pop().page.Close();
+            PageWithArgs previous = _pageStack.Peek();
+            _page = previous.page;
+            _page.Open(previous.args);
         }
 
         private void OnLoginSuccessHandler(string userId)
@@ -117,6 +135,18 @@ namespace Sequence.Demo
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.Log($"Failed to send MFA email to {email} with error: {error}");
+        }
+
+        public void SwitchToTokenInfoPage(TokenElement tokenElement, NetworkIcons networkIcons, ITransactionDetailsFetcher transactionDetailsFetcher)
+        {
+            StartCoroutine(SetUIPage(_tokenInfoPage, tokenElement, networkIcons, transactionDetailsFetcher));
+            _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Back);
+        }
+
+        public void ClearStack()
+        {
+            _pageStack = new Stack<PageWithArgs>();
+            _page = null;
         }
     }
 }

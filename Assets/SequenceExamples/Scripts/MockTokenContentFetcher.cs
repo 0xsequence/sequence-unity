@@ -15,9 +15,10 @@ namespace Sequence.Demo
         private int _fetched = 0;
         public readonly int DelayInMilliseconds = 100;
 
-        public MockTokenContentFetcher(int totalFetchable = 5)
+        public MockTokenContentFetcher(int totalFetchable = 5, int delayInMilliseconds = 100)
         {
-            _totalFetchable = totalFetchable;
+            this._totalFetchable = totalFetchable;
+            this.DelayInMilliseconds = delayInMilliseconds;
         }
         
         public async Task FetchContent(int maxToFetch)
@@ -47,20 +48,22 @@ namespace Sequence.Demo
                 "0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa", "0xb396CbD9b745Ffc4a9C9A6D43D7957b1350Be153"
             };
             Texture2D tokenIconTexture = MockNftContentFetcher.CreateMockTexture();
-            Texture2D networkIconTexture = MockNftContentFetcher.CreateMockTexture();
             Sprite tokenIconSprite = Sprite.Create(tokenIconTexture, new Rect(0, 0, tokenIconTexture.width, tokenIconTexture.height),
-                new Vector2(.5f, .5f));
-            Sprite networkIconSprite = Sprite.Create(networkIconTexture, new Rect(0, 0, networkIconTexture.width, networkIconTexture.height),
                 new Vector2(.5f, .5f));
 
             return new TokenElement(
                 new ERC20(potentialMockAddresses.GetRandomObjectFromArray()),
                 tokenIconSprite,
                 potentialNames.GetRandomObjectFromArray(),
-                networkIconSprite,
+                EnumExtensions.GetRandomEnumValue<Chain>(),
                 (uint)Random.Range(0, 10000),
                 potentialSymbols.GetRandomObjectFromArray(),
                 new MockCurrencyConverter());
+        }
+
+        public void Refresh()
+        {
+            _fetched = 0;
         }
     }
 }

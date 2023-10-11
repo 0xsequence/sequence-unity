@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -29,27 +30,43 @@ namespace Sequence.Demo
         private GridLayoutGroup _grid;
         private float _brandingBuffer = 60;
         private List<TokenUIElement> _tokenUIElements = new List<TokenUIElement>();
+        private WalletPanel _walletPanel;
 
         protected override void Awake()
         {
             base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
+            _walletPanel = FindObjectOfType<WalletPanel>();
         }
 
         public override void Open(params object[] args)
         {
             base.Open();
+            
+            _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Search);
 
             if (_tokenFetcher == null)
             {
-                throw new SystemException($"{nameof(_tokenFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
+                _tokenFetcher = args.GetObjectOfTypeIfExists<ITokenContentFetcher>();
+                if (_tokenFetcher == default)
+                {
+                    throw new SystemException(
+                        $"Invalid use. {nameof(WalletPage)} must be opened with a {typeof(ITokenContentFetcher)} as an argument.");
+                }
             }
 
             if (_nftFetcher == null)
             {
-                throw new SystemException($"{nameof(_nftFetcher)} must not be null. Please call {nameof(SetupContentFetchers)} before opening");
+                _nftFetcher = args.GetObjectOfTypeIfExists<INftContentFetcher>();
+                if (_nftFetcher == default)
+                {
+                    throw new SystemException(
+                        $"Invalid use. {nameof(WalletPage)} must be opened with a {typeof(INftContentFetcher)} as an argument.");
+                }
             }
+
+            SetupContentFetchers(_tokenFetcher, _nftFetcher);
 
             _tokenPool =
                 ObjectPool.ActivateObjectPool(_tokenPlaceHolderPrefab, _numberOfTokenPlaceholdersToInstantiate);
@@ -70,14 +87,18 @@ namespace Sequence.Demo
             _tokenPool.Cleanup();
             _nftPool.Cleanup();
             _tokenUIElements = new List<TokenUIElement>();
+            _tokenContent = new List<TokenElement>();
+            _nftContent = new List<Texture2D>();
         }
 
-        public void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)
+        private void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)
         {
             _tokenFetcher = tokenContentFetcher;
             _tokenFetcher.OnTokenFetchSuccess += HandleTokenFetchSuccess;
+            _tokenFetcher.Refresh();;
             _nftFetcher = nftContentFetcher;
             _nftFetcher.OnNftFetchSuccess += HandleNftFetchSuccess;
+            _nftFetcher.Refresh();
         }
 
         private void HandleTokenFetchSuccess(FetchTokenContentResult result)

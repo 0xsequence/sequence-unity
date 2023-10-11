@@ -80,7 +80,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return null;
             
             button.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
 
             AssertWeAreOnMfaPage();
             
@@ -174,7 +174,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(backButton);
             
             backButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertWeAreOnMfaPage();
             
@@ -195,7 +195,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(backButton);
             
             backButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertWeAreOnLoginPage();
             
@@ -220,7 +220,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(dismissButton);
             
             dismissButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertLoginPanelIsClosed();
         }

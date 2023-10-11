@@ -62,5 +62,11 @@ namespace Sequence.Demo
                     break;
             }
         }
+
+        public void OverrideAnimationTimes(float newAnimationDurationInSeconds)
+        {
+            _closeAnimationDurationInSeconds = newAnimationDurationInSeconds;
+            _openAnimationDurationInSeconds = newAnimationDurationInSeconds;
+        }
     }
 }

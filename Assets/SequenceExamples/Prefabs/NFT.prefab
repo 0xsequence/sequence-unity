@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1585219861179655251}
   - component: {fileID: 4291578054636979227}
   - component: {fileID: 3153608606666130438}
+  - component: {fileID: 3344517842618122965}
   m_Layer: 5
   m_Name: NFT
   m_TagString: Untagged
@@ -121,3 +122,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3344517842618122965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878011362095268920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deaa278414364aa78fe6dd20e315a721, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -97,6 +97,9 @@ chaintest.out
 TestResults_Edit.xml
 TestResults_Play.xml
 
+# Temporary test files
+Assets/InitTestScene*.unity*
+
 # Node
 node_modules
 

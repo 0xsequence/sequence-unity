@@ -8,6 +8,7 @@ namespace Sequence.Demo
     {
         public event Action<FetchNftContentResult> OnNftFetchSuccess; 
         public Task FetchContent(int maxToFetch);
+        public void Refresh();
     }
 
     public class FetchNftContentResult
