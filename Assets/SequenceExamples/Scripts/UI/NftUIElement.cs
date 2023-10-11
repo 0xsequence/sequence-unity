@@ -1,4 +1,3 @@
-using Sequence.Demo.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.UI;
 
