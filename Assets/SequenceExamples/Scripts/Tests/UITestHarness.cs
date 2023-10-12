@@ -132,7 +132,7 @@ namespace SequenceExamples.Scripts.Tests
         }
 
         [UnityTest]
-        public IEnumerator CollectionInfoPageTest_navigatingThroughNftInfoPages()
+        public IEnumerator CollectionInfoPageTest()
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests
