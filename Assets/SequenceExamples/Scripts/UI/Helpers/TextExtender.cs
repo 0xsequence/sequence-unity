@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class TextExtender : MonoBehaviour
+    public class TextExtender : MonoBehaviour, ITextSetter
     {
         private TextMeshProUGUI _text;
         private RectTransform _transform;

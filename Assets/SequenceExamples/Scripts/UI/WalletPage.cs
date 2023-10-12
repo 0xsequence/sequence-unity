@@ -24,7 +24,7 @@ namespace Sequence.Demo
         private ITokenContentFetcher _tokenFetcher;
         private List<TokenElement> _tokenContent = new List<TokenElement>();
         private INftContentFetcher _nftFetcher;
-        private List<Texture2D> _nftContent = new List<Texture2D>();
+        private List<NftElement> _nftContent = new List<NftElement>();
         private RectTransform _scrollRectContent;
         private int _widthInItems = 2;
         private GridLayoutGroup _grid;
@@ -37,13 +37,13 @@ namespace Sequence.Demo
             base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
-            _walletPanel = FindObjectOfType<WalletPanel>();
         }
 
         public override void Open(params object[] args)
         {
-            base.Open();
-            
+            base.Open(args);
+
+            _walletPanel = (WalletPanel)_panel;
             _walletPanel.SetTopBarMode(WalletPanel.TopBarMode.Search);
 
             if (_tokenFetcher == null)
@@ -88,7 +88,7 @@ namespace Sequence.Demo
             _nftPool.Cleanup();
             _tokenUIElements = new List<TokenUIElement>();
             _tokenContent = new List<TokenElement>();
-            _nftContent = new List<Texture2D>();
+            _nftContent = new List<NftElement>();
         }
 
         private void SetupContentFetchers(ITokenContentFetcher tokenContentFetcher, INftContentFetcher nftContentFetcher)
@@ -132,7 +132,7 @@ namespace Sequence.Demo
             }
 
             TokenUIElement uiElement = tokenContainer.GetComponent<TokenUIElement>();
-            uiElement.Assemble(element);
+            uiElement.Assemble(element, _walletPanel);
             _tokenUIElements.Add(uiElement);
             tokenContainer.SetParent(_scrollviewContentParent);
             tokenContainer.localScale = new Vector3(1, 1, 1);
@@ -140,12 +140,12 @@ namespace Sequence.Demo
 
         private void HandleNftFetchSuccess(FetchNftContentResult result)
         {
-            Texture2D[] textures = result.Content;
-            int count = textures.Length;
+            NftElement[] nftElements = result.Content;
+            int count = nftElements.Length;
             for (int i = 0; i < count; i++)
             {
-                _nftContent.Add(textures[i]);
-                ApplyTexture(textures[i]);
+                _nftContent.Add(nftElements[i]);
+                ApplyNftContent(nftElements[i]);
                 UpdateScrollViewSize();
             }
 
@@ -155,7 +155,7 @@ namespace Sequence.Demo
             }
         }
 
-        private void ApplyTexture(Texture2D texture)
+        private void ApplyNftContent(NftElement nft)
         {
             Transform nftContainer = _nftPool.GetNextAvailable();
             if (nftContainer == null)
@@ -164,9 +164,8 @@ namespace Sequence.Demo
                     $"{nameof(nftContainer)} should not be null. {nameof(_nftPool)} should expand.");
             }
             
-            Image nftImage = nftContainer.GetComponent<Image>();
-            nftImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
-                new Vector2(.5f, .5f));
+            NftUIElement nftUIElement = nftContainer.GetComponent<NftUIElement>();
+            nftUIElement.Assemble(nft, _walletPanel);
             nftContainer.SetParent(_scrollviewContentParent);
             nftContainer.localScale = new Vector3(1, 1, 1);
         }

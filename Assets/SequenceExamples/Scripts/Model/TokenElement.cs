@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class TokenElement : ICurrencyRepository
+    public class TokenElement : ICurrencyRepository, ISearchable
     {
         public ERC20 Erc20;
         public Sprite TokenIconSprite;
@@ -49,11 +49,6 @@ namespace Sequence.Demo
             Balance = value;
         }
 
-        public string GetAddress()
-        {
-            return Erc20.GetAddress();
-        }
-
         public string GetSymbol()
         {
             return Symbol;
@@ -71,7 +66,32 @@ namespace Sequence.Demo
 
         public Currency GetCurrency()
         {
-            return CurrencyConverter.ConvertToCurrency(GetAmount(), GetAddress());
+            return CurrencyConverter.ConvertToCurrency(GetAmount(), GetContractAddress());
+        }
+
+        public Address GetContractAddress()
+        {
+            return Erc20.GetAddress();
+        }
+
+        public Sprite GetIcon()
+        {
+            return TokenIconSprite;
+        }
+
+        public string GetName()
+        {
+            return TokenName;
+        }
+
+        public Chain GetNetwork()
+        {
+            return Network;
+        }
+
+        public uint GetNumberOwned()
+        {
+            return Balance;
         }
     }
 }

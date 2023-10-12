@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 
 namespace Sequence.Demo
 {
-    public class TokenUIElement : MonoBehaviour
+    public class TokenUIElement : WalletUIElement
     {
         [SerializeField] private Image _tokenIconImage;
         [SerializeField] private TextExtender _tokenNameSetter;
@@ -19,21 +19,18 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _balanceText;
         [SerializeField] private TextMeshProUGUI _currencyValueText;
         [SerializeField] private TextMeshProUGUI _percentChangeText;
-        public NetworkIcons NetworkIcons;
 
         private TokenElement _tokenElement;
         private AmountAndCurrencyTextSetter _amountAndCurrencyTextSetter;
         private Color _baseColor;
-        private SequenceUI _sequenceUI;
-
-        public ITransactionDetailsFetcher TransactionDetailsFetcher = new MockTransactionDetailsFetcher(15); // Todo: replace mock with concrete implementation
+        private WalletPanel _walletPanel;
 
         private void Awake()
         {
             _baseColor = _percentChangeText.color;
         }
 
-        public void Assemble(TokenElement tokenElement)
+        public void Assemble(TokenElement tokenElement, WalletPanel panel)
         {
             _tokenElement = tokenElement;
             
@@ -43,6 +40,8 @@ namespace Sequence.Demo
             
             _amountAndCurrencyTextSetter = new AmountAndCurrencyTextSetter(_balanceText, _currencyValueText, _tokenElement, _percentChangeText, _baseColor);
             _amountAndCurrencyTextSetter.SetInitialValueAndAmountText();
+
+            _walletPanel = panel;
         }
 
         public void RefreshCurrencyValue()
@@ -66,19 +65,14 @@ namespace Sequence.Demo
             }
         }
 
-        public Chain GetNetwork()
+        public override Chain GetNetwork()
         {
             return _tokenElement.Network;
         }
 
         public void SwitchToInfoPage()
         {
-            if (_sequenceUI == null)
-            {
-                _sequenceUI = FindObjectOfType<SequenceUI>();
-            }
-
-            _sequenceUI.SwitchToTokenInfoPage(_tokenElement, NetworkIcons, TransactionDetailsFetcher); 
+            _walletPanel.OpenTokenInfoPage(_tokenElement, NetworkIcons, TransactionDetailsFetcher);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sequence.Utils
 {
@@ -115,6 +116,11 @@ namespace Sequence.Utils
         public static string WithoutHexPrefix(this string value)
         {
             return value.Replace("0x", "");
+        }
+
+        public static string NoWhitespace(this string value)
+        {
+            return Regex.Replace(value, @"\s+", "");
         }
     }
 }

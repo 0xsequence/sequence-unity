@@ -37,7 +37,7 @@ namespace Sequence.Demo
             OnTokenFetchSuccess?.Invoke(new FetchTokenContentResult(mockElements, moreToFetch));
         }
 
-        private TokenElement CreateMockElement()
+        public TokenElement CreateMockElement()
         {
             string[] potentialNames = new string[]
                 { "AwesomeToken", "MadeWithSequence", "SequenceSampleToken", "SequenceTestToken", "SequenceToken", "SequenceBucks" };

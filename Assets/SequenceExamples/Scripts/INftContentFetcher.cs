@@ -13,10 +13,10 @@ namespace Sequence.Demo
 
     public class FetchNftContentResult
     {
-        public Texture2D[] Content;
+        public NftElement[] Content;
         public bool MoreToFetch;
 
-        public FetchNftContentResult(Texture2D[] content, bool moreToFetch)
+        public FetchNftContentResult(NftElement[] content, bool moreToFetch)
         {
             this.Content = content;
             this.MoreToFetch = moreToFetch;

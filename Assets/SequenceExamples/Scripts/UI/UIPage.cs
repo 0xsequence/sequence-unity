@@ -1,18 +1,23 @@
+using System;
 using System.Collections;
 using Sequence.Demo.Tweening;
+using Sequence.Utils;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Scale = Sequence.Demo.Tweening.Scale;
 
 namespace Sequence.Demo
 {
     [RequireComponent(typeof(RectTransform))]
-    public class UIPage : MonoBehaviour
+    public abstract class UIPage : MonoBehaviour
     {
         private RectTransform _transform;
         [SerializeField] protected float _openAnimationDurationInSeconds;
         [SerializeField] protected float _closeAnimationDurationInSeconds;
         [SerializeField] private AnimationType _animation;
         protected GameObject _gameObject;
-        private ITween _animator;
+        protected ITween _animator;
+        protected UIPanel _panel;
 
         public enum AnimationType
         {
@@ -35,8 +40,15 @@ namespace Sequence.Demo
 
         public virtual void Open(params object[] args)
         {
+            _panel =
+                args.GetObjectOfTypeIfExists<UIPanel>();
+            if (_panel == default)
+            {
+                throw new SystemException(
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(UIPanel)} as an argument");
+            }
             _gameObject.SetActive(true);
-            _animator.Animate( _openAnimationDurationInSeconds);
+            _animator.AnimateIn( _openAnimationDurationInSeconds);
         }
 
         public virtual void Close()
@@ -67,6 +79,11 @@ namespace Sequence.Demo
         {
             _closeAnimationDurationInSeconds = newAnimationDurationInSeconds;
             _openAnimationDurationInSeconds = newAnimationDurationInSeconds;
+        }
+
+        public virtual void Back()
+        {
+            _panel.Back();
         }
     }
 }

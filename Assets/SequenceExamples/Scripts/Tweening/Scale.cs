@@ -14,7 +14,7 @@ namespace Sequence.Demo.Tweening
             _transform.localScale = new Vector3(0, 0, 0);
         }
 
-        public void Animate(float durationInSeconds)
+        public void AnimateIn(float durationInSeconds)
         {
             ScaleOverTime(1, durationInSeconds);
         }
