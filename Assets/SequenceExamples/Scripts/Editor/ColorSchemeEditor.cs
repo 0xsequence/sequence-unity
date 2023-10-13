@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using Sequence.Demo;
 using UnityEditor;
 using UnityEngine;
@@ -20,3 +21,4 @@ namespace Sequence.Demo.EditorExtensions
         }
     }
 }
+#endif
