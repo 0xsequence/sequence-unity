@@ -184,5 +184,17 @@ namespace Sequence.Demo
         {
             OpenPageOverlaid(_walletDropdown, _walletAddress);
         }
+
+        public override IEnumerator SetUIPage(UIPage page, params object[] openArgs)
+        {
+            if (_page is WalletDropdown)
+            {
+                _page.Close();
+                _pageStack.Pop();
+                yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+                _page = _pageStack.Peek().page;
+            }
+            yield return base.SetUIPage(page, openArgs);
+        }
     }
 }

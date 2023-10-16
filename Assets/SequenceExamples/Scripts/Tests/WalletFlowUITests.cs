@@ -116,6 +116,16 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsTrue(_walletPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
             Assert.IsFalse(_transitionPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_nftInfoPage.gameObject.activeInHierarchy);
+        }
+
+        private void AssertWeAreOnNftInfoPage()
+        {
+            Assert.IsTrue(_walletPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_walletPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
+            Assert.IsFalse(_transitionPanel.gameObject.activeInHierarchy);
+            Assert.IsTrue(_nftInfoPage.gameObject.activeInHierarchy);
         }
 
         private IEnumerator AssertWalletPageIsAsExpected()
@@ -546,6 +556,23 @@ namespace SequenceExamples.Scripts.Tests
             
             AssertWeAreOnWalletPage();
             Assert.IsFalse(_walletDropdown.gameObject.activeInHierarchy);
+            
+            TestExtensions.ClickButtonWithName(topBar, "WalletDropdown");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+            AssertWeAreOnWalletPage();
+            Assert.IsTrue(_walletDropdown.gameObject.activeInHierarchy);
+            
+            TestExtensions.ClickButtonWithName(_walletPage.transform, "NFT(Clone)");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+
+            AssertWeAreOnNftInfoPage();
+            Assert.IsFalse(_walletDropdown.gameObject.activeInHierarchy);
+
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
+            AssertWeAreOnWalletPage();
+            Assert.IsFalse(_walletDropdown.gameObject.activeInHierarchy);
         }
+        
+        
     }
 }

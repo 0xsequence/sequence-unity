@@ -9,10 +9,10 @@ namespace Sequence.Demo
     {
         public UIPage InitialPage;
         
-        private Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
+        protected Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
         protected UIPage _page;
         
-        private struct PageWithArgs
+        protected struct PageWithArgs
         {
             public UIPage page;
             public object[] openArgs;
@@ -62,7 +62,7 @@ namespace Sequence.Demo
             Open(args);
         }
         
-        public IEnumerator SetUIPage(UIPage page, params object[] openArgs)
+        public virtual IEnumerator SetUIPage(UIPage page, params object[] openArgs)
         {
             if (_page != null)
             {
