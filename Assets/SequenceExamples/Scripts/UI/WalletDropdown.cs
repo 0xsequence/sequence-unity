@@ -31,7 +31,7 @@ namespace Sequence.Demo
         }
 
         /// <summary>
-        /// Copy _walletAddress to clipboard
+        /// Copy _walletAddress to clipboard and temporarily change _copyAddressIcon's sprite
         /// </summary>
         public void CopyAddress()
         {
