@@ -74,6 +74,13 @@ namespace Sequence.Demo
             _page.Open(openArgs.AppendObject(this));
         }
 
+        protected void OpenPageOverlaid(UIPage page, params object[] openArgs)
+        {
+            _page = page;
+            _pageStack.Push(new PageWithArgs(page, openArgs));
+            page.Open(openArgs.AppendObject(this));
+        }
+
         public virtual void Back(params object[] injectAdditionalParams)
         {
             if (_pageStack.Count <= 1)

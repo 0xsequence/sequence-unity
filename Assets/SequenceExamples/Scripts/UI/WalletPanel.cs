@@ -16,6 +16,7 @@ namespace Sequence.Demo
         private TokenInfoPage _tokenInfoPage;
         private NftInfoPage _nftInfoPage;
         private SearchPage _searchPage;
+        private WalletDropdown _walletDropdown;
         private CollectionNftMapper _collectionNftMapper;
         private INftContentFetcher _nftContentFetcher;
         private CollectionInfoPage _collectionInfoPage;
@@ -37,6 +38,7 @@ namespace Sequence.Demo
             _nftInfoPage = GetComponentInChildren<NftInfoPage>();
             _collectionInfoPage = GetComponentInChildren<CollectionInfoPage>();
             _searchPage = GetComponentInChildren<SearchPage>();
+            _walletDropdown = GetComponentInChildren<WalletDropdown>();
             _collectionNftMapper = new CollectionNftMapper();
         }
 
@@ -164,6 +166,11 @@ namespace Sequence.Demo
 
             StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray()));
             SetTopBarMode(TopBarMode.Back);
+        }
+        
+        public void OpenWalletDropdown()
+        {
+            OpenPageOverlaid(_walletDropdown);
         }
     }
 }
