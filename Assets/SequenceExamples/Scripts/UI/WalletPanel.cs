@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
+using TMPro;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -10,6 +12,7 @@ namespace Sequence.Demo
     {
         [SerializeField] private GameObject _searchButton;
         [SerializeField] private GameObject _backButton;
+        [SerializeField] private TextMeshProUGUI _walletAddressText;
         
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
@@ -22,6 +25,7 @@ namespace Sequence.Demo
         private CollectionInfoPage _collectionInfoPage;
         private ITokenContentFetcher _tokenContentFetcher;
         private List<TokenElement> _fetchedTokenElements;
+        private Address _walletAddress;
 
         public enum TopBarMode
         {
@@ -46,6 +50,14 @@ namespace Sequence.Demo
         {
             base.Open(args);
             _fetchedTokenElements = new List<TokenElement>();
+            _walletAddress = args.GetObjectOfTypeIfExists<Address>();
+            if (_walletAddress == default)
+            {
+                throw new SystemException(
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(Address)} as an argument");
+            }
+            
+            _walletAddressText.text = _walletAddress.CondenseForUI();
         }
 
         public override void Close()
@@ -170,7 +182,7 @@ namespace Sequence.Demo
         
         public void OpenWalletDropdown()
         {
-            OpenPageOverlaid(_walletDropdown);
+            OpenPageOverlaid(_walletDropdown, _walletAddress);
         }
     }
 }

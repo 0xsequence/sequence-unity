@@ -33,10 +33,11 @@ namespace SequenceExamples.Scripts.Tests
         private NftInfoPage _nftInfoPage;
         private TokenInfoPage _tokenInfoPage;
         private SearchViewAllPage _searchViewAllPage;
+        private WalletDropdown _walletDropdown;
 
         private bool _nftInfoPageCurrencyValueRefreshTested = false;
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage, SearchViewAllPage searchViewAllPage)
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage, SearchViewAllPage searchViewAllPage, WalletDropdown walletDropdown)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;
@@ -49,6 +50,7 @@ namespace SequenceExamples.Scripts.Tests
             _nftInfoPage = nftInfoPage;
             _tokenInfoPage = tokenInfoPage;
             _searchViewAllPage = searchViewAllPage;
+            _walletDropdown = walletDropdown;
         }
 
         public IEnumerator NavigateToWalletPageTest()
@@ -507,6 +509,43 @@ namespace SequenceExamples.Scripts.Tests
                 .TestSearchBarEntriesRemainWhenMovingBackAndForthBetweenSearchPages());
             yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToViewAllCollectionsPageTest());
             yield return _testMonobehaviour.StartCoroutine(searchTests.ToggleViewAllPageTest());
+        }
+
+        public IEnumerator TestWalletDropdown()
+        {
+            AssertWeAreOnWalletPage();
+            Assert.IsFalse(_walletDropdown.gameObject.activeInHierarchy);
+            
+            Transform topBar = _walletPanel.transform.FindAmongDecendants("TopBar");
+            Assert.IsNotNull(topBar);
+            TestExtensions.AssertTextWithNameHasText(topBar, "WalletAddressText", UITestHarness.TestAddress.CondenseForUI());
+            
+            TestExtensions.ClickButtonWithName(topBar, "WalletDropdown");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+            
+            AssertWeAreOnWalletPage();
+            Assert.IsTrue(_walletDropdown.gameObject.activeInHierarchy);
+            
+            TestExtensions.AssertTextWithNameHasText(_walletDropdown.transform, "WalletAddressText", UITestHarness.TestAddress.CondenseForUI());
+            
+            Transform copyAddressIconTransform = _walletDropdown.transform.FindAmongDecendants("CopyAddressIcon");
+            Assert.IsNotNull(copyAddressIconTransform);
+            Image copyAddressIcon = copyAddressIconTransform.GetComponent<Image>();
+            Assert.IsNotNull(copyAddressIcon);
+            Sprite copyAddressIconSprite = copyAddressIcon.sprite;
+            
+            TestExtensions.ClickButtonWithName(_walletDropdown.transform, "AddressLayoutGroup");
+            yield return new WaitForEndOfFrame(); // Allow UI a moment to update
+            Assert.AreNotEqual(copyAddressIconSprite, copyAddressIcon.sprite);
+            
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+            Assert.AreEqual(copyAddressIconSprite, copyAddressIcon.sprite);
+            
+            TestExtensions.ClickButtonWithName(_walletDropdown.transform, "CloseDropdownButton");
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
+            
+            AssertWeAreOnWalletPage();
+            Assert.IsFalse(_walletDropdown.gameObject.activeInHierarchy);
         }
     }
 }
