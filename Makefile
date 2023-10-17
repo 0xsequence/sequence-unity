@@ -57,3 +57,16 @@ test:
 	echo "" && \
 	echo "Play mode Test results: " && \
 	head -n 2 TestResults_Play.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'
+
+test-ui:
+	rm TestResults*.xml ; \
+	Unity -runTests -projectPath "$(pwd)" -testPlatform playmode -testResults TestResults_Play.xml ; \
+	echo "Play mode Test results: " && \
+	head -n 2 TestResults_Play.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'
+
+test-sdk:
+	rm TestResults*.xml ; cd ./testchain && (yarn start:hardhat & echo $$! > .pid) && cd .. && \
+	Unity -batchmode -runTests -projectPath "$(pwd)" -testPlatform editmode -testResults TestResults_Edit.xml ; Unity -quit && \
+	make stop && \
+	echo "Edit mode Test results: " && \
+	head -n 2 TestResults_Edit.xml | grep -Eo 'result="[^"]+"|total="[^"]+"|passed="[^"]+"|failed="[^"]+"|inconclusive="[^"]+"|skipped="[^"]+"|start-time="[^"]+"|end-time="[^"]+"|duration="[^"]+"' | grep -Ev 'clr-version=|engine-version=|asserts=|id=|testcasecount=' | sed -E 's/^[^"]+"([^"]+)"[^"]+"([^"]+)".*/\1: \2/'

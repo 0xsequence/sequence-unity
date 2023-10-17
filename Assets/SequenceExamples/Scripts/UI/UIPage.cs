@@ -33,11 +33,6 @@ namespace Sequence.Demo
             _animator.Initialize(_transform);
         }
 
-        protected virtual void Start()
-        {
-            
-        }
-
         public virtual void Open(params object[] args)
         {
             _panel =
