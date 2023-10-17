@@ -7,29 +7,19 @@ namespace Sequence.Demo
 {
     public class NftContentFetcher : INftContentFetcher
     {
-        private List<Chain> _excludeChains;
-        private List<Chain> _fetchableChains;
-        private List<IIndexer> _indexers;
-
-        public NftContentFetcher(params Chain[] excludeChains)
+        private IContentFetcher _contentFetcher;
+        
+        public NftContentFetcher(IContentFetcher contentFetcher)
         {
-            _excludeChains = excludeChains.ConvertToList();
-            
-            _fetchableChains = EnumExtensions.GetEnumValuesAsList<Chain>();
-            _fetchableChains = _fetchableChains.RemoveItemsInList(_excludeChains);
-            
-            _indexers = new List<IIndexer>();
-            int chains = _fetchableChains.Count;
-            for (int i = 0; i < chains; i++)
-            {
-                _indexers.Add(new ChainIndexer((int)_fetchableChains[i]));
-            }
+            _contentFetcher = contentFetcher;
         }
         
         public event Action<FetchNftContentResult> OnNftFetchSuccess;
-        public Task FetchContent(int maxToFetch)
+        
+        public async Task FetchContent(int maxToFetch)
         {
-            throw new NotImplementedException(); // Todo implement
+            FetchNftContentResult result = await _contentFetcher.FetchNftContent(maxToFetch);
+            OnNftFetchSuccess?.Invoke(result);
         }
 
         public void Refresh()
