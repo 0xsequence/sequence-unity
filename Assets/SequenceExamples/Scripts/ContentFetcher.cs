@@ -18,6 +18,7 @@ namespace Sequence.Demo
         private Address _address;
         private bool _more = true;
         private bool _isFetching = false;
+        private Queue<TokenBalance>[] _collectionsToProcess;
 
         public ContentFetcher(Address address, params Chain[] includeChains)
         {
@@ -30,6 +31,12 @@ namespace Sequence.Demo
             for (int i = 0; i < chains; i++)
             {
                 _indexers.Add(new ChainIndexer((int)_includeChains[i]));
+            }
+
+            _collectionsToProcess = new Queue<TokenBalance>[chains];
+            for (int i = 0; i < chains; i++)
+            {
+                _collectionsToProcess[i] = new Queue<TokenBalance>();
             }
         }
 
@@ -57,6 +64,7 @@ namespace Sequence.Demo
                 }
                 else
                 {
+                    ProcessCollectionsFromChain(chainIndex, pageSize);
                     Debug.Log("Moving to next chain...");
                     pageNumber = 0;
                     chainIndex++;
@@ -67,11 +75,11 @@ namespace Sequence.Demo
                     }
                 }
                 OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
-                await AddTokensToQueues(balances.balances, _indexers[chainIndex], pageSize);
+                await AddTokensToQueues(balances.balances, chainIndex);
             }
         }
 
-        private async Task AddTokensToQueues(TokenBalance[] tokenBalances, IIndexer indexer, int pageSize)
+        private async Task AddTokensToQueues(TokenBalance[] tokenBalances, int indexerIndex)
         {
             int items = tokenBalances.Length;
             for (int i = 0; i < items; i++)
@@ -85,7 +93,7 @@ namespace Sequence.Demo
                     }
                 }else if (tokenBalances[i].IsNft())
                 {
-                    await ProcessCollection(tokenBalances[i], indexer, pageSize);
+                    _collectionsToProcess[indexerIndex].Enqueue(tokenBalances[i]);
                 }
             }
         }
@@ -105,6 +113,15 @@ namespace Sequence.Demo
 
             return new TokenElement(tokenBalance.contractAddress, tokenIconSprite, contractInfo.name,
                 (Chain)(int)contractInfo.chainId, (uint)balance, contractInfo.symbol, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
+        }
+
+        private async Task ProcessCollectionsFromChain(int chainIndex, int pageSize)
+        {
+            Queue<TokenBalance> toProcess = _collectionsToProcess[chainIndex];
+            while (toProcess.TryPeek(out TokenBalance tokenBalance))
+            {
+                await ProcessCollection(tokenBalance, _indexers[chainIndex], pageSize);
+            }
         }
 
         private async Task ProcessCollection(TokenBalance tokenBalance, IIndexer indexer, int pageSize)
