@@ -138,7 +138,7 @@ namespace SequenceExamples.Scripts.Tests
 
         private IEnumerator AssertWeLoadEnoughContent()
         {
-            if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
+            if (_walletPage.GetTokenFetcher() is MockTokenContentFetcher mockTokenFetcher)
             {
                 yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
             }
@@ -147,7 +147,7 @@ namespace SequenceExamples.Scripts.Tests
                 NUnit.Framework.Assert.Fail($"Unexpected {nameof(_transitionPanel.TokenFetcher)} type. Expected {typeof(MockTokenContentFetcher)}");
             }
             
-            if (_transitionPanel.NftFetcher is MockNftContentFetcher mockNftFetcher)
+            if (_walletPage.GetNftFetcher() is MockNftContentFetcher mockNftFetcher)
             {
                 yield return new WaitForSeconds(RandomNumberOfNftsToFetch * (float)mockNftFetcher.DelayInMilliseconds / 1000);
             }
@@ -458,7 +458,7 @@ namespace SequenceExamples.Scripts.Tests
                 yield return _testMonobehaviour.StartCoroutine(TestCollectionInfoPage(item));
 
                 // Wait for tokens to load again
-                if (_transitionPanel.TokenFetcher is MockTokenContentFetcher mockTokenFetcher)
+                if (_walletPage.GetTokenFetcher() is MockTokenContentFetcher mockTokenFetcher)
                 {
                     yield return new WaitForSeconds(RandomNumberOfTokensToFetch * (float)mockTokenFetcher.DelayInMilliseconds / 1000);
                 }

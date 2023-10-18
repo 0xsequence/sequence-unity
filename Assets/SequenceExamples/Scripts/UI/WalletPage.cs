@@ -198,5 +198,15 @@ namespace Sequence.Demo
         {
             return _tokenUIElements.Count;
         }
+
+        public ITokenContentFetcher GetTokenFetcher()
+        {
+            return _tokenFetcher;
+        }
+
+        public INftContentFetcher GetNftFetcher()
+        {
+            return _nftFetcher;
+        }
     }
 }
