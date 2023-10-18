@@ -99,7 +99,7 @@ namespace Sequence
         private static string HostName(BigInteger chainID)
         {
             var indexerName = IndexerNames[chainID];
-            return $"https://{indexerName}-indexer-v2.sequence.app";
+            return $"https://{indexerName}-indexer.sequence.app";
         }
 
         public static async Task<T[]> FetchMultiplePages<T>(Func<int, Task<(Page, T[])>> func, int maxPages)
@@ -233,7 +233,8 @@ namespace Sequence
         /// <returns></returns>
         private static async Task<string> HTTPPost(BigInteger chainID, string endPoint, object args)
         {
-            var req = UnityWebRequest.Put(Url(chainID, endPoint), JsonConvert.SerializeObject(args));
+            string requestJson = JsonConvert.SerializeObject(args);
+            var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
             req.method = UnityWebRequest.kHttpVerbPOST;

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
+using Vector2 = UnityEngine.Vector2;
 
 namespace Sequence.Demo
 {
@@ -16,6 +18,7 @@ namespace Sequence.Demo
         private List<IIndexer> _indexers;
         private Address _address;
         private bool _more = true;
+        private bool _isFetching = false;
 
         public ContentFetcher(Address address, params Chain[] includeChains)
         {
@@ -35,11 +38,13 @@ namespace Sequence.Demo
         
         public async Task FetchContent(int pageSize)
         {
+            _isFetching = true;
             int chainIndex = 0;
             int pageNumber = 0;
             int indexers = _indexers.Count;
             while (_more)
             {
+                Debug.Log("Fetching content...");
                 GetTokenBalancesReturn balances = await _indexers[chainIndex].GetTokenBalances(
                     new GetTokenBalancesArgs(
                         _address,
@@ -52,10 +57,12 @@ namespace Sequence.Demo
                 }
                 else
                 {
+                    Debug.Log("Moving to next chain...");
                     pageNumber = 0;
                     chainIndex++;
                     if (chainIndex >= indexers)
                     {
+                        Debug.Log("No more chains to fetch from.");
                         _more = false;
                     }
                 }
@@ -66,6 +73,7 @@ namespace Sequence.Demo
 
         private async Task AddContentToLists(TokenBalance[] tokenBalances)
         {
+            Debug.Log("Adding content to lists...");
             int items = tokenBalances.Length;
             for (int i = 0; i < items; i++)
             {
@@ -97,8 +105,10 @@ namespace Sequence.Demo
                 Debug.LogError($"No contractInfo found for given token: {tokenBalance}");
             }
 
+            BigInteger balance = tokenBalance.balance / (BigInteger)Math.Pow(10, (int)contractInfo.decimals);
+
             return new TokenElement(tokenBalance.contractAddress, tokenIconSprite, contractInfo.name,
-                (Chain)(int)contractInfo.chainId, (uint)tokenBalance.balance, contractInfo.symbol, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
+                (Chain)(int)contractInfo.chainId, (uint)balance, contractInfo.symbol, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
         }
 
         private async Task<NftElement> BuildNftElement(TokenBalance tokenBalance)
@@ -164,7 +174,12 @@ namespace Sequence.Demo
             int tokensFetched = _tokenQueue.Count;
             while (tokensFetched < maxToFetch && _more)
             {
+                if (!_isFetching)
+                {
+                    FetchContent(maxToFetch);
+                }
                 await Task.Yield();
+                tokensFetched = _tokenQueue.Count;
             }
             TokenElement[] tokens = new TokenElement[maxToFetch];
             for (int i = 0; i < maxToFetch; i++)
@@ -180,7 +195,12 @@ namespace Sequence.Demo
             int nftsFetched = _nftQueue.Count;
             while (nftsFetched < maxToFetch && _more)
             {
+                if (!_isFetching)
+                {
+                    FetchContent(maxToFetch);
+                }
                 await Task.Yield();
+                nftsFetched = _nftQueue.Count;
             }
             NftElement[] nfts = new NftElement[maxToFetch];
             for (int i = 0; i < maxToFetch; i++)

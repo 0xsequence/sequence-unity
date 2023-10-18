@@ -27,5 +27,10 @@ namespace Sequence
         {
             return contractType == ContractType.ERC20;
         }
+        
+        public override string ToString()
+        {
+            return $"TokenBalance: id: {id}, contractAddress: {contractAddress}, contractType: {contractType}, accountAddress: {accountAddress}, tokenID: {tokenID}, balance: {balance}, blockHash: {blockHash}, blockNumber: {blockNumber}, updateID: {updateID}, chainId: {chainId}, contractInfo: {contractInfo}, tokenMetadata: {tokenMetadata}";
+        }
     }
 }

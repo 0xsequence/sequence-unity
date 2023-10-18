@@ -1,3 +1,4 @@
+using System.Numerics;
 using Sequence.Contracts;
 using UnityEngine;
 
