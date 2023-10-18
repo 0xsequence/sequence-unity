@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Sequence
+namespace Sequence.Demo
 {
     public static class SpriteFetcher
     {
