@@ -182,6 +182,7 @@ namespace Sequence
         public static async Task<GetTokenBalancesReturn> GetTokenBalances(BigInteger chainID, GetTokenBalancesArgs args)
         {
             var responseBody = await HTTPPost(chainID, "GetTokenBalances", args);
+            Debug.Log($"Response received {responseBody}");
             return BuildResponse<GetTokenBalancesReturn>(responseBody);
         }
 
@@ -233,20 +234,40 @@ namespace Sequence
         /// <returns></returns>
         private static async Task<string> HTTPPost(BigInteger chainID, string endPoint, object args)
         {
-            string requestJson = JsonConvert.SerializeObject(args);
-            var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
-            req.SetRequestHeader("Content-Type", "application/json");
-            req.SetRequestHeader("Accept", "application/json");
-            req.method = UnityWebRequest.kHttpVerbPOST;
-            await req.SendWebRequest();
-            if (req.responseCode < 200 || req.responseCode > 299)
+            try
             {
-                throw new System.Exception("Failed to make request, non-200 status code " + req.responseCode);
+                string requestJson = JsonConvert.SerializeObject(args);
+                var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+                req.SetRequestHeader("Content-Type", "application/json");
+                req.SetRequestHeader("Accept", "application/json");
+                req.method = UnityWebRequest.kHttpVerbPOST;
+                req.timeout = 10; // Request will timeout after 10 seconds
+                
+                // Create curl-equivalent request of the above and log it
+                string curlRequest =
+                    $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d '{requestJson}' {Url(chainID, endPoint)}";
+                Debug.Log("Sending request: " + curlRequest);
+                
+                await req.SendWebRequest();
+                if (req.responseCode < 200 || req.responseCode > 299 || req.error != null ||
+                    req.result == UnityWebRequest.Result.ConnectionError ||
+                    req.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    throw new Exception("Failed to make request, non-200 status code " + req.responseCode +
+                                        " with error: " + req.error);
+                }
+                string returnText = req.downloadHandler.text;
+                req.Dispose();
+                return returnText;
+            } catch (HttpRequestException e) {
+                Debug.LogError("HTTP Request failed: " + e.Message);
+            } catch (FormatException e) {
+                Debug.LogError("Invalid URL format: " + e.Message);
+            } catch (Exception e) {
+                Debug.LogError("An unexpected error occurred: " + e.Message);
             }
 
-            string returnText = req.downloadHandler.text;
-            req.Dispose();
-            return returnText;
+            return ""; // Shouldn't be reached - exception will be caught
         }
 
         /// <summary>

@@ -22,7 +22,6 @@ namespace Sequence
         TestnetPolygonMumbai = 80001,
         TestnetArbitrumGoerli = 421613,
         TestnetBNBSmartChain = 97,
-        TestnetAvalancheFuji = 43113,
         TestnetBaseGoerli = 84531,
     }
 }

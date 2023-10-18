@@ -42,9 +42,9 @@ namespace Sequence.Demo
             int chainIndex = 0;
             int pageNumber = 0;
             int indexers = _indexers.Count;
+            Debug.Log("Fetching content...");
             while (_more)
             {
-                Debug.Log("Fetching content...");
                 GetTokenBalancesReturn balances = await _indexers[chainIndex].GetTokenBalances(
                     new GetTokenBalancesArgs(
                         _address,
@@ -73,7 +73,6 @@ namespace Sequence.Demo
 
         private async Task AddContentToLists(TokenBalance[] tokenBalances)
         {
-            Debug.Log("Adding content to lists...");
             int items = tokenBalances.Length;
             for (int i = 0; i < items; i++)
             {
@@ -113,6 +112,9 @@ namespace Sequence.Demo
 
         private async Task<NftElement> BuildNftElement(TokenBalance tokenBalance)
         {
+            Debug.Log("Ignore NFT for now");
+            return null;
+            
             Sprite nftIconSprite = await FetchIconSprite(tokenBalance);
 
             ContractInfo contractInfo = tokenBalance.contractInfo;
