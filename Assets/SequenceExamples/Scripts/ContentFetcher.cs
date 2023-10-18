@@ -11,7 +11,6 @@ namespace Sequence.Demo
 {
     public class ContentFetcher : IContentFetcher
     {
-        private List<TokenBalance> _content = new List<TokenBalance>();
         private Queue<TokenElement> _tokenQueue = new Queue<TokenElement>();
         private Queue<NftElement> _nftQueue = new Queue<NftElement>();
         private List<Chain> _includeChains;
@@ -34,8 +33,9 @@ namespace Sequence.Demo
             }
         }
 
-        public event Action<FetchContentResult> OnContentFetchSuccess;
-        
+        public event Action<FetchContentResult> OnContentFetch;
+        public event Action<CollectionProcessingResult> OnCollectionProcessing;
+
         public async Task FetchContent(int pageSize)
         {
             _isFetching = true;
@@ -66,30 +66,26 @@ namespace Sequence.Demo
                         _more = false;
                     }
                 }
-                OnContentFetchSuccess?.Invoke(new FetchContentResult(balances.balances, _more));
-                await AddContentToLists(balances.balances);
+                OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
+                await AddTokensToQueues(balances.balances, _indexers[chainIndex], pageSize);
             }
         }
 
-        private async Task AddContentToLists(TokenBalance[] tokenBalances)
+        private async Task AddTokensToQueues(TokenBalance[] tokenBalances, IIndexer indexer, int pageSize)
         {
             int items = tokenBalances.Length;
             for (int i = 0; i < items; i++)
             {
-                if (tokenBalances[i].IsToken() || tokenBalances[i].IsNft())
-                {
-                    _content.Add(tokenBalances[i]);
-                }
-                
                 if (tokenBalances[i].IsToken())
                 {
                     TokenElement token = await BuildTokenElement(tokenBalances[i]);
-                    _tokenQueue.Enqueue(token);
-                }
-                else if (tokenBalances[i].IsNft())
+                    if (token != null)
+                    {
+                        _tokenQueue.Enqueue(token);
+                    }
+                }else if (tokenBalances[i].IsNft())
                 {
-                    NftElement nft = await BuildNftElement(tokenBalances[i]);
-                    _nftQueue.Enqueue(nft);
+                    await ProcessCollection(tokenBalances[i], indexer, pageSize);
                 }
             }
         }
@@ -101,7 +97,8 @@ namespace Sequence.Demo
             ContractInfo contractInfo = tokenBalance.contractInfo;
             if (contractInfo == null)
             {
-                Debug.LogError($"No contractInfo found for given token: {tokenBalance}");
+                Debug.LogWarning($"No contractInfo found for given token: {tokenBalance}");
+                return null;
             }
 
             BigInteger balance = tokenBalance.balance / (BigInteger)Math.Pow(10, (int)contractInfo.decimals);
@@ -110,37 +107,87 @@ namespace Sequence.Demo
                 (Chain)(int)contractInfo.chainId, (uint)balance, contractInfo.symbol, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
         }
 
+        private async Task ProcessCollection(TokenBalance tokenBalance, IIndexer indexer, int pageSize)
+        {
+            Debug.Log($"Processing collection: {tokenBalance}");
+            bool more = true;
+            int pageNumber = 0;
+            while (more)
+            {
+                GetTokenBalancesReturn balances = await indexer.GetTokenBalances(
+                    new GetTokenBalancesArgs(
+                        _address,
+                        tokenBalance.contractAddress,
+                        true,
+                        new Page { page = pageNumber, pageSize = pageSize }));
+                Page returnedPage = balances.page;
+                if (returnedPage.more)
+                {
+                    pageNumber = returnedPage.page;
+                }
+                else
+                {
+                    more = false;
+                }
+                OnCollectionProcessing?.Invoke(new CollectionProcessingResult(balances.balances, _more));
+                await AddNftsToQueue(balances.balances);
+            }
+        }
+
+        private async Task AddNftsToQueue(TokenBalance[] tokenBalances)
+        {
+            Debug.Log("Adding nfts to queue");
+            int items = tokenBalances.Length;
+            for (int i = 0; i < items; i++)
+            {
+                if (tokenBalances[i].IsNft())
+                {
+                    NftElement nft = await BuildNftElement(tokenBalances[i]);
+                    if (nft != null)
+                    {
+                        _nftQueue.Enqueue(nft);
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Only ERC721/ERC1155s should be provided to this method");
+                }
+            }
+        }
+
         private async Task<NftElement> BuildNftElement(TokenBalance tokenBalance)
         {
-            Debug.Log("Ignore NFT for now");
-            return null;
-            
-            Sprite nftIconSprite = await FetchIconSprite(tokenBalance);
+            Debug.Log("Building nft element");
+            Debug.Log("Fetching collection icon sprite");
+            Sprite collectionIconSprite = await FetchIconSprite(tokenBalance);
+            Debug.Log("Fetching nft icon sprite");
+            Sprite nftIconSprite = await FetchNftImageSprite(tokenBalance);
 
             ContractInfo contractInfo = tokenBalance.contractInfo;
             if (contractInfo == null)
             {
-                Debug.LogError($"No contractInfo found for given token: {tokenBalance}");
+                Debug.LogWarning($"No contractInfo found for given token: {tokenBalance}");
+                return null;
             }
 
-            return new NftElement(new Address(tokenBalance.contractAddress), nftIconSprite, contractInfo.name,
-                nftIconSprite, contractInfo.name, (uint)tokenBalance.id, (Chain)(int)contractInfo.chainId,
+            TokenMetadata metadata = tokenBalance.tokenMetadata;
+            if (metadata == null)
+            {
+                Debug.LogWarning($"No metadata found for given token: {tokenBalance}");
+                return null;
+            }
+
+            return new NftElement(new Address(tokenBalance.contractAddress), nftIconSprite, metadata.name,
+                collectionIconSprite, contractInfo.name, metadata.tokenId, (Chain)(int)contractInfo.chainId,
                 (uint)tokenBalance.balance, 1, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
-            // Todo figure out collection details
             // Todo figure out ethValue
         }
 
         private async Task<Sprite> FetchIconSprite(TokenBalance tokenBalance)
         {
-            Texture2D logo = MockNftContentFetcher.CreateMockTexture(); // Default if no image metadata provided
             string metadataUrl = "";
-            TokenMetadata metadata = tokenBalance.tokenMetadata;
             ContractInfo contractInfo = tokenBalance.contractInfo;
-            if (metadata != null && metadata.image != null && metadata.image.Length > 0 &&
-                !metadata.image.EndsWith("gif"))
-            {
-                metadataUrl = metadata.image;
-            }else if (contractInfo != null && contractInfo.logoURI != null && contractInfo.logoURI.Length > 0)
+            if (contractInfo != null && contractInfo.logoURI != null && contractInfo.logoURI.Length > 0)
             {
                 metadataUrl = contractInfo.logoURI;
             }
@@ -148,26 +195,25 @@ namespace Sequence.Demo
             {
                 Debug.Log($"No metadata URL found for given token: {tokenBalance}");
             }
+            
+            Sprite iconSprite = await SpriteFetcher.Fetch(metadataUrl);
+            return iconSprite;
+        }
 
-            if (metadataUrl.Length > 0)
+        private async Task<Sprite> FetchNftImageSprite(TokenBalance tokenBalance)
+        {
+            string metadataUrl = "";
+            TokenMetadata metadata = tokenBalance.tokenMetadata;
+            if (metadata != null && metadata.image != null && metadata.image.Length > 0)
             {
-                using (var imageRequest = UnityWebRequestTexture.GetTexture(metadataUrl))
-                {
-                    await imageRequest.SendWebRequest();
-
-                    if (imageRequest.result != UnityWebRequest.Result.Success)
-                    {
-                        Debug.Log($"Error fetching metadata image for token balance: {tokenBalance}. Error: {imageRequest.error}");
-                    }
-                    else
-                    {
-                        logo = ((DownloadHandlerTexture) imageRequest.downloadHandler).texture;
-                    }
-                }
+                metadataUrl = metadata.image;
+            }
+            else
+            {
+                Debug.Log($"No metadata URL found for given token: {tokenBalance}");
             }
             
-            Sprite iconSprite = Sprite.Create(logo, new Rect(0, 0, logo.width, logo.height),
-                new Vector2(.5f, .5f));
+            Sprite iconSprite = await SpriteFetcher.Fetch(metadataUrl);
             return iconSprite;
         }
 
