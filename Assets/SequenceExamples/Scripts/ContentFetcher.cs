@@ -93,6 +93,8 @@ namespace Sequence.Demo
                     }
                 }
             }
+            
+            
         }
 
         private async Task AddTokensToQueues(TokenBalance[] tokenBalances, int indexerIndex)
@@ -133,7 +135,7 @@ namespace Sequence.Demo
 
         private async Task ProcessCollectionsFromChain(int chainIndex, int pageSize)
         {
-            Debug.Log($"Processing chainIndex {chainIndex}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
+            Debug.Log($"Processing collections from {(Chain)(int)_indexers[chainIndex].GetChainID()}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
             Queue<TokenBalance> toProcess = _collectionsToProcess[chainIndex];
             while (toProcess.TryPeek(out TokenBalance tokenBalance))
             {
@@ -143,7 +145,6 @@ namespace Sequence.Demo
 
         private async Task ProcessCollection(TokenBalance tokenBalance, IIndexer indexer, int pageSize)
         {
-            Debug.Log($"Processing collection: {tokenBalance}");
             bool more = true;
             int pageNumber = 0;
             while (more)
@@ -228,7 +229,7 @@ namespace Sequence.Demo
             }
             else
             {
-                Debug.Log($"No metadata URL found for given token: {tokenBalance}");
+                Debug.LogWarning($"No metadata URL found for given token: {tokenBalance}");
             }
             
             Sprite iconSprite = await SpriteFetcher.Fetch(metadataUrl);

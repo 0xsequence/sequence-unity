@@ -34,11 +34,11 @@ namespace Sequence.Demo
                 } catch (Exception e) {
                     if (e.Message.Contains($"{(int)HttpStatusCode.Gone}"))
                     {
-                        Debug.LogWarning($"Error fetching sprite at url: {url}\nError: {e.Message}\nReturning default");
+                        Debug.LogWarning($"Error fetching image at url: {url}\nError: {e.Message}\nReturning default");
                     }
                     else
                     {
-                        Debug.LogError("An unexpected error occurred: " + e.Message);
+                        Debug.LogError("An unexpected error occurred: " + e.Message + $"\nUrl: {url}\nReturning default");
                     }
                 }
             }
