@@ -182,7 +182,6 @@ namespace Sequence
         public static async Task<GetTokenBalancesReturn> GetTokenBalances(BigInteger chainID, GetTokenBalancesArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetTokenBalances", args);
-            Debug.Log($"Response received {responseBody}");
             return BuildResponse<GetTokenBalancesReturn>(responseBody);
         }
 
@@ -234,20 +233,18 @@ namespace Sequence
         /// <returns></returns>
         private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
         {
+            string requestJson = JsonConvert.SerializeObject(args);
+            var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            req.SetRequestHeader("Content-Type", "application/json");
+            req.SetRequestHeader("Accept", "application/json");
+            req.method = UnityWebRequest.kHttpVerbPOST;
+            req.timeout = 10; // Request will timeout after 10 seconds
+                
+            // Create curl-equivalent request of the above and log it
+            string curlRequest = 
+                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d '{requestJson}' {Url(chainID, endPoint)}";
             try
             {
-                string requestJson = JsonConvert.SerializeObject(args);
-                var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
-                req.SetRequestHeader("Content-Type", "application/json");
-                req.SetRequestHeader("Accept", "application/json");
-                req.method = UnityWebRequest.kHttpVerbPOST;
-                req.timeout = 10; // Request will timeout after 10 seconds
-
-                // Create curl-equivalent request of the above and log it
-                string curlRequest =
-                    $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d '{requestJson}' {Url(chainID, endPoint)}";
-                Debug.Log("Sending request: " + curlRequest);
-
                 await req.SendWebRequest();
                 if (req.responseCode < 200 || req.responseCode > 299 || req.error != null ||
                     req.result == UnityWebRequest.Result.ConnectionError ||
@@ -263,11 +260,11 @@ namespace Sequence
             }
             catch (HttpRequestException e)
             {
-                Debug.LogError("HTTP Request failed: " + e.Message);
+                Debug.LogError("HTTP Request failed: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                Debug.LogError("Invalid URL format: " + e.Message);
+                Debug.LogError("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
@@ -275,22 +272,22 @@ namespace Sequence
                 {
                     if (retries == 5)
                     {
-                        Debug.LogError("Sequence server rate limit exceeded, giving up after 5 retries...");
+                        Debug.LogError("Sequence server rate limit exceeded, giving up after 5 retries..." + "\nCurl-equivalent request: " + curlRequest);
                     }
                     else
                     {
                         
-                        Debug.LogWarning($"Sequence server rate limit exceeded, trying again... Retries so far: {retries}");
+                        Debug.LogWarning($"Sequence server rate limit exceeded, trying again... Retries so far: {retries}" + "\nCurl-equivalent request: " + curlRequest);
                         return await RetryHttpPost(chainID, endPoint, args, 5 * retries, retries);
                     }
                 }   
                 else
                 {
-                    Debug.LogError("File load exception: " + e.Message);
+                    Debug.LogError("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
                 }
             }
             catch (Exception e) {
-                Debug.LogError("An unexpected error occurred: " + e.Message);
+                Debug.LogError("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
 
             return "";

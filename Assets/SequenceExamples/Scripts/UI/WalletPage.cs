@@ -120,6 +120,7 @@ namespace Sequence.Demo
             }
             else
             {
+                Debug.Log("No more tokens to fetch.");
                 _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
             }
         }
@@ -154,6 +155,10 @@ namespace Sequence.Demo
             if (result.MoreToFetch)
             {
                 _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
+            }
+            else
+            {
+                Debug.Log("No more nfts to fetch");
             }
         }
 

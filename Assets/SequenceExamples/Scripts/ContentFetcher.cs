@@ -71,7 +71,7 @@ namespace Sequence.Demo
                 else
                 {
                     ProcessCollectionsFromChain(chainIndex, pageSize);
-                    Debug.Log("Moving to next chain...");
+                    Debug.Log($"Moving to next chain... {(Chain)(int)_indexers[chainIndex + 1].GetChainID()}");
                     pageNumber = 0;
                     OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
                     await AddTokensToQueues(balances.balances, chainIndex);
@@ -123,6 +123,7 @@ namespace Sequence.Demo
 
         private async Task ProcessCollectionsFromChain(int chainIndex, int pageSize)
         {
+            Debug.Log($"Processing chainIndex {chainIndex}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
             Queue<TokenBalance> toProcess = _collectionsToProcess[chainIndex];
             while (toProcess.TryPeek(out TokenBalance tokenBalance))
             {
@@ -164,7 +165,6 @@ namespace Sequence.Demo
 
         private async Task AddNftsToQueue(TokenBalance[] tokenBalances)
         {
-            Debug.Log("Adding nfts to queue");
             int items = tokenBalances.Length;
             for (int i = 0; i < items; i++)
             {
@@ -185,10 +185,7 @@ namespace Sequence.Demo
 
         private async Task<NftElement> BuildNftElement(TokenBalance tokenBalance)
         {
-            Debug.Log("Building nft element");
-            Debug.Log("Fetching collection icon sprite");
             Sprite collectionIconSprite = await FetchIconSprite(tokenBalance);
-            Debug.Log("Fetching nft icon sprite");
             Sprite nftIconSprite = await FetchNftImageSprite(tokenBalance);
 
             ContractInfo contractInfo = tokenBalance.contractInfo;
@@ -284,8 +281,6 @@ namespace Sequence.Demo
             {
                 nfts[i] = _nftQueue.Dequeue();
             }
-            
-            Debug.Log($"@@@ FetchNftContent: {_more} || {_nftQueue.Count} || {CollectionsLeftToProcess()}");
 
             return new FetchNftContentResult(nfts, _more || _nftQueue.Count > 0 || CollectionsLeftToProcess());
         }
