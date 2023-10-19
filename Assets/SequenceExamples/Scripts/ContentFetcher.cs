@@ -59,7 +59,17 @@ namespace Sequence.Demo
                 GetTokenBalancesReturn balances = await _indexers[chainIndex].GetTokenBalances(args);
                 if (balances == null)
                 {
-                    throw new Exception($"Received an error from indexer when fetching token balances with args: {args}");
+                    Debug.LogWarning(
+                        $"Received an error from indexer when fetching token balances with args: {args}\nCheck chain status here: https://status.sequence.info/\nMoving to next chain... {(Chain)(int)_indexers[chainIndex + 1].GetChainID()}");
+                    
+                    chainIndex++;
+                    if (chainIndex >= indexers)
+                    {
+                        Debug.Log("No more chains to fetch from.");
+                        _more = false;
+                    }
+
+                    continue;
                 }
                 Page returnedPage = balances.page;
                 if (returnedPage.more)
