@@ -78,14 +78,14 @@ namespace Sequence.Demo
                 {
                     pageNumber = returnedPage.page;
                     OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
-                    await AddTokensToQueues(balances.balances, chainIndex);
+                    AddTokensToQueues(balances.balances, chainIndex);
                 }
                 else
                 {
                     // ProcessCollectionsFromChain(chainIndex, pageSize);
                     pageNumber = 0;
                     OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
-                    await AddTokensToQueues(balances.balances, chainIndex);
+                    AddTokensToQueues(balances.balances, chainIndex);
                     chainIndex++;
                     if (chainIndex >= indexers)
                     {
@@ -192,7 +192,7 @@ namespace Sequence.Demo
                 Debug.Log("Total NFTs found: " + nftsFound + " Balance according to tokenBalance: " + tokenBalance.balance);
                 
                 OnCollectionProcessing?.Invoke(new CollectionProcessingResult(balances.balances, more));
-                await AddNftsToQueue(balances.balances);
+                AddNftsToQueue(balances.balances);
             }
         }
 
