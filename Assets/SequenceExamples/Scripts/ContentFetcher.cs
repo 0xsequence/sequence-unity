@@ -328,8 +328,6 @@ namespace Sequence.Demo
             {
                 nfts[i] = _nftQueue.Dequeue();
             }
-            
-            Debug.Log($"@ more {_more} | nftQueue length {_nftQueue.Count} | collections left to process {CollectionsLeftToProcess()}");
 
             return new FetchNftContentResult(nfts, _more || _nftQueue.Count > 0 || CollectionsLeftToProcess());
         }

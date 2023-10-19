@@ -8203,11 +8203,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2980900696715088358, guid: 7d8e311766e5c4b8693a216ca3708b52, type: 3}
       propertyPath: _numberOfNftsToFetchAtOnce
-      value: 1
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2980900696715088358, guid: 7d8e311766e5c4b8693a216ca3708b52, type: 3}
       propertyPath: _numberOfTokensToFetchAtOnce
-      value: 1
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2980900696834639998, guid: 7d8e311766e5c4b8693a216ca3708b52, type: 3}
       propertyPath: m_AnchorMax.y
