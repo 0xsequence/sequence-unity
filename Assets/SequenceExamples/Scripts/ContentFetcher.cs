@@ -62,7 +62,9 @@ namespace Sequence.Demo
                     Debug.LogWarning(
                         $"Received an error from indexer when fetching token balances with args: {args}\nCheck chain status here: https://status.sequence.info/\nMoving to next chain... {(Chain)(int)_indexers[chainIndex + 1].GetChainID()}");
                     
+                    // ProcessCollectionsFromChain(chainIndex, pageSize);
                     chainIndex++;
+                    pageNumber = 0;
                     if (chainIndex >= indexers)
                     {
                         Debug.Log("No more chains to fetch from.");
@@ -80,8 +82,7 @@ namespace Sequence.Demo
                 }
                 else
                 {
-                    ProcessCollectionsFromChain(chainIndex, pageSize);
-                    Debug.Log($"Moving to next chain... {(Chain)(int)_indexers[chainIndex + 1].GetChainID()}");
+                    // ProcessCollectionsFromChain(chainIndex, pageSize);
                     pageNumber = 0;
                     OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
                     await AddTokensToQueues(balances.balances, chainIndex);
@@ -91,10 +92,17 @@ namespace Sequence.Demo
                         Debug.Log("No more chains to fetch from.");
                         _more = false;
                     }
+                    else
+                    {
+                        Debug.Log($"Moving to next chain... {(Chain)(int)_indexers[chainIndex].GetChainID()}");
+                    }
                 }
             }
-            
-            
+
+            for (int i = 0; i < indexers; i++)
+            {
+                await ProcessCollectionsFromChain(i, pageSize);
+            }
         }
 
         private async Task AddTokensToQueues(TokenBalance[] tokenBalances, int indexerIndex)
@@ -129,16 +137,25 @@ namespace Sequence.Demo
 
             BigInteger balance = tokenBalance.balance / (BigInteger)Math.Pow(10, (int)contractInfo.decimals);
 
-            return new TokenElement(tokenBalance.contractAddress, tokenIconSprite, contractInfo.name,
-                (Chain)(int)contractInfo.chainId, (uint)balance, contractInfo.symbol, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
+            try
+            {
+                return new TokenElement(tokenBalance.contractAddress, tokenIconSprite, contractInfo.name,
+                    (Chain)(int)contractInfo.chainId, (uint)balance, contractInfo.symbol,
+                    new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to build token element for token: {tokenBalance}\nError: {e.Message}");
+                return null;
+            }
         }
 
         private async Task ProcessCollectionsFromChain(int chainIndex, int pageSize)
         {
-            Debug.Log($"Processing collections from {(Chain)(int)_indexers[chainIndex].GetChainID()}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
             Queue<TokenBalance> toProcess = _collectionsToProcess[chainIndex];
-            while (toProcess.TryPeek(out TokenBalance tokenBalance))
+            while (toProcess.TryDequeue(out TokenBalance tokenBalance))
             {
+                Debug.Log($"Processing collections from {(Chain)(int)_indexers[chainIndex].GetChainID()}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
                 await ProcessCollection(tokenBalance, _indexers[chainIndex], pageSize);
             }
         }
@@ -147,6 +164,7 @@ namespace Sequence.Demo
         {
             bool more = true;
             int pageNumber = 0;
+            int nftsFound = 0;
             while (more)
             {
                 GetTokenBalancesReturn balances = await indexer.GetTokenBalances(
@@ -169,6 +187,10 @@ namespace Sequence.Demo
                 {
                     more = false;
                 }
+
+                nftsFound += balances.balances.Length;
+                Debug.Log("Total NFTs found: " + nftsFound + " Balance according to tokenBalance: " + tokenBalance.balance);
+                
                 OnCollectionProcessing?.Invoke(new CollectionProcessingResult(balances.balances, more));
                 await AddNftsToQueue(balances.balances);
             }
@@ -189,7 +211,7 @@ namespace Sequence.Demo
                 }
                 else
                 {
-                    throw new ArgumentException("Only ERC721/ERC1155s should be provided to this method");
+                    Debug.LogError($"Only ERC721/ERC1155s should be provided to this method! Given {tokenBalances[i]}");
                 }
             }
         }
@@ -213,10 +235,24 @@ namespace Sequence.Demo
                 return null;
             }
 
-            return new NftElement(new Address(tokenBalance.contractAddress), nftIconSprite, metadata.name,
-                collectionIconSprite, contractInfo.name, metadata.tokenId, (Chain)(int)contractInfo.chainId,
-                (uint)tokenBalance.balance, 1, new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
-            // Todo figure out ethValue
+            try
+            {
+                BigInteger balance = tokenBalance.balance;
+                if (contractInfo.decimals != 0)
+                {
+                    balance = tokenBalance.balance / (BigInteger)Math.Pow(10, (int)contractInfo.decimals);
+                }
+                return new NftElement(new Address(tokenBalance.contractAddress), nftIconSprite, metadata.name,
+                    collectionIconSprite, contractInfo.name, metadata.tokenId, (Chain)(int)contractInfo.chainId,
+                    (uint)balance, 1,
+                    new MockCurrencyConverter()); // Todo replace MockCurrencyConverter with real implementation
+                // Todo figure out ethValue
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to build NFT element for token: {tokenBalance}\nError: {e.Message}");
+                return null;
+            }
         }
 
         private async Task<Sprite> FetchIconSprite(TokenBalance tokenBalance)
@@ -292,6 +328,8 @@ namespace Sequence.Demo
             {
                 nfts[i] = _nftQueue.Dequeue();
             }
+            
+            Debug.Log($"@ more {_more} | nftQueue length {_nftQueue.Count} | collections left to process {CollectionsLeftToProcess()}");
 
             return new FetchNftContentResult(nfts, _more || _nftQueue.Count > 0 || CollectionsLeftToProcess());
         }
