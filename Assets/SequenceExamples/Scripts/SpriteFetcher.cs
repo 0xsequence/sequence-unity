@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,11 +9,6 @@ namespace Sequence.Demo
 {
     public static class SpriteFetcher
     {
-        private static string[] _validFileTypeIdentifiers = new string[]
-        {
-            ".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".tif", ".tgs", ".psd", ".hdr", ".svg", ".exr"
-        };
-
         public static async Task<Sprite> Fetch(string url)
         {
             Texture2D texture = new Texture2D(100, 100); // Default if we fail to fetch the texture
@@ -36,26 +32,19 @@ namespace Sequence.Demo
                 } catch (FormatException e) {
                     Debug.LogError("Invalid URL format: " + e.Message);
                 } catch (Exception e) {
-                    Debug.LogError("An unexpected error occurred: " + e.Message);
+                    if (e.Message.Contains($"{(int)HttpStatusCode.Gone}"))
+                    {
+                        Debug.LogWarning($"Error fetching sprite at url: {url}\nError: {e.Message}\nReturning default");
+                    }
+                    else
+                    {
+                        Debug.LogError("An unexpected error occurred: " + e.Message);
+                    }
                 }
             }
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
                 new Vector2(.5f, .5f));
             return sprite;
-        }
-        
-        private static bool EndsWithValidTypeIdentifier(this string url)
-        {
-            int identifiers = _validFileTypeIdentifiers.Length;
-            for (int i = 0; i < identifiers; i++)
-            {
-                if (url.EndsWith(_validFileTypeIdentifiers[i]))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

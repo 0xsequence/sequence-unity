@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using System.Net.Http;
-using System.Text;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using UnityEngine.Networking;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.IO;
+using System.Net;
 
 namespace Sequence
 {
@@ -128,7 +128,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<bool> Ping(BigInteger chainID)
         {
-            string responseBody = await HTTPPost(chainID, "Ping", null);
+            string responseBody = await HttpPost(chainID, "Ping", null);
             return BuildResponse<PingReturn>(responseBody).status;
         }
 
@@ -140,7 +140,7 @@ namespace Sequence
         {
 
 
-            var responseBody = await HTTPPost(chainID, "Version", null);
+            var responseBody = await HttpPost(chainID, "Version", null);
             return BuildResponse<VersionReturn>(responseBody).version;
         }
 
@@ -150,7 +150,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<RuntimeStatus> RuntimeStatus(BigInteger chainID)
         {
-            var responseBody = await HTTPPost(chainID, "RuntimeStatus", null);
+            var responseBody = await HttpPost(chainID, "RuntimeStatus", null);
             return BuildResponse<RuntimeStatusReturn>(responseBody).status;
         }
 
@@ -161,7 +161,7 @@ namespace Sequence
 
         public static async Task<BigInteger> GetChainID(BigInteger chainID)
         {
-            var responseBody = await HTTPPost(chainID, "GetChainID", null);
+            var responseBody = await HttpPost(chainID, "GetChainID", null);
             return BuildResponse<GetChainIDReturn>(responseBody).chainID;
         }
 
@@ -171,7 +171,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<EtherBalance> GetEtherBalance(BigInteger chainID, string accountAddress)
         {
-            var responseBody = await HTTPPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress));
+            var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress));
             return BuildResponse<GetEtherBalanceReturn>(responseBody).balance;
         }
 
@@ -181,7 +181,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<GetTokenBalancesReturn> GetTokenBalances(BigInteger chainID, GetTokenBalancesArgs args)
         {
-            var responseBody = await HTTPPost(chainID, "GetTokenBalances", args);
+            var responseBody = await HttpPost(chainID, "GetTokenBalances", args);
             Debug.Log($"Response received {responseBody}");
             return BuildResponse<GetTokenBalancesReturn>(responseBody);
         }
@@ -192,7 +192,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(BigInteger chainID, GetTokenSuppliesArgs args)
         {
-            var responseBody = await HTTPPost(chainID, "GetTokenSupplies", args);
+            var responseBody = await HttpPost(chainID, "GetTokenSupplies", args);
             return BuildResponse<GetTokenSuppliesReturn>(responseBody);
         }
 
@@ -202,7 +202,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(BigInteger chainID, GetTokenSuppliesMapArgs args)
         {
-            var responseBody = await HTTPPost(chainID, "GetTokenSuppliesMap", args);
+            var responseBody = await HttpPost(chainID, "GetTokenSuppliesMap", args);
             return BuildResponse<GetTokenSuppliesMapReturn>(responseBody);
 
         }
@@ -213,7 +213,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public static async Task<GetBalanceUpdatesReturn> GetBalanceUpdates(BigInteger chainID, GetBalanceUpdatesArgs args)
         {
-            var responseBody = await HTTPPost(chainID, "GetBalanceUpdates", args);
+            var responseBody = await HttpPost(chainID, "GetBalanceUpdates", args);
             return BuildResponse<GetBalanceUpdatesReturn>(responseBody);
         }
 
@@ -224,7 +224,7 @@ namespace Sequence
 
         public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(BigInteger chainID, GetTransactionHistoryArgs args)
         {
-            var responseBody = await HTTPPost(chainID, "GetTransactionHistory", args);
+            var responseBody = await HttpPost(chainID, "GetTransactionHistory", args);
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
         }
 
@@ -232,7 +232,7 @@ namespace Sequence
         /// Makes an HTTP Post Request with content-type set to application/json
         /// </summary>
         /// <returns></returns>
-        private static async Task<string> HTTPPost(BigInteger chainID, string endPoint, object args)
+        private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
         {
             try
             {
@@ -242,12 +242,12 @@ namespace Sequence
                 req.SetRequestHeader("Accept", "application/json");
                 req.method = UnityWebRequest.kHttpVerbPOST;
                 req.timeout = 10; // Request will timeout after 10 seconds
-                
+
                 // Create curl-equivalent request of the above and log it
                 string curlRequest =
                     $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d '{requestJson}' {Url(chainID, endPoint)}";
                 Debug.Log("Sending request: " + curlRequest);
-                
+
                 await req.SendWebRequest();
                 if (req.responseCode < 200 || req.responseCode > 299 || req.error != null ||
                     req.result == UnityWebRequest.Result.ConnectionError ||
@@ -256,18 +256,50 @@ namespace Sequence
                     throw new Exception("Failed to make request, non-200 status code " + req.responseCode +
                                         " with error: " + req.error);
                 }
+
                 string returnText = req.downloadHandler.text;
                 req.Dispose();
                 return returnText;
-            } catch (HttpRequestException e) {
+            }
+            catch (HttpRequestException e)
+            {
                 Debug.LogError("HTTP Request failed: " + e.Message);
-            } catch (FormatException e) {
+            }
+            catch (FormatException e)
+            {
                 Debug.LogError("Invalid URL format: " + e.Message);
-            } catch (Exception e) {
+            }
+            catch (FileLoadException e)
+            {
+                if (e.Message.Contains($"{(int)HttpStatusCode.TooManyRequests}"))
+                {
+                    if (retries == 5)
+                    {
+                        Debug.LogError("Sequence server rate limit exceeded, giving up after 5 retries...");
+                    }
+                    else
+                    {
+                        
+                        Debug.LogWarning($"Sequence server rate limit exceeded, trying again... Retries so far: {retries}");
+                        return await RetryHttpPost(chainID, endPoint, args, 5 * retries, retries);
+                    }
+                }   
+                else
+                {
+                    Debug.LogError("File load exception: " + e.Message);
+                }
+            }
+            catch (Exception e) {
                 Debug.LogError("An unexpected error occurred: " + e.Message);
             }
 
-            return ""; // Shouldn't be reached - exception will be caught
+            return "";
+        }
+
+        private static async Task<string> RetryHttpPost(BigInteger chainID, string endPoint, object args, float waitInSeconds, int retries)
+        {
+            await AsyncExtensions.DelayTask(waitInSeconds);
+            return await HttpPost(chainID, endPoint, args, retries + 1);
         }
 
         /// <summary>

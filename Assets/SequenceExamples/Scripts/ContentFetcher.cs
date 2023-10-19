@@ -52,21 +52,29 @@ namespace Sequence.Demo
             Debug.Log("Fetching content...");
             while (_more)
             {
-                GetTokenBalancesReturn balances = await _indexers[chainIndex].GetTokenBalances(
-                    new GetTokenBalancesArgs(
-                        _address,
-                        true,
-                        new Page { page = pageNumber, pageSize = pageSize }));
+                GetTokenBalancesArgs args = new GetTokenBalancesArgs(
+                    _address,
+                    true,
+                    new Page { page = pageNumber, pageSize = pageSize });
+                GetTokenBalancesReturn balances = await _indexers[chainIndex].GetTokenBalances(args);
+                if (balances == null)
+                {
+                    throw new Exception($"Received an error from indexer when fetching token balances with args: {args}");
+                }
                 Page returnedPage = balances.page;
                 if (returnedPage.more)
                 {
                     pageNumber = returnedPage.page;
+                    OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
+                    await AddTokensToQueues(balances.balances, chainIndex);
                 }
                 else
                 {
                     ProcessCollectionsFromChain(chainIndex, pageSize);
                     Debug.Log("Moving to next chain...");
                     pageNumber = 0;
+                    OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
+                    await AddTokensToQueues(balances.balances, chainIndex);
                     chainIndex++;
                     if (chainIndex >= indexers)
                     {
@@ -74,8 +82,6 @@ namespace Sequence.Demo
                         _more = false;
                     }
                 }
-                OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
-                await AddTokensToQueues(balances.balances, chainIndex);
             }
         }
 
@@ -137,6 +143,11 @@ namespace Sequence.Demo
                         tokenBalance.contractAddress,
                         true,
                         new Page { page = pageNumber, pageSize = pageSize }));
+                if (balances == null)
+                {
+                    Debug.LogError($"Failed to finish processing collection: {tokenBalance}");
+                    break;
+                }
                 Page returnedPage = balances.page;
                 if (returnedPage.more)
                 {
@@ -146,7 +157,7 @@ namespace Sequence.Demo
                 {
                     more = false;
                 }
-                OnCollectionProcessing?.Invoke(new CollectionProcessingResult(balances.balances, _more));
+                OnCollectionProcessing?.Invoke(new CollectionProcessingResult(balances.balances, more));
                 await AddNftsToQueue(balances.balances);
             }
         }
@@ -246,8 +257,9 @@ namespace Sequence.Demo
                 await Task.Yield();
                 tokensFetched = _tokenQueue.Count;
             }
-            TokenElement[] tokens = new TokenElement[maxToFetch];
-            for (int i = 0; i < maxToFetch; i++)
+
+            TokenElement[] tokens = new TokenElement[tokensFetched];
+            for (int i = 0; i < tokensFetched; i++)
             {
                 tokens[i] = _tokenQueue.Dequeue();
             }
@@ -258,7 +270,7 @@ namespace Sequence.Demo
         public async Task<FetchNftContentResult> FetchNftContent(int maxToFetch)
         {
             int nftsFetched = _nftQueue.Count;
-            while (nftsFetched < maxToFetch && _more)
+            while (nftsFetched < maxToFetch && (_more || CollectionsLeftToProcess()))
             {
                 if (!_isFetching)
                 {
@@ -267,18 +279,34 @@ namespace Sequence.Demo
                 await Task.Yield();
                 nftsFetched = _nftQueue.Count;
             }
-            NftElement[] nfts = new NftElement[maxToFetch];
-            for (int i = 0; i < maxToFetch; i++)
+            NftElement[] nfts = new NftElement[nftsFetched];
+            for (int i = 0; i < nftsFetched; i++)
             {
                 nfts[i] = _nftQueue.Dequeue();
             }
+            
+            Debug.Log($"@@@ FetchNftContent: {_more} || {_nftQueue.Count} || {CollectionsLeftToProcess()}");
 
-            return new FetchNftContentResult(nfts, _more || _nftQueue.Count > 0);
+            return new FetchNftContentResult(nfts, _more || _nftQueue.Count > 0 || CollectionsLeftToProcess());
         }
         
         public Address GetAddress()
         {
             return _address;
+        }
+
+        private bool CollectionsLeftToProcess()
+        {
+            int chains = _collectionsToProcess.Length;
+            for (int i = 0; i < chains; i++)
+            {
+                if (_collectionsToProcess[i].Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

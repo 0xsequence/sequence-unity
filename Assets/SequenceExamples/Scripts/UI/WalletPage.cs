@@ -75,6 +75,8 @@ namespace Sequence.Demo
             _tokenFetcher.FetchContent(_numberOfTokensToFetchAtOnce);
 
             StartCoroutine(RefreshTokenValues());
+
+            DestroyGridChildren();
         }
 
         public override void Close()
@@ -207,6 +209,21 @@ namespace Sequence.Demo
         public INftContentFetcher GetNftFetcher()
         {
             return _nftFetcher;
+        }
+
+        /// <summary>
+        /// Sometimes it's possible that when playmode ends, we can end up creating children in the grid
+        /// Or similarly, if you are editing the UI, you may forget to delete children in the grid
+        /// If this happens, the UI looks all wonky because you have all these extra items in the grid being displayed
+        /// This method ensures there are no children in the grid when the WalletPage is opened, resolving the issue
+        /// </summary>
+        private void DestroyGridChildren()
+        {
+            int count = _scrollviewContentParent.childCount;
+            for (int i = 0; i < count; i++)
+            {
+                Destroy(_scrollviewContentParent.GetChild(i).gameObject);
+            }
         }
     }
 }
