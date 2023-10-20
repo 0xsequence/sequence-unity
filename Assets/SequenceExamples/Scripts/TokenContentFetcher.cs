@@ -22,7 +22,7 @@ namespace Sequence.Demo
 
         public void Refresh()
         {
-            // Do nothing, not needed
+            _contentFetcher.RefreshTokens();
         }
     }
 }

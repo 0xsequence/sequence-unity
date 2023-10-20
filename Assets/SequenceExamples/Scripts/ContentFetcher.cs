@@ -250,7 +250,7 @@ namespace Sequence.Demo
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to build NFT element for token: {tokenBalance}\nError: {e.Message}");
+                Debug.LogWarning($"Failed to build NFT element for token: {tokenBalance}\nError: {e.Message}");
                 return null;
             }
         }
@@ -335,6 +335,24 @@ namespace Sequence.Demo
         public Address GetAddress()
         {
             return _address;
+        }
+
+        public void RefreshTokens()
+        {
+            _tokenQueue = new Queue<TokenElement>();
+            _more = true;
+            _isFetching = false;
+        }
+
+        public void RefreshNfts()
+        {
+            _nftQueue = new Queue<NftElement>();
+            int chains = _includeChains.Count;
+            _collectionsToProcess = new Queue<TokenBalance>[chains];
+            for (int i = 0; i < chains; i++)
+            {
+                _collectionsToProcess[i] = new Queue<TokenBalance>();
+            }
         }
 
         private bool CollectionsLeftToProcess()

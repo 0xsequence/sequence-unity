@@ -18,6 +18,16 @@ namespace Sequence.Demo
         public Task<FetchTokenContentResult> FetchTokenContent(int maxToFetch);
         public Task<FetchNftContentResult> FetchNftContent(int maxToFetch);
         public Address GetAddress();
+        
+        /// <summary>
+        /// Prepare the content fetcher to fetch tokens again
+        /// </summary>
+        public void RefreshTokens();
+        
+        /// <summary>
+        /// Prepare the content fetcher to fetch NFTs again
+        /// </summary>
+        public void RefreshNfts();
     }
     
     public class FetchContentResult
