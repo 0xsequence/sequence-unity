@@ -8,7 +8,7 @@ namespace Sequence.Demo
         public static bool IsTesting = false;
         public static UIPanel InitialPanel;
         public static object[] InitialPanelOpenArgs;
-            #endregion
+        #endregion
         
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
