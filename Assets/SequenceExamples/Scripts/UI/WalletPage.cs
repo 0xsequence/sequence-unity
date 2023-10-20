@@ -37,6 +37,8 @@ namespace Sequence.Demo
             base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
+            
+            DestroyGridChildren();
         }
 
         public override void Open(params object[] args)
@@ -72,8 +74,6 @@ namespace Sequence.Demo
                 ObjectPool.ActivateObjectPool(_tokenPlaceHolderPrefab, _numberOfTokenPlaceholdersToInstantiate);
             _nftPool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
             
-            DestroyGridChildren();
-
             _tokenFetcher.FetchContent(_numberOfTokensToFetchAtOnce);
 
             StartCoroutine(RefreshTokenValues());
