@@ -36,6 +36,9 @@ namespace SequenceExamples.Scripts.Tests
 
         private bool _nftInfoPageCurrencyValueRefreshTested = false;
 
+        private bool _tokensLoaded = false;
+        private bool _nftsLoaded = false;
+
         public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, WalletPanel walletPanel, WalletPage walletPage, LoginPanel loginPanel, TransitionPanel transitionPanel, SearchPage searchPage, CollectionInfoPage collectionInfoPage, NftInfoPage nftInfoPage, TokenInfoPage tokenInfoPage, SearchViewAllPage searchViewAllPage)
         {
             _testMonobehaviour = testMonobehaviour;
@@ -116,11 +119,14 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsFalse(_transitionPanel.gameObject.activeInHierarchy);
         }
 
-        private IEnumerator AssertWalletPageIsAsExpected()
+        private IEnumerator AssertWalletPageIsAsExpected(bool isIntegrationTest = false)
         {
             AssertPanelAssumptions_WalletPage();
             AssertWeAreOnWalletPage();
-            yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
+            if (!isIntegrationTest)
+            {
+                yield return _testMonobehaviour.StartCoroutine(AssertWeLoadEnoughContent());
+            }
             AssertTokensAreAboveNFTs();
             AssertWeHaveAppropriateNetworkIcons();
             AssertBrandingIsBelowContent();
@@ -235,7 +241,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(grid);
 
             RectTransform bottomContent =
-                grid.transform.GetChild(RandomNumberOfTokensToFetch + RandomNumberOfNftsToFetch - 1).GetComponent<RectTransform>();
+                grid.transform.GetChild(grid.transform.childCount - 1).GetComponent<RectTransform>();
             RectTransform brandingTransform = branding.GetComponent<RectTransform>();
             Vector3[] corners = new Vector3[4];
             bottomContent.GetWorldCorners(corners);
@@ -257,13 +263,14 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(balance);
             TextMeshProUGUI balanceText = balance.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(balanceText);
-            
-            token.RefreshWithBalance(5);
+
+            uint randomBalance = (uint)Random.Range(0, 10000);
+            token.RefreshWithBalance(randomBalance);
             
             AssertAppropriateColorPercentChangeText(percentChangeText);
             Assert.AreEqual("0.00%", percentChangeText.text);
             
-            balanceText.text.AssertStartsWith("5 ");
+            balanceText.text.AssertStartsWith($"{randomBalance:#,##0} ");
 
             yield return new WaitForSecondsRealtime(_walletPage.TimeBetweenTokenValueRefreshesInSeconds);
             
@@ -507,6 +514,65 @@ namespace SequenceExamples.Scripts.Tests
                 .TestSearchBarEntriesRemainWhenMovingBackAndForthBetweenSearchPages());
             yield return _testMonobehaviour.StartCoroutine(searchTests.NavigateToViewAllCollectionsPageTest());
             yield return _testMonobehaviour.StartCoroutine(searchTests.ToggleViewAllPageTest());
+        }
+        
+        public IEnumerator EndToEndTestFetchWalletContent()
+        {
+            yield return _testMonobehaviour.StartCoroutine(AssertContentIsFetchedAndDisplayedProperly());
+            
+            WalletUIElement[] elements = GetWalletElements();
+            
+            // Test Token info page works
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumptions(elements[0]));
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
+            
+            yield return _testMonobehaviour.StartCoroutine(AssertContentIsFetchedAndDisplayedProperly());
+            
+            elements = GetWalletElements();
+            
+            // Test Nft info page works
+            yield return _testMonobehaviour.StartCoroutine(NavigateToInfoPageAndAssertAssumptions(elements[elements.Length - 1]));
+            yield return _testMonobehaviour.StartCoroutine(HitUIBackButton());
+            
+            yield return _testMonobehaviour.StartCoroutine(AssertContentIsFetchedAndDisplayedProperly());
+        }
+
+        private IEnumerator AssertContentIsFetchedAndDisplayedProperly()
+        {
+            _tokensLoaded = false;
+            _nftsLoaded = false;
+            while (!_tokensLoaded || !_nftsLoaded)
+            {
+                yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected(isIntegrationTest: true));
+            }
+            yield return _testMonobehaviour.StartCoroutine(AssertWalletPageIsAsExpected(isIntegrationTest: true));
+        }
+
+        private WalletUIElement[] GetWalletElements()
+        {
+            GameObject grid = GameObject.Find("Grid");
+            Assert.IsNotNull(grid);
+            int contentLoaded = grid.transform.childCount;
+            Assert.IsTrue(contentLoaded > 0);
+            WalletUIElement[] elements = grid.GetComponentsInChildren<WalletUIElement>();
+            Assert.AreEqual(contentLoaded, elements.Length);
+            return elements;
+        }
+
+        public void OnTokenFetch(FetchTokenContentResult result)
+        {
+            if (!result.MoreToFetch)
+            {
+                _tokensLoaded = true;
+            }
+        }
+
+        public void OnNftFetch(FetchNftContentResult result)
+        {
+            if (!result.MoreToFetch)
+            {
+                _nftsLoaded = true;
+            }
         }
     }
 }

@@ -62,7 +62,6 @@ namespace Sequence.Demo
                     Debug.LogWarning(
                         $"Received an error from indexer when fetching token balances with args: {args}\nCheck chain status here: https://status.sequence.info/\nMoving to next chain... {(Chain)(int)_indexers[chainIndex + 1].GetChainID()}");
                     
-                    // ProcessCollectionsFromChain(chainIndex, pageSize);
                     chainIndex++;
                     pageNumber = 0;
                     if (chainIndex >= indexers)
@@ -82,7 +81,6 @@ namespace Sequence.Demo
                 }
                 else
                 {
-                    // ProcessCollectionsFromChain(chainIndex, pageSize);
                     pageNumber = 0;
                     OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
                     AddTokensToQueues(balances.balances, chainIndex);

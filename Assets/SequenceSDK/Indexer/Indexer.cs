@@ -234,7 +234,7 @@ namespace Sequence
         private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
         {
             string requestJson = JsonConvert.SerializeObject(args);
-            var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
             req.method = UnityWebRequest.kHttpVerbPOST;

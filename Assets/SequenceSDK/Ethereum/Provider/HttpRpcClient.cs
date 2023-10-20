@@ -30,7 +30,7 @@ namespace Sequence.Provider
             };
 
             var rpcRequestJson = JsonConvert.SerializeObject(request);
-            var unityRequest = UnityWebRequest.Put(_url, rpcRequestJson);
+            using var unityRequest = UnityWebRequest.Put(_url, rpcRequestJson);
             unityRequest.SetRequestHeader("Content-Type", "application/json");
             unityRequest.SetRequestHeader("Accept", "application/json");
             unityRequest.method = UnityWebRequest.kHttpVerbPOST;
@@ -65,7 +65,7 @@ namespace Sequence.Provider
 
             var rpcRequestJson = JsonConvert.SerializeObject(request);
             Debug.Log("request json :" + rpcRequestJson);
-            var unityRequest = UnityWebRequest.Put(_url, rpcRequestJson);
+            using var unityRequest = UnityWebRequest.Put(_url, rpcRequestJson);
             
             unityRequest.SetRequestHeader("Content-Type", "application/json");
             unityRequest.SetRequestHeader("Accept", "application/json");
@@ -91,7 +91,7 @@ namespace Sequence.Provider
 
         public async Task<RpcResponse> SendRequest(string requestJson)
         {
-            var unityRequest = UnityWebRequest.Put(_url, requestJson);
+            using var unityRequest = UnityWebRequest.Put(_url, requestJson);
 
             unityRequest.SetRequestHeader("Content-Type", "application/json");
             unityRequest.SetRequestHeader("Accept", "application/json");

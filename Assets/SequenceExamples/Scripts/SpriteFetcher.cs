@@ -16,7 +16,7 @@ namespace Sequence.Demo
             {
                 try
                 {
-                    UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(url);
+                    using UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(url);
                     await imageRequest.SendWebRequest();
 
                     if (imageRequest.result != UnityWebRequest.Result.Success)
@@ -28,9 +28,9 @@ namespace Sequence.Demo
                         texture = ((DownloadHandlerTexture) imageRequest.downloadHandler).texture;
                     }
                 } catch (HttpRequestException e) {
-                    Debug.LogError("HTTP Request failed: " + e.Message);
+                    Debug.LogWarning("HTTP Request failed: " + e.Message);
                 } catch (FormatException e) {
-                    Debug.LogError("Invalid URL format: " + e.Message);
+                    Debug.LogWarning("Invalid URL format: " + e.Message);
                 } catch (Exception e) {
                     if (e.Message.Contains($"{(int)HttpStatusCode.Gone}"))
                     {
@@ -38,7 +38,7 @@ namespace Sequence.Demo
                     }
                     else
                     {
-                        Debug.LogError("An unexpected error occurred: " + e.Message + $"\nUrl: {url}\nReturning default");
+                        Debug.LogWarning("An unexpected error occurred: " + e.Message + $"\nUrl: {url}\nReturning default");
                     }
                 }
             }

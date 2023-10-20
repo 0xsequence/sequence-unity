@@ -1,6 +1,8 @@
 using System.Collections;
 using NUnit.Framework;
+using Sequence;
 using Sequence.Demo;
+using Sequence.Utils;
 using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -151,6 +153,21 @@ namespace SequenceExamples.Scripts.Tests
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestSearchViewAllPage());
+        }
+
+        [UnityTest]
+        public IEnumerator ContentFetcherEndToEndTest()
+        {
+            IContentFetcher contentFetcher = new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
+                EnumExtensions.GetEnumValuesAsList<Chain>().ToArray());
+            ITokenContentFetcher tokenFetcher = new TokenContentFetcher(contentFetcher);
+            INftContentFetcher nftFetcher = new NftContentFetcher(contentFetcher);
+            tokenFetcher.OnTokenFetchSuccess += _walletFlowUITests.OnTokenFetch;
+            nftFetcher.OnNftFetchSuccess += _walletFlowUITests.OnNftFetch;
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
+                tokenFetcher,
+                nftFetcher));
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
         }
     }
 }
