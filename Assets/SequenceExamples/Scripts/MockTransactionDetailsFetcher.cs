@@ -61,7 +61,7 @@ namespace Sequence.Demo
                 }
 
                 mockElements[i] = temp;
-                await AsyncExtensions.DelayTask(DelayInMilliseconds);
+                await AsyncExtensions.DelayTask(DelayInMilliseconds / 1000f);
             }
 
             bool moreToFetch = _totalFetchable - _fetched > 0;
