@@ -71,12 +71,12 @@ namespace Sequence.Demo
             _tokenPool =
                 ObjectPool.ActivateObjectPool(_tokenPlaceHolderPrefab, _numberOfTokenPlaceholdersToInstantiate);
             _nftPool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
+            
+            DestroyGridChildren();
 
             _tokenFetcher.FetchContent(_numberOfTokensToFetchAtOnce);
 
             StartCoroutine(RefreshTokenValues());
-
-            DestroyGridChildren();
         }
 
         public override void Close()
