@@ -19,6 +19,8 @@ namespace Sequence.Demo
         private bool _more = true;
         private bool _isFetching = false;
         private Queue<TokenBalance>[] _collectionsToProcess;
+        
+        private int _chainIndex;
 
         public ContentFetcher(Address address, params Chain[] includeChains)
         {
@@ -46,7 +48,7 @@ namespace Sequence.Demo
         public async Task FetchContent(int pageSize)
         {
             _isFetching = true;
-            int chainIndex = 0;
+            _chainIndex = 0;
             int pageNumber = 0;
             int indexers = _indexers.Count;
             Debug.Log("Fetching content...");
@@ -56,50 +58,48 @@ namespace Sequence.Demo
                     _address,
                     true,
                     new Page { page = pageNumber, pageSize = pageSize });
-                GetTokenBalancesReturn balances = await _indexers[chainIndex].GetTokenBalances(args);
+                GetTokenBalancesReturn balances = await _indexers[_chainIndex].GetTokenBalances(args);
                 if (balances == null)
                 {
                     Debug.LogWarning(
-                        $"Received an error from indexer when fetching token balances with args: {args}\nCheck chain status here: https://status.sequence.info/\nMoving to next chain... {(Chain)(int)_indexers[chainIndex + 1].GetChainID()}");
+                        $"Received an error from indexer when fetching token balances with args: {args}\nCheck chain status here: https://status.sequence.info/");
                     
-                    chainIndex++;
                     pageNumber = 0;
-                    if (chainIndex >= indexers)
-                    {
-                        Debug.Log("No more chains to fetch from.");
-                        _more = false;
-                    }
+                    IncrementChainIndex(indexers);
 
                     continue;
                 }
                 Page returnedPage = balances.page;
+                AddTokensToQueues(balances.balances, _chainIndex);
                 if (returnedPage.more)
                 {
                     pageNumber = returnedPage.page;
-                    OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
-                    AddTokensToQueues(balances.balances, chainIndex);
                 }
                 else
                 {
                     pageNumber = 0;
-                    OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
-                    AddTokensToQueues(balances.balances, chainIndex);
-                    chainIndex++;
-                    if (chainIndex >= indexers)
-                    {
-                        Debug.Log("No more chains to fetch from.");
-                        _more = false;
-                    }
-                    else
-                    {
-                        Debug.Log($"Moving to next chain... {(Chain)(int)_indexers[chainIndex].GetChainID()}");
-                    }
+                    IncrementChainIndex(indexers);
                 }
+                OnContentFetch?.Invoke(new FetchContentResult(balances.balances, _more));
             }
 
             for (int i = 0; i < indexers; i++)
             {
                 await ProcessCollectionsFromChain(i, pageSize);
+            }
+        }
+
+        private void IncrementChainIndex(int indexers)
+        {
+            _chainIndex++;
+            if (_chainIndex >= indexers)
+            {
+                Debug.Log("No more chains to fetch from.");
+                _more = false;
+            }
+            else
+            {
+                Debug.Log($"Moving to next chain... {(Chain)(int)_indexers[_chainIndex].GetChainID()}");
             }
         }
 
@@ -187,7 +187,6 @@ namespace Sequence.Demo
                 }
 
                 nftsFound += balances.balances.Length;
-                Debug.Log("Total NFTs found: " + nftsFound + " Balance according to tokenBalance: " + tokenBalance.balance);
                 
                 OnCollectionProcessing?.Invoke(new CollectionProcessingResult(balances.balances, more));
                 AddNftsToQueue(balances.balances);
