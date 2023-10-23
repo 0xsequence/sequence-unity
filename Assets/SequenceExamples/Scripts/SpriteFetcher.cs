@@ -9,9 +9,11 @@ namespace Sequence.Demo
 {
     public static class SpriteFetcher
     {
+        public static readonly Texture2D DefaultTexture = new Texture2D(100, 100); // Default if we fail to fetch the texture
+        
         public static async Task<Sprite> Fetch(string url)
         {
-            Texture2D texture = new Texture2D(100, 100); // Default if we fail to fetch the texture
+            Texture2D texture = DefaultTexture;
             if (url != null && url.Length > 0 && !url.EndsWith(".gif"))
             {
                 try
@@ -42,6 +44,7 @@ namespace Sequence.Demo
                     }
                 }
             }
+
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
                 new Vector2(.5f, .5f));
             return sprite;
