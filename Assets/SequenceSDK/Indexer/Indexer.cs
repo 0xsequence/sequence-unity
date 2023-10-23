@@ -307,8 +307,16 @@ namespace Sequence
         /// <returns></returns>
         private static T BuildResponse<T>(string text)
         {
-            T data = JsonConvert.DeserializeObject<T>(text);
-            return data;
+            try
+            {
+                T data = JsonConvert.DeserializeObject<T>(text);
+                return data;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error building response" + e.Message);
+            }
+            return default;
         }
     }
 
