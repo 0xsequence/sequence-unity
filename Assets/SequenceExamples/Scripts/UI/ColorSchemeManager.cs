@@ -20,7 +20,7 @@ namespace Sequence.Demo
             for (int i = 0; i < prefabs; i++)
             {
                 GameObject prefabInstance = PrefabUtility.InstantiatePrefab(_uiElementPrefabs[i]) as GameObject;
-                ApplyColorSchemeToChildren(prefabInstance.transform);
+                ApplyColorSchemeToTransformAndChildren(prefabInstance.transform);
                 PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
                 DestroyImmediate(prefabInstance);
             }
@@ -33,14 +33,21 @@ namespace Sequence.Demo
             {
                 Transform child = parent.GetChild(i);
                 
-                SetButtonColor(child);
-
-                SetTextColor(child);
-
-                SetBackgroundColor(child);
-                
-                ApplyColorSchemeToChildren(child);
+                ApplyColorSchemeToTransformAndChildren(child);
             }
+        }
+
+        private void ApplyColorSchemeToTransformAndChildren(Transform obj)
+        {
+            ApplyColorSchemeToTransform(obj);
+            ApplyColorSchemeToChildren(obj);
+        }
+
+        private void ApplyColorSchemeToTransform(Transform obj)
+        {
+            SetButtonColor(obj);
+            SetTextColor(obj);
+            SetBackgroundColor(obj);
         }
 
         private void SetButtonColor(Transform t)
@@ -81,6 +88,16 @@ namespace Sequence.Demo
             if (panel != null)
             {
                 Image image = panel.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.color = _colorScheme.backgroundColor;
+                }
+            }
+            
+            WalletDropdown dropdown = t.GetComponent<WalletDropdown>();
+            if (dropdown != null)
+            {
+                Image image = dropdown.GetComponent<Image>();
                 if (image != null)
                 {
                     image.color = _colorScheme.backgroundColor;
