@@ -283,7 +283,7 @@ namespace Sequence
                 }   
                 else
                 {
-                    Debug.LogError("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                    Debug.LogWarning("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
                 }
             }
             catch (Exception e) {

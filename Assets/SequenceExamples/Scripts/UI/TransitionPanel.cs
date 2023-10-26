@@ -19,7 +19,8 @@ namespace Sequence.Demo
 
         public void OpenWalletPanel()
         {
-            _ui.OpenWalletPanelWithDelay(_closeAnimationDurationInSeconds, TokenFetcher, NftFetcher);
+            _ui.OpenWalletPanelWithDelay(_closeAnimationDurationInSeconds, TokenFetcher, NftFetcher, 
+                new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"));
         }
     }
 }

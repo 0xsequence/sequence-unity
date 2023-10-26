@@ -30,8 +30,11 @@ namespace SequenceExamples.Scripts.Tests
         private NftInfoPage _nftInfoPage;
         private TokenInfoPage _tokenInfoPage;
         private SearchViewAllPage _searchViewAllPage;
+        private WalletDropdown _walletDropdown;
 
         public static float WaitForAnimationTime = 1.5f;
+        
+        public static readonly Address TestAddress = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
 
         [UnitySetUp]
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
@@ -55,6 +58,7 @@ namespace SequenceExamples.Scripts.Tests
                 _nftInfoPage = FindObjectOfType<NftInfoPage>();
                 _tokenInfoPage = FindObjectOfType<TokenInfoPage>();
                 _searchViewAllPage = FindObjectOfType<SearchViewAllPage>();
+                _walletDropdown = FindObjectOfType<WalletDropdown>();
             }
 
             GameObject testObject = new GameObject("TestObject");
@@ -75,7 +79,7 @@ namespace SequenceExamples.Scripts.Tests
             
             _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
             _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel,
-                _searchPage, _collectionInfoPage, _nftInfoPage, _tokenInfoPage, _searchViewAllPage);
+                _searchPage, _collectionInfoPage, _nftInfoPage, _tokenInfoPage, _searchViewAllPage, _walletDropdown);
         }
 
         [UnityTearDown]
@@ -122,7 +126,8 @@ namespace SequenceExamples.Scripts.Tests
             _walletFlowUITests.RandomNumberOfNftsToFetch = Random.Range(1, 100);
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
                 new MockTokenContentFetcher(_walletFlowUITests.RandomNumberOfTokensToFetch, 0),
-                new MockNftContentFetcher(_walletFlowUITests.RandomNumberOfNftsToFetch, 0)));
+                new MockNftContentFetcher(_walletFlowUITests.RandomNumberOfNftsToFetch, 0),
+                TestAddress));
         }
 
         [UnityTest]
@@ -156,6 +161,13 @@ namespace SequenceExamples.Scripts.Tests
         }
 
         [UnityTest]
+        public IEnumerator WalletDropdownTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateWalletPanelTest());
+            yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestWalletDropdown());
+        }
+
+        [UnityTest]
         public IEnumerator ContentFetcherEndToEndTest()
         {
             IContentFetcher contentFetcher = new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
@@ -166,7 +178,8 @@ namespace SequenceExamples.Scripts.Tests
             nftFetcher.OnNftFetchSuccess += _walletFlowUITests.OnNftFetch;
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
                 tokenFetcher,
-                nftFetcher));
+                nftFetcher,
+                TestAddress));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
         }
     }

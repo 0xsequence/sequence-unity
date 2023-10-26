@@ -23,6 +23,7 @@ namespace Sequence.Demo
         {
             ScaleIn,
             FromBottom,
+            ScaleInVertically,
         }
 
         protected virtual void Awake()
@@ -67,6 +68,12 @@ namespace Sequence.Demo
                 case AnimationType.FromBottom:
                     _animator = _gameObject.AddComponent<FromBottom>();
                     break;
+                case AnimationType.ScaleInVertically:
+                    _animator = _gameObject.AddComponent<ScaleVertically>();
+                    break;
+                default:
+                    throw new NotImplementedException(
+                        $"This animation type {_animation} has not been added to {GetType().Name}'s implementation");
             }
         }
 
