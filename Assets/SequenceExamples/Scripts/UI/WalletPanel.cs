@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
+using TMPro;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -10,17 +12,20 @@ namespace Sequence.Demo
     {
         [SerializeField] private GameObject _searchButton;
         [SerializeField] private GameObject _backButton;
+        [SerializeField] private TextMeshProUGUI _walletAddressText;
         
         private WalletPage _walletPage;
         private TransitionPanel _transitionPanel;
         private TokenInfoPage _tokenInfoPage;
         private NftInfoPage _nftInfoPage;
         private SearchPage _searchPage;
+        private WalletDropdown _walletDropdown;
         private CollectionNftMapper _collectionNftMapper;
         private INftContentFetcher _nftContentFetcher;
         private CollectionInfoPage _collectionInfoPage;
         private ITokenContentFetcher _tokenContentFetcher;
         private List<TokenElement> _fetchedTokenElements;
+        private Address _walletAddress;
 
         public enum TopBarMode
         {
@@ -37,6 +42,7 @@ namespace Sequence.Demo
             _nftInfoPage = GetComponentInChildren<NftInfoPage>();
             _collectionInfoPage = GetComponentInChildren<CollectionInfoPage>();
             _searchPage = GetComponentInChildren<SearchPage>();
+            _walletDropdown = GetComponentInChildren<WalletDropdown>();
             _collectionNftMapper = new CollectionNftMapper();
         }
 
@@ -44,6 +50,14 @@ namespace Sequence.Demo
         {
             base.Open(args);
             _fetchedTokenElements = new List<TokenElement>();
+            _walletAddress = args.GetObjectOfTypeIfExists<Address>();
+            if (_walletAddress == default)
+            {
+                throw new SystemException(
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(Address)} as an argument");
+            }
+            
+            _walletAddressText.text = _walletAddress.CondenseForUI();
         }
 
         public override void Close()
@@ -164,6 +178,23 @@ namespace Sequence.Demo
 
             StartCoroutine(SetUIPage(_searchPage, searchableCollections, _fetchedTokenElements.ToArray()));
             SetTopBarMode(TopBarMode.Back);
+        }
+        
+        public void OpenWalletDropdown()
+        {
+            OpenPageOverlaid(_walletDropdown, _walletAddress);
+        }
+
+        public override IEnumerator SetUIPage(UIPage page, params object[] openArgs)
+        {
+            if (_page is WalletDropdown)
+            {
+                _page.Close();
+                _pageStack.Pop();
+                yield return new WaitUntil(() => !_page.isActiveAndEnabled);
+                _page = _pageStack.Peek().page;
+            }
+            yield return base.SetUIPage(page, openArgs);
         }
     }
 }
