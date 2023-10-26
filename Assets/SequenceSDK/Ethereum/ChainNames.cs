@@ -22,7 +22,6 @@ namespace Sequence
             { Chain.TestnetPolygonMumbai, "PolygonMumbai" },
             { Chain.TestnetArbitrumGoerli, "ArbitrumGoerli" },
             { Chain.TestnetBNBSmartChain, "BNBSmartChain" },
-            { Chain.TestnetAvalancheFuji, "AvalancheFuji" },
             { Chain.TestnetBaseGoerli, "BaseGoerli" },
         };
     }

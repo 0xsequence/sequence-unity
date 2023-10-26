@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -8,12 +9,12 @@ namespace Sequence.Demo
         public CollectionInfo Collection;
         public Sprite TokenIconSprite;
         public string TokenName;
-        public uint TokenNumber;
+        public BigInteger TokenNumber;
         public uint Balance;
         public float EthValue;
         public ICurrencyConverter CurrencyConverter;
 
-        public NftElement(CollectionInfo collection, Sprite tokenIconSprite, string tokenName, uint tokenNumber, uint balance, float ethValue, ICurrencyConverter currencyConverter)
+        public NftElement(CollectionInfo collection, Sprite tokenIconSprite, string tokenName, BigInteger tokenNumber, uint balance, float ethValue, ICurrencyConverter currencyConverter)
         {
             Collection = collection;
             TokenIconSprite = tokenIconSprite;
@@ -25,7 +26,7 @@ namespace Sequence.Demo
         }
 
         public NftElement(Address contractAddress, Sprite tokenIconSprite, string tokenName,
-            Sprite collectionIconSprite, string collectionName, uint tokenNumber, Chain network, uint balance,
+            Sprite collectionIconSprite, string collectionName, BigInteger tokenNumber, Chain network, uint balance,
             float ethValue, ICurrencyConverter currencyConverter)
         {
             CollectionInfo collection = CollectionInfo.GetCollectionInfo(contractAddress, collectionIconSprite, collectionName, network);

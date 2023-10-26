@@ -27,7 +27,7 @@ namespace Sequence.Demo
             for (int i = 0; i < count; i++)
             {
                 mockNfts[i] = CreateMockContent();
-                await Task.Delay(DelayInMilliseconds);
+                await AsyncExtensions.DelayTask(DelayInMilliseconds / 1000f);
             }
 
             bool moreToFetch = _totalFetchable - _fetched > 0;

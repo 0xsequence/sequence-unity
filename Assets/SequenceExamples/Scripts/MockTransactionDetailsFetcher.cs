@@ -29,7 +29,7 @@ namespace Sequence.Demo
             for (int i = 0; i < count; i++)
             {
                 mockElements[i] = CreateMockElement();
-                await Task.Delay(DelayInMilliseconds);
+                await AsyncExtensions.DelayTask(DelayInMilliseconds / 1000f);
             }
 
             bool moreToFetch = _totalFetchable - _fetched > 0;
@@ -54,14 +54,14 @@ namespace Sequence.Demo
             TransactionDetails[] mockElements = new TransactionDetails[count];
             for (int i = 0; i < count; i++)
             {
-                var temp = CreateMockElement();
+                var temp = CreateMockElement(contractAddresses[i]);
                 while (!temp.ContractAddress.Value.IsIn(contractAddresses))
                 {
                     temp = CreateMockElement();
                 }
 
                 mockElements[i] = temp;
-                await Task.Delay(DelayInMilliseconds);
+                await AsyncExtensions.DelayTask(DelayInMilliseconds / 1000f);
             }
 
             bool moreToFetch = _totalFetchable - _fetched > 0;
@@ -69,7 +69,7 @@ namespace Sequence.Demo
             OnTransactionDetailsFetchSuccess?.Invoke(new FetchTransactionDetailsResult(mockElements, moreToFetch));
         }
 
-        private TransactionDetails CreateMockElement()
+        private TransactionDetails CreateMockElement(string contractAddress = null)
         {
             string[] potentialTypes = new string[] { "Received", "Sent" };
             string[] potentialSymbols = new string[] { "ST", "MWS", "STT", "SST" };
@@ -91,10 +91,16 @@ namespace Sequence.Demo
             DateTime randomDate = new DateTime(randomYear, randomMonth, randomDay);
             string randomDateString = randomDate.ToString("MMMM d, yyyy");
 
+            Address contract = new Address(potentialMockAddresses.GetRandomObjectFromArray());
+            if (contractAddress != null)
+            {
+                contract = new Address(contractAddress);
+            }
+
             return new TransactionDetails(potentialTypes.GetRandomObjectFromArray(),
                 EnumExtensions.GetRandomEnumValue<Chain>(),
                 tokenIconSprite,
-                new Address(potentialMockAddresses.GetRandomObjectFromArray()),
+                contract,
                 new Address(potentialMockAddresses.GetRandomObjectFromArray()),
                 new Address(potentialMockAddresses.GetRandomObjectFromArray()),
                 (uint)Random.Range(0, 10000),

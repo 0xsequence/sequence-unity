@@ -37,6 +37,8 @@ namespace Sequence.Demo
             base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
+            
+            DestroyGridChildren();
         }
 
         public override void Open(params object[] args)
@@ -71,7 +73,7 @@ namespace Sequence.Demo
             _tokenPool =
                 ObjectPool.ActivateObjectPool(_tokenPlaceHolderPrefab, _numberOfTokenPlaceholdersToInstantiate);
             _nftPool = ObjectPool.ActivateObjectPool(_nftPlaceHolderPrefab, _numberOfNftPlaceholdersToInstantiate);
-
+            
             _tokenFetcher.FetchContent(_numberOfTokensToFetchAtOnce);
 
             StartCoroutine(RefreshTokenValues());
@@ -118,6 +120,7 @@ namespace Sequence.Demo
             }
             else
             {
+                Debug.Log("No more tokens to fetch.");
                 _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
             }
         }
@@ -144,6 +147,11 @@ namespace Sequence.Demo
             int count = nftElements.Length;
             for (int i = 0; i < count; i++)
             {
+                if (nftElements[i].TokenIconSprite.texture == SpriteFetcher.DefaultTexture)
+                {
+                    Debug.Log($"Nft {nftElements[i]} has the default image. This is likely because its image url is invalid. Skipping NFT...");
+                    continue;
+                }
                 _nftContent.Add(nftElements[i]);
                 ApplyNftContent(nftElements[i]);
                 UpdateScrollViewSize();
@@ -152,6 +160,10 @@ namespace Sequence.Demo
             if (result.MoreToFetch)
             {
                 _nftFetcher.FetchContent(_numberOfNftsToFetchAtOnce);
+            }
+            else
+            {
+                Debug.Log("No more nfts to fetch");
             }
         }
 
@@ -197,6 +209,31 @@ namespace Sequence.Demo
         public int CountFungibleTokensDisplayed()
         {
             return _tokenUIElements.Count;
+        }
+
+        public ITokenContentFetcher GetTokenFetcher()
+        {
+            return _tokenFetcher;
+        }
+
+        public INftContentFetcher GetNftFetcher()
+        {
+            return _nftFetcher;
+        }
+
+        /// <summary>
+        /// Sometimes it's possible that when playmode ends, we can end up creating children in the grid
+        /// Or similarly, if you are editing the UI, you may forget to delete children in the grid
+        /// If this happens, the UI looks all wonky because you have all these extra items in the grid being displayed
+        /// This method ensures there are no children in the grid when the WalletPage is opened, resolving the issue
+        /// </summary>
+        private void DestroyGridChildren()
+        {
+            int count = _scrollviewContentParent.childCount;
+            for (int i = 0; i < count; i++)
+            {
+                Destroy(_scrollviewContentParent.GetChild(i).gameObject);
+            }
         }
     }
 }

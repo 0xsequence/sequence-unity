@@ -71,5 +71,17 @@ namespace Sequence.Utils
 
             return false;
         }
+
+        public static List<T> ConvertToList<T>(this T[] arr)
+        {
+            List<T> newList = new List<T>();
+            int length = arr.Length;
+            for (int i = 0; i < length; i++)
+            {
+                newList.Add(arr[i]);
+            }
+
+            return newList;
+        }
     }
 }
