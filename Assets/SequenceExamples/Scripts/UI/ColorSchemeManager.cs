@@ -1,10 +1,8 @@
-using System;
-using System.Net.Mime;
+#if UNITY_EDITOR
 using Sequence.Demo.ScriptableObjects;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Sequence.Demo
@@ -106,3 +104,4 @@ namespace Sequence.Demo
         }
     }
 }
+#endif

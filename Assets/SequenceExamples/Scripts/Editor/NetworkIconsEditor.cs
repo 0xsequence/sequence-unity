@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using UnityEditor;
@@ -28,3 +29,4 @@ namespace Sequence.Demo.EditorExtensions
         }
     }
 }
+#endif
