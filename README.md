@@ -2,7 +2,7 @@
 This project is a work in progress - a version 2 for the Sequence Unity SDK
 
 ## Requirements
-Unity 2021.3.6f1
+Unity 2021.3.6f1 or later
 
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 
