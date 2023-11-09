@@ -46,10 +46,9 @@ namespace Sequence.Authentication
 
         public void HandleDeepLink(string link)
         {
-            Debug.LogError($"Deep link: {link}");
-            link = RemoveTrailingSlash(link);
+            link = link.RemoveTrailingSlash();
             
-            Dictionary<string, string> queryParams = ExtractQueryParameters(link);
+            Dictionary<string, string> queryParams = link.ExtractQueryParameters();
             if (queryParams.TryGetValue("state", out string state))
             {
                 if (state != _stateToken)
@@ -72,31 +71,6 @@ namespace Sequence.Authentication
             {
                 Debug.LogError($"Unexpected deep link: {link}");
             }
-        }
-        
-        private string RemoveTrailingSlash(string link)
-        {
-            if (link.EndsWith("/"))
-            {
-                link = link.Remove(link.Length - 1);
-            }
-
-            return link;
-        }
-
-        private Dictionary<string, string> ExtractQueryParameters(string link)
-        {
-            string[] urlSegments = link.Split('?');
-            string[] parameters = urlSegments[1].Split('&');
-            Dictionary<string, string> queryParameters = new Dictionary<string, string>();
-            int totalParameters = parameters.Length;
-            for (int i = 0; i < totalParameters; i++)
-            {
-                string[] keyValue = parameters[i].Split('=');
-                queryParameters.Add(keyValue[0], keyValue[1]);
-            }
-
-            return queryParameters;
         }
     }
 

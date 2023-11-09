@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Sequence.Authentication
 {
     public static class UrlExtensions
@@ -10,6 +12,31 @@ namespace Sequence.Authentication
             }
 
             return s;
+        }
+        
+        public static string RemoveTrailingSlash(this string s)
+        {
+            if (s.EndsWith("/"))
+            {
+                s = s.Remove(s.Length - 1);
+            }
+
+            return s;
+        }
+
+        public static Dictionary<string, string> ExtractQueryParameters(this string url)
+        {
+            string[] urlSegments = url.Split('?');
+            string[] parameters = urlSegments[1].Split('&');
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>();
+            int totalParameters = parameters.Length;
+            for (int i = 0; i < totalParameters; i++)
+            {
+                string[] keyValue = parameters[i].Split('=');
+                queryParameters.Add(keyValue[0], keyValue[1]);
+            }
+
+            return queryParameters;
         }
     }
 }
