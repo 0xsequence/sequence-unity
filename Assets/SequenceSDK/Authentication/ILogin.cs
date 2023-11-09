@@ -35,5 +35,13 @@ namespace Sequence.Authentication
         /// <param name="email"></param>
         /// <returns></returns>
         public Task Login(string email, string code);
+
+        /// <summary>
+        /// Attempt to log the user in using Google login
+        /// Emits an OnLoginSuccess event when successful
+        /// Emits an OnLoginFailed event when unsuccessful
+        /// Social login nat also emit relevant events
+        /// </summary>
+        public void GoogleLogin();
     }
 }

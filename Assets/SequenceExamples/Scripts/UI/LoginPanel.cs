@@ -1,4 +1,5 @@
 using Sequence.Authentication;
+using Sequence.WaaS;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -17,7 +18,7 @@ namespace Sequence.Demo
             
             _connectPage = GetComponentInChildren<ConnectPage>();
             
-            ILogin loginHandler = new MockLogin();
+            ILogin loginHandler = new WaaSLogin();
             
             _loginPage = GetComponentInChildren<LoginPage>();
             _loginPage.SetupLogin(loginHandler);

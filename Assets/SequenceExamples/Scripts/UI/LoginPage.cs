@@ -32,6 +32,7 @@ namespace Sequence.Demo
         public void GoogleLogin()
         {
             Debug.Log("Google Login");
+            LoginHandler.GoogleLogin();
         }
 
         public void DiscordLogin()

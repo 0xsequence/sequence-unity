@@ -44,5 +44,10 @@ namespace Sequence.Authentication
                 OnLoginSuccess?.Invoke("1234567890");
             }
         }
+
+        public void GoogleLogin()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
