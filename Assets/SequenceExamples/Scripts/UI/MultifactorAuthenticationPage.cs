@@ -1,5 +1,6 @@
 using System;
 using Sequence.Authentication;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,9 +33,15 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
-            if (email == null && (args.Length != 1 || args[0] is not string))
+            if (email == null)
             {
-                throw new ArgumentException($"Expected exactly one argument of type {typeof(string)}");
+                email = args.GetObjectOfTypeIfExists<string>();
+                
+                if (email == default)
+                {
+                    throw new SystemException(
+                        $"Invalid use. {GetType().Name} must be opened with a {typeof(string)} as an argument");
+                }
             }
 
             if (args.Length > 0)

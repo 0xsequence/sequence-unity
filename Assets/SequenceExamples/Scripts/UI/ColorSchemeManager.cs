@@ -1,7 +1,7 @@
-using System;
-using System.Net.Mime;
+#if UNITY_EDITOR
 using Sequence.Demo.ScriptableObjects;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +10,18 @@ namespace Sequence.Demo
     public class ColorSchemeManager : MonoBehaviour
     {
         [SerializeField] private ColorScheme _colorScheme;
+        [SerializeField] private GameObject[] _uiElementPrefabs;
         public void ApplyColorScheme()
         {
             ApplyColorSchemeToChildren(transform);
+            int prefabs = _uiElementPrefabs.Length;
+            for (int i = 0; i < prefabs; i++)
+            {
+                GameObject prefabInstance = PrefabUtility.InstantiatePrefab(_uiElementPrefabs[i]) as GameObject;
+                ApplyColorSchemeToTransformAndChildren(prefabInstance.transform);
+                PrefabUtility.ApplyPrefabInstance(prefabInstance, InteractionMode.UserAction);
+                DestroyImmediate(prefabInstance);
+            }
         }
 
         private void ApplyColorSchemeToChildren(Transform parent)
@@ -22,14 +31,21 @@ namespace Sequence.Demo
             {
                 Transform child = parent.GetChild(i);
                 
-                SetButtonColor(child);
-
-                SetTextColor(child);
-
-                SetBackgroundColor(child);
-                
-                ApplyColorSchemeToChildren(child);
+                ApplyColorSchemeToTransformAndChildren(child);
             }
+        }
+
+        private void ApplyColorSchemeToTransformAndChildren(Transform obj)
+        {
+            ApplyColorSchemeToTransform(obj);
+            ApplyColorSchemeToChildren(obj);
+        }
+
+        private void ApplyColorSchemeToTransform(Transform obj)
+        {
+            SetButtonColor(obj);
+            SetTextColor(obj);
+            SetBackgroundColor(obj);
         }
 
         private void SetButtonColor(Transform t)
@@ -66,7 +82,7 @@ namespace Sequence.Demo
                 }
             }
 
-            SequenceUI panel = t.GetComponent<SequenceUI>();
+            UIPanel panel = t.GetComponent<UIPanel>();
             if (panel != null)
             {
                 Image image = panel.GetComponent<Image>();
@@ -75,6 +91,17 @@ namespace Sequence.Demo
                     image.color = _colorScheme.backgroundColor;
                 }
             }
+            
+            WalletDropdown dropdown = t.GetComponent<WalletDropdown>();
+            if (dropdown != null)
+            {
+                Image image = dropdown.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.color = _colorScheme.backgroundColor;
+                }
+            }
         }
     }
 }
+#endif

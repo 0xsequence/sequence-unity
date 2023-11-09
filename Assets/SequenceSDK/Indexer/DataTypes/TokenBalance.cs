@@ -17,5 +17,20 @@ namespace Sequence
         public BigInteger chainId;
         public ContractInfo contractInfo;
         public TokenMetadata tokenMetadata;
+        
+        public bool IsNft()
+        {
+            return contractType == ContractType.ERC721 || contractType == ContractType.ERC1155;
+        }
+
+        public bool IsToken()
+        {
+            return contractType == ContractType.ERC20;
+        }
+        
+        public override string ToString()
+        {
+            return $"TokenBalance: id: {id}, contractAddress: {contractAddress}, contractType: {contractType}, accountAddress: {accountAddress}, tokenID: {tokenID}, balance: {balance}, blockHash: {blockHash}, blockNumber: {blockNumber}, updateID: {updateID}, chainId: {chainId}, contractInfo: {contractInfo}, tokenMetadata: {tokenMetadata}";
+        }
     }
 }

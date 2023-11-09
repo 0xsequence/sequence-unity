@@ -43,6 +43,11 @@ namespace Sequence.Contracts
             }
         }
 
+        public Address GetAddress()
+        {
+            return address;
+        }
+
         public async Task<string> Deploy(string bytecode, params object[] constructorArgs)
         {
             throw new NotImplementedException();

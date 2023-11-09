@@ -31,6 +31,11 @@ namespace Sequence.Contracts
             }
         }
 
+        public Address GetAddress()
+        {
+            return contract.GetAddress();
+        }
+
         public async Task<string> Name(IEthClient client)
         {
             string result = await contract.SendQuery<string>(client, "name");

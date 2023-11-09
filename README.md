@@ -2,7 +2,7 @@
 This project is a work in progress - a version 2 for the Sequence Unity SDK
 
 ## Requirements
-Unity 2021.3.6f1
+Unity 2021.3.6f1 or later
 
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 
@@ -64,9 +64,26 @@ A transaction, as implemented in EthTransaction, contains all the data and param
 ### Contract
 A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
 
-## Example UI
+## Sample UI
 A sample UI scene can be found under `Assets > SequenceExamples > Scenes > Demo.unity`
 This scene contains sample Sequence UI (with integration) for login flow and wallet view, settings, and transaction flow.
+
+### How It Works
+The sample Sequence UI is comprised of a few important components.
+
+#### UIPage
+A `UIPage` is the base implementation of a "page" in the sample UI. Example pages: `LoginPage`, `TokenInfoPage`
+It is responsible for opening/closing the page and managing the chosen `ITween`.
+
+#### ITween
+An `ITween` is an interface for an animation (in/out) that can be applied to a `RectTransform` (a required component of a `UIPage`).
+
+#### UIPanel
+Inherriting from `UIPage`, a `UIPanel` is the base implementation of a "panel" in the sample UI. Example panels: `LoginPanel`, `WalletPanel`
+In addition to `UIPage` responsibilities, UIPanels maintain a stack of UIPages and `object[]` (open arguments) and are responsible for managing any required event listeners and UI transitions between their child pages (according to Scene inspector heirarchy), including handling the "Back" button.
+
+#### SequenceSampleUI
+`SequenceSampleUI` can be thought of as the "manager" of the sample UI. It holds a reference to all the UIPanels and is responsible for opening them as needed, including at `Start()`. If you are integrating all or part of the provided sample UI into your project, you may find it more practical to replace `SequenceSampleUI` with your own UI "manager".
 
 ### Customizations + Color Schemes
 As a Made-With-Unity UI, the sample UI is cross platform and easily customizable.

@@ -13,52 +13,28 @@ namespace SequenceExamples.Scripts.Tests
     {
         private MonoBehaviour _testMonobehaviour;
             
-        private SequenceUI _ui;
+        private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
         private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
-        
-        [UnitySetUp]
-        private IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
-        {
-            SequenceUI.IsTesting = true;
-            SceneManager.LoadScene("SequenceExamples/Scenes/Demo");
-            while (_ui == null)
-            {
-                yield return null; // Allow object to load
-                _ui = FindObjectOfType<SequenceUI>();
-                _loginPanel = FindObjectOfType<LoginPanel>();
-                _connectPage = FindObjectOfType<ConnectPage>();
-                _loginPage = FindObjectOfType<LoginPage>();
-                _mfaPage = FindObjectOfType<MultifactorAuthenticationPage>();
-                _loginSuccessPage = FindObjectOfType<LoginSuccessPage>();
-            }
+        private WalletPanel _walletPanel;
 
-            GameObject testObject = new GameObject("TestObject");
-            testObject.AddComponent<TestClass>();
-            _testMonobehaviour = testObject.GetComponent<MonoBehaviour>();
-            
-            SequenceUI.IsTesting = false;
-            _ui.Start();
-            yield return new WaitForSeconds(3f); // Wait a few seconds to allow for UI to animate into place
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
+            MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel)
+        {
+            _testMonobehaviour = testMonobehaviour;
+            _ui = ui;
+            _loginPanel = loginPanel;
+            _connectPage = connectPage;
+            _loginPage = loginPage;
+            _mfaPage = mfaPage;
+            _loginSuccessPage = loginSuccessPage;
+            _walletPanel = walletPanel;
         }
 
-        [UnityTearDown]
-        private IEnumerator DropMajorElements()
-        {
-            _ui = null;
-            _loginPanel = null;
-            _connectPage = null;
-            _loginPage = null;
-            _mfaPage = null;
-            _loginSuccessPage = null;
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator IntegrationTest()
+        public IEnumerator EndToEndTest()
         {
             // Run all tests in one single suite to save time running test suite (otherwise, we need to reload and tear down the scene for each test
             InitialExpectationsTest();
@@ -81,9 +57,10 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsTrue(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_walletPanel.gameObject.activeInHierarchy);
         }
         
-        private IEnumerator TransitionToMfaPageTest()
+        public IEnumerator TransitionToMfaPageTest()
         {
             yield return _testMonobehaviour.StartCoroutine(TransitionToMfaPage("validEmail@valid.com"));
         }
@@ -103,7 +80,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return null;
             
             button.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
 
             AssertWeAreOnMfaPage();
             
@@ -120,6 +97,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_walletPanel.gameObject.activeInHierarchy);
         }
 
         private IEnumerator TransitionToLoginSuccessPageTest()
@@ -185,6 +163,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_loginSuccessPage.gameObject.activeInHierarchy);
+            Assert.IsFalse(_walletPanel.gameObject.activeInHierarchy);
         }
 
         private IEnumerator GoBackToMfaPageAndVerifyPageStateTest()
@@ -195,7 +174,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(backButton);
             
             backButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertWeAreOnMfaPage();
             
@@ -216,7 +195,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(backButton);
             
             backButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertWeAreOnLoginPage();
             
@@ -230,7 +209,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNull(backGameObject);
         }
 
-        private IEnumerator NavigateToLoginSuccessPageAndDismissTest()
+        public IEnumerator NavigateToLoginSuccessPageAndDismissTest()
         {
             yield return _testMonobehaviour.StartCoroutine(TransitionToMfaPage("newValidEmail@valid.com"));
             yield return _testMonobehaviour.StartCoroutine(TransitionToLoginSuccessPage("0987654321"));
@@ -241,7 +220,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(dismissButton);
             
             dismissButton.onClick.Invoke();
-            yield return new WaitForSeconds(3f); // Wait for next page to animate in
+            yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
             
             AssertLoginPanelIsClosed();
         }
