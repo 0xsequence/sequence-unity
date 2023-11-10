@@ -815,7 +815,7 @@ PlayerSettings:
   scriptingDefineSymbols:
     Android: VUPLEX_CCU;VUPLEX_STANDALONE
     Server: 
-    Standalone: VUPLEX_CCU;VUPLEX_STANDALONE
+    Standalone: 
     WebGL: VUPLEX_CCU;VUPLEX_STANDALONE
     iPhone: VUPLEX_CCU;VUPLEX_STANDALONE
   additionalCompilerArguments: {}
