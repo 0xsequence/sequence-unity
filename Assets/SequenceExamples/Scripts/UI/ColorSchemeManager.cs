@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using Sequence.Demo.ScriptableObjects;
 using TMPro;
 using UnityEditor;
@@ -11,6 +10,8 @@ namespace Sequence.Demo
     {
         [SerializeField] private ColorScheme _colorScheme;
         [SerializeField] private GameObject[] _uiElementPrefabs;
+       
+#if UNITY_EDITOR
         public void ApplyColorScheme()
         {
             ApplyColorSchemeToChildren(transform);
@@ -23,6 +24,7 @@ namespace Sequence.Demo
                 DestroyImmediate(prefabInstance);
             }
         }
+#endif
 
         private void ApplyColorSchemeToChildren(Transform parent)
         {
@@ -104,4 +106,3 @@ namespace Sequence.Demo
         }
     }
 }
-#endif
