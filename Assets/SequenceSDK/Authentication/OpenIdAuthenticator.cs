@@ -11,7 +11,7 @@ namespace Sequence.Authentication
         public Action<OpenIdAuthenticationResult> SignedIn;
         
         private static readonly string ClientId = "1041613285238-6hrgdboqrjglsj583njhhseh4b1nh16n.apps.googleusercontent.com";
-        private static readonly string RedirectUrl = "https://d625-70-27-5-107.ngrok-free.app/";
+        private static readonly string RedirectUrl = "https://3d41-142-115-54-118.ngrok-free.app/";
         
         private readonly string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();

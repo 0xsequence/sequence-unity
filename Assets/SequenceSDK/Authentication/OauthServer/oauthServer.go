@@ -7,7 +7,6 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// JavaScript code to extract id_token, client_id, and state from the URL hash fragment
 		jsCode := `
 			<script>
 				function parseUrlParams() {
