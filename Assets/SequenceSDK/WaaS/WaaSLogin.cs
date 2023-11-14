@@ -60,7 +60,7 @@ namespace Sequence.WaaS
 
             try
             {
-                AWSCredentialsFetcher fetcher = new AWSCredentialsFetcher(idToken, _awsConfig.IdentityPoolId);
+                AWSCredentialsFetcher fetcher = new AWSCredentialsFetcher(idToken, _awsConfig.IdentityPoolId, _awsConfig.Region);
                 credentials = await fetcher.GetCredentials();
             }
             catch (Exception e)

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Amazon;
 using Amazon.CognitoIdentity;
 using Amazon.CognitoIdentity.Model;
 using UnityEngine;
@@ -9,12 +10,14 @@ namespace Sequence.Authentication
     {
         private string _idToken;
         private string _identityPoolId;
+        private string _region;
         private string _issuer;
 
-        public AWSCredentialsFetcher(string idToken, string identityPoolId)
+        public AWSCredentialsFetcher(string idToken, string identityPoolId, string region)
         {
             _idToken = idToken;
             _identityPoolId = identityPoolId;
+            _region = region;
             _issuer = ExtractIssFromJwt(idToken);
         }
 
@@ -35,10 +38,10 @@ namespace Sequence.Authentication
                 }
             };
             
-            Debug.LogError("Creating client");
-            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(); // Problem line
-            Debug.LogError("Created client");
-            
+            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(new AmazonCognitoIdentityConfig
+            {
+                RegionEndpoint = RegionEndpoint.GetBySystemName(_region)
+            });
             GetIdResponse idResponse = await client.GetIdAsync(idRequest);
             string identityId = idResponse.IdentityId;
             return identityId;
