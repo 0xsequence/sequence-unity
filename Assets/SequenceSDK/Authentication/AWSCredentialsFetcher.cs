@@ -1,9 +1,6 @@
-using System;
-using System.Text;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentity;
 using Amazon.CognitoIdentity.Model;
-using Amazon.KeyManagementService.Model;
 using UnityEngine;
 
 namespace Sequence.Authentication
@@ -38,7 +35,9 @@ namespace Sequence.Authentication
                 }
             };
             
+            Debug.LogError("Creating client");
             using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(); // Problem line
+            Debug.LogError("Created client");
             
             GetIdResponse idResponse = await client.GetIdAsync(idRequest);
             string identityId = idResponse.IdentityId;

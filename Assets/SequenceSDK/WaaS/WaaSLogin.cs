@@ -39,6 +39,7 @@ namespace Sequence.WaaS
 
         public void GoogleLogin()
         {
+            Debug.LogError("Google login");
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
             authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += authenticator.HandleDeepLink;
@@ -48,6 +49,7 @@ namespace Sequence.WaaS
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
+            Debug.LogError("Google Id token: " + result.IdToken);
             ConnectToWaaS(result.IdToken);
         }
 
@@ -63,7 +65,7 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error fetching credentials from AWS" + e.Message);
+                OnLoginFailed?.Invoke("Error fetching credentials from AWS: " + e.Message);
                 return;
             }
             
@@ -77,7 +79,7 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error generating data key from AWS" + e.Message);
+                OnLoginFailed?.Invoke("Error generating data key from AWS: " + e.Message);
                 return;
             }
             

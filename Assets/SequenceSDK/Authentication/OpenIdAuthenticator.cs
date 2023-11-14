@@ -32,16 +32,7 @@ namespace Sequence.Authentication
 
         public void PlatformSpecificSetup()
         {
-#if UNITY_STANDALONE_OSX
-            // ensure our URL protocol handler is registered - MacOS sometimes doesn't pick it up from Info.plist.
-            var appPath = System.IO.Directory.GetParent(Application.dataPath);
-            var command = new System.Diagnostics.ProcessStartInfo();
-            command.FileName = "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister";
-            command.Arguments = " -R -f " + appPath;
-            command.UseShellExecute = false;
-            command.CreateNoWindow = true;
-            System.Diagnostics.Process.Start(command);
-#endif
+
         }
 
         public void HandleDeepLink(string link)

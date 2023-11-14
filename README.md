@@ -4,6 +4,14 @@ This project is a work in progress - a version 2 for the Sequence Unity SDK
 ## Requirements
 Unity 2021.3.6f1 or later
 
+## Supported Platforms
+
+- Android
+- iOS
+- PC standalone
+- Mac standalone -> (IL2CPP builds only -> in our testing the AWSSDK for .NET 2.0 causes freezing due to library loading issues)
+- WebGL (excluding OpenIdAuthentication)
+
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 
 Unity by navigating to `Window > General > Test Runner`.
