@@ -70,7 +70,7 @@ namespace Sequence.WaaS
                 return;
             }
             
-            Debug.LogError("Credentials fetched from AWS");
+            Debug.LogError($"Credentials fetched from AWS:\n{credentials.PrettyPrint()}");
 
             try
             {

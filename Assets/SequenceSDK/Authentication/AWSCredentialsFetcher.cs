@@ -41,6 +41,9 @@ namespace Sequence.Authentication
             
             Debug.LogError("Identity Id: " + identityId);
             
+            using CognitoAWSCredentials awsCredentials = new CognitoAWSCredentials(_identityPoolId, RegionEndpoint.GetBySystemName(_region));
+            awsCredentials.AddLogin(_issuer, _idToken);
+            
             GetCredentialsForIdentityRequest credentialsRequest = new GetCredentialsForIdentityRequest
             {
                 IdentityId = identityId,
@@ -50,12 +53,24 @@ namespace Sequence.Authentication
                 }
             };
             
-            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(RegionEndpoint.GetBySystemName(_region));
+            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(awsCredentials, RegionEndpoint.GetBySystemName(_region));
             
             GetCredentialsForIdentityResponse credentialsResponse = await client.GetCredentialsForIdentityAsync(credentialsRequest);
             Credentials credentials = credentialsResponse.Credentials;
 
             return credentials;
+        }
+        
+    }
+
+    public static class CredentialsExtentions
+    {
+        public static string PrettyPrint(this Credentials credentials)
+        {
+            return $"Access Key: {credentials.AccessKeyId}\n" +
+                   $"Secret Key: {credentials.SecretKey}\n" +
+                   $"Session Token: {credentials.SessionToken}\n" +
+                   $"Expiration: {credentials.Expiration}";
         }
     }
 }
