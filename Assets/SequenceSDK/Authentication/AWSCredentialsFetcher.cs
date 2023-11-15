@@ -29,27 +29,17 @@ namespace Sequence.Authentication
 
         private async Task<string> GetIdentityId()
         {
-            GetIdRequest idRequest = new GetIdRequest
-            {
-                IdentityPoolId = _identityPoolId,
-                Logins = new System.Collections.Generic.Dictionary<string, string>
-                {
-                    {_issuer, _idToken}
-                }
-            };
-            
-            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(new AmazonCognitoIdentityConfig
-            {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(_region)
-            });
-            GetIdResponse idResponse = await client.GetIdAsync(idRequest);
-            string identityId = idResponse.IdentityId;
+            using CognitoAWSCredentials credentials = new CognitoAWSCredentials(_identityPoolId, RegionEndpoint.GetBySystemName(_region));
+            credentials.AddLogin(_issuer, _idToken);
+            string identityId = await credentials.GetIdentityIdAsync();
             return identityId;
         }
         
         public async Task<Credentials> GetCredentials()
         {
             string identityId = await GetIdentityId();
+            
+            Debug.LogError("Identity Id: " + identityId);
             
             GetCredentialsForIdentityRequest credentialsRequest = new GetCredentialsForIdentityRequest
             {
@@ -60,7 +50,7 @@ namespace Sequence.Authentication
                 }
             };
             
-            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient();
+            using AmazonCognitoIdentityClient client = new AmazonCognitoIdentityClient(RegionEndpoint.GetBySystemName(_region));
             
             GetCredentialsForIdentityResponse credentialsResponse = await client.GetCredentialsForIdentityAsync(credentialsRequest);
             Credentials credentials = credentialsResponse.Credentials;

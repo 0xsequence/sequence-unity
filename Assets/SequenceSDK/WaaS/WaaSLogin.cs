@@ -14,12 +14,17 @@ namespace Sequence.WaaS
         private AWSConfig _awsConfig;
         private string _waasProjectId;
         private string _waasVersion;
+        private OpenIdAuthenticator _authenticator;
 
         public WaaSLogin(AWSConfig awsConfig, string waasProjectId, string waasVersion)
         {
             _awsConfig = awsConfig;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
+            _authenticator = new OpenIdAuthenticator();
+            _authenticator.PlatformSpecificSetup();
+            Application.deepLinkActivated += _authenticator.HandleDeepLink;
+            _authenticator.SignedIn += OnSocialLogin;
         }
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
@@ -40,11 +45,7 @@ namespace Sequence.WaaS
         public void GoogleLogin()
         {
             Debug.LogError("Google login");
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
-            authenticator.PlatformSpecificSetup();
-            Application.deepLinkActivated += authenticator.HandleDeepLink;
-            authenticator.SignedIn += OnSocialLogin;
-            authenticator.GoogleSignIn();
+            _authenticator.GoogleSignIn();
         }
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
