@@ -69,7 +69,6 @@ namespace Sequence.WaaS
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            Debug.LogError("Social login Id token: " + result.IdToken);
             ConnectToWaaS(result.IdToken);
         }
 
@@ -88,8 +87,6 @@ namespace Sequence.WaaS
                 OnLoginFailed?.Invoke("Error fetching credentials from AWS: " + e.Message);
                 return;
             }
-            
-            Debug.LogError($"Credentials fetched from AWS:\n{credentials.PrettyPrint()}");
 
             try
             {
@@ -102,8 +99,6 @@ namespace Sequence.WaaS
                 OnLoginFailed?.Invoke("Error generating data key from AWS: " + e.Message);
                 return;
             }
-            
-            Debug.LogError("Data key generated from AWS");
 
             EthWallet sessionWallet = new EthWallet();
 

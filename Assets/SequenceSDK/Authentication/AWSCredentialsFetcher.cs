@@ -39,8 +39,6 @@ namespace Sequence.Authentication
         {
             string identityId = await GetIdentityId();
             
-            Debug.LogError("Identity Id: " + identityId);
-            
             using CognitoAWSCredentials awsCredentials = new CognitoAWSCredentials(_identityPoolId, RegionEndpoint.GetBySystemName(_region));
             awsCredentials.AddLogin(_issuer, _idToken);
             
