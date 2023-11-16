@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentity.Model;
 using Sequence.Authentication;
 using Sequence.Extensions;
 using Sequence.Utils;
+using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Sequence.WaaS
 {
@@ -14,11 +17,11 @@ namespace Sequence.WaaS
         public static readonly string WaaSLoginUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
 
         private AWSConfig _awsConfig;
-        private string _waasProjectId;
+        private int _waasProjectId;
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
 
-        public WaaSLogin(AWSConfig awsConfig, string waasProjectId, string waasVersion)
+        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion)
         {
             _awsConfig = awsConfig;
             _waasProjectId = waasProjectId;
@@ -111,11 +114,11 @@ namespace Sequence.WaaS
             try
             {
                 (string sessionId, string dataWallet) = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
-                Debug.LogError($"Session ID: {sessionId} | Data Wallet: {dataWallet}");
+                Debug.LogError($"WaaSSession ID: {sessionId} | Data Wallet: {dataWallet}");
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error registering session: " + e.Message);
+                OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message);
                 return;
             }
         }
@@ -141,79 +144,13 @@ namespace Sequence.WaaS
         {
             HttpClient client = new HttpClient(WaaSLoginUrl);
             RegisterSessionPayload payload = new RegisterSessionPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
-            (string sessionId, string dataWallet) = await client.SendRequest<RegisterSessionPayload, (string, string)>("RegisterSession", payload);
+            RegisterSessionResponse response = await client.SendRequest<RegisterSessionPayload, RegisterSessionResponse>("RegisterSession", payload, new Dictionary<string, string>()
+            {
+                {"X-Sequence-Tenant", "9"},
+            });
+            string sessionId = response.data.sessionId;
+            string dataWallet = response.data.wallet;
             return (sessionId, dataWallet);
-        }
-    }
-
-    [Serializable]
-    public class WaaSLoginIntent
-    {
-        public string version;
-        public Packet packet;
-
-        [Serializable]
-        public class Packet
-        {
-            public static string OpenSessionCode = "openSession";
-            
-            public string code;
-            public string session;
-            public Proof proof;
-
-            [Serializable]
-            public class Proof
-            {
-                public string idToken;
-            }
-        }
-
-        public WaaSLoginIntent(string version, string code, string session, string idToken)
-        {
-            this.version = version;
-            this.packet = new Packet()
-            {
-                code = code,
-                session = session,
-                proof = new Packet.Proof()
-                {
-                    idToken = idToken
-                }
-            };
-        }
-    }
-
-    [Serializable]
-    public class WaaSLoginPayload
-    {
-        public string projectId;
-        public string idToken;
-        public string sessionAddress;
-        public string friendlyName;
-        public string intentJSON;
-
-        public WaaSLoginPayload(string projectId, string idToken, string sessionAddress, string friendlyName, string intentJson)
-        {
-            this.projectId = projectId;
-            this.idToken = idToken;
-            this.sessionAddress = sessionAddress;
-            this.friendlyName = friendlyName;
-            intentJSON = intentJson;
-        }
-    }
-    
-    [Serializable]
-    public class RegisterSessionPayload
-    {
-        public string encryptedPayloadKey;
-        public string payloadCiphertext;
-        public string payloadSig;
-
-        public RegisterSessionPayload(string encryptedPayloadKey, string payloadCiphertext, string payloadSig)
-        {
-            this.encryptedPayloadKey = encryptedPayloadKey;
-            this.payloadCiphertext = payloadCiphertext;
-            this.payloadSig = payloadSig;
         }
     }
 }

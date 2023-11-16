@@ -20,9 +20,9 @@ namespace Sequence.Demo
             
             ILogin loginHandler = new WaaSLogin(new AWSConfig(
                 "us-east-2", 
-                "us-east-2:3926b6ff-2888-4deb-851b-ced0914404bf", 
+                "us-east-2:42c9f39d-c935-4d5c-a845-5c8815c79ee3", 
                 "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d"),
-                "9", "1.0.0");
+                9, "1.0.0");
             
             _loginPage = GetComponentInChildren<LoginPage>();
             _loginPage.SetupLogin(loginHandler);
