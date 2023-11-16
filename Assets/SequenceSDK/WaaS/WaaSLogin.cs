@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentity.Model;
 using Sequence.Authentication;
+using Sequence.Extensions;
+using Sequence.Utils;
 using Sequence.Wallet;
 using UnityEngine;
 
@@ -9,7 +11,7 @@ namespace Sequence.WaaS
 {
     public class WaaSLogin : ILogin 
     {
-        public static readonly string WaaSLoginUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaaSAuthenticator/";
+        public static readonly string WaaSLoginUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
 
         private AWSConfig _awsConfig;
         private string _waasProjectId;
@@ -88,18 +90,26 @@ namespace Sequence.WaaS
 
             EthWallet sessionWallet = new EthWallet();
 
-            string signedPayled = await PrepareSignedPayload(sessionWallet, idToken, dataKey);
+            string loginPayload = AssembleLoginPayloadJson(idToken, sessionWallet);
+            string payloadCiphertext = await PrepareEncryptedPayload(sessionWallet, idToken, dataKey, loginPayload);
+            string signedPayload = await sessionWallet.SignMessage(loginPayload);
 
-            // Todo register session with waas rpc
-            Debug.LogError("Signed payload: " + signedPayled);
+            try
+            {
+                (string sessionId, string dataWallet) = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
+                Debug.LogError($"Session ID: {sessionId} | Data Wallet: {dataWallet}");
+            }
+            catch (Exception e)
+            {
+                OnLoginFailed?.Invoke("Error registering session: " + e.Message);
+                return;
+            }
         }
 
-        private async Task<string> PrepareSignedPayload(Wallet.IWallet sessionWallet, string idToken, DataKey dataKey)
+        private async Task<string> PrepareEncryptedPayload(Wallet.IWallet sessionWallet, string idToken, DataKey dataKey, string loginPayload)
         {
-            string loginPayload = AssembleLoginPayloadJson(idToken, sessionWallet);
             byte[] encryptedPayload = Encryptor.AES256CBCEncryption(dataKey.Plaintext, loginPayload);
-            string signedPayled = await sessionWallet.SignMessage(encryptedPayload);
-            return signedPayled;
+            return encryptedPayload.ByteArrayToHexStringWithPrefix();
         }
 
         private string AssembleLoginPayloadJson(string idToken, Wallet.IWallet sessionWallet)
@@ -108,9 +118,17 @@ namespace Sequence.WaaS
                 sessionWallet.GetAddress(), idToken);
             string intentJson = JsonUtility.ToJson(intent);
             WaaSLoginPayload payload = new WaaSLoginPayload(_waasProjectId, idToken, sessionWallet.GetAddress(),
-                "UserWallet", intentJson);
+                "FRIENDLY SESSION WALLET", intentJson);
             string payloadJson = JsonUtility.ToJson(payload);
             return payloadJson;
+        }
+
+        private async Task<(string, string)> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
+        {
+            HttpClient client = new HttpClient(WaaSLoginUrl);
+            RegisterSessionPayload payload = new RegisterSessionPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
+            (string sessionId, string dataWallet) = await client.SendRequest<RegisterSessionPayload, (string, string)>("RegisterSession", payload);
+            return (sessionId, dataWallet);
         }
     }
 
@@ -167,6 +185,21 @@ namespace Sequence.WaaS
             this.sessionAddress = sessionAddress;
             this.friendlyName = friendlyName;
             intentJSON = intentJson;
+        }
+    }
+    
+    [Serializable]
+    public class RegisterSessionPayload
+    {
+        public string encryptedPayloadKey;
+        public string payloadCiphertext;
+        public string payloadSig;
+
+        public RegisterSessionPayload(string encryptedPayloadKey, string payloadCiphertext, string payloadSig)
+        {
+            this.encryptedPayloadKey = encryptedPayloadKey;
+            this.payloadCiphertext = payloadCiphertext;
+            this.payloadSig = payloadSig;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Sequence.WaaS
 
         public WaaSWallet(string jwt)
         {
-            this._httpClient = new HttpClient();
+            this._httpClient = new HttpClient("https://next-api.sequence.app/rpc/Wallet");
             this._address = JwtHelper.GetWalletAddressFromJwt(jwt);
             this._httpClient.AddDefaultHeader("Authorization", $"Bearer {jwt}");
         }

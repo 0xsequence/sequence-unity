@@ -19,8 +19,9 @@ namespace Sequence.WaaS
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public HttpClient()
+        public HttpClient(string url)
         {
+            _url = url;
             this._defaultHeaders = new Dictionary<string, string>();
         }
 
