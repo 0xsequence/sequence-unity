@@ -40,8 +40,32 @@ namespace Sequence.Authentication
         /// Attempt to log the user in using Google login
         /// Emits an OnLoginSuccess event when successful
         /// Emits an OnLoginFailed event when unsuccessful
-        /// Social login nat also emit relevant events
+        /// Social login may also emit relevant events
         /// </summary>
         public void GoogleLogin();
+
+        /// <summary>
+        /// Attempt to log the user in using Discord login
+        /// Emits an OnLoginSuccess event when successful
+        /// Emits an OnLoginFailed event when unsuccessful
+        /// Social login may also emit relevant events
+        /// </summary>
+        public void DiscordLogin();
+
+        /// <summary>
+        /// Attempt to log the user in using Facebook login
+        /// Emits an OnLoginSuccess event when successful
+        /// Emits an OnLoginFailed event when unsuccessful
+        /// Social login may also emit relevant events
+        /// </summary>
+        public void FacebookLogin();
+
+        /// <summary>
+        /// Attempt to log the user in using Apple login
+        /// Emits an OnLoginSuccess event when successful
+        /// Emits an OnLoginFailed event when unsuccessful
+        /// Social login may also emit relevant events
+        /// </summary>
+        public void AppleLogin();
     }
 }

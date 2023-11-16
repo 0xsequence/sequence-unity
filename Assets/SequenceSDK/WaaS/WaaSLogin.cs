@@ -46,13 +46,27 @@ namespace Sequence.WaaS
 
         public void GoogleLogin()
         {
-            Debug.LogError("Google login");
             _authenticator.GoogleSignIn();
+        }
+
+        public void DiscordLogin()
+        {
+            _authenticator.DiscordSignIn();
+        }
+
+        public void FacebookLogin()
+        {
+            _authenticator.FacebookSignIn();
+        }
+        
+        public void AppleLogin()
+        {
+            _authenticator.AppleSignIn();
         }
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            Debug.LogError("Google Id token: " + result.IdToken);
+            Debug.LogError("Social login Id token: " + result.IdToken);
             ConnectToWaaS(result.IdToken);
         }
 

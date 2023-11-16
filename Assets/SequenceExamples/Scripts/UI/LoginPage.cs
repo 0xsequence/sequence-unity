@@ -38,16 +38,19 @@ namespace Sequence.Demo
         public void DiscordLogin()
         {
             Debug.Log("Discord Login");
+            LoginHandler.DiscordLogin();
         }
 
         public void FacebookLogin()
         {
             Debug.Log("Facebook Login");
+            LoginHandler.FacebookLogin();
         }
 
         public void AppleLogin()
         {
             Debug.Log("Apple Login");
+            LoginHandler.AppleLogin();
         }
     }
 }

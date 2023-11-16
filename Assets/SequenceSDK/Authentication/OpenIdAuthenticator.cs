@@ -10,7 +10,10 @@ namespace Sequence.Authentication
     {
         public Action<OpenIdAuthenticationResult> SignedIn;
         
-        private static readonly string ClientId = "1041613285238-6hrgdboqrjglsj583njhhseh4b1nh16n.apps.googleusercontent.com";
+        private static readonly string GoogleClientId = "1041613285238-6hrgdboqrjglsj583njhhseh4b1nh16n.apps.googleusercontent.com";
+        private static readonly string DiscordClientId = ""; // Todo replace
+        private static readonly string FacebookClientId = ""; // Todo replace
+        private static readonly string AppleClientId = ""; // Todo replace
         private static readonly string RedirectUrl = "https://3d41-142-115-54-118.ngrok-free.app/";
         
         private readonly string _stateToken = Guid.NewGuid().ToString();
@@ -20,14 +23,61 @@ namespace Sequence.Authentication
         {
             try
             {
-                string googleSignInUrl = 
-                    $"https://accounts.google.com/o/oauth2/auth?response_type=id_token&client_id={ClientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken}&nonce={_nonce}/";
+                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId);
                 Application.OpenURL(googleSignInUrl);
             }
             catch (Exception e)
             {
                 Debug.LogError($"Google sign in error: {e.Message}");
             }
+        }
+        
+        public void DiscordSignIn()
+        {
+            try
+            {
+                string discordSignInUrl =
+                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId);
+                Application.OpenURL(discordSignInUrl);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Discord sign in error: {e.Message}");
+            }
+        }
+
+        public void FacebookSignIn()
+        {
+            try
+            {
+                string facebookSignInUrl =
+                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId);
+                Application.OpenURL(facebookSignInUrl);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Facebook sign in error: {e.Message}");
+            }
+        }
+        
+        public void AppleSignIn()
+        {
+            try
+            {
+                string appleSignInUrl =
+                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId);
+                Application.OpenURL(appleSignInUrl);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Apple sign in error: {e.Message}");
+            }
+        }
+
+        private string GenerateSignInUrl(string baseUrl, string clientId)
+        {
+            return
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken}&nonce={_nonce}/";
         }
 
         public void PlatformSpecificSetup()

@@ -49,5 +49,20 @@ namespace Sequence.Authentication
         {
             throw new System.NotImplementedException();
         }
+
+        public void DiscordLogin()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void FacebookLogin()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void AppleLogin()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
