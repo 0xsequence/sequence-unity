@@ -113,8 +113,8 @@ namespace Sequence.WaaS
 
             try
             {
-                (string sessionId, string dataWallet) = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
-                Debug.LogError($"WaaSSession ID: {sessionId} | Data Wallet: {dataWallet}");
+                WaaSSessionData sessionData = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
+                Debug.LogError($"WaaSSession ID: {sessionData.sessionId} | Wallet: {sessionData.wallet}");
             }
             catch (Exception e)
             {
@@ -140,7 +140,7 @@ namespace Sequence.WaaS
             return payloadJson;
         }
 
-        private async Task<(string, string)> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
+        private async Task<WaaSSessionData> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
         {
             HttpClient client = new HttpClient(WaaSLoginUrl);
             RegisterSessionPayload payload = new RegisterSessionPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
@@ -148,9 +148,7 @@ namespace Sequence.WaaS
             {
                 {"X-Sequence-Tenant", "9"},
             });
-            string sessionId = response.data.sessionId;
-            string dataWallet = response.data.wallet;
-            return (sessionId, dataWallet);
+            return response.data;
         }
     }
 }
