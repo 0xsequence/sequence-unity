@@ -4,7 +4,7 @@ namespace Sequence.Authentication
 {
     public interface ILogin
     {
-        public delegate void OnLoginSuccessHandler(string userId);
+        public delegate void OnLoginSuccessHandler(string sessionId, string walletAddress);
         public event OnLoginSuccessHandler OnLoginSuccess;
 
         public delegate void OnLoginFailedHandler(string error);

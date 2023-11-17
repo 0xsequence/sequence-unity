@@ -37,9 +37,9 @@ namespace Sequence.WaaS
             {
                 OnMFAEmailSent?.Invoke(email);
             };
-            _mockLogin.OnLoginSuccess += token =>
+            _mockLogin.OnLoginSuccess += (token, address) =>
             {
-                OnLoginSuccess?.Invoke(token);
+                OnLoginSuccess?.Invoke(token, address);
             };
         }
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
@@ -120,7 +120,7 @@ namespace Sequence.WaaS
             try
             {
                 WaaSSessionData sessionData = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
-                Debug.LogError($"WaaSSession ID: {sessionData.sessionId} | Wallet: {sessionData.wallet}");
+                OnLoginSuccess?.Invoke(sessionData.sessionId, sessionData.wallet);
             }
             catch (Exception e)
             {
