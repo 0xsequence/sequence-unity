@@ -20,6 +20,7 @@ namespace Sequence.WaaS
         private int _waasProjectId;
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
+        private MockLogin _mockLogin;
 
         public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion)
         {
@@ -30,6 +31,16 @@ namespace Sequence.WaaS
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
+            
+            _mockLogin = new MockLogin();
+            _mockLogin.OnMFAEmailSent += email =>
+            {
+                OnMFAEmailSent?.Invoke(email);
+            };
+            _mockLogin.OnLoginSuccess += token =>
+            {
+                OnLoginSuccess?.Invoke(token);
+            };
         }
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
@@ -38,13 +49,13 @@ namespace Sequence.WaaS
         public async Task Login(string email)
         {
             Debug.LogError("Not Implemented... mocking for now");
-            await new MockLogin().Login(email);
+            await _mockLogin.Login(email);
         }
 
         public async Task Login(string email, string code)
         {
             Debug.LogError("Not Implemented... mocking for now");
-            await new MockLogin().Login(email, code);
+            await _mockLogin.Login(email, code);
         }
 
         public void GoogleLogin()

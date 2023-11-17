@@ -110,6 +110,8 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
             yield return
                 _testMonobehaviour.StartCoroutine(_loginFlowUITests.NavigateToLoginSuccessPageAndDismissTest());
+            LogAssert.Expect(LogType.Error, "Not Implemented... mocking for now");
+            LogAssert.Expect(LogType.Error, "Not Implemented... mocking for now");
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.NavigateToWalletPageTest());
         }
 

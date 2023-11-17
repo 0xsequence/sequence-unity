@@ -39,10 +39,14 @@ namespace SequenceExamples.Scripts.Tests
             // Run all tests in one single suite to save time running test suite (otherwise, we need to reload and tear down the scene for each test
             InitialExpectationsTest();
             yield return _testMonobehaviour.StartCoroutine(TransitionToMfaPageTest());
+            LogAssert.Expect(LogType.Error, "Not Implemented... mocking for now");
             yield return _testMonobehaviour.StartCoroutine(TransitionToLoginSuccessPageTest());
+            LogAssert.Expect(LogType.Error, "Not Implemented... mocking for now");
             yield return _testMonobehaviour.StartCoroutine(GoBackToMfaPageAndVerifyPageStateTest());
             yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest());
             yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageAndDismissTest());
+            LogAssert.Expect(LogType.Error, "Not Implemented... mocking for now");
+            LogAssert.Expect(LogType.Error, "Not Implemented... mocking for now");
         }
         
         private void InitialExpectationsTest()
