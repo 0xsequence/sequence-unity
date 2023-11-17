@@ -42,10 +42,9 @@ namespace Sequence.Authentication
         {
             try
             {
-                SignedIn?.Invoke(new OpenIdAuthenticationResult("eyJhbGciOiJSUzI1NiIsImtpZCI6IjViMzcwNjk2MGUzZTYwMDI0YTI2NTVlNzhjZmE2M2Y4N2M5N2QzMDkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI5NzA5ODc3NTY2NjAtMzVhNnRjNDhodmk4Y2V2OWNua25wMGl1Z3Y5cG9hMjMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI5NzA5ODc3NTY2NjAtMzVhNnRjNDhodmk4Y2V2OWNua25wMGl1Z3Y5cG9hMjMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTMzMjMxMDU3OTA0MTE1MjgyMTIiLCJoZCI6Imhvcml6b24uaW8iLCJlbWFpbCI6InFwQGhvcml6b24uaW8iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzAwMjM4MDE5LCJuYW1lIjoiUXVpbm4gUHVyZHkiLCJnaXZlbl9uYW1lIjoiUXVpbm4iLCJmYW1pbHlfbmFtZSI6IlB1cmR5IiwibG9jYWxlIjoiZW4iLCJpYXQiOjE3MDAyMzgzMTksImV4cCI6MTcwMDI0MTkxOSwianRpIjoiMWZkZGIxZDUyNjJkMjc3Nzg5MDMxY2RiYjZmYzJmMWI5MzBmN2ZkMiJ9.c74dQYeDliT1ABNyykcJ59SptbdAERkzqu2gjZhPuZin7lzNnGSZJG3QzU0xWDpvg-1iMZyp7KcPSiIhQckfMFA7bRYjVKe8JUmupjdFdIF6EnD574ykbQaImHz2Kvw504r9qEFbpf6P-prQP1uCpziKUGcp_VDOJwWj7I4xTOTEuIzLSQ5xf-JTQfYfg3JXjzAKmpuIVQqxNg4xPjCg6pAaWOLzvzvuHxuYb2NlVaQFMkpQ9LFTAp3c82DYFErMa458JnvyliZNRkr-TLWtccg8ETRu3OHT-crQjstDF_uaXeffa2aKPe_ZgET3rHq0OjawjK3qe1no_KL7DyqDSw"));
-                // string discordSignInUrl =
-                //     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId);
-                // Application.OpenURL(discordSignInUrl);
+                string discordSignInUrl =
+                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId);
+                Application.OpenURL(discordSignInUrl);
             }
             catch (Exception e)
             {
