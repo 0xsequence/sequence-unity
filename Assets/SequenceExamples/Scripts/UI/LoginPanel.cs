@@ -67,13 +67,11 @@ namespace Sequence.Demo
         
         // On Windows standalone, deep link will open a second instance of tghe game.
         // We need to catch this, and send our deep link URL to the already-running instance (through a TCP server)
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void PassDeepLinkViaLocalServer()
         {
-            Debug.LogError("Absolute URL: " + Application.absoluteURL);
             var args = System.Environment.GetCommandLineArgs();
-            Debug.LogError("Args: " + string.Join(", ", args));
             if (args.Length > 1 && args[1].StartsWith(OpenIdAuthenticator.UrlScheme))
             {
                 var socketConnection = new TcpClient("localhost", OpenIdAuthenticator.WINDOWS_IPC_PORT);
