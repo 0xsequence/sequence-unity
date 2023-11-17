@@ -27,8 +27,6 @@ func main() {
 					}
 
 					if (idToken && state) {
-						console.log('Received id_token:', idToken);
-						console.log('Received state:', state);
 						sendCustomUrlScheme(idToken, state);
 					} else {
 						console.error('id_token or state not found in URL hash fragment');
@@ -37,8 +35,11 @@ func main() {
 
 				function sendCustomUrlScheme(idToken, state) {
 					var customURLScheme = 'powered-by-sequence:/oauth2callback#?id_token=' + idToken + '&state=' + state;
-					// console.log('Custom URL scheme:', customURLScheme);
 					window.location.href = customURLScheme;
+					document.body.innerHTML = '<h1 id="returnMessage"><a href="' + customURLScheme + '">Click to return to app</a></h1>';
+					document.getElementById("returnMessage").addEventListener("click", function() {
+						document.body.innerHTML = '<h1>Please close this page and return to app</h1>';
+					});
 				}
 
 				window.onload = parseUrlParams;

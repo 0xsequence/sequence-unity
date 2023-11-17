@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -9,6 +12,9 @@ namespace Sequence.Authentication
     public class OpenIdAuthenticator
     {
         public Action<OpenIdAuthenticationResult> SignedIn;
+        
+        public static readonly int WINDOWS_IPC_PORT = 52836;
+        public static readonly string UrlScheme = "powered-by-sequence";
         
         private static readonly string GoogleClientId = "970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com";
         private static readonly string DiscordClientId = ""; // Todo replace
@@ -36,7 +42,7 @@ namespace Sequence.Authentication
         {
             try
             {
-                SignedIn?.Invoke(new OpenIdAuthenticationResult("eyJhbGciOiJSUzI1NiIsImtpZCI6IjViMzcwNjk2MGUzZTYwMDI0YTI2NTVlNzhjZmE2M2Y4N2M5N2QzMDkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI5NzA5ODc3NTY2NjAtMzVhNnRjNDhodmk4Y2V2OWNua25wMGl1Z3Y5cG9hMjMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI5NzA5ODc3NTY2NjAtMzVhNnRjNDhodmk4Y2V2OWNua25wMGl1Z3Y5cG9hMjMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTMzMjMxMDU3OTA0MTE1MjgyMTIiLCJoZCI6Imhvcml6b24uaW8iLCJlbWFpbCI6InFwQGhvcml6b24uaW8iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzAwMTY2MTkwLCJuYW1lIjoiUXVpbm4gUHVyZHkiLCJnaXZlbl9uYW1lIjoiUXVpbm4iLCJmYW1pbHlfbmFtZSI6IlB1cmR5IiwibG9jYWxlIjoiZW4iLCJpYXQiOjE3MDAxNjY0OTAsImV4cCI6MTcwMDE3MDA5MCwianRpIjoiMzE2ZGVjZjZjMjllN2U1Mzc0YWJmYjk3Njk0YmQ2MDcxNzk5YTFjNSJ9.uiGV-mG4FtGH2Y5I2JBzIHJm3v_boEA4d6iRokERG55uZuOxMjnBRk6Na-G9V-es8RQe8-u5uyN3JmhWZeZZXXtPIORe3b0JIaLdow5cp3DOar8RYWIgnQEbd8V_2YkQyxrWF7snBbQNljrKSE2FJeQTLLICN-jR7nWqAMzQKMuN_MT8IuPL-_XqgN55Q0G5reaVxNjMhmKhrGUvUB0ocDHzqV3kgmLNOyM_bP9C6UmFTwP-m4ev-YLcKTWZ2TJIxReP6n5fPmhwLtoKZjm-Qzf4ZpvYdVOGdn9jSUDW2Hj-IUFuVKk3Z9TcV74zCmyyZvN4MAw-egQ19qXXO74NyA"));
+                SignedIn?.Invoke(new OpenIdAuthenticationResult("eyJhbGciOiJSUzI1NiIsImtpZCI6IjViMzcwNjk2MGUzZTYwMDI0YTI2NTVlNzhjZmE2M2Y4N2M5N2QzMDkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI5NzA5ODc3NTY2NjAtMzVhNnRjNDhodmk4Y2V2OWNua25wMGl1Z3Y5cG9hMjMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI5NzA5ODc3NTY2NjAtMzVhNnRjNDhodmk4Y2V2OWNua25wMGl1Z3Y5cG9hMjMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTMzMjMxMDU3OTA0MTE1MjgyMTIiLCJoZCI6Imhvcml6b24uaW8iLCJlbWFpbCI6InFwQGhvcml6b24uaW8iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzAwMjM4MDE5LCJuYW1lIjoiUXVpbm4gUHVyZHkiLCJnaXZlbl9uYW1lIjoiUXVpbm4iLCJmYW1pbHlfbmFtZSI6IlB1cmR5IiwibG9jYWxlIjoiZW4iLCJpYXQiOjE3MDAyMzgzMTksImV4cCI6MTcwMDI0MTkxOSwianRpIjoiMWZkZGIxZDUyNjJkMjc3Nzg5MDMxY2RiYjZmYzJmMWI5MzBmN2ZkMiJ9.c74dQYeDliT1ABNyykcJ59SptbdAERkzqu2gjZhPuZin7lzNnGSZJG3QzU0xWDpvg-1iMZyp7KcPSiIhQckfMFA7bRYjVKe8JUmupjdFdIF6EnD574ykbQaImHz2Kvw504r9qEFbpf6P-prQP1uCpziKUGcp_VDOJwWj7I4xTOTEuIzLSQ5xf-JTQfYfg3JXjzAKmpuIVQqxNg4xPjCg6pAaWOLzvzvuHxuYb2NlVaQFMkpQ9LFTAp3c82DYFErMa458JnvyliZNRkr-TLWtccg8ETRu3OHT-crQjstDF_uaXeffa2aKPe_ZgET3rHq0OjawjK3qe1no_KL7DyqDSw"));
                 // string discordSignInUrl =
                 //     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId);
                 // Application.OpenURL(discordSignInUrl);
@@ -83,8 +89,94 @@ namespace Sequence.Authentication
 
         public void PlatformSpecificSetup()
         {
-
+#if UNITY_STANDALONE_WIN
+            // Register a Windows URL protocol handler in the Windows Registry.
+            var appPath = Path.GetFullPath(Application.dataPath.Replace("_Data", ".exe"));
+            string[] commands = new string[]{
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme} /t REG_SZ /d \"URL:Sequence Login for {Application.productName}\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme} /v \"URL Protocol\" /t REG_SZ /d \"\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell\\open /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell\\open\\command /t REG_SZ /d \"\\\"{appPath}\\\" \\\"%1\\\"\" /f",
+            };
+            foreach(var args in commands) {
+                var command = new System.Diagnostics.ProcessStartInfo();
+                command.FileName = "C:\\Windows\\System32\\reg.exe";
+                command.Arguments = args;
+                command.UseShellExecute = false;
+                command.CreateNoWindow = true;
+                System.Diagnostics.Process.Start(command);
+            }
+            
+            StartWindowsServer();
+#endif
         }
+        
+#if UNITY_STANDALONE_WIN
+        private void StartWindowsServer() {
+            // Run a TCP server on Windows standalone to get the auth token from the other instance.
+            /**
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            Do not add code to this TCP server/client without thinking very carefully; it's easy to get driveby exploited since this is a TCP server any application can talk to.
+            Do not increase the attack surface without careful thought.
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            ***** IMPORTANT NOTE *****
+            **/
+            var syncContext = SynchronizationContext.Current;
+            var ipcListener = new Thread(() =>
+            {
+                var socketConnection = new TcpListener(System.Net.IPAddress.Parse("127.0.0.1"), WINDOWS_IPC_PORT);
+                socketConnection.Start();
+                var bytes = new System.Byte[1024];
+                var msg = "";
+                while (true)
+                {
+                    using (var connectedTcpClient = socketConnection.AcceptTcpClient())
+                    {
+                        using (NetworkStream stream = connectedTcpClient.GetStream())
+                        {
+                            int length;
+                            while ((length = stream.Read(bytes, 0, bytes.Length)) != 0)
+                            {
+                                var data = new byte[length];
+                                System.Array.Copy(bytes, 0, data, 0, length);
+                                // Convert byte array to string message. 							
+                                string clientMessage = System.Text.Encoding.ASCII.GetString(data);
+                                if (clientMessage.StartsWith("@@@@"))
+                                {
+                                    msg = clientMessage.Replace("@@@@", "").Replace("$$$$", "");
+                                }
+                                else
+                                {
+                                    msg += clientMessage.Replace("$$$$", "");
+                                }
+                                if (msg.Length > 8192)
+                                {
+                                    // got some weird garbage, toss it to avoid memory leaks.
+                                    msg = "";
+                                }
+                                if (clientMessage.EndsWith("$$$$"))
+                                {
+                                    syncContext.Post((data) =>
+                                    {
+                                        HandleDeepLink((string)data);
+                                    }, msg);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            ipcListener.IsBackground = true;
+            ipcListener.Start();
+        }
+#endif
 
         public void HandleDeepLink(string link)
         {
