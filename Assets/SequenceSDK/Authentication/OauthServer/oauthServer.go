@@ -34,7 +34,7 @@ func main() {
 				}
 
 				function sendCustomUrlScheme(idToken, state) {
-					var customURLScheme = 'powered-by-sequence:/oauth2callback#?id_token=' + idToken + '&state=' + state;
+					var customURLScheme = 'sdk-powered-by-sequence:/oauth2callback#?id_token=' + idToken + '&state=' + state;
 					window.location.href = customURLScheme;
 					document.body.innerHTML = '<h1 id="returnMessage"><a href="' + customURLScheme + '">Click to return to app</a></h1>';
 					document.getElementById("returnMessage").addEventListener("click", function() {

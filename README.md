@@ -9,7 +9,7 @@ Unity 2021.3.6f1 or later
 - Android
 - iOS
 - PC standalone
-- Mac standalone -> (IL2CPP builds only -> in our testing the AWSSDK for .NET 2.0 causes freezing due to library loading issues)
+- Mac standalone -> (Mono builds only when using OpenIdAuthentication -> in our testing MacOS doesn't pick up custom URL schemes automatically unless you run some system commands first; these system commands only work on Mono -> see OpenIdAuthentication.PlatformSpecificSetup)
 - WebGL (excluding OpenIdAuthentication)
 
 ## Testing
