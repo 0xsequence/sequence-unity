@@ -17,7 +17,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="powered-by-sequence"/>
+                <data android:scheme="sdk-powered-by-sequence"/>
             </intent-filter>
         </activity>
     </application>
