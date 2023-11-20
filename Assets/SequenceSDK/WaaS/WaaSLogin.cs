@@ -153,8 +153,8 @@ namespace Sequence.WaaS
         private async Task<WaaSSessionData> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
         {
             HttpClient client = new HttpClient(WaaSLoginUrl);
-            RegisterSessionPayload payload = new RegisterSessionPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
-            RegisterSessionResponse response = await client.SendRequest<RegisterSessionPayload, RegisterSessionResponse>("RegisterSession", payload, new Dictionary<string, string>()
+            WaaSPayload payload = new WaaSPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
+            RegisterSessionResponse response = await client.SendRequest<WaaSPayload, RegisterSessionResponse>("RegisterSession", payload, new Dictionary<string, string>()
             {
                 {"X-Sequence-Tenant", "9"},
             });
