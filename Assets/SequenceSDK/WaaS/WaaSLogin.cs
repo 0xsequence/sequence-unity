@@ -46,6 +46,8 @@ namespace Sequence.WaaS
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
         public event ILogin.OnMFAEmailSentHandler OnMFAEmailSent;
         public event ILogin.OnMFAEmailFailedToSendHandler OnMFAEmailFailedToSend;
+        public event Action<WaaSWallet> OnWaaSWalletCreated; 
+
         public async Task Login(string email)
         {
             Debug.LogError("Not Implemented... mocking for now");
@@ -114,13 +116,15 @@ namespace Sequence.WaaS
             EthWallet sessionWallet = new EthWallet();
 
             string loginPayload = AssembleLoginPayloadJson(idToken, sessionWallet);
-            string payloadCiphertext = await PrepareEncryptedPayload(sessionWallet, idToken, dataKey, loginPayload);
+            string payloadCiphertext = await PrepareEncryptedPayload(dataKey, loginPayload);
             string signedPayload = await sessionWallet.SignMessage(loginPayload);
 
             try
             {
                 WaaSSessionData sessionData = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
                 OnLoginSuccess?.Invoke(sessionData.sessionId, sessionData.wallet);
+                WaaSWallet wallet = new WaaSWallet(new Address(sessionData.wallet), sessionData.sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
+                OnWaaSWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
             {
@@ -129,7 +133,7 @@ namespace Sequence.WaaS
             }
         }
 
-        private async Task<string> PrepareEncryptedPayload(Wallet.IWallet sessionWallet, string idToken, DataKey dataKey, string loginPayload)
+        private async Task<string> PrepareEncryptedPayload(DataKey dataKey, string loginPayload)
         {
             byte[] encryptedPayload = Encryptor.AES256CBCEncryption(dataKey.Plaintext, loginPayload);
             return encryptedPayload.ByteArrayToHexStringWithPrefix();

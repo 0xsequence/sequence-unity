@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Authentication;
+using Sequence.Wallet;
 
 namespace Sequence.WaaS
 {
@@ -7,12 +9,21 @@ namespace Sequence.WaaS
     {
         private HttpClient _httpClient;
         private Address _address;
+        private string _sessionId;
+        private EthWallet _sessionWallet;
+        private DataKey _awsDataKey;
+        private int _waasProjectId;
+        private string _waasVersion;
 
-        public WaaSWallet(string jwt)
+        public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion)
         {
-            this._httpClient = new HttpClient("https://next-api.sequence.app/rpc/Wallet");
-            this._address = JwtHelper.GetWalletAddressFromJwt(jwt);
-            this._httpClient.AddDefaultHeader("Authorization", $"Bearer {jwt}");
+            _address = address;
+            _sessionId = sessionId;
+            _sessionWallet = sessionWallet;
+            _awsDataKey = awsDataKey;
+            _waasProjectId = waasProjectId;
+            _waasVersion = waasVersion;
+            _httpClient = new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator/SendIntent");
         }
 
         public Task<CreatePartnerReturn> CreatePartner(CreatePartnerArgs args, Dictionary<string, string> headers = null)
