@@ -53,10 +53,17 @@ namespace Sequence.WaaS
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
-            Transaction waasTransaction = new Transaction((uint)transaction.ChainId.HexStringToInt(), GetAddress(), transaction.To, null, null, transaction.Value.ToString(), transaction.Data);
-            SendTransactionArgs args = new SendTransactionArgs(waasTransaction);
+            RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
+            SendTransactionArgs args = await BuildTransactionArgs(client, new RawTransaction[] { waasTransaction });
             SendTransactionReturn result = await _wallet.SendTransaction(args);
             return result.txHash;
+        }
+
+        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, RawTransaction[] transactions)
+        {
+            string networkId = await client.ChainID();
+            SendTransactionArgs args = new SendTransactionArgs(GetAddress(), networkId, transactions);
+            return args;
         }
 
         public async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
@@ -69,14 +76,14 @@ namespace Sequence.WaaS
         public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
         {
             int transactionCount = transactions.Length;
-            Transaction[] waasTransactions = new Transaction[transactionCount];
+            RawTransaction[] waasTransactions = new RawTransaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
-                waasTransactions[i] = new Transaction((uint)transactions[i].ChainId.HexStringToInt(), GetAddress(), transactions[i].To, null, null, transactions[i].Value.ToString(), transactions[i].Data);
+                waasTransactions[i] = new RawTransaction(transactions[i].To, transactions[i].Value.ToString(), transactions[i].Data);
             }
 
-            SendTransactionBatchArgs args = new SendTransactionBatchArgs(waasTransactions);
-            SendTransactionBatchReturn result = await _wallet.SendTransactionBatch(args);
+            SendTransactionArgs args = await BuildTransactionArgs(client, waasTransactions);
+            SendTransactionReturn result = await _wallet.SendTransaction(args);
             return new string[]{result.txHash};
         }
 

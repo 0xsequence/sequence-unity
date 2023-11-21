@@ -6,7 +6,7 @@ namespace Sequence.WaaS
     [Serializable]
     public class SignMessageArgs
     {
-        public string code { get; private set; }
+        public string code { get; private set; } = "signMessage";
         public uint expires { get; private set; }
         public uint issued { get; private set; }
         public string message { get; private set; }
@@ -19,7 +19,6 @@ namespace Sequence.WaaS
             this.wallet = wallet;
             this.network = networkId.ToString();
             this.message = message;
-            this.code = "signMessage";
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
         }
@@ -29,7 +28,6 @@ namespace Sequence.WaaS
             this.wallet = wallet;
             this.network = networkId;
             this.message = message;
-            this.code = "signMessage";
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
         }

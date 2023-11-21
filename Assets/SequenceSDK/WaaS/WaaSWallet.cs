@@ -103,10 +103,5 @@ namespace Sequence.WaaS
         {
             return _intentSender.SendIntent<SendTransactionReturn, SendTransactionArgs>(args);
         }
-
-        public Task<SendTransactionBatchReturn> SendTransactionBatch(SendTransactionBatchArgs args)
-        {
-            return _intentSender.SendIntent<SendTransactionBatchReturn, SendTransactionBatchArgs>(args);
-        }
     }
 }
