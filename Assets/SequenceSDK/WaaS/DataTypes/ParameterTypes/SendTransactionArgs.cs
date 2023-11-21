@@ -8,9 +8,9 @@ namespace Sequence.WaaS
     {
         public string code { get; private set; } = "sendTransaction";
         public string identifier { get; private set; } = Guid.NewGuid().ToString();
-        public string wallet { get; private set; }
         public string network { get; private set; }
         public SequenceSDK.WaaS.Transaction[] transactions { get; private set; }
+        public string wallet { get; private set; }
 
         public SendTransactionArgs(string walletAddress, string network, SequenceSDK.WaaS.Transaction[] transactions)
         {
