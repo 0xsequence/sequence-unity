@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -54,27 +56,50 @@ namespace Sequence.WaaS
             
             string method = request.method;
             string headersString = ExtractHeaders(request);
-            string curlCommand = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
-            Debug.Log("Equivalent curl command: " + curlCommand);
+            string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
+            Debug.Log("Equivalent curl command: " + curlRequest);
 
-            request.SendWebRequest();
-            while (!request.isDone)
+            try
             {
-                await Task.Yield();
-            }
+                await request.SendWebRequest();
             
-            if (request.error != null || request.result != UnityWebRequest.Result.Success)
-            {
-                throw new Exception($"Error sending request to {url}: {request.error}");
+                if (request.error != null || request.result != UnityWebRequest.Result.Success || request.responseCode < 200 || request.responseCode > 299)
+                {
+                    Debug.LogError($"Error sending request to {url}: {request.responseCode} {request.error}");
+                }
+                else
+                {
+                    byte[] results = request.downloadHandler.data;
+                    request.Dispose();
+                    var responseJson = Encoding.UTF8.GetString(results);
+                    try
+                    {
+                        T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
+                        return result;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
+                    }
+                }
             }
-            else
+            catch (HttpRequestException e)
             {
-                byte[] results = request.downloadHandler.data;
-                var responseJson = Encoding.UTF8.GetString(results);
-                T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
-                request.Dispose();
-                return result;
+                Debug.LogError("HTTP Request failed: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
+            catch (FormatException e)
+            {
+                Debug.LogError("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+            catch (FileLoadException e)
+            {
+                Debug.LogWarning("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+            catch (Exception e) {
+                Debug.LogError("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+
+            return default;
         }
 
         private string ExtractHeaders(UnityWebRequest request)

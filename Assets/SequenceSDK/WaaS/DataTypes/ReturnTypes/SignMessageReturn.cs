@@ -1,8 +1,11 @@
+using System;
+
 namespace Sequence.WaaS
 {
-    [System.Serializable]
+    [Serializable]
     public class SignMessageReturn
     {
+        public string message;
         public string signature;
     }
 }

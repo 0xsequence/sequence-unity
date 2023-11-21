@@ -104,7 +104,7 @@ namespace Sequence.WaaS
 
         public async Task<string> SignMessage(string message, string chainId)
         {
-            SignMessageArgs args = new SignMessageArgs((uint)chainId.HexStringToInt(), GetAddress(), message);
+            SignMessageArgs args = new SignMessageArgs(GetAddress(), chainId, message);
             var result = await _wallet.SignMessage(args);
             return result.signature;
         }

@@ -12,6 +12,8 @@ namespace Sequence.Demo
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
+        private WaaSDemoPage _waasDemoPage;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -20,6 +22,8 @@ namespace Sequence.Demo
             _connectPage = GetComponentInChildren<ConnectPage>();
             _loginPage = GetComponentInChildren<LoginPage>();
             _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
+
+            _waasDemoPage = FindObjectOfType<WaaSDemoPage>();
             
             ILogin loginHandler = new WaaSLogin(new AWSConfig(
                 "us-east-2", 
@@ -34,12 +38,17 @@ namespace Sequence.Demo
         public void SetupLoginHandler(ILogin loginHandler)
         {
             _loginPage.SetupLogin(loginHandler);
-            _loginPage.LoginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
-            _loginPage.LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
+            loginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
+            loginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
             
             _mfaPage.SetupLogin(loginHandler);
-            _mfaPage.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
-            _mfaPage.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
+            loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
+            loginHandler.OnLoginFailed += OnLoginFailedHandler;
+
+            if (loginHandler is WaaSLogin waaSLogin)
+            {
+                waaSLogin.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+            }
         } 
 
         public void OpenTransitionPanel()
@@ -86,5 +95,10 @@ namespace Sequence.Demo
             }
         }
 #endif
+
+        private void OnWaaSWalletCreatedHandler(WaaSWallet wallet)
+        {
+            _waasDemoPage.Open(wallet);
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.Authentication;
@@ -7,23 +8,15 @@ namespace Sequence.WaaS
 {
     public class WaaSWallet : IWallet
     {
-        private HttpClient _httpClient;
         private Address _address;
-        private string _sessionId;
-        private EthWallet _sessionWallet;
-        private DataKey _awsDataKey;
-        private int _waasProjectId;
-        private string _waasVersion;
+        private HttpClient _httpClient;
+        private IntentSender _intentSender;
 
         public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion)
         {
             _address = address;
-            _sessionId = sessionId;
-            _sessionWallet = sessionWallet;
-            _awsDataKey = awsDataKey;
-            _waasProjectId = waasProjectId;
-            _waasVersion = waasVersion;
-            _httpClient = new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator/SendIntent");
+            _httpClient = new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasWallet");
+            _intentSender = new IntentSender(new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator"), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
         }
 
         public Task<CreatePartnerReturn> CreatePartner(CreatePartnerArgs args, Dictionary<string, string> headers = null)
@@ -76,7 +69,7 @@ namespace Sequence.WaaS
             return _httpClient.SendRequest<CreateWalletArgs, CreateWalletReturn>("CreateWallet", args, headers);
         }
 
-        public Task<GetWalletAddressReturn> GetWalletAddress(GetWalletAddressArgs args, Dictionary<string, string> headers = null)
+        public Task<GetWalletAddressReturn> GetWalletAddress(GetWalletAddressArgs args)
         {
             GetWalletAddressReturn result = new GetWalletAddressReturn(this._address.Value);
             return Task.FromResult(result);
@@ -92,24 +85,28 @@ namespace Sequence.WaaS
             return _httpClient.SendRequest<WalletsArgs, WalletsReturn>("Wallets", args, headers);
         }
 
-        public Task<SignMessageReturn> SignMessage(SignMessageArgs args, Dictionary<string, string> headers = null)
+        public event Action<SignMessageReturn> OnSignMessageComplete;
+
+        public async Task<SignMessageReturn> SignMessage(SignMessageArgs args)
         {
-            return _httpClient.SendRequest<SignMessageArgs, SignMessageReturn>("SignMessage", args, headers);
+            var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
+            OnSignMessageComplete?.Invoke(result);
+            return result;
         }
 
-        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args, Dictionary<string, string> headers = null)
+        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
         {
-            return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>("IsValidMessageSignature", args, headers);
+            return _intentSender.SendIntent<IsValidMessageSignatureReturn, IsValidMessageSignatureArgs>(args);
         }
 
-        public Task<SendTransactionReturn> SendTransaction(SendTransactionArgs args, Dictionary<string, string> headers = null)
+        public Task<SendTransactionReturn> SendTransaction(SendTransactionArgs args)
         {
-            return _httpClient.SendRequest<SendTransactionArgs, SendTransactionReturn>("SendTransaction", args, headers);
+            return _intentSender.SendIntent<SendTransactionReturn, SendTransactionArgs>(args);
         }
 
-        public Task<SendTransactionBatchReturn> SendTransactionBatch(SendTransactionBatchArgs args, Dictionary<string, string> headers = null)
+        public Task<SendTransactionBatchReturn> SendTransactionBatch(SendTransactionBatchArgs args)
         {
-            return _httpClient.SendRequest<SendTransactionBatchArgs, SendTransactionBatchReturn>("SendTransactionBatch", args, headers);
+            return _intentSender.SendIntent<SendTransactionBatchReturn, SendTransactionBatchArgs>(args);
         }
     }
 }

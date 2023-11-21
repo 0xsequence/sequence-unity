@@ -121,9 +121,11 @@ namespace Sequence.WaaS
 
             try
             {
-                WaaSSessionData sessionData = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
-                OnLoginSuccess?.Invoke(sessionData.sessionId, sessionData.wallet);
-                WaaSWallet wallet = new WaaSWallet(new Address(sessionData.wallet), sessionData.sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
+                RegisterSessionResponse registerSessionResponse = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
+                string sessionId = registerSessionResponse.session.id;
+                string walletAddress = registerSessionResponse.data.wallet;
+                OnLoginSuccess?.Invoke(sessionId, walletAddress);
+                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
                 OnWaaSWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
@@ -150,7 +152,7 @@ namespace Sequence.WaaS
             return payloadJson;
         }
 
-        private async Task<WaaSSessionData> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
+        private async Task<RegisterSessionResponse> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
         {
             HttpClient client = new HttpClient(WaaSLoginUrl);
             WaaSPayload payload = new WaaSPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
@@ -158,7 +160,7 @@ namespace Sequence.WaaS
             {
                 {"X-Sequence-Tenant", "9"},
             });
-            return response.data;
+            return response;
         }
     }
 }
