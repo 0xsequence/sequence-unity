@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class SendTransactionReturn
+    public class SuccessfulTransactionReturn
     {
         public string txHash { get; private set; }
         public string metaTxHash { get; private set; }
@@ -12,7 +12,7 @@ namespace Sequence.WaaS
         public JObject nativeReceipt { get; private set; }
         public SimulateResult[] simulations { get; private set; }
 
-        public SendTransactionReturn(string txHash, string metaTxHash, SendTransactionArgs request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
+        public SuccessfulTransactionReturn(string txHash, string metaTxHash, SendTransactionArgs request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {
             this.txHash = txHash;
             this.metaTxHash = metaTxHash;

@@ -47,6 +47,7 @@ namespace Sequence.WaaS
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args);
 
-        public Task<SendTransactionReturn> SendTransaction(SendTransactionArgs args);
+        public event Action<SuccessfulTransactionReturn[]> OnSendTransactionComplete;
+        public Task<SuccessfulTransactionReturn> SendTransaction(SendTransactionArgs args);
     }
 }

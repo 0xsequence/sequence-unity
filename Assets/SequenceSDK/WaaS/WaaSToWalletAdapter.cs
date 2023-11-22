@@ -55,7 +55,7 @@ namespace Sequence.WaaS
         {
             RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
             SendTransactionArgs args = await BuildTransactionArgs(client, new RawTransaction[] { waasTransaction });
-            SendTransactionReturn result = await _wallet.SendTransaction(args);
+            SuccessfulTransactionReturn result = await _wallet.SendTransaction(args);
             return result.txHash;
         }
 
@@ -83,7 +83,7 @@ namespace Sequence.WaaS
             }
 
             SendTransactionArgs args = await BuildTransactionArgs(client, waasTransactions);
-            SendTransactionReturn result = await _wallet.SendTransaction(args);
+            SuccessfulTransactionReturn result = await _wallet.SendTransaction(args);
             return new string[]{result.txHash};
         }
 
