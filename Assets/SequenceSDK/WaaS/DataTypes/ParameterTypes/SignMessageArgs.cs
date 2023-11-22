@@ -13,7 +13,7 @@ namespace Sequence.WaaS
         public string network { get; private set; }
         public string wallet { get; private set; }
 
-        public SignMessageArgs(string wallet, Chain network, string message, uint timeBeforeExpiry = 3000)
+        public SignMessageArgs(string wallet, Chain network, string message, uint timeBeforeExpiry = 30)
         {
             int networkId = (int)network;
             this.wallet = wallet;
@@ -23,7 +23,7 @@ namespace Sequence.WaaS
             this.expires = this.issued + timeBeforeExpiry;
         }
         
-        public SignMessageArgs(string wallet, string networkId, string message, uint timeBeforeExpiry = 3000)
+        public SignMessageArgs(string wallet, string networkId, string message, uint timeBeforeExpiry = 30)
         {
             this.wallet = wallet;
             this.network = networkId;

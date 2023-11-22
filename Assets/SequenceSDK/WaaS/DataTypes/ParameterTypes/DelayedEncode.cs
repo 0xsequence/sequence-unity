@@ -3,8 +3,9 @@ namespace SequenceSDK.WaaS
     [System.Serializable]
     public class DelayedEncode : SequenceSDK.WaaS.Transaction
     {
+        public const string TypeIdentifier = "delayedEncode";
         public DelayedEncodeData data { get; private set; }
-        public string type { get; private set; } = "delayedEncode";
+        public string type { get; private set; } = TypeIdentifier;
         public string to { get; private set; }
         public string value { get; private set; }
         

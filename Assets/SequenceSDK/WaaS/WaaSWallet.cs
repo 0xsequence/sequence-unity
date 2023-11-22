@@ -99,11 +99,14 @@ namespace Sequence.WaaS
             return _intentSender.SendIntent<IsValidMessageSignatureReturn, IsValidMessageSignatureArgs>(args);
         }
 
-        public event Action<SuccessfulTransactionReturn[]> OnSendTransactionComplete;
+        public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
+        public event Action<FailedTransactionReturn> OnSendTransactionFailed;
 
-        public Task<SuccessfulTransactionReturn> SendTransaction(SendTransactionArgs args)
+        public async Task<SuccessfulTransactionReturn> SendTransaction(SendTransactionArgs args)
         {
-            return _intentSender.SendIntent<SuccessfulTransactionReturn, SendTransactionArgs>(args);
+            var result = await _intentSender.SendIntent<SuccessfulTransactionReturn, SendTransactionArgs>(args);
+            OnSendTransactionComplete?.Invoke(result);
+            return result;
         }
     }
 }
