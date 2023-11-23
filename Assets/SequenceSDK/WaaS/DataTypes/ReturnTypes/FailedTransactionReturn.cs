@@ -1,8 +1,9 @@
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class FailedTransactionReturn
+    public class FailedTransactionReturn : TransactionReturn
     {
+        public const string IdentifyingCode = "transactionFailed";
         public string error { get; private set; }
         public SendTransactionArgs request { get; private set; }
         public SimulateResult[] simulations { get; private set; }

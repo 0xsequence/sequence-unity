@@ -55,8 +55,19 @@ namespace Sequence.WaaS
         {
             RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
             SendTransactionArgs args = await BuildTransactionArgs(client, new RawTransaction[] { waasTransaction });
-            SuccessfulTransactionReturn result = await _wallet.SendTransaction(args);
-            return result.txHash;
+            TransactionReturn result = await _wallet.SendTransaction(args);
+            if (result is FailedTransactionReturn failedResult)
+            {
+                throw new Exception(failedResult.error);
+            }
+            else if (result is SuccessfulTransactionReturn successfulResult)
+            {
+                return successfulResult.txHash;
+            }
+            else
+            {
+                throw new Exception($"Unknown transaction result type. Given {result.GetType().Name}");
+            }
         }
 
         private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, RawTransaction[] transactions)
@@ -83,8 +94,19 @@ namespace Sequence.WaaS
             }
 
             SendTransactionArgs args = await BuildTransactionArgs(client, waasTransactions);
-            SuccessfulTransactionReturn result = await _wallet.SendTransaction(args);
-            return new string[]{result.txHash};
+            TransactionReturn result = await _wallet.SendTransaction(args);
+            if (result is FailedTransactionReturn failedResult)
+            {
+                throw new Exception(failedResult.error);
+            }
+            else if (result is SuccessfulTransactionReturn successfulResult)
+            {
+                return new[] { successfulResult.txHash };
+            }
+            else
+            {
+                throw new Exception($"Unknown transaction result type. Given {result.GetType().Name}");
+            }
         }
 
         public async Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client, EthTransaction[] transactions)

@@ -49,6 +49,6 @@ namespace Sequence.WaaS
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
-        public Task<SuccessfulTransactionReturn> SendTransaction(SendTransactionArgs args);
+        public Task<TransactionReturn> SendTransaction(SendTransactionArgs args);
     }
 }

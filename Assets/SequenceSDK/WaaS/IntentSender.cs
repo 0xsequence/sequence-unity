@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -43,8 +44,34 @@ namespace Sequence.WaaS
             WaaSPayload intent = new WaaSPayload(_dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Sequence-Tenant", _waasProjectId.ToString());
+            if (typeof(T) == typeof(TransactionReturn))
+            {
+                var transactionReturn = await SendTransactionIntent(intent, headers);
+                return (T)(object)transactionReturn;
+            }
+            
             IntentReturn<T> result = await _httpClient.SendRequest<WaaSPayload, IntentReturn<T>>("SendIntent", intent, headers);
             return result.data;
+        }
+
+        private async Task<TransactionReturn> SendTransactionIntent(WaaSPayload intent,
+            Dictionary<string, string> headers)
+        {
+            IntentReturn<JObject> result = await _httpClient.SendRequest<WaaSPayload, IntentReturn<JObject>>("SendIntent", intent, headers);
+            if (result.code == SuccessfulTransactionReturn.IdentifyingCode)
+            {
+                SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.data.ToString());
+                return successfulTransactionReturn;
+            }
+            else if (result.code == FailedTransactionReturn.IdentifyingCode)
+            {
+                FailedTransactionReturn failedTransactionReturn = JsonConvert.DeserializeObject<FailedTransactionReturn>(result.data.ToString());
+                return failedTransactionReturn;
+            }
+            else
+            {
+                throw new Exception($"Unexpected result code: {result.code}");
+            }
         }
 
         private string AssemblePayloadJson<T>(T args)

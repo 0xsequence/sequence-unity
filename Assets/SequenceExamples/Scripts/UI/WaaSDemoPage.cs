@@ -30,6 +30,7 @@ namespace Sequence.Demo
             
             _wallet.OnSignMessageComplete += OnSignMessageComplete;
             _wallet.OnSendTransactionComplete += OnSuccessfulTransaction;
+            _wallet.OnSendTransactionFailed += OnFailedTransaction;
         }
 
         private async Task SetAddress()
@@ -62,12 +63,24 @@ namespace Sequence.Demo
         private void OnSuccessfulTransaction(SuccessfulTransactionReturn result)
         {
             _resultText.text = $"https://polygonscan.com/tx/{result.txHash}";
-            Application.OpenURL($"https://polygonscan.com/tx/{result.txHash}");
+            Debug.Log("Transaction successful: " + result.txHash);
         }
         
         private void OnFailedTransaction(FailedTransactionReturn result)
         {
             _resultText.text = result.error;
+            Debug.LogError("Transaction failed: " + result.error);
+        }
+
+        public void SendFailingTransfer()
+        {
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address,
+                Chain.Polygon,
+                new SequenceSDK.WaaS.Transaction[]
+                {
+                    new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "99000000000000000000")
+                }));
         }
     }
 }

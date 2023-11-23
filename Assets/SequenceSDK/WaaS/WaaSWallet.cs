@@ -102,10 +102,17 @@ namespace Sequence.WaaS
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
 
-        public async Task<SuccessfulTransactionReturn> SendTransaction(SendTransactionArgs args)
+        public async Task<TransactionReturn> SendTransaction(SendTransactionArgs args)
         {
-            var result = await _intentSender.SendIntent<SuccessfulTransactionReturn, SendTransactionArgs>(args);
-            OnSendTransactionComplete?.Invoke(result);
+            var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
+            if (result is SuccessfulTransactionReturn)
+            {
+                OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
+            }
+            else
+            {
+                OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
+            }
             return result;
         }
     }

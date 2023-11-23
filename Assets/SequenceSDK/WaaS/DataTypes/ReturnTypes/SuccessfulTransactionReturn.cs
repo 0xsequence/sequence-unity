@@ -3,8 +3,9 @@ using Newtonsoft.Json.Linq;
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class SuccessfulTransactionReturn
+    public class SuccessfulTransactionReturn : TransactionReturn
     {
+        public const string IdentifyingCode = "transactionReceipt";
         public string txHash { get; private set; }
         public string metaTxHash { get; private set; }
         public SendTransactionArgs request { get; private set; }
