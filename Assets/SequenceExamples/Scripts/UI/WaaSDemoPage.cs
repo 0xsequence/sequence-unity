@@ -110,5 +110,52 @@ namespace Sequence.Demo
                         "1"),
                 }));
         }
+        
+        public void SendErc721Transfer()
+        {
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+                {
+                    new SendERC721(
+                        "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        "54530968763798660137294927684252503703134533114052628080002308208148824588621"),
+                }));
+        }
+        
+        public void SendErc1155Transfer()
+        {
+            // Todo fix
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+                {
+                    new SendERC1155(
+                        "0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb",
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        new SendERC1155Values[]
+                        {
+                            new SendERC1155Values("86", "1")
+                        }),
+                }));
+        }
+
+        public void SendMultipleTransferTypes()
+        {
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+                {
+                    new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"),
+                    new SendERC20(
+                        "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        "1"),
+                    new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"),
+                    new SendERC721(
+                        "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        "54530968763798660137294927684252503703134533114052628080002308208148824588621"),
+                    new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"),
+                }));
+        }
     }
 }

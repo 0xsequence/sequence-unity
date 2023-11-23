@@ -14,7 +14,7 @@ namespace Sequence.WaaS
         public string type { get; private set; } = TypeIdentifier;
         public SendERC1155Values[] vals { get; private set; }
 
-        public SendERC1155(string tokenAddress, string to, SendERC1155Values[] sendErc1155Values, string data)
+        public SendERC1155(string tokenAddress, string to, SendERC1155Values[] sendErc1155Values, string data = null)
         {
             this.token = tokenAddress;
             this.to = to;
