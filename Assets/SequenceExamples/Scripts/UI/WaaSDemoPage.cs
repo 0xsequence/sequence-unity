@@ -1,12 +1,16 @@
 using System;
 using System.ComponentModel;
+using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Contracts;
+using Sequence.Provider;
 using Sequence.Utils;
 using Sequence.WaaS;
 using SequenceSDK.Ethereum.Utils;
 using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;
+using IWallet = Sequence.Wallet.IWallet;
 
 namespace Sequence.Demo
 {
@@ -16,6 +20,7 @@ namespace Sequence.Demo
         
         private WaaSWallet _wallet;
         private Address _address;
+        private IWallet _adapter;
         
         public override void Open(params object[] args)
         {
@@ -35,6 +40,13 @@ namespace Sequence.Demo
             _wallet.OnSendTransactionComplete += OnSuccessfulTransaction;
             _wallet.OnSendTransactionFailed += OnFailedTransaction;
             _wallet.OnDropSessionComplete += OnDropSessionComplete;
+
+            CreateAdapter();
+        }
+
+        private async Task CreateAdapter()
+        {
+            _adapter = await WaaSToWalletAdapter.CreateAsync(_wallet);
         }
 
         private async Task SetAddress()
@@ -156,6 +168,20 @@ namespace Sequence.Demo
                         "54530968763798660137294927684252503703134533114052628080002308208148824588621"),
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"),
                 }));
+        }
+
+        public void SendWithAdapter()
+        {
+            DoSendWithAdapter();
+        }
+
+        private async Task DoSendWithAdapter()
+        {
+            ERC721 token = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
+            var receipt = await token.TransferFrom(_adapter.GetAddress(), "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", 
+                    "54530968763798660137294927684252503703134533114052628080002308208148824588621")
+                .SendTransactionMethodAndWaitForReceipt(_adapter, new SequenceEthClient("https://polygon-bor.publicnode.com"));
+            Debug.LogError($"Transaction hash: {receipt.transactionHash}");
         }
     }
 }

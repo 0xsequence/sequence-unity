@@ -101,6 +101,11 @@ namespace Sequence.Contracts
             return contract.CallFunction("transferFrom", fromAddress, toAddress, tokenId);
         }
 
+        public CallContractFunctionTransactionCreator TransferFrom(string fromAddress, string toAddress, string tokenId)
+        {
+            return TransferFrom(fromAddress, toAddress, BigInteger.Parse(tokenId));
+        }
+
         public CallContractFunctionTransactionCreator SafeTransferFrom(string fromAddress, string toAddress, BigInteger tokenId, byte[] data = null)
         {
             if (data != null)
