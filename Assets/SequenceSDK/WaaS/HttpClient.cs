@@ -93,7 +93,7 @@ namespace Sequence.WaaS
             }
             catch (FileLoadException e)
             {
-                Debug.LogWarning("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                Debug.LogError("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
                 Debug.LogError("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);

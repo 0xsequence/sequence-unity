@@ -115,5 +115,19 @@ namespace Sequence.WaaS
             }
             return result;
         }
+
+        public event Action<string> OnDropSessionComplete; 
+
+        public async Task<bool> DropSession(string dropSessionId)
+        {
+            var result = await _intentSender.DropSession(dropSessionId);
+            OnDropSessionComplete?.Invoke(dropSessionId);
+            return result;
+        }
+
+        public Task<bool> DropThisSession()
+        {
+            return DropSession(_intentSender.SessionId);
+        }
     }
 }

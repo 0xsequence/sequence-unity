@@ -15,10 +15,11 @@ namespace Sequence.WaaS
 {
     public class IntentSender
     {
+        public string SessionId { get; private set; }
+        
         private HttpClient _httpClient;
         private DataKey _dataKey;
         private Wallet.IWallet _sessionWallet;
-        private string _sessionId;
         private int _waasProjectId;
         private string _waasVersion;
 
@@ -27,7 +28,7 @@ namespace Sequence.WaaS
             _httpClient = httpClient;
             _dataKey = dataKey;
             _sessionWallet = sessionWallet;
-            _sessionId = sessionId;
+            SessionId = sessionId;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
         }
@@ -84,7 +85,7 @@ namespace Sequence.WaaS
             JObject packet = JsonConvert.DeserializeObject<JObject>(payload);
             string signedPayload = await _sessionWallet.SignMessage(SequenceCoder.KeccakHash(payload.ToByteArray()));
             Debug.Log($"Signing payload {payload} result: {signedPayload}");
-            IntentPayload intentPayload = new IntentPayload(_waasVersion, packet, (_sessionId, signedPayload));
+            IntentPayload intentPayload = new IntentPayload(_waasVersion, packet, (SessionId, signedPayload));
             return JsonConvert.SerializeObject(intentPayload);
         }
         
@@ -96,9 +97,22 @@ namespace Sequence.WaaS
 
         private string AssembleSendIntentPayload(string intentPayload)
         {
-            SendIntentPayload sendIntentPayload = new SendIntentPayload(_sessionId, intentPayload);
+            SendIntentPayload sendIntentPayload = new SendIntentPayload(SessionId, intentPayload);
             string payload = JsonConvert.SerializeObject(sendIntentPayload);
             return payload;
+        }
+
+        public async Task<bool> DropSession(string dropSessionId)
+        {
+            DropSessionArgs args = new DropSessionArgs(SessionId, dropSessionId);
+            string payload = JsonConvert.SerializeObject(args);
+            string payloadCiphertext = await PrepareEncryptedPayload(_dataKey, payload);
+            string signedPayload = await _sessionWallet.SignMessage(payload);
+            WaaSPayload intent = new WaaSPayload(_dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add("X-Sequence-Tenant", _waasProjectId.ToString());
+            IntentReturn<bool> result = await _httpClient.SendRequest<WaaSPayload, IntentReturn<bool>>("DropSession", intent, headers);
+            return result.data;
         }
     }
 }

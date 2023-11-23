@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Sequence.WaaS;
 
 namespace Sequence.WaaS
 {   
@@ -46,9 +45,11 @@ namespace Sequence.WaaS
         public Task<SignMessageReturn> SignMessage(SignMessageArgs args);
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args);
-
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
         public Task<TransactionReturn> SendTransaction(SendTransactionArgs args);
+        public event Action<string> OnDropSessionComplete;
+        public Task<bool> DropSession(string dropSessionId);
+        public Task<bool> DropThisSession();
     }
 }

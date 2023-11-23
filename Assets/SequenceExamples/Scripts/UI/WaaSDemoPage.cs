@@ -31,6 +31,7 @@ namespace Sequence.Demo
             _wallet.OnSignMessageComplete += OnSignMessageComplete;
             _wallet.OnSendTransactionComplete += OnSuccessfulTransaction;
             _wallet.OnSendTransactionFailed += OnFailedTransaction;
+            _wallet.OnDropSessionComplete += OnDropSessionComplete;
         }
 
         private async Task SetAddress()
@@ -81,6 +82,18 @@ namespace Sequence.Demo
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "99000000000000000000")
                 }));
+        }
+
+        public void DropSession()
+        {
+            _wallet.DropThisSession();
+        }
+        
+        private void OnDropSessionComplete(string droppedSessionId)
+        {
+            Debug.Log("Session dropped: " + droppedSessionId);
+            _wallet = null;
+            Close();
         }
     }
 }
