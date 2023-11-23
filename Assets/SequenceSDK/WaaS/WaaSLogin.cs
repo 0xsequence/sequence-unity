@@ -14,7 +14,7 @@ namespace Sequence.WaaS
 {
     public class WaaSLogin : ILogin 
     {
-        public static readonly string WaaSLoginUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
+        public const string WaaSWithAuthUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
 
         private AWSConfig _awsConfig;
         private int _waasProjectId;
@@ -115,13 +115,18 @@ namespace Sequence.WaaS
 
             EthWallet sessionWallet = new EthWallet();
 
+            IntentSender sender = new IntentSender(
+                new HttpClient(WaaSWithAuthUrl),
+                dataKey,
+                sessionWallet,
+                "Unknown",
+                _waasProjectId,
+                _waasVersion);
             string loginPayload = AssembleLoginPayloadJson(idToken, sessionWallet);
-            string payloadCiphertext = await PrepareEncryptedPayload(dataKey, loginPayload);
-            string signedPayload = await sessionWallet.SignMessage(loginPayload);
 
             try
             {
-                RegisterSessionResponse registerSessionResponse = await RegisterSession(dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
+                RegisterSessionResponse registerSessionResponse = await sender.PostIntent<RegisterSessionResponse>(loginPayload, "RegisterSession");
                 string sessionId = registerSessionResponse.session.id;
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
@@ -135,12 +140,6 @@ namespace Sequence.WaaS
             }
         }
 
-        private async Task<string> PrepareEncryptedPayload(DataKey dataKey, string loginPayload)
-        {
-            byte[] encryptedPayload = Encryptor.AES256CBCEncryption(dataKey.Plaintext, loginPayload);
-            return encryptedPayload.ByteArrayToHexStringWithPrefix();
-        }
-
         private string AssembleLoginPayloadJson(string idToken, Wallet.IWallet sessionWallet)
         {
             WaaSLoginIntent intent = new WaaSLoginIntent(_waasVersion, WaaSLoginIntent.Packet.OpenSessionCode,
@@ -150,17 +149,6 @@ namespace Sequence.WaaS
                 "FRIENDLY SESSION WALLET", intentJson);
             string payloadJson = JsonUtility.ToJson(payload);
             return payloadJson;
-        }
-
-        private async Task<RegisterSessionResponse> RegisterSession(string encryptedPayloadKey, string payloadCiphertext, string signedPayload) 
-        {
-            HttpClient client = new HttpClient(WaaSLoginUrl);
-            WaaSPayload payload = new WaaSPayload(encryptedPayloadKey, payloadCiphertext, signedPayload);
-            RegisterSessionResponse response = await client.SendRequest<WaaSPayload, RegisterSessionResponse>("RegisterSession", payload, new Dictionary<string, string>()
-            {
-                {"X-Sequence-Tenant", "9"},
-            });
-            return response;
         }
     }
 }

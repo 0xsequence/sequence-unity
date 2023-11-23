@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.Authentication;
 using Sequence.Wallet;
+using UnityEngine;
 
 namespace Sequence.WaaS
 {
@@ -16,7 +17,7 @@ namespace Sequence.WaaS
         {
             _address = address;
             _httpClient = new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasWallet");
-            _intentSender = new IntentSender(new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator"), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
+            _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
         }
 
         public Task<CreatePartnerReturn> CreatePartner(CreatePartnerArgs args, Dictionary<string, string> headers = null)
@@ -121,7 +122,14 @@ namespace Sequence.WaaS
         public async Task<bool> DropSession(string dropSessionId)
         {
             var result = await _intentSender.DropSession(dropSessionId);
-            OnDropSessionComplete?.Invoke(dropSessionId);
+            if (result)
+            {
+                OnDropSessionComplete?.Invoke(dropSessionId);
+            }
+            else
+            {
+                Debug.LogError("Failed to drop session: " + dropSessionId);
+            }
             return result;
         }
 
