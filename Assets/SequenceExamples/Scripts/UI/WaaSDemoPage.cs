@@ -1,7 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using Sequence.WaaS;
+using SequenceSDK.Ethereum.Utils;
+using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;
 
@@ -94,6 +97,18 @@ namespace Sequence.Demo
             Debug.Log("Session dropped: " + droppedSessionId);
             _wallet = null;
             Close();
+        }
+
+        public void SendErc20Transfer()
+        {
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+                {
+                    new SendERC20(
+                        "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        "1"),
+                }));
         }
     }
 }
