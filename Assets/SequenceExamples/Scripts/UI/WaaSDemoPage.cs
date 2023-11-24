@@ -241,5 +241,21 @@ namespace Sequence.Demo
                         1, "data".ToByteArray()), // Todo figure out why data is required
                 }));
         }
+
+        public void DelayedEncode()
+        {
+            // Todo fix
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+                {
+                    new DelayedEncode("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", "0", new DelayedEncodeData(
+                        "transfer(address,uint256)",
+                        new object[]
+                        {
+                            "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"
+                        },
+                        "transfer")),
+                }));
+        }
     }
 }
