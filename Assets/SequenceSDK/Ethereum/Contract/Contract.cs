@@ -52,6 +52,11 @@ namespace Sequence.Contracts
         {
             throw new NotImplementedException();
         }
+        
+        public string AssembleCallData(string functionName, params object[] functionArgs)
+        {
+            return GetData(functionName, functionArgs);
+        }
 
         public CallContractFunctionTransactionCreator CallFunction(string functionName, params object[] functionArgs)
         {

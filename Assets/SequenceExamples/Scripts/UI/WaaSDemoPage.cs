@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Contracts;
 using Sequence.Provider;
+using Sequence.Transactions;
 using Sequence.Utils;
 using Sequence.WaaS;
 using SequenceSDK.Ethereum.Utils;
@@ -177,11 +178,68 @@ namespace Sequence.Demo
 
         private async Task DoSendWithAdapter()
         {
-            ERC721 token = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
-            var receipt = await token.TransferFrom(_adapter.GetAddress(), "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", 
+            ERC721 nft = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
+            var receipt = await nft.TransferFrom(_adapter.GetAddress(), "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", 
                     "54530968763798660137294927684252503703134533114052628080002308208148824588621")
                 .SendTransactionMethodAndWaitForReceipt(_adapter, new SequenceEthClient("https://polygon-bor.publicnode.com"));
             Debug.LogError($"Transaction hash: {receipt.transactionHash}");
+            
+        }
+
+        public void SendMultipleWithAdapter()
+        {
+            DoSendMultipleWithAdapter();
+        }
+
+        private async Task DoSendMultipleWithAdapter()
+        {
+            ERC721 nft = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
+            ERC1155 sft = new ERC1155("0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb");
+            SequenceEthClient client = new SequenceEthClient("https://polygon-bor.publicnode.com");
+            var nftTransfer = await nft.TransferFrom(_adapter.GetAddress(),
+                "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                "54530968763798660137294927684252503703134533114052628080002308208148824588621")(client, new ContractCall(_adapter.GetAddress()));
+            var sftTransfer = await sft.SafeTransferFrom(_adapter.GetAddress(),
+                "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                "86",
+                1)(client, new ContractCall(_adapter.GetAddress()));
+
+            var receipt = await _adapter.SendTransactionBatchAndWaitForReceipts(client, new EthTransaction[]
+            {
+                nftTransfer, sftTransfer
+            });
+            Debug.LogError($"Transaction hash: {receipt[0].transactionHash}");
+            
+            // or
+            
+            // _wallet.SendTransaction(new SendTransactionArgs(
+            //     _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            //     {
+            //         new RawTransaction(nftTransfer),
+            //         new RawTransaction(sftTransfer),
+            //     }));
+        }
+        
+        public void SendMultipleWithAdapter2()
+        {
+            DoSendMultipleWithAdapter2();
+        }
+
+        private async Task DoSendMultipleWithAdapter2()
+        {
+            ERC721 nft = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
+            ERC1155 sft = new ERC1155("0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb");
+            _wallet.SendTransaction(new SendTransactionArgs(
+                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+                {
+                    new RawTransaction(nft.Contract, "transferFrom", _adapter.GetAddress().Value,
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        BigInteger.Parse("54530968763798660137294927684252503703134533114052628080002308208148824588621")),
+                    new RawTransaction(sft.Contract, "safeTransferFrom", _adapter.GetAddress().Value,
+                        "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
+                        86,
+                        1, "data".ToByteArray()), // Todo figure out why data is required
+                }));
         }
     }
 }

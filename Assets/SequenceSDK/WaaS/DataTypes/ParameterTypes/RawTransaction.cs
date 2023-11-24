@@ -1,5 +1,7 @@
 using System.Numerics;
 using Newtonsoft.Json;
+using Sequence.Contracts;
+using Sequence.Transactions;
 using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.WaaS
@@ -22,6 +24,30 @@ namespace Sequence.WaaS
             this.to = to;
             this.value = value;
             this.data = calldata;
+        }
+
+        public RawTransaction(EthTransaction transaction)
+        {
+            string to = transaction.To;
+            if (to == StringExtensions.ZeroAddress)
+            {
+                to = WaaSZeroAddress;
+            }
+            this.to = to;
+            this.value = transaction.Value.ToString();
+            this.data = transaction.Data;
+        }
+        
+        public RawTransaction(Contract contract, string functionName, params object[] functionArgs)
+        {
+            string to = contract.GetAddress();
+            if (to == StringExtensions.ZeroAddress)
+            {
+                to = WaaSZeroAddress;
+            }
+            this.to = to;
+            this.value = BigInteger.Zero.ToString();
+            this.data = contract.AssembleCallData(functionName, functionArgs);
         }
         
         [JsonConstructor]
