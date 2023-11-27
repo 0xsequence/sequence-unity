@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.WaaS
+namespace Sequence.WaaS.Authentication
 {
     [Serializable]
     public class DropSessionReturn

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.Authentication;
+using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
 using UnityEngine;
 
@@ -136,6 +137,14 @@ namespace Sequence.WaaS
         public Task<bool> DropThisSession()
         {
             return DropSession(_intentSender.SessionId);
+        }
+
+        public event Action<WaaSSession[]> OnSessionsFound;
+        public async Task<WaaSSession[]> ListSessions()
+        {
+            WaaSSession[] results = await _intentSender.ListSessions();
+            OnSessionsFound?.Invoke(results);
+            return results;
         }
     }
 }

@@ -9,6 +9,7 @@ using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using SequenceSDK.WaaS;
+using SequenceSDK.WaaS.Authentication;
 using UnityEngine;
 
 namespace Sequence.WaaS
@@ -113,6 +114,14 @@ namespace Sequence.WaaS
             }
             T result = await _httpClient.SendRequest<WaaSPayload, T>(path, intent, headers);
             return result;
+        }
+
+        public async Task<WaaSSession[]> ListSessions()
+        {
+            ListSessionsArgs args = new ListSessionsArgs(SessionId);
+            string payload = JsonConvert.SerializeObject(args);
+            var result = await PostIntent<ListSessionsReturn>(payload, "ListSessions");
+            return result.sessions;
         }
     }
 }

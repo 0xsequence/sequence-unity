@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.WaaS.Authentication;
 
 namespace Sequence.WaaS
 {   
@@ -51,5 +52,7 @@ namespace Sequence.WaaS
         public event Action<string> OnDropSessionComplete;
         public Task<bool> DropSession(string dropSessionId);
         public Task<bool> DropThisSession();
+        public event Action<WaaSSession[]> OnSessionsFound;
+        public Task<WaaSSession[]> ListSessions();
     }
 }

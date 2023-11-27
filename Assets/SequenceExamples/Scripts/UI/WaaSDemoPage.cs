@@ -7,6 +7,7 @@ using Sequence.Provider;
 using Sequence.Transactions;
 using Sequence.Utils;
 using Sequence.WaaS;
+using Sequence.WaaS.Authentication;
 using SequenceSDK.Ethereum.Utils;
 using SequenceSDK.WaaS;
 using TMPro;
@@ -256,6 +257,17 @@ namespace Sequence.Demo
                         },
                         "transfer")),
                 }));
+        }
+
+        public void ListSessions()
+        {
+            _wallet.OnSessionsFound += OnSessionsListed;
+            _wallet.ListSessions();
+        }
+        
+        private void OnSessionsListed(WaaSSession[] sessions)
+        {
+            _resultText.text = $"Found {sessions.Length} sessions";
         }
     }
 }

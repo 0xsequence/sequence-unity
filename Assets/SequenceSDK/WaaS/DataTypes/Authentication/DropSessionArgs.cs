@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace SequenceSDK.WaaS
+namespace SequenceSDK.WaaS.Authentication
 {
     [Serializable]
     public class DropSessionArgs
