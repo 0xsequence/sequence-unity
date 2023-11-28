@@ -110,6 +110,13 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
             yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EndToEndSocialFlowTest());
         }
+        
+        [UnityTest]
+        public IEnumerator LoginEmailFlowFailTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EmailFlowFailTest());
+        }
 
         [UnityTest]
         public IEnumerator NavigateToWalletPageFromLoginTest()
@@ -189,5 +196,11 @@ namespace SequenceExamples.Scripts.Tests
                 TestAddress));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
         }
+    }
+
+    public class TestClass : MonoBehaviour
+    {
+        // Used to attach a monobehaviour to our test object. Unity requires a monobehaviour to attach a coroutine to - that way it can cancel the coroutine if the monobehaviour
+        // gets destroyed. The test object will not be destroyed, allowing our tests to run to completion
     }
 }
