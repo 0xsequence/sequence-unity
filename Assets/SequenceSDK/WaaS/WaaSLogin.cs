@@ -73,6 +73,13 @@ namespace Sequence.WaaS
                     OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
                     return;
                 }
+                
+                if (_challengeSession.StartsWith("Error"))
+                {
+                    OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
+                    return;
+                }
+                
                 OnMFAEmailSent?.Invoke(email);
             }
             catch (Exception e)
@@ -98,6 +105,13 @@ namespace Sequence.WaaS
                     OnLoginFailed?.Invoke("Unknown error establishing AWS session");
                     return;
                 }
+
+                if (idToken.StartsWith("Error"))
+                {
+                    OnLoginFailed?.Invoke(idToken);
+                    return;
+                }
+                
                 ConnectToWaaS(idToken);
             }
             catch (Exception e)

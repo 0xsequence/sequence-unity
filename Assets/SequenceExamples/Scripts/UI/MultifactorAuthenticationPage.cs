@@ -12,6 +12,7 @@ namespace Sequence.Demo
         [SerializeField] private TMP_InputField _inputField;
         [SerializeField] private TextMeshProUGUI[] _inputBoxes;
         [SerializeField] private TextMeshProUGUI _enterCodeText;
+        [SerializeField] private TextMeshProUGUI _errorText;
 
         private int _numberOfMFADigits;
         internal ILogin LoginHandler { get; private set; }
@@ -24,10 +25,18 @@ namespace Sequence.Demo
             _inputField.onValueChanged.AddListener(OnInputValueChanged);
             _numberOfMFADigits = _inputBoxes.Length;
         }
+        
+        public override void Close()
+        {
+            base.Close();
+            _errorText.text = "";
+            LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
+        }
 
         public void SetupLogin(ILogin loginHandler)
         {
             LoginHandler = loginHandler;
+            LoginHandler.OnLoginFailed += OnLoginFailedHandler;
         }
 
         public override void Open(params object[] args)
@@ -76,9 +85,15 @@ namespace Sequence.Demo
 
         public void Login()
         {
-            string code = _inputField.text.Substring(0, _numberOfMFADigits);
+            string code = _inputField.text.Substring(0, Math.Min(_numberOfMFADigits, _inputField.text.Length));
             Debug.Log($"Attempting to sign in with email {email} and code {code}");
             LoginHandler.Login(email, code);
+        }
+
+        private void OnLoginFailedHandler(string error)
+        {
+            Debug.LogError($"Failed login: {error}");
+            _errorText.text = error;
         }
     }
 }

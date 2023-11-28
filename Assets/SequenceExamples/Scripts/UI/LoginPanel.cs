@@ -1,6 +1,8 @@
+using System;
 using System.Net.Sockets;
 using Sequence.Authentication;
 using Sequence.WaaS;
+using TMPro;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -40,11 +42,9 @@ namespace Sequence.Demo
         {
             _loginPage.SetupLogin(loginHandler);
             loginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
-            loginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
             
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
-            loginHandler.OnLoginFailed += OnLoginFailedHandler;
 
             if (loginHandler is WaaSLogin waaSLogin)
             {
@@ -63,20 +63,10 @@ namespace Sequence.Demo
             StartCoroutine(SetUIPage(_loginSuccessPage));
         }
 
-        private void OnLoginFailedHandler(string error)
-        {
-            Debug.LogError($"Failed login: {error}");
-        }
-
         private void OnMFAEmailSentHandler(string email)
         {
             Debug.Log($"Successfully sent MFA email to {email}");
             StartCoroutine(SetUIPage(_mfaPage, email));
-        }
-
-        private void OnMFAEmailFailedToSendHandler(string email, string error)
-        {
-            Debug.Log($"Failed to send MFA email to {email} with error: {error}");
         }
         
         // On Windows standalone, deep link will open a second instance of tghe game.

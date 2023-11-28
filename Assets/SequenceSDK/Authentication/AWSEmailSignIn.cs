@@ -43,10 +43,8 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error establishing AWS session: {e.Message}");
+                return $"Error establishing AWS session: {e.Message}";
             }
-
-            return "";
         }
 
         public async Task<string> Login(string challengeSession, string email, string code)
@@ -67,14 +65,16 @@ namespace Sequence.Authentication
             try
             {
                 RespondToAuthChallengeResponse response = await client.RespondToAuthChallengeAsync(request);
+                if (response.AuthenticationResult == null)
+                {
+                    return "Error establishing session: Incorrect code";
+                }
                 return response.AuthenticationResult.IdToken;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error establishing AWS session: {e.Message}");
+                return $"Error establishing AWS session: {e.Message}";
             }
-
-            return "";
         }
     }
 }
