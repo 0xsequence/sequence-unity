@@ -6,5 +6,10 @@ namespace Sequence.Authentication
         {
             return email != "invalidEmail"; 
         }
+
+        public bool ValidateCode(string code)
+        {
+            return code != "invalidCode";
+        }
     }
 }
