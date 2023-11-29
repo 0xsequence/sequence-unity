@@ -27,6 +27,10 @@ namespace Sequence.Authentication
         public static Dictionary<string, string> ExtractQueryParameters(this string url)
         {
             string[] urlSegments = url.Split('?');
+            if (urlSegments.Length != 2)
+            {
+                return null;
+            }
             string[] parameters = urlSegments[1].Split('&');
             Dictionary<string, string> queryParameters = new Dictionary<string, string>();
             int totalParameters = parameters.Length;

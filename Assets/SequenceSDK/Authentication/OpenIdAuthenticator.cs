@@ -22,7 +22,7 @@ namespace Sequence.Authentication
         private static readonly string AppleClientId = ""; // Todo replace
         private static readonly string RedirectUrl = "https://3d41-142-115-54-118.ngrok-free.app/";
         
-        private readonly string _stateToken = Guid.NewGuid().ToString();
+        private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
 
         public void GoogleSignIn()
@@ -191,6 +191,11 @@ namespace Sequence.Authentication
             link = link.RemoveTrailingSlash();
             
             Dictionary<string, string> queryParams = link.ExtractQueryParameters();
+            if (queryParams == null)
+            {
+                Debug.LogError($"Unexpected deep link: {link}");
+                return;
+            }
             if (queryParams.TryGetValue("state", out string state))
             {
                 if (state != _stateToken)
@@ -214,6 +219,13 @@ namespace Sequence.Authentication
                 Debug.LogError($"Unexpected deep link: {link}");
             }
         }
+
+#if UNITY_EDITOR
+        public void InjectStateTokenForTesting(string stateToken)
+        {
+            _stateToken = stateToken;
+        }
+#endif
     }
 
     public class OpenIdAuthenticationResult
