@@ -38,9 +38,7 @@ namespace Sequence.WaaS
         {
             string payload = AssemblePayloadJson(args);
             string intentPayload = await AssembleIntentPayload(payload);
-            Debug.Log($"Intent Payload: {intentPayload}");
             string sendIntentPayload = AssembleSendIntentPayload(intentPayload);
-            Debug.Log($"Send intent payload: {sendIntentPayload}");
             IntentReturn<T> result = await PostIntent<IntentReturn<T>>(sendIntentPayload, "SendIntent");
             return result.data;
         }
@@ -74,7 +72,6 @@ namespace Sequence.WaaS
         {
             JObject packet = JsonConvert.DeserializeObject<JObject>(payload);
             string signedPayload = await _sessionWallet.SignMessage(SequenceCoder.KeccakHash(payload.ToByteArray()));
-            Debug.Log($"Signing payload {payload} result: {signedPayload}");
             IntentPayload intentPayload = new IntentPayload(_waasVersion, packet, (SessionId, signedPayload));
             return JsonConvert.SerializeObject(intentPayload);
         }
