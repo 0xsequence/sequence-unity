@@ -1,5 +1,7 @@
+using System;
 using Sequence.Authentication;
 using Sequence.Demo.Tweening;
+using Sequence.WaaS;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -68,6 +70,14 @@ namespace Sequence.Demo
         {
             Debug.LogError($"Failed to send MFA email to {email} with error: {error}");
             _errorText.text = error;
+        }
+
+        public void SubscribeToWaaSWalletCreatedEvent(Action<WaaSWallet> OnWaaSWalletCreatedHandler)
+        {
+            if (LoginHandler is WaaSLogin login)
+            {
+                login.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+            }
         }
     }
 }

@@ -89,7 +89,10 @@ namespace Sequence.Demo
 
         private void OnWaaSWalletCreatedHandler(WaaSWallet wallet)
         {
-            _waasDemoPage.Open(wallet);
+            if (_waasDemoPage != null)
+            {
+                _waasDemoPage.Open(wallet);
+            }
         }
     }
 }
