@@ -20,7 +20,6 @@ namespace Sequence.WaaS
         private int _waasProjectId;
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
-        private MockLogin _mockLogin;
         private IValidator _validator;
         private string _challengeSession;
 
@@ -33,16 +32,6 @@ namespace Sequence.WaaS
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
-            
-            _mockLogin = new MockLogin();
-            _mockLogin.OnMFAEmailSent += email =>
-            {
-                OnMFAEmailSent?.Invoke(email);
-            };
-            _mockLogin.OnLoginSuccess += (token, address) =>
-            {
-                OnLoginSuccess?.Invoke(token, address);
-            };
 
             if (validator == null)
             {
