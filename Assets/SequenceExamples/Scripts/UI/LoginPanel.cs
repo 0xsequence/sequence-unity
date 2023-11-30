@@ -54,7 +54,10 @@ namespace Sequence.Demo
 
         public void OpenTransitionPanel()
         {
-            _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
+            if (_transitionPanel != null)
+            {
+                _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
+            }
         }
 
         private void OnLoginSuccessHandler(string sessionId, string walletAddress)
