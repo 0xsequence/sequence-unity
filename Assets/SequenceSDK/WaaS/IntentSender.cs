@@ -99,6 +99,7 @@ namespace Sequence.WaaS
 
         public async Task<T> PostIntent<T>(string payload, string path)
         {
+            Debug.Log($"Sending intent: {path} | with payload: {payload}");
             string payloadCiphertext = await PrepareEncryptedPayload(_dataKey, payload);
             string signedPayload = await _sessionWallet.SignMessage(payload);
             WaaSPayload intent = new WaaSPayload(_dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);

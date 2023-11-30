@@ -67,6 +67,8 @@ namespace Sequence.WaaS.Tests
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
             walletTests.TestSendERC20();
+            walletTests.TestSendBatchTransaction_withERC721();
+            walletTests.TestSendBatchTransaction_withERC1155();
             await Task.Delay(100);
             while (_testsStarted > _failedTests.Count + _passedTests)
             {
