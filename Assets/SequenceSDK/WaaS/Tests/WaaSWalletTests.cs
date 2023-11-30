@@ -14,6 +14,8 @@ namespace Sequence.WaaS.Tests
 
         private string _toAddress = "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f";
         private string _polygonNode = "https://polygon-bor.publicnode.com";
+        private string _erc20Address = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
+        private IIndexer _polygonIndexer = new ChainIndexer((int)Chain.Polygon);
 
         private IEthClient _client;
         
@@ -59,6 +61,32 @@ namespace Sequence.WaaS.Tests
             CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestTransfer));
             CustomAssert.IsTrue(newBalance < balance, nameof(TestTransfer));
             CustomAssert.IsTrue(newBalance2 > balance2, nameof(TestTransfer));
+            WaaSTestHarness.TestPassed?.Invoke();
+        }
+        
+        public async Task TestSendERC20()
+        {
+            WaaSTestHarness.TestStarted?.Invoke();
+            GetTokenBalancesReturn tokenBalances =
+                await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
+            BigInteger balance = tokenBalances.balances[0].balance;
+            GetTokenBalancesReturn tokenBalances2 =
+                await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
+            BigInteger balance2 = tokenBalances2.balances[0].balance;
+            TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address, Chain.Polygon,
+                new SequenceSDK.WaaS.Transaction[]
+                {
+                    new SendERC20(_erc20Address, _toAddress, "1"),
+                }));
+            CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestSendERC20));
+            GetTokenBalancesReturn newTokenBalances =
+                await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
+            BigInteger newBalance = newTokenBalances.balances[0].balance;
+            GetTokenBalancesReturn newTokenBalances2 =
+                await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
+            BigInteger newBalance2 = newTokenBalances2.balances[0].balance;
+            CustomAssert.IsTrue(newBalance < balance, nameof(TestSendERC20));
+            CustomAssert.IsTrue(newBalance2 > balance2, nameof(TestSendERC20));
             WaaSTestHarness.TestPassed?.Invoke();
         }
     }
