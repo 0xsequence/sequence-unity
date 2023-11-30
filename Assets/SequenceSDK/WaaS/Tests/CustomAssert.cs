@@ -4,13 +4,15 @@ namespace Sequence.WaaS.Tests
 {
     public static class CustomAssert
     {
-        public static Exception TestFailedException;
+        public static Exception TestFailedException(string reason)
+        {
+            return new Exception(reason);
+        }
         public static void NotNull(object obj, string name, params object[] args)
         {
             if (obj == null)
             {
-                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(name, args));
-                throw TestFailedException;
+                throw TestFailedException($"{obj} was null");
             }
         }
         
@@ -18,8 +20,7 @@ namespace Sequence.WaaS.Tests
         {
             if (!condition)
             {
-                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(name, args));
-                throw TestFailedException;
+                throw TestFailedException($"Condition was not true");
             }
         }
         
@@ -27,8 +28,7 @@ namespace Sequence.WaaS.Tests
         {
             if (!expected.Equals(actual))
             {
-                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(name, args));
-                throw TestFailedException;
+                throw TestFailedException($"Expected {expected} is not equal to Actual {actual}");
             }
         }
     }

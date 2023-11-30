@@ -59,7 +59,13 @@ namespace Sequence.WaaS.Tests
             TestPassed += () => _passedTests++;
             TestStarted += () => _testsStarted++;
             WaaSWalletTests walletTests = new WaaSWalletTests(wallet);
+            wallet.OnSendTransactionFailed += OnFailedTransaction;
             RunTests(walletTests);
+        }
+
+        private void OnFailedTransaction(FailedTransactionReturn result)
+        {
+            Debug.LogError("Transaction failed: " + result.error);
         }
 
         private async Task RunTests(WaaSWalletTests walletTests)
@@ -82,9 +88,10 @@ namespace Sequence.WaaS.Tests
     public class WaaSTestFailed
     {
         public string Name;
+        public string Reason;
         public object[] Args;
         
-        public WaaSTestFailed(string name, params object[] args)
+        public WaaSTestFailed(string name, string reason, params object[] args)
         {
             Name = name;
             Args = args;
