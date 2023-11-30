@@ -1133,6 +1133,7 @@ GameObject:
   - component: {fileID: 3911810626726668091}
   - component: {fileID: 3911810626726668088}
   - component: {fileID: 3911810626726668089}
+  - component: {fileID: 5552976813548595767}
   m_Layer: 5
   m_Name: EmailField
   m_TagString: Untagged
@@ -1297,6 +1298,21 @@ MonoBehaviour:
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   m_InputValidator: {fileID: 0}
+--- !u!114 &5552976813548595767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810626726668095}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &3911810626781686524
 GameObject:
   m_ObjectHideFlags: 0
@@ -3396,6 +3412,7 @@ GameObject:
   - component: {fileID: 3911810627319900516}
   - component: {fileID: 3911810627319900517}
   - component: {fileID: 3911810627319900538}
+  - component: {fileID: 4941028632984207277}
   m_Layer: 5
   m_Name: FacebookSignInButton
   m_TagString: Untagged
@@ -3518,6 +3535,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &4941028632984207277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810627319900536}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &3911810627337978480
 GameObject:
   m_ObjectHideFlags: 0
@@ -3530,6 +3562,7 @@ GameObject:
   - component: {fileID: 3911810627337978492}
   - component: {fileID: 3911810627337978493}
   - component: {fileID: 3911810627337978482}
+  - component: {fileID: 6233296149268931246}
   m_Layer: 5
   m_Name: DiscordSignInButton
   m_TagString: Untagged
@@ -3652,6 +3685,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6233296149268931246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810627337978480}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &3911810627365367162
 GameObject:
   m_ObjectHideFlags: 0
@@ -3664,6 +3712,7 @@ GameObject:
   - component: {fileID: 3911810627365367142}
   - component: {fileID: 3911810627365367143}
   - component: {fileID: 3911810627365367140}
+  - component: {fileID: 8013561242365326973}
   m_Layer: 5
   m_Name: GoogleSignInButton
   m_TagString: Untagged
@@ -3786,6 +3835,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &8013561242365326973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810627365367162}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &3911810627461880609
 GameObject:
   m_ObjectHideFlags: 0
@@ -3855,6 +3919,7 @@ GameObject:
   - component: {fileID: 3911810627582119940}
   - component: {fileID: 3911810627582119941}
   - component: {fileID: 3911810627582119962}
+  - component: {fileID: 3476568028726160840}
   m_Layer: 5
   m_Name: AppleSignInButton
   m_TagString: Untagged
@@ -3977,6 +4042,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &3476568028726160840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810627582119960}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &3911810627681270574
 GameObject:
   m_ObjectHideFlags: 0
@@ -4123,6 +4203,7 @@ GameObject:
   - component: {fileID: 3911810627745206999}
   - component: {fileID: 3911810627745206996}
   - component: {fileID: 3911810627745206997}
+  - component: {fileID: 7419297975693617718}
   m_Layer: 5
   m_Name: LoginButton
   m_TagString: Untagged
@@ -4245,6 +4326,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7419297975693617718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810627745206955}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &3911810627748593830
 GameObject:
   m_ObjectHideFlags: 0
@@ -6080,6 +6176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3911810628226866637}
   - component: {fileID: 3911810628226866636}
+  - component: {fileID: 702636062}
   m_Layer: 5
   m_Name: Login
   m_TagString: Untagged
@@ -6132,6 +6229,29 @@ MonoBehaviour:
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
   _errorText: {fileID: 3911810627816165819}
+--- !u!114 &702636062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3911810628226866626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9371cf66ddfa45cd83c7d30c5acba4c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _emailLoginOutlines:
+  - {fileID: 5552976813548595767}
+  - {fileID: 7419297975693617718}
+  _googleLoginOutlines:
+  - {fileID: 8013561242365326973}
+  _discordLoginOutlines:
+  - {fileID: 6233296149268931246}
+  _facebookLoginOutlines:
+  - {fileID: 4941028632984207277}
+  _appleLoginOutlines:
+  - {fileID: 3476568028726160840}
 --- !u!1 &3911810628247143358
 GameObject:
   m_ObjectHideFlags: 0

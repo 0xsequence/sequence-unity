@@ -14,18 +14,23 @@ namespace Sequence.Demo
         
         private TMP_InputField _inputField;
         private LoginMethod _loginMethod;
+        private LoginButtonHighlighter _loginButtonHighlighter;
         internal ILogin LoginHandler { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
             _inputField = GetComponentInChildren<TMP_InputField>();
+            _loginButtonHighlighter = GetComponent<LoginButtonHighlighter>();
         }
 
         private void Start()
         {
             _loginMethod = GetLoginMethod();
-            Debug.LogError($"Previously logged in with {_loginMethod.ToString()}");
+            if (_loginButtonHighlighter != null)
+            {
+                _loginButtonHighlighter.HighlightAppropriateButton(_loginMethod);
+            }
         }
 
         public override void Close()
