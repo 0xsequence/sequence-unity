@@ -13,12 +13,19 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _errorText;
         
         private TMP_InputField _inputField;
+        private LoginMethod _loginMethod;
         internal ILogin LoginHandler { get; private set; }
 
         protected override void Awake()
         {
             base.Awake();
             _inputField = GetComponentInChildren<TMP_InputField>();
+        }
+
+        private void Start()
+        {
+            _loginMethod = GetLoginMethod();
+            Debug.LogError($"Previously logged in with {_loginMethod.ToString()}");
         }
 
         public override void Close()
@@ -78,6 +85,15 @@ namespace Sequence.Demo
             {
                 login.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
             }
+        }
+        
+        private LoginMethod GetLoginMethod()
+        {
+            if (PlayerPrefs.HasKey(WaaSLogin.WaaSLoginMethod))
+            {
+                return (LoginMethod) PlayerPrefs.GetInt(WaaSLogin.WaaSLoginMethod);
+            }
+            return LoginMethod.None;
         }
     }
 }
