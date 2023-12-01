@@ -6242,7 +6242,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _emailLoginOutlines:
-  - {fileID: 5552976813548595767}
   - {fileID: 7419297975693617718}
   _googleLoginOutlines:
   - {fileID: 8013561242365326973}
