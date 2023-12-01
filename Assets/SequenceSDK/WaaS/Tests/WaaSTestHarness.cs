@@ -78,6 +78,8 @@ namespace Sequence.WaaS.Tests
             walletTests.TestSendBatchTransaction_withERC1155();
             walletTests.TestDelayedEncode("transfer(address,uint256)");
             walletTests.TestDelayedEncode(ERC20.Abi);
+            walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
+            walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
             await Task.Delay(100);
             while (_testsStarted > _failedTests.Count + _passedTests)
             {
