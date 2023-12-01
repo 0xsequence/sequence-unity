@@ -61,7 +61,8 @@ namespace Sequence.WaaS.Tests
             TestStarted += () => _testsStarted++;
             WaaSWalletTests walletTests = new WaaSWalletTests(wallet);
             wallet.OnSendTransactionFailed += OnFailedTransaction;
-            RunTests(walletTests);
+            SessionManagementTests sessionManagementTests = new SessionManagementTests(wallet);
+            RunTests(walletTests, sessionManagementTests);
         }
 
         private void OnFailedTransaction(FailedTransactionReturn result)
@@ -69,7 +70,7 @@ namespace Sequence.WaaS.Tests
             Debug.LogError("Transaction failed: " + result.error);
         }
 
-        private async Task RunTests(WaaSWalletTests walletTests)
+        private async Task RunTests(WaaSWalletTests walletTests, SessionManagementTests sessionManagementTests)
         {
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
@@ -80,13 +81,21 @@ namespace Sequence.WaaS.Tests
             walletTests.TestDelayedEncode(ERC20.Abi);
             walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
             walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            await WaitForTestsToComplete();
+            
+            sessionManagementTests.TestSessionManagement();
+            await WaitForTestsToComplete();
+            
+            Debug.LogError($"Tests run: {_testsStarted} | Tests passed: {_passedTests} | Tests failed: {_failedTests.Count}");
+        }
+
+        private async Task WaitForTestsToComplete()
+        {
             await Task.Delay(100);
             while (_testsStarted > _failedTests.Count + _passedTests)
             {
                 await Task.Delay(100);
             }
-            
-            Debug.LogError($"Tests run: {_testsStarted} | Tests passed: {_passedTests} | Tests failed: {_failedTests.Count}");
         }
     }
 
@@ -100,11 +109,12 @@ namespace Sequence.WaaS.Tests
         {
             Name = name;
             Args = args;
+            Reason = reason;
         }
         
         public override string ToString()
         {
-            return $"Test {Name} failed with args: {string.Join(", ", Args)}";
+            return $"Test {Name} failed with args: {string.Join(", ", Args)} | reason: {Reason}";
         }
     }
 }

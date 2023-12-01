@@ -10,6 +10,7 @@ namespace Sequence.WaaS
 {
     public class WaaSWallet : IWallet
     {
+        public string SessionId { get; private set; }
         private Address _address;
         private HttpClient _httpClient;
         private IntentSender _intentSender;
@@ -19,6 +20,7 @@ namespace Sequence.WaaS
             _address = address;
             _httpClient = new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasWallet");
             _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
+            SessionId = sessionId;
         }
 
         public Task<CreatePartnerReturn> CreatePartner(CreatePartnerArgs args, Dictionary<string, string> headers = null)
@@ -136,7 +138,7 @@ namespace Sequence.WaaS
 
         public Task<bool> DropThisSession()
         {
-            return DropSession(_intentSender.SessionId);
+            return DropSession(SessionId);
         }
 
         public event Action<WaaSSession[]> OnSessionsFound;
