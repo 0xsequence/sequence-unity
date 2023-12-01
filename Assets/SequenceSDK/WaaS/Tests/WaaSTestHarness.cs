@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Contracts;
 using Sequence.Demo;
 using UnityEngine;
 
@@ -75,6 +76,8 @@ namespace Sequence.WaaS.Tests
             walletTests.TestSendERC20();
             walletTests.TestSendBatchTransaction_withERC721();
             walletTests.TestSendBatchTransaction_withERC1155();
+            walletTests.TestDelayedEncode("transfer(address,uint256)");
+            walletTests.TestDelayedEncode(ERC20.Abi);
             await Task.Delay(100);
             while (_testsStarted > _failedTests.Count + _passedTests)
             {

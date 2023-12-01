@@ -266,5 +266,47 @@ namespace Sequence.WaaS.Tests
                 WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSendBatchTransaction_withERC1155), e.Message));
             }
         }
+
+        public async Task TestDelayedEncode(string abi)
+        {
+            try
+            {
+                WaaSTestHarness.TestStarted?.Invoke();
+                GetTokenBalancesReturn tokenBalances =
+                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
+                BigInteger balance = tokenBalances.balances[0].balance;
+                GetTokenBalancesReturn tokenBalances2 =
+                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
+                BigInteger balance2 = tokenBalances2.balances[0].balance;
+
+                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
+                    Chain.Polygon,
+                    new SequenceSDK.WaaS.Transaction[]
+                    {
+                        new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
+                            abi,
+                            new object[]
+                            {
+                                _erc20Address, "1"
+                            },
+                            "transfer")),
+                    }));
+
+                CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestDelayedEncode));
+                GetTokenBalancesReturn newTokenBalances =
+                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
+                BigInteger newBalance = newTokenBalances.balances[0].balance;
+                GetTokenBalancesReturn newTokenBalances2 =
+                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
+                BigInteger newBalance2 = newTokenBalances2.balances[0].balance;
+                CustomAssert.IsTrue(newBalance < balance, nameof(TestDelayedEncode));
+                CustomAssert.IsTrue(newBalance2 > balance2, nameof(TestDelayedEncode));
+                WaaSTestHarness.TestPassed?.Invoke();
+            }
+            catch (Exception e)
+            {
+                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestDelayedEncode), e.Message));
+            }
+        }
     }
 }
