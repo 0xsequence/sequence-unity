@@ -14,6 +14,7 @@ namespace Sequence.Demo
         
         private TMP_InputField _inputField;
         private LoginMethod _loginMethod;
+        private string _loginEmail;
         private LoginButtonHighlighter _loginButtonHighlighter;
         private InfoPopupPanel _infoPopupPanel;
         private bool _hasShownInfoPopupForDifferentLoginMethod = false;
@@ -30,9 +31,17 @@ namespace Sequence.Demo
         private void Start()
         {
             _loginMethod = GetLoginMethod();
+            
             if (_loginButtonHighlighter != null)
             {
                 _loginButtonHighlighter.HighlightAppropriateButton(_loginMethod);
+            }
+
+            _loginEmail = GetLoginEmail();
+
+            if (_loginMethod == LoginMethod.Email)
+            {
+                _inputField.text = _loginEmail;
             }
         }
 
@@ -51,12 +60,12 @@ namespace Sequence.Demo
 
         public void Login()
         {
-            if (_loginMethod != LoginMethod.Email && !_hasShownInfoPopupForDifferentLoginMethod)
+            string email = _inputField.text;
+            if ((_loginMethod != LoginMethod.Email || (_loginMethod == LoginMethod.Email && _loginEmail != email))  && !_hasShownInfoPopupForDifferentLoginMethod)
             {
                 NotifyUserTheyAreLoggingInOnADifferentAccount();
                 return;
             }
-            string email = _inputField.text;
             Debug.Log($"Signing in with email: {email}");
             _errorText.text = "";
             LoginHandler.Login(email);
@@ -132,11 +141,25 @@ namespace Sequence.Demo
         private void NotifyUserTheyAreLoggingInOnADifferentAccount()
         {
             string message = $"Last time, you logged in with <b>{_loginMethod}</b>. Logging in with a different method will use a different account.";
+            if (_loginMethod == LoginMethod.Email)
+            {
+                message = $"Last time, you logged in with <b>{_loginMethod}</b>: <i>{_loginEmail}</i>. Logging in with a different method or email will use a different account.";
+            }
             if (_infoPopupPanel != null)
             {
                 _infoPopupPanel.Open(message);
                 _hasShownInfoPopupForDifferentLoginMethod = true;
             }
+        }
+
+        private string GetLoginEmail()
+        {
+            if (PlayerPrefs.HasKey(OpenIdAuthenticator.LoginEmail))
+            {
+                return PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
+            }
+
+            return "";
         }
     }
 }

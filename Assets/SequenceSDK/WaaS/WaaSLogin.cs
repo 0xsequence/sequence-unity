@@ -182,7 +182,9 @@ namespace Sequence.WaaS
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
                 OnWaaSWalletCreated?.Invoke(wallet);
+                string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
+                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
             }
             catch (Exception e)

@@ -11,6 +11,7 @@ namespace Sequence.Authentication
 {
     public class OpenIdAuthenticator
     {
+        public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
@@ -82,8 +83,14 @@ namespace Sequence.Authentication
 
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
-            return
+            string url =
                 $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken + method}&nonce={_nonce}/";
+            if (PlayerPrefs.HasKey(LoginEmail))
+            {
+                url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
+            }
+
+            return url;
         }
 
         public void PlatformSpecificSetup()
