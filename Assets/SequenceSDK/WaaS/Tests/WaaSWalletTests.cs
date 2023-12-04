@@ -41,8 +41,8 @@ namespace Sequence.WaaS.Tests
         
         private async Task GetAddress()
         {
-            var result = await _wallet.GetWalletAddress(new GetWalletAddressArgs(0));
-            _address = result.address;
+            var result = _wallet.GetWalletAddress();
+            _address = result;
         }
         
         public async Task TestMessageSigning(string message, Chain network)

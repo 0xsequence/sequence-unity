@@ -36,7 +36,7 @@ namespace Sequence.Demo
             _gameObject.SetActive(true);
             _animator.AnimateIn( _openAnimationDurationInSeconds);
 
-            SetAddress();
+            _address = _wallet.GetWalletAddress();
             
             _wallet.OnSignMessageComplete += OnSignMessageComplete;
             _wallet.OnSendTransactionComplete += OnSuccessfulTransaction;
@@ -48,13 +48,7 @@ namespace Sequence.Demo
 
         private async Task CreateAdapter()
         {
-            _adapter = await WaaSToWalletAdapter.CreateAsync(_wallet);
-        }
-
-        private async Task SetAddress()
-        {
-            var addressReturn = await _wallet.GetWalletAddress(new GetWalletAddressArgs(0));
-            _address = new Address(addressReturn.address);
+            _adapter = new WaaSToWalletAdapter(_wallet);
         }
         
         public void SignMessage()
