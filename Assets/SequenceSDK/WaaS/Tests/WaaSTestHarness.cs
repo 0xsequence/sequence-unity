@@ -10,6 +10,7 @@ namespace Sequence.WaaS.Tests
     public class WaaSTestHarness : MonoBehaviour
     {
         public static string RequiredAddress = "0x48b0560661326cB8EECb68107CD72B4B4aB8B2fb";
+        public static int DelayForTransactionToProcess = 15000; // Allow the indexer some time to pull new data from chain
         
         public static Action<WaaSTestFailed> TestFailed;
         public static Action TestPassed;
@@ -78,16 +79,19 @@ namespace Sequence.WaaS.Tests
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
             walletTests.TestSendERC20();
-            // walletTests.TestSendBatchTransaction_withERC721();
-            // walletTests.TestSendBatchTransaction_withERC1155();
-            // walletTests.TestDelayedEncode("transfer(address,uint256)");
-            // walletTests.TestDelayedEncode(ERC20.Abi);
-            // walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
-            // walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            walletTests.TestSendBatchTransaction_withERC721();
+            walletTests.TestSendBatchTransaction_withERC1155();
+            walletTests.TestDelayedEncode("transfer(address,uint256)");
+            walletTests.TestDelayedEncode(ERC20.Abi);
+            walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
+            walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            await WaitForTestsToComplete();
+
             adapterTests.TestGetAddress(RequiredAddress);
-            adapterTests.TestSignMessage("Hello world", Chain.Polygon);
-            adapterTests.TestSendTransaction_basicTransfer();
-            adapterTests.TestSendERC20();
+            adapterTests.TestSignMessage_withAdapter("Hello world", Chain.Polygon);
+            adapterTests.TestSendTransaction_withAdapter();
+            adapterTests.TestSendERC20_withAdapter();
+            adapterTests.TestBatchTransactions_withAdapter();
             await WaitForTestsToComplete();
             
             sessionManagementTests.TestSessionManagement();

@@ -175,7 +175,6 @@ namespace Sequence.WaaS
 
             try
             {
-                await Task.Delay(25000);
                 RegisterSessionResponse registerSessionResponse = await sender.PostIntent<RegisterSessionResponse>(loginPayload, "RegisterSession");
                 string sessionId = registerSessionResponse.session.id;
                 string walletAddress = registerSessionResponse.data.wallet;

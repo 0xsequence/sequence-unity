@@ -85,18 +85,18 @@ namespace Sequence.WaaS
             }
             catch (HttpRequestException e)
             {
-                Debug.LogError("HTTP Request failed: " + e.Message + " reason: " + request.downloadHandler.data  + "\nCurl-equivalent request: " + curlRequest);
+                Debug.LogError("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                Debug.LogError("Invalid URL format: " + e.Message + " reason: " + request.downloadHandler.data + "\nCurl-equivalent request: " + curlRequest);
+                Debug.LogError("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                Debug.LogError("File load exception: " + e.Message + " reason: " + request.downloadHandler.data + "\nCurl-equivalent request: " + curlRequest);
+                Debug.LogError("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
-                Debug.LogError("An unexpected error occurred: " + e.Message + " reason: " + request.downloadHandler.data + "\nCurl-equivalent request: " + curlRequest);
+                Debug.LogError("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
 
             return default;

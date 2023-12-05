@@ -30,7 +30,6 @@ namespace Sequence.WaaS.Tests
         private IIndexer _polygonIndexer = new ChainIndexer((int)Chain.Polygon);
 
         private IEthClient _client;
-        private int _delayForTransactionToProcess = 10000; // Allow the indexer some time to pull new data from chain
 
         public WaaSWalletTests(IWallet wallet)
         {
@@ -72,8 +71,8 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                var balance = await _client.BalanceAt(_address);
-                var balance2 = await _client.BalanceAt(_toAddress);
+                BalanceChecker balanceChecker = await BalanceChecker.CreateAsync(_client, _address);
+                BalanceChecker balanceChecker2 = await BalanceChecker.CreateAsync(_client, _toAddress);
 
                 TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
                     Chain.Polygon,
@@ -83,11 +82,9 @@ namespace Sequence.WaaS.Tests
                     }));
 
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestTransfer));
-                await Task.Delay(_delayForTransactionToProcess);
-                var newBalance = await _client.BalanceAt(_address);
-                var newBalance2 = await _client.BalanceAt(_toAddress);
-                CustomAssert.IsTrue(newBalance < balance, nameof(TestTransfer));
-                CustomAssert.IsTrue(newBalance2 > balance2, nameof(TestTransfer));
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestTransfer));
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestTransfer));
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
@@ -101,12 +98,10 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                GetTokenBalancesReturn tokenBalances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger balance = tokenBalances.balances[0].balance;
-                GetTokenBalancesReturn tokenBalances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger balance2 = tokenBalances2.balances[0].balance;
+                Erc20BalanceChecker balanceChecker =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc20Address);
+                Erc20BalanceChecker balanceChecker2 =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
 
                 TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
                     Chain.Polygon,
@@ -116,15 +111,9 @@ namespace Sequence.WaaS.Tests
                     }));
 
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestSendERC20));
-                await Task.Delay(_delayForTransactionToProcess);
-                GetTokenBalancesReturn newTokenBalances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger newBalance = newTokenBalances.balances[0].balance;
-                GetTokenBalancesReturn newTokenBalances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger newBalance2 = newTokenBalances2.balances[0].balance;
-                CustomAssert.IsTrue(newBalance < balance, nameof(TestSendERC20));
-                CustomAssert.IsTrue(newBalance2 > balance2, nameof(TestSendERC20));
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestSendERC20));
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestSendERC20));
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
@@ -141,14 +130,12 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                BigInteger balance = await _client.BalanceAt(_address);
-                GetTokenBalancesReturn erc20Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger erc20Balance = erc20Balances.balances[0].balance;
-                GetTokenBalancesReturn erc721Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc721Address));
-                BigInteger erc721Balance = erc721Balances.balances[0].balance;
-                if (erc721Balance == 0)
+                BalanceChecker balanceChecker = await BalanceChecker.CreateAsync(_client, _address);
+                Erc20BalanceChecker erc20BalanceChecker =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc20Address);
+                Erc721BalanceChecker erc721BalanceChecker =
+                    await Erc721BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc721Address);
+                if (erc721BalanceChecker.GetBalance() == 0)
                 {
                     string failReason =
                         $"Test {nameof(TestSendBatchTransaction_withERC721)} was not setup properly. {_address} must have an NFT from contract address: {_erc721Address}";
@@ -158,10 +145,11 @@ namespace Sequence.WaaS.Tests
                     throw TestNotSetupProperly;
                 }
 
-                BigInteger balance2 = await _client.BalanceAt(_toAddress);
-                GetTokenBalancesReturn erc20Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger erc20Balance2 = erc20Balances2.balances[0].balance;
+                BalanceChecker balanceChecker2 = await BalanceChecker.CreateAsync(_client, _toAddress);
+                Erc20BalanceChecker erc20BalanceChecker2 =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
+                Erc721BalanceChecker erc721BalanceChecker2 =
+                    await Erc721BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc721Address);
 
                 TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
                     Chain.Polygon,
@@ -172,29 +160,14 @@ namespace Sequence.WaaS.Tests
                         new RawTransaction(_toAddress, "1")
                     }));
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestSendBatchTransaction_withERC721));
-                await Task.Delay(_delayForTransactionToProcess);
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
 
-                BigInteger newBalance = await _client.BalanceAt(_address);
-                GetTokenBalancesReturn newErc20Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger newErc20Balance = newErc20Balances.balances[0].balance;
-                GetTokenBalancesReturn newErc721Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc721Address));
-                BigInteger newBalance2 = await _client.BalanceAt(_toAddress);
-                GetTokenBalancesReturn newErc20Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger newErc20Balance2 = newErc20Balances2.balances[0].balance;
-                GetTokenBalancesReturn newErc721Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc721Address));
-                BigInteger newErc721Balance2 = newErc721Balances2.balances[0].balance;
-
-                CustomAssert.IsTrue(balance > newBalance, nameof(TestSendBatchTransaction_withERC721));
-                CustomAssert.IsTrue(erc20Balance > newErc20Balance, nameof(TestSendBatchTransaction_withERC721));
-                CustomAssert.IsTrue(newErc721Balances.balances.Length == 0,
-                    nameof(TestSendBatchTransaction_withERC721));
-                CustomAssert.IsTrue(balance2 < newBalance2, nameof(TestSendBatchTransaction_withERC721));
-                CustomAssert.IsTrue(erc20Balance2 < newErc20Balance2, nameof(TestSendBatchTransaction_withERC721));
-                CustomAssert.IsTrue(newErc721Balance2 == 1, nameof(TestSendBatchTransaction_withERC721));
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withERC721));
+                await erc20BalanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withERC721));
+                await erc721BalanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withERC721));
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withERC721));
+                await erc20BalanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withERC721));
+                await erc721BalanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withERC721));
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
@@ -209,14 +182,12 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                BigInteger balance = await _client.BalanceAt(_address);
-                GetTokenBalancesReturn erc20Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger erc20Balance = erc20Balances.balances[0].balance;
-                GetTokenBalancesReturn erc1155Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc1155Address));
-                BigInteger erc1155Balance = erc1155Balances.balances[0].balance;
-                if (erc1155Balance == 0)
+                BalanceChecker balanceChecker = await BalanceChecker.CreateAsync(_client, _address);
+                Erc20BalanceChecker erc20BalanceChecker =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc20Address);
+                Erc1155BalanceChecker erc1155BalanceChecker =
+                    await Erc1155BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc1155Address);
+                if (erc1155BalanceChecker.GetBalance() == 0)
                 {
                     string failReason =
                         $"Test {nameof(TestSendBatchTransaction_withERC1155)} was not setup properly. {_address} must have an SFT from contract address: {_erc1155Address}";
@@ -224,10 +195,11 @@ namespace Sequence.WaaS.Tests
                     throw TestNotSetupProperly;
                 }
 
-                BigInteger balance2 = await _client.BalanceAt(_toAddress);
-                GetTokenBalancesReturn erc20Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger erc20Balance2 = erc20Balances2.balances[0].balance;
+                BalanceChecker balanceChecker2 = await BalanceChecker.CreateAsync(_client, _toAddress);
+                Erc20BalanceChecker erc20BalanceChecker2 =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
+                Erc1155BalanceChecker erc1155BalanceChecker2 =
+                    await Erc1155BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc1155Address);
 
                 TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
                     Chain.Polygon,
@@ -242,29 +214,14 @@ namespace Sequence.WaaS.Tests
                     }));
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn,
                     nameof(TestSendBatchTransaction_withERC1155));
-                await Task.Delay(_delayForTransactionToProcess);
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
 
-                BigInteger newBalance = await _client.BalanceAt(_address);
-                GetTokenBalancesReturn newErc20Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger newErc20Balance = newErc20Balances.balances[0].balance;
-                GetTokenBalancesReturn newErc1155Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc1155Address));
-                BigInteger newBalance2 = await _client.BalanceAt(_toAddress);
-                GetTokenBalancesReturn newErc20Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger newErc20Balance2 = newErc20Balances2.balances[0].balance;
-                GetTokenBalancesReturn newErc1155Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc1155Address));
-                BigInteger newErc1155Balance2 = newErc1155Balances2.balances[0].balance;
-
-                CustomAssert.IsTrue(balance > newBalance, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(erc20Balance > newErc20Balance, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(newErc1155Balances.balances.Length == 0 || newErc1155Balances.balances[0].balance < erc1155Balance,
-                    nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(balance2 < newBalance2, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(erc20Balance2 < newErc20Balance2, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(newErc1155Balance2 == 1, nameof(TestSendBatchTransaction_withERC1155));
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withERC1155));
+                await erc20BalanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withERC1155));
+                await erc1155BalanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withERC1155));
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withERC1155));
+                await erc20BalanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withERC1155));
+                await erc1155BalanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withERC1155));
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
@@ -278,12 +235,10 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                GetTokenBalancesReturn tokenBalances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger balance = tokenBalances.balances[0].balance;
-                GetTokenBalancesReturn tokenBalances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger balance2 = tokenBalances2.balances[0].balance;
+                Erc20BalanceChecker balanceChecker =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc20Address);
+                Erc20BalanceChecker balanceChecker2 =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
 
                 TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
                     Chain.Polygon,
@@ -299,20 +254,14 @@ namespace Sequence.WaaS.Tests
                     }));
 
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestDelayedEncode));
-                await Task.Delay(_delayForTransactionToProcess);
-                GetTokenBalancesReturn newTokenBalances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger newBalance = newTokenBalances.balances[0].balance;
-                GetTokenBalancesReturn newTokenBalances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger newBalance2 = newTokenBalances2.balances[0].balance;
-                CustomAssert.IsTrue(newBalance < balance, nameof(TestDelayedEncode));
-                CustomAssert.IsTrue(newBalance2 > balance2, nameof(TestDelayedEncode));
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestDelayedEncode));
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestDelayedEncode));
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
             {
-                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestDelayedEncode), e.Message));
+                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestDelayedEncode), e.Message, abi));
             }
         }
         
@@ -321,16 +270,13 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                BigInteger balance = await _client.BalanceAt(_address);
-                GetTokenBalancesReturn erc20Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger erc20Balance = erc20Balances.balances[0].balance;
-
-                BigInteger balance2 = await _client.BalanceAt(_toAddress);
-                GetTokenBalancesReturn erc20Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger erc20Balance2 = erc20Balances2.balances[0].balance;
-
+                BalanceChecker balanceChecker = await BalanceChecker.CreateAsync(_client, _address);
+                Erc20BalanceChecker erc20BalanceChecker =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc20Address);
+                
+                BalanceChecker balanceChecker2 = await BalanceChecker.CreateAsync(_client, _toAddress);
+                Erc20BalanceChecker erc20BalanceChecker2 =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
                 TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
                     Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
@@ -346,26 +292,19 @@ namespace Sequence.WaaS.Tests
                     }));
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn,
                     nameof(TestSendBatchTransaction_withERC1155));
-                await Task.Delay(_delayForTransactionToProcess);
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
 
-                BigInteger newBalance = await _client.BalanceAt(_address);
-                GetTokenBalancesReturn newErc20Balances =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_address, _erc20Address));
-                BigInteger newErc20Balance = newErc20Balances.balances[0].balance;
-                BigInteger newBalance2 = await _client.BalanceAt(_toAddress);
-                GetTokenBalancesReturn newErc20Balances2 =
-                    await _polygonIndexer.GetTokenBalances(new GetTokenBalancesArgs(_toAddress, _erc20Address));
-                BigInteger newErc20Balance2 = newErc20Balances2.balances[0].balance;
-
-                CustomAssert.IsTrue(balance > newBalance, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(erc20Balance > newErc20Balance, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(balance2 < newBalance2, nameof(TestSendBatchTransaction_withERC1155));
-                CustomAssert.IsTrue(erc20Balance2 < newErc20Balance2, nameof(TestSendBatchTransaction_withERC1155));
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withDelayedEncode), abi);
+                await erc20BalanceChecker.AssertNewValueIsSmaller(nameof(TestSendBatchTransaction_withDelayedEncode),
+                    abi);
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withDelayedEncode), abi);
+                await erc20BalanceChecker2.AssertNewValueIsLarger(nameof(TestSendBatchTransaction_withDelayedEncode),
+                    abi);
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
             {
-                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSendBatchTransaction_withERC1155), e.Message));
+                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSendBatchTransaction_withERC1155), e.Message, abi));
             }
         }
     }
