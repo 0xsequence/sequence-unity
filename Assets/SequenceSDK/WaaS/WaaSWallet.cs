@@ -37,7 +37,7 @@ namespace Sequence.WaaS
             return result;
         }
 
-        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
+        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args) // Todo figure out this intent is still supported
         {
             return _intentSender.SendIntent<IsValidMessageSignatureReturn, IsValidMessageSignatureArgs>(args);
         }
