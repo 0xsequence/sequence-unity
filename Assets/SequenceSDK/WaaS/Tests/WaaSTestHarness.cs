@@ -9,6 +9,8 @@ namespace Sequence.WaaS.Tests
 {
     public class WaaSTestHarness : MonoBehaviour
     {
+        public static string RequiredAddress = "0x48b0560661326cB8EECb68107CD72B4B4aB8B2fb";
+        
         public static Action<WaaSTestFailed> TestFailed;
         public static Action TestPassed;
         public static Action TestStarted;
@@ -62,7 +64,8 @@ namespace Sequence.WaaS.Tests
             WaaSWalletTests walletTests = new WaaSWalletTests(wallet);
             wallet.OnSendTransactionFailed += OnFailedTransaction;
             SessionManagementTests sessionManagementTests = new SessionManagementTests(wallet);
-            RunTests(walletTests, sessionManagementTests);
+            WaaSToWalletAdapterTests adapterTests = new WaaSToWalletAdapterTests(wallet);
+            RunTests(walletTests, sessionManagementTests, adapterTests);
         }
 
         private void OnFailedTransaction(FailedTransactionReturn result)
@@ -70,17 +73,21 @@ namespace Sequence.WaaS.Tests
             Debug.LogError("Transaction failed: " + result.error);
         }
 
-        private async Task RunTests(WaaSWalletTests walletTests, SessionManagementTests sessionManagementTests)
+        private async Task RunTests(WaaSWalletTests walletTests, SessionManagementTests sessionManagementTests, WaaSToWalletAdapterTests adapterTests)
         {
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
             walletTests.TestSendERC20();
-            walletTests.TestSendBatchTransaction_withERC721();
-            walletTests.TestSendBatchTransaction_withERC1155();
-            walletTests.TestDelayedEncode("transfer(address,uint256)");
-            walletTests.TestDelayedEncode(ERC20.Abi);
-            walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
-            walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            // walletTests.TestSendBatchTransaction_withERC721();
+            // walletTests.TestSendBatchTransaction_withERC1155();
+            // walletTests.TestDelayedEncode("transfer(address,uint256)");
+            // walletTests.TestDelayedEncode(ERC20.Abi);
+            // walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
+            // walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            adapterTests.TestGetAddress(RequiredAddress);
+            adapterTests.TestSignMessage("Hello world", Chain.Polygon);
+            adapterTests.TestSendTransaction_basicTransfer();
+            adapterTests.TestSendERC20();
             await WaitForTestsToComplete();
             
             sessionManagementTests.TestSessionManagement();

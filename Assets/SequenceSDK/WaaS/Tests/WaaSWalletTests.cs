@@ -62,7 +62,7 @@ namespace Sequence.WaaS.Tests
             }
         }
 
-        private static bool AppearsToBeValidSignature(string signature)
+        public static bool AppearsToBeValidSignature(string signature)
         {
             return signature.StartsWith("0x") && signature.IsHexFormat();
         } 
