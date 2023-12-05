@@ -12,7 +12,7 @@ namespace Sequence.WaaS.Tests
         {
             if (obj == null)
             {
-                throw TestFailedException($"{obj} was null");
+                throw TestFailedException($"{obj} was null | Source: {name} with args {args}");
             }
         }
         
@@ -20,7 +20,7 @@ namespace Sequence.WaaS.Tests
         {
             if (!condition)
             {
-                throw TestFailedException($"Condition was not true");
+                throw TestFailedException($"Condition was not true | Source: {name} with args {args}");
             }
         }
         
@@ -28,7 +28,7 @@ namespace Sequence.WaaS.Tests
         {
             if (!expected.Equals(actual))
             {
-                throw TestFailedException($"Expected {expected} is not equal to Actual {actual}");
+                throw TestFailedException($"Expected {expected} is not equal to Actual {actual} | Source: {name} with args {args}");
             }
         }
     }

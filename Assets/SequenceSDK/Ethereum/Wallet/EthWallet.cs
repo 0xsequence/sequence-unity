@@ -58,13 +58,8 @@ namespace Sequence.Wallet
             return IWallet.PubkeyToAddress(publicKeyBytes64);
         }
 
-        public Address GetAddress(uint accountIndex = 0)
+        public Address GetAddress()
         {
-            if (accountIndex != 0)
-            {
-                Debug.LogWarning("EthWallet has no concept of accountIndex. There is only one Address/account per EthWallet.");
-            }
-            
             if (address == null)
             {
                 address = new Address(GenerateAddress());

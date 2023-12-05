@@ -17,7 +17,7 @@ namespace Sequence.Wallet
 {
     public interface IWallet 
     {
-        public Address GetAddress(uint accountIndex = 0);
+        public Address GetAddress();
         public Task<string> SendTransaction(IEthClient client, EthTransaction transaction);
         public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction);
         public Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions);
