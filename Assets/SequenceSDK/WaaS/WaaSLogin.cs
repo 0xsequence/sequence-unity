@@ -44,7 +44,7 @@ namespace Sequence.WaaS
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
         public event ILogin.OnMFAEmailSentHandler OnMFAEmailSent;
         public event ILogin.OnMFAEmailFailedToSendHandler OnMFAEmailFailedToSend;
-        public Action<WaaSWallet> OnWaaSWalletCreated; 
+        public static Action<WaaSWallet> OnWaaSWalletCreated; 
 
         public async Task Login(string email)
         {
