@@ -12,6 +12,11 @@ namespace Sequence
             this._chainId = chainId;
         }
         
+        public ChainIndexer(Chain chain)
+        {
+            this._chainId = (int)chain;
+        }
+        
         public Task<bool> Ping()
         {
             return Indexer.Ping(_chainId);
