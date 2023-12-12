@@ -44,7 +44,6 @@ namespace Sequence.WaaS
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
         public event ILogin.OnMFAEmailSentHandler OnMFAEmailSent;
         public event ILogin.OnMFAEmailFailedToSendHandler OnMFAEmailFailedToSend;
-        public static Action<WaaSWallet> OnWaaSWalletCreated; 
 
         public async Task Login(string email)
         {
@@ -181,7 +180,7 @@ namespace Sequence.WaaS
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
-                OnWaaSWalletCreated?.Invoke(wallet);
+                WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);

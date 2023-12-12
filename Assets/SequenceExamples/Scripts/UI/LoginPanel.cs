@@ -46,7 +46,7 @@ namespace Sequence.Demo
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
-            WaaSLogin.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
         } 
 
         public void OpenTransitionPanel()

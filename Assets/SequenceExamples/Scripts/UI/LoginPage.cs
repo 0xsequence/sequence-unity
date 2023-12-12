@@ -123,7 +123,7 @@ namespace Sequence.Demo
 
         public void SubscribeToWaaSWalletCreatedEvent(Action<WaaSWallet> OnWaaSWalletCreatedHandler)
         {
-            WaaSLogin.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
         }
         
         private LoginMethod GetLoginMethod()
