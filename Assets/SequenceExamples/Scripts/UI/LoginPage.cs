@@ -4,12 +4,14 @@ using Sequence.Demo.Tweening;
 using Sequence.WaaS;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
     public class LoginPage : UIPage
     {
+        public bool NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = true;
         [SerializeField] private TextMeshProUGUI _errorText;
         
         private TMP_InputField _inputField;
@@ -61,10 +63,13 @@ namespace Sequence.Demo
         public void Login()
         {
             string email = _inputField.text;
-            if ((_loginMethod != LoginMethod.Email || (_loginMethod == LoginMethod.Email && _loginEmail != email))  && !_hasShownInfoPopupForDifferentLoginMethod)
+            if (NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime)
             {
-                NotifyUserTheyAreLoggingInOnADifferentAccount();
-                return;
+                if ((_loginMethod != LoginMethod.Email || (_loginMethod == LoginMethod.Email && _loginEmail != email))  && !_hasShownInfoPopupForDifferentLoginMethod)
+                {
+                    NotifyUserTheyAreLoggingInOnADifferentAccount();
+                    return;
+                }
             }
             Debug.Log($"Signing in with email: {email}");
             _errorText.text = "";
@@ -73,10 +78,13 @@ namespace Sequence.Demo
 
         public void GoogleLogin()
         {
-            if (_loginMethod != LoginMethod.Google && !_hasShownInfoPopupForDifferentLoginMethod)
+            if (NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime)
             {
-                NotifyUserTheyAreLoggingInOnADifferentAccount();
-                return;
+                if (_loginMethod != LoginMethod.Google && !_hasShownInfoPopupForDifferentLoginMethod)
+                {
+                    NotifyUserTheyAreLoggingInOnADifferentAccount();
+                    return;
+                }
             }
             Debug.Log("Google Login");
             LoginHandler.GoogleLogin();
@@ -84,10 +92,13 @@ namespace Sequence.Demo
 
         public void DiscordLogin()
         {
-            if (_loginMethod != LoginMethod.Discord && !_hasShownInfoPopupForDifferentLoginMethod)
+            if (NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime)
             {
-                NotifyUserTheyAreLoggingInOnADifferentAccount();
-                return;
+                if (_loginMethod != LoginMethod.Discord && !_hasShownInfoPopupForDifferentLoginMethod)
+                {
+                    NotifyUserTheyAreLoggingInOnADifferentAccount();
+                    return;
+                }
             }
             Debug.Log("Discord Login");
             LoginHandler.DiscordLogin();
@@ -95,10 +106,13 @@ namespace Sequence.Demo
 
         public void FacebookLogin()
         {
-            if (_loginMethod != LoginMethod.Facebook && !_hasShownInfoPopupForDifferentLoginMethod)
+            if (NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime)
             {
-                NotifyUserTheyAreLoggingInOnADifferentAccount();
-                return;
+                if (_loginMethod != LoginMethod.Facebook && !_hasShownInfoPopupForDifferentLoginMethod)
+                {
+                    NotifyUserTheyAreLoggingInOnADifferentAccount();
+                    return;
+                }
             }
             Debug.Log("Facebook Login");
             LoginHandler.FacebookLogin();
@@ -106,10 +120,13 @@ namespace Sequence.Demo
 
         public void AppleLogin()
         {
-            if (_loginMethod != LoginMethod.Apple && !_hasShownInfoPopupForDifferentLoginMethod)
+            if (NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime)
             {
-                NotifyUserTheyAreLoggingInOnADifferentAccount();
-                return;
+                if (_loginMethod != LoginMethod.Apple && !_hasShownInfoPopupForDifferentLoginMethod)
+                {
+                    NotifyUserTheyAreLoggingInOnADifferentAccount();
+                    return;
+                }
             }
             Debug.Log("Apple Login");
             LoginHandler.AppleLogin();

@@ -33,6 +33,7 @@ namespace SequenceExamples.Scripts.Tests
             _loginPanel = loginPanel;
             _connectPage = connectPage;
             _loginPage = loginPage;
+            _loginPage.NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = false;
             _mfaPage = mfaPage;
             _loginSuccessPage = loginSuccessPage;
             _walletPanel = walletPanel;
