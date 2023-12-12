@@ -67,7 +67,7 @@ public class ContractIntegrationTests
         Contract complexContract = new Contract(complexContractAddress, complexContractAbi);
         object[] resultPart1 = await complexContract.QueryContract<object[]>("testPart1", expectedNumber, expectedWord,
             expectedNumbers,
-            expectedDoubleNestedWords).SendQuery(client);
+            expectedDoubleNestedWords)(client);
         object[] resultPart2 = await complexContract.QueryContract<object[]>("testPart2", expectedBoolean,
             expectedBools, expectedByteArray, expectedMoreBytes, expectedAddresses).SendQuery(client);
         
