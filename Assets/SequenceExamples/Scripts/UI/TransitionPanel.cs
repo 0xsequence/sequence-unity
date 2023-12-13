@@ -1,5 +1,6 @@
 using System;
 using Sequence.Utils;
+using Sequence.WaaS;
 
 namespace Sequence.Demo
 {
@@ -7,20 +8,26 @@ namespace Sequence.Demo
     {
         public ITokenContentFetcher TokenFetcher = new TokenContentFetcher(contentFetcher);
         public INftContentFetcher NftFetcher = new NftContentFetcher(contentFetcher);
+        public IWallet Wallet;
         private SequenceSampleUI _ui;
         private static IContentFetcher contentFetcher =
             new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
                 EnumExtensions.GetEnumValuesAsList<Chain>().ToArray());
+        
         protected override void Awake()
         {
             base.Awake();
             _ui = FindObjectOfType<SequenceSampleUI>();
+            WaaSWallet.OnWaaSWalletCreated += (wallet =>
+            {
+                Wallet = wallet;
+            });
         }
 
         public void OpenWalletPanel()
         {
             _ui.OpenWalletPanelWithDelay(_closeAnimationDurationInSeconds, TokenFetcher, NftFetcher, 
-                new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"));
+                Wallet);
         }
     }
 }

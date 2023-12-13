@@ -54,10 +54,11 @@ namespace SequenceExamples.Scripts.Tests
         {
             // Run all tests in one single suite to save time running test suite (otherwise, we need to reload and tear down the scene for each test
             InitialExpectationsTest();
+            string expectedEmail = TestExtensions.GetTextFromInputFieldWithName(_loginPage.transform, "EmailField");
             foreach (string provider in new[] {"Google", "Discord", "Facebook", "Apple"})
             {
                 yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageViaSocialLoginTest(provider));
-                yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest(""));
+                yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest(expectedEmail));
             }
             
             yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageViaSocialLoginAndDismissTest("Google"));

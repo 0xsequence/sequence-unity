@@ -105,6 +105,7 @@ namespace SequenceExamples.Scripts.Tests
 
             _transitionPanel.TokenFetcher = new MockTokenContentFetcher(RandomNumberOfTokensToFetch, 0);
             _transitionPanel.NftFetcher = new MockNftContentFetcher(RandomNumberOfNftsToFetch, 0);
+            _transitionPanel.Wallet = new MockWaaSWallet();
             Debug.Log($"Will fetch {RandomNumberOfTokensToFetch} tokens and {RandomNumberOfNftsToFetch} NFTs");
             
             openWalletButton.onClick.Invoke();
@@ -535,7 +536,7 @@ namespace SequenceExamples.Scripts.Tests
             
             Transform topBar = _walletPanel.transform.FindAmongDecendants("TopBar");
             Assert.IsNotNull(topBar);
-            TestExtensions.AssertTextWithNameHasText(topBar, "WalletAddressText", UITestHarness.TestAddress.CondenseForUI());
+            TestExtensions.AssertTextWithNameHasText(topBar, "WalletAddressText", MockWaaSWallet.TestAddress.CondenseForUI());
             
             TestExtensions.ClickButtonWithName(topBar, "WalletDropdown");
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
@@ -543,7 +544,7 @@ namespace SequenceExamples.Scripts.Tests
             AssertWeAreOnWalletPage();
             Assert.IsTrue(_walletDropdown.gameObject.activeInHierarchy);
             
-            TestExtensions.AssertTextWithNameHasText(_walletDropdown.transform, "WalletAddressText", UITestHarness.TestAddress.CondenseForUI());
+            TestExtensions.AssertTextWithNameHasText(_walletDropdown.transform, "WalletAddressText", MockWaaSWallet.TestAddress.CondenseForUI());
             
             Transform copyAddressIconTransform = _walletDropdown.transform.FindAmongDecendants("CopyAddressIcon");
             Assert.IsNotNull(copyAddressIconTransform);

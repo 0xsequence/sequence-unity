@@ -33,8 +33,6 @@ namespace SequenceExamples.Scripts.Tests
         private WalletDropdown _walletDropdown;
 
         public static float WaitForAnimationTime = 1.5f;
-        
-        public static readonly Address TestAddress = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
 
         [UnitySetUp]
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
@@ -139,7 +137,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
                 new MockTokenContentFetcher(_walletFlowUITests.RandomNumberOfTokensToFetch, 0),
                 new MockNftContentFetcher(_walletFlowUITests.RandomNumberOfNftsToFetch, 0),
-                TestAddress));
+                new MockWaaSWallet()));
         }
 
         [UnityTest]
@@ -191,7 +189,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
                 tokenFetcher,
                 nftFetcher,
-                TestAddress));
+                new MockWaaSWallet()));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
         }
     }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
+using Sequence.WaaS;
 using TMPro;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ namespace Sequence.Demo
         private ITokenContentFetcher _tokenContentFetcher;
         private List<TokenElement> _fetchedTokenElements;
         private Address _walletAddress;
+        private IWallet _wallet;
 
         public enum TopBarMode
         {
@@ -50,12 +52,14 @@ namespace Sequence.Demo
         {
             base.Open(args);
             _fetchedTokenElements = new List<TokenElement>();
-            _walletAddress = args.GetObjectOfTypeIfExists<Address>();
-            if (_walletAddress == default)
+            _wallet = args.GetObjectOfTypeIfExists<IWallet>();
+            if (_wallet == default)
             {
                 throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(Address)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(IWallet)} as an argument");
             }
+
+            _walletAddress = _wallet.GetWalletAddress();
             
             _walletAddressText.text = _walletAddress.CondenseForUI();
         }
