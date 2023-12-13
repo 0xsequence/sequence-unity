@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Sequence;
 using Sequence.Demo;
@@ -184,8 +185,10 @@ namespace SequenceExamples.Scripts.Tests
         [UnityTest]
         public IEnumerator ContentFetcherEndToEndTest()
         {
+            List<Chain> chains = EnumExtensions.GetEnumValuesAsList<Chain>();
+            chains.Remove(Chain.None);
             IContentFetcher contentFetcher = new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
-                EnumExtensions.GetEnumValuesAsList<Chain>().ToArray());
+                chains.ToArray());
             ITokenContentFetcher tokenFetcher = new TokenContentFetcher(contentFetcher);
             INftContentFetcher nftFetcher = new NftContentFetcher(contentFetcher);
             tokenFetcher.OnTokenFetchSuccess += _walletFlowUITests.OnTokenFetch;
