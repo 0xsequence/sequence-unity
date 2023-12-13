@@ -97,8 +97,14 @@ namespace Sequence.Demo
                 contract = new Address(contractAddress);
             }
 
+            Chain network = Chain.None;
+            while (network == Chain.None)
+            {
+                network = EnumExtensions.GetRandomEnumValue<Chain>();
+            }
+
             return new TransactionDetails(potentialTypes.GetRandomObjectFromArray(),
-                EnumExtensions.GetRandomEnumValue<Chain>(),
+                network,
                 tokenIconSprite,
                 contract,
                 new Address(potentialMockAddresses.GetRandomObjectFromArray()),

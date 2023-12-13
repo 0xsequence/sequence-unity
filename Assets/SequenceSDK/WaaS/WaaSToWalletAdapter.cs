@@ -113,9 +113,9 @@ namespace Sequence.WaaS
             return result.signature;
         }
 
-        public async Task<bool> IsValidSignature(string signature, string message, string chainId, uint accountIndex = 0)
+        public async Task<bool> IsValidSignature(string signature, string message, Chain chain)
         {
-            var args = new IsValidMessageSignatureArgs((uint)chainId.HexStringToInt(), GetAddress(), message, signature);
+            var args = new IsValidMessageSignatureArgs(chain, GetAddress(), message, signature);
             var result = await _wallet.IsValidMessageSignature(args);
             return result.isValid;
         }
