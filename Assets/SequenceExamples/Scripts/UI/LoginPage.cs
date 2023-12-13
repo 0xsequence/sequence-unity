@@ -149,6 +149,8 @@ namespace Sequence.Demo
             {
                 return (LoginMethod) PlayerPrefs.GetInt(WaaSLogin.WaaSLoginMethod);
             }
+
+            _hasShownInfoPopupForDifferentLoginMethod = true; // Don't show popup if we can't find the previous login method
             return LoginMethod.None;
         }
         
