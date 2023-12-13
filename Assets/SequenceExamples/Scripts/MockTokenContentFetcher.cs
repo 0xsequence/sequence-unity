@@ -51,11 +51,17 @@ namespace Sequence.Demo
             Sprite tokenIconSprite = Sprite.Create(tokenIconTexture, new Rect(0, 0, tokenIconTexture.width, tokenIconTexture.height),
                 new Vector2(.5f, .5f));
 
+            Chain network = Chain.None;
+            while (network == Chain.None)
+            {
+                network = EnumExtensions.GetRandomEnumValue<Chain>();
+            }
+            
             return new TokenElement(
                 new ERC20(potentialMockAddresses.GetRandomObjectFromArray()),
                 tokenIconSprite,
                 potentialNames.GetRandomObjectFromArray(),
-                EnumExtensions.GetRandomEnumValue<Chain>(),
+                network,
                 (uint)Random.Range(0, 10000),
                 potentialSymbols.GetRandomObjectFromArray(),
                 new MockCurrencyConverter());

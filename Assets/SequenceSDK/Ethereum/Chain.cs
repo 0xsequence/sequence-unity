@@ -23,5 +23,8 @@ namespace Sequence
         TestnetArbitrumGoerli = 421613,
         TestnetBNBSmartChain = 97,
         TestnetBaseGoerli = 84531,
+        
+        // Null
+        None = 0
     }
 }

@@ -5,7 +5,7 @@ namespace Sequence
 {
     public static class ChainId
     {
-        public static string AsString(this Chain chain)
+        public static string AsHexString(this Chain chain)
         {
             BigInteger chainId = (BigInteger)(int)chain;
             return chainId.BigIntegerToHexString();

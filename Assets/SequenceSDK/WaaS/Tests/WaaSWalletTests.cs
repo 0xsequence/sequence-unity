@@ -52,7 +52,9 @@ namespace Sequence.WaaS.Tests
                 var result = await _wallet.SignMessage(new SignMessageArgs(_address, network, message));
                 string signature = result.signature;
                 CustomAssert.NotNull(signature, nameof(TestMessageSigning), message, network);
-                CustomAssert.IsTrue(AppearsToBeValidSignature(signature), nameof(TestMessageSigning), message, network); // If a signature appears valid and comes from WaaS, it most likely is valid - validity is tested on the WaaS side
+                var isValid = await _wallet.IsValidMessageSignature(new IsValidMessageSignatureArgs(network, _address, message, signature));
+                bool isValidSignature = isValid.isValid;
+                CustomAssert.IsTrue(isValidSignature, nameof(TestMessageSigning), message, network);
                 WaaSTestHarness.TestPassed?.Invoke();
             }
             catch (Exception e)
@@ -60,11 +62,6 @@ namespace Sequence.WaaS.Tests
                 WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestMessageSigning), e.Message, message, network));
             }
         }
-
-        public static bool AppearsToBeValidSignature(string signature)
-        {
-            return signature.StartsWith("0x") && signature.IsHexFormat();
-        } 
 
         public async Task TestTransfer()
         {

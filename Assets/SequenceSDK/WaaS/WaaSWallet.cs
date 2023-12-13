@@ -37,9 +37,10 @@ namespace Sequence.WaaS
             return result;
         }
 
-        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args) // Todo figure out this intent is still supported
+        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
         {
-            return _intentSender.SendIntent<IsValidMessageSignatureReturn, IsValidMessageSignatureArgs>(args);
+            return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
+                "API/IsValidMessageSignature", args, null, "https://api.sequence.app/rpc/");
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
