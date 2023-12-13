@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Sequence.Authentication;
 using Sequence.Provider;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -32,9 +33,13 @@ namespace Sequence.WaaS
             this._defaultHeaders[key] = value;
         }
 
-        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null)
+        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             string url = _url + "/" + path;
+            if (overrideUrl != null)
+            {
+                url = overrideUrl.AppendTrailingSlashIfNeeded() + path;
+            }
             string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("Content-Type", "application/json");

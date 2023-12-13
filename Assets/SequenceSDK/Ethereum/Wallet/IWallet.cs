@@ -57,9 +57,7 @@ namespace Sequence.Wallet
         /// <param name="accountIndex"></param>
         /// <param name="chainId"></param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public Task<bool> IsValidSignature(string signature, string message, string chainId = "", uint accountIndex = 0);
-
-        
+        public Task<bool> IsValidSignature(string signature, string message, Chain chain = Chain.None);
 
         /// <summary>
         /// Recovers the Ethereum address from a message and its signature.

@@ -7,7 +7,12 @@ namespace Sequence.Extensions
     {
         public static string ByteArrayToHexStringWithPrefix(this byte[] byteArray)
         {
-            return "0x" + SequenceCoder.ByteArrayToHexString(byteArray);
+            return "0x" + byteArray.ByteArrayToHexString();
+        }
+        
+        public static string ByteArrayToHexString(this byte[] byteArray)
+        {
+            return SequenceCoder.ByteArrayToHexString(byteArray);
         }
 
         public static bool HasPrefix(this byte[] b, byte[] prefix) {
