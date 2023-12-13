@@ -19,7 +19,6 @@ namespace SequenceExamples.Scripts.Tests
             
         private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
-        private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -47,7 +46,6 @@ namespace SequenceExamples.Scripts.Tests
                 yield return null; // Allow object to load
                 _ui = FindObjectOfType<SequenceSampleUI>();
                 _loginPanel = FindObjectOfType<LoginPanel>();
-                _connectPage = FindObjectOfType<ConnectPage>();
                 _loginPage = FindObjectOfType<LoginPage>();
                 _mfaPage = FindObjectOfType<MultifactorAuthenticationPage>();
                 _loginSuccessPage = FindObjectOfType<LoginSuccessPage>();
@@ -78,7 +76,7 @@ namespace SequenceExamples.Scripts.Tests
             _ui.Start();
             yield return new WaitForSeconds(WaitForAnimationTime); // Wait a few seconds to allow for UI to animate into place
             
-            _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
+            _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
             _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel,
                 _searchPage, _collectionInfoPage, _nftInfoPage, _tokenInfoPage, _searchViewAllPage, _walletDropdown);
         }
@@ -88,7 +86,6 @@ namespace SequenceExamples.Scripts.Tests
         {
             _ui = null;
             _loginPanel = null;
-            _connectPage = null;
             _loginPage = null;
             _mfaPage = null;
             _loginSuccessPage = null;

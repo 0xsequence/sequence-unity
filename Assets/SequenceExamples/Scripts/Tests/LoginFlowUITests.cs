@@ -17,7 +17,6 @@ namespace SequenceExamples.Scripts.Tests
             
         private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
-        private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -25,13 +24,12 @@ namespace SequenceExamples.Scripts.Tests
         
         private static readonly WaitForSeconds WaitForAnimationTime = new WaitForSeconds(UITestHarness.WaitForAnimationTime);
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel,  LoginPage loginPage,
             MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;
             _loginPanel = loginPanel;
-            _connectPage = connectPage;
             _loginPage = loginPage;
             _loginPage.NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = false;
             _mfaPage = mfaPage;
@@ -73,7 +71,6 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertWeAreOnLoginPage()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
@@ -118,7 +115,6 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertWeAreOnMfaPage()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
@@ -204,7 +200,6 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertWeAreOnLoginSuccessPage()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_loginSuccessPage.gameObject.activeInHierarchy);
@@ -277,7 +272,6 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertLoginPanelIsClosed()
         {
             Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);

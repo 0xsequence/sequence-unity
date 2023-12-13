@@ -10,7 +10,6 @@ namespace Sequence.Demo
     public class LoginPanel : UIPanel
     {
         private TransitionPanel _transitionPanel;
-        private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -21,7 +20,6 @@ namespace Sequence.Demo
             base.Awake();
             _transitionPanel = FindObjectOfType<TransitionPanel>();
             
-            _connectPage = GetComponentInChildren<ConnectPage>();
             _loginPage = GetComponentInChildren<LoginPage>();
             _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
 
