@@ -26,6 +26,13 @@ namespace Sequence.Authentication
         private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
 
+        private string _urlScheme;
+
+        public OpenIdAuthenticator(string urlScheme)
+        {
+            _urlScheme = urlScheme;
+        }
+
         public void GoogleSignIn()
         {
             try
@@ -84,7 +91,7 @@ namespace Sequence.Authentication
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
             string url =
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken + method}&nonce={_nonce}/";
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
@@ -206,7 +213,7 @@ namespace Sequence.Authentication
             }
             if (queryParams.TryGetValue("state", out string state))
             {
-                if (!state.StartsWith(_stateToken))
+                if (!state.Contains(_stateToken))
                 {
                     Debug.LogError("State token mismatch");
                     return;

@@ -9,6 +9,8 @@ namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
+        public string UrlScheme = "sdk-powered-by-sequence";
+        
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
@@ -30,7 +32,7 @@ namespace Sequence.Demo
                 "us-east-2:42c9f39d-c935-4d5c-a845-5c8815c79ee3", 
                 "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d",
                 "5fl7dg7mvu534o9vfjbc6hj31p"),
-                9, "1.0.0");
+                9, "1.0.0", UrlScheme);
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
