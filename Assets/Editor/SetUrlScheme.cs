@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using Sequence.Authentication;
+using Sequence.Authentication.ScriptableObjects;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
@@ -10,31 +12,34 @@ namespace Editor
     public class SetUrlScheme
     {
         private static string _plistPath;
+        private static string _urlScheme;
         
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
+            OpenIdAuthenticatorConfig config = Resources.Load<OpenIdAuthenticatorConfig>("OpenIdAuthenticatorConfig");
+            if (config == null)
+            {
+                throw new Exception("OpenIdAuthenticatorConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > OpenIdAuthenticatorConfig");
+                return;
+            }
+            _urlScheme = config.UrlScheme;
+            
             _plistPath = Path.Combine(pathToBuiltProject, "Contents/Info.plist");
 
             if (target == BuildTarget.iOS)
             {
-                SetiOSUrlScheme();
+                SetPlistUrlScheme();
             }
             else if (target == BuildTarget.StandaloneOSX)
             {
-                SetMacOSUrlScheme();
+                SetPlistUrlScheme();
             }
 
-            Debug.Log($"Custom URL scheme set successfully: {OpenIdAuthenticator.UrlScheme}");
-        }
-        
-        private static void SetiOSUrlScheme() {
-            AddPlistValue("CFBundleURLTypes", new[] { new PlistElementDict() });
-            AddPlistValue("CFBundleURLTypes[0].CFBundleURLName", new[] { new PlistElementString(OpenIdAuthenticator.UrlScheme) });
-            AddPlistValue("CFBundleURLTypes[0].CFBundleURLSchemes", new[] { new PlistElementString(OpenIdAuthenticator.UrlScheme) });
+            Debug.Log($"Custom URL scheme set successfully: {_urlScheme}");
         }
 
-        private static void SetMacOSUrlScheme()
+        private static void SetPlistUrlScheme()
         {
             PlistDocument plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
@@ -58,7 +63,7 @@ namespace Editor
                     }
                     if (existingDict.values["CFBundleURLSchemes"] is PlistElementArray newArray)
                     {
-                        newArray.values.Add(new PlistElementString(OpenIdAuthenticator.UrlScheme));
+                        newArray.values.Add(new PlistElementString(_urlScheme));
                     }
                 }
             }

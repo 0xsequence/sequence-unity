@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Sequence.Authentication.ScriptableObjects;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -14,7 +15,7 @@ namespace Sequence.Authentication
     {
         public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
-        public static string UrlScheme = "sequence-try-something-fun";
+        private string _urlScheme;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
         
@@ -26,6 +27,19 @@ namespace Sequence.Authentication
         
         private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
+
+        public OpenIdAuthenticator()
+        {
+            OpenIdAuthenticatorConfig config = Resources.Load<OpenIdAuthenticatorConfig>("OpenIdAuthenticatorConfig");
+
+            if (config == null)
+            {
+                Debug.LogError("OpenIdAuthenticatorConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > OpenIdAuthenticatorConfig");
+                return;
+            }
+
+            _urlScheme = config.UrlScheme;
+        }
 
         public void GoogleSignIn()
         {
@@ -85,7 +99,7 @@ namespace Sequence.Authentication
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
             string url =
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={UrlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
@@ -100,11 +114,11 @@ namespace Sequence.Authentication
             // Register a Windows URL protocol handler in the Windows Registry.
             var appPath = Path.GetFullPath(Application.dataPath.Replace("_Data", ".exe"));
             string[] commands = new string[]{
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme} /t REG_SZ /d \"URL:Sequence Login for {Application.productName}\" /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme} /v \"URL Protocol\" /t REG_SZ /d \"\" /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell\\open /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell\\open\\command /t REG_SZ /d \"\\\"{appPath}\\\" \\\"%1\\\"\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme} /t REG_SZ /d \"URL:Sequence Login for {Application.productName}\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme} /v \"URL Protocol\" /t REG_SZ /d \"\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell\\open /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell\\open\\command /t REG_SZ /d \"\\\"{appPath}\\\" \\\"%1\\\"\" /f",
             };
             foreach(var args in commands) {
                 var command = new System.Diagnostics.ProcessStartInfo();
