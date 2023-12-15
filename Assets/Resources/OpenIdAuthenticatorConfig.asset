@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31bdc7ca06145c58d72ef6ca48f8e02, type: 3}
   m_Name: OpenIdAuthenticatorConfig
   m_EditorClassIdentifier: 
-  UrlScheme: ios-test
+  UrlScheme: sdk-powered-by-sequence
