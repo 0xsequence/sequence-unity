@@ -23,12 +23,14 @@ namespace Sequence.WaaS
         private OpenIdAuthenticator _authenticator;
         private IValidator _validator;
         private string _challengeSession;
+        private string _builderApiKey;
 
-        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, string urlScheme, IValidator validator = null)
+        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, string builderApiKey, IValidator validator = null)
         {
             _awsConfig = awsConfig;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
+            _builderApiKey = builderApiKey;
             _authenticator = new OpenIdAuthenticator();
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
@@ -170,7 +172,8 @@ namespace Sequence.WaaS
                 sessionWallet,
                 "Unknown",
                 _waasProjectId,
-                _waasVersion);
+                _waasVersion,
+                _builderApiKey);
             string loginPayload = AssembleLoginPayloadJson(idToken, sessionWallet);
 
             try
@@ -179,7 +182,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.session.id;
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
+                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion, _builderApiKey);
                 WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);

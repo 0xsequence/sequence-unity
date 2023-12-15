@@ -16,11 +16,11 @@ namespace Sequence.WaaS
         private HttpClient _httpClient;
         private IntentSender _intentSender;
 
-        public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion)
+        public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion, string builderApiKey)
         {
             _address = address;
-            _httpClient = new HttpClient("https://d14tu8valot5m0.cloudfront.net/rpc/WaasWallet");
-            _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
+            _httpClient = new HttpClient("https://api.sequence.app/rpc");
+            _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion, builderApiKey);
             SessionId = sessionId;
         }
 
@@ -41,7 +41,7 @@ namespace Sequence.WaaS
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
         {
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
-                "API/IsValidMessageSignature", args, null, "https://api.sequence.app/rpc/");
+                "API/IsValidMessageSignature", args);
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;

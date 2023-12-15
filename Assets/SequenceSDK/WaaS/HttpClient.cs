@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Sequence.Authentication;
+using Sequence.Config;
 using Sequence.Provider;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -26,6 +27,8 @@ namespace Sequence.WaaS
         {
             _url = url;
             this._defaultHeaders = new Dictionary<string, string>();
+            _defaultHeaders["Content-Type"] = "application/json";
+            _defaultHeaders["Accept"] = "application/json";
         }
 
         public void AddDefaultHeader(string key, string value)
@@ -42,8 +45,6 @@ namespace Sequence.WaaS
             }
             string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             UnityWebRequest request = UnityWebRequest.Get(url);
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Accept", "application/json");
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
             request.uploadHandler = new UploadHandlerRaw(requestData);
@@ -52,6 +53,16 @@ namespace Sequence.WaaS
             if (headers == null)
             {
                 headers = _defaultHeaders;
+            }
+            else
+            {
+                foreach (string key in _defaultHeaders.Keys)
+                {
+                    if (!headers.ContainsKey(key))
+                    {
+                        headers[key] = _defaultHeaders[key];
+                    }
+                }
             }
             
             foreach (string key in headers.Keys)
@@ -110,7 +121,7 @@ namespace Sequence.WaaS
         private string ExtractHeaders(UnityWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
-            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant"})
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Token"})
             {
                 string headerValue = request.GetRequestHeader(headerKey);
                 if (string.IsNullOrEmpty(headerValue))

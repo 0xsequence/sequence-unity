@@ -23,8 +23,9 @@ namespace Sequence.WaaS
         private Wallet.IWallet _sessionWallet;
         private int _waasProjectId;
         private string _waasVersion;
+        private string _builderApiKey;
 
-        public IntentSender(HttpClient httpClient, DataKey dataKey, Wallet.IWallet sessionWallet, string sessionId, int waasProjectId, string waasVersion)
+        public IntentSender(HttpClient httpClient, DataKey dataKey, Wallet.IWallet sessionWallet, string sessionId, int waasProjectId, string waasVersion, string builderApiKey)
         {
             _httpClient = httpClient;
             _dataKey = dataKey;
@@ -32,6 +33,7 @@ namespace Sequence.WaaS
             SessionId = sessionId;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
+            _builderApiKey = builderApiKey;
         }
 
         public async Task<T> SendIntent<T, T2>(T2 args)
@@ -105,6 +107,7 @@ namespace Sequence.WaaS
             WaaSPayload intent = new WaaSPayload(_dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("X-Sequence-Tenant", _waasProjectId.ToString());
+            headers.Add("X-Access-Token", _builderApiKey);
             if (typeof(T) == typeof(IntentReturn<TransactionReturn>))
             {
                 var transactionReturn = await SendTransactionIntent(intent, headers);
