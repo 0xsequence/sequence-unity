@@ -16,12 +16,7 @@ namespace Editor
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
-            OpenIdAuthenticatorConfig config = Resources.Load<OpenIdAuthenticatorConfig>("OpenIdAuthenticatorConfig");
-            if (config == null)
-            {
-                throw new Exception("OpenIdAuthenticatorConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > OpenIdAuthenticatorConfig");
-                return;
-            }
+            SequenceConfig config = SequenceConfig.GetConfig();
             _urlScheme = config.UrlScheme;
             
             if (target == BuildTarget.iOS)
