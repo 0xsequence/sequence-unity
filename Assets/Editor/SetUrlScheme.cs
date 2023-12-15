@@ -25,14 +25,14 @@ namespace Editor
             }
             _urlScheme = config.UrlScheme;
             
-            _plistPath = Path.Combine(pathToBuiltProject, "Contents/Info.plist");
-
             if (target == BuildTarget.iOS)
             {
+                _plistPath = Path.Combine(pathToBuiltProject, "Info.plist");
                 SetPlistUrlScheme();
             }
             else if (target == BuildTarget.StandaloneOSX)
             {
+                _plistPath = Path.Combine(pathToBuiltProject, "Contents/Info.plist");
                 SetPlistUrlScheme();
             }
 
@@ -66,26 +66,6 @@ namespace Editor
                         newArray.values.Add(new PlistElementString(_urlScheme));
                     }
                 }
-            }
-
-            plist.WriteToFile(_plistPath);
-        }
-
-        private static void AddPlistValue(string key, PlistElement[] elements)
-        {
-            PlistDocument plist = new PlistDocument();
-            plist.ReadFromFile(_plistPath);
-
-            PlistElementDict rootDict = plist.root;
-            if (rootDict.values.ContainsKey(key) && rootDict.values[key] is PlistElementArray existingArray)
-            {
-                existingArray.values.AddRange(elements);
-            }
-            else
-            {
-                PlistElementArray newArray = new PlistElementArray();
-                newArray.values.AddRange(elements);
-                rootDict.values[key] = newArray;
             }
 
             plist.WriteToFile(_plistPath);
