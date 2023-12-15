@@ -23,7 +23,7 @@ namespace Sequence.Authentication
         private static readonly string DiscordClientId = ""; // Todo replace
         private static readonly string FacebookClientId = ""; // Todo replace
         private static readonly string AppleClientId = ""; // Todo replace
-        private static readonly string RedirectUrl = "https://3d41-142-115-54-118.ngrok-free.app/";
+        private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
         private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
@@ -99,7 +99,7 @@ namespace Sequence.Authentication
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
             string url =
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
