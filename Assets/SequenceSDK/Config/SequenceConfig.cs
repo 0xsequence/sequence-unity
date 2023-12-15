@@ -6,8 +6,22 @@ namespace Sequence.Config
     [CreateAssetMenu(fileName = "SequenceConfig", menuName = "Sequence/SequenceConfig", order = 1)]
     public class SequenceConfig : ScriptableObject
     {
-        [Header("URL Scheme Configuration")]
+        [Header("Social Sign In Configuration")]
         public string UrlScheme = "sdk-powered-by-sequence";
+        
+        [Header("AWS Configuration")]
+        public string Region = "us-east-2";
+        public string IdentityPoolId = "us-east-2:42c9f39d-c935-4d5c-a845-5c8815c79ee3";
+        public string KMSEncryptionKeyId = "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d";
+        public string CognitoClientId = "5fl7dg7mvu534o9vfjbc6hj31p";
+        
+        [Header("WaaS Configuration")]
+        public int WaaSProjectId = 9;
+        public string WaaSVersion = "1.0.0";
+
+        [Header("Sequence SDK Configuration")] 
+        public string BuilderAPIKey_Prod;
+        public string BuilderAPIKey_Dev;
 
         public static SequenceConfig GetConfig()
         {
