@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -13,9 +14,9 @@ namespace Sequence.Authentication
     {
         public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
+        public static string UrlScheme = "sequence-try-something-fun";
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
-        public static readonly string UrlScheme = "powered-by-sequence";
         
         private static readonly string GoogleClientId = "970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com";
         private static readonly string DiscordClientId = ""; // Todo replace
@@ -25,13 +26,6 @@ namespace Sequence.Authentication
         
         private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
-
-        private string _urlScheme;
-
-        public OpenIdAuthenticator(string urlScheme)
-        {
-            _urlScheme = urlScheme;
-        }
 
         public void GoogleSignIn()
         {
@@ -91,7 +85,7 @@ namespace Sequence.Authentication
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
             string url =
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={UrlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();

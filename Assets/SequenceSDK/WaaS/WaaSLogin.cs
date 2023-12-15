@@ -29,7 +29,7 @@ namespace Sequence.WaaS
             _awsConfig = awsConfig;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
-            _authenticator = new OpenIdAuthenticator(urlScheme);
+            _authenticator = new OpenIdAuthenticator();
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
