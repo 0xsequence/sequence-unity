@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Sequence.Authentication.ScriptableObjects;
+using Sequence.Config;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Sequence.Authentication.ScriptableObjects
+namespace Sequence.Config
 {
     [CreateAssetMenu(fileName = "OpenIdAuthenticatorConfig", menuName = "Sequence/OpenIdAuthenticatorConfig", order = 1)]
     public class OpenIdAuthenticatorConfig : ScriptableObject

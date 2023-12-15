@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Sequence.Authentication;
-using Sequence.Authentication.ScriptableObjects;
+using Sequence.Config;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
