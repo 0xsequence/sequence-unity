@@ -42,5 +42,24 @@ namespace Sequence.WaaS
             this.tokenIds = tokenIds;
             this.tokenAmounts = tokenAmounts;
         }
+        
+        public Transaction(Chain chainId, string from, string to, string autoGas = null, BigInteger? nonce = null, string value = null, string calldata = null, string tokenAddress = null, string tokenAmount = null, string[] tokenIds = null, string[] tokenAmounts = null)
+        {
+            this.chainId = (uint)chainId;
+            this.from = from;
+            if (to == StringExtensions.ZeroAddress)
+            {
+                to = WaaSZeroAddress;
+            }
+            this.to = to;
+            this.autoGas = autoGas;
+            this.nonce = nonce;
+            this.value = value;
+            this.calldata = calldata;
+            this.tokenAddress = tokenAddress;
+            this.tokenAmount = tokenAmount;
+            this.tokenIds = tokenIds;
+            this.tokenAmounts = tokenAmounts;
+        }
     }
 }
