@@ -1,5 +1,5 @@
 {
-    "name": "WaaSTests",
+    "name": "SequenceWaaSEndToEndTests",
     "rootNamespace": "Sequence.WaaS.Tests",
     "references": [
         "GUID:68e161619428e430bba22d7d0a9548ab",
@@ -12,16 +12,11 @@
         "GUID:72aec190c59574cbabd6cbdd81011e4d",
         "GUID:a35e3a53d4439435f8b36ed2c6158cd8"
     ],
-    "includePlatforms": [
-        "Editor",
-        "macOSStandalone"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
