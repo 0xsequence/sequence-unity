@@ -4,8 +4,10 @@ using Sequence.Authentication;
 using Sequence.Authentication.ScriptableObjects;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.iOS.Xcode;
 using UnityEngine;
+#if UNITY_IOS || UNITY_STANDALONE_OSX
+using UnityEditor.iOS.Xcode;
+#endif
 
 namespace Editor
 {
@@ -41,6 +43,7 @@ namespace Editor
 
         private static void SetPlistUrlScheme()
         {
+#if UNITY_IOS || UNITY_STANDALONE_OSX
             PlistDocument plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
 
@@ -69,6 +72,7 @@ namespace Editor
             }
 
             plist.WriteToFile(_plistPath);
+#endif
         }
     }
 }

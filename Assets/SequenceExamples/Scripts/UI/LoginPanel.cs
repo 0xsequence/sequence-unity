@@ -9,7 +9,7 @@ namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
-        public string UrlScheme = "sdk-powered-by-sequence";
+        public static string UrlScheme = "sdk-powered-by-sequence";
         
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
@@ -76,7 +76,7 @@ namespace Sequence.Demo
         private static void PassDeepLinkViaLocalServer()
         {
             var args = System.Environment.GetCommandLineArgs();
-            if (args.Length > 1 && args[1].StartsWith(OpenIdAuthenticator.UrlScheme))
+            if (args.Length > 1 && args[1].StartsWith(UrlScheme))
             {
                 var socketConnection = new TcpClient("localhost", OpenIdAuthenticator.WINDOWS_IPC_PORT);
                 var bytes = System.Text.Encoding.ASCII.GetBytes("@@@@" + args[1] + "$$$$");
