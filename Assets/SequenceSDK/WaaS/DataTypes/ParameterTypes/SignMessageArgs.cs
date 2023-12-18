@@ -15,5 +15,12 @@ namespace Sequence.WaaS
             this.walletAddress = walletAddress;
             this.message = message;
         }
+        
+        public SignMessageArgs(Chain chainId, string walletAddress, string message)
+        {
+            this.chainId = (uint)chainId;
+            this.walletAddress = walletAddress;
+            this.message = message;
+        }
     }
 }
