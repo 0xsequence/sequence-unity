@@ -33,7 +33,8 @@ namespace Sequence.Demo
                 config.IdentityPoolId, 
                 config.KMSEncryptionKeyId,
                 config.CognitoClientId),
-                config.WaaSProjectId, config.WaaSVersion, config.BuilderAPIKey_Prod);
+                config.WaaSProjectId, 
+                config.WaaSVersion);
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();

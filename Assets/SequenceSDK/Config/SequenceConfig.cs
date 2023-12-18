@@ -23,16 +23,21 @@ namespace Sequence.Config
         public string BuilderAPIKey_Prod;
         public string BuilderAPIKey_Dev;
 
+        private static SequenceConfig _config;
+
         public static SequenceConfig GetConfig()
         {
-            SequenceConfig config = Resources.Load<SequenceConfig>("SequenceConfig");
+            if (_config == null)
+            {
+                _config = Resources.Load<SequenceConfig>("SequenceConfig");
+            }
 
-            if (config == null)
+            if (_config == null)
             {
                 throw new Exception("SequenceConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > SequenceConfig");
             }
 
-            return config;
+            return _config;
         }
     }
 }

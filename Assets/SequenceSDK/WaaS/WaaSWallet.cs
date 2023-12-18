@@ -16,11 +16,11 @@ namespace Sequence.WaaS
         private HttpClient _httpClient;
         private IntentSender _intentSender;
 
-        public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion, string builderApiKey)
+        public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion)
         {
             _address = address;
             _httpClient = new HttpClient("https://api.sequence.app/rpc");
-            _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion, builderApiKey);
+            _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
             SessionId = sessionId;
         }
 

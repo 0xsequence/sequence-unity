@@ -29,6 +29,7 @@ namespace Sequence.WaaS
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
+            _defaultHeaders["X-Access-Token"] = SequenceConfig.GetConfig().BuilderAPIKey_Prod;
         }
 
         public void AddDefaultHeader(string key, string value)
