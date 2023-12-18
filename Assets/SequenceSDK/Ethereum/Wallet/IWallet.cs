@@ -1,23 +1,29 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using NBitcoin.Secp256k1;
 using Sequence.ABI;
+using Sequence.Extensions;
 using Sequence.Provider;
-using Sequence.Utils;
+using Sequence.Signer;
+using Sequence.Transactions;
+using Sequence.Ethereum.Utils;
 using UnityEngine;
 
 namespace Sequence.Wallet
 {
     public interface IWallet 
     {
-        public Address GetAddress();
-        public Task<BigInteger> GetBalance(IEthClient client);
-        public Task<BigInteger> GetNonce(IEthClient client);
-        public (string v, string r, string s) SignTransaction(byte[] message, string chainId);
-        public Task<string> SendRawTransaction(IEthClient client, string signedTransactionData);
-        public Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData);
+        public Address GetAddress(uint accountIndex = 0);
+        public Task<string> SendTransaction(IEthClient client, EthTransaction transaction);
+        public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction);
+        public Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions);
+
+        public Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client,
+            EthTransaction[] transactions);
 
         /// <summary>
         /// 
@@ -34,22 +40,26 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a byte array.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(byte[] message);
+        public Task<string> SignMessage(byte[] message, byte[] chainId = null);
 
         /// <summary>
         /// Signs a message with the wallet's private key.
         /// </summary>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string message);
+        public Task<string> SignMessage(string message, string chainId = null);
 
         /// <summary>
         /// Verifies the validity of a signature for a given message.
         /// </summary>
         /// <param name="signature">The signature to verify.</param>
         /// <param name="message">The message that was signed.</param>
+        /// <param name="accountIndex"></param>
+        /// <param name="chainId"></param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public bool IsValidSignature(string signature, string message);
+        public Task<bool> IsValidSignature(string signature, string message, string chainId = "", uint accountIndex = 0);
+
+        
 
         /// <summary>
         /// Recovers the Ethereum address from a message and its signature.
@@ -57,8 +67,37 @@ namespace Sequence.Wallet
         /// <param name="message">The message that was signed.</param>
         /// <param name="signature">The signature of the message.</param>
         /// <returns>The Ethereum address as a string.</returns>
-        public string Recover(string message, string signature);
+        public static string Recover(string message, string signature)
+        {
+            byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
+            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
 
+            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
+            ECPubKey _pubkey;
+            var ctx = Context.Instance;
+            ECPubKey.TryRecover(ctx, recoverble, hashedMessage, out _pubkey);
+
+            byte[] publickeyBytes = _pubkey.ToBytes(false);
+            byte[] publicKeyBytes64 = new byte[64];
+            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64); //trim extra 0 at the beginning...
+
+            return PubkeyToAddress(publicKeyBytes64);
+        }
+
+        /// <summary>
+        /// Converts a public key to an Ethereum address.
+        /// </summary>
+        /// <param name="pubkey">The public key byte array.</param>
+        /// <returns>The Ethereum address derived from the public key.</returns>
+        internal static string PubkeyToAddress(byte[] pubkey)
+        {
+            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(pubkey));
+            int length = hashed.Length;
+            string address = hashed.Substring(length - 40);
+
+            address = SequenceCoder.AddressChecksum(address);
+            return address;
+        }
 
         /// <summary>
         /// Adds the Ethereum Signed Message prefix to a message.
@@ -72,7 +111,7 @@ namespace Sequence.Wallet
             byte[] messageLen = Encoding.UTF8.GetBytes((message.Length).ToString());
             if (!message.Take(message191.Length).SequenceEqual(message191))
             {
-                message = ByteArrayExtensions.ConcatenateByteArrays(message191 , messageLen, message);
+                message = ByteArrayExtensions.ConcatenateByteArrays(message191, messageLen, message);
             }
 
             return message;

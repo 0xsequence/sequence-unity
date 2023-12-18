@@ -3,35 +3,38 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Sequence.Core.Wallet;
-using Sequence.Core.Provider;
+using Sequence.Core;
+using System;
+using System.Threading.Tasks;
+using Sequence.Core.V2;
 
 namespace Sequence.Core.Signature
 {
     public interface ISignature
     {
         // Threshold is the minimum signing weight required for a signature to be valid.
-        int Threshold();
+        UInt16 Threshold();
 
         // Checkpoint is the nonce of the wallet configuration that the signature applies to.
-        BigInteger Checkpoint();
+        UInt32 Checkpoint();
 
         // Recover derives the wallet configuration that the signature applies to.
         // Also returns the signature's weight.
         // If chainID is not provided, provider must be provided.
         // If provider is not provided, EIP-1271 signatures are assumed to be valid.
         // If signerSignatures is provided, it will be populated with the valid signer signatures of this signature.
-        (IWalletConfig, BigInteger) Recover(WalletContext context, 
+        Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, 
                                             Digest digest, 
                                             Address wallet,
                                             BigInteger chainId,
                                             RPCProvider provider,
-                                            List<SignerSignatures> signerSignatures);
+                                            params SignerSignatures[] signerSignatures);
 
         // Recover a signature but only using the subdigest
         (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, 
                                                     Subdigest subdigest, 
                                                     RPCProvider provider,
-                                                    List<SignerSignatures> signerSignatures);
+                                                    params SignerSignatures[] signerSignatures);
 
         // Reduce returns an equivalent optimized signature.
         ISignature Reduce(Subdigest subdigest);

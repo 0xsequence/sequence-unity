@@ -197,7 +197,7 @@ namespace Sequence.Provider
 		/// <param name="address"></param>
 		/// <param name="blockNumber"></param>
 		/// <returns></returns>
-		Task<BigInteger> BalanceAt(string address, string blockNumber);
+		Task<BigInteger> BalanceAt(string address, string blockNumber = null);
 
 
 		/// <summary>

@@ -35,9 +35,11 @@ public class ERC721Tests
     {
         try
         {
-            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, bytecode);
+            ContractDeploymentResult result = await ContractDeployer.Deploy(client, wallet1, bytecode);
+            TransactionReceipt receipt = result.Receipt;
             contractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(contractAddress);
+            Assert.AreEqual(contractAddress, result.PreCalculatedContractAddress);
         }
         catch (Exception ex)
         {
@@ -79,9 +81,11 @@ public class ERC721Tests
         try
         {
             // Deploy an autoincrementing NFT contract so we can test the other mint function
-            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, autoIncrementingIdVersionBytecode);
+            ContractDeploymentResult result = await ContractDeployer.Deploy(client, wallet1, autoIncrementingIdVersionBytecode);
+            TransactionReceipt receipt = result.Receipt;
             string autoIncrementingContractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(autoIncrementingContractAddress);
+            Assert.AreEqual(autoIncrementingContractAddress, result.PreCalculatedContractAddress);
             ERC721 autoIncrementingToken = new ERC721(autoIncrementingContractAddress, autoIncrementingAbi);
 
             // Mint an auto incrementing token to random address so that index starts at one like with the other contract

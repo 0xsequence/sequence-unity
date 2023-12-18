@@ -1,4 +1,4 @@
-using Sequence.Core.Provider;
+using Sequence.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,12 +75,7 @@ namespace Sequence.Core.V2
 
             IWalletConfigTree tree = WalletConfigTreeDecoder.Decode(treeDict);
 
-            return new WalletConfig
-            {
-                threshold = threshold,
-                checkpoint = checkpoint,
-                tree = tree,
-            };
+            return new WalletConfig(threshold, checkpoint, tree);
         }
     }
 }

@@ -5,13 +5,14 @@ using System;
 using System.Numerics;
 using Sequence.Core.Signature;
 using Sequence.Core.Wallet;
-using Sequence.Core.Provider;
+using Sequence.Core;
+using System.Threading.Tasks;
 
 namespace Sequence.Core.V2.Signature
 {
     public class ChainedSignature : ISignature
     {
-        public BigInteger Checkpoint()
+        public uint Checkpoint()
         {
             throw new NotImplementedException();
         }
@@ -26,12 +27,12 @@ namespace Sequence.Core.V2.Signature
             throw new NotImplementedException();
         }
 
-        public (IWalletConfig, BigInteger) Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public Task<(IWalletConfig, BigInteger)> Recover(WalletContext context, Digest digest, Address wallet, BigInteger chainId, RPCProvider provider, params SignerSignatures[] signerSignatures)
         {
             throw new NotImplementedException();
         }
 
-        public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, List<SignerSignatures> signerSignatures)
+        public (IWalletConfig, BigInteger) RecoverSubdigest(WalletContext context, Subdigest subdigest, RPCProvider provider, params SignerSignatures[] signerSignatures)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +42,7 @@ namespace Sequence.Core.V2.Signature
             throw new NotImplementedException();
         }
 
-        public int Threshold()
+        public ushort Threshold()
         {
             throw new NotImplementedException();
         }

@@ -71,8 +71,8 @@ namespace Sequence.Signer
                 signature.WriteToSpanCompact(sigHash64, out recId);
                 signature.Deconstruct(out r, out s, out recId);
                 BigInteger v = recId + chainId * 2 + 35;
-                R = r.ToBytes();//new BigInteger(1, r.ToBytes()).ToByteArrayUnsigned();
-                S = s.ToBytes();//new BigInteger(1, s.ToBytes()).ToByteArrayUnsigned();
+                R = r.ToBytes();
+                S = s.ToBytes();
                 V = v.BigIntegerToHexString();
 
                 return GetSignatureForTransaction();

@@ -5,7 +5,7 @@ using Sequence.Core.Signature;
 
 namespace Sequence.Core.V2.Wallet.ConfigTree
 {
-    public class WalletConfigTreeNestedLeaf : IWalletConfigTree
+    public class WalletConfigTreeNestedLeaf : IWalletConfigTree, IImageHashable
     {
         public string Weight { get; set; }
         public ushort Threshold { get; set; }

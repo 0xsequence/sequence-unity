@@ -1,7 +1,7 @@
 using System;
 using Sequence.ABI;
 
-namespace Sequence.Utils
+namespace Sequence.Extensions
 {
     public static class ByteArrayExtensions
     {

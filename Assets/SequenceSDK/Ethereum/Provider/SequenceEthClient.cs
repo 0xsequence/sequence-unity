@@ -42,8 +42,12 @@ namespace Sequence.Provider
             }
         }
     
-        public async Task<BigInteger> BalanceAt(string address, string blockNumber)
+        public async Task<BigInteger> BalanceAt(string address, string blockNumber = null)
         {
+            if (blockNumber == null)
+            {
+                blockNumber = await BlockNumber();
+            }
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getBalance", new object[] { address, blockNumber});
             ThrowIfResponseHasErrors(response);
             string balanceHex = response.result.ToString();

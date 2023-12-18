@@ -4,6 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
+using Sequence.Provider;
 using UnityEngine;
 using Sequence.Wallet;
 using Sequence.Utils;
@@ -12,13 +14,13 @@ namespace Sequence.Transactions
 {
     public class EthTransaction
     {
-        BigInteger Nonce{ get; set; }
-        BigInteger GasPrice { get; set; }
-        BigInteger GasLimit { get; set; }
-        string To { get; set; }
-        BigInteger Value { get; set; }
-        string Data { get; set; }
-        string ChainId { get; set; }
+        public BigInteger Nonce{ get; private set; }
+        public BigInteger GasPrice { get; private set; }
+        public BigInteger GasLimit { get; private set; }
+        public string To { get; private set; }
+        public BigInteger Value { get; private set; }
+        public string Data { get; private set; }
+        public string ChainId { get; private set; }
 
         string V { get; set; }
         string R { get; set; }
@@ -132,7 +134,7 @@ namespace Sequence.Transactions
             }
         }
 
-        public string SignAndEncodeTransaction(IWallet wallet)
+        public string SignAndEncodeTransaction(EthWallet wallet)
         {
             string encoded_signing = this.RLPEncode();
             string signingHash = SequenceCoder.KeccakHash(encoded_signing).EnsureHexPrefix();
@@ -142,6 +144,11 @@ namespace Sequence.Transactions
             this.S = s;
             string tx = this.RLPEncode();
             return tx;
+        }
+
+        public void IncrementNonceBy(int i)
+        {
+            this.Nonce += i;
         }
     }
 }

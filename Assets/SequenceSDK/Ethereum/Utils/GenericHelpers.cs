@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.Utils
+namespace Sequence.Ethereum.Utils
 {
     public static class GenericHelpers
     {
@@ -26,7 +26,7 @@ namespace Sequence.Utils
 
             return result;
         }
-
+        
         public static bool SequenceEqual<T>(this T[] first, T[] second)
         {
             if (first == null)

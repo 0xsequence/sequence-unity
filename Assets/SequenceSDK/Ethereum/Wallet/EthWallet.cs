@@ -10,7 +10,10 @@ using System.Text;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Extensions;
+using Sequence.Transactions;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Wallet
 {
@@ -52,11 +55,16 @@ namespace Sequence.Wallet
 
             Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64);
 
-            return PubkeyToAddress(publicKeyBytes64);
+            return IWallet.PubkeyToAddress(publicKeyBytes64);
         }
 
-        public Address GetAddress()
+        public Address GetAddress(uint accountIndex = 0)
         {
+            if (accountIndex != 0)
+            {
+                Debug.LogWarning("EthWallet has no concept of accountIndex. There is only one Address/account per EthWallet.");
+            }
+            
             if (address == null)
             {
                 address = new Address(GenerateAddress());
@@ -75,23 +83,60 @@ namespace Sequence.Wallet
             return await client.NonceAt(GetAddress());
         }
 
+        public Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
+        {
+            string signedTransaction = transaction.SignAndEncodeTransaction(this);
+            return SendRawTransaction(client, signedTransaction);
+        }
+
+        public async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
+        {
+            string result = await SendTransaction(client, transaction);
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
+            return receipt;
+        }
+
+        public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
+        {
+            int transactionCount = transactions.Length;
+            string[] transactionHashes = new string[transactionCount];
+            for (int i = 0; i < transactionCount; i++)
+            {
+                transactions[i].IncrementNonceBy(i);
+                transactionHashes[i] = await SendTransaction(client, transactions[i]);
+            }
+            
+            return transactionHashes;
+        }
+
+        public async Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client, EthTransaction[] transactions)
+        {
+            string[] transactionHashes = await SendTransactionBatch(client, transactions);
+            int transactionCount = transactions.Length;
+            if (transactionCount != transactionHashes.Length)
+            {
+                throw new SystemException("Invalid system state: didn't receive as many transaction hashes as transactions");
+            }
+
+            TransactionReceipt[] receipts = new TransactionReceipt[transactionCount];
+            for (int i = 0; i < transactionCount; i++)
+            {
+                receipts[i] = await client.WaitForTransactionReceipt(transactionHashes[i]);
+            }
+
+            return receipts;
+        }
+
         public (string v, string r, string s) SignTransaction(byte[] message, string chainId)
         {
             int id = chainId.HexStringToInt();
             return EthSignature.SignAndReturnVRS(message, privKey, id);
         }
 
-        public async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
+        private async Task<string> SendRawTransaction(IEthClient client, string signedTransactionData)
         {
             string result = await client.SendRawTransaction(signedTransactionData);
             return result;
-        }
-
-        public async Task<TransactionReceipt> SendRawTransactionAndWaitForReceipt(IEthClient client, string signedTransactionData)
-        {
-            string result = await SendRawTransaction(client, signedTransactionData);
-            TransactionReceipt receipt = await client.WaitForTransactionReceipt(result);
-            return receipt;
         }
 
         /// <summary>
@@ -109,8 +154,12 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a byte array.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(byte[] message)
+        public async Task<string> SignMessage(byte[] message, byte[] chainId = null)
         {
+            if (chainId != null && chainId.Length > 0)
+            {
+                message = ByteArrayExtensions.ConcatenateByteArrays(message, chainId);
+            }
             byte[] message32 = SequenceCoder.KeccakHash(PrefixedMessage(message));
             return EthSignature.Sign(message32, privKey);
         }
@@ -121,10 +170,15 @@ namespace Sequence.Wallet
         /// </summary>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string message)
+        public Task<string> SignMessage(string message, string chainId = null)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-            return SignMessage(messageBytes);
+            byte[] chainIdBytes = null;
+            if (chainId != null)
+            {
+                chainIdBytes = Encoding.UTF8.GetBytes(chainId);
+            }
+            return SignMessage(messageBytes, chainIdBytes);
         }
 
         /// <summary>
@@ -133,7 +187,7 @@ namespace Sequence.Wallet
         /// <param name="privateKey">The private key as a hexadecimal string.</param>
         /// <param name="message">The message to sign as a string.</param>
         /// <returns>The signature as a string.</returns>
-        public string SignMessage(string privateKey, string message)
+        public string SignMessageWithPrivateKey(string privateKey, string message)
         {
             byte[] message32 = new byte[32];
             message32 = SequenceCoder.KeccakHash(PrefixedMessage(Encoding.UTF8.GetBytes(message)));
@@ -163,43 +217,25 @@ namespace Sequence.Wallet
         /// <param name="signature">The signature to verify.</param>
         /// <param name="message">The message that was signed.</param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public bool IsValidSignature(string signature, string message)
+        public async Task<bool> IsValidSignature(string signature, string message, string chainId = "", uint accountIndex = 0)
         {
-            byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
-            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
-
-            if (recoverble != null)
+            byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+            if (chainId != null && chainId.Length > 0)
             {
-                SecpECDSASignature sig = recoverble.ToSignature();
+                messageBytes = ByteArrayExtensions.ConcatenateByteArrays(messageBytes, Encoding.UTF8.GetBytes(chainId));
+            }
+            byte[] messagePrefix = PrefixedMessage(messageBytes);
+            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
+            SecpRecoverableECDSASignature recoverable = EthSignature.GetSignature(signature);
+
+            if (recoverable != null)
+            {
+                SecpECDSASignature sig = recoverable.ToSignature();
 
                 return pubKey.SigVerify(sig, hashedMessage);
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Recovers the Ethereum address from a message and its signature.
-        /// </summary>
-        /// <param name="message">The message that was signed.</param>
-        /// <param name="signature">The signature of the message.</param>
-        /// <returns>The Ethereum address as a string.</returns>
-        public string Recover(string message, string signature)
-        {
-            byte[] messagePrefix = PrefixedMessage(Encoding.UTF8.GetBytes(message));
-            byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
-
-            SecpRecoverableECDSASignature recoverble = EthSignature.GetSignature(signature);
-            ECPubKey _pubkey;
-            var ctx = Context.Instance;
-            ECPubKey.TryRecover(ctx, recoverble, hashedMessage, out _pubkey);
-
-            byte[] publickeyBytes = _pubkey.ToBytes(false);
-            byte[] publicKeyBytes64 = new byte[64];
-            Array.Copy(publickeyBytes, 1, publicKeyBytes64, 0, 64); //trim extra 0 at the beginning...
-
-            return PubkeyToAddress(publicKeyBytes64);
         }
 
         /// <summary>
@@ -212,19 +248,9 @@ namespace Sequence.Wallet
             return IWallet.PrefixedMessage(message);
         }
 
-        /// <summary>
-        /// Converts a public key to an Ethereum address.
-        /// </summary>
-        /// <param name="pubkey">The public key byte array.</param>
-        /// <returns>The Ethereum address derived from the public key.</returns>
-        private string PubkeyToAddress(byte[] pubkey)
+        public string Recover(string message, string signature)
         {
-            string hashed = SequenceCoder.ByteArrayToHexString(SequenceCoder.KeccakHash(pubkey));
-            int length = hashed.Length;
-            string address = hashed.Substring(length - 40);
-
-            address = SequenceCoder.AddressChecksum(address);
-            return address;
+            return IWallet.Recover(message, signature);
         }
     }
 }

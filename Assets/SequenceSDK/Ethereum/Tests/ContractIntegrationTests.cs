@@ -32,8 +32,8 @@ public class ContractIntegrationTests
     {
         try
         {
-            TransactionReceipt receipt = await ContractDeployer.Deploy(client, wallet1, complexContractBytecode);
-            complexContractAddress = receipt.contractAddress;
+            ContractDeploymentResult receipt = await ContractDeployer.Deploy(client, wallet1, complexContractBytecode);
+            complexContractAddress = receipt.Receipt.contractAddress;
             Assert.IsNotEmpty(complexContractAddress);
         }
         catch (Exception ex)

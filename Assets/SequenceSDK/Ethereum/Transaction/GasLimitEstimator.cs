@@ -17,7 +17,7 @@ namespace Sequence.Transactions {
             this.wallet = wallet;
         }
 
-        public TransactionCreator BuildTransactionCreator(string to, string data = null, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null) {
+        public TransactionCreator BuildTransactionCreator(string to, string data = null, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, BigInteger? nonce = null) {
             return async () => {
                 if (value == null)
                 {
@@ -44,17 +44,20 @@ namespace Sequence.Transactions {
                 {
                     gasLimit = await client.EstimateGas(call);
                 }
+                if (nonce == null)
+                {
+                    nonce = await client.NonceAt(wallet);
+                }
                 
-                BigInteger nonce = await client.NonceAt(wallet);
                 string chainId = await client.ChainID();
-                EthTransaction transaction = new EthTransaction(nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data, chainId);
+                EthTransaction transaction = new EthTransaction((BigInteger)nonce, (BigInteger)gasPrice, (BigInteger)gasLimit, to, (BigInteger)value, data, chainId);
                 return transaction;
             };
         }
 
-        public async Task<EthTransaction> BuildTransaction(string to, string data = null, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null)
+        public async Task<EthTransaction> BuildTransaction(string to, string data = null, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, BigInteger? nonce = null)
         {
-            return await BuildTransactionCreator(to, data, value, gasPrice, gasLimit)();
+            return await BuildTransactionCreator(to, data, value, gasPrice, gasLimit, nonce)();
         }
     }
 }
