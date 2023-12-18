@@ -15,6 +15,7 @@ namespace Sequence.Demo
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
         private WaaSDemoPage _waasDemoPage;
+        private static string _urlScheme;
         
         protected override void Awake()
         {
@@ -38,6 +39,11 @@ namespace Sequence.Demo
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
+            
+            if (_urlScheme == null) 
+            {
+                _urlScheme = SequenceConfig.GetConfig().UrlScheme;
+            }
         }
 
         public void SetupLoginHandler(ILogin loginHandler)
@@ -78,7 +84,11 @@ namespace Sequence.Demo
         private static void PassDeepLinkViaLocalServer()
         {
             var args = System.Environment.GetCommandLineArgs();
-            if (args.Length > 1 && args[1].StartsWith(OpenIdAuthenticator.UrlScheme))
+            if (_urlScheme == null) 
+            {
+                _urlScheme = SequenceConfig.GetConfig().UrlScheme;
+            }
+            if (args.Length > 1 && args[1].StartsWith(_urlScheme))
             {
                 var socketConnection = new TcpClient("localhost", OpenIdAuthenticator.WINDOWS_IPC_PORT);
                 var bytes = System.Text.Encoding.ASCII.GetBytes("@@@@" + args[1] + "$$$$");
