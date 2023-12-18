@@ -37,7 +37,8 @@ namespace Sequence.WaaS
             this._defaultHeaders[key] = value;
         }
 
-        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        public (UnityWebRequest, string, string) BuildRequest<T>(string path, T args,
+            [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             string url = _url + "/" + path;
             if (overrideUrl != null)
@@ -74,7 +75,16 @@ namespace Sequence.WaaS
             string method = request.method;
             string headersString = ExtractHeaders(request);
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
-            Debug.Log("Equivalent curl command: " + curlRequest);
+
+            return (request, curlRequest, url);
+        }
+
+        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        {
+            (UnityWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
+            UnityWebRequest request = newRequest.Item1;
+            string curlRequest = newRequest.Item2;
+            string url = newRequest.Item3;
 
             try
             {
