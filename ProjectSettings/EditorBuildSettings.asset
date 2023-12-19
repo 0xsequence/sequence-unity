@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 0
+  - enabled: 1
     path: Assets/SequenceExamples/Scenes/Demo.unity
     guid: 4dfb06a7c845a4513907bd9b1a335575
-  - enabled: 1
+  - enabled: 0
     path: Assets/SequenceSDK/WaaS/Tests/EndToEnd/WaaSEndToEndTests.unity
     guid: 6a48e95d2401d41339a9d99c129ae1f9
   m_configObjects:
