@@ -1,7 +1,7 @@
 namespace Sequence
 {
     [System.Serializable]
-    public class Transaction
+    public class ClientTransaction
     {
         public string blockHash;
         public string blockNumber;
