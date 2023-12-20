@@ -9,6 +9,10 @@ namespace Sequence.Config
     {
         [Header("Social Sign In Configuration")]
         public string UrlScheme = "sdk-powered-by-sequence";
+        public string GoogleClientId;
+        public string DiscordClientId;
+        public string FacebookClientId;
+        public string AppleClientId;
         
         [Header("AWS Configuration")]
         public string Region = "us-east-2";
