@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Sequence.Config
 {
@@ -20,9 +21,7 @@ namespace Sequence.Config
         public string WaaSVersion = "1.0.0";
 
         [Header("Sequence SDK Configuration")] 
-        public string BuilderAPIKey_Prod;
-        public string BuilderAPIKey_Dev;
-
+        public string BuilderAPIKey;
         private static SequenceConfig _config;
 
         public static SequenceConfig GetConfig()
