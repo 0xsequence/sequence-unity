@@ -41,8 +41,28 @@ namespace Sequence.Authentication
             }
             else
             {
-                OnLoginSuccess?.Invoke("1234567890");
+                OnLoginSuccess?.Invoke("1234567890", "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
             }
+        }
+
+        public void GoogleLogin()
+        {
+            OnLoginSuccess?.Invoke("1234567890", "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+        }
+
+        public void DiscordLogin()
+        {
+            OnLoginSuccess?.Invoke("1234567890", "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+        }
+
+        public void FacebookLogin()
+        {
+            OnLoginSuccess?.Invoke("1234567890", "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+        }
+
+        public void AppleLogin()
+        {
+            OnLoginSuccess?.Invoke("1234567890", "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
         }
     }
 }

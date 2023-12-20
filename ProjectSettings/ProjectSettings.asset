@@ -221,9 +221,10 @@ PlayerSettings:
   iOSLaunchScreenCustomStoryboardPath: 
   iOSLaunchScreeniPadCustomStoryboardPath: 
   iOSDeviceRequirements: []
-  iOSURLSchemes: []
+  iOSURLSchemes:
+  - sdk-powered-by-sequence
   macOSURLSchemes:
-  - demo-dapp-sequence
+  - sdk-powered-by-sequence
   iOSBackgroundModes: 0
   iOSMetalForceHardShadows: 0
   metalEditorSupport: 1
@@ -813,14 +814,15 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    Android: VUPLEX_CCU;VUPLEX_STANDALONE
+    Android: 
     Server: 
-    Standalone: VUPLEX_CCU;VUPLEX_STANDALONE
+    Standalone: 
     WebGL: VUPLEX_CCU;VUPLEX_STANDALONE
     iPhone: VUPLEX_CCU;VUPLEX_STANDALONE
   additionalCompilerArguments: {}
   platformArchitecture: {}
-  scriptingBackend: {}
+  scriptingBackend:
+    Standalone: 0
   il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}

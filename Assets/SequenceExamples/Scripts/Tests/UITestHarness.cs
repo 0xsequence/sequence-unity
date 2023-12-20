@@ -98,10 +98,17 @@ namespace SequenceExamples.Scripts.Tests
         }
 
         [UnityTest]
-        public IEnumerator LoginFlowTest()
+        public IEnumerator LoginEmailFlowTest()
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
-            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EndToEndTest());
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EndToEndEmailFlowTest());
+        }
+
+        [UnityTest]
+        public IEnumerator LoginSocialFlowTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EndToEndSocialFlowTest());
         }
 
         [UnityTest]

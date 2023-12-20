@@ -4,6 +4,14 @@ This project is a work in progress - a version 2 for the Sequence Unity SDK
 ## Requirements
 Unity 2021.3.6f1 or later
 
+## Supported Platforms
+
+- Android
+- iOS
+- PC standalone
+- Mac standalone -> (Mono builds only when using OpenIdAuthentication -> in our testing MacOS doesn't pick up custom URL schemes automatically unless you run some system commands first; these system commands only work on Mono -> see OpenIdAuthentication.PlatformSpecificSetup)
+- WebGL (excluding OpenIdAuthentication)
+
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 
 Unity by navigating to `Window > General > Test Runner`.

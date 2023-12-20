@@ -1,5 +1,7 @@
 using System.Collections;
+using Sequence.Authentication;
 using Sequence.Demo;
+using SequenceExamples.Scripts.Tests.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -20,6 +22,8 @@ namespace SequenceExamples.Scripts.Tests
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
         private WalletPanel _walletPanel;
+        
+        private static readonly WaitForSeconds WaitForAnimationTime = new WaitForSeconds(UITestHarness.WaitForAnimationTime);
 
         public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
             MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel)
@@ -32,17 +36,32 @@ namespace SequenceExamples.Scripts.Tests
             _mfaPage = mfaPage;
             _loginSuccessPage = loginSuccessPage;
             _walletPanel = walletPanel;
+            
+            _loginPanel.SetupLoginHandler(new MockLogin());
         }
 
-        public IEnumerator EndToEndTest()
+        public IEnumerator EndToEndEmailFlowTest()
         {
             // Run all tests in one single suite to save time running test suite (otherwise, we need to reload and tear down the scene for each test
             InitialExpectationsTest();
             yield return _testMonobehaviour.StartCoroutine(TransitionToMfaPageTest());
             yield return _testMonobehaviour.StartCoroutine(TransitionToLoginSuccessPageTest());
             yield return _testMonobehaviour.StartCoroutine(GoBackToMfaPageAndVerifyPageStateTest());
-            yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest());
+            yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest("validEmail@valid.com"));
             yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageAndDismissTest());
+        }
+
+        public IEnumerator EndToEndSocialFlowTest()
+        {
+            // Run all tests in one single suite to save time running test suite (otherwise, we need to reload and tear down the scene for each test
+            InitialExpectationsTest();
+            foreach (string provider in new[] {"Google", "Discord", "Facebook", "Apple"})
+            {
+                yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageViaSocialLoginTest(provider));
+                yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest(""));
+            }
+            
+            yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageViaSocialLoginAndDismissTest("Google"));
         }
         
         private void InitialExpectationsTest()
@@ -128,7 +147,21 @@ namespace SequenceExamples.Scripts.Tests
 
             AssertWeAreOnLoginSuccessPage();
         }
+        
+        private IEnumerator NavigateToLoginSuccessPageViaSocialLoginAndDismissTest(string providerName)
+        {
+            yield return NavigateToLoginSuccessPageViaSocialLoginTest(providerName);
+            yield return DismissTest();
+        }
 
+        private IEnumerator NavigateToLoginSuccessPageViaSocialLoginTest(string providerName)
+        {
+            TestExtensions.ClickButtonWithName(_loginPage.transform, $"{providerName}SignInButton");
+            yield return WaitForAnimationTime;
+            
+            AssertWeAreOnLoginSuccessPage();
+        }
+        
         private TMP_InputField FetchMfaCodeFieldAndAssertAssumptions()
         {
             GameObject MfaCodeGameObject = GameObject.Find("MFACodeField");
@@ -187,7 +220,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.AreEqual("Enter the code sent to\n<b>validEmail@valid.com</b>", text.text);
         }
 
-        private IEnumerator GoBackToLoginPageAndVerifyPageStateTest()
+        private IEnumerator GoBackToLoginPageAndVerifyPageStateTest(string expectedEmail)
         {
             GameObject backGameObject = GameObject.Find("BackButton");
             Assert.IsNotNull(backGameObject);
@@ -203,7 +236,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(emailGameObject);
             TMP_InputField emailInputField = emailGameObject.GetComponent<TMP_InputField>();
             Assert.IsNotNull(emailInputField);
-            Assert.AreEqual("validEmail@valid.com", emailInputField.text);
+            Assert.AreEqual(expectedEmail, emailInputField.text);
             
             backGameObject = GameObject.Find("BackButton");
             Assert.IsNull(backGameObject);
@@ -213,7 +246,11 @@ namespace SequenceExamples.Scripts.Tests
         {
             yield return _testMonobehaviour.StartCoroutine(TransitionToMfaPage("newValidEmail@valid.com"));
             yield return _testMonobehaviour.StartCoroutine(TransitionToLoginSuccessPage("0987654321"));
-            
+            yield return _testMonobehaviour.StartCoroutine(DismissTest());
+        }
+
+        private IEnumerator DismissTest()
+        {
             GameObject dismissGameObject = GameObject.Find("DismissButton");
             Assert.IsNotNull(dismissGameObject);
             Button dismissButton = dismissGameObject.GetComponent<Button>();

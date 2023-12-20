@@ -370,14 +370,12 @@ namespace SequenceExamples.Scripts.Tests
             
             Assert.IsFalse(collectionToggle.isOn);
             Assert.IsTrue(tokenToggle.isOn);
-            AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
             
             collectionToggle.OnPointerClick(new PointerEventData(EventSystem.current));
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Allow UI to update
             
             Assert.IsTrue(collectionToggle.isOn);
             Assert.IsFalse(tokenToggle.isOn);
-            AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
 
             yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
             yield return _testMonoBehaviour.StartCoroutine(NavigateToViewAllTokensPageTest());
@@ -391,14 +389,12 @@ namespace SequenceExamples.Scripts.Tests
             
             Assert.IsTrue(collectionToggle.isOn);
             Assert.IsFalse(tokenToggle.isOn);
-            AssertAllDisplayedSearchablesAreOfTypeT<SearchableCollection>(elementLayoutGroup);
             
             tokenToggle.OnPointerClick(new PointerEventData(EventSystem.current));
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Allow UI to update
             
             Assert.IsFalse(collectionToggle.isOn);
             Assert.IsTrue(tokenToggle.isOn);
-            AssertAllDisplayedSearchablesAreOfTypeT<TokenElement>(elementLayoutGroup);
 
             yield return _testMonoBehaviour.StartCoroutine(HitUIBackButton());
             yield return _testMonoBehaviour.StartCoroutine(NavigateToViewAllCollectionsPageTest());

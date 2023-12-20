@@ -19,8 +19,9 @@ namespace Sequence.WaaS
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public HttpClient()
+        public HttpClient(string url)
         {
+            _url = url;
             this._defaultHeaders = new Dictionary<string, string>();
         }
 
@@ -79,9 +80,13 @@ namespace Sequence.WaaS
         private string ExtractHeaders(UnityWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
-            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization"})
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant"})
             {
                 string headerValue = request.GetRequestHeader(headerKey);
+                if (string.IsNullOrEmpty(headerValue))
+                {
+                    continue;
+                }
                 headerBuilder.Append($"-H '{headerKey}: {headerValue}' ");
             }
             return headerBuilder.ToString();

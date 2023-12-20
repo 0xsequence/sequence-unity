@@ -1,7 +1,5 @@
 using System;
 using System.Text;
-using System.Web;
-using Sequence;
 using UnityEngine;
 
 namespace Sequence.WaaS
