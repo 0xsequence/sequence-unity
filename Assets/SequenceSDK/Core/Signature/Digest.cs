@@ -38,7 +38,7 @@ namespace Sequence.Core.Signature
             return (new ImageHash()
             {
                 Hash = new Hash(hashBytes),
-            }, null);;
+            }, null);
         }
 
         // Subdigest derives the hash to be signed by the Sequence wallet's signers to validate the digest.
