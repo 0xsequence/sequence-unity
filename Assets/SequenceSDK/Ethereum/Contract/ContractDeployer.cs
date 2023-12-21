@@ -19,11 +19,9 @@ namespace Sequence.Contracts
             BigInteger? gasPrice = null,
             BigInteger? gasLimit = null)
         {
-            EthTransaction deployTransaction = await new GasLimitEstimator(client, wallet.GetAddress()).BuildTransaction(StringExtensions.ZeroAddress, bytecode, 0, gasPrice, gasLimit);
-            string preCalculatedContractAddress = CalculateContractAddress(deployTransaction.Nonce, wallet.GetAddress());
-            string transactionHash = await wallet.SendTransaction(client, deployTransaction);
-            TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
-            return new ContractDeploymentResult(transactionHash, preCalculatedContractAddress, receipt);
+            TransactionReceipt receipt = await wallet.DeployContract(client, bytecode); 
+            ContractDeploymentResult result = new ContractDeploymentResult(receipt);
+            return result;
         }
 
         public static string CalculateContractAddress(BigInteger nonce, string senderAddress)
@@ -45,15 +43,14 @@ namespace Sequence.Contracts
     public class ContractDeploymentResult
     {
         public string TransactionHash;
-        public string PreCalculatedContractAddress;
         public TransactionReceipt Receipt;
+        public Address DeployedContractAddress;
 
-        public ContractDeploymentResult(string transactionHash, string preCalculatedContractAddress,
-            TransactionReceipt receipt)
+        public ContractDeploymentResult(TransactionReceipt receipt)
         {
-            this.TransactionHash = transactionHash;
-            this.PreCalculatedContractAddress = preCalculatedContractAddress;
+            this.TransactionHash = receipt.transactionHash;
             this.Receipt = receipt;
+            this.DeployedContractAddress = new Address(receipt.contractAddress);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Sequence.ABI;
 using Sequence.Utils;
 
 namespace Sequence
@@ -9,6 +10,12 @@ namespace Sequence
         {
             BigInteger chainId = (BigInteger)(int)chain;
             return chainId.BigIntegerToHexString();
+        }
+        
+        public static Chain ChainFromHexString(this string hexString)
+        {
+            BigInteger chainId = hexString.HexStringToBigInteger();
+            return (Chain)(int)chainId;
         }
     }
 }

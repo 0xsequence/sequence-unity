@@ -33,6 +33,13 @@ namespace SequenceExamples.Scripts.Tests.Utils
             throw new NotImplementedException();
         }
 
+        public event Action<ContractDeploymentResult> OnDeployContractComplete;
+
+        public Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
+        {
+            throw new NotImplementedException();
+        }
+
         public event Action<string> OnDropSessionComplete;
         public Task<bool> DropSession(string dropSessionId)
         {

@@ -43,7 +43,7 @@ public class ERC1155Tests
             TransactionReceipt receipt = result.Receipt;
             contractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(contractAddress);
-            Assert.AreEqual(contractAddress, result.PreCalculatedContractAddress);
+            Assert.AreEqual(contractAddress, result.DeployedContractAddress.Value);
         }
         catch (Exception ex)
         {

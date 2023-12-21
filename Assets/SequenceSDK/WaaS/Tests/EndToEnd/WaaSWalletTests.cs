@@ -304,5 +304,21 @@ namespace Sequence.WaaS.Tests
                 WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSendBatchTransaction_withERC1155), e.Message, abi));
             }
         }
+        
+        public async Task TestDeployContract(string bytecode)
+        {
+            try
+            {
+                WaaSTestHarness.TestStarted?.Invoke();
+                ContractDeploymentResult result = await _wallet.DeployContract(Chain.Polygon, bytecode);
+                CustomAssert.IsTrue(result.TransactionReturn is SuccessfulTransactionReturn, nameof(TestDeployContract));
+                CustomAssert.NotNull(result.DeployedContractAddress, nameof(TestDeployContract));
+                WaaSTestHarness.TestPassed?.Invoke();
+            }
+            catch (Exception e)
+            {
+                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestDeployContract), e.Message));
+            }
+        }
     }
 }

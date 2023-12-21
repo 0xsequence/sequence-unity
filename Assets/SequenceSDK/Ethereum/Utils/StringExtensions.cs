@@ -16,8 +16,8 @@ namespace Sequence.Utils
         /// <returns></returns>
         public static BigInteger HexStringToBigInteger(this string hexString)
         {
-            hexString = hexString.Replace("0x", "");
-            return BigInteger.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
+            hexString = hexString.WithoutHexPrefix();
+            return BigInteger.Parse("0" + hexString, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -121,6 +121,28 @@ namespace Sequence.Utils
         public static string NoWhitespace(this string value)
         {
             return Regex.Replace(value, @"\s+", "");
+        }
+        
+        public static string RemoveZeroPadding(this string value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            if (value.Length == 0)
+            {
+                return value;
+            }
+            string hexValue = value.WithoutHexPrefix();
+
+            int firstNonZeroIndex = 0;
+            while (firstNonZeroIndex < hexValue.Length && hexValue[firstNonZeroIndex] == '0')
+            {
+                firstNonZeroIndex++;
+            }
+
+            string result = hexValue.Substring(firstNonZeroIndex).EnsureHexPrefix();
+            return result;
         }
     }
 }

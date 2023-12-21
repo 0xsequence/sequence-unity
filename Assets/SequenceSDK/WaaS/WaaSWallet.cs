@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.ABI;
 using Sequence.Authentication;
+using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
+using SequenceSDK.WaaS;
 using UnityEngine;
 
 namespace Sequence.WaaS
@@ -15,6 +18,7 @@ namespace Sequence.WaaS
         private Address _address;
         private HttpClient _httpClient;
         private IntentSender _intentSender;
+        private const string _sequenceCreatedContractEvent = "CreatedContract(address)";
 
         public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion)
         {
@@ -59,6 +63,67 @@ namespace Sequence.WaaS
                 OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
             }
             return result;
+        }
+
+        public event Action<ContractDeploymentResult> OnDeployContractComplete;
+
+        public async Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
+        {
+            TransactionReturn transactionReturn = await SendTransaction(new SendTransactionArgs(
+                _address,
+                network,
+                new Transaction[]
+                {
+                    new DelayedEncode(_address, value, new DelayedEncodeData(
+                        "createContract(bytes)", new object[]
+                        {
+                            bytecode,
+                        }, "createContract"))
+                }));
+            
+            if (transactionReturn is SuccessfulTransactionReturn successfulTransactionReturn)
+            {
+                string topic = SequenceCoder.KeccakHashASCII(_sequenceCreatedContractEvent);
+                MetaTxnReceiptLog log = FindLogWithTopic(successfulTransactionReturn.receipt, topic);
+                if (log == null)
+                {
+                    throw new Exception("Failed to find newly deployed contract address in transaction receipt logs " + successfulTransactionReturn.receipt);
+                }
+                string deployedContractAddressString = log.data.RemoveZeroPadding();
+                Address deployedContractAddress = new Address(deployedContractAddressString);
+                
+                ContractDeploymentResult result = new ContractDeploymentResult(transactionReturn, deployedContractAddress);
+                OnDeployContractComplete?.Invoke(result);
+                return result;
+            }
+            else
+            {
+                throw new Exception("Failed to deploy contract");
+            }
+        }
+        
+        private MetaTxnReceiptLog FindLogWithTopic(MetaTxnReceipt receipt, string topic)
+        {
+            topic = topic.EnsureHexPrefix();
+            MetaTxnReceipt[] receipts = receipt.receipts;
+            int receiptsLength = receipts.Length;
+            for (int i = 0; i < receiptsLength; i++)
+            {
+                int logsCount = receipts[i].logs.Length;
+                for (int j = 0; j < logsCount; j++)
+                {
+                    int topicsCount = receipts[i].logs[j].topics.Length;
+                    for (int k = 0; k < topicsCount; k++)
+                    {
+                        if (receipts[i].logs[j].topics[k] == topic)
+                        {
+                            return receipts[i].logs[j];
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         public event Action<string> OnDropSessionComplete; 

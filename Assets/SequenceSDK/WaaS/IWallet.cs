@@ -15,10 +15,24 @@ namespace Sequence.WaaS
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
         public Task<TransactionReturn> SendTransaction(SendTransactionArgs args);
+        public event Action<ContractDeploymentResult> OnDeployContractComplete;
+        public Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0");
         public event Action<string> OnDropSessionComplete;
         public Task<bool> DropSession(string dropSessionId);
         public Task<bool> DropThisSession();
         public event Action<WaaSSession[]> OnSessionsFound;
         public Task<WaaSSession[]> ListSessions();
+    }
+    
+    public class ContractDeploymentResult
+    {
+        public TransactionReturn TransactionReturn;
+        public Address DeployedContractAddress;
+
+        public ContractDeploymentResult(TransactionReturn transactionReturn, Address deployedContractAddress)
+        {
+            TransactionReturn = transactionReturn;
+            DeployedContractAddress = deployedContractAddress;
+        }
     }
 }

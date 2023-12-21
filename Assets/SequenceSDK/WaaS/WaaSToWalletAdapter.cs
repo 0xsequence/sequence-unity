@@ -9,6 +9,7 @@ using Sequence.ABI;
 using Sequence.Extensions;
 using Sequence.Transactions;
 using Sequence.Utils;
+using SequenceSDK.WaaS;
 
 namespace Sequence.WaaS
 {
@@ -24,6 +25,32 @@ namespace Sequence.WaaS
         public Address GetAddress()
         {
             return _wallet.GetWalletAddress();
+        }
+
+        public async Task<TransactionReceipt> DeployContract(IEthClient client, string bytecode, ulong value = 0)
+        {
+            string chainId = await client.ChainID();
+            Chain network = chainId.ChainFromHexString();
+            ContractDeploymentResult result = await _wallet.DeployContract(network, bytecode, value.ToString());
+            if (result.TransactionReturn is SuccessfulTransactionReturn successfulTransactionReturn)
+            {
+                string transactionHash = successfulTransactionReturn.txHash;
+                TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
+                if (receipt.contractAddress == null)
+                {
+                    receipt.contractAddress = result.DeployedContractAddress.Value;
+                }
+
+                return receipt;
+            }
+            else if (result.TransactionReturn is FailedTransactionReturn failedTransactionReturn)
+            {
+                throw new Exception(failedTransactionReturn.error);
+            }
+            else
+            {
+                throw new Exception($"Unknown transaction result type. Given {result.TransactionReturn.GetType().Name}");
+            }
         }
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
@@ -45,7 +72,7 @@ namespace Sequence.WaaS
             }
         }
 
-        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, RawTransaction[] transactions)
+        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, Transaction[] transactions)
         {
             string networkId = await client.ChainID();
             SendTransactionArgs args = new SendTransactionArgs(GetAddress(), networkId, transactions);
