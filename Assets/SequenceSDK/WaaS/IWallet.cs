@@ -15,8 +15,9 @@ namespace Sequence.WaaS
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
         public Task<TransactionReturn> SendTransaction(SendTransactionArgs args);
-        public event Action<ContractDeploymentResult> OnDeployContractComplete;
-        public Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0");
+        public event Action<SuccessfulContractDeploymentResult> OnDeployContractComplete;
+        public event Action<FailedContractDeploymentResult> OnDeployContractFailed;
+        public Task<SuccessfulContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0");
         public event Action<string> OnDropSessionComplete;
         public Task<bool> DropSession(string dropSessionId);
         public Task<bool> DropThisSession();
@@ -24,15 +25,27 @@ namespace Sequence.WaaS
         public Task<WaaSSession[]> ListSessions();
     }
     
-    public class ContractDeploymentResult
+    public class SuccessfulContractDeploymentResult
     {
-        public TransactionReturn TransactionReturn;
+        public SuccessfulTransactionReturn TransactionReturn;
         public Address DeployedContractAddress;
 
-        public ContractDeploymentResult(TransactionReturn transactionReturn, Address deployedContractAddress)
+        public SuccessfulContractDeploymentResult(SuccessfulTransactionReturn transactionReturn, Address deployedContractAddress)
         {
             TransactionReturn = transactionReturn;
             DeployedContractAddress = deployedContractAddress;
+        }
+    }
+    
+    public class FailedContractDeploymentResult
+    {
+        public FailedTransactionReturn TransactionReturn;
+        public string Error;
+
+        public FailedContractDeploymentResult(FailedTransactionReturn transactionReturn, string error)
+        {
+            TransactionReturn = transactionReturn;
+            Error = error;
         }
     }
 }

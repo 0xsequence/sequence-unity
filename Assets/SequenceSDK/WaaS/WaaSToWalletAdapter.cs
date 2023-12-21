@@ -31,26 +31,15 @@ namespace Sequence.WaaS
         {
             string chainId = await client.ChainID();
             Chain network = chainId.ChainFromHexString();
-            ContractDeploymentResult result = await _wallet.DeployContract(network, bytecode, value.ToString());
-            if (result.TransactionReturn is SuccessfulTransactionReturn successfulTransactionReturn)
+            SuccessfulContractDeploymentResult result = await _wallet.DeployContract(network, bytecode, value.ToString());
+            string transactionHash = result.TransactionReturn.txHash;
+            TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
+            if (receipt.contractAddress == null)
             {
-                string transactionHash = successfulTransactionReturn.txHash;
-                TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
-                if (receipt.contractAddress == null)
-                {
-                    receipt.contractAddress = result.DeployedContractAddress.Value;
-                }
+                receipt.contractAddress = result.DeployedContractAddress.Value;
+            }
 
-                return receipt;
-            }
-            else if (result.TransactionReturn is FailedTransactionReturn failedTransactionReturn)
-            {
-                throw new Exception(failedTransactionReturn.error);
-            }
-            else
-            {
-                throw new Exception($"Unknown transaction result type. Given {result.TransactionReturn.GetType().Name}");
-            }
+            return receipt;
         }
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)

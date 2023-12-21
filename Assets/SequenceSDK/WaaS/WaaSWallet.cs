@@ -65,10 +65,12 @@ namespace Sequence.WaaS
             return result;
         }
 
-        public event Action<ContractDeploymentResult> OnDeployContractComplete;
+        public event Action<SuccessfulContractDeploymentResult> OnDeployContractComplete;
+        public event Action<FailedContractDeploymentResult> OnDeployContractFailed;
 
-        public async Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
+        public async Task<SuccessfulContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
         {
+            bytecode = bytecode.EnsureHexPrefix();
             TransactionReturn transactionReturn = await SendTransaction(new SendTransactionArgs(
                 _address,
                 network,
@@ -87,18 +89,24 @@ namespace Sequence.WaaS
                 MetaTxnReceiptLog log = FindLogWithTopic(successfulTransactionReturn.receipt, topic);
                 if (log == null)
                 {
-                    throw new Exception("Failed to find newly deployed contract address in transaction receipt logs " + successfulTransactionReturn.receipt);
+                    OnDeployContractFailed?.Invoke(new FailedContractDeploymentResult(null,"Failed to find newly deployed contract address in transaction receipt logs " + successfulTransactionReturn.receipt));
                 }
                 string deployedContractAddressString = log.data.RemoveZeroPadding();
                 Address deployedContractAddress = new Address(deployedContractAddressString);
                 
-                ContractDeploymentResult result = new ContractDeploymentResult(transactionReturn, deployedContractAddress);
+                SuccessfulContractDeploymentResult result = new SuccessfulContractDeploymentResult(successfulTransactionReturn, deployedContractAddress);
                 OnDeployContractComplete?.Invoke(result);
                 return result;
             }
+            else if (transactionReturn is FailedTransactionReturn failedTransactionReturn)
+            {
+                OnDeployContractFailed?.Invoke(new FailedContractDeploymentResult(failedTransactionReturn, failedTransactionReturn.error));
+                return null;
+            }
             else
             {
-                throw new Exception("Failed to deploy contract");
+                OnDeployContractFailed?.Invoke(new FailedContractDeploymentResult(null, $"Unknown transaction result type. Given {transactionReturn.GetType().Name}"));
+                return null;
             }
         }
         
