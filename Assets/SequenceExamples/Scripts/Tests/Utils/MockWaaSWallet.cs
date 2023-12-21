@@ -34,8 +34,9 @@ namespace SequenceExamples.Scripts.Tests.Utils
         }
 
         public event Action<SuccessfulContractDeploymentResult> OnDeployContractComplete;
+        public event Action<FailedContractDeploymentResult> OnDeployContractFailed;
 
-        public Task<SuccessfulContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
+        public Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
         {
             throw new NotImplementedException();
         }

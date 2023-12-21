@@ -31,21 +31,32 @@ namespace Sequence.WaaS
         {
             string chainId = await client.ChainID();
             Chain network = chainId.ChainFromHexString();
-            SuccessfulContractDeploymentResult result = await _wallet.DeployContract(network, bytecode, value.ToString());
-            string transactionHash = result.TransactionReturn.txHash;
-            TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
-            if (receipt.contractAddress == null)
+            ContractDeploymentResult result = await _wallet.DeployContract(network, bytecode, value.ToString());
+            if (result is FailedContractDeploymentResult failedResult)
             {
-                receipt.contractAddress = result.DeployedContractAddress.Value;
+                throw new Exception("Failed to deploy contract: " + failedResult.Error);
             }
+            else if (result is SuccessfulContractDeploymentResult successfulResult)
+            {
+                string transactionHash = successfulResult.TransactionReturn.txHash;
+                TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
+                if (receipt.contractAddress == null)
+                {
+                    receipt.contractAddress = successfulResult.DeployedContractAddress.Value;
+                }
 
-            return receipt;
+                return receipt;
+            }
+            else
+            {
+                throw new Exception($"Unknown contract deployment result type. Given {result.GetType().Name}");
+            }
         }
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
             RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
-            SendTransactionArgs args = await BuildTransactionArgs(client, new RawTransaction[] { waasTransaction });
+            SendTransactionArgs args = await BuildTransactionArgs(client, new Transaction[] { waasTransaction });
             TransactionReturn result = await _wallet.SendTransaction(args);
             if (result is FailedTransactionReturn failedResult)
             {
