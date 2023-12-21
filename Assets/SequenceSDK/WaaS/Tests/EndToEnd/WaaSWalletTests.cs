@@ -310,9 +310,9 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                ContractDeploymentResult result = await _wallet.DeployContract(Chain.Polygon, bytecode);
-                CustomAssert.IsTrue(result is SuccessfulContractDeploymentResult, nameof(TestDeployContract));
-                if (result is SuccessfulContractDeploymentResult successfulResult)
+                ContractDeploymentReturn result = await _wallet.DeployContract(Chain.Polygon, bytecode);
+                CustomAssert.IsTrue(result is SuccessfulContractDeploymentReturn, nameof(TestDeployContract));
+                if (result is SuccessfulContractDeploymentReturn successfulResult)
                 {
                     CustomAssert.NotNull(successfulResult.TransactionReturn, nameof(TestDeployContract));
                     CustomAssert.NotNull(successfulResult.DeployedContractAddress, nameof(TestDeployContract));

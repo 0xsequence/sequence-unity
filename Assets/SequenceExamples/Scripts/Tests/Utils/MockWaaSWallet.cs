@@ -33,10 +33,10 @@ namespace SequenceExamples.Scripts.Tests.Utils
             throw new NotImplementedException();
         }
 
-        public event Action<SuccessfulContractDeploymentResult> OnDeployContractComplete;
-        public event Action<FailedContractDeploymentResult> OnDeployContractFailed;
+        public event Action<SuccessfulContractDeploymentReturn> OnDeployContractComplete;
+        public event Action<FailedContractDeploymentReturn> OnDeployContractFailed;
 
-        public Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0")
+        public Task<ContractDeploymentReturn> DeployContract(Chain network, string bytecode, string value = "0")
         {
             throw new NotImplementedException();
         }

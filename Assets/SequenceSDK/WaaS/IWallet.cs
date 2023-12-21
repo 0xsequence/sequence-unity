@@ -15,9 +15,9 @@ namespace Sequence.WaaS
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
         public Task<TransactionReturn> SendTransaction(SendTransactionArgs args);
-        public event Action<SuccessfulContractDeploymentResult> OnDeployContractComplete;
-        public event Action<FailedContractDeploymentResult> OnDeployContractFailed;
-        public Task<ContractDeploymentResult> DeployContract(Chain network, string bytecode, string value = "0");
+        public event Action<SuccessfulContractDeploymentReturn> OnDeployContractComplete;
+        public event Action<FailedContractDeploymentReturn> OnDeployContractFailed;
+        public Task<ContractDeploymentReturn> DeployContract(Chain network, string bytecode, string value = "0");
         public event Action<string> OnDropSessionComplete;
         public Task<bool> DropSession(string dropSessionId);
         public Task<bool> DropThisSession();

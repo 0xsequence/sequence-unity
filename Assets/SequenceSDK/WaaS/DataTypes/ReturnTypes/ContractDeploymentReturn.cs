@@ -1,28 +1,28 @@
 namespace Sequence.WaaS
 {
-    public abstract class ContractDeploymentResult
+    public abstract class ContractDeploymentReturn
     {
         
     }
     
-    public class SuccessfulContractDeploymentResult : ContractDeploymentResult
+    public class SuccessfulContractDeploymentReturn : ContractDeploymentReturn
     {
         public SuccessfulTransactionReturn TransactionReturn;
         public Address DeployedContractAddress;
 
-        public SuccessfulContractDeploymentResult(SuccessfulTransactionReturn transactionReturn, Address deployedContractAddress)
+        public SuccessfulContractDeploymentReturn(SuccessfulTransactionReturn transactionReturn, Address deployedContractAddress)
         {
             TransactionReturn = transactionReturn;
             DeployedContractAddress = deployedContractAddress;
         }
     }
     
-    public class FailedContractDeploymentResult : ContractDeploymentResult
+    public class FailedContractDeploymentReturn : ContractDeploymentReturn
     {
         public FailedTransactionReturn TransactionReturn;
         public string Error;
 
-        public FailedContractDeploymentResult(FailedTransactionReturn transactionReturn, string error)
+        public FailedContractDeploymentReturn(FailedTransactionReturn transactionReturn, string error)
         {
             TransactionReturn = transactionReturn;
             Error = error;

@@ -31,12 +31,12 @@ namespace Sequence.WaaS
         {
             string chainId = await client.ChainID();
             Chain network = chainId.ChainFromHexString();
-            ContractDeploymentResult result = await _wallet.DeployContract(network, bytecode, value.ToString());
-            if (result is FailedContractDeploymentResult failedResult)
+            ContractDeploymentReturn result = await _wallet.DeployContract(network, bytecode, value.ToString());
+            if (result is FailedContractDeploymentReturn failedResult)
             {
                 throw new Exception("Failed to deploy contract: " + failedResult.Error);
             }
-            else if (result is SuccessfulContractDeploymentResult successfulResult)
+            else if (result is SuccessfulContractDeploymentReturn successfulResult)
             {
                 string transactionHash = successfulResult.TransactionReturn.txHash;
                 TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
