@@ -89,6 +89,10 @@ namespace Sequence.WaaS
         public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
         {
             int transactionCount = transactions.Length;
+            if (transactionCount <= 0)
+            {
+                throw new Exception("Cannot send empty transaction batch");
+            }
             RawTransaction[] waasTransactions = new RawTransaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
