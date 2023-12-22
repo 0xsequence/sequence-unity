@@ -17,14 +17,14 @@ namespace Sequence.WaaS
         public string SessionId { get; private set; }
         private Address _address;
         private HttpClient _httpClient;
-        private IntentSender _intentSender;
+        private IIntentSender _intentSender;
         private const string _sequenceCreatedContractEvent = "CreatedContract(address)";
 
-        public WaaSWallet(Address address, string sessionId, EthWallet sessionWallet, DataKey awsDataKey, int waasProjectId, string waasVersion)
+        public WaaSWallet(Address address, string sessionId, IIntentSender intentSender)
         {
             _address = address;
             _httpClient = new HttpClient("https://api.sequence.app/rpc");
-            _intentSender = new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), awsDataKey, sessionWallet, sessionId, waasProjectId, waasVersion);
+            _intentSender = intentSender;
             SessionId = sessionId;
         }
 

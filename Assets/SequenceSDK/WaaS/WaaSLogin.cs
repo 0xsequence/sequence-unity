@@ -179,7 +179,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.session.id;
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
+                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), dataKey, sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
