@@ -100,28 +100,29 @@ ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/m
 ### ADR 3 - WaaS Client
 August 2, 2023 - author: Quinn Purdy
 Updated Aug 16, 2023 - author: Quinn Purdy
+Updated Jan 3, 2023 - author: Quinn Purdy
 
 #### Status
-Pending - approval of the accompanying PR will constitute approval of this ADR.
+Updates Pending - approval of the accompanying PR will constitute approval of this ADR.
 
 #### Context
-A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http.
+A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http. This WaaS service, with our authentication system, can be used to provide users with a more secure and more frictionless (less "wallet-like") UX.
 
 #### Decision
-In order to save time on the integration, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
+In order to save time on the integration and provide users with a more secure and frictionless UX, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
 
-For authentication, sequence-unity will be provided with a JWT from the game backend that contains as a payload, the partner_id and the wallet address for the authenticated user. Requests made to the WaaS service will require inclusion of the JWT that was provided.
+For authentication, sequence-unity will use the [OIDC implicit flow](https://openid.net/specs/openid-connect-implicit-1_0.html#ImplicitFlow) or AWS Cognito Email with OTP Sign In to obtain an idToken, which is combined with some config variables to establish a session with the WaaS service. The Authentication logic (obtaining the idToken) can be found in the `SequenceAuthentication` assembly.
+
+The SDK will require developers to input a number of config variables during setup. This will be done via a ScriptableObject, defined in the `SequenceConfig` assembly, that can be fetched via [Resources.Load](https://docs.unity3d.com/ScriptReference/Resources.Load.html) when needed.
 
 Similar to ADR 2, the WaaS client will be implemented in a separate assembly from "SequenceEthereum". This assembly will be called "SequenceWaaS" and will reference and depend on the Ethereum library assembly "SequenceEthereum".
 
-For now, all tests will remain in the same assembly "SequenceTests".
+Since use of WaaS requires an idToken that cannot currently be hardcoded, some of the tests live in a separate assembly, `SequenceWaaSEndToEndTests`, that is used when building the `WaaSEndToEndTests` scene for end to end testing. Additionally, we've included unit tests, and other tests using mocks that can be run from within the editor, in the `SequenceWaaSTests` assembly. 
 
 #### Consequences
-As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved, justifying the trade-off.
+As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved and there is a better UX for end-users and developers alike, justifying the trade-off.
 
 Additionally, since the WaaS client relies on network requests, we must add additional async Tasks to the SequenceEthereum IWallet interface. This will require additional await statements throughout, harming readability.
-
-For authenticating into the WaaS service, the game developers will be required to have a backend that supports some form of authentication in addition to at least a partial integration with the WaaS server, as required to provide the game client with a JWT for authentication with the WaaS service.
 
 Remaining consequences follow those from ADR 2 (with respect to assemblies).
 
