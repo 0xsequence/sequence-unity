@@ -220,11 +220,11 @@ namespace Sequence.Demo
             SequenceEthClient client = new SequenceEthClient("https://polygon-bor.publicnode.com");
             var nftTransfer = await nft.TransferFrom(_adapter.GetAddress(),
                 "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
-                "54530968763798660137294927684252503703134533114052628080002308208148824588621")(client, new ContractCall(_adapter.GetAddress()));
+                "54530968763798660137294927684252503703134533114052628080002308208148824588621").Create(client, new ContractCall(_adapter.GetAddress()));
             var sftTransfer = await sft.SafeTransferFrom(_adapter.GetAddress(),
                 "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
                 "86",
-                1)(client, new ContractCall(_adapter.GetAddress()));
+                1).Create(client, new ContractCall(_adapter.GetAddress()));
 
             var receipt = await _adapter.SendTransactionBatchAndWaitForReceipts(client, new EthTransaction[]
             {

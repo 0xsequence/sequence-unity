@@ -32,12 +32,12 @@ namespace Sequence.Contracts
         }
 
         #region Mintable
-        public CallContractFunctionTransactionCreator SafeMint(string toAddress, BigInteger tokenId)
+        public CallContractFunction SafeMint(string toAddress, BigInteger tokenId)
         {
             return Contract.CallFunction("safeMint", toAddress, tokenId);
         }
         #region AutoIncrementIds
-        public CallContractFunctionTransactionCreator SafeMint(string toAddress)
+        public CallContractFunction SafeMint(string toAddress)
         {
             return Contract.CallFunction("safeMint", toAddress);
         }
@@ -74,7 +74,7 @@ namespace Sequence.Contracts
             return result;
         }
 
-        public CallContractFunctionTransactionCreator Approve(string spenderAddress, BigInteger tokenId)
+        public CallContractFunction Approve(string spenderAddress, BigInteger tokenId)
         {
             return Contract.CallFunction("approve", spenderAddress, tokenId);
         }
@@ -85,7 +85,7 @@ namespace Sequence.Contracts
             return result;
         }
 
-        public CallContractFunctionTransactionCreator SetApprovalForAll(string operatorAddress, bool approved)
+        public CallContractFunction SetApprovalForAll(string operatorAddress, bool approved)
         {
             return Contract.CallFunction("setApprovalForAll", operatorAddress, approved);
         }
@@ -96,17 +96,17 @@ namespace Sequence.Contracts
             return isApproved;
         }
 
-        public CallContractFunctionTransactionCreator TransferFrom(string fromAddress, string toAddress, BigInteger tokenId)
+        public CallContractFunction TransferFrom(string fromAddress, string toAddress, BigInteger tokenId)
         {
             return Contract.CallFunction("transferFrom", fromAddress, toAddress, tokenId);
         }
 
-        public CallContractFunctionTransactionCreator TransferFrom(string fromAddress, string toAddress, string tokenId)
+        public CallContractFunction TransferFrom(string fromAddress, string toAddress, string tokenId)
         {
             return TransferFrom(fromAddress, toAddress, BigInteger.Parse(tokenId));
         }
 
-        public CallContractFunctionTransactionCreator SafeTransferFrom(string fromAddress, string toAddress, BigInteger tokenId, byte[] data = null)
+        public CallContractFunction SafeTransferFrom(string fromAddress, string toAddress, BigInteger tokenId, byte[] data = null)
         {
             if (data != null)
             {
@@ -116,7 +116,7 @@ namespace Sequence.Contracts
         }
 
         #region Burnable
-        public CallContractFunctionTransactionCreator Burn(BigInteger tokenId)
+        public CallContractFunction Burn(BigInteger tokenId)
         {
             return Contract.CallFunction("burn", tokenId);
         }

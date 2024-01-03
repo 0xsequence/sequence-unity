@@ -36,7 +36,7 @@ namespace Sequence.Contracts
         }
 
         #region Mintable
-        public CallContractFunctionTransactionCreator Mint(string toAddress, BigInteger tokenId, BigInteger amount, byte[] data = null)
+        public CallContractFunction Mint(string toAddress, BigInteger tokenId, BigInteger amount, byte[] data = null)
         {
             if (data == null)
             {
@@ -45,7 +45,7 @@ namespace Sequence.Contracts
             return Contract.CallFunction("mint", toAddress, tokenId, amount, data);
         }
 
-        public CallContractFunctionTransactionCreator MintBatch(string toAddress, BigInteger[] tokenIds, BigInteger[] amounts, byte[] data = null)
+        public CallContractFunction MintBatch(string toAddress, BigInteger[] tokenIds, BigInteger[] amounts, byte[] data = null)
         {
             if (data == null)
             {
@@ -56,7 +56,7 @@ namespace Sequence.Contracts
         #endregion
 
         #region UpdatableURI
-        public CallContractFunctionTransactionCreator SetURI(string newURI)
+        public CallContractFunction SetURI(string newURI)
         {
             return Contract.CallFunction("setURI", newURI);
         }
@@ -80,7 +80,7 @@ namespace Sequence.Contracts
             return result;
         }
 
-        public CallContractFunctionTransactionCreator SetApprovalForAll(string operatorAddress, bool approved)
+        public CallContractFunction SetApprovalForAll(string operatorAddress, bool approved)
         {
             return Contract.CallFunction("setApprovalForAll", operatorAddress, approved);
         }
@@ -91,7 +91,7 @@ namespace Sequence.Contracts
             return isApproved;
         }
 
-        public CallContractFunctionTransactionCreator SafeTransferFrom(string fromAddress, string toAddress, BigInteger tokenId, BigInteger value, byte[] data = null)
+        public CallContractFunction SafeTransferFrom(string fromAddress, string toAddress, BigInteger tokenId, BigInteger value, byte[] data = null)
         {
             if (data == null)
             {
@@ -101,12 +101,12 @@ namespace Sequence.Contracts
             return Contract.CallFunction("safeTransferFrom", fromAddress, toAddress, tokenId, value, data);
         }
 
-        public CallContractFunctionTransactionCreator SafeTransferFrom(string fromAddress, string toAddress, string tokenId, BigInteger value, byte[] data = null)
+        public CallContractFunction SafeTransferFrom(string fromAddress, string toAddress, string tokenId, BigInteger value, byte[] data = null)
         {
             return SafeTransferFrom(fromAddress, toAddress, BigInteger.Parse(tokenId), value, data);
         }
 
-        public CallContractFunctionTransactionCreator SafeBatchTransferFrom(string fromAddress, string toAddress, BigInteger[] tokenIds, BigInteger[] values, byte[] data = null)
+        public CallContractFunction SafeBatchTransferFrom(string fromAddress, string toAddress, BigInteger[] tokenIds, BigInteger[] values, byte[] data = null)
         {
             if (data == null)
             {
@@ -116,12 +116,12 @@ namespace Sequence.Contracts
         }
 
         #region Burnable
-        public CallContractFunctionTransactionCreator Burn(string fromAddress, BigInteger tokenId, BigInteger value)
+        public CallContractFunction Burn(string fromAddress, BigInteger tokenId, BigInteger value)
         {
             return Contract.CallFunction("burn", fromAddress, tokenId, value);
         }
 
-        public CallContractFunctionTransactionCreator BurnBatch(string fromAddress, BigInteger[] tokenIds, BigInteger[] values)
+        public CallContractFunction BurnBatch(string fromAddress, BigInteger[] tokenIds, BigInteger[] values)
         {
             return Contract.CallFunction("burnBatch", fromAddress, tokenIds, values);
         }

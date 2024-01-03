@@ -134,11 +134,11 @@ namespace Sequence.WaaS.Tests
                 EthTransaction transfer =
                     await new GasLimitEstimator(_client, new Address(_address)).BuildTransaction(_toAddress, value: 1);
                 ERC20 usdc = new ERC20(_erc20Address);
-                EthTransaction erc20Transfer = await usdc.Transfer(_toAddress, 1)(_client, new ContractCall(new Address(_address)));
+                EthTransaction erc20Transfer = await usdc.Transfer(_toAddress, 1).Create(_client, new ContractCall(new Address(_address)));
                 ERC721 erc721 = new ERC721(_erc721Address);
-                EthTransaction erc721Transfer = await erc721.TransferFrom(_address, _toAddress, _erc721TokenId)(_client, new ContractCall(new Address(_address)));
+                EthTransaction erc721Transfer = await erc721.TransferFrom(_address, _toAddress, _erc721TokenId).Create(_client, new ContractCall(new Address(_address)));
                 ERC1155 erc1155 = new ERC1155(_erc1155Address);
-                EthTransaction erc1155Transfer = await erc1155.SafeTransferFrom(_address, _toAddress, _erc1155TokenId, 1)(_client, new ContractCall(new Address(_address)));
+                EthTransaction erc1155Transfer = await erc1155.SafeTransferFrom(_address, _toAddress, _erc1155TokenId, 1).Create(_client, new ContractCall(new Address(_address)));
                 TransactionReceipt[] receipts = await _wallet.SendTransactionBatchAndWaitForReceipts(_client,
                     new EthTransaction[]
                     {
