@@ -84,6 +84,7 @@ namespace Sequence.WaaS.Tests
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
             walletTests.TestSendERC20();
+            walletTests.TestSendERC20_usingRawTransaction();
             walletTests.TestSendBatchTransaction_withERC721();
             walletTests.TestSendBatchTransaction_withERC1155();
             walletTests.TestDelayedEncode("transfer(address,uint256)");

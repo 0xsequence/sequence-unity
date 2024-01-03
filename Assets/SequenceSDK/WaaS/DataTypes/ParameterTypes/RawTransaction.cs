@@ -49,6 +49,19 @@ namespace Sequence.WaaS
             this.value = BigInteger.Zero.ToString();
             this.data = contract.AssembleCallData(functionName, functionArgs);
         }
+
+        public RawTransaction(CallContractFunction callContractFunction, string value = "0")
+        {
+            string to = callContractFunction.Address;
+            if (to == StringExtensions.ZeroAddress)
+            {
+                to = WaaSZeroAddress;
+            }
+
+            this.to = to;
+            this.value = value;
+            this.data = callContractFunction.CallData;
+        }
         
         [JsonConstructor]
         public RawTransaction(string data, string to, string type, string value)

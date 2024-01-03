@@ -170,7 +170,7 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                Contracts.ContractDeploymentResult result = await ContractDeployer.Deploy(_client, _wallet, bytecode);
+                ContractDeploymentResult result = await ContractDeployer.Deploy(_client, _wallet, bytecode);
                 CustomAssert.NotNull(result, nameof(TestDeployContract_withAdapter));
                 CustomAssert.NotNull(result.DeployedContractAddress, nameof(TestDeployContract_withAdapter));
                 CustomAssert.IsEqual(result.Receipt.contractAddress, result.DeployedContractAddress.Value, nameof(TestDeployContract_withAdapter));
