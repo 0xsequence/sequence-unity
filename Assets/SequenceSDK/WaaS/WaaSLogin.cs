@@ -15,6 +15,7 @@ namespace Sequence.WaaS
     public class WaaSLogin : ILogin 
     {
         public const string WaaSWithAuthUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
+        public const string WaaSLoginMethod = "WaaSLoginMethod";
 
         private AWSConfig _awsConfig;
         private int _waasProjectId;
@@ -101,7 +102,7 @@ namespace Sequence.WaaS
                     return;
                 }
                 
-                ConnectToWaaS(idToken);
+                ConnectToWaaS(idToken, LoginMethod.Email);
             }
             catch (Exception e)
             {
@@ -131,10 +132,10 @@ namespace Sequence.WaaS
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            ConnectToWaaS(result.IdToken);
+            ConnectToWaaS(result.IdToken, result.Method);
         }
 
-        public async Task ConnectToWaaS(string idToken)
+        public async Task ConnectToWaaS(string idToken, LoginMethod method)
         {
             Credentials credentials;
             DataKey dataKey;
@@ -181,6 +182,10 @@ namespace Sequence.WaaS
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
                 OnWaaSWalletCreated?.Invoke(wallet);
+                string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
+                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
+                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+                PlayerPrefs.Save();
             }
             catch (Exception e)
             {
