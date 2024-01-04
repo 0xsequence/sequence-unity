@@ -17,21 +17,21 @@ namespace Sequence.WaaS
         public string network { get; private set; }
         public string wallet { get; private set; }
 
-        public SignMessageArgs(string wallet, Chain network, string message, uint timeBeforeExpiry = 30)
+        public SignMessageArgs(string walletAddress, Chain network, string message, uint timeBeforeExpiry = 30)
         {
             int networkId = (int)network;
-            this.wallet = wallet;
+            this.wallet = walletAddress;
             this.network = networkId.ToString();
-            this.message = PrepareMessage(message);
+            this.message = message;
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
         }
         
-        public SignMessageArgs(string wallet, string networkId, string message, uint timeBeforeExpiry = 30)
+        public SignMessageArgs(string walletAddress, string networkId, string message, uint timeBeforeExpiry = 30)
         {
-            this.wallet = wallet;
+            this.wallet = walletAddress;
             this.network = networkId;
-            this.message = PrepareMessage(message);
+            this.message = message;
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
         }
