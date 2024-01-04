@@ -17,7 +17,7 @@ namespace Sequence.Wallet
 {
     public interface IWallet 
     {
-        public Address GetAddress(uint accountIndex = 0);
+        public Address GetAddress();
         public Task<string> SendTransaction(IEthClient client, EthTransaction transaction);
         public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction);
         public Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions);
@@ -57,9 +57,7 @@ namespace Sequence.Wallet
         /// <param name="accountIndex"></param>
         /// <param name="chainId"></param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public Task<bool> IsValidSignature(string signature, string message, string chainId = "", uint accountIndex = 0);
-
-        
+        public Task<bool> IsValidSignature(string signature, string message, Chain chain = Chain.None);
 
         /// <summary>
         /// Recovers the Ethereum address from a message and its signature.

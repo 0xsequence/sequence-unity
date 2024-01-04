@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Contracts;
 using Sequence.Demo;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ namespace Sequence.WaaS.Tests
 {
     public class WaaSTestHarness : MonoBehaviour
     {
+        public static string RequiredAddress = "0x48b0560661326cB8EECb68107CD72B4B4aB8B2fb";
+        public static int DelayForTransactionToProcess = 15000; // Allow the indexer some time to pull new data from chain
+        
         public static Action<WaaSTestFailed> TestFailed;
         public static Action TestPassed;
         public static Action TestStarted;
@@ -60,7 +64,9 @@ namespace Sequence.WaaS.Tests
             TestStarted += () => _testsStarted++;
             WaaSWalletTests walletTests = new WaaSWalletTests(wallet);
             wallet.OnSendTransactionFailed += OnFailedTransaction;
-            RunTests(walletTests);
+            SessionManagementTests sessionManagementTests = new SessionManagementTests(wallet);
+            WaaSToWalletAdapterTests adapterTests = new WaaSToWalletAdapterTests(wallet);
+            RunTests(walletTests, sessionManagementTests, adapterTests);
         }
 
         private void OnFailedTransaction(FailedTransactionReturn result)
@@ -68,20 +74,39 @@ namespace Sequence.WaaS.Tests
             Debug.LogError("Transaction failed: " + result.error);
         }
 
-        private async Task RunTests(WaaSWalletTests walletTests)
+        private async Task RunTests(WaaSWalletTests walletTests, SessionManagementTests sessionManagementTests, WaaSToWalletAdapterTests adapterTests)
         {
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
             walletTests.TestSendERC20();
             walletTests.TestSendBatchTransaction_withERC721();
             walletTests.TestSendBatchTransaction_withERC1155();
+            walletTests.TestDelayedEncode("transfer(address,uint256)");
+            walletTests.TestDelayedEncode(ERC20.Abi);
+            walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
+            walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            await WaitForTestsToComplete();
+
+            adapterTests.TestGetAddress(RequiredAddress);
+            adapterTests.TestSignMessage_withAdapter("Hello world", Chain.Polygon);
+            adapterTests.TestSendTransaction_withAdapter();
+            adapterTests.TestSendERC20_withAdapter();
+            adapterTests.TestBatchTransactions_withAdapter();
+            await WaitForTestsToComplete();
+            
+            sessionManagementTests.TestSessionManagement();
+            await WaitForTestsToComplete();
+            
+            Debug.LogError($"Tests run: {_testsStarted} | Tests passed: {_passedTests} | Tests failed: {_failedTests.Count}");
+        }
+
+        private async Task WaitForTestsToComplete()
+        {
             await Task.Delay(100);
             while (_testsStarted > _failedTests.Count + _passedTests)
             {
                 await Task.Delay(100);
             }
-            
-            Debug.LogError($"Tests run: {_testsStarted} | Tests passed: {_passedTests} | Tests failed: {_failedTests.Count}");
         }
     }
 
@@ -95,11 +120,12 @@ namespace Sequence.WaaS.Tests
         {
             Name = name;
             Args = args;
+            Reason = reason;
         }
         
         public override string ToString()
         {
-            return $"Test {Name} failed with args: {string.Join(", ", Args)}";
+            return $"Test {Name} failed with args: {string.Join(", ", Args)} | reason: {Reason}";
         }
     }
 }

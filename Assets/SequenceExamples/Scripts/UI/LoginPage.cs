@@ -125,7 +125,7 @@ namespace Sequence.Demo
         {
             if (LoginHandler is WaaSLogin login)
             {
-                login.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+                WaaSLogin.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
             }
         }
         
