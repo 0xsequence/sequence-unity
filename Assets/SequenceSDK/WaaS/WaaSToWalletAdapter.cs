@@ -53,10 +53,28 @@ namespace Sequence.WaaS
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
-            Transaction waasTransaction = new Transaction((uint)transaction.ChainId.HexStringToInt(), GetAddress(), transaction.To, null, null, transaction.Value.ToString(), transaction.Data);
-            SendTransactionArgs args = new SendTransactionArgs(waasTransaction);
-            SendTransactionReturn result = await _wallet.SendTransaction(args);
-            return result.txHash;
+            RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
+            SendTransactionArgs args = await BuildTransactionArgs(client, new RawTransaction[] { waasTransaction });
+            TransactionReturn result = await _wallet.SendTransaction(args);
+            if (result is FailedTransactionReturn failedResult)
+            {
+                throw new Exception(failedResult.error);
+            }
+            else if (result is SuccessfulTransactionReturn successfulResult)
+            {
+                return successfulResult.txHash;
+            }
+            else
+            {
+                throw new Exception($"Unknown transaction result type. Given {result.GetType().Name}");
+            }
+        }
+
+        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, RawTransaction[] transactions)
+        {
+            string networkId = await client.ChainID();
+            SendTransactionArgs args = new SendTransactionArgs(GetAddress(), networkId, transactions);
+            return args;
         }
 
         public async Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction)
@@ -69,15 +87,26 @@ namespace Sequence.WaaS
         public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
         {
             int transactionCount = transactions.Length;
-            Transaction[] waasTransactions = new Transaction[transactionCount];
+            RawTransaction[] waasTransactions = new RawTransaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
-                waasTransactions[i] = new Transaction((uint)transactions[i].ChainId.HexStringToInt(), GetAddress(), transactions[i].To, null, null, transactions[i].Value.ToString(), transactions[i].Data);
+                waasTransactions[i] = new RawTransaction(transactions[i].To, transactions[i].Value.ToString(), transactions[i].Data);
             }
 
-            SendTransactionBatchArgs args = new SendTransactionBatchArgs(waasTransactions);
-            SendTransactionBatchReturn result = await _wallet.SendTransactionBatch(args);
-            return new string[]{result.txHash};
+            SendTransactionArgs args = await BuildTransactionArgs(client, waasTransactions);
+            TransactionReturn result = await _wallet.SendTransaction(args);
+            if (result is FailedTransactionReturn failedResult)
+            {
+                throw new Exception(failedResult.error);
+            }
+            else if (result is SuccessfulTransactionReturn successfulResult)
+            {
+                return new[] { successfulResult.txHash };
+            }
+            else
+            {
+                throw new Exception($"Unknown transaction result type. Given {result.GetType().Name}");
+            }
         }
 
         public async Task<TransactionReceipt[]> SendTransactionBatchAndWaitForReceipts(IEthClient client, EthTransaction[] transactions)
@@ -104,7 +133,7 @@ namespace Sequence.WaaS
 
         public async Task<string> SignMessage(string message, string chainId)
         {
-            SignMessageArgs args = new SignMessageArgs((uint)chainId.HexStringToInt(), GetAddress(), message);
+            SignMessageArgs args = new SignMessageArgs(GetAddress(), chainId, message);
             var result = await _wallet.SignMessage(args);
             return result.signature;
         }
