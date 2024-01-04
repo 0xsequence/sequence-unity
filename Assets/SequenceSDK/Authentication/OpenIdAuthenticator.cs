@@ -11,6 +11,7 @@ namespace Sequence.Authentication
 {
     public class OpenIdAuthenticator
     {
+        public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
@@ -22,14 +23,14 @@ namespace Sequence.Authentication
         private static readonly string AppleClientId = ""; // Todo replace
         private static readonly string RedirectUrl = "https://3d41-142-115-54-118.ngrok-free.app/";
         
-        private readonly string _stateToken = Guid.NewGuid().ToString();
+        private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
 
         public void GoogleSignIn()
         {
             try
             {
-                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId);
+                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
                 Application.OpenURL(googleSignInUrl);
             }
             catch (Exception e)
@@ -43,7 +44,7 @@ namespace Sequence.Authentication
             try
             {
                 string discordSignInUrl =
-                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId);
+                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
                 Application.OpenURL(discordSignInUrl);
             }
             catch (Exception e)
@@ -57,7 +58,7 @@ namespace Sequence.Authentication
             try
             {
                 string facebookSignInUrl =
-                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId);
+                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
                 Application.OpenURL(facebookSignInUrl);
             }
             catch (Exception e)
@@ -71,7 +72,7 @@ namespace Sequence.Authentication
             try
             {
                 string appleSignInUrl =
-                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId);
+                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 Application.OpenURL(appleSignInUrl);
             }
             catch (Exception e)
@@ -80,10 +81,16 @@ namespace Sequence.Authentication
             }
         }
 
-        private string GenerateSignInUrl(string baseUrl, string clientId)
+        private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
-            return
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken}&nonce={_nonce}/";
+            string url =
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken + method}&nonce={_nonce}/";
+            if (PlayerPrefs.HasKey(LoginEmail))
+            {
+                url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
+            }
+
+            return url;
         }
 
         public void PlatformSpecificSetup()
@@ -188,16 +195,23 @@ namespace Sequence.Authentication
 
         public void HandleDeepLink(string link)
         {
+            LoginMethod method = LoginMethod.None;
             link = link.RemoveTrailingSlash();
             
             Dictionary<string, string> queryParams = link.ExtractQueryParameters();
+            if (queryParams == null)
+            {
+                Debug.LogError($"Unexpected deep link: {link}");
+                return;
+            }
             if (queryParams.TryGetValue("state", out string state))
             {
-                if (state != _stateToken)
+                if (!state.StartsWith(_stateToken))
                 {
                     Debug.LogError("State token mismatch");
                     return;
                 }
+                method = GetMethodFromState(state);
             }
             else
             {
@@ -207,22 +221,56 @@ namespace Sequence.Authentication
             
             if (queryParams.TryGetValue("id_token", out string idToken))
             {
-                SignedIn?.Invoke(new OpenIdAuthenticationResult(idToken));
+                SignedIn?.Invoke(new OpenIdAuthenticationResult(idToken, method));
             }
             else
             {
                 Debug.LogError($"Unexpected deep link: {link}");
             }
         }
+
+        private LoginMethod GetMethodFromState(string state)
+        {
+            if (state.EndsWith(nameof(LoginMethod.Google)))
+            {
+                return LoginMethod.Google;
+            }
+
+            if (state.EndsWith(nameof(LoginMethod.Discord)))
+            {
+                return LoginMethod.Discord;
+            }
+
+            if (state.EndsWith(nameof(LoginMethod.Facebook)))
+            {
+                return LoginMethod.Facebook;
+            }
+
+            if (state.EndsWith(nameof(LoginMethod.Apple)))
+            {
+                return LoginMethod.Apple;
+            }
+
+            return LoginMethod.Custom;
+        }
+
+#if UNITY_EDITOR
+        public void InjectStateTokenForTesting(string stateToken)
+        {
+            _stateToken = stateToken;
+        }
+#endif
     }
 
     public class OpenIdAuthenticationResult
     {
         public string IdToken { get; private set; }
+        public LoginMethod Method { get; private set; }
 
-        public OpenIdAuthenticationResult(string idToken)
+        public OpenIdAuthenticationResult(string idToken, LoginMethod method)
         {
             IdToken = idToken;
+            Method = method;
         }
     }
 }

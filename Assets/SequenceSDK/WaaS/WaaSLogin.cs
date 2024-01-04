@@ -15,12 +15,12 @@ namespace Sequence.WaaS
     public class WaaSLogin : ILogin 
     {
         public const string WaaSWithAuthUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
+        public const string WaaSLoginMethod = "WaaSLoginMethod";
 
         private AWSConfig _awsConfig;
         private int _waasProjectId;
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
-        private MockLogin _mockLogin;
         private IValidator _validator;
         private string _challengeSession;
 
@@ -33,16 +33,6 @@ namespace Sequence.WaaS
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
-            
-            _mockLogin = new MockLogin();
-            _mockLogin.OnMFAEmailSent += email =>
-            {
-                OnMFAEmailSent?.Invoke(email);
-            };
-            _mockLogin.OnLoginSuccess += (token, address) =>
-            {
-                OnLoginSuccess?.Invoke(token, address);
-            };
 
             if (validator == null)
             {
@@ -54,7 +44,7 @@ namespace Sequence.WaaS
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
         public event ILogin.OnMFAEmailSentHandler OnMFAEmailSent;
         public event ILogin.OnMFAEmailFailedToSendHandler OnMFAEmailFailedToSend;
-        public event Action<WaaSWallet> OnWaaSWalletCreated; 
+        public Action<WaaSWallet> OnWaaSWalletCreated; 
 
         public async Task Login(string email)
         {
@@ -112,7 +102,7 @@ namespace Sequence.WaaS
                     return;
                 }
                 
-                ConnectToWaaS(idToken);
+                ConnectToWaaS(idToken, LoginMethod.Email);
             }
             catch (Exception e)
             {
@@ -142,10 +132,10 @@ namespace Sequence.WaaS
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            ConnectToWaaS(result.IdToken);
+            ConnectToWaaS(result.IdToken, result.Method);
         }
 
-        public async Task ConnectToWaaS(string idToken)
+        public async Task ConnectToWaaS(string idToken, LoginMethod method)
         {
             Credentials credentials;
             DataKey dataKey;
@@ -192,6 +182,10 @@ namespace Sequence.WaaS
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
                 OnWaaSWalletCreated?.Invoke(wallet);
+                string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
+                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
+                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+                PlayerPrefs.Save();
             }
             catch (Exception e)
             {
