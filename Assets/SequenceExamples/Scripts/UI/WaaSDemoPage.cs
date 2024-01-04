@@ -139,7 +139,6 @@ namespace Sequence.Demo
         
         public void SendErc1155Transfer()
         {
-            // Todo fix
             _wallet.SendTransaction(new SendTransactionArgs(
                 _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
@@ -245,7 +244,6 @@ namespace Sequence.Demo
 
         public void DelayedEncode()
         {
-            // Todo fix
             _wallet.SendTransaction(new SendTransactionArgs(
                 _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
