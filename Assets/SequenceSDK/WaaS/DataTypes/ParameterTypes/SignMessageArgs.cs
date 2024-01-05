@@ -27,15 +27,6 @@ namespace Sequence.WaaS
             this.expires = this.issued + timeBeforeExpiry;
         }
         
-        public SignMessageArgs(string wallet, string networkId, string message, uint timeBeforeExpiry = 30)
-        {
-            this.wallet = wallet;
-            this.network = networkId;
-            this.message = PrepareMessage(message);
-            this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            this.expires = this.issued + timeBeforeExpiry;
-        }
-        
         private static string PrepareMessage(string message)
         {
             return Wallet.IWallet.PrefixedMessage(Encoding.UTF8.GetBytes(message)).ByteArrayToHexString().ToUpper().EnsureHexPrefix();

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Sequence;
 using Sequence.WaaS;
 using Sequence.WaaS.Authentication;
+using SequenceSDK.WaaS;
 
 namespace SequenceExamples.Scripts.Tests.Utils
 {
@@ -16,19 +17,21 @@ namespace SequenceExamples.Scripts.Tests.Utils
         }
 
         public event Action<SignMessageReturn> OnSignMessageComplete;
-        public Task<SignMessageReturn> SignMessage(SignMessageArgs args)
+
+        public Task<SignMessageReturn> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
+        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature)
         {
             throw new NotImplementedException();
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
-        public Task<TransactionReturn> SendTransaction(SendTransactionArgs args)
+
+        public Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
         {
             throw new NotImplementedException();
         }
