@@ -128,22 +128,32 @@ public class SequenceEthClientTests
         }
     }
 
-    private static object[] chainIdCases =
-    {
-        new object[] { testnetUrl,  "0x7a69"},
-        new object[] { publicPolygonRpc, "0x89" },
-    };
-
+    private static List<Chain> chainIdCases = EnumExtensions.GetEnumValuesAsList<Chain>();
+    
     [TestCaseSource(nameof(chainIdCases))]
-    public async Task TestChainId(string url, string expected)
+    public async Task TestChainId(Chain chain)
     {
+        if (chain == Chain.None) return;
+        if (chain == Chain.TestnetGoerli || chain == Chain.TestnetArbitrumGoerli || chain == Chain.TestnetBaseGoerli)
+        {
+            // These chains are not supported by node gateway according to the builder
+            try
+            {
+                var client = new SequenceEthClient(chain);
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("not supported"));
+                return;
+            }
+        }
         try
         {
-            var client = new SequenceEthClient(url);
+            var client = new SequenceEthClient(chain);
             string chainId = await client.ChainID();
-            Assert.AreEqual(expected, chainId);
-        }
-        catch (Exception ex)
+            Assert.AreEqual(chain.AsHexString(), chainId);
+        }catch (Exception ex)
         {
             Assert.Fail("Expected no exception, but got: " + ex.Message);
         }

@@ -15,6 +15,16 @@ namespace Sequence.Provider
         private readonly string url = "";
         private string chainId = null;
 
+        public SequenceEthClient(Chain chain)
+        {
+            _httpRpcClient = new HttpRpcClient(NodeGatewayBridge.GetNodeGatewayUrl(chain));
+        }
+        
+        internal SequenceEthClient()
+        {
+            _httpRpcClient = new HttpRpcClient(url);
+        }
+
         public SequenceEthClient(string _url)
         {
             _httpRpcClient = new HttpRpcClient(_url);

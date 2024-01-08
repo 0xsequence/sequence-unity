@@ -16,6 +16,7 @@ namespace Sequence
             { Chain.Avalanche, "Avalanche" },
             { Chain.Gnosis, "Gnosis" },
             { Chain.Base, "Base" },
+            { Chain.OasysHomeverse, "OasysHomeverse"},
             
             { Chain.TestnetGoerli, "Goerli" },
             { Chain.TestnetSepolia, "Sepolia" },
@@ -23,6 +24,8 @@ namespace Sequence
             { Chain.TestnetArbitrumGoerli, "ArbitrumGoerli" },
             { Chain.TestnetBNBSmartChain, "BNBSmartChain" },
             { Chain.TestnetBaseGoerli, "BaseGoerli" },
+            { Chain.TestnetAvalanche, "AvalancheTestnet"},
+            {Chain.TestnetOasysHomeverse, "OasysHomeverseTestnet"}
         };
     }
 }
