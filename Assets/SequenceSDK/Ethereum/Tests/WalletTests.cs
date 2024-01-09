@@ -8,13 +8,13 @@ using Sequence.Provider;
 using System.Text;
 using NBitcoin.Secp256k1;
 using System;
-using System.Linq;
 using Sequence;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Numerics;
 using Sequence.Transactions;
 using Sequence.Contracts;
+using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS;
 using IWallet = Sequence.Wallet.IWallet;
@@ -290,7 +290,7 @@ public class EthWalletTests
 
         byte[] _19 = SequenceCoder.HexStringToByteArray("19");
         byte[] testMessage = Encoding.ASCII.GetBytes("Ethereum Signed Message:\n" +"this is a test".Length + "this is a test");
-        testMessage = _19.Concat(testMessage).ToArray();
+        testMessage = ByteArrayExtensions.ConcatenateByteArrays(_19, testMessage);
         string sig = await wallet.SignMessage(testMessage);
 
         Assert.AreEqual("0x45c666ac1fc5faae5639014d2c163c1ac4863fb78a4bd23c3785f7db99cf553666191da4cad5968d018287e784ceabc7f5565b5375a4b7e35cba897d0b666f0f1b", sig);
