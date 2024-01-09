@@ -6,7 +6,7 @@
   "unity": "2021.3",
   "keywords": ["Unity", "Package", "wallet", "ethereum", "web3", "sequence", "waas"],
   "dependencies": {
-    "com.newtonsoft.json" : "3.0.2"
+    "com.unity.nuget.newtonsoft-json" : "3.0.2"
   },
   "author": {
     "name": "0xsequence",
