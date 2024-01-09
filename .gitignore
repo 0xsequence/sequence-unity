@@ -106,5 +106,4 @@ testchain/artifacts/@openzeppelin
 testchain/artifacts/build-info
 testchain/cache/
 
-package.json
 package-lock.json
