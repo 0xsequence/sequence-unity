@@ -1,14 +1,17 @@
+using System;
 using System.Net.Sockets;
 using Sequence.Authentication;
 using Sequence.WaaS;
+using TMPro;
 using UnityEngine;
 
 namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
+        public static string UrlScheme = "sdk-powered-by-sequence";
+        
         private TransitionPanel _transitionPanel;
-        private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -19,7 +22,6 @@ namespace Sequence.Demo
             base.Awake();
             _transitionPanel = FindObjectOfType<TransitionPanel>();
             
-            _connectPage = GetComponentInChildren<ConnectPage>();
             _loginPage = GetComponentInChildren<LoginPage>();
             _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
 
@@ -28,8 +30,9 @@ namespace Sequence.Demo
             ILogin loginHandler = new WaaSLogin(new AWSConfig(
                 "us-east-2", 
                 "us-east-2:42c9f39d-c935-4d5c-a845-5c8815c79ee3", 
-                "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d"),
-                9, "1.0.0");
+                "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d",
+                "5fl7dg7mvu534o9vfjbc6hj31p"),
+                9, "1.0.0", UrlScheme);
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
@@ -39,21 +42,19 @@ namespace Sequence.Demo
         {
             _loginPage.SetupLogin(loginHandler);
             loginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
-            loginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
             
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
-            loginHandler.OnLoginFailed += OnLoginFailedHandler;
-
-            if (loginHandler is WaaSLogin waaSLogin)
-            {
-                waaSLogin.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
-            }
+            
+            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
         } 
 
         public void OpenTransitionPanel()
         {
-            _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
+            if (_transitionPanel != null)
+            {
+                _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
+            }
         }
 
         private void OnLoginSuccessHandler(string sessionId, string walletAddress)
@@ -62,20 +63,10 @@ namespace Sequence.Demo
             StartCoroutine(SetUIPage(_loginSuccessPage));
         }
 
-        private void OnLoginFailedHandler(string error)
-        {
-            Debug.LogError($"Failed login: {error}");
-        }
-
         private void OnMFAEmailSentHandler(string email)
         {
             Debug.Log($"Successfully sent MFA email to {email}");
             StartCoroutine(SetUIPage(_mfaPage, email));
-        }
-
-        private void OnMFAEmailFailedToSendHandler(string email, string error)
-        {
-            Debug.Log($"Failed to send MFA email to {email} with error: {error}");
         }
         
         // On Windows standalone, deep link will open a second instance of tghe game.
@@ -85,7 +76,7 @@ namespace Sequence.Demo
         private static void PassDeepLinkViaLocalServer()
         {
             var args = System.Environment.GetCommandLineArgs();
-            if (args.Length > 1 && args[1].StartsWith(OpenIdAuthenticator.UrlScheme))
+            if (args.Length > 1 && args[1].StartsWith(UrlScheme))
             {
                 var socketConnection = new TcpClient("localhost", OpenIdAuthenticator.WINDOWS_IPC_PORT);
                 var bytes = System.Text.Encoding.ASCII.GetBytes("@@@@" + args[1] + "$$$$");
@@ -98,7 +89,10 @@ namespace Sequence.Demo
 
         private void OnWaaSWalletCreatedHandler(WaaSWallet wallet)
         {
-            _waasDemoPage.Open(wallet);
+            if (_waasDemoPage != null)
+            {
+                _waasDemoPage.Open(wallet);
+            }
         }
     }
 }

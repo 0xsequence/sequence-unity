@@ -8,5 +8,7 @@ namespace Sequence.Authentication
         /// <param name="email"></param>
         /// <returns></returns>
         public bool ValidateEmail(string email);
+        
+        public bool ValidateCode(string code);
     }
 }

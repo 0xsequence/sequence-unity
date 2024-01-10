@@ -25,6 +25,15 @@ namespace SequenceExamples.Scripts.Tests.Utils
             Assert.AreEqual(expected, text.text);
         }
         
+        public static string GetTextFromInputFieldWithName(Transform parent, string name)
+        {
+            Transform textTransform = parent.FindAmongDecendants(name);
+            Assert.IsNotNull(textTransform);
+            TMP_InputField text = textTransform.GetComponent<TMP_InputField>();
+            Assert.IsNotNull(text);
+            return text.text;
+        }
+        
         public static void AssertStartsWith(this string value, string startsWith)
         {
             int length = startsWith.Length;

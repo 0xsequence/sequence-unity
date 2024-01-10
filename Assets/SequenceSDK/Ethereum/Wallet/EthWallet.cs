@@ -58,13 +58,8 @@ namespace Sequence.Wallet
             return IWallet.PubkeyToAddress(publicKeyBytes64);
         }
 
-        public Address GetAddress(uint accountIndex = 0)
+        public Address GetAddress()
         {
-            if (accountIndex != 0)
-            {
-                Debug.LogWarning("EthWallet has no concept of accountIndex. There is only one Address/account per EthWallet.");
-            }
-            
             if (address == null)
             {
                 address = new Address(GenerateAddress());
@@ -217,12 +212,12 @@ namespace Sequence.Wallet
         /// <param name="signature">The signature to verify.</param>
         /// <param name="message">The message that was signed.</param>
         /// <returns><c>true</c> if the signature is valid, <c>false</c> otherwise.</returns>
-        public async Task<bool> IsValidSignature(string signature, string message, string chainId = "", uint accountIndex = 0)
+        public async Task<bool> IsValidSignature(string signature, string message, Chain chain = Chain.None)
         {
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-            if (chainId != null && chainId.Length > 0)
+            if (chain != Chain.None)
             {
-                messageBytes = ByteArrayExtensions.ConcatenateByteArrays(messageBytes, Encoding.UTF8.GetBytes(chainId));
+                messageBytes = ByteArrayExtensions.ConcatenateByteArrays(messageBytes, Encoding.UTF8.GetBytes(chain.AsHexString()));
             }
             byte[] messagePrefix = PrefixedMessage(messageBytes);
             byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);

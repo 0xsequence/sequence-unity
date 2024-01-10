@@ -17,7 +17,6 @@ namespace SequenceExamples.Scripts.Tests
             
         private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
-        private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -25,14 +24,14 @@ namespace SequenceExamples.Scripts.Tests
         
         private static readonly WaitForSeconds WaitForAnimationTime = new WaitForSeconds(UITestHarness.WaitForAnimationTime);
 
-        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel, ConnectPage connectPage, LoginPage loginPage,
+        public void Setup(MonoBehaviour testMonobehaviour, SequenceSampleUI ui, LoginPanel loginPanel,  LoginPage loginPage,
             MultifactorAuthenticationPage mfaPage, LoginSuccessPage loginSuccessPage, WalletPanel walletPanel)
         {
             _testMonobehaviour = testMonobehaviour;
             _ui = ui;
             _loginPanel = loginPanel;
-            _connectPage = connectPage;
             _loginPage = loginPage;
+            _loginPage.NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = false;
             _mfaPage = mfaPage;
             _loginSuccessPage = loginSuccessPage;
             _walletPanel = walletPanel;
@@ -55,10 +54,11 @@ namespace SequenceExamples.Scripts.Tests
         {
             // Run all tests in one single suite to save time running test suite (otherwise, we need to reload and tear down the scene for each test
             InitialExpectationsTest();
+            string expectedEmail = TestExtensions.GetTextFromInputFieldWithName(_loginPage.transform, "EmailField");
             foreach (string provider in new[] {"Google", "Discord", "Facebook", "Apple"})
             {
                 yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageViaSocialLoginTest(provider));
-                yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest(""));
+                yield return _testMonobehaviour.StartCoroutine(GoBackToLoginPageAndVerifyPageStateTest(expectedEmail));
             }
             
             yield return _testMonobehaviour.StartCoroutine(NavigateToLoginSuccessPageViaSocialLoginAndDismissTest("Google"));
@@ -72,7 +72,6 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertWeAreOnLoginPage()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
@@ -85,6 +84,18 @@ namespace SequenceExamples.Scripts.Tests
         }
 
         private IEnumerator TransitionToMfaPage(string email)
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTransitionToMfaPage(email));
+
+            AssertWeAreOnMfaPage();
+            
+            GameObject textGameObject = GameObject.Find("EnterCodeText");
+            Assert.IsNotNull(textGameObject);
+            TextMeshProUGUI text = textGameObject.GetComponent<TextMeshProUGUI>();
+            Assert.AreEqual($"Enter the code sent to\n<b>{email}</b>", text.text);
+        }
+
+        private IEnumerator InitiateTransitionToMfaPage(string email)
         {
             GameObject buttonGameObject = GameObject.Find("LoginButton");
             Assert.IsNotNull(buttonGameObject);
@@ -100,19 +111,11 @@ namespace SequenceExamples.Scripts.Tests
             
             button.onClick.Invoke();
             yield return new WaitForSeconds(UITestHarness.WaitForAnimationTime); // Wait for next page to animate in
-
-            AssertWeAreOnMfaPage();
-            
-            GameObject textGameObject = GameObject.Find("EnterCodeText");
-            Assert.IsNotNull(textGameObject);
-            TextMeshProUGUI text = textGameObject.GetComponent<TextMeshProUGUI>();
-            Assert.AreEqual($"Enter the code sent to\n<b>{email}</b>", text.text);
         }
 
         private void AssertWeAreOnMfaPage()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
@@ -164,11 +167,17 @@ namespace SequenceExamples.Scripts.Tests
         
         private TMP_InputField FetchMfaCodeFieldAndAssertAssumptions()
         {
+            TMP_InputField MfaCodeField = FetchMfaCodeField();
+            Assert.AreEqual("", MfaCodeField.text);
+            return MfaCodeField;
+        }
+
+        private TMP_InputField FetchMfaCodeField()
+        {
             GameObject MfaCodeGameObject = GameObject.Find("MFACodeField");
             Assert.IsNotNull(MfaCodeGameObject);
             TMP_InputField MfaCodeField = MfaCodeGameObject.GetComponent<TMP_InputField>();
             Assert.IsNotNull(MfaCodeField);
-            Assert.AreEqual("", MfaCodeField.text);
             return MfaCodeField;
         }
 
@@ -192,7 +201,6 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertWeAreOnLoginSuccessPage()
         {
             Assert.IsTrue(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsTrue(_loginSuccessPage.gameObject.activeInHierarchy);
@@ -265,16 +273,52 @@ namespace SequenceExamples.Scripts.Tests
         private void AssertLoginPanelIsClosed()
         {
             Assert.IsFalse(_loginPanel.gameObject.activeInHierarchy);
-            Assert.IsFalse(_connectPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_mfaPage.gameObject.activeInHierarchy);
             Assert.IsFalse(_loginSuccessPage.gameObject.activeInHierarchy);
         }
-    }
 
-    public class TestClass : MonoBehaviour
-    {
-        // Used to attach a monobehaviour to our test object. Unity requires a monobehaviour to attach a coroutine to - that way it can cancel the coroutine if the monobehaviour
-        // gets destroyed. The test object will not be destroyed, allowing our tests to run to completion
+        public IEnumerator EmailFlowFailTest()
+        {
+            AssertWeAreOnLoginPage();
+            TestExtensions.AssertTextWithNameHasText(_loginPage.transform, "ErrorText", "");
+            yield return _testMonobehaviour.StartCoroutine(InitiateTransitionToMfaPage("invalidEmail"));
+            AssertWeAreOnLoginPage();
+            TestExtensions.AssertTextWithNameHasText(_loginPage.transform, "ErrorText", "Invalid email: invalidEmail");
+            LogAssert.Expect(LogType.Error, "Failed to send MFA email to invalidEmail with error: Invalid email: invalidEmail");
+
+            yield return _testMonobehaviour.StartCoroutine(InitiateTransitionToMfaPage("failSend@fakeDomain.com"));
+            AssertWeAreOnLoginPage();
+            TestExtensions.AssertTextWithNameHasText(_loginPage.transform, "ErrorText", "Failed to send email to failSend@fakeDomain.com");
+            LogAssert.Expect(LogType.Error, "Failed to send MFA email to failSend@fakeDomain.com with error: Failed to send email to failSend@fakeDomain.com");
+
+            yield return _testMonobehaviour.StartCoroutine(TransitionToMfaPage("failLogin@noReason.net"));
+            
+            AssertWeAreOnMfaPage();
+            TMP_InputField MfaCodeField = FetchMfaCodeField();
+            MfaCodeField.text = "invalidCode";
+            TestExtensions.ClickButtonWithName(_mfaPage.transform, "ContinueButton");
+            yield return WaitForAnimationTime;
+            TestExtensions.AssertTextWithNameHasText(_mfaPage.transform, "ErrorText", "Login failed because of invalid code");
+            LogAssert.Expect(LogType.Error, "Failed login: Login failed because of invalid code");
+            
+            MfaCodeField.text = "12345";
+            TestExtensions.ClickButtonWithName(_mfaPage.transform, "ContinueButton");
+            yield return WaitForAnimationTime;
+            TestExtensions.AssertTextWithNameHasText(_mfaPage.transform, "ErrorText", "Login failed because of invalid code");
+            LogAssert.Expect(LogType.Error, "Failed login: Login failed because of invalid code");
+            
+            MfaCodeField.text = "12e456";
+            TestExtensions.ClickButtonWithName(_mfaPage.transform, "ContinueButton");
+            yield return WaitForAnimationTime;
+            TestExtensions.AssertTextWithNameHasText(_mfaPage.transform, "ErrorText", "Login failed because of invalid code");
+            LogAssert.Expect(LogType.Error, "Failed login: Login failed because of invalid code");
+            
+            MfaCodeField.text = "123456";
+            TestExtensions.ClickButtonWithName(_mfaPage.transform, "ContinueButton");
+            yield return WaitForAnimationTime;
+            TestExtensions.AssertTextWithNameHasText(_mfaPage.transform, "ErrorText", "Login failed for some reason");
+            LogAssert.Expect(LogType.Error, "Failed login: Login failed for some reason");
+        }
     }
 }

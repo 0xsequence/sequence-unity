@@ -1,4 +1,8 @@
 using System;
+using System.Text;
+using Sequence.ABI;
+using Sequence.Extensions;
+using Sequence.Utils;
 using SequenceSDK.WaaS;
 
 namespace Sequence.WaaS
@@ -30,6 +34,11 @@ namespace Sequence.WaaS
             this.message = message;
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
+        }
+        
+        private static string PrepareMessage(string message)
+        {
+            return Wallet.IWallet.PrefixedMessage(Encoding.UTF8.GetBytes(message)).ByteArrayToHexString().ToUpper().EnsureHexPrefix();
         }
     }
 }

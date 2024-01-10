@@ -272,10 +272,10 @@ public class EthWalletTests
         string address = wallet.GetAddress();
         Assert.NotNull(address);
 
-        string sig = await wallet.SignMessage(message, "0x89");
+        string sig = await wallet.SignMessage(message, Chain.Polygon.AsHexString());
         Assert.NotNull(sig);
 
-        bool valid = await wallet.IsValidSignature(sig, message, chainId: "0x89");
+        bool valid = await wallet.IsValidSignature(sig, message, chain: Chain.Polygon);
         Assert.IsTrue(valid);
     }
 

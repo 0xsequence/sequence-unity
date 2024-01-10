@@ -4,6 +4,8 @@ using System.IO;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Sequence.Authentication.ScriptableObjects;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,25 +13,39 @@ namespace Sequence.Authentication
 {
     public class OpenIdAuthenticator
     {
+        public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
+        private string _urlScheme;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
-        public static readonly string UrlScheme = "powered-by-sequence";
         
         private static readonly string GoogleClientId = "970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com";
         private static readonly string DiscordClientId = ""; // Todo replace
         private static readonly string FacebookClientId = ""; // Todo replace
         private static readonly string AppleClientId = ""; // Todo replace
-        private static readonly string RedirectUrl = "https://3d41-142-115-54-118.ngrok-free.app/";
+        private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
-        private readonly string _stateToken = Guid.NewGuid().ToString();
+        private string _stateToken = Guid.NewGuid().ToString();
         private readonly string _nonce = Guid.NewGuid().ToString();
+
+        public OpenIdAuthenticator()
+        {
+            OpenIdAuthenticatorConfig config = Resources.Load<OpenIdAuthenticatorConfig>("OpenIdAuthenticatorConfig");
+
+            if (config == null)
+            {
+                Debug.LogError("OpenIdAuthenticatorConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > OpenIdAuthenticatorConfig");
+                return;
+            }
+
+            _urlScheme = config.UrlScheme;
+        }
 
         public void GoogleSignIn()
         {
             try
             {
-                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId);
+                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
                 Application.OpenURL(googleSignInUrl);
             }
             catch (Exception e)
@@ -43,7 +59,7 @@ namespace Sequence.Authentication
             try
             {
                 string discordSignInUrl =
-                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId);
+                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
                 Application.OpenURL(discordSignInUrl);
             }
             catch (Exception e)
@@ -57,7 +73,7 @@ namespace Sequence.Authentication
             try
             {
                 string facebookSignInUrl =
-                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId);
+                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
                 Application.OpenURL(facebookSignInUrl);
             }
             catch (Exception e)
@@ -71,7 +87,7 @@ namespace Sequence.Authentication
             try
             {
                 string appleSignInUrl =
-                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId);
+                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 Application.OpenURL(appleSignInUrl);
             }
             catch (Exception e)
@@ -80,10 +96,16 @@ namespace Sequence.Authentication
             }
         }
 
-        private string GenerateSignInUrl(string baseUrl, string clientId)
+        private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
-            return
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl.AppendTrailingSlashIfNeeded()}&scope=openid+profile+email&state={_stateToken}&nonce={_nonce}/";
+            string url =
+                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
+            if (PlayerPrefs.HasKey(LoginEmail))
+            {
+                url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
+            }
+
+            return url;
         }
 
         public void PlatformSpecificSetup()
@@ -92,11 +114,11 @@ namespace Sequence.Authentication
             // Register a Windows URL protocol handler in the Windows Registry.
             var appPath = Path.GetFullPath(Application.dataPath.Replace("_Data", ".exe"));
             string[] commands = new string[]{
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme} /t REG_SZ /d \"URL:Sequence Login for {Application.productName}\" /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme} /v \"URL Protocol\" /t REG_SZ /d \"\" /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell\\open /f",
-                $"add HKEY_CURRENT_USER\\Software\\Classes\\{UrlScheme}\\shell\\open\\command /t REG_SZ /d \"\\\"{appPath}\\\" \\\"%1\\\"\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme} /t REG_SZ /d \"URL:Sequence Login for {Application.productName}\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme} /v \"URL Protocol\" /t REG_SZ /d \"\" /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell\\open /f",
+                $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell\\open\\command /t REG_SZ /d \"\\\"{appPath}\\\" \\\"%1\\\"\" /f",
             };
             foreach(var args in commands) {
                 var command = new System.Diagnostics.ProcessStartInfo();
@@ -188,16 +210,23 @@ namespace Sequence.Authentication
 
         public void HandleDeepLink(string link)
         {
+            LoginMethod method = LoginMethod.None;
             link = link.RemoveTrailingSlash();
             
             Dictionary<string, string> queryParams = link.ExtractQueryParameters();
+            if (queryParams == null)
+            {
+                Debug.LogError($"Unexpected deep link: {link}");
+                return;
+            }
             if (queryParams.TryGetValue("state", out string state))
             {
-                if (state != _stateToken)
+                if (!state.Contains(_stateToken))
                 {
                     Debug.LogError("State token mismatch");
                     return;
                 }
+                method = GetMethodFromState(state);
             }
             else
             {
@@ -207,22 +236,56 @@ namespace Sequence.Authentication
             
             if (queryParams.TryGetValue("id_token", out string idToken))
             {
-                SignedIn?.Invoke(new OpenIdAuthenticationResult(idToken));
+                SignedIn?.Invoke(new OpenIdAuthenticationResult(idToken, method));
             }
             else
             {
                 Debug.LogError($"Unexpected deep link: {link}");
             }
         }
+
+        private LoginMethod GetMethodFromState(string state)
+        {
+            if (state.EndsWith(nameof(LoginMethod.Google)))
+            {
+                return LoginMethod.Google;
+            }
+
+            if (state.EndsWith(nameof(LoginMethod.Discord)))
+            {
+                return LoginMethod.Discord;
+            }
+
+            if (state.EndsWith(nameof(LoginMethod.Facebook)))
+            {
+                return LoginMethod.Facebook;
+            }
+
+            if (state.EndsWith(nameof(LoginMethod.Apple)))
+            {
+                return LoginMethod.Apple;
+            }
+
+            return LoginMethod.Custom;
+        }
+
+#if UNITY_EDITOR
+        public void InjectStateTokenForTesting(string stateToken)
+        {
+            _stateToken = stateToken;
+        }
+#endif
     }
 
     public class OpenIdAuthenticationResult
     {
         public string IdToken { get; private set; }
+        public LoginMethod Method { get; private set; }
 
-        public OpenIdAuthenticationResult(string idToken)
+        public OpenIdAuthenticationResult(string idToken, LoginMethod method)
         {
             IdToken = idToken;
+            Method = method;
         }
     }
 }

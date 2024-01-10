@@ -10,12 +10,7 @@
         "BouncyCastle.Crypto.dll",
         "NBitcoin.Secp256k1.dll",
         "NBitcoin.dll",
-        "Newtonsoft.Json.dll",
-        "Nethereum.Web3.dll",
-        "Nethereum.Util.dll",
-        "Nethereum.Signer.dll",
-        "Nethereum.ABI.dll",
-        "Nethereum.Hex.dll"
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

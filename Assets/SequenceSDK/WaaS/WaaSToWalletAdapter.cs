@@ -15,40 +15,15 @@ namespace Sequence.WaaS
     public class WaaSToWalletAdapter : Sequence.Wallet.IWallet
     {
         private IWallet _wallet;
-        private Dictionary<uint, Address> _walletAddressesByAccountIndex;
 
-        public static async Task<WaaSToWalletAdapter> CreateAsync(WaaSWallet wallet)
-        {
-            var walletAddressesByAccountIndex = new Dictionary<uint, Address>();
-            var address = await wallet.GetWalletAddress(null);
-            walletAddressesByAccountIndex[0] = new Address(address.address);
-            return new WaaSToWalletAdapter(wallet, walletAddressesByAccountIndex);
-        }
-
-        private WaaSToWalletAdapter(IWallet wallet, Dictionary<uint, Address> walletAddressesByAccountIndex)
+        public WaaSToWalletAdapter(IWallet wallet)
         {
             _wallet = wallet;
-            _walletAddressesByAccountIndex = walletAddressesByAccountIndex;
-        }
-
-        public static async Task<WaaSToWalletAdapter> CreateAsync(IWallet wallet, uint[] accountIndexes)
-        {
-            var walletAddressesByAccountIndex = new Dictionary<uint, Address>();
-            int accounts = accountIndexes.Length;
-
-            for (int i = 0; i < accounts; i++)
-            {
-                var addressReturn =
-                    await wallet.GetWalletAddress(new GetWalletAddressArgs(accountIndexes[i]));
-                walletAddressesByAccountIndex[accountIndexes[i]] = new Address(addressReturn.address);
-            }
-
-            return new WaaSToWalletAdapter(wallet, walletAddressesByAccountIndex);
         }
         
-        public Address GetAddress(uint accountIndex = 0)
+        public Address GetAddress()
         {
-            return _walletAddressesByAccountIndex[accountIndex];
+            return _wallet.GetWalletAddress();
         }
 
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
@@ -138,9 +113,9 @@ namespace Sequence.WaaS
             return result.signature;
         }
 
-        public async Task<bool> IsValidSignature(string signature, string message, string chainId, uint accountIndex = 0)
+        public async Task<bool> IsValidSignature(string signature, string message, Chain chain)
         {
-            var args = new IsValidMessageSignatureArgs((uint)chainId.HexStringToInt(), GetAddress(accountIndex), message, signature);
+            var args = new IsValidMessageSignatureArgs(chain, GetAddress(), message, signature);
             var result = await _wallet.IsValidMessageSignature(args);
             return result.isValid;
         }

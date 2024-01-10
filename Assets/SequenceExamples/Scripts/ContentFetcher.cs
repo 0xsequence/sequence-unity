@@ -27,6 +27,10 @@ namespace Sequence.Demo
             _address = address;
             
             _includeChains = includeChains.ConvertToList();
+            if (_includeChains.Contains(Chain.None))
+            {
+                _includeChains.Remove(Chain.None);
+            }
 
             _indexers = new List<IIndexer>();
             int chains = _includeChains.Count;

@@ -14,10 +14,6 @@ namespace Sequence.Provider
         private IRpcClient _httpRpcClient;
         private readonly string url = "";
         private string chainId = null;
-        public SequenceEthClient()
-        {
-            _httpRpcClient = new HttpRpcClient(url);
-        }
 
         public SequenceEthClient(string _url)
         {

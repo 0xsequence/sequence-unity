@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Sequence;
 using Sequence.Demo;
@@ -18,7 +19,6 @@ namespace SequenceExamples.Scripts.Tests
             
         private SequenceSampleUI _ui;
         private LoginPanel _loginPanel;
-        private ConnectPage _connectPage;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -33,8 +33,6 @@ namespace SequenceExamples.Scripts.Tests
         private WalletDropdown _walletDropdown;
 
         public static float WaitForAnimationTime = 1.5f;
-        
-        public static readonly Address TestAddress = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
 
         [UnitySetUp]
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
@@ -46,7 +44,6 @@ namespace SequenceExamples.Scripts.Tests
                 yield return null; // Allow object to load
                 _ui = FindObjectOfType<SequenceSampleUI>();
                 _loginPanel = FindObjectOfType<LoginPanel>();
-                _connectPage = FindObjectOfType<ConnectPage>();
                 _loginPage = FindObjectOfType<LoginPage>();
                 _mfaPage = FindObjectOfType<MultifactorAuthenticationPage>();
                 _loginSuccessPage = FindObjectOfType<LoginSuccessPage>();
@@ -77,7 +74,7 @@ namespace SequenceExamples.Scripts.Tests
             _ui.Start();
             yield return new WaitForSeconds(WaitForAnimationTime); // Wait a few seconds to allow for UI to animate into place
             
-            _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _connectPage, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
+            _loginFlowUITests.Setup(_testMonobehaviour, _ui, _loginPanel, _loginPage, _mfaPage, _loginSuccessPage, _walletPanel);
             _walletFlowUITests.Setup(_testMonobehaviour, _ui, _walletPanel, _walletPage, _loginPanel, _transitionPanel,
                 _searchPage, _collectionInfoPage, _nftInfoPage, _tokenInfoPage, _searchViewAllPage, _walletDropdown);
         }
@@ -87,7 +84,6 @@ namespace SequenceExamples.Scripts.Tests
         {
             _ui = null;
             _loginPanel = null;
-            _connectPage = null;
             _loginPage = null;
             _mfaPage = null;
             _loginSuccessPage = null;
@@ -109,6 +105,13 @@ namespace SequenceExamples.Scripts.Tests
         {
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
             yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EndToEndSocialFlowTest());
+        }
+        
+        [UnityTest]
+        public IEnumerator LoginEmailFlowFailTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.EmailFlowFailTest());
         }
 
         [UnityTest]
@@ -134,7 +137,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
                 new MockTokenContentFetcher(_walletFlowUITests.RandomNumberOfTokensToFetch, 0),
                 new MockNftContentFetcher(_walletFlowUITests.RandomNumberOfNftsToFetch, 0),
-                TestAddress));
+                new MockWaaSWallet()));
         }
 
         [UnityTest]
@@ -186,8 +189,14 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(InitiateTest(_walletPanel,
                 tokenFetcher,
                 nftFetcher,
-                TestAddress));
+                new MockWaaSWallet()));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
         }
+    }
+
+    public class TestClass : MonoBehaviour
+    {
+        // Used to attach a monobehaviour to our test object. Unity requires a monobehaviour to attach a coroutine to - that way it can cancel the coroutine if the monobehaviour
+        // gets destroyed. The test object will not be destroyed, allowing our tests to run to completion
     }
 }

@@ -15,14 +15,16 @@ namespace Sequence.WaaS
     public class WaaSLogin : ILogin 
     {
         public const string WaaSWithAuthUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
+        public const string WaaSLoginMethod = "WaaSLoginMethod";
 
         private AWSConfig _awsConfig;
         private int _waasProjectId;
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
-        private MockLogin _mockLogin;
+        private IValidator _validator;
+        private string _challengeSession;
 
-        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion)
+        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, string urlScheme, IValidator validator = null)
         {
             _awsConfig = awsConfig;
             _waasProjectId = waasProjectId;
@@ -31,33 +33,80 @@ namespace Sequence.WaaS
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
-            
-            _mockLogin = new MockLogin();
-            _mockLogin.OnMFAEmailSent += email =>
+
+            if (validator == null)
             {
-                OnMFAEmailSent?.Invoke(email);
-            };
-            _mockLogin.OnLoginSuccess += (token, address) =>
-            {
-                OnLoginSuccess?.Invoke(token, address);
-            };
+                validator = new Validator();
+            }
+            _validator = validator;
         }
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
         public event ILogin.OnMFAEmailSentHandler OnMFAEmailSent;
         public event ILogin.OnMFAEmailFailedToSendHandler OnMFAEmailFailedToSend;
-        public event Action<WaaSWallet> OnWaaSWalletCreated; 
 
         public async Task Login(string email)
         {
-            Debug.LogError("Not Implemented... mocking for now");
-            await _mockLogin.Login(email);
+            if (!_validator.ValidateEmail(email))
+            {
+                OnMFAEmailFailedToSend?.Invoke(email, $"Invalid email: {email}");
+                return;
+            }
+            
+            AWSEmailSignIn signIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
+            try
+            {
+                _challengeSession = await signIn.SignIn(email);
+                if (string.IsNullOrEmpty(_challengeSession))
+                {
+                    OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
+                    return;
+                }
+                
+                if (_challengeSession.StartsWith("Error"))
+                {
+                    OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
+                    return;
+                }
+                
+                OnMFAEmailSent?.Invoke(email);
+            }
+            catch (Exception e)
+            {
+                OnMFAEmailFailedToSend?.Invoke(email, e.Message);
+            }
         }
 
         public async Task Login(string email, string code)
         {
-            Debug.LogError("Not Implemented... mocking for now");
-            await _mockLogin.Login(email, code);
+            if (!_validator.ValidateCode(code))
+            {
+                OnLoginFailed?.Invoke($"Invalid code: {code}");
+                return;
+            }
+            
+            AWSEmailSignIn signIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
+            try
+            {
+                string idToken = await signIn.Login(_challengeSession, email, code);
+                if (string.IsNullOrEmpty(idToken))
+                {
+                    OnLoginFailed?.Invoke("Unknown error establishing AWS session");
+                    return;
+                }
+
+                if (idToken.StartsWith("Error"))
+                {
+                    OnLoginFailed?.Invoke(idToken);
+                    return;
+                }
+                
+                ConnectToWaaS(idToken, LoginMethod.Email);
+            }
+            catch (Exception e)
+            {
+                OnLoginFailed?.Invoke(e.Message);
+            }
         }
 
         public void GoogleLogin()
@@ -82,10 +131,10 @@ namespace Sequence.WaaS
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            ConnectToWaaS(result.IdToken);
+            ConnectToWaaS(result.IdToken, result.Method);
         }
 
-        public async Task ConnectToWaaS(string idToken)
+        public async Task ConnectToWaaS(string idToken, LoginMethod method)
         {
             Credentials credentials;
             DataKey dataKey;
@@ -131,7 +180,11 @@ namespace Sequence.WaaS
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
-                OnWaaSWalletCreated?.Invoke(wallet);
+                WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
+                string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
+                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
+                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+                PlayerPrefs.Save();
             }
             catch (Exception e)
             {
