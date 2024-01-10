@@ -4,18 +4,18 @@ using Sequence.Authentication;
 using Sequence.WaaS;
 using TMPro;
 using UnityEngine;
+using Sequence.Config;
 
 namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
-        public static string UrlScheme = "sdk-powered-by-sequence";
-        
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
         private WaaSDemoPage _waasDemoPage;
+        private static string _urlScheme;
         
         protected override void Awake()
         {
@@ -26,16 +26,24 @@ namespace Sequence.Demo
             _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
 
             _waasDemoPage = FindObjectOfType<WaaSDemoPage>();
+
+            SequenceConfig config = SequenceConfig.GetConfig();
             
             ILogin loginHandler = new WaaSLogin(new AWSConfig(
-                "us-east-2", 
-                "us-east-2:42c9f39d-c935-4d5c-a845-5c8815c79ee3", 
-                "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d",
-                "5fl7dg7mvu534o9vfjbc6hj31p"),
-                9, "1.0.0", UrlScheme);
+                config.Region, 
+                config.IdentityPoolId, 
+                config.KMSEncryptionKeyId,
+                config.CognitoClientId),
+                config.WaaSProjectId, 
+                config.WaaSVersion);
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
+            
+            if (_urlScheme == null) 
+            {
+                _urlScheme = SequenceConfig.GetConfig().UrlScheme;
+            }
         }
 
         public void SetupLoginHandler(ILogin loginHandler)
@@ -76,7 +84,11 @@ namespace Sequence.Demo
         private static void PassDeepLinkViaLocalServer()
         {
             var args = System.Environment.GetCommandLineArgs();
-            if (args.Length > 1 && args[1].StartsWith(UrlScheme))
+            if (_urlScheme == null) 
+            {
+                _urlScheme = SequenceConfig.GetConfig().UrlScheme;
+            }
+            if (args.Length > 1 && args[1].StartsWith(_urlScheme))
             {
                 var socketConnection = new TcpClient("localhost", OpenIdAuthenticator.WINDOWS_IPC_PORT);
                 var bytes = System.Text.Encoding.ASCII.GetBytes("@@@@" + args[1] + "$$$$");

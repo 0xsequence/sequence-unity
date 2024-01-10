@@ -9,6 +9,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.IO;
 using System.Net;
+using Sequence.Config;
 
 namespace Sequence
 {
@@ -79,6 +80,8 @@ namespace Sequence
         { (int)Chain.TestnetBNBSmartChain, "bsc-testnet" },
         { (int)Chain.TestnetBaseGoerli, "base-goerli" },
     };
+
+        private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
 
         /// <summary>
         /// Combines <see cref="PATH"/> and <paramref name="name"/> to suffix on to the Base Address
@@ -237,6 +240,7 @@ namespace Sequence
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
+            req.SetRequestHeader("X-Access-Key", _builderApiKey);
             req.method = UnityWebRequest.kHttpVerbPOST;
             req.timeout = 10; // Request will timeout after 10 seconds
                 

@@ -24,7 +24,7 @@ namespace Sequence.WaaS
         private IValidator _validator;
         private string _challengeSession;
 
-        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, string urlScheme, IValidator validator = null)
+        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, IValidator validator = null)
         {
             _awsConfig = awsConfig;
             _waasProjectId = waasProjectId;

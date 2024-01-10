@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Sequence.Authentication;
+using Sequence.Config;
 using Sequence.Provider;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -26,6 +27,9 @@ namespace Sequence.WaaS
         {
             _url = url;
             this._defaultHeaders = new Dictionary<string, string>();
+            _defaultHeaders["Content-Type"] = "application/json";
+            _defaultHeaders["Accept"] = "application/json";
+            _defaultHeaders["X-Access-Token"] = SequenceConfig.GetConfig().BuilderAPIKey;
         }
 
         public void AddDefaultHeader(string key, string value)
@@ -33,7 +37,8 @@ namespace Sequence.WaaS
             this._defaultHeaders[key] = value;
         }
 
-        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        public (UnityWebRequest, string, string) BuildRequest<T>(string path, T args,
+            [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             string url = _url + "/" + path;
             if (overrideUrl != null)
@@ -42,8 +47,6 @@ namespace Sequence.WaaS
             }
             string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             UnityWebRequest request = UnityWebRequest.Get(url);
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Accept", "application/json");
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
             request.uploadHandler = new UploadHandlerRaw(requestData);
@@ -52,6 +55,16 @@ namespace Sequence.WaaS
             if (headers == null)
             {
                 headers = _defaultHeaders;
+            }
+            else
+            {
+                foreach (string key in _defaultHeaders.Keys)
+                {
+                    if (!headers.ContainsKey(key))
+                    {
+                        headers[key] = _defaultHeaders[key];
+                    }
+                }
             }
             
             foreach (string key in headers.Keys)
@@ -62,7 +75,16 @@ namespace Sequence.WaaS
             string method = request.method;
             string headersString = ExtractHeaders(request);
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
-            Debug.Log("Equivalent curl command: " + curlRequest);
+
+            return (request, curlRequest, url);
+        }
+
+        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        {
+            (UnityWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
+            UnityWebRequest request = newRequest.Item1;
+            string curlRequest = newRequest.Item2;
+            string url = newRequest.Item3;
 
             try
             {
@@ -110,7 +132,7 @@ namespace Sequence.WaaS
         private string ExtractHeaders(UnityWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
-            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant"})
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Token"})
             {
                 string headerValue = request.GetRequestHeader(headerKey);
                 if (string.IsNullOrEmpty(headerValue))

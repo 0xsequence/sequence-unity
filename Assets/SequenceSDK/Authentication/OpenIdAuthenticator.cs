@@ -1,13 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Sequence.Authentication.ScriptableObjects;
-using UnityEditor;
+using Sequence.Config;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence.Authentication
 {
@@ -19,10 +13,11 @@ namespace Sequence.Authentication
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
         
-        private static readonly string GoogleClientId = "970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com";
-        private static readonly string DiscordClientId = ""; // Todo replace
-        private static readonly string FacebookClientId = ""; // Todo replace
-        private static readonly string AppleClientId = ""; // Todo replace
+        private string GoogleClientId;
+        private string DiscordClientId;
+        private string FacebookClientId;
+        private string AppleClientId;
+        
         private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
         private string _stateToken = Guid.NewGuid().ToString();
@@ -30,15 +25,13 @@ namespace Sequence.Authentication
 
         public OpenIdAuthenticator()
         {
-            OpenIdAuthenticatorConfig config = Resources.Load<OpenIdAuthenticatorConfig>("OpenIdAuthenticatorConfig");
-
-            if (config == null)
-            {
-                Debug.LogError("OpenIdAuthenticatorConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > OpenIdAuthenticatorConfig");
-                return;
-            }
+            SequenceConfig config = SequenceConfig.GetConfig();
 
             _urlScheme = config.UrlScheme;
+            GoogleClientId = config.GoogleClientId;
+            DiscordClientId = config.DiscordClientId;
+            FacebookClientId = config.FacebookClientId;
+            AppleClientId = config.AppleClientId;
         }
 
         public void GoogleSignIn()
@@ -98,6 +91,11 @@ namespace Sequence.Authentication
 
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
+            if (String.IsNullOrWhiteSpace(clientId))
+            {
+                throw new Exception("Client ID is not set. Please set it in the SequenceConfig asset in your Resources folder.");
+            }
+            
             string url =
                 $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))
