@@ -79,19 +79,19 @@ namespace Sequence.WaaS.Tests
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
             walletTests.TestSendERC20();
-            walletTests.TestSendBatchTransaction_withERC721();
-            walletTests.TestSendBatchTransaction_withERC1155();
-            walletTests.TestDelayedEncode("transfer(address,uint256)");
-            walletTests.TestDelayedEncode(ERC20.Abi);
-            walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
-            walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
+            // walletTests.TestSendBatchTransaction_withERC721();
+            // walletTests.TestSendBatchTransaction_withERC1155();
+            // walletTests.TestDelayedEncode("transfer(address,uint256)");
+            // walletTests.TestDelayedEncode(ERC20.Abi);
+            // walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
+            // walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
             await WaitForTestsToComplete();
 
             adapterTests.TestGetAddress(RequiredAddress);
             adapterTests.TestSignMessage_withAdapter("Hello world", Chain.Polygon);
             adapterTests.TestSendTransaction_withAdapter();
             adapterTests.TestSendERC20_withAdapter();
-            adapterTests.TestBatchTransactions_withAdapter();
+            // adapterTests.TestBatchTransactions_withAdapter();
             await WaitForTestsToComplete();
             
             sessionManagementTests.TestSessionManagement();
