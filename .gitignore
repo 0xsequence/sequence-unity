@@ -23,7 +23,6 @@
 /[Aa]ssets/Resources
 /[Aa]ssets/Resources.meta
 /[Aa]ssets/Samples
-/[Aa]ssets/Plugins/Android*
 
 # Recordings can get excessive in size
 /[Rr]ecordings/
