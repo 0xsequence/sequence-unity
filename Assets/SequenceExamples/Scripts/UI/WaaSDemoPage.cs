@@ -13,7 +13,6 @@ using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;
 using IWallet = Sequence.Wallet.IWallet;
-using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.Demo
 {
