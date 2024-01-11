@@ -14,7 +14,7 @@ namespace Sequence.WaaS
 {
     public class WaaSLogin : ILogin 
     {
-        public const string WaaSWithAuthUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
+        public const string WaaSWithAuthUrl = "https://d3jwb7a1rcpkmp.cloudfront.net/rpc/WaasAuthenticator";
         public const string WaaSLoginMethod = "WaaSLoginMethod";
 
         private AWSConfig _awsConfig;
