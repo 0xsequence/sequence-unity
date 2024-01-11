@@ -16,5 +16,18 @@
     "type": "git",
     "url": "https://github.com/0xsequence/sequence-unity.git"
   },
-  "category": "web3"
+  "category": "web3",
+  "samples": [
+    {
+      "displayName": "Prefabs",
+      "description": "UI Prefabs",
+      "path": "Samples~/Prefabs"
+
+    },
+    {
+      "displayName": "Demo Scenes",
+      "description": "Demo scenes showcasing the SDK",
+      "path": "Samples~/Scenes"
+    }
+  ]
 }
