@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentity.Model;
 using Sequence.Authentication;
+using Sequence.Config;
 using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
@@ -27,7 +28,15 @@ namespace Sequence.WaaS
         public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, IValidator validator = null)
         {
             _awsConfig = awsConfig;
+            if (waasProjectId == 0)
+            {
+                throw SequenceConfig.MissingConfigError("WaaS Project Id");
+            }
             _waasProjectId = waasProjectId;
+            if (string.IsNullOrWhiteSpace(waasVersion))
+            {
+                throw SequenceConfig.MissingConfigError("WaaS Version");
+            }
             _waasVersion = waasVersion;
             _authenticator = new OpenIdAuthenticator();
             _authenticator.PlatformSpecificSetup();
