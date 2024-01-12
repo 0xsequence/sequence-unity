@@ -23,6 +23,7 @@ namespace Sequence.WaaS
         private OpenIdAuthenticator _authenticator;
         private IValidator _validator;
         private string _challengeSession;
+        private int retries = 0;
 
         public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, IValidator validator = null)
         {
@@ -62,6 +63,17 @@ namespace Sequence.WaaS
                     OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
                     return;
                 }
+
+                if (_challengeSession.Contains("user not found"))
+                {
+                    if (retries > 1)
+                    {
+                        OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
+                        return;
+                    }
+                    SignUpThenRetryLogin(email);
+                    return;
+                }
                 
                 if (_challengeSession.StartsWith("Error"))
                 {
@@ -70,6 +82,21 @@ namespace Sequence.WaaS
                 }
                 
                 OnMFAEmailSent?.Invoke(email);
+            }
+            catch (Exception e)
+            {
+                OnMFAEmailFailedToSend?.Invoke(email, e.Message);
+            }
+        }
+
+        public async Task SignUpThenRetryLogin(string email)
+        {
+            AWSEmailSignIn signIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
+            try
+            {
+                await signIn.SignUp(email);
+                retries++;
+                Login(email);
             }
             catch (Exception e)
             {
