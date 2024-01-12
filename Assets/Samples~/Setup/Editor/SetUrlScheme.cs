@@ -20,6 +20,11 @@ namespace Editor
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             _urlScheme = config.UrlScheme;
+
+            if (string.IsNullOrWhiteSpace(_urlScheme))
+            {
+                Debug.LogWarning(SequenceConfig.MissingConfigError("Url Scheme").Message);
+            }
             
             if (target == BuildTarget.iOS)
             {

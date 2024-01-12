@@ -29,7 +29,12 @@ namespace Sequence.WaaS
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            _defaultHeaders["X-Access-Key"] = SequenceConfig.GetConfig().BuilderAPIKey;
+            SequenceConfig config = SequenceConfig.GetConfig();
+            _defaultHeaders["X-Access-Token"] = config.BuilderAPIKey;
+            if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))
+            {
+                throw SequenceConfig.MissingConfigError("Builder API Key");
+            }
         }
 
         public void AddDefaultHeader(string key, string value)

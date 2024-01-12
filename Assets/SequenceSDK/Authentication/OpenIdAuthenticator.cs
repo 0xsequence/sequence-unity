@@ -38,6 +38,10 @@ namespace Sequence.Authentication
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(GoogleClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Google Client Id");
+                }
                 string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
                 Application.OpenURL(googleSignInUrl);
             }
@@ -51,6 +55,10 @@ namespace Sequence.Authentication
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(DiscordClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Discord Client Id");
+                }
                 string discordSignInUrl =
                     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
                 Application.OpenURL(discordSignInUrl);
@@ -65,6 +73,10 @@ namespace Sequence.Authentication
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(FacebookClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Facebook Client Id");
+                }
                 string facebookSignInUrl =
                     GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
                 Application.OpenURL(facebookSignInUrl);
@@ -79,6 +91,10 @@ namespace Sequence.Authentication
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(AppleClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Apple Client Id");
+                }
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 Application.OpenURL(appleSignInUrl);
@@ -91,9 +107,14 @@ namespace Sequence.Authentication
 
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
-            if (String.IsNullOrWhiteSpace(clientId))
+            if (string.IsNullOrWhiteSpace(clientId))
             {
-                throw new Exception("Client ID is not set. Please set it in the SequenceConfig asset in your Resources folder.");
+                throw SequenceConfig.MissingConfigError("WaaS Project Id");
+            }
+
+            if (string.IsNullOrWhiteSpace(_urlScheme))
+            {
+                throw SequenceConfig.MissingConfigError("Url Scheme");
             }
             
             string url =
