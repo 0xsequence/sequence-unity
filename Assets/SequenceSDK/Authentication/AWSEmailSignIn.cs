@@ -13,7 +13,7 @@ using Random = UnityEngine.Random;
 
 namespace Sequence.Authentication
 {
-    public class AWSEmailSignIn
+    public class AWSEmailSignIn : IEmailSignIn
     {
         private string _identityPoolId;
         private string _region;
@@ -100,7 +100,6 @@ namespace Sequence.Authentication
             try
             {
                 SignUpResponse response = await client.SignUpAsync(request);
-                int i = 0;
             }
             catch (Exception e)
             {
