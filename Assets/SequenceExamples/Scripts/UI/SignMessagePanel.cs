@@ -8,43 +8,28 @@ namespace Sequence.Demo
 {
     public class SignMessagePanel : UIPanel
     {
-        [SerializeField] private TMP_InputField _messageInputField;
-        [SerializeField] private TextMeshProUGUI _signatureText;
-        [SerializeField] private TextMeshProUGUI _walletAddressText;
-        [SerializeField] private Chain _chain;
-        
-        private IWallet _wallet;
+        private TransitionPanel _transitionPanel;
 
         public override void Open(params object[] args)
         {
             base.Open(args);
-            _wallet = args.GetObjectOfTypeIfExists<IWallet>();
-            if (_wallet == default)
+            _transitionPanel = args.GetObjectOfTypeIfExists<TransitionPanel>();
+            if (_transitionPanel == default)
             {
                 throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(IWallet)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(TransitionPanel)} as an argument");
             }
-
-            _wallet.OnSignMessageComplete += OnMessageSignComplete;
-
-            _walletAddressText.text = _wallet.GetWalletAddress();
         }
-        
+
         public override void Close()
         {
             base.Close();
-            TransitionPanel transitionPanel = FindObjectOfType<TransitionPanel>();
-            if (transitionPanel != null)
-            {
-                transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
-            }
-            
-            _wallet.OnSignMessageComplete -= OnMessageSignComplete;
+            _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
 
         public override void Back(params object[] injectAdditionalParams)
         {
-            if (_pageStack.Count < 1)
+            if (_pageStack.Count <= 1)
             {
                 Close();
             }
@@ -52,16 +37,6 @@ namespace Sequence.Demo
             {
                 base.Back(injectAdditionalParams);
             }
-        }
-        
-        public void SignMessage()
-        {
-            _wallet.SignMessage(_chain, _messageInputField.text);
-        }
-
-        private void OnMessageSignComplete(SignMessageReturn signMessageReturn)
-        {
-            _signatureText.text = signMessageReturn.signature;
         }
     }
 }

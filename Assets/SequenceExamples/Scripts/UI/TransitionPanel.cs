@@ -32,7 +32,7 @@ namespace Sequence.Demo
 
         public void OpenSignMessagePanel()
         {
-            _ui.OpenSignMessagePanelWithDelay(_closeAnimationDurationInSeconds, Wallet);
+            _ui.OpenSignMessagePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
     }
 }
