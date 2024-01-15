@@ -5774,6 +5774,7 @@ MonoBehaviour:
   _animation: 0
   NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime: 1
   _errorText: {fileID: 3911810627816165819}
+  _infoPopupPanelPrefab: {fileID: 8067163605015323916, guid: a5a68ec1b8c3c430694abc1729fc5369, type: 3}
 --- !u!114 &702636062
 MonoBehaviour:
   m_ObjectHideFlags: 0
