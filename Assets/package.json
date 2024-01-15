@@ -21,7 +21,7 @@
     {
       "displayName": "Demo Scene",
       "description": "Basic demo scene showcasing the SDK functionality",
-      "path": "Samples~/Scenes"
+      "path": "Samples~/DemoScene"
     }
   ],
   "documentationUrl": "https://docs.sequence.xyz/",
