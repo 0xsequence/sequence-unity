@@ -10,6 +10,8 @@ namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
+        [SerializeField] private GameObject _waaSSessionManagerPrefab;
+        
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
@@ -55,6 +57,8 @@ namespace Sequence.Demo
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
             WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+
+            Instantiate(_waaSSessionManagerPrefab);
         } 
 
         public void OpenTransitionPanel()
