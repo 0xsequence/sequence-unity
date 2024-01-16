@@ -39,7 +39,7 @@ public class ERC721Tests
             TransactionReceipt receipt = result.Receipt;
             contractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(contractAddress);
-            Assert.AreEqual(contractAddress, result.PreCalculatedContractAddress);
+            Assert.AreEqual(contractAddress, result.DeployedContractAddress.Value);
         }
         catch (Exception ex)
         {
@@ -85,7 +85,7 @@ public class ERC721Tests
             TransactionReceipt receipt = result.Receipt;
             string autoIncrementingContractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(autoIncrementingContractAddress);
-            Assert.AreEqual(autoIncrementingContractAddress, result.PreCalculatedContractAddress);
+            Assert.AreEqual(autoIncrementingContractAddress, result.DeployedContractAddress.Value);
             ERC721 autoIncrementingToken = new ERC721(autoIncrementingContractAddress, autoIncrementingAbi);
 
             // Mint an auto incrementing token to random address so that index starts at one like with the other contract

@@ -15,7 +15,7 @@ namespace Sequence
         {
             for (int i = 0; i < balances.Length; i++)
             {
-                if (balances[i].id == key)
+                if (balances[i].tokenID == key)
                 {
                     return i;
                 }
