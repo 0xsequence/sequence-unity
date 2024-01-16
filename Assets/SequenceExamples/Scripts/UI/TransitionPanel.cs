@@ -34,5 +34,10 @@ namespace Sequence.Demo
         {
             _ui.OpenSignMessagePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
+        
+        public void OpenSendTransactionPanel()
+        {
+            _ui.OpenSendTransactionPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
     }
 }
