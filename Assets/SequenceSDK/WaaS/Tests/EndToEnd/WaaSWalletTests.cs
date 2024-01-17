@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.ABI;
+using Sequence.Contracts;
 using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Wallet;
@@ -116,6 +117,37 @@ namespace Sequence.WaaS.Tests
             catch (Exception e)
             {
                 WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSendERC20), e.Message));
+            }
+        }
+        
+        public async Task TestSendERC20_usingRawTransaction()
+        {
+            try
+            {
+                WaaSTestHarness.TestStarted?.Invoke();
+                Erc20BalanceChecker balanceChecker =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _address, _erc20Address);
+                Erc20BalanceChecker balanceChecker2 =
+                    await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
+                
+                ERC20 erc20 = new ERC20(_erc20Address);
+
+                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
+                    Chain.Polygon,
+                    new SequenceSDK.WaaS.Transaction[]
+                    {
+                        new RawTransaction(erc20.Transfer(_toAddress, 1)),
+                    }));
+
+                CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestSendERC20_usingRawTransaction));
+                await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
+                await balanceChecker.AssertNewValueIsSmaller(nameof(TestSendERC20_usingRawTransaction));
+                await balanceChecker2.AssertNewValueIsLarger(nameof(TestSendERC20_usingRawTransaction));
+                WaaSTestHarness.TestPassed?.Invoke();
+            }
+            catch (Exception e)
+            {
+                WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSendERC20_usingRawTransaction), e.Message));
             }
         }
 
