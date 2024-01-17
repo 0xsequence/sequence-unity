@@ -81,7 +81,7 @@ namespace Sequence
         { (int)Chain.TestnetBaseGoerli, "base-goerli" },
     };
 
-        private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey_Prod;
+        private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
 
         /// <summary>
         /// Combines <see cref="PATH"/> and <paramref name="name"/> to suffix on to the Base Address

@@ -8839,10 +8839,10 @@ MonoBehaviour:
   _animation: 0
   _numberOfTokenPlaceholdersToInstantiate: 3
   _tokenPlaceHolderPrefab: {fileID: 6706636487979383531, guid: 5046b36227b8f41dc898c9e90a98e655, type: 3}
-  _numberOfTokensToFetchAtOnce: 6
+  _numberOfTokensToFetchAtOnce: 50
   _numberOfNftPlaceholdersToInstantiate: 10
   _nftPlaceHolderPrefab: {fileID: 1878011362095268920, guid: 0ad74f6689ca94f53b758794927d6133, type: 3}
-  _numberOfNftsToFetchAtOnce: 6
+  _numberOfNftsToFetchAtOnce: 50
   _scrollviewContentParent: {fileID: 2980900695808590223}
   TimeBetweenTokenValueRefreshesInSeconds: 5
 --- !u!1 &2980900696743074721

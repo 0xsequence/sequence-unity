@@ -11,7 +11,6 @@ namespace Sequence.WaaS
         public Address GetWalletAddress();
         public event Action<SignMessageReturn> OnSignMessageComplete;
         public Task<SignMessageReturn> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30);
-
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature);
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;

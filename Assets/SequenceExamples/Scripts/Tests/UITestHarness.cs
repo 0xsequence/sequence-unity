@@ -38,7 +38,7 @@ namespace SequenceExamples.Scripts.Tests
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
         {
             SequenceSampleUI.IsTesting = true;
-            SceneManager.LoadScene("SequenceExamples/Scenes/Demo");
+            SceneManager.LoadScene("Samples/Scenes/Demo");
             while (_ui == null)
             {
                 yield return null; // Allow object to load
@@ -177,7 +177,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestWalletDropdown());
         }
 
-        [UnityTest, Timeout(300000)]
+        [UnityTest]
         public IEnumerator ContentFetcherEndToEndTest()
         {
             IContentFetcher contentFetcher = new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
