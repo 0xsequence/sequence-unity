@@ -85,7 +85,7 @@ public class DecodeABITests
         },
         new object[]
         {
-            ERC1155.Abi, new Dictionary<string, List<(string[], string)>>
+            ERC1155.SpecifyBurnAddressAbi, new Dictionary<string, List<(string[], string)>>
             {
                 { "balanceOf", new List<(string[], string)> { (new string[] { "address", "uint256" }, "(uint256)") } },
                 {

@@ -17,6 +17,7 @@ using Sequence.Transactions;
 using Sequence.Contracts;
 using Sequence.Utils;
 using Sequence.WaaS;
+using ContractDeploymentResult = Sequence.Contracts.ContractDeploymentResult;
 using IWallet = Sequence.Wallet.IWallet;
 
 public class EthWalletTests
@@ -144,7 +145,7 @@ public class EthWalletTests
             TransactionReceipt receipt = result.Receipt;
 
             Assert.IsNotNull(receipt.contractAddress);
-            Assert.AreEqual(receipt.contractAddress, result.PreCalculatedContractAddress);
+            Assert.AreEqual(receipt.contractAddress, result.DeployedContractAddress.Value);
         }
         catch (Exception ex)
         {
@@ -166,7 +167,7 @@ public class EthWalletTests
             TransactionReceipt receipt = deployResult.Receipt;
 
             Assert.IsNotNull(receipt.contractAddress);
-            Assert.AreEqual(receipt.contractAddress, deployResult.PreCalculatedContractAddress);
+            Assert.AreEqual(receipt.contractAddress, deployResult.DeployedContractAddress.Value);
 
             //Interaction (mock mint)
 

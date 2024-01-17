@@ -141,7 +141,7 @@ namespace Sequence.Provider
         /// </summary>
         /// <param name="transactionHash"></param>
         /// <returns></returns>
-        Task<Transaction> TransactionByHash(string transactionHash);
+        Task<ClientTransaction> TransactionByHash(string transactionHash);
 
 
 		/// <summary>
@@ -150,7 +150,7 @@ namespace Sequence.Provider
 		/// <param name="blockHash"></param>
 		/// <param name="transactionIndex"></param>
 		/// <returns></returns>
-		Task<Transaction> TransactionSender(string blockHash, BigInteger transactionIndex);
+		Task<ClientTransaction> TransactionSender(string blockHash, BigInteger transactionIndex);
 
 
 		/// <summary>
@@ -167,7 +167,7 @@ namespace Sequence.Provider
 		/// <param name="blockHash"></param>
 		/// <param name="transactionIndex"></param>
 		/// <returns></returns>
-		Task<Transaction> TransactionInBlock(string blockHash, BigInteger transactionIndex);
+		Task<ClientTransaction> TransactionInBlock(string blockHash, BigInteger transactionIndex);
 
 
 		/// <summary>
@@ -328,9 +328,9 @@ namespace Sequence.Provider
 		/// SendTransaction = eth_sendRawTransaction
 		/// return the transaction hash
 		/// </summary>
-		/// <param name="transaction"></param>
+		/// <param name="clientTransaction"></param>
 		/// <returns></returns>
-		Task<string> SendTransaction(Transaction transaction);
+		Task<string> SendTransaction(ClientTransaction clientTransaction);
 
 		/// <summary>
 		/// eth_sendRawTransaction on a signed transaction hash

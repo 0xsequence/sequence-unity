@@ -67,6 +67,13 @@ namespace Sequence.Wallet
             return address;
         }
 
+        public async Task<TransactionReceipt> DeployContract(IEthClient client, string bytecode, ulong value = 0)
+        {
+            EthTransaction deployTransaction = await new GasLimitEstimator(client, GetAddress()).BuildTransaction(StringExtensions.ZeroAddress, bytecode, value);
+            TransactionReceipt receipt = await SendTransactionAndWaitForReceipt(client, deployTransaction);
+            return receipt;
+        }
+
         public async Task<BigInteger> GetBalance(IEthClient client)
         {
             BigInteger balance = await client.BalanceAt(GetAddress(), "latest");

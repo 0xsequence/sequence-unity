@@ -7,6 +7,7 @@ using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Transactions;
 using System.Text;
+using Sequence.Wallet;
 using UnityEngine;
 
 namespace Sequence.Contracts
@@ -14,7 +15,6 @@ namespace Sequence.Contracts
     public class Contract
     {
         Address address;
-        public delegate Task<EthTransaction> CallContractFunctionTransactionCreator(IEthClient client, ContractCall contractCallInfo);
         public delegate Task<T> QueryContractMessageSender<T>(IEthClient client);
 
         private string abi;
@@ -58,17 +58,10 @@ namespace Sequence.Contracts
             return GetData(functionName, functionArgs);
         }
 
-        public CallContractFunctionTransactionCreator CallFunction(string functionName, params object[] functionArgs)
+        public CallContractFunction CallFunction(string functionName, params object[] functionArgs)
         {
             string callData = GetData(functionName, functionArgs);
-            return async (IEthClient client, ContractCall contractCallInfo) =>
-            {
-                GasLimitEstimator estimator = new GasLimitEstimator(client, contractCallInfo.from);
-                var transactionCreator = estimator.BuildTransactionCreator(this.address, callData, contractCallInfo.value, contractCallInfo.gasPrice);
-
-                EthTransaction transaction = await transactionCreator();
-                return transaction;
-            };
+            return new CallContractFunction(callData, address);
         }
 
         public QueryContractMessageSender<T> QueryContract<T>(string functionName, params object[] args)

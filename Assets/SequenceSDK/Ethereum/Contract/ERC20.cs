@@ -72,45 +72,45 @@ namespace Sequence.Contracts
             return result;
         }
 
-        public CallContractFunctionTransactionCreator Transfer(string toAddress, BigInteger amount)
+        public CallContractFunction Transfer(string toAddress, BigInteger amount)
         {
             return Contract.CallFunction("transfer", toAddress, amount);
         }
 
-        public CallContractFunctionTransactionCreator Approve(string spenderAddress, BigInteger amount)
+        public CallContractFunction Approve(string spenderAddress, BigInteger amount)
         {
             return Contract.CallFunction("approve", spenderAddress, amount);
         }
 
-        public CallContractFunctionTransactionCreator TransferFrom(string fromAddress, string toAddress, BigInteger amount)
+        public CallContractFunction TransferFrom(string fromAddress, string toAddress, BigInteger amount)
         {
             return Contract.CallFunction("transferFrom", fromAddress, toAddress, amount);
         }
 
-        public CallContractFunctionTransactionCreator IncreaseAllowance(string spenderAddress, BigInteger amount)
+        public CallContractFunction IncreaseAllowance(string spenderAddress, BigInteger amount)
         {
             return Contract.CallFunction("increaseAllowance", spenderAddress, amount);
         }
 
-        public CallContractFunctionTransactionCreator DecreaseAllowance(string spenderAddress, BigInteger amount)
+        public CallContractFunction DecreaseAllowance(string spenderAddress, BigInteger amount)
         {
             return Contract.CallFunction("decreaseAllowance", spenderAddress, amount);
         }
 
         #region mintable
-        public CallContractFunctionTransactionCreator Mint(string toAddress, BigInteger amount)
+        public CallContractFunction Mint(string toAddress, BigInteger amount)
         {
             return Contract.CallFunction("mint", toAddress, amount);
         }
         #endregion
 
         #region burnable
-        public CallContractFunctionTransactionCreator Burn(BigInteger amount)
+        public CallContractFunction Burn(BigInteger amount)
         {
             return Contract.CallFunction("burn", amount);
         }
 
-        public CallContractFunctionTransactionCreator BurnFrom(string fromAddress, BigInteger amount)
+        public CallContractFunction BurnFrom(string fromAddress, BigInteger amount)
         {
             return Contract.CallFunction("burnFrom", fromAddress, amount);
         }

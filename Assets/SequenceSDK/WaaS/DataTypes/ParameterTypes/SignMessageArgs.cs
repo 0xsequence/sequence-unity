@@ -1,9 +1,7 @@
 using System;
 using System.Text;
-using Sequence.ABI;
 using Sequence.Extensions;
 using Sequence.Utils;
-using SequenceSDK.WaaS;
 
 namespace Sequence.WaaS
 {

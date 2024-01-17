@@ -43,7 +43,7 @@ public class ERC1155Tests
             TransactionReceipt receipt = result.Receipt;
             contractAddress = receipt.contractAddress;
             Assert.IsNotEmpty(contractAddress);
-            Assert.AreEqual(contractAddress, result.PreCalculatedContractAddress);
+            Assert.AreEqual(contractAddress, result.DeployedContractAddress.Value);
         }
         catch (Exception ex)
         {
@@ -83,7 +83,7 @@ public class ERC1155Tests
 
     private async Task TestBurn()
     {
-        ERC1155 token = new ERC1155(contractAddress);
+        ERC1155 token = new ERC1155(contractAddress, true);
         try
         {
             await AssertBurnPreConditions(token, tokenId1, amount1, wallet1.GetAddress());
@@ -158,7 +158,7 @@ public class ERC1155Tests
 
     private async Task TestBurnBatch()
     {
-        ERC1155 token = new ERC1155(contractAddress);
+        ERC1155 token = new ERC1155(contractAddress, true);
         try
         {
             await AssertBurnPreConditionsBatch(token, tokenIds1, amounts1, wallet1.GetAddress());
@@ -234,7 +234,7 @@ public class ERC1155Tests
     [Test]
     public async Task TestURI()
     {
-        ERC1155 token = new ERC1155(contractAddress);
+        ERC1155 token = new ERC1155(contractAddress, true);
         try
         {
             TransactionReceipt receipt = await token.Mint(wallet1.GetAddress(), tokenId1, amount1)
@@ -361,5 +361,75 @@ public class ERC1155Tests
         }
 
         await TestBurnBatch();
+    }
+
+    [Test]
+    public async Task TestExceptionWhenUsingIncorrectBurnMethod_dontSpecifyBurnAddressCase()
+    {
+        ERC1155 token = new ERC1155(contractAddress, false);
+        try
+        {
+            CallContractFunction fun = token.Burn(wallet1.GetAddress(), tokenId1, amount1);
+            Assert.Fail("Expected exception, but got none");
+        }
+        catch (Exception e)
+        {
+            Assert.IsTrue(e.Message.Contains("Improper method use"));
+        }
+        
+        try
+        {
+            CallContractFunction fun = token.BurnBatch(wallet1.GetAddress(), tokenIds1, amounts1);
+            Assert.Fail("Expected exception, but got none");
+        }
+        catch (Exception e)
+        {
+            Assert.IsTrue(e.Message.Contains("Improper method use"));
+        }
+
+        try
+        {
+            CallContractFunction fun = token.Burn(tokenId1, amount1);
+            CallContractFunction fun2 = token.BurnBatch(tokenIds1, amounts1);
+        }
+        catch (Exception e)
+        {
+            Assert.Fail("Expected no exception but one was thrown with method: " + e.Message);
+        }
+    }
+
+    [Test]
+    public void TestExceptionWhenUsingIncorrectBurnMethod_specifyBurnAddressCase()
+    {
+        ERC1155 token = new ERC1155(contractAddress, true);
+        try
+        {
+            CallContractFunction fun = token.Burn(tokenId1, amount1);
+            Assert.Fail("Expected exception, but got none");
+        }
+        catch (Exception e)
+        {
+            Assert.IsTrue(e.Message.Contains("Improper method use"));
+        }
+        
+        try
+        {
+            CallContractFunction fun = token.BurnBatch(tokenIds1, amounts1);
+            Assert.Fail("Expected exception, but got none");
+        }
+        catch (Exception e)
+        {
+            Assert.IsTrue(e.Message.Contains("Improper method use"));
+        }
+
+        try
+        {
+            CallContractFunction fun = token.Burn(wallet1.GetAddress(), tokenId1, amount1);
+            CallContractFunction fun2 = token.BurnBatch(wallet1.GetAddress(), tokenIds1, amounts1);
+        }
+        catch (Exception e)
+        {
+            Assert.Fail("Expected no exception but one was thrown with method: " + e.Message);
+        }
     }
 }

@@ -18,6 +18,7 @@ namespace Sequence.Wallet
     public interface IWallet 
     {
         public Address GetAddress();
+        public Task<TransactionReceipt> DeployContract(IEthClient client, string bytecode, ulong value = 0);
         public Task<string> SendTransaction(IEthClient client, EthTransaction transaction);
         public Task<TransactionReceipt> SendTransactionAndWaitForReceipt(IEthClient client, EthTransaction transaction);
         public Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions);
