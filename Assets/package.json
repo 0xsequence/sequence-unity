@@ -22,6 +22,11 @@
       "displayName": "Demo Scene",
       "description": "Basic demo scene showcasing the SDK functionality",
       "path": "Samples~/Scenes"
+    },
+    {
+      "displayName": "Useful Scripts",
+      "description": "Basic scripts that are helpful for getting started with the SDK",
+      "path": "Samples~/Scripts"
     }
   ],
   "documentationUrl": "https://docs.sequence.xyz/",
