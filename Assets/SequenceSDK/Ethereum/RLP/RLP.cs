@@ -2,8 +2,8 @@ using Sequence.ABI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using Sequence.Extensions;
 using UnityEngine;
 
 namespace Sequence.RLP
@@ -40,7 +40,7 @@ namespace Sequence.RLP
                 else
                 {
                     byte[] head = SequenceCoder.HexStringToByteArray((EncodeLength(byteArrayInput.Length, 128)));
-                    return  head.Concat(byteArrayInput).ToArray();
+                    return ByteArrayExtensions.ConcatenateByteArrays(head, byteArrayInput);
                 }
             }
             else if (input is List<object> listInput)
@@ -53,10 +53,10 @@ namespace Sequence.RLP
                 byte[] output = { };
                 foreach (var item in listInput)
                 {
-                    output = output.Concat(Encode(item)).ToArray();
+                    output = ByteArrayExtensions.ConcatenateByteArrays(output, Encode(item));
                 }
                 byte[] head = SequenceCoder.HexStringToByteArray(EncodeLength(output.Length, 192));
-                return head.Concat(output).ToArray();
+                return ByteArrayExtensions.ConcatenateByteArrays(head, output);
             }
             return null;
         }
