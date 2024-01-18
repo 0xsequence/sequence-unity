@@ -139,8 +139,8 @@ namespace Sequence.WaaS
 
         public async Task<string> SignMessage(string message, string chainId)
         {
-            var result = await _wallet.SignMessage(chainId.ChainFromHexString(), message);
-            return result.signature;
+            string signature = await _wallet.SignMessage(chainId.ChainFromHexString(), message);
+            return signature;
         }
 
         public async Task<bool> IsValidSignature(string signature, string message, Chain chain)

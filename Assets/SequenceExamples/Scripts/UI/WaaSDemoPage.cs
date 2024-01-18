@@ -57,9 +57,9 @@ namespace Sequence.Demo
             _wallet.SignMessage(Chain.Polygon, "Hello World!");
         }
         
-        private void OnSignMessageComplete(SignMessageReturn result)
+        private void OnSignMessageComplete(string signature)
         {
-            _resultText.text = result.signature;
+            _resultText.text = signature;
         }
 
         public void SendTransfer()
