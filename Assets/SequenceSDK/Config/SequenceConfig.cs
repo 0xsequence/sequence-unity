@@ -8,6 +8,10 @@ namespace Sequence.Config
     {
         [Header("Social Sign In Configuration")]
         public string UrlScheme = "sdk-powered-by-sequence";
+        public string GoogleClientId;
+        public string DiscordClientId;
+        public string FacebookClientId;
+        public string AppleClientId;
         
         [Header("AWS Configuration")]
         public string Region = "us-east-2";
@@ -20,9 +24,7 @@ namespace Sequence.Config
         public string WaaSVersion = "1.0.0";
 
         [Header("Sequence SDK Configuration")] 
-        public string BuilderAPIKey_Prod;
-        public string BuilderAPIKey_Dev;
-
+        public string BuilderAPIKey;
         private static SequenceConfig _config;
 
         public static SequenceConfig GetConfig()
