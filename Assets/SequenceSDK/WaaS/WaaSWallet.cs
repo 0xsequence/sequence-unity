@@ -37,9 +37,17 @@ namespace Sequence.WaaS
 
         public async Task<SignMessageReturn> SignMessage(SignMessageArgs args)
         {
-            var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
-            OnSignMessageComplete?.Invoke(result);
-            return result;
+            try
+            {
+                var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
+                OnSignMessageComplete?.Invoke(result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                return null;
+            }
         }
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
@@ -53,16 +61,25 @@ namespace Sequence.WaaS
 
         public async Task<TransactionReturn> SendTransaction(SendTransactionArgs args)
         {
-            var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
-            if (result is SuccessfulTransactionReturn)
+            try
             {
-                OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
+                var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
+                if (result is SuccessfulTransactionReturn)
+                {
+                    OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
+                }
+                else
+                {
+                    OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
+                }
+                return result;
             }
-            else
+            catch (Exception e)
             {
-                OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
+                FailedTransactionReturn result = new FailedTransactionReturn(e.Message, args, null);
+                OnSendTransactionFailed?.Invoke(result);
+                return result;
             }
-            return result;
         }
 
         public event Action<SuccessfulContractDeploymentReturn> OnDeployContractComplete;

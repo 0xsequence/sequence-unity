@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -35,6 +36,29 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionFailedEvent()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("",null,null));
+            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successEventHit = true;
+            };
+            bool failedEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedEventHit = true;
+            };
+            
+            await wallet.SendTransaction(null);
+            
+            Assert.IsFalse(successEventHit);
+            Assert.IsTrue(failedEventHit);
+        }
+
+        [Test]
+        public async Task TestSendTransactionException()
+        {
+            IIntentSender intentSender = new MockIntentSender(new Exception("Something bad happened"));
             WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
             
             bool successEventHit = false;
@@ -236,6 +260,49 @@ namespace Sequence.WaaS.Tests
             Assert.IsNotNull(deploymentReturn);
             Assert.IsNotNull(deploymentReturn.TransactionReturn);
             Assert.AreEqual(response, deploymentReturn.TransactionReturn);
+            Assert.AreEqual("some error", deploymentReturn.Error);
+            Assert.AreEqual(result2, deploymentReturn);
+        }
+
+        [Test]
+        public async Task TestDeployContractTransactionException()
+        {
+            Exception exception = new Exception("some error");
+            IIntentSender intentSender = new MockIntentSender(exception);
+            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            
+            
+            bool successTransactionEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successTransactionEventHit = true;
+            };
+            bool failedTransactionEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedTransactionEventHit = true;
+            };
+            bool successContractDeployEventHit = false;
+            wallet.OnDeployContractComplete += (result)=>
+            {
+                successContractDeployEventHit = true;
+            };
+            bool failedContractDeployEventHit = false;
+            FailedContractDeploymentReturn deploymentReturn = null;
+            wallet.OnDeployContractFailed += (result)=>
+            {
+                failedContractDeployEventHit = true;
+                deploymentReturn = result;
+            };
+            
+            var result2 = await wallet.DeployContract(Chain.None, "");
+            
+            Assert.IsFalse(successTransactionEventHit);
+            Assert.IsTrue(failedTransactionEventHit);
+            Assert.IsFalse(successContractDeployEventHit);
+            Assert.IsTrue(failedContractDeployEventHit);
+            Assert.IsNotNull(deploymentReturn);
+            Assert.IsNotNull(deploymentReturn.TransactionReturn);
             Assert.AreEqual("some error", deploymentReturn.Error);
             Assert.AreEqual(result2, deploymentReturn);
         }
