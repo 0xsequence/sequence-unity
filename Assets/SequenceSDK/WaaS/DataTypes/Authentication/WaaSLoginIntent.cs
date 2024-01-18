@@ -14,6 +14,8 @@ namespace Sequence.WaaS.Authentication
             public static string OpenSessionCode = "openSession";
             
             public string code;
+            public uint expires;
+            public uint issued;
             public string session;
             public Proof proof;
 
@@ -24,13 +26,15 @@ namespace Sequence.WaaS.Authentication
             }
         }
 
-        public WaaSLoginIntent(string version, string code, string session, string idToken)
+        public WaaSLoginIntent(string version, string code, string session, string idToken, uint timeBeforeExpiry = 30)
         {
             this.version = version;
             this.packet = new Packet()
             {
                 code = code,
                 session = session,
+                issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                expires = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds() + timeBeforeExpiry,
                 proof = new Packet.Proof()
                 {
                     idToken = idToken
