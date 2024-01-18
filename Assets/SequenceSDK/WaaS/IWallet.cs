@@ -8,8 +8,8 @@ namespace Sequence.WaaS
     public interface IWallet
     {
         public Address GetWalletAddress();
-        public event Action<SignMessageReturn> OnSignMessageComplete;
-        public Task<SignMessageReturn> SignMessage(SignMessageArgs args);
+        public event Action<string> OnSignMessageComplete;
+        public Task<string> SignMessage(SignMessageArgs args);
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args);
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;

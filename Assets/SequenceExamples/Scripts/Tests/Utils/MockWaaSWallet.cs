@@ -15,8 +15,8 @@ namespace SequenceExamples.Scripts.Tests.Utils
             return TestAddress;
         }
 
-        public event Action<SignMessageReturn> OnSignMessageComplete;
-        public Task<SignMessageReturn> SignMessage(SignMessageArgs args)
+        public event Action<string> OnSignMessageComplete;
+        public Task<string> SignMessage(SignMessageArgs args)
         {
             throw new NotImplementedException();
         }

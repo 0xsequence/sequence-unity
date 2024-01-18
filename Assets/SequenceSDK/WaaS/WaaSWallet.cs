@@ -33,13 +33,14 @@ namespace Sequence.WaaS
             return _address;
         }
 
-        public event Action<SignMessageReturn> OnSignMessageComplete;
+        public event Action<string> OnSignMessageComplete;
 
-        public async Task<SignMessageReturn> SignMessage(SignMessageArgs args)
+        public async Task<string> SignMessage(SignMessageArgs args)
         {
             var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
-            OnSignMessageComplete?.Invoke(result);
-            return result;
+            string signature = result.signature;
+            OnSignMessageComplete?.Invoke(signature);
+            return signature;
         }
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
