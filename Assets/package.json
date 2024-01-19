@@ -19,6 +19,11 @@
   "category": "web3",
   "samples": [
     {
+      "displayName": "Setup",
+      "description": "Import this into your project to get started",
+      "path": "Samples~/Setup"
+    },
+    {
       "displayName": "Demo Scene",
       "description": "Basic demo scene showcasing the SDK functionality",
       "path": "Samples~/DemoScene"
