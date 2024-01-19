@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 using Sequence.RLP;
 using Sequence.ABI;
-using System.Linq;
 using System.Text;
+using Sequence.Extensions;
+using Sequence.Utils;
 
 public class RLPTest
 {
@@ -38,7 +38,7 @@ public class RLPTest
 
         string a_1024 = new string('a', 1024);
         byte[] a_1024_expected = new byte[] { 0xb9, 0x04, 0x00 };
-        a_1024_expected = a_1024_expected.Concat(Enumerable.Repeat((byte)'a', 1024).ToArray()).ToArray();
+        a_1024_expected = ByteArrayExtensions.ConcatenateByteArrays(a_1024_expected, ByteArrayExtensions.BuildArrayWithRepeatedValue(new byte[] {(byte)'a'}, 1024));
         byte[] a_1024_encoded = RLP.Encode(Encoding.UTF8.GetBytes(a_1024));
         
         Debug.Log(SequenceCoder.ByteArrayToHexString(a_1024_expected));
@@ -46,9 +46,14 @@ public class RLPTest
         CollectionAssert.AreEqual(a_1024_expected, a_1024_encoded);
 
         //List<object> longList = new List<object>(1024);
-        List<object> longList = Enumerable.Repeat((object)(Encoding.UTF8.GetBytes("a")), 1024).ToList();
+        var tempArray = ByteArrayExtensions.BuildArrayWithRepeatedValue(new byte[] { (byte)'a' }, 1024);
+        List<object> longList = new List<object>();
+        foreach (byte b in tempArray)
+        {
+            longList.Add(new byte[]{b});
+        }
         byte[] longList_expected = new byte[] { 0xf9, 0x04, 0x00 };
-        longList_expected = longList_expected.Concat(Enumerable.Repeat((byte)'a', 1024).ToArray()).ToArray();
+        longList_expected = ByteArrayExtensions.ConcatenateByteArrays(longList_expected, ByteArrayExtensions.BuildArrayWithRepeatedValue(new byte[] { (byte)'a' }, 1024));
         byte[] longList_encoded = RLP.Encode(longList);
 
         Debug.Log(SequenceCoder.ByteArrayToHexString(longList_expected));
@@ -98,8 +103,13 @@ public class RLPTest
         Debug.Log(a_1024);
         Debug.Log(a_1024_decoded);
         CollectionAssert.AreEqual(a_1024, a_1024_decoded);
-
-        List<object> longList = Enumerable.Repeat((object)(Encoding.UTF8.GetBytes("a")), 1024).ToList();      
+        
+        var tempArray = ByteArrayExtensions.BuildArrayWithRepeatedValue(new byte[] { (byte)'a' }, 1024);
+        List<object> longList = new List<object>();
+        foreach (byte b in tempArray)
+        {
+            longList.Add(new byte[]{b});
+        }
         byte[] longList_encoded = RLP.Encode(longList);
         List<object> longList_decoded = (List<object>)RLP.Decode(longList_encoded);
         /*foreach (object item in longList)

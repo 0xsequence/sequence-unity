@@ -192,6 +192,13 @@ namespace SequenceExamples.Scripts.Tests
                 new MockWaaSWallet()));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
         }
+        
+        [UnityTest]
+        public IEnumerator LoadingScreenTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.LoadingScreenTest());
+        }
     }
 
     public class TestClass : MonoBehaviour
