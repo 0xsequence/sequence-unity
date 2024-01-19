@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.CognitoIdentity;
@@ -8,10 +9,11 @@ using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Runtime;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Sequence.Authentication
 {
-    public class AWSEmailSignIn
+    public class AWSEmailSignIn : IEmailSignIn
     {
         private string _identityPoolId;
         private string _region;
@@ -75,6 +77,49 @@ namespace Sequence.Authentication
             {
                 return $"Error establishing AWS session: {e.Message}";
             }
+        }
+
+        public async Task SignUp(string email)
+        {
+            using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
+            SignUpRequest request = new SignUpRequest
+            {
+                ClientId = _cognitoClientId,
+                Username = email,
+                Password = GeneratePassword(),
+                UserAttributes = new List<AttributeType>
+                {
+                    new AttributeType
+                    {
+                        Name = "email",
+                        Value = email
+                    }
+                }
+            };
+
+            try
+            {
+                SignUpResponse response = await client.SignUpAsync(request);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error establishing AWS session: {e.Message}");
+            }
+        }
+
+        private string GeneratePassword()
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+=";
+
+            StringBuilder randomChars = new StringBuilder(12);
+            for (int i = 0; i < 12; i++)
+            {
+                randomChars.Append(chars[Random.Range(0, chars.Length)]);
+            }
+
+            string password = $"aB1%{randomChars}";
+
+            return password;
         }
     }
 }
