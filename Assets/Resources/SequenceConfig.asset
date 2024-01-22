@@ -17,10 +17,6 @@ MonoBehaviour:
   DiscordClientId: 
   FacebookClientId: 
   AppleClientId: 
-  Region: us-east-2
-  IdentityPoolId: us-east-2:9747b3b1-c831-4efd-8aee-ac362373ad53
-  KMSEncryptionKeyId: arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d
-  CognitoClientId: 3fd4tq7gvroie1romfslk2nvv8
-  WaaSProjectId: 124
   WaaSVersion: 1.0.0
-  BuilderAPIKey: YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA
+  WaaSConfigKey: eyJwcm9qZWN0SWQiOjIsImlkZW50aXR5UG9vbElkIjoidXMtZWFzdC0yOjQyZGMyZjE4LTJmOWItNGZkNS05NDI5LWUwZGE1MjFmOWNmNCIsImlkcFJlZ2lvbiI6InVzLWVhc3QtMiIsInJwY1NlcnZlciI6Imh0dHBzOi8vZGV2LXdhYXMuc2VxdWVuY2UuYXBwIiwia21zUmVnaW9uIjoidXMtZWFzdC0yIiwia2V5SWQiOiJhcm46YXdzOmttczp1cy1lYXN0LTI6MzgxNDkyMjQ3Njk3OmtleS8xODgxZTY3My1mMThkLTQ1NTgtODI5YS0xM2I4MThjMDMwNjUifQ
+  BuilderAPIKey: EeP6AmufRFfigcWaNverI6CAAAAAAAAAA
