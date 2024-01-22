@@ -320,5 +320,91 @@ namespace SequenceExamples.Scripts.Tests
             TestExtensions.AssertTextWithNameHasText(_mfaPage.transform, "ErrorText", "Login failed for some reason");
             LogAssert.Expect(LogType.Error, "Failed login: Login failed for some reason");
         }
+
+        public IEnumerator LoadingScreenTest()
+        {
+            AssertWeAreOnLoginPage();
+            MockLoginCustomEventTiming loginHandler = new MockLoginCustomEventTiming();
+            _loginPanel.SetupLoginHandler(loginHandler);
+            CheckLoadingScreenPresence(false);
+            
+            TestExtensions.ClickButtonWithName(_loginPage.transform, "LoginButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnMFAEmailFailedToSendEvent();
+            LogAssert.Expect(LogType.Error, "Failed to send MFA email to  with error: ");
+            yield return null;
+            CheckLoadingScreenPresence(false);
+
+            TestExtensions.ClickButtonWithName(_loginPage.transform, "GoogleSignInButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnMFAEmailFailedToSendEvent();
+            LogAssert.Expect(LogType.Error, "Failed to send MFA email to  with error: ");
+            yield return null;
+            CheckLoadingScreenPresence(false);
+
+            TestExtensions.ClickButtonWithName(_loginPage.transform, "DiscordSignInButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnLoginFailedEvent();
+            LogAssert.Expect(LogType.Error, "Failed login: ");
+            yield return null;
+            CheckLoadingScreenPresence(false);
+
+            TestExtensions.ClickButtonWithName(_loginPage.transform, "FacebookSignInButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnLoginFailedEvent();
+            LogAssert.Expect(LogType.Error, "Failed login: ");
+            yield return null;
+            CheckLoadingScreenPresence(false);
+
+            TestExtensions.ClickButtonWithName(_loginPage.transform, "AppleSignInButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnLoginFailedEvent();
+            LogAssert.Expect(LogType.Error, "Failed login: ");
+            yield return null;
+            CheckLoadingScreenPresence(false);
+            
+            TestExtensions.ClickButtonWithName(_loginPage.transform, "LoginButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnMFAEmailSentEvent();
+            yield return null;
+            CheckLoadingScreenPresence(false);
+            
+            AssertWeAreOnMfaPage();
+            
+            TestExtensions.ClickButtonWithName(_mfaPage.transform, "ContinueButton");
+            CheckLoadingScreenPresence(true);
+            yield return WaitForAnimationTime;
+            CheckLoadingScreenPresence(true);
+            loginHandler.FireOnLoginSuccessEvent();
+            yield return null;
+            CheckLoadingScreenPresence(false);
+            
+            AssertWeAreOnLoginSuccessPage();
+        }
+
+        private void CheckLoadingScreenPresence(bool isPresent)
+        {
+            LoadingScreen loadingScreen = FindObjectOfType<LoadingScreen>();
+            if (isPresent)
+            {
+                Assert.IsNotNull(loadingScreen);
+            }
+            else
+            {
+                Assert.IsNull(loadingScreen);
+            }
+        }
     }
 }

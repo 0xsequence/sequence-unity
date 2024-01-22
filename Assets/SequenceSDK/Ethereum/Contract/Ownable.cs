@@ -35,12 +35,12 @@ namespace Sequence.Contracts
             return result;
         }
 
-        public CallContractFunctionTransactionCreator RenounceOwnership()
+        public CallContractFunction RenounceOwnership()
         {
             return Contract.CallFunction("renounceOwnership");
         }
 
-        public CallContractFunctionTransactionCreator TransferOwnership(string toAddress)
+        public CallContractFunction TransferOwnership(string toAddress)
         {
             return Contract.CallFunction("transferOwnership", toAddress);
         }

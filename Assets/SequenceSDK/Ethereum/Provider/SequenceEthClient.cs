@@ -235,7 +235,7 @@ namespace Sequence.Provider
             return response.result.ToString();
         }
 
-        public Task<string> SendTransaction(Transaction transaction)
+        public Task<string> SendTransaction(ClientTransaction clientTransaction)
         {
             throw new System.NotImplementedException();
         }
@@ -266,11 +266,11 @@ namespace Sequence.Provider
             throw new System.NotImplementedException();
         }
 
-        public async Task<Transaction> TransactionByHash(string transactionHash)
+        public async Task<ClientTransaction> TransactionByHash(string transactionHash)
         {
             RpcResponse response = await _httpRpcClient.SendRequest("eth_getTransactionByHash", new object[] { transactionHash });
             ThrowIfResponseHasErrors(response);
-            Transaction result = JsonConvert.DeserializeObject<Transaction>(response.result.ToString());
+            ClientTransaction result = JsonConvert.DeserializeObject<ClientTransaction>(response.result.ToString());
             return result;
         }
 
@@ -282,7 +282,7 @@ namespace Sequence.Provider
             return transactionCount;
         }
 
-        public Task<Transaction> TransactionInBlock(string blockHash, BigInteger transactionIndex)
+        public Task<ClientTransaction> TransactionInBlock(string blockHash, BigInteger transactionIndex)
         {
             throw new System.NotImplementedException();
         }
@@ -302,7 +302,7 @@ namespace Sequence.Provider
             return receipt;
         }
 
-        public Task<Transaction> TransactionSender(string blockHash, BigInteger transactionIndex)
+        public Task<ClientTransaction> TransactionSender(string blockHash, BigInteger transactionIndex)
         {
             throw new System.NotImplementedException();
         }

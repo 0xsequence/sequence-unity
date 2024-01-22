@@ -354,20 +354,20 @@ public class SequenceEthClientTests
 
             string result = await client.SendRawTransaction(tx);
 
-            Transaction transaction = await client.TransactionByHash(result);
+            ClientTransaction clientTransaction = await client.TransactionByHash(result);
 
-            Assert.IsNotNull(transaction);
-            Assert.AreEqual(result, transaction.hash);
-            Assert.AreEqual(nonce, transaction.nonce.HexStringToBigInteger());
-            Assert.AreEqual(gasPrice, transaction.gasPrice.HexStringToBigInteger());
-            Assert.AreEqual(gasLimit, transaction.gas.HexStringToBigInteger());
-            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(transaction.to));
-            Assert.AreEqual(value, transaction.value.HexStringToBigInteger());
-            Assert.AreEqual(data.EnsureHexPrefix(), transaction.input);
-            Assert.AreEqual(v, transaction.v);
-            Assert.AreEqual(r, transaction.r);
-            Assert.AreEqual(s, transaction.s);
-            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(transaction.from));
+            Assert.IsNotNull(clientTransaction);
+            Assert.AreEqual(result, clientTransaction.hash);
+            Assert.AreEqual(nonce, clientTransaction.nonce.HexStringToBigInteger());
+            Assert.AreEqual(gasPrice, clientTransaction.gasPrice.HexStringToBigInteger());
+            Assert.AreEqual(gasLimit, clientTransaction.gas.HexStringToBigInteger());
+            Assert.AreEqual(wallet2.GetAddress().Value, SequenceCoder.AddressChecksum(clientTransaction.to));
+            Assert.AreEqual(value, clientTransaction.value.HexStringToBigInteger());
+            Assert.AreEqual(data.EnsureHexPrefix(), clientTransaction.input);
+            Assert.AreEqual(v, clientTransaction.v);
+            Assert.AreEqual(r, clientTransaction.r);
+            Assert.AreEqual(s, clientTransaction.s);
+            Assert.AreEqual(wallet1.GetAddress().Value, SequenceCoder.AddressChecksum(clientTransaction.from));
 
             await client.WaitForTransactionReceipt(result); // Not waiting for the transaction to process will cause the next tests to fail as they would be submitting a duplicate transaction
         }
@@ -389,11 +389,11 @@ public class SequenceEthClientTests
             string transactionHash = await wallet1.SendTransaction(client, wallet2.GetAddress(), 1);
             await client.WaitForTransactionReceipt(transactionHash); // Wait for transaction to process so we have a block hash
             
-            Transaction transaction = await client.TransactionByHash(transactionHash);
-            Assert.IsNotNull(transaction);
-            Assert.IsNotNull(transaction.blockHash);
+            ClientTransaction clientTransaction = await client.TransactionByHash(transactionHash);
+            Assert.IsNotNull(clientTransaction);
+            Assert.IsNotNull(clientTransaction.blockHash);
 
-            transactionCount = await client.TransactionCount(transaction.blockHash);
+            transactionCount = await client.TransactionCount(clientTransaction.blockHash);
             Assert.Greater(transactionCount, BigInteger.Zero);
         }
         catch (Exception ex) {

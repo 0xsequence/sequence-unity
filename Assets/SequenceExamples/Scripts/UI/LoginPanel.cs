@@ -16,6 +16,7 @@ namespace Sequence.Demo
         private LoginSuccessPage _loginSuccessPage;
         private WaaSDemoPage _waasDemoPage;
         private static string _urlScheme;
+        internal ILogin LoginHandler { get; private set; }
         
         protected override void Awake()
         {
@@ -48,6 +49,8 @@ namespace Sequence.Demo
 
         public void SetupLoginHandler(ILogin loginHandler)
         {
+            LoginHandler = loginHandler;
+
             _loginPage.SetupLogin(loginHandler);
             loginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
             

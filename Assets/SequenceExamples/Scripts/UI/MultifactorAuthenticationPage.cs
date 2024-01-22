@@ -13,6 +13,7 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI[] _inputBoxes;
         [SerializeField] private TextMeshProUGUI _enterCodeText;
         [SerializeField] private TextMeshProUGUI _errorText;
+        [SerializeField] private GameObject _loadingScreenPrefab;
 
         private int _numberOfMFADigits;
         internal ILogin LoginHandler { get; private set; }
@@ -88,12 +89,18 @@ namespace Sequence.Demo
             string code = _inputField.text.Substring(0, Math.Min(_numberOfMFADigits, _inputField.text.Length));
             Debug.Log($"Attempting to sign in with email {email} and code {code}");
             LoginHandler.Login(email, code);
+            InstantiateLoadingScreen();
         }
 
         private void OnLoginFailedHandler(string error)
         {
             Debug.LogError($"Failed login: {error}");
             _errorText.text = error;
+        }
+
+        private void InstantiateLoadingScreen()
+        {
+            Instantiate(_loadingScreenPrefab, transform.parent);
         }
     }
 }

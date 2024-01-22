@@ -1,12 +1,7 @@
 #define HAS_SPAN
 #define SECP256K1_LIB
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using NBitcoin.Secp256k1;
 using Sequence.ABI;
-using System.Text;
-using System.Linq;
 using System;
 using System.Numerics;
 using Sequence.Utils;
