@@ -35,24 +35,26 @@ namespace Sequence.WaaS
 
         public event Action<SignMessageReturn> OnSignMessageComplete;
 
-        public async Task<SignMessageReturn> SignMessage(SignMessageArgs args)
+        public async Task<SignMessageReturn> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
+            SignMessageArgs args = new SignMessageArgs(_address, network, message, timeBeforeExpiry);
             var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
             OnSignMessageComplete?.Invoke(result);
             return result;
         }
 
-        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(IsValidMessageSignatureArgs args)
+        public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature)
         {
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
-                "API/IsValidMessageSignature", args);
+                "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature));
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
 
-        public async Task<TransactionReturn> SendTransaction(SendTransactionArgs args)
+        public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
         {
+            SendTransactionArgs args = new SendTransactionArgs(_address, network, transactions, timeBeforeExpiry);
             var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
             if (result is SuccessfulTransactionReturn)
             {
@@ -71,8 +73,7 @@ namespace Sequence.WaaS
         public async Task<ContractDeploymentReturn> DeployContract(Chain network, string bytecode, string value = "0")
         {
             bytecode = bytecode.EnsureHexPrefix();
-            TransactionReturn transactionReturn = await SendTransaction(new SendTransactionArgs(
-                _address,
+            TransactionReturn transactionReturn = await SendTransaction(
                 network,
                 new Transaction[]
                 {
@@ -81,7 +82,7 @@ namespace Sequence.WaaS
                         {
                             bytecode,
                         }, "createContract"))
-                }));
+                });
             
             if (transactionReturn is SuccessfulTransactionReturn successfulTransactionReturn)
             {

@@ -25,7 +25,7 @@ namespace Sequence.WaaS.Tests
                 failedEventHit = true;
             };
             
-            await wallet.SendTransaction(null);
+            await wallet.SendTransaction(Chain.None, null);
             
             Assert.IsTrue(successEventHit);
             Assert.IsFalse(failedEventHit);
@@ -48,7 +48,7 @@ namespace Sequence.WaaS.Tests
                 failedEventHit = true;
             };
             
-            await wallet.SendTransaction(null);
+            await wallet.SendTransaction(Chain.None, null);
             
             Assert.IsFalse(successEventHit);
             Assert.IsTrue(failedEventHit);
@@ -66,7 +66,7 @@ namespace Sequence.WaaS.Tests
                 successEventHit = true;
             };
             
-            await wallet.SignMessage(null);
+            await wallet.SignMessage(Chain.None, "");
             
             Assert.IsTrue(successEventHit);
         }

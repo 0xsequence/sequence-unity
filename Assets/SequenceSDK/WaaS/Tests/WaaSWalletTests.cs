@@ -49,10 +49,10 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                var result = await _wallet.SignMessage(new SignMessageArgs(_address, network, message));
+                var result = await _wallet.SignMessage( network, message);
                 string signature = result.signature;
                 CustomAssert.NotNull(signature, nameof(TestMessageSigning), message, network);
-                var isValid = await _wallet.IsValidMessageSignature(new IsValidMessageSignatureArgs(network, _address, message, signature));
+                var isValid = await _wallet.IsValidMessageSignature(network, message, signature);
                 bool isValidSignature = isValid.isValid;
                 CustomAssert.IsTrue(isValidSignature, nameof(TestMessageSigning), message, network);
                 WaaSTestHarness.TestPassed?.Invoke();
@@ -71,12 +71,12 @@ namespace Sequence.WaaS.Tests
                 BalanceChecker balanceChecker = await BalanceChecker.CreateAsync(_client, _address);
                 BalanceChecker balanceChecker2 = await BalanceChecker.CreateAsync(_client, _toAddress);
 
-                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
+                TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
                     {
                         new RawTransaction(_toAddress, "1"),
-                    }));
+                    });
 
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestTransfer));
                 await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
@@ -100,12 +100,12 @@ namespace Sequence.WaaS.Tests
                 Erc20BalanceChecker balanceChecker2 =
                     await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
 
-                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
+                TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
                     {
                         new SendERC20(_erc20Address, _toAddress, "1"),
-                    }));
+                    });
 
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestSendERC20));
                 await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
@@ -148,14 +148,13 @@ namespace Sequence.WaaS.Tests
                 Erc721BalanceChecker erc721BalanceChecker2 =
                     await Erc721BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc721Address);
 
-                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
-                    Chain.Polygon,
+                TransactionReturn result = await _wallet.SendTransaction(Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
                     {
                         new SendERC20(_erc20Address, _toAddress, "1"),
                         new SendERC721(_erc721Address, _toAddress, _erc721TokenId),
                         new RawTransaction(_toAddress, "1")
-                    }));
+                    });
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestSendBatchTransaction_withERC721));
                 await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
 
@@ -198,8 +197,7 @@ namespace Sequence.WaaS.Tests
                 Erc1155BalanceChecker erc1155BalanceChecker2 =
                     await Erc1155BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc1155Address);
 
-                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
-                    Chain.Polygon,
+                TransactionReturn result = await _wallet.SendTransaction(Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
                     {
                         new SendERC20(_erc20Address, _toAddress, "1"),
@@ -208,7 +206,7 @@ namespace Sequence.WaaS.Tests
                             new SendERC1155Values(_erc1155TokenId, "1")
                         }),
                         new RawTransaction(_toAddress, "1")
-                    }));
+                    });
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn,
                     nameof(TestSendBatchTransaction_withERC1155));
                 await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
@@ -237,8 +235,7 @@ namespace Sequence.WaaS.Tests
                 Erc20BalanceChecker balanceChecker2 =
                     await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
 
-                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
-                    Chain.Polygon,
+                TransactionReturn result = await _wallet.SendTransaction(Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
                     {
                         new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
@@ -248,7 +245,7 @@ namespace Sequence.WaaS.Tests
                                 _erc20Address, "1"
                             },
                             "transfer")),
-                    }));
+                    });
 
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn, nameof(TestDelayedEncode));
                 await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
@@ -274,8 +271,7 @@ namespace Sequence.WaaS.Tests
                 BalanceChecker balanceChecker2 = await BalanceChecker.CreateAsync(_client, _toAddress);
                 Erc20BalanceChecker erc20BalanceChecker2 =
                     await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
-                TransactionReturn result = await _wallet.SendTransaction(new SendTransactionArgs(_address,
-                    Chain.Polygon,
+                TransactionReturn result = await _wallet.SendTransaction(Chain.Polygon,
                     new SequenceSDK.WaaS.Transaction[]
                     {
                         new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
@@ -286,7 +282,7 @@ namespace Sequence.WaaS.Tests
                             },
                             "transfer")),
                         new RawTransaction(_toAddress, "1")
-                    }));
+                    });
                 CustomAssert.IsTrue(result is SuccessfulTransactionReturn,
                     nameof(TestSendBatchTransaction_withERC1155));
                 await Task.Delay(WaaSTestHarness.DelayForTransactionToProcess);
