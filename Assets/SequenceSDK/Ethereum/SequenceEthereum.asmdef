@@ -1,7 +1,7 @@
 {
     "name": "SequenceEthereum",
     "rootNamespace": "",
-    "references": [],
+    "references": ["GUID:a35e3a53d4439435f8b36ed2c6158cd8"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
