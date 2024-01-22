@@ -14,18 +14,18 @@ namespace Sequence.Config
         public string FacebookClientId;
         public string AppleClientId;
         
-        [Header("AWS Configuration")]
-        public string Region;
-        public string IdentityPoolId;
-        public string KMSEncryptionKeyId;
-        public string CognitoClientId;
-        
         [Header("WaaS Configuration")]
-        public int WaaSProjectId;
         public string WaaSVersion = "1.0.0";
+        public string WaaSConfigKey;
+        public int WaaSProjectId { get; private set; }
+        public string Region { get; private set; }
+        public string IdentityPoolId { get; private set; }
+        public string KMSEncryptionKeyId { get; private set; }
+        public string CognitoClientId { get; private set; }
 
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
+        
         private static SequenceConfig _config;
 
         public static SequenceConfig GetConfig()
@@ -46,6 +46,17 @@ namespace Sequence.Config
         public static Exception MissingConfigError(string valueName)
         {
             return new Exception($"{valueName} is not set. Please set it in SequenceConfig asset in your Resources folder.");
+        }
+
+        public static ConfigJwt GetConfigJwt()
+        {
+            string configKey = _config.WaaSConfigKey;
+            if (string.IsNullOrWhiteSpace(configKey))
+            {
+                throw SequenceConfig.MissingConfigError("WaaS Config Key");
+            }
+
+            return JwtHelper.GetConfigJwt(configKey);
         }
     }
 }

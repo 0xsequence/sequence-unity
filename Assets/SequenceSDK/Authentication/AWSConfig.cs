@@ -1,5 +1,6 @@
 using System;
 using Sequence.Config;
+using UnityEngine;
 
 namespace Sequence.Authentication
 {
@@ -29,7 +30,7 @@ namespace Sequence.Authentication
             KMSEncryptionKeyId = kmsEncryptionKeyId;
             if (string.IsNullOrWhiteSpace(cognitoClientId))
             {
-                throw SequenceConfig.MissingConfigError("Cognito Client Id");
+                Debug.LogWarning(SequenceConfig.MissingConfigError("Cognito Client Id").Message + " Email sign in will not work.");
             }
             CognitoClientId = cognitoClientId;
         }
