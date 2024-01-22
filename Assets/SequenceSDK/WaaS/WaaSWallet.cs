@@ -55,7 +55,8 @@ namespace Sequence.WaaS
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature)
         {
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
-                "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature));
+                "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
+            new Dictionary<string, string>() {{"X-Access-Key", "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"}}); // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;

@@ -14,9 +14,9 @@ namespace Sequence.WaaS.Tests
         private string _address;
         private string _toAddress = "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f";
         private string _polygonNode = "https://polygon-bor.publicnode.com";
-        private string _erc20Address = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
+        private string _erc20Address = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
         private string _erc721Address = "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f";
-        private string _erc721TokenId = "27070476534167349548939059504276130568103741723583141759304527275404067148946";
+        private string _erc721TokenId = "18744835910876056821490721563850010263377359459933499228339117876467177683972";
         private string _erc1155Address = "0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb";
         private string _erc1155TokenId = "86";
         private IIndexer _polygonIndexer = new ChainIndexer((int)Chain.Polygon);
