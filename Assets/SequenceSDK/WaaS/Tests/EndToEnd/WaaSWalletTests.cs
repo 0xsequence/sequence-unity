@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Sequence.WaaS.Tests
 {
     // Note: These tests rely on the certain tokens being present in a given wallet address. These tokens are typically found in the wallet created by WaaS when logging in via
-    // Google to qp@horizon.io - 0x48b0560661326cB8EECb68107CD72B4B4aB8B2fb
+    // Google to qp@horizon.io - 0x2D566542570771c264b98959B037f4eb7534caaA
     public class WaaSWalletTests
     {
         public static Exception TestNotSetupProperly;
@@ -23,7 +23,7 @@ namespace Sequence.WaaS.Tests
 
         private string _toAddress = "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f";
         private string _polygonNode = "https://polygon-bor.publicnode.com";
-        private string _erc20Address = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
+        private string _erc20Address = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
         private string _erc721Address = "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f";
         private string _erc721TokenId = "54530968763798660137294927684252503703134533114052628080002308208148824588621";
         private string _erc1155Address = "0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb";
