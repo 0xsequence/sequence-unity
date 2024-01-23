@@ -65,7 +65,7 @@ namespace Samples.Scripts
             // Do something
         }
         
-        private void OnSignMessageCompleteHandler(SignMessageReturn result) {
+        private void OnSignMessageCompleteHandler(string result) {
             // Do something
         }
         
