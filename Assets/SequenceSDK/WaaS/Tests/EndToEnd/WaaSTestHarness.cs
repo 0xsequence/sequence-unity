@@ -39,7 +39,7 @@ namespace Sequence.WaaS.Tests
             DisableAllUIPages();
             OpenUIPanel(_loginPanel);
             
-            _loginPage.SubscribeToWaaSWalletCreatedEvent(InitiateTests);
+            WaaSWallet.OnWaaSWalletCreated += InitiateTests;
         }
         
         private void DisableAllUIPages()

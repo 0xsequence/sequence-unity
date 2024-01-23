@@ -36,6 +36,13 @@ namespace Sequence.Authentication
 
         public void GoogleSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(GoogleClientId))
@@ -53,6 +60,13 @@ namespace Sequence.Authentication
         
         public void DiscordSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(DiscordClientId))
@@ -71,6 +85,13 @@ namespace Sequence.Authentication
 
         public void FacebookSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(FacebookClientId))
@@ -89,6 +110,13 @@ namespace Sequence.Authentication
         
         public void AppleSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(AppleClientId))

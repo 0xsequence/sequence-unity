@@ -183,10 +183,5 @@ namespace Sequence.Demo
         {
             Instantiate(_loadingScreenPrefab, transform.parent);
         }
-
-        public void SubscribeToWaaSWalletCreatedEvent(Action<WaaSWallet> OnWaaSWalletCreatedHandler)
-        {
-            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
-        }
     }
 }
