@@ -41,7 +41,7 @@ namespace Sequence.Demo
         {
             _wallet.SignMessage(_chain, _messageInputField.text);
         }
-
+        
         private void OnMessageSignComplete(string signature)
         {
             _signatureText.text = signature;
