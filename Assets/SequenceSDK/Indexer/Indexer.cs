@@ -244,9 +244,8 @@ namespace Sequence
             req.method = UnityWebRequest.kHttpVerbPOST;
             req.timeout = 10; // Request will timeout after 10 seconds
                 
-            // Create curl-equivalent request of the above and log it
             string curlRequest = 
-                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d '{requestJson}' {Url(chainID, endPoint)}";
+                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {_builderApiKey}\" -d '{requestJson}' {Url(chainID, endPoint)}";
             try
             {
                 await req.SendWebRequest();

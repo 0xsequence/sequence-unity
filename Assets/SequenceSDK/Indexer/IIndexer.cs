@@ -28,9 +28,14 @@ namespace Sequence
         /// <summary>
         /// Retrieve the chain ID for a given BlockChainType
         /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
 
         public BigInteger GetChainID();
+
+        /// <summary>
+        /// Retrieve the Chain for this indexer
+        /// </summary>
+        /// <returns></returns>
+        public Chain GetChain();
 
         /// <summary>
         /// Retrieve the balance of a network's native token for a given account address
