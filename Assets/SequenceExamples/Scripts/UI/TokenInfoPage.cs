@@ -39,7 +39,7 @@ namespace Sequence.Demo
             _tokenIconImage.sprite = _tokenElement.TokenIconSprite;
             _tokenNameText.text = _tokenElement.TokenName;
             _networkIconImage.sprite = _networkIcons.GetIcon(_tokenElement.Network);
-            _networkNameText.text = ChainNames.NameOf[_tokenElement.Network];
+            _networkNameText.text = ChainDictionaries.NameOf[_tokenElement.Network];
         }
     }
 }

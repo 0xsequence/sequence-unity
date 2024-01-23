@@ -13,13 +13,13 @@ namespace Sequence.Demo
     {
         public bool NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = true;
         [SerializeField] private TextMeshProUGUI _errorText;
+        [SerializeField] private GameObject _infoPopupPanelPrefab;
         [SerializeField] private GameObject _loadingScreenPrefab;
         
         private TMP_InputField _inputField;
         private LoginMethod _loginMethod;
         private string _loginEmail;
         private LoginButtonHighlighter _loginButtonHighlighter;
-        private InfoPopupPanel _infoPopupPanel;
         private bool _hasShownInfoPopupForDifferentLoginMethod = false;
         internal ILogin LoginHandler { get; private set; }
 
@@ -28,7 +28,6 @@ namespace Sequence.Demo
             base.Awake();
             _inputField = GetComponentInChildren<TMP_InputField>();
             _loginButtonHighlighter = GetComponent<LoginButtonHighlighter>();
-            _infoPopupPanel = FindObjectOfType<InfoPopupPanel>();
         }
 
         private void Start()
@@ -162,9 +161,11 @@ namespace Sequence.Demo
             {
                 message = $"Last time, you logged in with <b>{_loginMethod}</b>: <i>{_loginEmail}</i>. Logging in with a different method or email will use a different account.";
             }
-            if (_infoPopupPanel != null)
+            GameObject infoPopupPanelGameObject = Instantiate(_infoPopupPanelPrefab, transform.parent);
+            InfoPopupPanel infoPopupPanel = infoPopupPanelGameObject.GetComponent<InfoPopupPanel>();
+            if (infoPopupPanel != null)
             {
-                _infoPopupPanel.Open(message);
+                infoPopupPanel.Open(message);
                 _hasShownInfoPopupForDifferentLoginMethod = true;
             }
         }
@@ -182,11 +183,6 @@ namespace Sequence.Demo
         private void InstantiateLoadingScreen()
         {
             Instantiate(_loadingScreenPrefab, transform.parent);
-        }
-
-        public void SubscribeToWaaSWalletCreatedEvent(Action<WaaSWallet> OnWaaSWalletCreatedHandler)
-        {
-            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Sequence
         Avalanche = 43114,
         Gnosis = 100,
         Base = 8453,
+        OasysHomeverse = 19011,
         
         // Testnets
         TestnetGoerli = 5,
@@ -23,6 +24,8 @@ namespace Sequence
         TestnetArbitrumGoerli = 421613,
         TestnetBNBSmartChain = 97,
         TestnetBaseGoerli = 84531,
+        TestnetAvalanche = 43113,
+        TestnetOasysHomeverse = 40875,
         
         // Null
         None = 0

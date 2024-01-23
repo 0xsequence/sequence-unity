@@ -70,7 +70,7 @@ namespace Sequence.Demo
             _collectionIcon.sprite = _collectionInfo.IconSprite;
             _collectionNameText.text = _collectionInfo.Name;
             _networkIcon.sprite = _networkIcons.GetIcon(_collectionInfo.Network);
-            _networkName.text = ChainNames.NameOf[_collectionInfo.Network];
+            _networkName.text = ChainDictionaries.NameOf[_collectionInfo.Network];
             
             List<NftElement> nftsInCollection = _walletPanel.GetNftsFromCollection(_collectionInfo);
             _uniqueCollectiblesOwnedText.text = $"{nftsInCollection.Count} Unique Collectibles";

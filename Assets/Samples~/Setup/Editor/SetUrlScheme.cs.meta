@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Samples~/Setup/Editor/SetUrlScheme.cs.meta
+guid: c86e044ed9a6b4f8883de0220d5df152
+========
+guid: 662b4bdee6cf74c0488bdbf46932388d
+>>>>>>>> origin/master:Assets/SequenceSDK/WaaS/DataTypes/ParameterTypes/RawTransaction.cs.meta
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
