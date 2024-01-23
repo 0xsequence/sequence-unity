@@ -41,10 +41,10 @@ namespace Sequence.Demo
         {
             _wallet.SignMessage(_chain, _messageInputField.text);
         }
-
-        private void OnMessageSignComplete(SignMessageReturn signMessageReturn)
+        
+        private void OnMessageSignComplete(string signature)
         {
-            _signatureText.text = signMessageReturn.signature;
+            _signatureText.text = signature;
         }
     }
 }

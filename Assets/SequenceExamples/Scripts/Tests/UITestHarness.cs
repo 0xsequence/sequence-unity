@@ -177,7 +177,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.TestWalletDropdown());
         }
 
-        [UnityTest, Timeout(300000)]
+        [UnityTest]
         public IEnumerator ContentFetcherEndToEndTest()
         {
             IContentFetcher contentFetcher = new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
@@ -191,6 +191,13 @@ namespace SequenceExamples.Scripts.Tests
                 nftFetcher,
                 new MockWaaSWallet()));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
+        }
+        
+        [UnityTest]
+        public IEnumerator LoadingScreenTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.LoadingScreenTest());
         }
     }
 

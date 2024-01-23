@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Sequence.Config
 {
@@ -7,22 +8,24 @@ namespace Sequence.Config
     public class SequenceConfig : ScriptableObject
     {
         [Header("Social Sign In Configuration")]
-        public string UrlScheme = "sdk-powered-by-sequence";
-        
-        [Header("AWS Configuration")]
-        public string Region = "us-east-2";
-        public string IdentityPoolId = "us-east-2:42c9f39d-c935-4d5c-a845-5c8815c79ee3";
-        public string KMSEncryptionKeyId = "arn:aws:kms:us-east-2:170768627592:key/0fd8f803-9cb5-4de5-86e4-41963fb6043d";
-        public string CognitoClientId = "5fl7dg7mvu534o9vfjbc6hj31p";
+        public string UrlScheme;
+        public string GoogleClientId;
+        public string DiscordClientId;
+        public string FacebookClientId;
+        public string AppleClientId;
         
         [Header("WaaS Configuration")]
-        public int WaaSProjectId = 9;
         public string WaaSVersion = "1.0.0";
+        public string WaaSConfigKey;
+        public int WaaSProjectId { get; private set; }
+        public string Region { get; private set; }
+        public string IdentityPoolId { get; private set; }
+        public string KMSEncryptionKeyId { get; private set; }
+        public string CognitoClientId { get; private set; }
 
         [Header("Sequence SDK Configuration")] 
-        public string BuilderAPIKey_Prod;
-        public string BuilderAPIKey_Dev;
-
+        public string BuilderAPIKey;
+        
         private static SequenceConfig _config;
 
         public static SequenceConfig GetConfig()
@@ -38,6 +41,22 @@ namespace Sequence.Config
             }
 
             return _config;
+        }
+
+        public static Exception MissingConfigError(string valueName)
+        {
+            return new Exception($"{valueName} is not set. Please set it in SequenceConfig asset in your Resources folder.");
+        }
+
+        public static ConfigJwt GetConfigJwt()
+        {
+            string configKey = _config.WaaSConfigKey;
+            if (string.IsNullOrWhiteSpace(configKey))
+            {
+                throw SequenceConfig.MissingConfigError("WaaS Config Key");
+            }
+
+            return JwtHelper.GetConfigJwt(configKey);
         }
     }
 }

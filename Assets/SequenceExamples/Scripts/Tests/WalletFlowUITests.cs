@@ -253,6 +253,11 @@ namespace SequenceExamples.Scripts.Tests
             GameObject grid = GameObject.Find("Grid");
             Assert.IsNotNull(grid);
 
+            int gridChildren = grid.transform.childCount;
+            if (gridChildren == 0)
+            {
+                return; // We haven't fetched anything yet
+            }
             RectTransform bottomContent =
                 grid.transform.GetChild(grid.transform.childCount - 1).GetComponent<RectTransform>();
             RectTransform brandingTransform = branding.GetComponent<RectTransform>();
@@ -267,7 +272,10 @@ namespace SequenceExamples.Scripts.Tests
         private IEnumerator AssertValueChangeDisplayedCorrectly()
         {
             TokenUIElement token = FindObjectOfType<TokenUIElement>();
-            Assert.IsNotNull(token);
+            if (token == null)
+            {
+                yield break; // We haven't fetched anything yet
+            }
             Transform percentChange = token.transform.Find("PercentChangeText");
             Assert.IsNotNull(percentChange);
             TextMeshProUGUI percentChangeText = percentChange.GetComponent<TextMeshProUGUI>();

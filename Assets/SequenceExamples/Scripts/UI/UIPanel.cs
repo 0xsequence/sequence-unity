@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Utils;
@@ -28,6 +29,14 @@ namespace Sequence.Demo
         {
             base.Awake();
             _panel = this;
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GoBack();
+            }
         }
 
         public override void Open(params object[] args)

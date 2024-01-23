@@ -19,5 +19,19 @@ namespace SequenceSDK.Ethereum.Utils
             BigInteger result = (BigInteger) normalized;
             return result;
         }
+
+        public static string ReturnToNormalString(BigInteger x, int decimals = 18)
+        {
+            float result = ReturnToNormal(x, decimals);
+            return result.ToString();
+        }
+
+        public static float ReturnToNormal(BigInteger x, int decimals = 18)
+        {
+            x = Math.Abs((long)x);
+            double normalized = (long)x / Math.Pow(10, decimals);
+            float result = (float) normalized;
+            return result;
+        }
     }
 }

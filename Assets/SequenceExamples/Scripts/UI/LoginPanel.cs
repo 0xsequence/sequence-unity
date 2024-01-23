@@ -16,6 +16,7 @@ namespace Sequence.Demo
         private LoginSuccessPage _loginSuccessPage;
         private WaaSDemoPage _waasDemoPage;
         private static string _urlScheme;
+        internal ILogin LoginHandler { get; private set; }
         
         protected override void Awake()
         {
@@ -29,13 +30,7 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            ILogin loginHandler = new WaaSLogin(new AWSConfig(
-                config.Region, 
-                config.IdentityPoolId, 
-                config.KMSEncryptionKeyId,
-                config.CognitoClientId),
-                config.WaaSProjectId, 
-                config.WaaSVersion);
+            ILogin loginHandler = new WaaSLogin();
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
@@ -48,6 +43,8 @@ namespace Sequence.Demo
 
         public void SetupLoginHandler(ILogin loginHandler)
         {
+            LoginHandler = loginHandler;
+
             _loginPage.SetupLogin(loginHandler);
             loginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
             

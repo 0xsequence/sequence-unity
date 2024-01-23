@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading;
+using System.Net.Sockets;
+using System.Collections.Generic;
 using Sequence.Config;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence.Authentication
 {
@@ -19,10 +16,11 @@ namespace Sequence.Authentication
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
         
-        private static readonly string GoogleClientId = "970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com";
-        private static readonly string DiscordClientId = ""; // Todo replace
-        private static readonly string FacebookClientId = ""; // Todo replace
-        private static readonly string AppleClientId = ""; // Todo replace
+        private string GoogleClientId;
+        private string DiscordClientId;
+        private string FacebookClientId;
+        private string AppleClientId;
+        
         private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
         private string _stateToken = Guid.NewGuid().ToString();
@@ -33,12 +31,27 @@ namespace Sequence.Authentication
             SequenceConfig config = SequenceConfig.GetConfig();
 
             _urlScheme = config.UrlScheme;
+            GoogleClientId = config.GoogleClientId;
+            DiscordClientId = config.DiscordClientId;
+            FacebookClientId = config.FacebookClientId;
+            AppleClientId = config.AppleClientId;
         }
 
         public void GoogleSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
+                if (string.IsNullOrWhiteSpace(GoogleClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Google Client Id");
+                }
                 string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
                 Application.OpenURL(googleSignInUrl);
             }
@@ -50,8 +63,19 @@ namespace Sequence.Authentication
         
         public void DiscordSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
+                if (string.IsNullOrWhiteSpace(DiscordClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Discord Client Id");
+                }
                 string discordSignInUrl =
                     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
                 Application.OpenURL(discordSignInUrl);
@@ -64,8 +88,19 @@ namespace Sequence.Authentication
 
         public void FacebookSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
+                if (string.IsNullOrWhiteSpace(FacebookClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Facebook Client Id");
+                }
                 string facebookSignInUrl =
                     GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
                 Application.OpenURL(facebookSignInUrl);
@@ -78,8 +113,19 @@ namespace Sequence.Authentication
         
         public void AppleSignIn()
         {
+#if UNITY_EDITOR
+            Debug.LogError("Social sign in is not supported in the editor.");
+            return;
+#elif UNITY_WEBGL
+            Debug.LogError("Social sign in is not supported in WebGL.");
+            return;
+#endif
             try
             {
+                if (string.IsNullOrWhiteSpace(AppleClientId))
+                {
+                    throw SequenceConfig.MissingConfigError("Apple Client Id");
+                }
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 Application.OpenURL(appleSignInUrl);
@@ -92,6 +138,16 @@ namespace Sequence.Authentication
 
         private string GenerateSignInUrl(string baseUrl, string clientId, string method)
         {
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw SequenceConfig.MissingConfigError("WaaS Project Id");
+            }
+
+            if (string.IsNullOrWhiteSpace(_urlScheme))
+            {
+                throw SequenceConfig.MissingConfigError("Url Scheme");
+            }
+            
             string url =
                 $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))

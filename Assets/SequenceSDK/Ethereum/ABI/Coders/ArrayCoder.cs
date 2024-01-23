@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -48,8 +47,7 @@ namespace Sequence.ABI
             try
             {
                 List<object> valueWrapper = new List<object>();
-                var valueList = value.Cast<object>().ToList();
-                valueWrapper.Add(valueList);
+                valueWrapper.Add(value);
                 return _tupleCoder.EncodeToString(valueWrapper, new string[]{evmType});
             }
             catch (Exception ex)
