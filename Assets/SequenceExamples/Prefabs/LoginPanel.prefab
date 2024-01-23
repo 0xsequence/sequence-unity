@@ -231,6 +231,7 @@ MonoBehaviour:
   _closeAnimationDurationInSeconds: 0.375
   _animation: 1
   InitialPage: {fileID: 3911810628226866636}
+  _waaSSessionManagerPrefab: {fileID: 7790316493338947565, guid: 560af3ce0e704472fa1f24e03a6bf3c6, type: 3}
 --- !u!1 &3911810626580786178
 GameObject:
   m_ObjectHideFlags: 0
