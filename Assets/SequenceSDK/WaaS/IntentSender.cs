@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Sequence.WaaS
 {
-    public class IntentSender
+    public class IntentSender : IIntentSender
     {
         public string SessionId { get; private set; }
         
@@ -104,7 +104,6 @@ namespace Sequence.WaaS
             string signedPayload = await _sessionWallet.SignMessage(payload);
             WaaSPayload intent = new WaaSPayload(_dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            headers.Add("X-Sequence-Tenant", _waasProjectId.ToString());
             if (typeof(T) == typeof(IntentReturn<TransactionReturn>))
             {
                 var transactionReturn = await SendTransactionIntent(intent, headers);

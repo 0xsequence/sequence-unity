@@ -36,7 +36,7 @@ namespace SequenceExamples.Scripts.Tests
             Assert.IsNotNull(networkName);
             TextMeshProUGUI networkNameText = networkName.GetComponent<TextMeshProUGUI>();
             Assert.IsNotNull(networkNameText);
-            Assert.AreEqual(ChainNames.NameOf[network], networkNameText.text);
+            Assert.AreEqual(ChainDictionaries.NameOf[network], networkNameText.text);
 
             if (!_hasCheckedIfCurrencyValueTextsAreRefreshing)
             {

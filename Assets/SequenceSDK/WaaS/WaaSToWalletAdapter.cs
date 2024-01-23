@@ -9,6 +9,7 @@ using Sequence.ABI;
 using Sequence.Extensions;
 using Sequence.Transactions;
 using Sequence.Utils;
+using SequenceSDK.WaaS;
 
 namespace Sequence.WaaS
 {
@@ -26,11 +27,37 @@ namespace Sequence.WaaS
             return _wallet.GetWalletAddress();
         }
 
+        public async Task<TransactionReceipt> DeployContract(IEthClient client, string bytecode, ulong value = 0)
+        {
+            string chainId = await client.ChainID();
+            Chain network = chainId.ChainFromHexString();
+            ContractDeploymentReturn result = await _wallet.DeployContract(network, bytecode, value.ToString());
+            if (result is FailedContractDeploymentReturn failedResult)
+            {
+                throw new Exception("Failed to deploy contract: " + failedResult.Error);
+            }
+            else if (result is SuccessfulContractDeploymentReturn successfulResult)
+            {
+                string transactionHash = successfulResult.TransactionReturn.txHash;
+                TransactionReceipt receipt = await client.WaitForTransactionReceipt(transactionHash);
+                if (receipt.contractAddress == null)
+                {
+                    receipt.contractAddress = successfulResult.DeployedContractAddress.Value;
+                }
+
+                return receipt;
+            }
+            else
+            {
+                throw new Exception($"Unknown contract deployment result type. Given {result.GetType().Name}");
+            }
+        }
+
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
             RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
-            SendTransactionArgs args = await BuildTransactionArgs(client, new RawTransaction[] { waasTransaction });
-            TransactionReturn result = await _wallet.SendTransaction(args);
+            SendTransactionArgs args = await BuildTransactionArgs(client, new Transaction[] { waasTransaction });
+            TransactionReturn result = await _wallet.SendTransaction(args.network.ChainFromHexString(), args.transactions);
             if (result is FailedTransactionReturn failedResult)
             {
                 throw new Exception(failedResult.error);
@@ -45,7 +72,7 @@ namespace Sequence.WaaS
             }
         }
 
-        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, RawTransaction[] transactions)
+        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, Transaction[] transactions)
         {
             string networkId = await client.ChainID();
             SendTransactionArgs args = new SendTransactionArgs(GetAddress(), networkId, transactions);
@@ -62,6 +89,10 @@ namespace Sequence.WaaS
         public async Task<string[]> SendTransactionBatch(IEthClient client, EthTransaction[] transactions)
         {
             int transactionCount = transactions.Length;
+            if (transactionCount <= 0)
+            {
+                throw new Exception("Cannot send empty transaction batch");
+            }
             RawTransaction[] waasTransactions = new RawTransaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
@@ -69,7 +100,7 @@ namespace Sequence.WaaS
             }
 
             SendTransactionArgs args = await BuildTransactionArgs(client, waasTransactions);
-            TransactionReturn result = await _wallet.SendTransaction(args);
+            TransactionReturn result = await _wallet.SendTransaction(args.network.ChainFromHexString(), args.transactions);
             if (result is FailedTransactionReturn failedResult)
             {
                 throw new Exception(failedResult.error);
@@ -108,15 +139,13 @@ namespace Sequence.WaaS
 
         public async Task<string> SignMessage(string message, string chainId)
         {
-            SignMessageArgs args = new SignMessageArgs(GetAddress(), chainId, message);
-            var result = await _wallet.SignMessage(args);
-            return result.signature;
+            string signature = await _wallet.SignMessage(chainId.ChainFromHexString(), message);
+            return signature;
         }
 
         public async Task<bool> IsValidSignature(string signature, string message, Chain chain)
         {
-            var args = new IsValidMessageSignatureArgs(chain, GetAddress(), message, signature);
-            var result = await _wallet.IsValidMessageSignature(args);
+            var result = await _wallet.IsValidMessageSignature(chain, message, signature);
             return result.isValid;
         }
     }

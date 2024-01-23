@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentity.Model;
 using Sequence.Authentication;
+using Sequence.Config;
 using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
@@ -14,7 +15,7 @@ namespace Sequence.WaaS
 {
     public class WaaSLogin : ILogin 
     {
-        public const string WaaSWithAuthUrl = "https://d14tu8valot5m0.cloudfront.net/rpc/WaasAuthenticator";
+        public static string WaaSWithAuthUrl { get; private set; }
         public const string WaaSLoginMethod = "WaaSLoginMethod";
 
         private AWSConfig _awsConfig;
@@ -22,13 +23,38 @@ namespace Sequence.WaaS
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
         private IValidator _validator;
+        private IEmailSignIn _emailSignIn;
         private string _challengeSession;
+        private int retries = 0;
 
-        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, IValidator validator = null)
+        public WaaSLogin(IValidator validator = null)
         {
-            _awsConfig = awsConfig;
-            _waasProjectId = waasProjectId;
+            SequenceConfig config = SequenceConfig.GetConfig();
+            string waasVersion = config.WaaSVersion;
+            if (string.IsNullOrWhiteSpace(waasVersion))
+            {
+                throw SequenceConfig.MissingConfigError("WaaS Version");
+            }
             _waasVersion = waasVersion;
+            
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.keyId, configJwt.emailClientId);
+            _awsConfig = awsConfig;
+
+            string rpcUrl = configJwt.rpcServer;
+            if (string.IsNullOrWhiteSpace(rpcUrl))
+            {
+                throw SequenceConfig.MissingConfigError("RPC Server");
+            }
+            WaaSWithAuthUrl = $"{rpcUrl.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator";
+            
+            int projectId = configJwt.projectId;
+            if (string.IsNullOrWhiteSpace(projectId.ToString()))
+            {
+                throw SequenceConfig.MissingConfigError("Project ID");
+            }
+            _waasProjectId = projectId;
+            
             _authenticator = new OpenIdAuthenticator();
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
@@ -39,7 +65,15 @@ namespace Sequence.WaaS
                 validator = new Validator();
             }
             _validator = validator;
+            
+            _emailSignIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
         }
+        
+        public void InjectEmailSignIn(IEmailSignIn emailSignIn)
+        {
+            _emailSignIn = emailSignIn;
+        }
+        
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
         public event ILogin.OnLoginFailedHandler OnLoginFailed;
         public event ILogin.OnMFAEmailSentHandler OnMFAEmailSent;
@@ -53,13 +87,23 @@ namespace Sequence.WaaS
                 return;
             }
             
-            AWSEmailSignIn signIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
             try
             {
-                _challengeSession = await signIn.SignIn(email);
+                _challengeSession = await _emailSignIn.SignIn(email);
                 if (string.IsNullOrEmpty(_challengeSession))
                 {
                     OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
+                    return;
+                }
+
+                if (_challengeSession.Contains("user not found"))
+                {
+                    if (retries > 1)
+                    {
+                        OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
+                        return;
+                    }
+                    SignUpThenRetryLogin(email);
                     return;
                 }
                 
@@ -77,6 +121,20 @@ namespace Sequence.WaaS
             }
         }
 
+        public async Task SignUpThenRetryLogin(string email)
+        {
+            try
+            {
+                await _emailSignIn.SignUp(email);
+                retries++;
+                Login(email);
+            }
+            catch (Exception e)
+            {
+                OnMFAEmailFailedToSend?.Invoke(email, e.Message);
+            }
+        }
+
         public async Task Login(string email, string code)
         {
             if (!_validator.ValidateCode(code))
@@ -85,10 +143,9 @@ namespace Sequence.WaaS
                 return;
             }
             
-            AWSEmailSignIn signIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
             try
             {
-                string idToken = await signIn.Login(_challengeSession, email, code);
+                string idToken = await _emailSignIn.Login(_challengeSession, email, code);
                 if (string.IsNullOrEmpty(idToken))
                 {
                     OnLoginFailed?.Invoke("Unknown error establishing AWS session");
@@ -179,7 +236,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.session.id;
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, sessionWallet, dataKey, _waasProjectId, _waasVersion);
+                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), dataKey, sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);

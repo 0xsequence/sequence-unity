@@ -29,5 +29,15 @@ namespace Sequence.Demo
             _ui.OpenWalletPanelWithDelay(_closeAnimationDurationInSeconds, TokenFetcher, NftFetcher, 
                 Wallet);
         }
+
+        public void OpenSignMessagePanel()
+        {
+            _ui.OpenSignMessagePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
+        
+        public void OpenSendTransactionPanel()
+        {
+            _ui.OpenSendTransactionPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
     }
 }

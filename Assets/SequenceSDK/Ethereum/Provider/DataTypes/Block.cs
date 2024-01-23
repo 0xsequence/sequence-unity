@@ -21,7 +21,7 @@ namespace Sequence
         public string sha3Uncles;
         public string stateRoot;
         public string totalDifficulty;
-        public List<Transaction> transactions;
+        public List<ClientTransaction> transactions;
         public string transactionsRoot;
         public List<object> uncles;
 
