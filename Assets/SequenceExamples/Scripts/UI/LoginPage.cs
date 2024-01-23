@@ -13,12 +13,13 @@ namespace Sequence.Demo
     {
         public bool NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = true;
         [SerializeField] private TextMeshProUGUI _errorText;
+        [SerializeField] private GameObject _infoPopupPanelPrefab;
+        [SerializeField] private GameObject _loadingScreenPrefab;
         
         private TMP_InputField _inputField;
         private LoginMethod _loginMethod;
         private string _loginEmail;
         private LoginButtonHighlighter _loginButtonHighlighter;
-        private InfoPopupPanel _infoPopupPanel;
         private bool _hasShownInfoPopupForDifferentLoginMethod = false;
         internal ILogin LoginHandler { get; private set; }
 
@@ -27,7 +28,6 @@ namespace Sequence.Demo
             base.Awake();
             _inputField = GetComponentInChildren<TMP_InputField>();
             _loginButtonHighlighter = GetComponent<LoginButtonHighlighter>();
-            _infoPopupPanel = FindObjectOfType<InfoPopupPanel>();
         }
 
         private void Start()
@@ -74,6 +74,7 @@ namespace Sequence.Demo
             Debug.Log($"Signing in with email: {email}");
             _errorText.text = "";
             LoginHandler.Login(email);
+            InstantiateLoadingScreen();
         }
 
         public void GoogleLogin()
@@ -88,6 +89,7 @@ namespace Sequence.Demo
             }
             Debug.Log("Google Login");
             LoginHandler.GoogleLogin();
+            InstantiateLoadingScreen();
         }
 
         public void DiscordLogin()
@@ -102,6 +104,7 @@ namespace Sequence.Demo
             }
             Debug.Log("Discord Login");
             LoginHandler.DiscordLogin();
+            InstantiateLoadingScreen();
         }
 
         public void FacebookLogin()
@@ -116,6 +119,7 @@ namespace Sequence.Demo
             }
             Debug.Log("Facebook Login");
             LoginHandler.FacebookLogin();
+            InstantiateLoadingScreen();
         }
 
         public void AppleLogin()
@@ -130,17 +134,13 @@ namespace Sequence.Demo
             }
             Debug.Log("Apple Login");
             LoginHandler.AppleLogin();
+            InstantiateLoadingScreen();
         }
         
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.LogError($"Failed to send MFA email to {email} with error: {error}");
             _errorText.text = error;
-        }
-
-        public void SubscribeToWaaSWalletCreatedEvent(Action<WaaSWallet> OnWaaSWalletCreatedHandler)
-        {
-            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
         }
         
         private LoginMethod GetLoginMethod()
@@ -161,9 +161,11 @@ namespace Sequence.Demo
             {
                 message = $"Last time, you logged in with <b>{_loginMethod}</b>: <i>{_loginEmail}</i>. Logging in with a different method or email will use a different account.";
             }
-            if (_infoPopupPanel != null)
+            GameObject infoPopupPanelGameObject = Instantiate(_infoPopupPanelPrefab, transform.parent);
+            InfoPopupPanel infoPopupPanel = infoPopupPanelGameObject.GetComponent<InfoPopupPanel>();
+            if (infoPopupPanel != null)
             {
-                _infoPopupPanel.Open(message);
+                infoPopupPanel.Open(message);
                 _hasShownInfoPopupForDifferentLoginMethod = true;
             }
         }
@@ -176,6 +178,11 @@ namespace Sequence.Demo
             }
 
             return "";
+        }
+
+        private void InstantiateLoadingScreen()
+        {
+            Instantiate(_loadingScreenPrefab, transform.parent);
         }
     }
 }

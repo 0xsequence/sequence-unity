@@ -59,7 +59,7 @@ namespace SequenceExamples.Scripts.Tests
             TestExtensions.AssertImageWithNameHasSprite(_collectionInfoPage.transform, "CollectionIcon", collection.IconSprite);
             TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "CollectionNameText", collection.Name);
             TestExtensions.AssertImageWithNameHasSprite(_collectionInfoPage.transform, "NetworkIcon", networkIcons.GetIcon(collection.Network));
-            TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "NetworkName", ChainNames.NameOf[collection.Network]);
+            TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "NetworkName", ChainDictionaries.NameOf[collection.Network]);
             TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "UniqueCollectiblesOwnedText", $"{_walletPanel.GetNftsFromCollection(collection).Count} Unique Collectibles");
             TestExtensions.AssertTextWithNameHasText(_collectionInfoPage.transform, "TotalOwnedText", $"Owned ({NftElement.CalculateTotalNftsOwned(_walletPanel.GetNftsFromCollection(collection))})");
 

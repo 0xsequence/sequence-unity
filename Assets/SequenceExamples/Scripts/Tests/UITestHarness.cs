@@ -38,7 +38,7 @@ namespace SequenceExamples.Scripts.Tests
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
         {
             SequenceSampleUI.IsTesting = true;
-            SceneManager.LoadScene("Samples/Scenes/Demo");
+            SceneManager.LoadScene("SequenceExamples/Scenes/Tests");
             while (_ui == null)
             {
                 yield return null; // Allow object to load
@@ -191,6 +191,13 @@ namespace SequenceExamples.Scripts.Tests
                 nftFetcher,
                 new MockWaaSWallet()));
             yield return _testMonobehaviour.StartCoroutine(_walletFlowUITests.EndToEndTestFetchWalletContent());
+        }
+        
+        [UnityTest]
+        public IEnumerator LoadingScreenTest()
+        {
+            yield return _testMonobehaviour.StartCoroutine(InitiateTest(_loginPanel));
+            yield return _testMonobehaviour.StartCoroutine(_loginFlowUITests.LoadingScreenTest());
         }
     }
 

@@ -1,5 +1,4 @@
 using System.Numerics;
-using Sequence.ABI;
 using Sequence.Utils;
 
 namespace Sequence

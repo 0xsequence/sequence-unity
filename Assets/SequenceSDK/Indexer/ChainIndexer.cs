@@ -37,6 +37,11 @@ namespace Sequence
             return _chainId;
         }
 
+        public Chain GetChain()
+        {
+            return (Chain)(int)_chainId;
+        }
+
         public Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
             return Indexer.GetEtherBalance(_chainId, accountAddress);
