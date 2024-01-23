@@ -38,5 +38,28 @@ namespace Sequence.Extensions
             }
             return result;
         }
+
+        public static byte[] BuildArrayWithRepeatedValue(byte[] value, int repetitions)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            if (repetitions < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(repetitions), "Repetitions must be non-negative.");
+            }
+
+            int totalLength = value.Length * repetitions;
+            byte[] result = new byte[totalLength];
+
+            for (int i = 0; i < totalLength; i += value.Length)
+            {
+                Buffer.BlockCopy(value, 0, result, i, value.Length);
+            }
+
+            return result;
+        }
     }
 }

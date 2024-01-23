@@ -30,7 +30,7 @@ namespace Sequence.WaaS
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
             SequenceConfig config = SequenceConfig.GetConfig();
-            _defaultHeaders["X-Access-Token"] = config.BuilderAPIKey;
+            _defaultHeaders["X-Access-Key"] = config.BuilderAPIKey;
             if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
@@ -137,7 +137,7 @@ namespace Sequence.WaaS
         private string ExtractHeaders(UnityWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
-            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Token"})
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Key"})
             {
                 string headerValue = request.GetRequestHeader(headerKey);
                 if (string.IsNullOrEmpty(headerValue))

@@ -13,6 +13,7 @@ namespace Sequence.Demo
     {
         public bool NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = true;
         [SerializeField] private TextMeshProUGUI _errorText;
+        [SerializeField] private GameObject _loadingScreenPrefab;
         
         private TMP_InputField _inputField;
         private LoginMethod _loginMethod;
@@ -74,6 +75,7 @@ namespace Sequence.Demo
             Debug.Log($"Signing in with email: {email}");
             _errorText.text = "";
             LoginHandler.Login(email);
+            InstantiateLoadingScreen();
         }
 
         public void GoogleLogin()
@@ -88,6 +90,7 @@ namespace Sequence.Demo
             }
             Debug.Log("Google Login");
             LoginHandler.GoogleLogin();
+            InstantiateLoadingScreen();
         }
 
         public void DiscordLogin()
@@ -102,6 +105,7 @@ namespace Sequence.Demo
             }
             Debug.Log("Discord Login");
             LoginHandler.DiscordLogin();
+            InstantiateLoadingScreen();
         }
 
         public void FacebookLogin()
@@ -116,6 +120,7 @@ namespace Sequence.Demo
             }
             Debug.Log("Facebook Login");
             LoginHandler.FacebookLogin();
+            InstantiateLoadingScreen();
         }
 
         public void AppleLogin()
@@ -130,17 +135,13 @@ namespace Sequence.Demo
             }
             Debug.Log("Apple Login");
             LoginHandler.AppleLogin();
+            InstantiateLoadingScreen();
         }
         
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.LogError($"Failed to send MFA email to {email} with error: {error}");
             _errorText.text = error;
-        }
-
-        public void SubscribeToWaaSWalletCreatedEvent(Action<WaaSWallet> OnWaaSWalletCreatedHandler)
-        {
-            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
         }
         
         private LoginMethod GetLoginMethod()
@@ -176,6 +177,11 @@ namespace Sequence.Demo
             }
 
             return "";
+        }
+
+        private void InstantiateLoadingScreen()
+        {
+            Instantiate(_loadingScreenPrefab, transform.parent);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Sequence.WaaS
             int networkId = (int)network;
             this.wallet = walletAddress;
             this.network = networkId.ToString();
-            this.message = message;
+            this.message = PrepareMessage(message);
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
         }
@@ -29,7 +29,7 @@ namespace Sequence.WaaS
         {
             this.wallet = walletAddress;
             this.network = networkId;
-            this.message = message;
+            this.message = PrepareMessage(message);
             this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             this.expires = this.issued + timeBeforeExpiry;
         }

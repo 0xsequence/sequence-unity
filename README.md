@@ -1,5 +1,4 @@
 # Sequence Unity SDK
-This project is a work in progress - a version 2 for the Sequence Unity SDK
 
 ## Requirements
 Unity 2021.3.6f1 or later
@@ -32,6 +31,8 @@ Then
 `source ~/.bashrc` or `source ~/.zshrc`
 Then
 `touch TestResults.xml` from the route directory of the project
+
+Run `make bootstrap` to install dependancies locally that are required for running the testchain.
 #### Running the test
 To run the test please use
 `make test`
@@ -111,7 +112,7 @@ Updated Aug 16, 2023 - author: Quinn Purdy
 Updated Jan 3, 2023 - author: Quinn Purdy
 
 #### Status
-Updates Pending - approval of the accompanying PR will constitute approval of this ADR.
+Approved
 
 #### Context
 A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http. This WaaS service, with our authentication system, can be used to provide users with a more secure and more frictionless (less "wallet-like") UX.

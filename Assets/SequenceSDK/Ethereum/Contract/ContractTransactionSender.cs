@@ -21,7 +21,7 @@ namespace Sequence.Contracts
             params object[] functionArgs)
         {
             ContractCall callingInfo = new ContractCall(wallet.GetAddress(), value);
-            EthTransaction transaction = await contract.CallFunction(functionName, functionArgs)(client, callingInfo);
+            EthTransaction transaction = await contract.CallFunction(functionName, functionArgs).Create(client, callingInfo);
             string result = await wallet.SendTransaction(client, transaction);
             return result;
         }
@@ -40,18 +40,18 @@ namespace Sequence.Contracts
         }
 
         public static async Task<string> SendTransactionMethod(
-            this CallContractFunctionTransactionCreator transactionCreator,
+            this CallContractFunction transactionCreator,
             IWallet wallet,
             IEthClient client,
             BigInteger? value = null)
         {
-            EthTransaction transaction = await transactionCreator(client, new ContractCall(wallet.GetAddress(), value));
+            EthTransaction transaction = await transactionCreator.Create(client, new ContractCall(wallet.GetAddress(), value));
             string result = await wallet.SendTransaction(client, transaction);
             return result;
         }
 
         public static async Task<TransactionReceipt> SendTransactionMethodAndWaitForReceipt(
-            this CallContractFunctionTransactionCreator transactionCreator,
+            this CallContractFunction transactionCreator,
             IWallet wallet,
             IEthClient client,
             BigInteger? value = null)

@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Sequence.WaaS
 {
-    public class IntentSender
+    public class IntentSender : IIntentSender
     {
         public string SessionId { get; private set; }
         
