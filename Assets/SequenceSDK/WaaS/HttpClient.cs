@@ -16,7 +16,7 @@ namespace Sequence.WaaS
 {
     public class HttpClient
     {
-        private readonly string _url = "https://next-api.sequence.app/rpc/Wallet";
+        private readonly string _url;
         private Dictionary<string, string> _defaultHeaders;
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
@@ -97,7 +97,7 @@ namespace Sequence.WaaS
             
                 if (request.error != null || request.result != UnityWebRequest.Result.Success || request.responseCode < 200 || request.responseCode > 299)
                 {
-                    Debug.LogError($"Error sending request to {url}: {request.responseCode} {request.error}");
+                    throw new Exception($"Error sending request to {url}: {request.responseCode} {request.error}");
                 }
                 else
                 {
@@ -111,27 +111,25 @@ namespace Sequence.WaaS
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError($"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
+                        throw new Exception($"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
                     }
                 }
             }
             catch (HttpRequestException e)
             {
-                Debug.LogError("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                Debug.LogError("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                Debug.LogError("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
-                Debug.LogError("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
-
-            return default;
         }
 
         private string ExtractHeaders(UnityWebRequest request)

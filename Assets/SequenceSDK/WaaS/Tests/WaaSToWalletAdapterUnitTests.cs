@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Provider;
@@ -27,6 +28,24 @@ namespace Sequence.WaaS.Tests
             catch (System.Exception e)
             {
                 Assert.AreEqual("something happened", e.Message);
+            }
+        }
+        
+        [Test]
+        public async Task TestSendTransactionException()
+        {
+            IIntentSender intentSender = new MockIntentSender(new Exception("some bad stuff happened"));
+            WaaSToWalletAdapter adapter = new WaaSToWalletAdapter(new WaaSWallet(address, "", intentSender));
+
+            try
+            {
+                string transactionHash = await adapter.SendTransaction(_client,
+                    new EthTransaction(0, 1, 1, address, 0, "", Chain.Polygon.AsHexString()));
+                Assert.Fail("Expected exception, but none was thrown");
+            }
+            catch (System.Exception e)
+            {
+                Assert.AreEqual("some bad stuff happened", e.Message);
             }
         }
         
@@ -102,6 +121,23 @@ namespace Sequence.WaaS.Tests
         public async Task TestDeployContractFailed()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("something happened",null,null));
+            WaaSToWalletAdapter adapter = new WaaSToWalletAdapter(new WaaSWallet(address, "", intentSender));
+
+            try
+            {
+                TransactionReceipt receipt = await adapter.DeployContract(_client, "");
+                Assert.Fail("Expected exception, but none was thrown");
+            }
+            catch (System.Exception e)
+            {
+                Assert.AreEqual("Failed to deploy contract: something happened", e.Message);
+            }
+        }
+
+        [Test]
+        public async Task TestDeployContractTransactionException()
+        {
+            IIntentSender intentSender = new MockIntentSender(new Exception("something happened"));
             WaaSToWalletAdapter adapter = new WaaSToWalletAdapter(new WaaSWallet(address, "", intentSender));
 
             try

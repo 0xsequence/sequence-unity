@@ -245,12 +245,12 @@ namespace Sequence
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
-            req.SetRequestHeader("X-Access-Key", _builderApiKey);
+            req.SetRequestHeader("X-Access-Key", "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"); // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
             req.method = UnityWebRequest.kHttpVerbPOST;
             req.timeout = 10; // Request will timeout after 10 seconds
                 
             string curlRequest = 
-                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {_builderApiKey}\" -d '{requestJson}' {Url(chainID, endPoint)}";
+                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
             try
             {
                 await req.SendWebRequest();

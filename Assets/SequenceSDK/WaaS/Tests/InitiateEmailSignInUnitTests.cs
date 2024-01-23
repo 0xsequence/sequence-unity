@@ -7,7 +7,7 @@ namespace Sequence.WaaS.Tests
     {
         private string _email = "email@domain.com";
         
-        private WaaSLogin _waasLogin = new WaaSLogin(new AWSConfig("region", "identityPoolId", "kmsEncryptionKeyId", "cognitoClientId"), 1, "version");
+        private WaaSLogin _waasLogin = new WaaSLogin();
         
         [Test]
         public void TestLogin_Success()

@@ -15,7 +15,7 @@ namespace Sequence.WaaS
 {
     public class WaaSLogin : ILogin 
     {
-        public const string WaaSWithAuthUrl = "https://d3jwb7a1rcpkmp.cloudfront.net/rpc/WaasAuthenticator";
+        public static string WaaSWithAuthUrl { get; private set; }
         public const string WaaSLoginMethod = "WaaSLoginMethod";
 
         private AWSConfig _awsConfig;
@@ -27,19 +27,34 @@ namespace Sequence.WaaS
         private string _challengeSession;
         private int retries = 0;
 
-        public WaaSLogin(AWSConfig awsConfig, int waasProjectId, string waasVersion, IValidator validator = null)
+        public WaaSLogin(IValidator validator = null)
         {
-            _awsConfig = awsConfig;
-            if (waasProjectId == 0)
-            {
-                throw SequenceConfig.MissingConfigError("WaaS Project Id");
-            }
-            _waasProjectId = waasProjectId;
+            SequenceConfig config = SequenceConfig.GetConfig();
+            string waasVersion = config.WaaSVersion;
             if (string.IsNullOrWhiteSpace(waasVersion))
             {
                 throw SequenceConfig.MissingConfigError("WaaS Version");
             }
             _waasVersion = waasVersion;
+            
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.keyId, configJwt.emailClientId);
+            _awsConfig = awsConfig;
+
+            string rpcUrl = configJwt.rpcServer;
+            if (string.IsNullOrWhiteSpace(rpcUrl))
+            {
+                throw SequenceConfig.MissingConfigError("RPC Server");
+            }
+            WaaSWithAuthUrl = $"{rpcUrl.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator";
+            
+            int projectId = configJwt.projectId;
+            if (string.IsNullOrWhiteSpace(projectId.ToString()))
+            {
+                throw SequenceConfig.MissingConfigError("Project ID");
+            }
+            _waasProjectId = projectId;
+            
             _authenticator = new OpenIdAuthenticator();
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;

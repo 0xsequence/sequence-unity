@@ -30,13 +30,7 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            ILogin loginHandler = new WaaSLogin(new AWSConfig(
-                config.Region, 
-                config.IdentityPoolId, 
-                config.KMSEncryptionKeyId,
-                config.CognitoClientId),
-                config.WaaSProjectId, 
-                config.WaaSVersion);
+            ILogin loginHandler = new WaaSLogin();
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();

@@ -21,5 +21,11 @@ namespace Sequence.Demo
             }
             _infoText.text = info;
         }
+
+        public override void Close()
+        {
+            base.Close();
+            Destroy(_gameObject);
+        }
     }
 }

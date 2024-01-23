@@ -16,9 +16,9 @@ namespace SequenceExamples.Scripts.Tests.Utils
             return TestAddress;
         }
 
-        public event Action<SignMessageReturn> OnSignMessageComplete;
+        public event Action<string> OnSignMessageComplete;
 
-        public Task<SignMessageReturn> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
+        public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
             throw new NotImplementedException();
         }
