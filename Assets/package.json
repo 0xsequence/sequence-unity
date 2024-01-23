@@ -1,0 +1,30 @@
+{
+  "name": "xyz.0xsequence.waas-unity",
+  "version": "0.0.1",
+  "displayName": "Sequence WaaS SDK",
+  "description": "A Unity SDK for the Sequence WaaS API",
+  "unity": "2021.3",
+  "keywords": ["Unity", "Package", "wallet", "ethereum", "web3", "sequence", "waas"],
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json" : "3.0.2"
+  },
+  "author": {
+    "name": "0xsequence",
+    "url": "https://sequence.xyz/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xsequence/sequence-unity.git"
+  },
+  "category": "web3",
+  "samples": [
+    {
+      "displayName": "Demo Scene",
+      "description": "Basic demo scene showcasing the SDK functionality",
+      "path": "Samples~/Scenes"
+    }
+  ],
+  "documentationUrl": "https://docs.sequence.xyz/",
+  "changelogUrl": "https://github.com/0xsequence/sequence-unity/releases",
+  "licensesUrl": "https://docs.sequence.xyz/"
+}
