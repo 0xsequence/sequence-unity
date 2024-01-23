@@ -16,7 +16,7 @@ namespace Sequence.WaaS
 {
     public class HttpClient
     {
-        private readonly string _url = "https://next-api.sequence.app/rpc/Wallet";
+        private readonly string _url;
         private Dictionary<string, string> _defaultHeaders;
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
