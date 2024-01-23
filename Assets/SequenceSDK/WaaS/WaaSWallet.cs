@@ -33,21 +33,30 @@ namespace Sequence.WaaS
             return _address;
         }
 
-        public event Action<SignMessageReturn> OnSignMessageComplete;
+        public event Action<string> OnSignMessageComplete;
 
-        public async Task<SignMessageReturn> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
+        public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
-            SignMessageArgs args = new SignMessageArgs(_address, network, message, timeBeforeExpiry);
-            var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
-            OnSignMessageComplete?.Invoke(result);
-            return result;
+            try
+            {
+                SignMessageArgs args = new SignMessageArgs(_address, network, message, timeBeforeExpiry);
+                var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
+                string signature = result.signature;
+                OnSignMessageComplete?.Invoke(signature);
+                return signature;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                return null;
+            }
         }
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature)
         {
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
-                new Dictionary<string, string>() {{"X-Access-Key", "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"}}); // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
+            new Dictionary<string, string>() {{"X-Access-Key", "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"}}); // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
@@ -56,16 +65,25 @@ namespace Sequence.WaaS
         public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
         {
             SendTransactionArgs args = new SendTransactionArgs(_address, network, transactions, timeBeforeExpiry);
-            var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
-            if (result is SuccessfulTransactionReturn)
+            try
             {
-                OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
+                var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
+                if (result is SuccessfulTransactionReturn)
+                {
+                    OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
+                }
+                else
+                {
+                    OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
+                }
+                return result;
             }
-            else
+            catch (Exception e)
             {
-                OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
+                FailedTransactionReturn result = new FailedTransactionReturn(e.Message, args, null);
+                OnSendTransactionFailed?.Invoke(result);
+                return result;
             }
-            return result;
         }
 
         public event Action<SuccessfulContractDeploymentReturn> OnDeployContractComplete;

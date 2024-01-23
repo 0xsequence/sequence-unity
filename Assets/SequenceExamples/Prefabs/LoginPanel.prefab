@@ -5774,7 +5774,10 @@ MonoBehaviour:
   _animation: 0
   NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime: 1
   _errorText: {fileID: 3911810627816165819}
-  _loadingScreenPrefab: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
+  _infoPopupPanelPrefab: {fileID: 8067163605015323916, guid: a5a68ec1b8c3c430694abc1729fc5369,
+    type: 3}
+  _loadingScreenPrefab: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28,
+    type: 3}
 --- !u!114 &702636062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6434,7 +6437,8 @@ MonoBehaviour:
   - {fileID: 3911810626580786188}
   _enterCodeText: {fileID: 3911810626720903612}
   _errorText: {fileID: 3911810627950373898}
-  _loadingScreenPrefab: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
+  _loadingScreenPrefab: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28,
+    type: 3}
 --- !u!1 &3911810628491489749
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "0.0.1",
+  "version": "2.0.0",
   "displayName": "Sequence WaaS SDK",
   "description": "A Unity SDK for the Sequence WaaS API",
   "unity": "2021.3",
@@ -19,9 +19,14 @@
   "category": "web3",
   "samples": [
     {
+      "displayName": "Setup",
+      "description": "Import this into your project to get started",
+      "path": "Samples~/Setup"
+    },
+    {
       "displayName": "Demo Scene",
       "description": "Basic demo scene showcasing the SDK functionality",
-      "path": "Samples~/Scenes"
+      "path": "Samples~/DemoScene"
     },
     {
       "displayName": "Demo Tower Defense Game",
@@ -29,7 +34,7 @@
       "path": "Samples~/DemoTowerDefenseGame"
     }
   ],
-  "documentationUrl": "https://docs.sequence.xyz/",
+  "documentationUrl": "https://docs.sequence.xyz/unity-waas-sdk",
   "changelogUrl": "https://github.com/0xsequence/sequence-unity/releases",
   "licensesUrl": "https://docs.sequence.xyz/"
 }

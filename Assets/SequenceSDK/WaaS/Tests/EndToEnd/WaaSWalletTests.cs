@@ -50,8 +50,7 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                var result = await _wallet.SignMessage(network, message);
-                string signature = result.signature;
+                string signature = await _wallet.SignMessage(network, message);
                 CustomAssert.NotNull(signature, nameof(TestMessageSigning), message, network);
                 var isValid = await _wallet.IsValidMessageSignature(network,  message, signature);
                 bool isValidSignature = isValid.isValid;

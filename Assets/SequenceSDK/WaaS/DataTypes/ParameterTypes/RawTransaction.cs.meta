@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: 440173e1d14cb46df83c91d4ae049753
+<<<<<<<< HEAD:Assets/Samples~/Setup/Editor/SetUrlScheme.cs.meta
+guid: 0a20843d8e490466c8d3baf820810b1b
+========
+guid: 662b4bdee6cf74c0488bdbf46932388d
+>>>>>>>> origin/master:Assets/SequenceSDK/WaaS/DataTypes/ParameterTypes/RawTransaction.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
