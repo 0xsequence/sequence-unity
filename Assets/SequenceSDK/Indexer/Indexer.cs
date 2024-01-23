@@ -236,6 +236,11 @@ namespace Sequence
         /// <returns></returns>
         private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
         {
+            if (string.IsNullOrWhiteSpace(_builderApiKey))
+            {
+                throw SequenceConfig.MissingConfigError("Builder API Key");
+            }
+            
             string requestJson = JsonConvert.SerializeObject(args);
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
