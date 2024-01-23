@@ -54,23 +54,22 @@ namespace Sequence.Demo
         
         public void SignMessage()
         {
-            _wallet.SignMessage(new SignMessageArgs(_address, Chain.Polygon, "Hello World!"));
+            _wallet.SignMessage(Chain.Polygon, "Hello World!");
         }
         
-        private void OnSignMessageComplete(SignMessageReturn result)
+        private void OnSignMessageComplete(string signature)
         {
-            _resultText.text = result.signature;
+            _resultText.text = signature;
         }
 
         public void SendTransfer()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address,
+            _wallet.SendTransaction(
                 Chain.Polygon,
                 new SequenceSDK.WaaS.Transaction[]
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1")
-                }));
+                });
         }
 
         public void DeployERC20()
@@ -98,13 +97,12 @@ namespace Sequence.Demo
 
         public void SendFailingTransfer()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address,
+            _wallet.SendTransaction(
                 Chain.Polygon,
                 new SequenceSDK.WaaS.Transaction[]
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "99000000000000000000")
-                }));
+                });
         }
 
         public void DropSession()
@@ -121,32 +119,29 @@ namespace Sequence.Demo
 
         public void SendErc20Transfer()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
                     new SendERC20(
                         "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
                         "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
                         "1"),
-                }));
+                });
         }
         
         public void SendErc721Transfer()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
                     new SendERC721(
                         "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
                         "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
                         "54530968763798660137294927684252503703134533114052628080002308208148824588621"),
-                }));
+                });
         }
         
         public void SendErc1155Transfer()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
                     new SendERC1155(
                         "0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb",
@@ -155,13 +150,12 @@ namespace Sequence.Demo
                         {
                             new SendERC1155Values("86", "1")
                         }),
-                }));
+                });
         }
 
         public void SendMultipleTransferTypes()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", DecimalNormalizer.Normalize(1)),
                     new SendERC20(
@@ -186,7 +180,7 @@ namespace Sequence.Demo
                             "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"
                         },
                         "transfer")),
-                }));
+                });
         }
 
         public void SendWithAdapter()
@@ -247,8 +241,7 @@ namespace Sequence.Demo
         {
             ERC721 nft = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
             ERC1155 sft = new ERC1155("0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb");
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
                     new RawTransaction(nft.Contract, "transferFrom", _adapter.GetAddress().Value,
                         "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
@@ -257,13 +250,12 @@ namespace Sequence.Demo
                         "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
                         86,
                         1, "data".ToByteArray()), // Todo figure out why data is required
-                }));
+                });
         }
 
         public void DelayedEncode()
         {
-            _wallet.SendTransaction(new SendTransactionArgs(
-                _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
                 {
                     new DelayedEncode("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", "0", new DelayedEncodeData(
                         "transfer(address,uint256)",
@@ -272,7 +264,7 @@ namespace Sequence.Demo
                             "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1"
                         },
                         "transfer")),
-                }));
+                });
         }
 
         public void ListSessions()

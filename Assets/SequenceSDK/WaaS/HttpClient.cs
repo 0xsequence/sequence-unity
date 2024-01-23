@@ -16,7 +16,7 @@ namespace Sequence.WaaS
 {
     public class HttpClient
     {
-        private readonly string _url = "https://next-api.sequence.app/rpc/Wallet";
+        private readonly string _url;
         private Dictionary<string, string> _defaultHeaders;
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
@@ -29,7 +29,12 @@ namespace Sequence.WaaS
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            _defaultHeaders["X-Access-Token"] = SequenceConfig.GetConfig().BuilderAPIKey;
+            SequenceConfig config = SequenceConfig.GetConfig();
+            _defaultHeaders["X-Access-Key"] = config.BuilderAPIKey;
+            if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))
+            {
+                throw SequenceConfig.MissingConfigError("Builder API Key");
+            }
         }
 
         public void AddDefaultHeader(string key, string value)
@@ -130,7 +135,7 @@ namespace Sequence.WaaS
         private string ExtractHeaders(UnityWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
-            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Token"})
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Key"})
             {
                 string headerValue = request.GetRequestHeader(headerKey);
                 if (string.IsNullOrEmpty(headerValue))

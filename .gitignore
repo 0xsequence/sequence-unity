@@ -13,11 +13,16 @@
 # Plugins
 
 /[Aa]ssets/TextMesh Pro/
-/[Aa]ssets/Plugins.meta
 /[Aa]ssets/TextMesh Pro.meta
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
+
+# Package Manager formatting
+/[Aa]ssets/TextMesh Pro
+/[Aa]ssets/Resources
+/[Aa]ssets/Resources.meta
+/[Aa]ssets/Samples
 
 # Recordings can get excessive in size
 /[Rr]ecordings/
@@ -106,5 +111,4 @@ testchain/artifacts/@openzeppelin
 testchain/artifacts/build-info
 testchain/cache/
 
-package.json
 package-lock.json

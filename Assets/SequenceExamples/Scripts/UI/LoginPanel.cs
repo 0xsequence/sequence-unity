@@ -10,6 +10,8 @@ namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
+        [SerializeField] private GameObject _waaSSessionManagerPrefab;
+        
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
@@ -30,13 +32,7 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            ILogin loginHandler = new WaaSLogin(new AWSConfig(
-                config.Region, 
-                config.IdentityPoolId, 
-                config.KMSEncryptionKeyId,
-                config.CognitoClientId),
-                config.WaaSProjectId, 
-                config.WaaSVersion);
+            ILogin loginHandler = new WaaSLogin();
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
@@ -58,6 +54,8 @@ namespace Sequence.Demo
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
             WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+
+            Instantiate(_waaSSessionManagerPrefab);
         } 
 
         public void OpenTransitionPanel()
