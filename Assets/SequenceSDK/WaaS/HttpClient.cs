@@ -29,7 +29,7 @@ namespace Sequence.WaaS
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            _defaultHeaders["X-Access-Token"] = SequenceConfig.GetConfig().BuilderAPIKey;
+            _defaultHeaders["X-Access-Key"] = SequenceConfig.GetConfig().BuilderAPIKey;
         }
 
         public void AddDefaultHeader(string key, string value)
@@ -132,7 +132,7 @@ namespace Sequence.WaaS
         private string ExtractHeaders(UnityWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
-            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Token"})
+            foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Key"})
             {
                 string headerValue = request.GetRequestHeader(headerKey);
                 if (string.IsNullOrEmpty(headerValue))
