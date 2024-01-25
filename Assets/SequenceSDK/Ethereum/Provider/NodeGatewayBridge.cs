@@ -28,6 +28,9 @@ namespace Sequence.Provider
             { Chain.TestnetAvalanche, "avalanche-testnet" },
             { Chain.TestnetBNBSmartChain, "bsc-testnet" },
             { Chain.TestnetOasysHomeverse, "homeverse-testnet" },
+            { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia"},
+            { Chain.TestnetOptimisticSepolia, "optimism-sepolia"},
+            { Chain.TestnetBaseSepolia, "base-sepolia"},
         };
         
         private const string _baseUrl = "https://nodes.sequence.app/";
