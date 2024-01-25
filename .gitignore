@@ -23,6 +23,7 @@
 /[Aa]ssets/Resources
 /[Aa]ssets/Resources.meta
 /[Aa]ssets/Samples
+/[Aa]ssets/Samples~/Setup/Resources/SequenceConfig.asset
 
 # Recordings can get excessive in size
 /[Rr]ecordings/

@@ -21,11 +21,12 @@ namespace Sequence
         TestnetGoerli = 5,
         TestnetSepolia = 11155111,
         TestnetPolygonMumbai = 80001,
-        TestnetArbitrumGoerli = 421613,
+        TestnetArbitrumSepolia = 421614,
         TestnetBNBSmartChain = 97,
-        TestnetBaseGoerli = 84531,
+        TestnetBaseSepolia = 84532,
         TestnetAvalanche = 43113,
         TestnetOasysHomeverse = 40875,
+        TestnetOptimisticSepolia = 11155420,
         
         // Null
         None = 0

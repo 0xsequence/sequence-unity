@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31bdc7ca06145c58d72ef6ca48f8e02, type: 3}
   m_Name: SequenceConfig
   m_EditorClassIdentifier: 
-  UrlScheme: sdk-powered-by-sequence
-  GoogleClientId: 970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com
+  UrlScheme: 
+  GoogleClientId: 
   DiscordClientId: 
   FacebookClientId: 
   AppleClientId: 
   WaaSVersion: 1.0.0
-  WaaSConfigKey: eyJwcm9qZWN0SWQiOjIsImlkZW50aXR5UG9vbElkIjoidXMtZWFzdC0yOjQyZGMyZjE4LTJmOWItNGZkNS05NDI5LWUwZGE1MjFmOWNmNCIsImlkcFJlZ2lvbiI6InVzLWVhc3QtMiIsInJwY1NlcnZlciI6Imh0dHBzOi8vZGV2LXdhYXMuc2VxdWVuY2UuYXBwIiwia21zUmVnaW9uIjoidXMtZWFzdC0yIiwia2V5SWQiOiJhcm46YXdzOmttczp1cy1lYXN0LTI6MzgxNDkyMjQ3Njk3OmtleS8xODgxZTY3My1mMThkLTQ1NTgtODI5YS0xM2I4MThjMDMwNjUifQ
-  BuilderAPIKey: EeP6AmufRFfigcWaNverI6CAAAAAAAAAA
+  WaaSConfigKey: 
+  BuilderAPIKey: 

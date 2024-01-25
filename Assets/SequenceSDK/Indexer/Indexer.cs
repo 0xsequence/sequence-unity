@@ -76,9 +76,7 @@ namespace Sequence
         { (int)Chain.TestnetGoerli, "goerli" },
         { (int)Chain.TestnetSepolia, "sepolia" },
         { (int)Chain.TestnetPolygonMumbai, "mumbai" },
-        { (int)Chain.TestnetArbitrumGoerli, "arbitrum-goerli" },
         { (int)Chain.TestnetBNBSmartChain, "bsc-testnet" },
-        { (int)Chain.TestnetBaseGoerli, "base-goerli" },
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;

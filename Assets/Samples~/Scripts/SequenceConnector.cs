@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Samples.Scripts
 {
     /// <summary>
-    /// Attach this to a monobehaviour in your scene. It will automatically capture a WaaSWallet when it is created and setup all event handlers (fill in your own logic).
+    /// Attach this to a GameObject in your scene. It will automatically capture a WaaSWallet when it is created and setup all event handlers (fill in your own logic).
     /// This mono behaviour will persist between scenes and is accessed via SequenceConnector.Instance singleton.
     /// </summary>
     public class SequenceConnector : MonoBehaviour
