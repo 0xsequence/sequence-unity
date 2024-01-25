@@ -134,7 +134,7 @@ public class SequenceEthClientTests
     public async Task TestChainId(Chain chain)
     {
         if (chain == Chain.None) return;
-        if (chain == Chain.TestnetGoerli || chain == Chain.TestnetArbitrumGoerli || chain == Chain.TestnetBaseGoerli)
+        if (chain == Chain.TestnetGoerli)
         {
             // These chains are not supported by node gateway according to the builder
             try

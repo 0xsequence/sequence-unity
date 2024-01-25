@@ -21,10 +21,12 @@ namespace Sequence
             { Chain.TestnetGoerli, "Goerli" },
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetPolygonMumbai, "PolygonMumbai" },
-            { Chain.TestnetArbitrumGoerli, "ArbitrumGoerli" },
+            { Chain.TestnetArbitrumSepolia, "ArbitrumSepolia" },
             { Chain.TestnetBNBSmartChain, "BNBSmartChain" },
-            { Chain.TestnetBaseGoerli, "BaseGoerli" },
+            { Chain.TestnetBaseSepolia, "BaseSepolia" },
             { Chain.TestnetOasysHomeverse, "TestnetOasysHomeverse"},
+            { Chain.TestnetAvalanche, "TestnetAvalanche"},
+            { Chain.TestnetOptimisticSepolia, "OptimisticSepolia"},
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -36,16 +38,20 @@ namespace Sequence
             { Chain.ArbitrumOne, "AETH" },
             { Chain.ArbitrumNova, "AETH" },
             { Chain.Optimism, "OP" },
-            { Chain.Avalanche, "ETH" },
+            { Chain.Avalanche, "AVAX" },
             { Chain.Gnosis, "xDai" },
             { Chain.Base, "ETH" },
+            { Chain.OasysHomeverse, "OAS"},
 
             { Chain.TestnetGoerli, "ETH" },
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetPolygonMumbai, "MATIC" },
-            { Chain.TestnetArbitrumGoerli, "AETH" },
+            { Chain.TestnetArbitrumSepolia, "AETH" },
             { Chain.TestnetBNBSmartChain, "BNB" },
-            { Chain.TestnetBaseGoerli, "ETH" },
+            { Chain.TestnetBaseSepolia, "ETH" },
+            { Chain.TestnetOasysHomeverse, "OAS"},
+            { Chain.TestnetAvalanche, "AVAX"},
+            { Chain.TestnetOptimisticSepolia, "OP"},
         };
 
         public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
@@ -60,13 +66,17 @@ namespace Sequence
             { Chain.Avalanche, "https://subnets.avax.network/c-chain/" },
             { Chain.Gnosis, "https://gnosisscan.io/" },
             { Chain.Base, "https://basescan.org/" },
+            { Chain.OasysHomeverse, "https://explorer.oasys.homeverse.games/" },
 
             { Chain.TestnetGoerli, "https://goerli.etherscan.io/" },
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetPolygonMumbai, "https://mumbai.polygonscan.com/" },
-            { Chain.TestnetArbitrumGoerli, "https://arbiscan.io/" },
+            { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
             { Chain.TestnetBNBSmartChain, "https://testnet.bscscan.com/" },
-            { Chain.TestnetBaseGoerli, "https://goerli.basescan.org/" },
+            { Chain.TestnetBaseSepolia, "https://sepolia.basescan.org/" },
+            { Chain.TestnetOasysHomeverse, "https://explorer.testnet.oasys.games/" },
+            { Chain.TestnetAvalanche, "https://testnet.snowtrace.io/" },
+            { Chain.TestnetOptimisticSepolia, "https://sepolia-optimism.etherscan.io/" },
         };
     }
 }
