@@ -128,6 +128,7 @@ namespace Sequence.Authentication
                 }
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
+                appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
                 Application.OpenURL(appleSignInUrl);
             }
             catch (Exception e)
@@ -149,7 +150,7 @@ namespace Sequence.Authentication
             }
             
             string url =
-                $"{baseUrl}?response_type=id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+profile+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
