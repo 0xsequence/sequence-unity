@@ -10,7 +10,7 @@ namespace Sequence.Authenticator.Tests
         [Test]
         public void TestNoQueryParams()
         {
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
+            OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app";
             authenticator.HandleDeepLink(url);
             LogAssert.Expect(LogType.Error, "Unexpected deep link: https://sequence.app");
@@ -19,7 +19,7 @@ namespace Sequence.Authenticator.Tests
         [Test]
         public void TestNoStateToken()
         {
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
+            OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?code=123456";
             authenticator.HandleDeepLink(url);
             LogAssert.Expect(LogType.Error, "State token missing");
@@ -28,7 +28,7 @@ namespace Sequence.Authenticator.Tests
         [Test]
         public void TestStateTokenMismatch()
         {
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
+            OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?code=123456&state=123456";
             authenticator.HandleDeepLink(url);
             LogAssert.Expect(LogType.Error, "State token mismatch");
@@ -37,7 +37,7 @@ namespace Sequence.Authenticator.Tests
         [Test]
         public void TestNoIdToken()
         {
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
+            OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?state=123456";
             authenticator.InjectStateTokenForTesting("123456");
             authenticator.HandleDeepLink(url);
@@ -47,7 +47,7 @@ namespace Sequence.Authenticator.Tests
         [Test]
         public void TestValidDeepLink()
         {
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
+            OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?state=123456&id_token=654321";
             authenticator.InjectStateTokenForTesting("123456");
             bool eventReceived = false;
@@ -63,7 +63,7 @@ namespace Sequence.Authenticator.Tests
         [Test]
         public void TestValidDeepLink_withTrailingSlash()
         {
-            OpenIdAuthenticator authenticator = new OpenIdAuthenticator();
+            OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?state=123456&id_token=654321/";
             authenticator.InjectStateTokenForTesting("123456");
             bool eventReceived = false;

@@ -26,6 +26,7 @@ namespace Sequence.WaaS
         private IEmailSignIn _emailSignIn;
         private string _challengeSession;
         private int retries = 0;
+        private EthWallet _sessionWallet;
 
         public WaaSLogin(IValidator validator = null)
         {
@@ -55,7 +56,9 @@ namespace Sequence.WaaS
             }
             _waasProjectId = projectId;
             
-            _authenticator = new OpenIdAuthenticator();
+            _sessionWallet = new EthWallet();
+            
+            _authenticator = new OpenIdAuthenticator(_sessionWallet.GetAddress());
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
@@ -145,7 +148,7 @@ namespace Sequence.WaaS
             
             try
             {
-                string idToken = await _emailSignIn.Login(_challengeSession, email, code);
+                string idToken = await _emailSignIn.Login(_challengeSession, email, code, _sessionWallet.GetAddress());
                 if (string.IsNullOrEmpty(idToken))
                 {
                     OnLoginFailed?.Invoke("Unknown error establishing AWS session");
@@ -219,16 +222,14 @@ namespace Sequence.WaaS
                 return;
             }
 
-            EthWallet sessionWallet = new EthWallet();
-
             IntentSender sender = new IntentSender(
                 new HttpClient(WaaSWithAuthUrl),
                 dataKey,
-                sessionWallet,
+                _sessionWallet,
                 "Unknown",
                 _waasProjectId,
                 _waasVersion);
-            string loginPayload = AssembleLoginPayloadJson(idToken, sessionWallet);
+            string loginPayload = AssembleLoginPayloadJson(idToken, _sessionWallet);
 
             try
             {
@@ -236,7 +237,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.session.id;
                 string walletAddress = registerSessionResponse.data.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), dataKey, sessionWallet, sessionId, _waasProjectId, _waasVersion));
+                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), dataKey, _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);

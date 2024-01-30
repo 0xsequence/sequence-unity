@@ -26,7 +26,7 @@ namespace Sequence.Authentication
             return returnValue;
         }
 
-        public async Task<string> Login(string challengeSession, string email, string code)
+        public async Task<string> Login(string challengeSession, string email, string code, string sessionWalletAddress = "")
         {
             throw new NotImplementedException();
         }
