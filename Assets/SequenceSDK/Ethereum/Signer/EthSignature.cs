@@ -4,6 +4,7 @@ using NBitcoin.Secp256k1;
 using Sequence.ABI;
 using System;
 using System.Numerics;
+using Sequence.Extensions;
 using Sequence.Utils;
 
 namespace Sequence.Signer
@@ -109,7 +110,10 @@ namespace Sequence.Signer
         /// <returns>The signature as a string.</returns>
         public static string GetSignatureString()
         {
-            return "0x"+SequenceCoder.ByteArrayToHexString(R) + SequenceCoder.ByteArrayToHexString(S) + V.Replace("0x","");
+            string r = SequenceCoder.ByteArrayToHexString(R);
+            string s = SequenceCoder.ByteArrayToHexString(S);
+            string v = V.Replace("0x", "");
+            return "0x" + r + s + v;
         }
 
         /// <summary>

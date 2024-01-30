@@ -1,0 +1,18 @@
+{
+    "name": "SequenceRelayer",
+    "rootNamespace": "Sequence.Relayer",
+    "references": [
+        "GUID:a35e3a53d4439435f8b36ed2c6158cd8",
+        "GUID:4e0a798abbda240658187632ae443a67",
+        "GUID:f7fd4ba36aabd1d499450c174865e70b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

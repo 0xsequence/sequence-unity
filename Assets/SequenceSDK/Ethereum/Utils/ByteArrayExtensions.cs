@@ -12,6 +12,10 @@ namespace Sequence.Extensions
         
         public static string ByteArrayToHexString(this byte[] byteArray)
         {
+            if (byteArray == null || byteArray.Length == 0)
+            {
+                return "";
+            }
             return SequenceCoder.ByteArrayToHexString(byteArray);
         }
 

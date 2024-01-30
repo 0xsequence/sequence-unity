@@ -144,5 +144,23 @@ namespace Sequence.Utils
             string result = hexValue.Substring(firstNonZeroIndex).EnsureHexPrefix();
             return result;
         }
+
+        public static byte[] HexStringToByteArray(this string value)
+        {
+            value = value.WithoutHexPrefix();
+            if (value.Length % 2 != 0)
+            {
+                value = "0" + value;
+            }
+            
+            byte[] result = new byte[value.Length / 2];
+
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = Convert.ToByte(value.Substring(i * 2, 2), 16);
+            }
+
+            return result;
+        }
     }
 }
