@@ -24,9 +24,10 @@ namespace Sequence.Authentication
         private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
         private string _stateToken = Guid.NewGuid().ToString();
-        private readonly string _nonce = Guid.NewGuid().ToString();
 
-        public OpenIdAuthenticator()
+        private string _sessionAddress;
+
+        public OpenIdAuthenticator(string sessionAddress)
         {
             SequenceConfig config = SequenceConfig.GetConfig();
 
@@ -35,6 +36,8 @@ namespace Sequence.Authentication
             DiscordClientId = config.DiscordClientId;
             FacebookClientId = config.FacebookClientId;
             AppleClientId = config.AppleClientId;
+            
+            _sessionAddress = sessionAddress;
         }
 
         public void GoogleSignIn()
@@ -150,7 +153,7 @@ namespace Sequence.Authentication
             }
             
             string url =
-                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_nonce}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_sessionAddress}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();

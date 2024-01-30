@@ -49,7 +49,7 @@ namespace Sequence.Authentication
             }
         }
 
-        public async Task<string> Login(string challengeSession, string email, string code)
+        public async Task<string> Login(string challengeSession, string email, string code, string sessionWalletAddress = "")
         {
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
             RespondToAuthChallengeRequest request = new RespondToAuthChallengeRequest
@@ -63,6 +63,13 @@ namespace Sequence.Authentication
                 ClientId = _cognitoClientId,
                 Session = challengeSession
             };
+            if (!string.IsNullOrWhiteSpace(sessionWalletAddress))
+            {
+                request.ClientMetadata = new Dictionary<string, string>
+                {
+                    { "sessionAddress", sessionWalletAddress }
+                };
+            }
             
             try
             {
