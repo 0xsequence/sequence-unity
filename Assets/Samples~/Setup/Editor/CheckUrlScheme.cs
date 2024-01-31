@@ -2,15 +2,17 @@ using System;
 using System.IO;
 using Sequence.Config;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Callbacks;
 using UnityEngine;
 #if UNITY_IOS || UNITY_STANDALONE_OSX
+using System.Collections.Generic;
 using UnityEditor.iOS.Xcode;
 #endif
 
 namespace Editor
 {
-    public class SetUrlScheme
+    public class CheckUrlScheme
     {
         private static string _plistPath;
         private static string _urlScheme;
@@ -29,48 +31,64 @@ namespace Editor
             if (target == BuildTarget.iOS)
             {
                 _plistPath = Path.Combine(pathToBuiltProject, "Info.plist");
-                SetPlistUrlScheme();
+                CheckPlistUrlScheme();
             }
             else if (target == BuildTarget.StandaloneOSX)
             {
                 _plistPath = Path.Combine(pathToBuiltProject, "Contents/Info.plist");
-                SetPlistUrlScheme();
+                CheckPlistUrlScheme();
             }
-
-            Debug.Log($"Custom URL scheme set successfully: {_urlScheme}");
         }
 
-        private static void SetPlistUrlScheme()
+        private static Exception _missingUrlSchemeException = new BuildFailedException(
+            "URL Scheme not set in Unity Editor. Please follow the instructions here or social sign in will not work! https://docs.sequence.xyz/unity-waas-sdk/authentication");
+        
+        private static void CheckPlistUrlScheme()
         {
 #if UNITY_IOS || UNITY_STANDALONE_OSX
             PlistDocument plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
 
             PlistElementDict rootDict = plist.root;
-            if (!rootDict.values.ContainsKey("CFBundleURLTypes")) 
+            if (!rootDict.values.ContainsKey("CFBundleURLTypes"))
             {
-                rootDict.values.Add("CFBundleURLTypes", new PlistElementArray());
+                throw _missingUrlSchemeException;
             }
             if (rootDict.values["CFBundleURLTypes"] is PlistElementArray existingArray)
             {
                 if (existingArray.values.Count == 0)
                 {
-                    existingArray.values.Add(new PlistElementDict());
+                    throw _missingUrlSchemeException;
                 }
                 if (existingArray.values[0] is PlistElementDict existingDict)
                 {
                     if (!existingDict.values.ContainsKey("CFBundleURLSchemes"))
                     {
-                        existingDict.values.Add("CFBundleURLSchemes", new PlistElementArray());
+                        throw _missingUrlSchemeException;
                     }
                     if (existingDict.values["CFBundleURLSchemes"] is PlistElementArray newArray)
                     {
-                        newArray.values.Add(new PlistElementString(_urlScheme));
+                        List<PlistElement> values = newArray.values;
+                        int count = values.Count;
+                        if (count == 0)
+                        {
+                            throw _missingUrlSchemeException;
+                        }
+                        for (int i =0; i < count; i++)
+                        {
+                            PlistElement plistElement = values[i];
+                            if (plistElement is PlistElementString plistElementString)
+                            {
+                                if (plistElementString.value == _urlScheme)
+                                {
+                                    return;
+                                }
+                            }
+                        }
+                        throw _missingUrlSchemeException;
                     }
                 }
             }
-
-            plist.WriteToFile(_plistPath);
 #endif
         }
     }
