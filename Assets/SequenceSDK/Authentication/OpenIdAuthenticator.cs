@@ -153,7 +153,7 @@ namespace Sequence.Authentication
             }
             
             string url =
-                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_sessionAddress}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionAddress}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
