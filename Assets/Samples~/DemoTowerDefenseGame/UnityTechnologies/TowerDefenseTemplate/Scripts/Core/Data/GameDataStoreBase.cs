@@ -5,7 +5,7 @@
 	/// </summary>
 	public abstract class GameDataStoreBase : IDataStore
 	{
-		public float masterVolume = 1;
+		public float masterVolume = 0;
 
 		public float sfxVolume = 1;
 
