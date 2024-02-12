@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using UnityEditor.iOS.Xcode;
 #endif
 
-namespace Editor
+namespace Sequence.Editor
 {
     public class CheckUrlScheme
     {
