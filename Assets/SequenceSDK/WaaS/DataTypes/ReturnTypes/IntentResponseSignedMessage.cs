@@ -3,12 +3,12 @@ using System;
 namespace Sequence.WaaS
 {
     [Serializable]
-    public class SignMessageReturn
+    public class IntentResponseSignedMessage
     {
-        public string message;
         public string signature;
+        public string message;
         
-        public SignMessageReturn(string message, string signature)
+        public IntentResponseSignedMessage(string message, string signature)
         {
             this.message = message;
             this.signature = signature;

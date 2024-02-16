@@ -25,7 +25,7 @@ namespace Sequence.WaaS.Tests
         {
             _waasLogin.InjectEmailSignIn(new MockEmailSignIn(""));
             
-            _waasLogin.OnMFAEmailFailedToSend += (email, error) => Assert.AreEqual("Unknown error establishing AWS session", error);
+            _waasLogin.OnMFAEmailFailedToSend += (email, error) => Assert.AreEqual("Unknown error establishing AWS sessionId", error);
             _waasLogin.OnMFAEmailSent += (email) => Assert.Fail($"Unexpected success");
             
             _waasLogin.Login(_email);

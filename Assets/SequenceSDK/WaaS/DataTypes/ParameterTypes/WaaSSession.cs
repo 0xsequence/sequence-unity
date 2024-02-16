@@ -1,6 +1,8 @@
 using System;
+using Newtonsoft.Json.Linq;
+using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS.Authentication
+namespace Sequence.WaaS
 {
     [Serializable]
     public class WaaSSession
@@ -9,8 +11,7 @@ namespace Sequence.WaaS.Authentication
         public string address;
         public string userId;
         public int projectId;
-        public string issuer;
-        public string subject;
+        public Identity identity;
         public string friendlyName;
         public DateTime createdAt;
         public DateTime refreshedAt;

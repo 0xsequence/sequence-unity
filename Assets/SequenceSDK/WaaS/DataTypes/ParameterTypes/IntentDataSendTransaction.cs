@@ -7,43 +7,33 @@ using UnityEditor;
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class SendTransactionArgs
+    public class IntentDataSendTransaction
     {
-        public string code { get; private set; } = "sendTransaction";
-        public uint expires { get; private set; }
         public string identifier { get; private set; } = Guid.NewGuid().ToString();
-        public uint issued { get; private set; }
         public string network { get; private set; }
-        public SequenceSDK.WaaS.Transaction[] transactions { get; private set; }
+        public Transaction[] transactions { get; private set; }
         public string wallet { get; private set; }
 
         public static readonly string transactionTypeIdentifier = "type";
 
-        public SendTransactionArgs(string walletAddress, string network, SequenceSDK.WaaS.Transaction[] transactions, uint timeBeforeExpiry = 30)
+        public IntentDataSendTransaction(string walletAddress, string network, SequenceSDK.WaaS.Transaction[] transactions)
         {
             this.wallet = walletAddress;
             this.network = network;
             this.transactions = transactions;
-            this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            this.expires = this.issued + timeBeforeExpiry;
         }
         
-        public SendTransactionArgs(string walletAddress, Chain network, SequenceSDK.WaaS.Transaction[] transactions, uint timeBeforeExpiry = 30)
+        public IntentDataSendTransaction(string walletAddress, Chain network, SequenceSDK.WaaS.Transaction[] transactions)
         {
             uint networkId = (uint)network;
             this.wallet = walletAddress;
             this.network = networkId.ToString();
             this.transactions = transactions;
-            this.issued = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            this.expires = this.issued + timeBeforeExpiry;
         }
 
         [JsonConstructor]
-        public SendTransactionArgs(string code, uint expires, uint issued, string network, JObject[] transactions, string wallet)
+        public IntentDataSendTransaction(string code, uint expires, uint issued, string network, JObject[] transactions, string wallet)
         {
-            this.code = code;
-            this.expires = expires;
-            this.issued = issued;
             this.network = network;
             this.wallet = wallet;
             int transactionCount = transactions.Length;

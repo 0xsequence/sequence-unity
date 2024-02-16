@@ -224,7 +224,7 @@ namespace Sequence.Demo
             
             // or
             
-            // _wallet.SendTransaction(new SendTransactionArgs(
+            // _wallet.SendTransaction(new IntentDataSendTransaction(
             //     _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
             //     {
             //         new RawTransaction(nftTransfer),
@@ -273,7 +273,7 @@ namespace Sequence.Demo
             _wallet.ListSessions();
         }
         
-        private void OnSessionsListed(WaaSSession[] sessions)
+        private void OnSessionsListed(string[] sessions)
         {
             _resultText.text = $"Found {sessions.Length} sessions";
         }

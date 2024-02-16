@@ -50,7 +50,16 @@ namespace Sequence.WaaS
             {
                 url = overrideUrl.AppendTrailingSlashIfNeeded() + path;
             }
-            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+
+            string requestJson = "";
+            if (typeof(T) == typeof(string))
+            {
+                requestJson = args as string;
+            }
+            else
+            {
+                requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            }
             UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);

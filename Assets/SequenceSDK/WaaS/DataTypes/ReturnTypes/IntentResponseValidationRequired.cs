@@ -1,13 +1,13 @@
 using System;
 
-namespace SequenceSDK.WaaS.Authentication
+namespace Sequence.WaaS
 {
     [Serializable]
-    public class ListSessionsArgs
+    public class IntentResponseValidationRequired
     {
         public string sessionId { get; private set; }
 
-        public ListSessionsArgs(string sessionId)
+        public IntentResponseValidationRequired(string sessionId)
         {
             this.sessionId = sessionId;
         }

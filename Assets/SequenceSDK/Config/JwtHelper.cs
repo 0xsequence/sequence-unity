@@ -20,6 +20,12 @@ namespace Sequence.Config
                 throw new Exception("Config Key decoding failed: " + ex.Message + " Please double check that you've input the key correctly then contact Sequence support.");
             }
 
+            string validEmailConfig = CheckValidEmailConfigJwt(payload);
+            if (validEmailConfig != null)
+            {
+                Debug.LogWarning("Config Key decoding failed to find AWS config values: " + validEmailConfig + "\nEmail sign in will not work.");
+            }
+
             return payload;
         }
         
@@ -51,35 +57,45 @@ namespace Sequence.Config
         
         private static void CheckValidConfigJwt(ConfigJwt payload)
         {
-            if (string.IsNullOrWhiteSpace(payload.idpRegion))
-            {
-                throw new Exception("Config JWT missing idpRegion.");
-            }
-            
-            if (string.IsNullOrWhiteSpace(payload.identityPoolId))
-            {
-                throw new Exception("Config JWT missing identityPoolId.");
-            }
-            
-            if (string.IsNullOrWhiteSpace(payload.keyId))
-            {
-                throw new Exception("Config JWT missing keyId.");
-            }
-            
             if (string.IsNullOrWhiteSpace(payload.rpcServer))
             {
                 throw new Exception("Config JWT missing rpcServer.");
-            }
-            
-            if (string.IsNullOrWhiteSpace(payload.kmsRegion))
-            {
-                throw new Exception("Config JWT missing kmsRegion.");
             }
             
             if (string.IsNullOrWhiteSpace(payload.projectId.ToString()))
             {
                 throw new Exception("Config JWT missing projectId.");
             }
+        }
+        
+        private static string CheckValidEmailConfigJwt(ConfigJwt payload)
+        {
+            if (string.IsNullOrWhiteSpace(payload.emailClientId))
+            {
+                return "Config JWT missing emailClientId.";
+            }
+            
+            if (string.IsNullOrWhiteSpace(payload.idpRegion))
+            {
+                return "Config JWT missing idpRegion.";
+            }
+            
+            if (string.IsNullOrWhiteSpace(payload.identityPoolId))
+            {
+                return "Config JWT missing identityPoolId.";
+            }
+            
+            if (string.IsNullOrWhiteSpace(payload.keyId))
+            {
+                return "Config JWT missing keyId.";
+            }
+            
+            if (string.IsNullOrWhiteSpace(payload.kmsRegion))
+            {
+                return "Config JWT missing kmsRegion.";
+            }
+
+            return null;
         }
     }
 }

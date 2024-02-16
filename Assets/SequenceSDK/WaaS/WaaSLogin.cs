@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentity.Model;
+using Newtonsoft.Json;
+using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
+using SequenceSDK.WaaS;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -37,10 +40,17 @@ namespace Sequence.WaaS
                 throw SequenceConfig.MissingConfigError("WaaS Version");
             }
             _waasVersion = waasVersion;
-            
+
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.keyId, configJwt.emailClientId);
-            _awsConfig = awsConfig;
+            try
+            {
+                AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.keyId, configJwt.emailClientId);
+                _awsConfig = awsConfig;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
+            }
 
             string rpcUrl = configJwt.rpcServer;
             if (string.IsNullOrWhiteSpace(rpcUrl))
@@ -58,7 +68,7 @@ namespace Sequence.WaaS
             
             _sessionWallet = new EthWallet();
             
-            _authenticator = new OpenIdAuthenticator(_sessionWallet.GetAddress());
+            _authenticator = new OpenIdAuthenticator(SequenceCoder.KeccakHashASCII(IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress())).EnsureHexPrefix());
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
@@ -68,8 +78,11 @@ namespace Sequence.WaaS
                 validator = new Validator();
             }
             _validator = validator;
-            
-            _emailSignIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
+
+            if (_awsConfig != null)
+            {
+                _emailSignIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
+            }
         }
         
         public void InjectEmailSignIn(IEmailSignIn emailSignIn)
@@ -95,7 +108,7 @@ namespace Sequence.WaaS
                 _challengeSession = await _emailSignIn.SignIn(email);
                 if (string.IsNullOrEmpty(_challengeSession))
                 {
-                    OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
+                    OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS sessionId");
                     return;
                 }
 
@@ -106,7 +119,7 @@ namespace Sequence.WaaS
                         OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
                         return;
                     }
-                    SignUpThenRetryLogin(email);
+                    await SignUpThenRetryLogin(email);
                     return;
                 }
                 
@@ -130,7 +143,7 @@ namespace Sequence.WaaS
             {
                 await _emailSignIn.SignUp(email);
                 retries++;
-                Login(email);
+                await Login(email);
             }
             catch (Exception e)
             {
@@ -151,7 +164,7 @@ namespace Sequence.WaaS
                 string idToken = await _emailSignIn.Login(_challengeSession, email, code, _sessionWallet.GetAddress());
                 if (string.IsNullOrEmpty(idToken))
                 {
-                    OnLoginFailed?.Invoke("Unknown error establishing AWS session");
+                    OnLoginFailed?.Invoke("Unknown error establishing AWS sessionId");
                     return;
                 }
 
@@ -161,7 +174,7 @@ namespace Sequence.WaaS
                     return;
                 }
                 
-                ConnectToWaaS(idToken, LoginMethod.Email);
+                await ConnectToWaaS(idToken, LoginMethod.Email);
             }
             catch (Exception e)
             {
@@ -196,48 +209,22 @@ namespace Sequence.WaaS
 
         public async Task ConnectToWaaS(string idToken, LoginMethod method)
         {
-            Credentials credentials;
-            DataKey dataKey;
-
-            try
-            {
-                AWSCredentialsFetcher fetcher = new AWSCredentialsFetcher(idToken, _awsConfig.IdentityPoolId, _awsConfig.Region);
-                credentials = await fetcher.GetCredentials();
-            }
-            catch (Exception e)
-            {
-                OnLoginFailed?.Invoke("Error fetching credentials from AWS: " + e.Message);
-                return;
-            }
-
-            try
-            {
-                AWSDataKeyGenerator generator =
-                    new AWSDataKeyGenerator(credentials, _awsConfig.Region, _awsConfig.KMSEncryptionKeyId);
-                dataKey = await generator.GenerateDataKey();
-            }
-            catch (Exception e)
-            {
-                OnLoginFailed?.Invoke("Error generating data key from AWS: " + e.Message);
-                return;
-            }
 
             IntentSender sender = new IntentSender(
                 new HttpClient(WaaSWithAuthUrl),
-                dataKey,
                 _sessionWallet,
-                "Unknown",
+                IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress()),
                 _waasProjectId,
                 _waasVersion);
-            string loginPayload = AssembleLoginPayloadJson(idToken, _sessionWallet);
+            IntentDataOpenSession loginIntent = AssembleLoginIntent(idToken, _sessionWallet);
 
             try
             {
-                RegisterSessionResponse registerSessionResponse = await sender.PostIntent<RegisterSessionResponse>(loginPayload, "RegisterSession");
-                string sessionId = registerSessionResponse.session.id;
-                string walletAddress = registerSessionResponse.data.wallet;
+                IntentResponseSessionOpened registerSessionResponse = await sender.SendIntent<IntentResponseSessionOpened, IntentDataOpenSession>(loginIntent, IntentType.OpenSession);
+                string sessionId = registerSessionResponse.sessionId;
+                string walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), dataKey, _sessionWallet, sessionId, _waasProjectId, _waasVersion));
+                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
@@ -251,15 +238,10 @@ namespace Sequence.WaaS
             }
         }
 
-        private string AssembleLoginPayloadJson(string idToken, Wallet.IWallet sessionWallet)
+        private IntentDataOpenSession AssembleLoginIntent(string idToken, Wallet.IWallet sessionWallet)
         {
-            WaaSLoginIntent intent = new WaaSLoginIntent(_waasVersion, WaaSLoginIntent.Packet.OpenSessionCode,
-                sessionWallet.GetAddress(), idToken);
-            string intentJson = JsonUtility.ToJson(intent);
-            WaaSLoginPayload payload = new WaaSLoginPayload(_waasProjectId, idToken, sessionWallet.GetAddress(),
-                "FRIENDLY SESSION WALLET", intentJson);
-            string payloadJson = JsonUtility.ToJson(payload);
-            return payloadJson;
+            IntentDataOpenSession intent = new IntentDataOpenSession(sessionWallet.GetAddress(), null, idToken);
+            return intent;
         }
     }
 }

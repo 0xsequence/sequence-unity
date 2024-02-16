@@ -9,7 +9,7 @@ using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using SequenceSDK.WaaS;
-using SequenceSDK.WaaS.Authentication;
+using UnityEditor;
 using UnityEngine;
 
 namespace Sequence.WaaS
@@ -19,43 +19,52 @@ namespace Sequence.WaaS
         public string SessionId { get; private set; }
         
         private HttpClient _httpClient;
-        private DataKey _dataKey;
         private Wallet.IWallet _sessionWallet;
         private int _waasProjectId;
         private string _waasVersion;
+        
+        private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
 
-        public IntentSender(HttpClient httpClient, DataKey dataKey, Wallet.IWallet sessionWallet, string sessionId, int waasProjectId, string waasVersion)
+        public IntentSender(HttpClient httpClient, Wallet.IWallet sessionWallet, string sessionId, int waasProjectId, string waasVersion)
         {
             _httpClient = httpClient;
-            _dataKey = dataKey;
             _sessionWallet = sessionWallet;
             SessionId = sessionId;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
         }
 
-        public async Task<T> SendIntent<T, T2>(T2 args)
+        public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30)
         {
             string payload = AssemblePayloadJson(args);
-            string intentPayload = await AssembleIntentPayload(payload);
-            string sendIntentPayload = AssembleSendIntentPayload(intentPayload);
-            IntentReturn<T> result = await PostIntent<IntentReturn<T>>(sendIntentPayload, "SendIntent");
+            string intentPayload = await AssembleIntentPayload(payload, type, timeBeforeExpiryInSeconds);
+            string path = "SendIntent";
+            if (type == IntentType.OpenSession)
+            {
+                path = "RegisterSession";
+                RegisterSessionResponse registerSessionResponse = await PostIntent<RegisterSessionResponse>(intentPayload, path);
+                return (T)(object)(registerSessionResponse.response.data);
+            }
+            IntentResponse<T> result = await PostIntent<IntentResponse<T>>(intentPayload, path);
             return result.data;
         }
 
-        private async Task<IntentReturn<TransactionReturn>> SendTransactionIntent(WaaSPayload intent,
+        private async Task<IntentResponse<TransactionReturn>> SendTransactionIntent(string intent,
             Dictionary<string, string> headers)
         {
-            IntentReturn<JObject> result = await _httpClient.SendRequest<WaaSPayload, IntentReturn<JObject>>("SendIntent", intent, headers);
+            IntentResponse<JObject> result = await _httpClient.SendRequest<string, IntentResponse<JObject>>("SendIntent", intent, headers);
             if (result.code == SuccessfulTransactionReturn.IdentifyingCode)
             {
                 SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.data.ToString());
-                return new IntentReturn<TransactionReturn>(result.code, successfulTransactionReturn);
+                return new IntentResponse<TransactionReturn>(result.code, successfulTransactionReturn);
             }
             else if (result.code == FailedTransactionReturn.IdentifyingCode)
             {
                 FailedTransactionReturn failedTransactionReturn = JsonConvert.DeserializeObject<FailedTransactionReturn>(result.data.ToString());
-                return new IntentReturn<TransactionReturn>(result.code, failedTransactionReturn);
+                return new IntentResponse<TransactionReturn>(result.code, failedTransactionReturn);
             }
             else
             {
@@ -65,14 +74,22 @@ namespace Sequence.WaaS
 
         private string AssemblePayloadJson<T>(T args)
         {
-            return JsonConvert.SerializeObject(args);
+            return JsonConvert.SerializeObject(args, serializerSettings);
         }
 
-        private async Task<string> AssembleIntentPayload(string payload)
+        private async Task<string> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds)
         {
             JObject packet = JsonConvert.DeserializeObject<JObject>(payload);
-            string signedPayload = await _sessionWallet.SignMessage(SequenceCoder.KeccakHash(payload.ToByteArray()));
-            IntentPayload intentPayload = new IntentPayload(_waasVersion, packet, (SessionId, signedPayload));
+            IntentPayload toSign = new IntentPayload(_waasVersion, type, packet, null, timeToLiveInSeconds);
+            string toSignJson = JsonConvert.SerializeObject(toSign, serializerSettings);
+            string signedPayload = await _sessionWallet.SignMessage(SequenceCoder.KeccakHash(toSignJson.ToByteArray()));
+            IntentPayload intentPayload = new IntentPayload(_waasVersion, type, toSign.expiresAt, toSign.issuedAt, packet,
+                new Signature[] {new Signature(IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress()), signedPayload)});
+            if (type == IntentType.OpenSession)
+            {
+                RegisterSessionIntent registerSessionIntent = new RegisterSessionIntent(Guid.NewGuid().ToString(), intentPayload);
+                return JsonConvert.SerializeObject(registerSessionIntent);
+            }
             return JsonConvert.SerializeObject(intentPayload);
         }
         
@@ -82,43 +99,32 @@ namespace Sequence.WaaS
             return encryptedPayload.ByteArrayToHexStringWithPrefix();
         }
 
-        private string AssembleSendIntentPayload(string intentPayload)
-        {
-            SendIntentPayload sendIntentPayload = new SendIntentPayload(SessionId, intentPayload);
-            string payload = JsonConvert.SerializeObject(sendIntentPayload);
-            return payload;
-        }
-
         public async Task<bool> DropSession(string dropSessionId)
         {
-            DropSessionArgs args = new DropSessionArgs(SessionId, dropSessionId);
-            string payload = JsonConvert.SerializeObject(args);
-            var result = await PostIntent<DropSessionReturn>(payload, "DropSession");
-            return result.ok;
+            IntentResponseSessionClosed result = await SendIntent<IntentResponseSessionClosed, IntentDataCloseSession>(
+                new IntentDataCloseSession(IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress())),
+                IntentType.CloseSession);
+            return result != null;
         }
 
         public async Task<T> PostIntent<T>(string payload, string path)
         {
             Debug.Log($"Sending intent: {path} | with payload: {payload}");
-            string payloadCiphertext = await PrepareEncryptedPayload(_dataKey, payload);
-            string signedPayload = await _sessionWallet.SignMessage(payload);
-            WaaSPayload intent = new WaaSPayload(_dataKey.Ciphertext.ByteArrayToHexStringWithPrefix(), payloadCiphertext, signedPayload);
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            if (typeof(T) == typeof(IntentReturn<TransactionReturn>))
+            if (typeof(T) == typeof(IntentResponse<TransactionReturn>))
             {
-                var transactionReturn = await SendTransactionIntent(intent, headers);
+                var transactionReturn = await SendTransactionIntent(payload, headers);
                 return (T)(object)transactionReturn;
             }
-            T result = await _httpClient.SendRequest<WaaSPayload, T>(path, intent, headers);
+            T result = await _httpClient.SendRequest<string, T>(path, payload, headers);
             return result;
         }
 
-        public async Task<WaaSSession[]> ListSessions()
+        public async Task<string[]> ListSessions()
         {
-            ListSessionsArgs args = new ListSessionsArgs(SessionId);
-            string payload = JsonConvert.SerializeObject(args);
-            var result = await PostIntent<ListSessionsReturn>(payload, "ListSessions");
-            return result.sessions;
+            IntentResponseListSessions sessions = await SendIntent<IntentResponseListSessions, IntentDataListSessions>(
+                new IntentDataListSessions(_sessionWallet.GetAddress()), IntentType.ListSessions);
+            return sessions.sessions;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSTestHarness.TestStarted?.Invoke();
-                WaaSSession[] sessions = await TestListSessions();
+                string[] sessions = await TestListSessions();
                 if (sessions == null)
                 {
                     return;
@@ -36,7 +36,7 @@ namespace Sequence.WaaS.Tests
 
             try
             {
-                WaaSSession[] sessions = await _wallet.ListSessions();
+                string[] sessions = await _wallet.ListSessions();
                 WaaSTestHarness.TestFailed?.Invoke(new WaaSTestFailed(nameof(TestSessionManagement), "Expected an exception. Session was likely not dropped."));
             }
             catch (Exception e)
@@ -45,11 +45,11 @@ namespace Sequence.WaaS.Tests
             }
         }
 
-        private async Task<WaaSSession[]> TestListSessions()
+        private async Task<string[]> TestListSessions()
         {
             try
             {
-                WaaSSession[] sessions = await _wallet.ListSessions();
+                string[] sessions = await _wallet.ListSessions();
                 if (sessions == null || sessions.Length == 0)
                 {
                     throw new Exception("No sessions found.");
@@ -65,16 +65,16 @@ namespace Sequence.WaaS.Tests
             }
         }
 
-        private async Task TestDropInactiveSession(WaaSSession[] sessions)
+        private async Task TestDropInactiveSession(string[] sessions)
         {
             try
             {
                 int sessionCount = sessions.Length;
                 for (int i = 0; i < sessionCount; i++)
                 {
-                    if (sessions[i].id != _wallet.SessionId)
+                    if (sessions[i] != _wallet.SessionId)
                     {
-                        await _wallet.DropSession(sessions[i].id);
+                        await _wallet.DropSession(sessions[i]);
                         break;
                     }
                 }
