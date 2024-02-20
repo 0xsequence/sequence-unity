@@ -22,6 +22,7 @@ namespace Sequence.WaaS
         private Wallet.IWallet _sessionWallet;
         private int _waasProjectId;
         private string _waasVersion;
+        private string _sessionId;
         
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
@@ -35,6 +36,7 @@ namespace Sequence.WaaS
             SessionId = sessionId;
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
+            _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
         }
 
         public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30)
@@ -88,7 +90,7 @@ namespace Sequence.WaaS
             string toSignJson = JsonConvert.SerializeObject(toSign, serializerSettings);
             string signedPayload = await _sessionWallet.SignMessage(SequenceCoder.KeccakHash(toSignJson.ToByteArray()));
             IntentPayload intentPayload = new IntentPayload(_waasVersion, type, toSign.expiresAt, toSign.issuedAt, packet,
-                new Signature[] {new Signature(IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress()), signedPayload)});
+                new Signature[] {new Signature(_sessionId, signedPayload)});
             if (type == IntentType.OpenSession)
             {
                 RegisterSessionIntent registerSessionIntent = new RegisterSessionIntent(Guid.NewGuid().ToString(), intentPayload);

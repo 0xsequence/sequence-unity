@@ -30,6 +30,7 @@ namespace Sequence.WaaS
         private string _challengeSession;
         private int retries = 0;
         private EthWallet _sessionWallet;
+        private string _sessionId;
 
         public WaaSLogin(IValidator validator = null)
         {
@@ -67,8 +68,9 @@ namespace Sequence.WaaS
             _waasProjectId = projectId;
             
             _sessionWallet = new EthWallet();
+            _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
-            _authenticator = new OpenIdAuthenticator(SequenceCoder.KeccakHashASCII(IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress())).EnsureHexPrefix());
+            _authenticator = new OpenIdAuthenticator(SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix());
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
@@ -213,7 +215,7 @@ namespace Sequence.WaaS
             IntentSender sender = new IntentSender(
                 new HttpClient(WaaSWithAuthUrl),
                 _sessionWallet,
-                IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress()),
+                _sessionId,
                 _waasProjectId,
                 _waasVersion);
             IntentDataOpenSession loginIntent = AssembleLoginIntent(idToken, _sessionWallet);
