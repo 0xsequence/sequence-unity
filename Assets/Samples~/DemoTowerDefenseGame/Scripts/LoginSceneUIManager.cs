@@ -8,9 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LoginSceneUIManager : MonoBehaviour
-{
-    [SerializeField] private Button _playButton;
-    
+{ 
     private LoginPanel _loginPanel;
     private void Awake()
     {
