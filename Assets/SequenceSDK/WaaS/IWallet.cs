@@ -21,7 +21,7 @@ namespace Sequence.WaaS
         public event Action<string> OnDropSessionComplete;
         public Task<bool> DropSession(string dropSessionId);
         public Task<bool> DropThisSession();
-        public event Action<string[]> OnSessionsFound;
-        public Task<string[]> ListSessions();
+        public event Action<WaaSSession[]> OnSessionsFound;
+        public Task<WaaSSession[]> ListSessions();
     }
 }

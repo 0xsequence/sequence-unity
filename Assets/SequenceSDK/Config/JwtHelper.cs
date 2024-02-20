@@ -84,16 +84,6 @@ namespace Sequence.Config
             {
                 return "Config JWT missing identityPoolId.";
             }
-            
-            if (string.IsNullOrWhiteSpace(payload.keyId))
-            {
-                return "Config JWT missing keyId.";
-            }
-            
-            if (string.IsNullOrWhiteSpace(payload.kmsRegion))
-            {
-                return "Config JWT missing kmsRegion.";
-            }
 
             return null;
         }

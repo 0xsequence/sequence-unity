@@ -97,17 +97,11 @@ namespace Sequence.WaaS
 
             return intentPayload;
         }
-        
-        private async Task<string> PrepareEncryptedPayload(DataKey dataKey, string payload)
-        {
-            byte[] encryptedPayload = Encryptor.AES256CBCEncryption(dataKey.Plaintext, payload);
-            return encryptedPayload.ByteArrayToHexStringWithPrefix();
-        }
 
         public async Task<bool> DropSession(string dropSessionId)
         {
             IntentResponseSessionClosed result = await SendIntent<IntentResponseSessionClosed, IntentDataCloseSession>(
-                new IntentDataCloseSession(IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress())),
+                new IntentDataCloseSession(dropSessionId),
                 IntentType.CloseSession);
             return result != null;
         }
@@ -125,11 +119,11 @@ namespace Sequence.WaaS
             return result;
         }
 
-        public async Task<string[]> ListSessions()
+        public async Task<WaaSSession[]> ListSessions()
         {
-            IntentResponseListSessions sessions = await SendIntent<IntentResponseListSessions, IntentDataListSessions>(
+            WaaSSession[] sessions = await SendIntent<WaaSSession[], IntentDataListSessions>(
                 new IntentDataListSessions(_sessionWallet.GetAddress()), IntentType.ListSessions);
-            return sessions.sessions;
+            return sessions;
         }
     }
 }

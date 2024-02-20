@@ -44,7 +44,7 @@ namespace Sequence.WaaS
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
             try
             {
-                AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.keyId, configJwt.emailClientId);
+                AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.emailClientId);
                 _awsConfig = awsConfig;
             }
             catch (Exception e)

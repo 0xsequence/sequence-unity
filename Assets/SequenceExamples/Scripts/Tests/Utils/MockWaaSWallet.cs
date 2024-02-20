@@ -55,8 +55,8 @@ namespace SequenceExamples.Scripts.Tests.Utils
             throw new NotImplementedException();
         }
 
-        public event Action<string[]> OnSessionsFound;
-        public Task<string[]> ListSessions()
+        public event Action<WaaSSession[]> OnSessionsFound;
+        public Task<WaaSSession[]> ListSessions()
         {
             throw new NotImplementedException();
         }

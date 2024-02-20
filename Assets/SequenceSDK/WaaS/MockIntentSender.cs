@@ -40,7 +40,7 @@ namespace Sequence.WaaS
             throw new System.NotImplementedException();
         }
 
-        public Task<string[]> ListSessions()
+        public Task<WaaSSession[]> ListSessions()
         {
             throw new System.NotImplementedException();
         }

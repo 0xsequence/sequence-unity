@@ -9,6 +9,6 @@ namespace Sequence.WaaS
         public Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30);
         public Task<bool> DropSession(string dropSessionId);
         public Task<T> PostIntent<T>(string payload, string path);
-        public Task<string[]> ListSessions();
+        public Task<WaaSSession[]> ListSessions();
     }
 }

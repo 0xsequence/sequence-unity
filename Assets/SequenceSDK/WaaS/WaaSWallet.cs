@@ -182,10 +182,10 @@ namespace Sequence.WaaS
             return DropSession(SessionId);
         }
 
-        public event Action<string[]> OnSessionsFound;
-        public async Task<string[]> ListSessions()
+        public event Action<WaaSSession[]> OnSessionsFound;
+        public async Task<WaaSSession[]> ListSessions()
         {
-            string[] results = await _intentSender.ListSessions();
+            WaaSSession[] results = await _intentSender.ListSessions();
             OnSessionsFound?.Invoke(results);
             return results;
         }

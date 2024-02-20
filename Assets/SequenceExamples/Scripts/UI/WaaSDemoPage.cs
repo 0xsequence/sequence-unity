@@ -273,7 +273,7 @@ namespace Sequence.Demo
             _wallet.ListSessions();
         }
         
-        private void OnSessionsListed(string[] sessions)
+        private void OnSessionsListed(WaaSSession[] sessions)
         {
             _resultText.text = $"Found {sessions.Length} sessions";
         }
