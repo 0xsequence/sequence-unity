@@ -40,35 +40,39 @@ namespace Sequence.WaaS
         public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30)
         {
             string payload = AssemblePayloadJson(args);
-            string intentPayload = await AssembleIntentPayload(payload, type, timeBeforeExpiryInSeconds);
+            object intentPayload = await AssembleIntentPayload(payload, type, timeBeforeExpiryInSeconds);
             string path = "SendIntent";
             if (type == IntentType.OpenSession)
             {
                 path = "RegisterSession";
-                RegisterSessionResponse registerSessionResponse = await PostIntent<RegisterSessionResponse>(intentPayload, path);
+                RegisterSessionIntent intent = intentPayload as RegisterSessionIntent;
+                string intentPayloadJson = JsonConvert.SerializeObject(intent, serializerSettings);
+                RegisterSessionResponse registerSessionResponse = await PostIntent<RegisterSessionResponse>(intentPayloadJson, path);
                 return (T)(object)(registerSessionResponse.response.data);
             }
-            IntentResponse<T> result = await PostIntent<IntentResponse<T>>(intentPayload, path);
-            return result.data;
+            SendIntentPayload sendIntentPayload = new SendIntentPayload(intentPayload as IntentPayload);
+            string sendIntentPayloadJson = JsonConvert.SerializeObject(sendIntentPayload, serializerSettings);
+            IntentResponse<T> result = await PostIntent<IntentResponse<T>>(sendIntentPayloadJson, path);
+            return result.response.data;
         }
 
         private async Task<IntentResponse<TransactionReturn>> SendTransactionIntent(string intent,
             Dictionary<string, string> headers)
         {
             IntentResponse<JObject> result = await _httpClient.SendRequest<string, IntentResponse<JObject>>("SendIntent", intent, headers);
-            if (result.code == SuccessfulTransactionReturn.IdentifyingCode)
+            if (result.response.code == SuccessfulTransactionReturn.IdentifyingCode)
             {
-                SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.data.ToString());
-                return new IntentResponse<TransactionReturn>(result.code, successfulTransactionReturn);
+                SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.response.data.ToString());
+                return new IntentResponse<TransactionReturn>(new Response<TransactionReturn>(result.response.code, successfulTransactionReturn));
             }
-            else if (result.code == FailedTransactionReturn.IdentifyingCode)
+            else if (result.response.code == FailedTransactionReturn.IdentifyingCode)
             {
-                FailedTransactionReturn failedTransactionReturn = JsonConvert.DeserializeObject<FailedTransactionReturn>(result.data.ToString());
-                return new IntentResponse<TransactionReturn>(result.code, failedTransactionReturn);
+                FailedTransactionReturn failedTransactionReturn = JsonConvert.DeserializeObject<FailedTransactionReturn>(result.response.data.ToString());
+                return new IntentResponse<TransactionReturn>(new Response<TransactionReturn>(result.response.code, failedTransactionReturn));
             }
             else
             {
-                throw new Exception($"Unexpected result code: {result.code}");
+                throw new Exception($"Unexpected result code: {result.response.code}");
             }
         }
 
@@ -77,7 +81,7 @@ namespace Sequence.WaaS
             return JsonConvert.SerializeObject(args, serializerSettings);
         }
 
-        private async Task<string> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds)
+        private async Task<object> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds)
         {
             JObject packet = JsonConvert.DeserializeObject<JObject>(payload);
             IntentPayload toSign = new IntentPayload(_waasVersion, type, packet, null, timeToLiveInSeconds);
@@ -88,9 +92,10 @@ namespace Sequence.WaaS
             if (type == IntentType.OpenSession)
             {
                 RegisterSessionIntent registerSessionIntent = new RegisterSessionIntent(Guid.NewGuid().ToString(), intentPayload);
-                return JsonConvert.SerializeObject(registerSessionIntent);
+                return registerSessionIntent;
             }
-            return JsonConvert.SerializeObject(intentPayload);
+
+            return intentPayload;
         }
         
         private async Task<string> PrepareEncryptedPayload(DataKey dataKey, string payload)
