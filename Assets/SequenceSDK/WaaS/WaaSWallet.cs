@@ -80,7 +80,7 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                FailedTransactionReturn result = new FailedTransactionReturn(e.Message, args, null);
+                FailedTransactionReturn result = new FailedTransactionReturn(e.Message, args);
                 OnSendTransactionFailed?.Invoke(result);
                 return result;
             }
