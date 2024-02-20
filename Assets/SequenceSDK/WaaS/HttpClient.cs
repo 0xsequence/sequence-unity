@@ -98,7 +98,6 @@ namespace Sequence.WaaS
             (UnityWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
             UnityWebRequest request = newRequest.Item1;
             string curlRequest = newRequest.Item2;
-            Debug.Log(curlRequest);
             string url = newRequest.Item3;
 
             try
