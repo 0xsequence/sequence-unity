@@ -49,6 +49,7 @@ namespace Samples.Scripts
 
         private void OnDestroy()
         {
+            if (Wallet == null) return;
             Wallet.OnSendTransactionComplete -= OnSendTransactionCompleteHandler;
             Wallet.OnSendTransactionFailed -= OnSendTransactionFailedHandler;
             Wallet.OnSignMessageComplete -= OnSignMessageCompleteHandler;
