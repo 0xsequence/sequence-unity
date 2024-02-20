@@ -68,7 +68,7 @@ namespace Sequence.Demo
 
         private void OnLoginSuccessHandler(string sessionId, string walletAddress)
         {
-            Debug.Log($"Successful login with sessionId Id: {sessionId} | wallet address: {walletAddress}");
+            Debug.Log($"Successful login with session Id: {sessionId} | wallet address: {walletAddress}");
             StartCoroutine(SetUIPage(_loginSuccessPage));
         }
 

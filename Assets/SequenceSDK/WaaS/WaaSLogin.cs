@@ -110,7 +110,7 @@ namespace Sequence.WaaS
                 _challengeSession = await _emailSignIn.SignIn(email);
                 if (string.IsNullOrEmpty(_challengeSession))
                 {
-                    OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS sessionId");
+                    OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
                     return;
                 }
 
@@ -166,7 +166,7 @@ namespace Sequence.WaaS
                 string idToken = await _emailSignIn.Login(_challengeSession, email, code, _sessionWallet.GetAddress());
                 if (string.IsNullOrEmpty(idToken))
                 {
-                    OnLoginFailed?.Invoke("Unknown error establishing AWS sessionId");
+                    OnLoginFailed?.Invoke("Unknown error establishing AWS session");
                     return;
                 }
 

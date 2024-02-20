@@ -224,12 +224,11 @@ namespace Sequence.Demo
             
             // or
             
-            // _wallet.SendTransaction(new IntentDataSendTransaction(
-            //     _address, Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            // _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
             //     {
             //         new RawTransaction(nftTransfer),
             //         new RawTransaction(sftTransfer),
-            //     }));
+            //     });
         }
         
         public void SendMultipleWithAdapter2()
