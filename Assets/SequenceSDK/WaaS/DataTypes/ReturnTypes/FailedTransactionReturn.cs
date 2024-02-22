@@ -1,3 +1,7 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SequenceSDK.WaaS;
+
 namespace Sequence.WaaS
 {
     [System.Serializable]
@@ -5,14 +9,24 @@ namespace Sequence.WaaS
     {
         public const string IdentifyingCode = "transactionFailed";
         public string error { get; private set; }
-        public SendTransactionArgs request { get; private set; }
+        public JObject request { get; private set; } // Todo replace with IntentPayload once response structure is updated
         public SimulateResult[] simulations { get; private set; }
 
-        public FailedTransactionReturn(string error, SendTransactionArgs request, SimulateResult[] simulations)
+        [JsonConstructor]
+        public FailedTransactionReturn(string error, JObject request, SimulateResult[] simulations)
         {
             this.error = error;
             this.request = request;
             this.simulations = simulations;
+        }
+        
+        public FailedTransactionReturn(string error, IntentDataSendTransaction request)
+        {
+            this.error = error;
+            string requestJson = Newtonsoft.Json.JsonConvert.SerializeObject(request);
+            JObject requestJObject = JObject.Parse(requestJson);
+            this.request = new JObject(new IntentPayload("", IntentType.SendTransaction, requestJObject, null));
+            this.simulations = null;
         }
     }
 }

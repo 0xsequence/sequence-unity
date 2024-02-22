@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Sequence.WaaS.Authentication;
+using SequenceSDK.WaaS;
 
 namespace Sequence.WaaS
 {
@@ -19,7 +20,7 @@ namespace Sequence.WaaS
             _exception = e;
         }
         
-        public async Task<T> SendIntent<T, T2>(T2 args)
+        public async Task<T> SendIntent<T, T2>(T2 args, IntentType type = IntentType.None, uint timeBeforeExpiryInSeconds = 30)
         {
             if (_exception != null)
             {

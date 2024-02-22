@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace SequenceSDK.WaaS
@@ -7,27 +8,67 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class IntentPayload
     {
-        public string version { get; private set; }
-        public JObject packet { get; private set; }
+        public JObject data { get; private set; }
+        public uint expiresAt { get; private set; }
+        public uint issuedAt { get; private set; }
+        public string name { get; private set; }
         public Signature[] signatures { get; private set; }
-        
-        public IntentPayload(string version, JObject packet, Signature[] signatures)
+        public string version { get; private set; }
+
+        [JsonConstructor]
+        public IntentPayload(string version, string name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
         {
             this.version = version;
-            this.packet = packet;
+            this.name = name;
+            this.expiresAt = expiresAt;
+            this.issuedAt = issuedAt;
+            this.data = data;
+            this.signatures = signatures;
+        }
+        
+        public IntentPayload(string version, IntentType name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
+        {
+            this.version = version;
+            this.name = IntentNames[name];
+            this.expiresAt = expiresAt;
+            this.issuedAt = issuedAt;
+            this.data = data;
             this.signatures = signatures;
         }
 
-        public IntentPayload(string version, JObject packet, params (string, string)[] signatures)
+        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30)
         {
             this.version = version;
-            this.packet = packet;
-            this.signatures = new Signature[signatures.Length];
-            int length = signatures.Length;
-            for (int i = 0; i < length; i++)
-            {
-                this.signatures[i] = new Signature(signatures[i].Item1, signatures[i].Item2);
-            }
+            this.name = IntentNames[type];
+            this.data = data;
+            this.signatures = signatures;
+            this.issuedAt = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            this.expiresAt = this.issuedAt + timeBeforeExpiryInSeconds;
         }
+
+        private static readonly Dictionary<IntentType, string> IntentNames = new Dictionary<IntentType, string>
+        {
+            {IntentType.OpenSession, "openSession"},
+            {IntentType.CloseSession, "closeSession"},
+            {IntentType.ValidateSession, "validateSession"},
+            {IntentType.FinishValidateSession, "finishValidateSession"},
+            {IntentType.ListSessions, "listSessions"},
+            {IntentType.GetSession, "getSession"},
+            {IntentType.SignMessage, "signMessage"},
+            {IntentType.SendTransaction, "sendTransaction"},
+        };
+    }
+
+    public enum IntentType
+    {
+        OpenSession,
+        CloseSession,
+        ValidateSession,
+        FinishValidateSession,
+        ListSessions,
+        GetSession,
+        SignMessage,
+        SendTransaction,
+        None
     }
 }

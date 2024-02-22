@@ -7,23 +7,23 @@ namespace SequenceSDK.WaaS
     {
         public const string TypeIdentifier = "erc20send";
         public string to { get; private set; }
-        public string token { get; private set; }
+        public string tokenAddress { get; private set; }
         public string type { get; private set; } = TypeIdentifier;
         public string value { get; private set; }
         
         public SendERC20(string tokenAddress, string to, string value)
         {
-            this.token = tokenAddress;
+            this.tokenAddress = tokenAddress;
             this.to = to;
             this.value = value;
         }
 
         
         [JsonConstructor]
-        public SendERC20(string to, string token, string type, string value)
+        public SendERC20(string to, string tokenAddress, string type, string value)
         {
             this.to = to;
-            this.token = token;
+            this.tokenAddress = tokenAddress;
             this.type = type;
             this.value = value;
         }

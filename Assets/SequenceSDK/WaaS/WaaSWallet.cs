@@ -39,8 +39,8 @@ namespace Sequence.WaaS
         {
             try
             {
-                SignMessageArgs args = new SignMessageArgs(_address, network, message, timeBeforeExpiry);
-                var result = await _intentSender.SendIntent<SignMessageReturn, SignMessageArgs>(args);
+                IntentDataSignMessage args = new IntentDataSignMessage(_address, network, message);
+                var result = await _intentSender.SendIntent<IntentResponseSignedMessage, IntentDataSignMessage>(args, IntentType.SignMessage, timeBeforeExpiry);
                 string signature = result.signature;
                 OnSignMessageComplete?.Invoke(signature);
                 return signature;
@@ -64,10 +64,10 @@ namespace Sequence.WaaS
 
         public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
         {
-            SendTransactionArgs args = new SendTransactionArgs(_address, network, transactions, timeBeforeExpiry);
+            IntentDataSendTransaction args = new IntentDataSendTransaction(_address, network, transactions);
             try
             {
-                var result = await _intentSender.SendIntent<TransactionReturn, SendTransactionArgs>(args);
+                var result = await _intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(args, IntentType.SendTransaction, timeBeforeExpiry);
                 if (result is SuccessfulTransactionReturn)
                 {
                     OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
@@ -80,7 +80,7 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                FailedTransactionReturn result = new FailedTransactionReturn(e.Message, args, null);
+                FailedTransactionReturn result = new FailedTransactionReturn(e.Message, args);
                 OnSendTransactionFailed?.Invoke(result);
                 return result;
             }
@@ -172,7 +172,7 @@ namespace Sequence.WaaS
             }
             else
             {
-                Debug.LogError("Failed to drop session: " + dropSessionId);
+                Debug.LogError("Failed to drop sessionId: " + dropSessionId);
             }
             return result;
         }

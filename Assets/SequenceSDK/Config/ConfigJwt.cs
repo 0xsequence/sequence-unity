@@ -9,8 +9,6 @@ namespace Sequence.Config
         public string identityPoolId;
         public string idpRegion;
         public string rpcServer;
-        public string kmsRegion;
-        public string keyId;
         public string emailClientId;
     }
 }

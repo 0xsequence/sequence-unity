@@ -1,19 +1,15 @@
 using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
-namespace Sequence.WaaS
+namespace SequenceSDK.WaaS
 {
     [Serializable]
     public class SendIntentPayload
     {
-        public string sessionId { get; private set; }
-        public string intentJson { get; private set; }
-
-        public SendIntentPayload(string sessionId, string intentJson)
+        public IntentPayload intent {get; private set;}
+        
+        public SendIntentPayload(IntentPayload intent)
         {
-            this.sessionId = sessionId;
-            this.intentJson = intentJson;
-        }  
+            this.intent = intent;
+        }
     }
 }

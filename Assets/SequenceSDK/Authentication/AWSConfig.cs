@@ -8,10 +8,9 @@ namespace Sequence.Authentication
     {
         public string Region { get; private set; }
         public string IdentityPoolId { get; private set; }
-        public string KMSEncryptionKeyId { get; private set; }
         public string CognitoClientId { get; private set; }
 
-        public AWSConfig(string region, string identityPoolId, string kmsEncryptionKeyId, string cognitoClientId)
+        public AWSConfig(string region, string identityPoolId,  string cognitoClientId)
         {
             if (string.IsNullOrWhiteSpace(region))
             {
@@ -23,11 +22,6 @@ namespace Sequence.Authentication
                 throw SequenceConfig.MissingConfigError("Identity Pool Id");
             }
             IdentityPoolId = identityPoolId;
-            if (string.IsNullOrWhiteSpace(kmsEncryptionKeyId))
-            {
-                throw SequenceConfig.MissingConfigError("KMS Encryption Key Id");
-            }
-            KMSEncryptionKeyId = kmsEncryptionKeyId;
             if (string.IsNullOrWhiteSpace(cognitoClientId))
             {
                 Debug.LogWarning(SequenceConfig.MissingConfigError("Cognito Client Id").Message + " Email sign in will not work.");
