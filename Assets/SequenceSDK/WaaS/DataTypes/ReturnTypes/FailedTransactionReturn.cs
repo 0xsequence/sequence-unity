@@ -25,7 +25,9 @@ namespace Sequence.WaaS
             this.error = error;
             string requestJson = Newtonsoft.Json.JsonConvert.SerializeObject(request);
             JObject requestJObject = JObject.Parse(requestJson);
-            this.request = new JObject(new IntentPayload("", IntentType.SendTransaction, requestJObject, null));
+            IntentPayload payload = new IntentPayload("", IntentType.SendTransaction, requestJObject, null);
+            string payloadJson = JsonConvert.SerializeObject(payload);
+            this.request = JObject.Parse(payloadJson);
             this.simulations = null;
         }
     }
