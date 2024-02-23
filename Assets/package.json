@@ -1,6 +1,6 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "displayName": "Sequence WaaS SDK",
   "description": "A Unity SDK for the Sequence WaaS API",
   "unity": "2021.3",
