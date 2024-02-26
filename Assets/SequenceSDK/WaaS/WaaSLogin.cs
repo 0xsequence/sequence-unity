@@ -21,7 +21,6 @@ namespace Sequence.WaaS
         public static string WaaSWithAuthUrl { get; private set; }
         public const string WaaSLoginMethod = "WaaSLoginMethod";
 
-        private AWSConfig _awsConfig;
         private int _waasProjectId;
         private string _waasVersion;
         private OpenIdAuthenticator _authenticator;
@@ -43,15 +42,6 @@ namespace Sequence.WaaS
             _waasVersion = waasVersion;
 
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            try
-            {
-                AWSConfig awsConfig = new AWSConfig(configJwt.idpRegion, configJwt.identityPoolId, configJwt.emailClientId);
-                _awsConfig = awsConfig;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
-            }
 
             string rpcUrl = configJwt.rpcServer;
             if (string.IsNullOrWhiteSpace(rpcUrl))
@@ -81,9 +71,13 @@ namespace Sequence.WaaS
             }
             _validator = validator;
 
-            if (_awsConfig != null)
+            try
             {
-                _emailSignIn = new AWSEmailSignIn(_awsConfig.IdentityPoolId, _awsConfig.Region, _awsConfig.CognitoClientId);
+                _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
             }
         }
         

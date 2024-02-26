@@ -15,13 +15,11 @@ namespace Sequence.Authentication
 {
     public class AWSEmailSignIn : IEmailSignIn
     {
-        private string _identityPoolId;
         private string _region;
         private string _cognitoClientId;
         
-        public AWSEmailSignIn(string identityPoolId, string region, string cognitoClientId)
+        public AWSEmailSignIn(string region, string cognitoClientId)
         {
-            _identityPoolId = identityPoolId;
             _region = region;
             _cognitoClientId = cognitoClientId;
         }
