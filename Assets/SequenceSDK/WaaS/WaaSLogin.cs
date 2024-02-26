@@ -107,6 +107,11 @@ namespace Sequence.WaaS
             
             try
             {
+                if (_emailSignIn == null)
+                {
+                    OnMFAEmailFailedToSend?.Invoke(email, "Email sign in not available. Please check for logged warnings; there is most likely a configuration issue.");
+                    return;
+                }
                 _challengeSession = await _emailSignIn.SignIn(email);
                 if (string.IsNullOrEmpty(_challengeSession))
                 {
