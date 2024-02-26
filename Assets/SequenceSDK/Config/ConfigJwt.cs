@@ -10,5 +10,6 @@ namespace Sequence.Config
         public string idpRegion;
         public string rpcServer;
         public string emailClientId;
+        public string emailRegion;
     }
 }

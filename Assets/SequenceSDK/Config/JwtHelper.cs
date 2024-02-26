@@ -74,16 +74,6 @@ namespace Sequence.Config
             {
                 return "Config JWT missing emailClientId.";
             }
-            
-            if (string.IsNullOrWhiteSpace(payload.idpRegion))
-            {
-                return "Config JWT missing idpRegion.";
-            }
-            
-            if (string.IsNullOrWhiteSpace(payload.identityPoolId))
-            {
-                return "Config JWT missing identityPoolId.";
-            }
 
             return null;
         }

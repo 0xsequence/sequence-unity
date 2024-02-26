@@ -17,11 +17,6 @@ namespace Sequence.Config
         [Header("WaaS Configuration")]
         public string WaaSVersion = "1.0.0";
         public string WaaSConfigKey;
-        public int WaaSProjectId { get; private set; }
-        public string Region { get; private set; }
-        public string IdentityPoolId { get; private set; }
-        public string KMSEncryptionKeyId { get; private set; }
-        public string CognitoClientId { get; private set; }
 
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
