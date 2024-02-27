@@ -9,7 +9,7 @@ namespace Sequence.WaaS.Tests
 {
     public class WaaSTestHarness : MonoBehaviour
     {
-        public static string RequiredAddress = "0x2D566542570771c264b98959B037f4eb7534caaA";
+        public static string RequiredAddress = "0x75700a9dC31ff38b93EafDC380c28e1B816f6799";
         public static int DelayForTransactionToProcess = 15000; // Allow the indexer some time to pull new data from chain
         
         public static Action<WaaSTestFailed> TestFailed;

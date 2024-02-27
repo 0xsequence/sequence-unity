@@ -81,7 +81,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestSignMessageSuccessEvent()
         {
-            IIntentSender intentSender = new MockIntentSender(new SignMessageReturn("",""));
+            IIntentSender intentSender = new MockIntentSender(new IntentResponseSignedMessage("",""));
             WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
             
             bool successEventHit = false;

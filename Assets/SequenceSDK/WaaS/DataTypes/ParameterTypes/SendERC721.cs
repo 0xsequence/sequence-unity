@@ -12,12 +12,12 @@ namespace SequenceSDK.WaaS
         public string id { get; private set; }
         public bool safe { get; private set; }
         public string to { get; private set; }
-        public string token { get; private set; }
+        public string tokenAddress { get; private set; }
         public string type { get; private set; } = TypeIdentifier;
         
         public SendERC721(string tokenAddress, string to, string tokenId, bool safe = true, string data = null)
         {
-            this.token = tokenAddress;
+            this.tokenAddress = tokenAddress;
             this.to = to;
             this.id = tokenId;
             this.safe = safe;
@@ -30,13 +30,13 @@ namespace SequenceSDK.WaaS
         }
 
         [JsonConstructor]
-        public SendERC721(string data, string id, bool safe, string to, string token, string type)
+        public SendERC721(string data, string id, bool safe, string to, string tokenAddress, string type)
         {
             this.data = data;
             this.id = id;
             this.safe = safe;
             this.to = to;
-            this.token = token;
+            this.tokenAddress = tokenAddress;
             this.type = type;
         }
     }

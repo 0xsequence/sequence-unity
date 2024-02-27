@@ -14,6 +14,12 @@ Unity 2021.3.6f1 or later
 - Mac standalone -> (Mono builds only when using OpenIdAuthentication -> in our testing MacOS doesn't pick up custom URL schemes automatically unless you run some system commands first; these system commands only work on Mono -> see OpenIdAuthentication.PlatformSpecificSetup)
 - WebGL (excluding OpenIdAuthentication)
 
+## Contributing
+
+As an open source project, we welcome and encourage your contributions! However, due to security reasons, we require that all commits be signed and verified on GitHub in order to merge into our master branch. So before contributing, you'll want to spend a few minutes setting that up if you haven't already.
+
+To start signing your commits, please see: https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
+
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 
 Unity by navigating to `Window > General > Test Runner`.

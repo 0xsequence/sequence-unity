@@ -56,7 +56,7 @@ namespace Sequence.WaaS
         public async Task<string> SendTransaction(IEthClient client, EthTransaction transaction)
         {
             RawTransaction waasTransaction = new RawTransaction(transaction.To, transaction.Value.ToString(), transaction.Data);
-            SendTransactionArgs args = await BuildTransactionArgs(client, new Transaction[] { waasTransaction });
+            IntentDataSendTransaction args = await BuildTransactionArgs(client, new Transaction[] { waasTransaction });
             TransactionReturn result = await _wallet.SendTransaction(args.network.ChainFromHexString(), args.transactions);
             if (result is FailedTransactionReturn failedResult)
             {
@@ -72,10 +72,10 @@ namespace Sequence.WaaS
             }
         }
 
-        private async Task<SendTransactionArgs> BuildTransactionArgs(IEthClient client, Transaction[] transactions)
+        private async Task<IntentDataSendTransaction> BuildTransactionArgs(IEthClient client, Transaction[] transactions)
         {
             string networkId = await client.ChainID();
-            SendTransactionArgs args = new SendTransactionArgs(GetAddress(), networkId, transactions);
+            IntentDataSendTransaction args = new IntentDataSendTransaction(GetAddress(), networkId, transactions);
             return args;
         }
 
@@ -99,7 +99,7 @@ namespace Sequence.WaaS
                 waasTransactions[i] = new RawTransaction(transactions[i].To, transactions[i].Value.ToString(), transactions[i].Data);
             }
 
-            SendTransactionArgs args = await BuildTransactionArgs(client, waasTransactions);
+            IntentDataSendTransaction args = await BuildTransactionArgs(client, waasTransactions);
             TransactionReturn result = await _wallet.SendTransaction(args.network.ChainFromHexString(), args.transactions);
             if (result is FailedTransactionReturn failedResult)
             {

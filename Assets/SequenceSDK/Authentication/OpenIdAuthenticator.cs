@@ -25,9 +25,9 @@ namespace Sequence.Authentication
         
         private string _stateToken = Guid.NewGuid().ToString();
 
-        private string _sessionAddress;
+        private string _sessionId; // Session Id is expected to be hex(keccak256(sessionWalletAddress))
 
-        public OpenIdAuthenticator(string sessionAddress)
+        public OpenIdAuthenticator(string sessionId)
         {
             SequenceConfig config = SequenceConfig.GetConfig();
 
@@ -37,7 +37,7 @@ namespace Sequence.Authentication
             FacebookClientId = config.FacebookClientId;
             AppleClientId = config.AppleClientId;
             
-            _sessionAddress = sessionAddress;
+            _sessionId = sessionId;
         }
 
         public void GoogleSignIn()
@@ -153,7 +153,7 @@ namespace Sequence.Authentication
             }
             
             string url =
-                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}&nonce={_sessionAddress}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();

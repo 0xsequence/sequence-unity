@@ -3,6 +3,7 @@ using Sequence;
 using Sequence.WaaS;
 using Sequence.WaaS.Authentication;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Samples.Scripts
 {
@@ -12,7 +13,7 @@ namespace Samples.Scripts
     /// </summary>
     public class SequenceConnector : MonoBehaviour
     {
-        [SerializeField] private Chain _chain;
+        public Chain Chain { get; private set; }
         public static SequenceConnector Instance { get; private set; }
         
         public WaaSWallet Wallet { get; private set; }
@@ -31,7 +32,7 @@ namespace Samples.Scripts
             }
 
             WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreated;
-            Indexer = new ChainIndexer(_chain);
+            Indexer = new ChainIndexer(Chain);
         }
 
         private void OnWaaSWalletCreated(WaaSWallet wallet)
@@ -48,6 +49,7 @@ namespace Samples.Scripts
 
         private void OnDestroy()
         {
+            if (Wallet == null) return;
             Wallet.OnSendTransactionComplete -= OnSendTransactionCompleteHandler;
             Wallet.OnSendTransactionFailed -= OnSendTransactionFailedHandler;
             Wallet.OnSignMessageComplete -= OnSignMessageCompleteHandler;
