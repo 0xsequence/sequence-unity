@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Demo;
+using Sequence.Relayer;
 using Sequence.WaaS;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -37,6 +38,11 @@ public class LoginSceneUIManager : MonoBehaviour
         SequenceBridge.Wallet = wallet;
         wallet.OnSendTransactionComplete += SequenceBridge.OnTransactionSuccessHandler;
         wallet.OnSendTransactionFailed += SequenceBridge.OnTransactionFailedHandler;
+        
+        SequenceBridge.Minter = new CloudflareMinter(new EthAuthenticationProof(wallet, SequenceBridge.Network));
+        SequenceBridge.Minter.OnMintTokenSuccess += SequenceBridge.OnMintSuccessHandler;
+        SequenceBridge.Minter.OnMintTokenFailed += SequenceBridge.OnMintFailedHandler;
+        
         SceneManager.LoadScene("MainMenu");
     }
     

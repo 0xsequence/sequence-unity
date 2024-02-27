@@ -14,14 +14,14 @@ namespace Sequence.Relayer
         
         public EthAuthenticationProof(IWallet eoaWallet, Chain chain)
         {
-            _proofSigner = new EOAProofSigner(eoaWallet, _chain);
             _chain = chain;
+            _proofSigner = new EOAProofSigner(eoaWallet, _chain);
         }
         
         public EthAuthenticationProof(Sequence.WaaS.IWallet waasWallet, Chain chain)
         {
-            _proofSigner = new WaaSProofSigner(waasWallet, _chain);
             _chain = chain;
+            _proofSigner = new WaaSProofSigner(waasWallet, _chain);
         }
 
         public async Task<string> GenerateProof()
@@ -39,6 +39,11 @@ namespace Sequence.Relayer
             string signedProof = await _proofSigner.SignProof(base64Proof);
             string ethAuthenticationProof = $"eth.{_proofSigner.SigningAddress()}.{base64Proof}.{signedProof}";
             return ethAuthenticationProof;
+        }
+        
+        public string GetSigningAddress()
+        {
+            return _proofSigner.SigningAddress();
         }
 
         private interface IProofSigner

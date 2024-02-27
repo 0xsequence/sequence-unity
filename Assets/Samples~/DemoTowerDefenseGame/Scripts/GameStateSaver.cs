@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence;
 using Sequence.Contracts;
+using Sequence.Relayer;
 using Sequence.WaaS;
 using SequenceSDK.WaaS;
 using UnityEngine;
@@ -14,13 +15,20 @@ public class GameStateSaver
     private GameStateLoader _loader;
     private Address _walletAddress;
     private ERC1155 _gameStateContract;
-    
-    public GameStateSaver(IWallet wallet = null)
+    private CloudflareMinter _minter;
+
+    public GameStateSaver(IWallet wallet = null, CloudflareMinter minter = null)
     {
         _wallet = wallet;
         if (_wallet == null)
         {
             _wallet = SequenceBridge.Wallet;
+        }
+
+        _minter = minter;
+        if (_minter == null)
+        {
+            _minter = SequenceBridge.Minter;
         }
 
         _walletAddress = _wallet.GetWalletAddress();
@@ -34,10 +42,7 @@ public class GameStateSaver
         if (starsEarned > stars)
         {
             int needed = starsEarned - stars;
-            _wallet.SendTransaction(SequenceBridge.Network, new Transaction[]
-            {
-                new RawTransaction(_gameStateContract.Mint(_walletAddress, BigInteger.Parse(SequenceBridge.Level0TokenId + levelId), needed)),
-            });
+            _minter.MintToken(SequenceBridge.Level0TokenId + levelId, (uint)needed);
         }
     }
 

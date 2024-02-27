@@ -15,7 +15,7 @@ namespace Sequence.Relayer
         public static async Task<bool> IsValidEthAuthProof(Chain chain, Address walletAddress, string ethAuthProof)
         {
             int chainId = (int)chain;
-            IsValidEthAuthProofRequest requestObject = new IsValidEthAuthProofRequest("polygon", walletAddress, ethAuthProof);
+            IsValidEthAuthProofRequest requestObject = new IsValidEthAuthProofRequest(chainId.ToString(), walletAddress, ethAuthProof);
             string payload = JsonConvert.SerializeObject(requestObject);
 
             using UnityWebRequest request = UnityWebRequest.Get("https://api.sequence.app/rpc/API/IsValidETHAuthProof");
@@ -31,16 +31,22 @@ namespace Sequence.Relayer
             request.SetRequestHeader("Accept", "application/json");
             
             string curlRequest = $"curl -X POST -H \"X-Access-Key: {request.GetRequestHeader("X-Access-Key")}\" -H \"Content-Type: application/json\" -H \"Accept: application/json\" -d '{payload}' https://api.sequence.app/rpc/API/IsValidETHAuthProof";
-            Debug.Log(curlRequest);
+
+            try
+            {
+                await request.SendWebRequest();
             
-            await request.SendWebRequest();
+                byte[] results = request.downloadHandler.data;
+                request.Dispose();
+                var responseJson = Encoding.UTF8.GetString(results);
             
-            byte[] results = request.downloadHandler.data;
-            request.Dispose();
-            var responseJson = Encoding.UTF8.GetString(results);
-            
-            IsValidEthAuthProofResponse responseObject = JsonConvert.DeserializeObject<IsValidEthAuthProofResponse>(responseJson);
-            return responseObject.isValid;
+                IsValidEthAuthProofResponse responseObject = JsonConvert.DeserializeObject<IsValidEthAuthProofResponse>(responseJson);
+                return responseObject.isValid;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error validating ETH Auth Proof: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl request: " + curlRequest);
+            }
         }
     }
 
