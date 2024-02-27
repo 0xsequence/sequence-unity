@@ -24,7 +24,7 @@ namespace Sequence.Relayer
         
         public event Action<string> OnMintTokenSuccess;
         public event Action<string> OnMintTokenFailed;
-        public async Task MintToken(string tokenId, uint amount = 1)
+        public async Task<string> MintToken(string tokenId, uint amount = 1)
         {
             string proof = await _ethAuthenticationProof.GenerateProof();
             
@@ -64,7 +64,7 @@ namespace Sequence.Relayer
                     request.Dispose();
 
                     OnMintTokenSuccess?.Invoke(transactionHash);
-                    return;
+                    return transactionHash;
                 }
                 OnMintTokenFailed?.Invoke("Error minting using cloudflare: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl request: " + curlRequest);
             }
@@ -72,6 +72,8 @@ namespace Sequence.Relayer
             {
                 OnMintTokenFailed?.Invoke("Error minting using cloudflare: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl request: " + curlRequest);
             }
+
+            return null;
         }
     }
 
