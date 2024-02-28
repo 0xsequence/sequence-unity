@@ -65,7 +65,7 @@ namespace Sequence.Authentication
             {
                 request.ClientMetadata = new Dictionary<string, string>
                 {
-                    { "sessionAddress", sessionWalletAddress }
+                    { "SESSION_HASH", sessionWalletAddress }
                 };
             }
             
