@@ -10,9 +10,8 @@ using System.Text;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.Extensions;
-using Sequence.Transactions;
 using Sequence.Utils;
+using Sequence.Transactions;
 using UnityEngine;
 
 namespace Sequence.Wallet

@@ -1,5 +1,6 @@
 ﻿using System;
-namespace Sequence.Extensions
+
+namespace Sequence.Utils
 {
     public static class UInt32Extensions
     {

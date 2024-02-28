@@ -3,7 +3,6 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using Sequence.WaaS;
-using SequenceSDK.Ethereum.Utils;
 using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;

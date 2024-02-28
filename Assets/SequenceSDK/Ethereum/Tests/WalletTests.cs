@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 using System.Numerics;
 using Sequence.Transactions;
 using Sequence.Contracts;
-using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS;
 using ContractDeploymentResult = Sequence.Contracts.ContractDeploymentResult;

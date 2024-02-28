@@ -39,7 +39,7 @@ public class LoginSceneUIManager : MonoBehaviour
         wallet.OnSendTransactionComplete += SequenceBridge.OnTransactionSuccessHandler;
         wallet.OnSendTransactionFailed += SequenceBridge.OnTransactionFailedHandler;
         
-        SequenceBridge.Minter = new CloudflareMinter(new EthAuthenticationProof(wallet, SequenceBridge.Network));
+        SequenceBridge.Minter = new CloudflareMinter(new EthAuthenticationProof(wallet, SequenceBridge.Network), "https://sequence-relayer-jelly-forest.tpin.workers.dev/");
         SequenceBridge.Minter.OnMintTokenSuccess += SequenceBridge.OnMintSuccessHandler;
         SequenceBridge.Minter.OnMintTokenFailed += SequenceBridge.OnMintFailedHandler;
         

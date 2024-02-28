@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,13 +14,14 @@ namespace Sequence.Relayer
 {
     public class CloudflareMinter
     {
-        private const string _mintEndpoint = "https://c801-70-26-76-48.ngrok-free.app/";
+        private string _mintEndpoint;
         
         private EthAuthenticationProof _ethAuthenticationProof;
         
-        public CloudflareMinter(EthAuthenticationProof ethAuthenticationProof)
+        public CloudflareMinter(EthAuthenticationProof ethAuthenticationProof, string mintEndpoint)
         {
             _ethAuthenticationProof = ethAuthenticationProof;
+            _mintEndpoint = mintEndpoint.AppendTrailingSlashIfNeeded();
         }
         
         public event Action<string> OnMintTokenSuccess;

@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using Sequence.Extensions;
 using Sequence.Utils;
 
 namespace Sequence.WaaS

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using Sequence.Extensions;
+using Sequence.Utils;
 using Sequence.Utils;
 
 public class ByteArrayExtensionsTests 

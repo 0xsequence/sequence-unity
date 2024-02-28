@@ -4,7 +4,6 @@ using NBitcoin.Secp256k1;
 using Sequence.ABI;
 using System;
 using System.Numerics;
-using Sequence.Extensions;
 using Sequence.Utils;
 
 namespace Sequence.Signer

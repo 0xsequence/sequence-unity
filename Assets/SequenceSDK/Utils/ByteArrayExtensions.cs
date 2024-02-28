@@ -1,7 +1,8 @@
 using System;
-using Sequence.ABI;
+using System.Text;
+using UnityEngine;
 
-namespace Sequence.Extensions
+namespace Sequence.Utils
 {
     public static class ByteArrayExtensions
     {
@@ -16,7 +17,19 @@ namespace Sequence.Extensions
             {
                 return "";
             }
-            return SequenceCoder.ByteArrayToHexString(byteArray);
+            
+            try
+            {
+                StringBuilder hex = new StringBuilder(byteArray.Length * 2);
+                foreach (byte b in byteArray)
+                    hex.AppendFormat("{0:x2}", b);
+                return hex.ToString();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
+                return string.Empty;
+            }
         }
 
         public static bool HasPrefix(this byte[] b, byte[] prefix) {

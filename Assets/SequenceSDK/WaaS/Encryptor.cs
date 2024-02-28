@@ -1,6 +1,5 @@
 using System.IO;
 using System.Security.Cryptography;
-using Sequence.Extensions;
 using Sequence.Utils;
 
 namespace Sequence.WaaS

@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Sequence.Extensions;
+using Sequence.Utils;
 
 public class BoolExtensionsTests
 {

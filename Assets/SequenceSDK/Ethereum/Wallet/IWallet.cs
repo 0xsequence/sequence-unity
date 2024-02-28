@@ -6,11 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using NBitcoin.Secp256k1;
 using Sequence.ABI;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Transactions;
-using Sequence.Ethereum.Utils;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.Wallet

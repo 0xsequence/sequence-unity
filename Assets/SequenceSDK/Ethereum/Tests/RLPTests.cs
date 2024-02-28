@@ -5,7 +5,6 @@ using UnityEngine;
 using Sequence.RLP;
 using Sequence.ABI;
 using System.Text;
-using Sequence.Extensions;
 using Sequence.Utils;
 
 public class RLPTest
