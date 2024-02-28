@@ -109,7 +109,7 @@ namespace Sequence.Provider
 
         public async Task<string> CallContract(params object[] args)
         {
-            RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args);
+            RpcResponse response = await _httpRpcClient.SendRequest("eth_call", args.AppendArray(new object[]{"latest"}));
             ThrowIfResponseHasErrors(response);
             string result = response.result.ToString();
             return result;
