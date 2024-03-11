@@ -38,6 +38,11 @@ namespace Sequence.Authentication
             }
             foreach (KeyValuePair<string, string> hashParameter in hashParameters)
             {
+                if (queryParameters.ContainsKey(hashParameter.Key))
+                {
+                    queryParameters[hashParameter.Key] = hashParameter.Value;
+                    continue;
+                }
                 queryParameters.Add(hashParameter.Key, hashParameter.Value);
             }
 
