@@ -7,44 +7,37 @@ namespace Sequence.Authentication
     public class IosBrowser : IBrowser
     {
         private OpenIdAuthenticator _authenticator;
-        private string _urlScheme;
         private static IosBrowser _instance;
         
-        private IosBrowser(OpenIdAuthenticator authenticator, string urlScheme)
+        private IosBrowser(OpenIdAuthenticator authenticator)
         {
             _authenticator = authenticator;
-            _urlScheme = urlScheme;
         }
         
-        public static IosBrowser Setup(OpenIdAuthenticator authenticator, string urlScheme)
+        public static IosBrowser Setup(OpenIdAuthenticator authenticator)
         {
             if (authenticator == null)
             {
                 throw new ArgumentNullException(nameof(authenticator));
             }
-            if (string.IsNullOrWhiteSpace(urlScheme))
-            {
-                throw new ArgumentNullException(nameof(urlScheme));
-            }
 
             if (_instance == null)
             {
-                _instance = new IosBrowser(authenticator, urlScheme);
+                _instance = new IosBrowser(authenticator);
                 return _instance;
             }
             _instance._authenticator = authenticator;
-            _instance._urlScheme = urlScheme;
             return _instance;
         }
         
-        public void Authenticate(string url)
+        public void Authenticate(string url, string redirectUrl = "")
         {
             if (string.IsNullOrWhiteSpace(url))
             {
                 throw new ArgumentNullException(nameof(url));
             }
             
-            IntPtr sessionPointer = Auth_ASWebAuthenticationSession_InitWithURL(url, _urlScheme,
+            IntPtr sessionPointer = Auth_ASWebAuthenticationSession_InitWithURL(url, redirectUrl,
                 OnAuthenticationSessionCompleted);
             Auth_ASWebAuthenticationSession_SetPrefersEphemeralWebBrowserSession(sessionPointer, 0);
             if (Auth_ASWebAuthenticationSession_Start(sessionPointer) == 0)

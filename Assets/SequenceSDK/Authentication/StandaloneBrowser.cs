@@ -4,7 +4,7 @@ namespace Sequence.Authentication
 {
     public class StandaloneBrowser : IBrowser
     {
-        public void Authenticate(string url)
+        public void Authenticate(string url, string redirectUrl = "")
         {
             Application.OpenURL(url);
         }

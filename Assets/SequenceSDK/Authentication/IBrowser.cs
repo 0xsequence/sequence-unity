@@ -4,6 +4,6 @@ namespace Sequence.Authentication
 {
     public interface IBrowser
     {
-        public void Authenticate(string url);
+        public void Authenticate(string url, string redirectUrl = "");
     }
 }

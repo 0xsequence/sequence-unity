@@ -21,7 +21,7 @@ namespace Sequence.Authentication
         private string FacebookClientId;
         private string AppleClientId;
         
-        private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
+        private static string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
         private string _stateToken = Guid.NewGuid().ToString();
 
@@ -34,14 +34,31 @@ namespace Sequence.Authentication
             SequenceConfig config = SequenceConfig.GetConfig();
 
             _urlScheme = config.UrlScheme;
-            GoogleClientId = config.GoogleClientId;
-            DiscordClientId = config.DiscordClientId;
-            FacebookClientId = config.FacebookClientId;
-            AppleClientId = config.AppleClientId;
+            SetClientIds(config);
             
             _sessionId = sessionId;
             
             _browser = CreateBrowser();
+        }
+
+        private void SetClientIds(SequenceConfig config)
+        {
+#if UNITY_IOS
+            GoogleClientId = config.GoogleClientIdIOS;
+            DiscordClientId = config.DiscordClientIdIOS;
+            FacebookClientId = config.FacebookClientIdIOS;
+            AppleClientId = config.AppleClientIdIOS;
+#elif UNITY_ANDROID
+            GoogleClientId = config.GoogleClientIdAndroid;
+            DiscordClientId = config.DiscordClientIdAndroid;    
+            FacebookClientId = config.FacebookClientIAndroid;
+            AppleClientId = config.AppleClientIdAndroid;
+#else
+            GoogleClientId = config.GoogleClientId;
+            DiscordClientId = config.DiscordClientId;
+            FacebookClientId = config.FacebookClientId;
+            AppleClientId = config.AppleClientId;
+#endif
         }
 
         private IBrowser CreateBrowser()
@@ -53,7 +70,7 @@ namespace Sequence.Authentication
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new StandaloneBrowser();
 #elif UNITY_IOS
-            return IosBrowser.Setup(this, _urlScheme);
+            return IosBrowser.Setup(this);
 #elif UNITY_ANDROID
             return new StandaloneBrowser();    // Todo switch to AndroidBrowser
 #else
@@ -70,12 +87,19 @@ namespace Sequence.Authentication
                     throw SequenceConfig.MissingConfigError("Google Client Id");
                 }
                 string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
-                _browser.Authenticate(googleSignInUrl);
+                _browser.Authenticate(googleSignInUrl, ReverseClientId(GoogleClientId));
             }
             catch (Exception e)
             {
                 Debug.LogError($"Google sign in error: {e.Message}");
             }
+        }
+
+        private string ReverseClientId(string clientId)
+        {
+            string[] parts = clientId.Split('.');
+            Array.Reverse(parts);
+            return string.Join(".", parts);
         }
         
         public void DiscordSignIn()
@@ -144,6 +168,10 @@ namespace Sequence.Authentication
             {
                 throw SequenceConfig.MissingConfigError("Url Scheme");
             }
+            
+#if UNITY_IOS || UNITY_ANDROID
+            RedirectUrl = $"{ReverseClientId(clientId)}://";
+#endif
             
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}/";
@@ -260,7 +288,7 @@ namespace Sequence.Authentication
             LoginMethod method = LoginMethod.None;
             link = link.RemoveTrailingSlash();
             
-            Dictionary<string, string> queryParams = link.ExtractQueryParameters();
+            Dictionary<string, string> queryParams = link.ExtractQueryAndHashParameters();
             if (queryParams == null)
             {
                 Debug.LogError($"Unexpected deep link: {link}");
