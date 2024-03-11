@@ -27,6 +27,8 @@ namespace Sequence.Authentication
 
         private string _sessionId; // Session Id is expected to be hex(keccak256(sessionWalletAddress))
 
+        private IBrowser _browser;
+
         public OpenIdAuthenticator(string sessionId)
         {
             SequenceConfig config = SequenceConfig.GetConfig();
@@ -38,17 +40,29 @@ namespace Sequence.Authentication
             AppleClientId = config.AppleClientId;
             
             _sessionId = sessionId;
+            
+            _browser = CreateBrowser();
+        }
+
+        private IBrowser CreateBrowser()
+        {
+#if UNITY_WEBGL
+            return new WebGLBrowser();
+#elif UNITY_EDITOR
+            return new EditorBrowser();
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            return new StandaloneBrowser();
+#elif UNITY_IOS
+            return IosBrowser.Setup(this, _urlScheme);
+#elif UNITY_ANDROID
+            return new StandaloneBrowser();    // Todo switch to AndroidBrowser
+#else
+            throw new NotImplementedException("No social sign in implementation for this platform");
+#endif
         }
 
         public void GoogleSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(GoogleClientId))
@@ -56,7 +70,7 @@ namespace Sequence.Authentication
                     throw SequenceConfig.MissingConfigError("Google Client Id");
                 }
                 string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
-                Application.OpenURL(googleSignInUrl);
+                _browser.Authenticate(googleSignInUrl);
             }
             catch (Exception e)
             {
@@ -66,13 +80,6 @@ namespace Sequence.Authentication
         
         public void DiscordSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(DiscordClientId))
@@ -81,7 +88,7 @@ namespace Sequence.Authentication
                 }
                 string discordSignInUrl =
                     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
-                Application.OpenURL(discordSignInUrl);
+                _browser.Authenticate(discordSignInUrl);
             }
             catch (Exception e)
             {
@@ -91,13 +98,6 @@ namespace Sequence.Authentication
 
         public void FacebookSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(FacebookClientId))
@@ -106,7 +106,7 @@ namespace Sequence.Authentication
                 }
                 string facebookSignInUrl =
                     GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
-                Application.OpenURL(facebookSignInUrl);
+                _browser.Authenticate(facebookSignInUrl);
             }
             catch (Exception e)
             {
@@ -116,13 +116,6 @@ namespace Sequence.Authentication
         
         public void AppleSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(AppleClientId))
@@ -132,7 +125,7 @@ namespace Sequence.Authentication
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
-                Application.OpenURL(appleSignInUrl);
+                _browser.Authenticate(appleSignInUrl);
             }
             catch (Exception e)
             {
