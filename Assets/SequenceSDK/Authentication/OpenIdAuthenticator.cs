@@ -72,7 +72,7 @@ namespace Sequence.Authentication
 #elif UNITY_IOS
             return IosBrowser.Setup(this);
 #elif UNITY_ANDROID
-            return new StandaloneBrowser();    // Todo switch to AndroidBrowser
+            return new AndroidBrowser(this);
 #else
             throw new NotImplementedException("No social sign in implementation for this platform");
 #endif

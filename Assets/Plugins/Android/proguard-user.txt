@@ -1,0 +1,2 @@
+-include Assets/Plugins/Android/Libraries/credentials-1.2.1-sources.jar
+-include Assets/Plugins/Android/Libraries/googleid-1.1.0-javadoc.jar
