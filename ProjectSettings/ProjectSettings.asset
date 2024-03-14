@@ -817,7 +817,7 @@ PlayerSettings:
     Server: 
     Standalone: 
     WebGL: VUPLEX_CCU;VUPLEX_STANDALONE
-    iPhone: VUPLEX_CCU;VUPLEX_STANDALONE
+    iPhone: APPLE_AUTH_MANAGER_NATIVE_IMPLEMENTATION_AVAILABLE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

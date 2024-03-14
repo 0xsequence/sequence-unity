@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using Sequence.Config;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Sequence.Authentication
 {
@@ -149,7 +150,13 @@ namespace Sequence.Authentication
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
+#if UNITY_IOS || UNITY_STANDALONE_OSX
+                GameObject appleSignInObject = Object.Instantiate(new GameObject());
+                SignInWithApple appleSignIn = appleSignInObject.AddComponent<SignInWithApple>();
+                appleSignIn.LoginToApple(this, _sessionId, _stateToken);
+#else
                 _browser.Authenticate(appleSignInUrl);
+#endif
             }
             catch (Exception e)
             {
