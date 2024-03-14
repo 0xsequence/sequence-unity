@@ -65,6 +65,18 @@ namespace Sequence.WaaS
             if (result.response.code == SuccessfulTransactionReturn.IdentifyingCode)
             {
                 SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.response.data.ToString());
+                while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
+                {
+                    try
+                    {
+                        successfulTransactionReturn = await GetTransactionReceipt(successfulTransactionReturn);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                        return new IntentResponse<TransactionReturn>(new Response<TransactionReturn>(result.response.code, successfulTransactionReturn));
+                    }
+                }
                 return new IntentResponse<TransactionReturn>(new Response<TransactionReturn>(result.response.code, successfulTransactionReturn));
             }
             else if (result.response.code == FailedTransactionReturn.IdentifyingCode)
@@ -126,6 +138,33 @@ namespace Sequence.WaaS
             WaaSSession[] sessions = await SendIntent<WaaSSession[], IntentDataListSessions>(
                 new IntentDataListSessions(_sessionWallet.GetAddress()), IntentType.ListSessions);
             return sessions;
+        }
+        
+        private async Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn response)
+        {
+            JObject requestData = response.request.data;
+            if (requestData.TryGetValue("network", out JToken networkJToken))
+            {
+                string network = networkJToken.Value<string>();
+                if (requestData.TryGetValue("wallet", out JToken walletAddressJToken))
+                {
+                    string wallet = walletAddressJToken.Value<string>();
+                    Address walletAddress = new Address(wallet);
+                    SuccessfulTransactionReturn result =
+                        await SendIntent<SuccessfulTransactionReturn, IntentDataGetTransactionReceipt>(
+                            new IntentDataGetTransactionReceipt(walletAddress, network, response.metaTxHash),
+                            IntentType.GetTransactionReceipt);
+                    return result;
+                }
+                else
+                {
+                    throw new Exception("Wallet address not found in response");
+                }
+            }
+            else
+            {
+                throw new Exception("Network not found in response");
+            }
         }
     }
 }
