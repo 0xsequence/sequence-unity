@@ -18,7 +18,7 @@ namespace Sequence.WaaS
     {
         public string SessionId { get; private set; }
         
-        private HttpClient _httpClient;
+        private IHttpClient _httpClient;
         private Wallet.IWallet _sessionWallet;
         private int _waasProjectId;
         private string _waasVersion;
@@ -29,7 +29,7 @@ namespace Sequence.WaaS
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public IntentSender(HttpClient httpClient, Wallet.IWallet sessionWallet, string sessionId, int waasProjectId, string waasVersion)
+        public IntentSender(IHttpClient httpClient, Wallet.IWallet sessionWallet, string sessionId, int waasProjectId, string waasVersion)
         {
             _httpClient = httpClient;
             _sessionWallet = sessionWallet;

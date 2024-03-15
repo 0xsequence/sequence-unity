@@ -14,7 +14,7 @@ using UnityEngine.Networking;
 
 namespace Sequence.WaaS
 {
-    public class HttpClient
+    public class HttpClient : IHttpClient
     {
         private readonly string _url;
         private Dictionary<string, string> _defaultHeaders;
