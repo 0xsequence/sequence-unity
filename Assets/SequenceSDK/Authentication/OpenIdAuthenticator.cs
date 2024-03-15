@@ -176,7 +176,7 @@ namespace Sequence.Authentication
                 throw SequenceConfig.MissingConfigError("Url Scheme");
             }
             
-#if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS
             RedirectUrl = $"{ReverseClientId(clientId)}://";
 #endif
             
