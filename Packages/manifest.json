@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.lupidan.apple-signin-unity": "https://github.com/lupidan/apple-signin-unity.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "1.15.18",
     "com.unity.feature.development": "1.0.1",
