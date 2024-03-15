@@ -64,6 +64,69 @@ namespace Sequence.WaaS.Tests
             }
         }
 
+        [Test]
+        public async Task TestGetTransactionReceipt()
+        {
+            EthWallet wallet = new EthWallet();
+            IntentDataSendTransaction intentDataSendTransaction =
+                new IntentDataSendTransaction(wallet.GetAddress(), Chain.None, null);
+            string intentJson = JsonConvert.SerializeObject(intentDataSendTransaction);
+            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsSuccessfulTransaction(), wallet, "", 0, "");
+            
+            var result = await intentSender.GetTransactionReceipt(new SuccessfulTransactionReturn("", "",
+                new IntentPayload(
+                    "1.0.0", IntentType.GetTransactionReceipt, JsonConvert.DeserializeObject<JObject>(intentJson), null), null));
+            
+            Assert.NotNull(result);
+            Assert.AreEqual(result.txHash, MockHttpClientReturnsSuccessfulTransaction.txHash);
+        }
+
+        [Test]
+        public async Task TestGetTransactionReceipt_noNetwork()
+        {
+            EthWallet wallet = new EthWallet();
+            IsValidMessageSignatureArgs intentData =
+                new IsValidMessageSignatureArgs(Chain.None, "", "", "");
+            string intentJson = JsonConvert.SerializeObject(intentData);
+            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsSuccessfulTransaction(), wallet, "", 0, "");
+
+            try
+            {
+                var result = await intentSender.GetTransactionReceipt(new SuccessfulTransactionReturn("", "",
+                    new IntentPayload(
+                        "1.0.0", IntentType.GetTransactionReceipt, JsonConvert.DeserializeObject<JObject>(intentJson),
+                        null), null));
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual("Network not found in response", e.Message);
+            }
+        }
+
+        [Test]
+        public async Task TestGetTransactionReceipt_noWallet()
+        {
+            EthWallet wallet = new EthWallet();
+            JObjectWithoutWallet intentData =
+                new JObjectWithoutWallet(Chain.None.ToString());
+            string intentJson = JsonConvert.SerializeObject(intentData);
+            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsSuccessfulTransaction(), wallet, "", 0, "");
+
+            try
+            {
+                var result = await intentSender.GetTransactionReceipt(new SuccessfulTransactionReturn("", "",
+                    new IntentPayload(
+                        "1.0.0", IntentType.GetTransactionReceipt, JsonConvert.DeserializeObject<JObject>(intentJson),
+                        null), null));
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual("Wallet address not found in response", e.Message);
+            }
+        }
+
         private class MockHttpClientReturnsFailedTransaction : IHttpClient
         {
             public static string error = "Mock failed transaction";
@@ -100,6 +163,17 @@ namespace Sequence.WaaS.Tests
                     new SuccessfulTransactionReturn(txHash, "", null, null)));
                 string responseJson = JsonConvert.SerializeObject(response);
                 return JsonConvert.DeserializeObject<T2>(responseJson);
+            }
+        }
+
+        [Serializable]
+        private class JObjectWithoutWallet
+        {
+            public string network;
+
+            public JObjectWithoutWallet(string network)
+            {
+                this.network = network;
             }
         }
     }
