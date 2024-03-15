@@ -65,18 +65,6 @@ namespace Sequence.WaaS
             if (result.response.code == SuccessfulTransactionReturn.IdentifyingCode)
             {
                 SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.response.data.ToString());
-                while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
-                {
-                    try
-                    {
-                        successfulTransactionReturn = await GetTransactionReceipt(successfulTransactionReturn);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
-                        return new IntentResponse<TransactionReturn>(new Response<TransactionReturn>(result.response.code, successfulTransactionReturn));
-                    }
-                }
                 return new IntentResponse<TransactionReturn>(new Response<TransactionReturn>(result.response.code, successfulTransactionReturn));
             }
             else if (result.response.code == FailedTransactionReturn.IdentifyingCode)
@@ -140,7 +128,7 @@ namespace Sequence.WaaS
             return sessions;
         }
         
-        private async Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn response)
+        public async Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn response)
         {
             JObject requestData = response.request.data;
             if (requestData.TryGetValue("network", out JToken networkJToken))

@@ -2,6 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Sequence.Utils;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Sequence.WaaS.Tests
 {
@@ -12,7 +15,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestSendTransactionSuccessEvent()
         {
-            IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn("","",null,null));
+            IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3","",null,null));
             WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
             
             bool successEventHit = false;
@@ -98,7 +101,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestDeployContractSuccessEvent()
         {
-            SuccessfulTransactionReturn response = new SuccessfulTransactionReturn("", "", null, new MetaTxnReceipt("",
+            SuccessfulTransactionReturn response = new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3", "", null, new MetaTxnReceipt("",
                 "", 0, null, new MetaTxnReceipt[]
                 {
                     new MetaTxnReceipt("", "", 0, new MetaTxnReceiptLog[]
@@ -161,7 +164,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestDeployContractCantFindDeployTopic()
         {
             
-            SuccessfulTransactionReturn response = new SuccessfulTransactionReturn("", "", null, new MetaTxnReceipt("",
+            SuccessfulTransactionReturn response = new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3", "", null, new MetaTxnReceipt("",
                 "", 0, null, new MetaTxnReceipt[]
                 {
                     new MetaTxnReceipt("", "", 0, new MetaTxnReceiptLog[]
@@ -305,6 +308,148 @@ namespace Sequence.WaaS.Tests
             Assert.IsNotNull(deploymentReturn.TransactionReturn);
             Assert.AreEqual("some error", deploymentReturn.Error);
             Assert.AreEqual(result2, deploymentReturn);
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(3)]
+        [TestCase(10)]
+        public async Task TestWaitForTransactionReceipt(int numberOfFetches)
+        {
+            SuccessfulTransactionReturn resultWithNoTransactionHash =
+                new SuccessfulTransactionReturn("", "", null, null);
+            object[] mockReturnObjects = new object[numberOfFetches];
+            for (int i = 0; i < numberOfFetches; i++)
+            {
+                mockReturnObjects[i] = resultWithNoTransactionHash;
+            }
+
+            SuccessfulTransactionReturn resultWithTransactionHash =
+                new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3",
+                    "", null, null);
+
+            MockIntentSender intentSender =
+                new MockIntentSender(mockReturnObjects.AppendObject(resultWithTransactionHash));
+            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successEventHit = true;
+            };
+            bool failedEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedEventHit = true;
+            };
+
+            var result = await wallet.SendTransaction(Chain.None, null);
+            
+            Assert.IsTrue(successEventHit);
+            Assert.IsFalse(failedEventHit);
+            if (result is SuccessfulTransactionReturn successfulTransactionReturn)
+            {
+                Assert.AreEqual(resultWithTransactionHash, successfulTransactionReturn);
+            }
+            else
+            {
+                Assert.Fail($"Expected {nameof(SuccessfulTransactionReturn)} return type");
+            }
+        }
+
+        [Test]
+        public async Task TestWaitForTransactionReceipt_failedToFetch()
+        {
+            int numberOfFetches = 5;
+            
+            SuccessfulTransactionReturn resultWithNoTransactionHash =
+                new SuccessfulTransactionReturn("", "", null, null);
+            object[] mockReturnObjects = new object[numberOfFetches];
+            for (int i = 0; i < numberOfFetches; i++)
+            {
+                mockReturnObjects[i] = resultWithNoTransactionHash;
+            }
+
+            SuccessfulTransactionReturn resultWithTransactionHash =
+                new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3",
+                    "", null, null);
+
+            MockIntentSender intentSender =
+                new MockIntentSender(mockReturnObjects.AppendObject(resultWithTransactionHash));
+            intentSender.InjectException(new Exception("some random error"));
+            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successEventHit = true;
+            };
+            bool failedEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedEventHit = true;
+            };
+            
+            LogAssert.Expect(LogType.Error, "Transaction was successful, but we're unable to obtain the transaction hash. Reason: some random error");
+            
+            var result = await wallet.SendTransaction(Chain.None, null);
+            
+            Assert.IsTrue(successEventHit);
+            Assert.IsFalse(failedEventHit);
+            if (result is SuccessfulTransactionReturn successfulTransactionReturn)
+            {
+                Assert.AreEqual(resultWithNoTransactionHash, successfulTransactionReturn);
+            }
+            else
+            {
+                Assert.Fail($"Expected {nameof(SuccessfulTransactionReturn)} return type");
+            }
+        }
+        
+        [TestCase(1)]
+        [TestCase(3)]
+        [TestCase(10)]
+        public async Task TestDontWaitForTransactionReceipt(int numberOfFetches)
+        {
+            SuccessfulTransactionReturn resultWithNoTransactionHash =
+                new SuccessfulTransactionReturn("", "", null, null);
+            object[] mockReturnObjects = new object[numberOfFetches];
+            for (int i = 0; i < numberOfFetches; i++)
+            {
+                mockReturnObjects[i] = resultWithNoTransactionHash;
+            }
+
+            SuccessfulTransactionReturn resultWithTransactionHash =
+                new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3",
+                    "", null, null);
+
+            MockIntentSender intentSender =
+                new MockIntentSender(mockReturnObjects.AppendObject(resultWithTransactionHash));
+            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successEventHit = true;
+            };
+            bool failedEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedEventHit = true;
+            };
+
+            var result = await wallet.SendTransaction(Chain.None, null, false);
+            
+            Assert.IsTrue(successEventHit);
+            Assert.IsFalse(failedEventHit);
+            if (result is SuccessfulTransactionReturn successfulTransactionReturn)
+            {
+                Assert.AreEqual(resultWithNoTransactionHash, successfulTransactionReturn);
+            }
+            else
+            {
+                Assert.Fail($"Expected {nameof(SuccessfulTransactionReturn)} return type");
+            }
         }
     }
 }

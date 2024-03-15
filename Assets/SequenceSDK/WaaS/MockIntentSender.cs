@@ -7,27 +7,34 @@ namespace Sequence.WaaS
 {
     public class MockIntentSender : IIntentSender
     {
-        private object _returnObject;
+        private object[] _returnObjects;
         private Exception _exception;
+        private int _numberOfCalls = 0;
         
-        public MockIntentSender(object returnObject)
+        public MockIntentSender(params object[] returnObjects)
         {
-            _returnObject = returnObject;
+            _returnObjects = returnObjects;
         }
 
         public MockIntentSender(Exception e)
         {
             _exception = e;
         }
+
+        public void InjectException(Exception e)
+        {
+            _exception = e;
+        }
         
         public async Task<T> SendIntent<T, T2>(T2 args, IntentType type = IntentType.None, uint timeBeforeExpiryInSeconds = 30)
         {
-            if (_exception != null)
+            if (_exception != null && !(_numberOfCalls == 0 && _returnObjects != null && _returnObjects.Length > 1))
             {
                 throw _exception;
             }
-            
-            return (T)_returnObject;
+
+            _numberOfCalls++;
+            return (T)_returnObjects[_numberOfCalls - 1];
         }
 
         public Task<bool> DropSession(string dropSessionId)
@@ -43,6 +50,17 @@ namespace Sequence.WaaS
         public Task<WaaSSession[]> ListSessions()
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn response)
+        {
+            if (_exception != null)
+            {
+                throw _exception;
+            }
+
+            _numberOfCalls++;
+            return (SuccessfulTransactionReturn)_returnObjects[_numberOfCalls - 1];
         }
     }
 }

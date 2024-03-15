@@ -31,7 +31,7 @@ namespace SequenceExamples.Scripts.Tests.Utils
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
 
-        public Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
+        public Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, bool waitForReceipt = true, uint timeBeforeExpiry = 30)
         {
             throw new NotImplementedException();
         }

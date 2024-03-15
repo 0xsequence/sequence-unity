@@ -154,7 +154,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestDeployContractSuccess()
         {
-            SuccessfulTransactionReturn response = new SuccessfulTransactionReturn("", "", null, new MetaTxnReceipt("",
+            SuccessfulTransactionReturn response = new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3", "", null, new MetaTxnReceipt("",
                 "", 0, null, new MetaTxnReceipt[]
                 {
                     new MetaTxnReceipt("", "", 0, new MetaTxnReceiptLog[]

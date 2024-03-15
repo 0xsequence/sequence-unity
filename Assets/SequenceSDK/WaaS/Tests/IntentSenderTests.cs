@@ -63,9 +63,6 @@ namespace Sequence.WaaS.Tests
                 Assert.Fail($"Did not receive {nameof(SuccessfulTransactionReturn)}");
             }
         }
-        
-        // Todo write tests where we get blank txHash back
-        
 
         private class MockHttpClientReturnsFailedTransaction : IHttpClient
         {
