@@ -208,5 +208,23 @@ namespace Sequence.WaaS
             OnSessionsFound?.Invoke(results);
             return results;
         }
+
+        public async Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
+        {
+            while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
+            {
+                try
+                {
+                    successfulTransactionReturn = await _intentSender.GetTransactionReceipt(successfulTransactionReturn);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                    return successfulTransactionReturn;
+                }
+            }
+
+            return successfulTransactionReturn;
+        }
     }
 }

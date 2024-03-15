@@ -60,5 +60,10 @@ namespace SequenceExamples.Scripts.Tests.Utils
         {
             throw new NotImplementedException();
         }
+
+        public Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

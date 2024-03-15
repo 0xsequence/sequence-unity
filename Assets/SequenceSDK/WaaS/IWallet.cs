@@ -23,5 +23,8 @@ namespace Sequence.WaaS
         public Task<bool> DropThisSession();
         public event Action<WaaSSession[]> OnSessionsFound;
         public Task<WaaSSession[]> ListSessions();
+
+        public Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(
+            SuccessfulTransactionReturn successfulTransactionReturn);
     }
 }
