@@ -56,6 +56,7 @@ namespace SequenceSDK.WaaS
             {IntentType.GetSession, "getSession"},
             {IntentType.SignMessage, "signMessage"},
             {IntentType.SendTransaction, "sendTransaction"},
+            {IntentType.GetTransactionReceipt, "getTransactionReceipt"},
         };
     }
 
@@ -69,6 +70,7 @@ namespace SequenceSDK.WaaS
         GetSession,
         SignMessage,
         SendTransaction,
+        GetTransactionReceipt,
         None
     }
 }
