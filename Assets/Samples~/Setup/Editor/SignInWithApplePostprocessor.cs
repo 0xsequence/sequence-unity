@@ -1,4 +1,6 @@
+#if UNITY_IOS
 using AppleAuth.Editor;
+#endif
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
@@ -28,17 +30,6 @@ namespace Sequence.Editor
             manager.AddSignInWithAppleWithCompatibility();
             manager.WriteToFile();
 #endif
-        }
-#endif
-        
-#if UNITY_STANDALONE_OSX // From https://github.com/lupidan/apple-signin-unity?tab=readme-ov-file#plugin-setup-macos
-        [PostProcessBuild(1)]
-        public static void OnPostProcessBuild(BuildTarget target, string path)
-        {
-            if (target != BuildTarget.StandaloneOSX)
-                return;
-
-            AppleAuthMacosPostprocessorHelper.FixManagerBundleIdentifier(target, path);
         }
 #endif
     }

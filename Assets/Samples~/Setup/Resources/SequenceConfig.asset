@@ -12,11 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31bdc7ca06145c58d72ef6ca48f8e02, type: 3}
   m_Name: SequenceConfig
   m_EditorClassIdentifier: 
-  UrlScheme: 
-  GoogleClientId: 
+  UrlScheme: sdk-powered-by-sequence
+  GoogleClientId: 970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com
   DiscordClientId: 
   FacebookClientId: 
-  AppleClientId: 
+  AppleClientId: com.horizon.sequence.waas
+  GoogleClientIdIOS: 970987756660-tln480mkru9g5du3otto4l90g1gapdmo.apps.googleusercontent.com
+  DiscordClientIdIOS: 
+  FacebookClientIdIOS: 
+  AppleClientIdIOS: com.horizon.sequence.waas
+  GoogleClientIdAndroid: 970987756660-35a6tc48hvi8cev9cnknp0iugv9poa23.apps.googleusercontent.com
+  DiscordClientIdAndroid: 
+  FacebookClientIAndroid: 
+  AppleClientIdAndroid: 
   WaaSVersion: 1.0.0
-  WaaSConfigKey: 
-  BuilderAPIKey: 
+  WaaSConfigKey: eyJwcm9qZWN0SWQiOjIzLCJlbWFpbFJlZ2lvbiI6InVzLWVhc3QtMiIsImVtYWlsQ2xpZW50SWQiOiI1Z3A5bWgyZmJxYmo4bDZwcmpnbzc1cDBmNiIsInJwY1NlcnZlciI6Imh0dHBzOi8vbmV4dC13YWFzLnNlcXVlbmNlLmFwcCJ9
+  BuilderAPIKey: y9NeffxmVxkDUvKrvcZA2pLAAAAAAAAAA
