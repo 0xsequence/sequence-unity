@@ -6,7 +6,7 @@ using UnityEditor.iOS.Xcode;
 
 namespace AppleAuth.Editor
 {
-    public static class ProjectCapabilityManagerExtension
+    public static class ProjectCapabilityManagerExtension // From https://github.com/lupidan/apple-signin-unity/blob/master/AppleAuth/Editor/ProjectCapabilityManagerExtension.cs
     {
         private const string EntitlementsArrayKey = "com.apple.developer.applesignin";
         private const string DefaultAccessLevel = "Default";
