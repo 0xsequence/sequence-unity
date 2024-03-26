@@ -13,6 +13,7 @@ namespace Sequence.Authentication
     {
         public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
+        public Action<string> OnSignInFailed;
         private string _urlScheme;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
@@ -92,7 +93,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                Debug.LogError($"Google sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Google sign in error: {e.Message}");
             }
         }
 
@@ -117,7 +118,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                Debug.LogError($"Discord sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Discord sign in error: {e.Message}");
             }
         }
 
@@ -135,7 +136,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                Debug.LogError($"Facebook sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Facebook sign in error: {e.Message}");
             }
         }
         
@@ -160,7 +161,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                Debug.LogError($"Apple sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Apple sign in error: {e.Message}");
             }
         }
 
@@ -298,21 +299,21 @@ namespace Sequence.Authentication
             Dictionary<string, string> queryParams = link.ExtractQueryAndHashParameters();
             if (queryParams == null)
             {
-                Debug.LogError($"Unexpected deep link: {link}");
+                OnSignInFailed?.Invoke($"Unexpected deep link: {link}");
                 return;
             }
             if (queryParams.TryGetValue("state", out string state))
             {
                 if (!state.Contains(_stateToken))
                 {
-                    Debug.LogError("State token mismatch");
+                    OnSignInFailed?.Invoke("State token mismatch");
                     return;
                 }
                 method = GetMethodFromState(state);
             }
             else
             {
-                Debug.LogError("State token missing");
+                OnSignInFailed?.Invoke("State token missing");
                 return;
             }
             
@@ -322,7 +323,7 @@ namespace Sequence.Authentication
             }
             else
             {
-                Debug.LogError($"Unexpected deep link: {link}");
+                OnSignInFailed?.Invoke($"Unexpected deep link: {link}");
             }
         }
 
