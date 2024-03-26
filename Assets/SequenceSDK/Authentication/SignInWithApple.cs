@@ -30,17 +30,14 @@ namespace Sequence.Authentication
 
         public void LoginToApple(OpenIdAuthenticator authenticator, string nonce, string state)
         {
-            // Initialize the Apple Auth Manager
             if (m_AppleAuthManager == null)
             {
                 Initialize();
             }
 
-            // Set the login arguments
             var loginArgs = new AppleAuthLoginArgs(LoginOptions.IncludeEmail | LoginOptions.IncludeFullName,
                 nonce, state);
 
-            // Perform the login
             m_AppleAuthManager.LoginWithAppleId(
                 loginArgs,
                 credential =>
