@@ -16,26 +16,28 @@ namespace Sequence.Relayer
     {
         private string _mintEndpoint;
         
-        private EthAuthenticationProof _ethAuthenticationProof;
+        private MintingRequestProver _mintingRequestProver;
+
+        private Address _contractAddress;
         
-        public CloudflareMinter(EthAuthenticationProof ethAuthenticationProof, string mintEndpoint)
+        public CloudflareMinter(MintingRequestProver mintingRequestProver, string mintEndpoint, string contractAddress)
         {
-            _ethAuthenticationProof = ethAuthenticationProof;
+            _mintingRequestProver = mintingRequestProver;
             _mintEndpoint = mintEndpoint.AppendTrailingSlashIfNeeded();
+            _contractAddress = new Address(contractAddress);
         }
         
         public event Action<string> OnMintTokenSuccess;
         public event Action<string> OnMintTokenFailed;
         public async Task<string> MintToken(string tokenId, uint amount = 1)
         {
-            string proof = await _ethAuthenticationProof.GenerateProof();
+            MintingRequestProof requestProof = await _mintingRequestProver.GenerateProof(_contractAddress, tokenId, amount);
             
             MintTokenRequest mintTokenRequest = new MintTokenRequest()
             {
-                proof = proof,
-                address = _ethAuthenticationProof.GetSigningAddress(),
-                tokenId = ulong.Parse(tokenId),
-                amount = amount
+                proof = requestProof.Proof,
+                signedProof = requestProof.SignedProof,
+                address = requestProof.SigningAddress,
             };
             
             string mintTokenRequestJson = JsonConvert.SerializeObject(mintTokenRequest);
@@ -83,8 +85,7 @@ namespace Sequence.Relayer
     public class MintTokenRequest
     {
         public string proof;
+        public string signedProof;
         public string address;
-        public ulong tokenId;
-        public uint amount;
     }
 }

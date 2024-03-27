@@ -4,21 +4,21 @@ using Sequence.Wallet;
 
 namespace Sequence.Relayer.Tests
 {
-    public class EthAuthenticationProofTests
+    public class MintingRequestProverTests
     {
         [Test]
         public async Task TestEoaAuthenticationProofGeneration()
         {
             EthWallet wallet = new EthWallet();
-            EthAuthenticationProof proof = new EthAuthenticationProof(wallet, Chain.Polygon);
+            MintingRequestProver prover = new MintingRequestProver(wallet, Chain.Polygon);
 
-            string ethAuthenticationProof = await proof.GenerateProof();
+            MintingRequestProof mintingRequestProof = await prover.GenerateProof("0x75700a9dC31ff38b93EafDC380c28e1B816f6799", "tokenId", 5);
             
-            Assert.NotNull(ethAuthenticationProof);
+            Assert.NotNull(mintingRequestProof);
 
             try
             {
-                bool isValid = await EthAuthenticationProofValidator.IsValidEthAuthProof(Chain.Polygon, wallet.GetAddress(), ethAuthenticationProof);
+                bool isValid = await MintingRequestProofValidator.IsValidMintingRequestProof(Chain.Polygon, mintingRequestProof);
                 Assert.True(isValid);
             }
             catch (System.Exception e)

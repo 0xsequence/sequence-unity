@@ -7,38 +7,41 @@ using Sequence.Wallet;
 
 namespace Sequence.Relayer
 {
-    public class EthAuthenticationProof
+    public class MintingRequestProver
     {
         private IProofSigner _proofSigner;
         private Chain _chain;
         
-        public EthAuthenticationProof(IWallet eoaWallet, Chain chain)
+        public MintingRequestProver(IWallet eoaWallet, Chain chain)
         {
             _chain = chain;
             _proofSigner = new EOAProofSigner(eoaWallet, _chain);
         }
         
-        public EthAuthenticationProof(Sequence.WaaS.IWallet waasWallet, Chain chain)
+        public MintingRequestProver(Sequence.WaaS.IWallet waasWallet, Chain chain)
         {
             _chain = chain;
             _proofSigner = new WaaSProofSigner(waasWallet, _chain);
         }
 
-        public async Task<string> GenerateProof()
+        public async Task<MintingRequestProof> GenerateProof(string contractAddress, string tokenId, uint amount)
         {
             ProofPayload proofPayload = new ProofPayload()
             {
                 app = "Made with Sequence Unity SDK App",
                 iat = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 exp = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 300,
-                v = "1",
-                ogn = "Sequence Unity SDK"
+                ogn = "Sequence Unity SDK",
+                payload = new MintRequestPayload()
+                {
+                    contractAddress = contractAddress,
+                    tokenId = tokenId,
+                    amount = amount
+                }
             };
             string proof = JsonConvert.SerializeObject(proofPayload);
-            string base64Proof = Convert.ToBase64String(proof.ToByteArray());
-            string signedProof = await _proofSigner.SignProof(base64Proof);
-            string ethAuthenticationProof = $"eth.{_proofSigner.SigningAddress()}.{base64Proof}.{signedProof}";
-            return ethAuthenticationProof;
+            string signedProof = await _proofSigner.SignProof(proof);
+            return new MintingRequestProof(proof, signedProof, new Address(_proofSigner.SigningAddress()));
         }
         
         public string GetSigningAddress()
@@ -96,6 +99,20 @@ namespace Sequence.Relayer
             }
         }
     }
+
+    public class MintingRequestProof
+    {
+        public string Proof;
+        public string SignedProof;
+        public Address SigningAddress;
+
+        public MintingRequestProof(string proof, string signedProof, Address signingAddress)
+        {
+            Proof = proof;
+            SignedProof = signedProof;
+            SigningAddress = signingAddress;
+        }
+    }
     
     [Serializable]
     public class ProofPayload
@@ -104,6 +121,14 @@ namespace Sequence.Relayer
         public uint exp;
         public uint iat;
         public string ogn;
-        public string v;
+        public MintRequestPayload payload;
+    }
+
+    [Serializable]
+    public class MintRequestPayload
+    {
+        public string contractAddress;
+        public string tokenId;
+        public uint amount;
     }
 }
