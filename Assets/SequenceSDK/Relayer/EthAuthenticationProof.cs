@@ -101,9 +101,9 @@ namespace Sequence.Relayer
     public class ProofPayload
     {
         public string app;
-        public uint iat;
         public uint exp;
-        public string v;
+        public uint iat;
         public string ogn;
+        public string v;
     }
 }
