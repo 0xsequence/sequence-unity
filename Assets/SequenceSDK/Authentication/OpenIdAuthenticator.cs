@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using Sequence.Config;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Sequence.Authentication
 {
@@ -12,6 +13,7 @@ namespace Sequence.Authentication
     {
         public const string LoginEmail = "LoginEmail";
         public Action<OpenIdAuthenticationResult> SignedIn;
+        public Action<string> OnSignInFailed;
         private string _urlScheme;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
@@ -21,34 +23,65 @@ namespace Sequence.Authentication
         private string FacebookClientId;
         private string AppleClientId;
         
-        private static readonly string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
+        private static string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
         
         private string _stateToken = Guid.NewGuid().ToString();
 
         private string _sessionId; // Session Id is expected to be hex(keccak256(sessionWalletAddress))
+
+        private IBrowser _browser;
 
         public OpenIdAuthenticator(string sessionId)
         {
             SequenceConfig config = SequenceConfig.GetConfig();
 
             _urlScheme = config.UrlScheme;
+            SetClientIds(config);
+            
+            _sessionId = sessionId;
+            
+            _browser = CreateBrowser();
+        }
+
+        private void SetClientIds(SequenceConfig config)
+        {
+#if UNITY_IOS
+            GoogleClientId = config.GoogleClientIdIOS;
+            DiscordClientId = config.DiscordClientIdIOS;
+            FacebookClientId = config.FacebookClientIdIOS;
+            AppleClientId = config.AppleClientIdIOS;
+#elif UNITY_ANDROID
+            GoogleClientId = config.GoogleClientIdAndroid;
+            DiscordClientId = config.DiscordClientIdAndroid;    
+            FacebookClientId = config.FacebookClientIAndroid;
+            AppleClientId = config.AppleClientIdAndroid;
+#else
             GoogleClientId = config.GoogleClientId;
             DiscordClientId = config.DiscordClientId;
             FacebookClientId = config.FacebookClientId;
             AppleClientId = config.AppleClientId;
-            
-            _sessionId = sessionId;
+#endif
+        }
+
+        private IBrowser CreateBrowser()
+        {
+#if UNITY_WEBGL
+            return new WebGLBrowser();
+#elif UNITY_EDITOR
+            return new EditorBrowser();
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            return new StandaloneBrowser();
+#elif UNITY_IOS
+            return IosBrowser.Setup(this);
+#elif UNITY_ANDROID
+            return new StandaloneBrowser();    // Todo switch to AndroidBrowser
+#else
+            throw new NotImplementedException("No social sign in implementation for this platform");
+#endif
         }
 
         public void GoogleSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(GoogleClientId))
@@ -56,23 +89,23 @@ namespace Sequence.Authentication
                     throw SequenceConfig.MissingConfigError("Google Client Id");
                 }
                 string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
-                Application.OpenURL(googleSignInUrl);
+                _browser.Authenticate(googleSignInUrl, ReverseClientId(GoogleClientId));
             }
             catch (Exception e)
             {
-                Debug.LogError($"Google sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Google sign in error: {e.Message}");
             }
+        }
+
+        private string ReverseClientId(string clientId)
+        {
+            string[] parts = clientId.Split('.');
+            Array.Reverse(parts);
+            return string.Join(".", parts);
         }
         
         public void DiscordSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(DiscordClientId))
@@ -81,23 +114,16 @@ namespace Sequence.Authentication
                 }
                 string discordSignInUrl =
                     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
-                Application.OpenURL(discordSignInUrl);
+                _browser.Authenticate(discordSignInUrl);
             }
             catch (Exception e)
             {
-                Debug.LogError($"Discord sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Discord sign in error: {e.Message}");
             }
         }
 
         public void FacebookSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(FacebookClientId))
@@ -106,23 +132,16 @@ namespace Sequence.Authentication
                 }
                 string facebookSignInUrl =
                     GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
-                Application.OpenURL(facebookSignInUrl);
+                _browser.Authenticate(facebookSignInUrl);
             }
             catch (Exception e)
             {
-                Debug.LogError($"Facebook sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Facebook sign in error: {e.Message}");
             }
         }
         
         public void AppleSignIn()
         {
-#if UNITY_EDITOR
-            Debug.LogError("Social sign in is not supported in the editor.");
-            return;
-#elif UNITY_WEBGL
-            Debug.LogError("Social sign in is not supported in WebGL.");
-            return;
-#endif
             try
             {
                 if (string.IsNullOrWhiteSpace(AppleClientId))
@@ -132,11 +151,17 @@ namespace Sequence.Authentication
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
-                Application.OpenURL(appleSignInUrl);
+#if UNITY_IOS
+                GameObject appleSignInObject = Object.Instantiate(new GameObject());
+                SignInWithApple appleSignIn = appleSignInObject.AddComponent<SignInWithApple>();
+                appleSignIn.LoginToApple(this, _sessionId, _stateToken);
+#else
+                _browser.Authenticate(appleSignInUrl);
+#endif
             }
             catch (Exception e)
             {
-                Debug.LogError($"Apple sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Apple sign in error: {e.Message}");
             }
         }
 
@@ -151,6 +176,10 @@ namespace Sequence.Authentication
             {
                 throw SequenceConfig.MissingConfigError("Url Scheme");
             }
+            
+#if UNITY_IOS
+            RedirectUrl = $"{ReverseClientId(clientId)}://";
+#endif
             
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}/";
@@ -267,24 +296,24 @@ namespace Sequence.Authentication
             LoginMethod method = LoginMethod.None;
             link = link.RemoveTrailingSlash();
             
-            Dictionary<string, string> queryParams = link.ExtractQueryParameters();
+            Dictionary<string, string> queryParams = link.ExtractQueryAndHashParameters();
             if (queryParams == null)
             {
-                Debug.LogError($"Unexpected deep link: {link}");
+                OnSignInFailed?.Invoke($"Unexpected deep link: {link}");
                 return;
             }
             if (queryParams.TryGetValue("state", out string state))
             {
                 if (!state.Contains(_stateToken))
                 {
-                    Debug.LogError("State token mismatch");
+                    OnSignInFailed?.Invoke("State token mismatch");
                     return;
                 }
                 method = GetMethodFromState(state);
             }
             else
             {
-                Debug.LogError("State token missing");
+                OnSignInFailed?.Invoke("State token missing");
                 return;
             }
             
@@ -294,7 +323,7 @@ namespace Sequence.Authentication
             }
             else
             {
-                Debug.LogError($"Unexpected deep link: {link}");
+                OnSignInFailed?.Invoke($"Unexpected deep link: {link}");
             }
         }
 

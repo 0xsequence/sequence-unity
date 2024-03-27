@@ -7,13 +7,25 @@ namespace Sequence.Config
     [CreateAssetMenu(fileName = "SequenceConfig", menuName = "Sequence/SequenceConfig", order = 1)]
     public class SequenceConfig : ScriptableObject
     {
-        [Header("Social Sign In Configuration")]
+        [Header("Social Sign In Configuration - Standalone Platforms")]
         public string UrlScheme;
         public string GoogleClientId;
         public string DiscordClientId;
         public string FacebookClientId;
         public string AppleClientId;
         
+        [Header("Social Sign In Configuration - iOS")]
+        public string GoogleClientIdIOS;
+        public string DiscordClientIdIOS;
+        public string FacebookClientIdIOS;
+        public string AppleClientIdIOS;
+        
+        [Header("Social Sign In Configuration - Android")]
+        public string GoogleClientIdAndroid;
+        public string DiscordClientIdAndroid;
+        public string FacebookClientIAndroid;
+        public string AppleClientIdAndroid;
+
         [Header("WaaS Configuration")]
         public string WaaSVersion = "1.0.0";
         public string WaaSConfigKey;
