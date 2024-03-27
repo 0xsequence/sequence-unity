@@ -62,14 +62,33 @@ namespace Sequence.WaaS
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
         public event Action<FailedTransactionReturn> OnSendTransactionFailed;
 
-        public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
+        public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, bool waitForReceipt = true, uint timeBeforeExpiry = 30)
         {
             IntentDataSendTransaction args = new IntentDataSendTransaction(_address, network, transactions);
             try
             {
                 var result = await _intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(args, IntentType.SendTransaction, timeBeforeExpiry);
-                if (result is SuccessfulTransactionReturn)
+                if (result is SuccessfulTransactionReturn successfulTransactionReturn)
                 {
+                    if (waitForReceipt)
+                    {
+                        while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
+                        {
+                            try
+                            {
+                                successfulTransactionReturn = await _intentSender.GetTransactionReceipt(successfulTransactionReturn);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                                OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
+                                return result;
+                            }
+                        }
+
+                        OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
+                        return successfulTransactionReturn;
+                    }
                     OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
                 }
                 else
@@ -188,6 +207,24 @@ namespace Sequence.WaaS
             WaaSSession[] results = await _intentSender.ListSessions();
             OnSessionsFound?.Invoke(results);
             return results;
+        }
+
+        public async Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
+        {
+            while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
+            {
+                try
+                {
+                    successfulTransactionReturn = await _intentSender.GetTransactionReceipt(successfulTransactionReturn);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                    return successfulTransactionReturn;
+                }
+            }
+
+            return successfulTransactionReturn;
         }
     }
 }

@@ -10,5 +10,6 @@ namespace Sequence.WaaS
         public Task<bool> DropSession(string dropSessionId);
         public Task<T> PostIntent<T>(string payload, string path);
         public Task<WaaSSession[]> ListSessions();
+        public Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn response);
     }
 }
