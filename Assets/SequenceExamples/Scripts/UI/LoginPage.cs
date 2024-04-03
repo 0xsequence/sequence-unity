@@ -52,12 +52,14 @@ namespace Sequence.Demo
             base.Close();
             _errorText.text = "";
             LoginHandler.OnMFAEmailFailedToSend -= OnMFAEmailFailedToSendHandler;
+            LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
         }
 
         public void SetupLogin(ILogin loginHandler)
         {
             LoginHandler = loginHandler;
             LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
+            LoginHandler.OnLoginFailed += OnLoginFailedHandler;
         }
 
         public void Login()
@@ -140,6 +142,12 @@ namespace Sequence.Demo
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.LogError($"Failed to send MFA email to {email} with error: {error}");
+            _errorText.text = error;
+        }
+        
+        private void OnLoginFailedHandler(string error)
+        {
+            Debug.LogError($"Failed to sign in to WaaS API with error: {error}");
             _errorText.text = error;
         }
         

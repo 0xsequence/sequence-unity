@@ -64,6 +64,7 @@ namespace Sequence.WaaS
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
+            _authenticator.OnSignInFailed += OnSocialSignInFailed;
 
             if (validator == null)
             {
@@ -206,6 +207,11 @@ namespace Sequence.WaaS
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
             ConnectToWaaS(result.IdToken, result.Method);
+        }
+
+        private void OnSocialSignInFailed(string error)
+        {
+            OnLoginFailed?.Invoke("Connecting to WaaS API failed due to error with social sign in: " + error);
         }
 
         public async Task ConnectToWaaS(string idToken, LoginMethod method)

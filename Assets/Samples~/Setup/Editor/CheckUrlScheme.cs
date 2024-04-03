@@ -45,7 +45,7 @@ namespace Sequence.Editor
         
         private static void CheckPlistUrlScheme()
         {
-#if UNITY_IOS || UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX
             PlistDocument plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
 
