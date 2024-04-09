@@ -24,9 +24,44 @@ namespace Sequence.Utils
             return s;
         }
 
-        public static Dictionary<string, string> ExtractQueryParameters(this string url)
+        public static Dictionary<string, string> ExtractQueryAndHashParameters(this string url)
         {
-            string[] urlSegments = url.Split('?');
+            Dictionary<string, string> queryParameters = url.ExtractQueryParameters();
+            Dictionary<string, string> hashParameters = url.ExtractHashParameters();
+            if (queryParameters == null)
+            {
+                return hashParameters;
+            }
+            if (hashParameters == null)
+            {
+                return queryParameters;
+            }
+            foreach (KeyValuePair<string, string> hashParameter in hashParameters)
+            {
+                if (queryParameters.ContainsKey(hashParameter.Key))
+                {
+                    queryParameters[hashParameter.Key] = hashParameter.Value;
+                    continue;
+                }
+                queryParameters.Add(hashParameter.Key, hashParameter.Value);
+            }
+
+            return queryParameters;
+        }
+
+        private static Dictionary<string, string> ExtractQueryParameters(this string url)
+        {
+            return url.ExtractParameters('?');
+        }
+
+        private static Dictionary<string, string> ExtractHashParameters(this string url)
+        {
+            return url.ExtractParameters('#');
+        }
+
+        private static Dictionary<string, string> ExtractParameters(this string url, char separator)
+        {
+            string[] urlSegments = url.Split(separator);
             if (urlSegments.Length != 2)
             {
                 return null;
