@@ -12,7 +12,7 @@ public static class SequenceBridge
     public static IIndexer Indexer = new ChainIndexer(Network);
     public const string GameStateContractAddress = "0x64d9f9d527abe2a1c1ce3fada98601c4ac5bfdd2";
     public const string Level0TokenId = "123456"; // This is a placeholder token ID. For each level, the token ID is $"123456{n}" where n is the level number. The amount of each token ID you have is the number of stars you earned for that level.
-    public static CloudflareMinter Minter;
+    public static PermissionedMinter Minter;
     
     public static void OnTransactionFailedHandler(FailedTransactionReturn result)
     {

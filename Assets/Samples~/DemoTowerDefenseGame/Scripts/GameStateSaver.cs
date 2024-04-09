@@ -15,9 +15,9 @@ public class GameStateSaver
     private GameStateLoader _loader;
     private Address _walletAddress;
     private ERC1155 _gameStateContract;
-    private CloudflareMinter _minter;
+    private PermissionedMinter _minter;
 
-    public GameStateSaver(IWallet wallet = null, CloudflareMinter minter = null)
+    public GameStateSaver(IWallet wallet = null, PermissionedMinter minter = null)
     {
         _wallet = wallet;
         if (_wallet == null)

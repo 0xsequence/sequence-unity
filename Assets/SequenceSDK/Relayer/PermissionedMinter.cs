@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 
 namespace Sequence.Relayer
 {
-    public class CloudflareMinter
+    public class PermissionedMinter
     {
         private string _mintEndpoint;
         
@@ -20,7 +20,7 @@ namespace Sequence.Relayer
 
         private Address _contractAddress;
         
-        public CloudflareMinter(MintingRequestProver mintingRequestProver, string mintEndpoint, string contractAddress)
+        public PermissionedMinter(MintingRequestProver mintingRequestProver, string mintEndpoint, string contractAddress)
         {
             _mintingRequestProver = mintingRequestProver;
             _mintEndpoint = mintEndpoint.AppendTrailingSlashIfNeeded();
