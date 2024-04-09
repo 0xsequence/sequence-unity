@@ -112,6 +112,13 @@ namespace Sequence.Relayer
             SignedProof = signedProof;
             SigningAddress = signingAddress;
         }
+
+        public MintingRequestProof(MintTokenRequest request)
+        {
+            Proof = request.proof;
+            SignedProof = request.signedProof;
+            SigningAddress = new Address(request.address);
+        }
     }
     
     [Serializable]
