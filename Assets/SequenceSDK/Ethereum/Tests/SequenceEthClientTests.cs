@@ -134,20 +134,6 @@ public class SequenceEthClientTests
     public async Task TestChainId(Chain chain)
     {
         if (chain == Chain.None) return;
-        if (chain == Chain.TestnetGoerli)
-        {
-            // These chains are not supported by node gateway according to the builder
-            try
-            {
-                var client = new SequenceEthClient(chain);
-                Assert.Fail("Expected exception but none was thrown");
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex.Message.Contains("not supported"));
-                return;
-            }
-        }
         try
         {
             var client = new SequenceEthClient(chain);
