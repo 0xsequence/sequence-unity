@@ -12,6 +12,7 @@ namespace Sequence.Demo
         
         protected Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
         protected UIPage _page;
+        private bool _isOpen = false;
         
         protected struct PageWithArgs
         {
@@ -44,12 +45,14 @@ namespace Sequence.Demo
             _gameObject.SetActive(true);
             _animator.AnimateIn( _openAnimationDurationInSeconds);
             StartCoroutine(OpenInitialPage(args));
+            _isOpen = true;
         }
 
         public override void Close()
         {
             base.Close();
             ClearStack();
+            _isOpen = false;
         }
 
         public virtual IEnumerator OpenInitialPage(params object[] openArgs)
@@ -111,7 +114,21 @@ namespace Sequence.Demo
         public void ClearStack()
         {
             _pageStack = new Stack<PageWithArgs>();
+            if (_page != null)
+            {
+                _page.Close();
+            }
             _page = null;
+        }
+
+        public float GetCloseAnimationDuration()
+        {
+            return _closeAnimationDurationInSeconds;
+        }
+
+        public bool IsOpen()
+        {
+            return _isOpen;
         }
     }
 }
