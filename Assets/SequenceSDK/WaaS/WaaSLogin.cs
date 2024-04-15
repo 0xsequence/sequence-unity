@@ -31,6 +31,8 @@ namespace Sequence.WaaS
         private EthWallet _sessionWallet;
         private string _sessionId;
 
+        private bool _isLoggingIn = false;
+
         public WaaSLogin(IValidator validator = null)
         {
             SequenceConfig config = SequenceConfig.GetConfig();
@@ -204,6 +206,11 @@ namespace Sequence.WaaS
             _authenticator.AppleSignIn();
         }
 
+        public bool IsLoggingIn()
+        {
+            return _isLoggingIn;
+        }
+
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
             ConnectToWaaS(result.IdToken, result.Method);
@@ -216,7 +223,7 @@ namespace Sequence.WaaS
 
         public async Task ConnectToWaaS(string idToken, LoginMethod method)
         {
-
+            _isLoggingIn = true;
             IntentSender sender = new IntentSender(
                 new HttpClient(WaaSWithAuthUrl),
                 _sessionWallet,
@@ -237,10 +244,12 @@ namespace Sequence.WaaS
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
+                _isLoggingIn = false;
             }
             catch (Exception e)
             {
                 OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message);
+                _isLoggingIn = false;
                 return;
             }
         }
