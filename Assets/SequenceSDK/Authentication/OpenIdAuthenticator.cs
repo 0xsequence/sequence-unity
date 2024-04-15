@@ -24,7 +24,7 @@ namespace Sequence.Authentication
         private string AppleClientId;
         
         private static string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
-        
+
         private string _stateToken = Guid.NewGuid().ToString();
 
         private string _sessionId; // Session Id is expected to be hex(keccak256(sessionWalletAddress))
@@ -180,6 +180,8 @@ namespace Sequence.Authentication
 #if UNITY_IOS
             RedirectUrl = $"{ReverseClientId(clientId)}://";
 #endif
+            
+            _stateToken = Guid.NewGuid().ToString();
             
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}/";
