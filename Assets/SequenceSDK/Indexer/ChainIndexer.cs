@@ -14,7 +14,7 @@ namespace Sequence
         
         public ChainIndexer(Chain chain)
         {
-            this._chainId = (int)chain;
+            this._chainId = BigInteger.Parse(chain.GetChainId());
         }
         
         public Task<bool> Ping()

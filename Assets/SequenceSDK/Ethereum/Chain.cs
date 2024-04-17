@@ -30,8 +30,8 @@ namespace Sequence
         TestnetOptimisticSepolia = 11155420,
         TestnetAstarZKyoto = 6038361,
         TestnetXrSepolia = 2730,
-        // Todo find a way to add Xai Sepolia - issue is that the network id is too large to fit inside an int so I can't just use the enum index
-        // TestnetXaiSepolia = 37714555429, 
+        
+        TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
         // Null
         None = 0
