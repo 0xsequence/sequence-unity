@@ -42,7 +42,14 @@ namespace Sequence.Provider
                 throw new Exception(
                     "Network is not supported. Please contact Sequence support and use your own RPC url in the meantime");
             }
-            string url = _baseUrl + _pathAt[chain] + "/" + "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"; // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
+
+            string builderApiKey = _config.BuilderAPIKey;
+            if (string.IsNullOrWhiteSpace(builderApiKey))
+            {
+                throw SequenceConfig.MissingConfigError("Builder API Key");
+            }
+            
+            string url = _baseUrl + _pathAt[chain] + "/" + builderApiKey; 
             return url;
         }
     }
