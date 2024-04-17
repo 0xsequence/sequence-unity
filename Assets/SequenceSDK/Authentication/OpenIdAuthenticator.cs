@@ -30,6 +30,8 @@ namespace Sequence.Authentication
         private string _sessionId; // Session Id is expected to be hex(keccak256(sessionWalletAddress))
 
         private IBrowser _browser;
+        
+        private static bool _windowsSetup = false;
 
         public OpenIdAuthenticator(string sessionId)
         {
@@ -196,6 +198,11 @@ namespace Sequence.Authentication
         public void PlatformSpecificSetup()
         {
 #if UNITY_STANDALONE_WIN
+            if (_windowsSetup)
+            {
+                return;
+            }
+
             // Register a Windows URL protocol handler in the Windows Registry.
             var appPath = Path.GetFullPath(Application.dataPath.Replace("_Data", ".exe"));
             string[] commands = new string[]{
@@ -290,6 +297,7 @@ namespace Sequence.Authentication
             });
             ipcListener.IsBackground = true;
             ipcListener.Start();
+            _windowsSetup = true;
         }
 #endif
 
