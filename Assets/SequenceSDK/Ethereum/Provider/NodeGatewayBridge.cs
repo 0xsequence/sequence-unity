@@ -34,6 +34,8 @@ namespace Sequence.Provider
             { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
             { Chain.TestnetPolygonAmoy, "amoy" }, 
             { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
+            { Chain.TestnetXrSepolia, "xr-sepolia-testnet" },
+            { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
         };
         
         private const string _baseUrl = "https://nodes.sequence.app/";

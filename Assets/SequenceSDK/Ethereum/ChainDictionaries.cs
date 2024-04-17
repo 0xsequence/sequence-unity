@@ -93,6 +93,8 @@ namespace Sequence
         
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
         {
+            { Chain.None, ""},
+            
             { Chain.Ethereum, "1" },
             { Chain.Polygon, "137" },
             { Chain.PolygonZkEvm, "1101" },
@@ -117,7 +119,7 @@ namespace Sequence
             { Chain.TestnetOptimisticSepolia, "11155420" },
             { Chain.TestnetAstarZKyoto, "6038361" },
             { Chain.TestnetXrSepolia, "2730" },
-            { Chain.TestnetXaiSepolia, "-1" }
+            { Chain.TestnetXaiSepolia, "37714555429" }
         };
         
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -146,7 +148,7 @@ namespace Sequence
             { "11155420", Chain.TestnetOptimisticSepolia },
             { "6038361", Chain.TestnetAstarZKyoto },
             { "2730", Chain.TestnetXrSepolia },
-            { "-1", Chain.TestnetXaiSepolia }
+            { "37714555429", Chain.TestnetXaiSepolia }
         };
     }
 }
