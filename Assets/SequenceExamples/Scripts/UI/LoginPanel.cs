@@ -78,7 +78,7 @@ namespace Sequence.Demo
             StartCoroutine(SetUIPage(_mfaPage, email));
         }
         
-        // On Windows standalone, deep link will open a second instance of tghe game.
+        // On Windows standalone, deep link will open a second instance of the game.
         // We need to catch this, and send our deep link URL to the already-running instance (through a TCP server)
 #if UNITY_STANDALONE_WIN
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

@@ -57,9 +57,12 @@ namespace Sequence.Demo
 
         public virtual IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            ClearStack();
-            yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
-            yield return StartCoroutine(SetUIPage(InitialPage, openArgs));
+            if (InitialPage != null)
+            {
+                ClearStack();
+                yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
+                yield return StartCoroutine(SetUIPage(InitialPage, openArgs));
+            }
         }
         
         public virtual void OpenWithDelay(float delayInSeconds, params object[] args)
