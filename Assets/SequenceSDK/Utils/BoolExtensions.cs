@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sequence.Extensions
+namespace Sequence.Utils
 {
     public static class BoolExtensions
     {

@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using Sequence.Extensions;
+using Sequence.Utils;
 
 public class UInt16ExtensionsTests
 {

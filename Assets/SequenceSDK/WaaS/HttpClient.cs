@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Provider;
+using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 

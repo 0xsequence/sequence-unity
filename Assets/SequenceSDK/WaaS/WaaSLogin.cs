@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Config;
-using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using Sequence.Wallet;

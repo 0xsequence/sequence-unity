@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Sequence.Authentication
+namespace Sequence.Utils
 {
     public static class UrlExtensions
     {

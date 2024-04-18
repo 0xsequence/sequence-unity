@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Sequence.Extensions;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.RLP

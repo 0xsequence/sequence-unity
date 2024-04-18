@@ -204,18 +204,7 @@ namespace Sequence.ABI
         /// <returns>The hexadecimal string.</returns>
         public static string ByteArrayToHexString(byte[] ba)
         {
-            try
-            {
-                StringBuilder hex = new StringBuilder(ba.Length * 2);
-                foreach (byte b in ba)
-                    hex.AppendFormat("{0:x2}", b);
-                return hex.ToString();
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
-                return string.Empty;
-            }
+            return ba.ByteArrayToHexString();
         }
 
         public static string HexStringToHumanReadable(string hexString)

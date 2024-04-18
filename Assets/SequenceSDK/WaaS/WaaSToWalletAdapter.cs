@@ -6,7 +6,6 @@ using Sequence.Provider;
 using Sequence.WaaS;
 using System;
 using Sequence.ABI;
-using Sequence.Extensions;
 using Sequence.Transactions;
 using Sequence.Utils;
 using SequenceSDK.WaaS;

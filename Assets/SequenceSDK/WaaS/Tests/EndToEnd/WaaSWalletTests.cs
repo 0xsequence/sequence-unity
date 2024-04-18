@@ -3,10 +3,8 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Contracts;
-using Sequence.Extensions;
 using Sequence.Provider;
 using Sequence.Wallet;
-using Sequence.Utils;
 using SequenceSDK.WaaS;
 using UnityEngine;
 

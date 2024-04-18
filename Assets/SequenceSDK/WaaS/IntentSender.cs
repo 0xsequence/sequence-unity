@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.ABI;
 using Sequence.Authentication;
-using Sequence.Extensions;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using SequenceSDK.WaaS;

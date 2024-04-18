@@ -4,6 +4,7 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using Sequence.Config;
+using Sequence.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

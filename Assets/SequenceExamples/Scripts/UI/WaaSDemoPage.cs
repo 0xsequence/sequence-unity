@@ -8,7 +8,7 @@ using Sequence.Transactions;
 using Sequence.Utils;
 using Sequence.WaaS;
 using Sequence.WaaS.Authentication;
-using SequenceSDK.Ethereum.Utils;
+using Sequence.Utils;
 using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;

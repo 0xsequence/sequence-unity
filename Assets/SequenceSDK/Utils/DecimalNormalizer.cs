@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using UnityEngine;
 
-namespace SequenceSDK.Ethereum.Utils
+namespace Sequence.Utils
 {
     public static class DecimalNormalizer
     {

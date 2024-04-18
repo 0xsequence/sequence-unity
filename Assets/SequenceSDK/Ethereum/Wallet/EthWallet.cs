@@ -10,9 +10,8 @@ using System.Text;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.Extensions;
-using Sequence.Transactions;
 using Sequence.Utils;
+using Sequence.Transactions;
 using UnityEngine;
 
 namespace Sequence.Wallet
@@ -178,7 +177,7 @@ namespace Sequence.Wallet
             byte[] chainIdBytes = null;
             if (chainId != null)
             {
-                chainIdBytes = Encoding.UTF8.GetBytes(chainId);
+                chainIdBytes = chainId.HexStringToByteArray();
             }
             return SignMessage(messageBytes, chainIdBytes);
         }
@@ -224,7 +223,7 @@ namespace Sequence.Wallet
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             if (chain != Chain.None)
             {
-                messageBytes = ByteArrayExtensions.ConcatenateByteArrays(messageBytes, Encoding.UTF8.GetBytes(chain.AsHexString()));
+                messageBytes = ByteArrayExtensions.ConcatenateByteArrays(messageBytes, chain.AsHexString().HexStringToByteArray());
             }
             byte[] messagePrefix = PrefixedMessage(messageBytes);
             byte[] hashedMessage = SequenceCoder.KeccakHash(messagePrefix);
