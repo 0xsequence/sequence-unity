@@ -85,7 +85,7 @@ namespace Sequence
         { BigInteger.Parse(Chain.TestnetOptimisticSepolia.GetChainId()), "optimism-sepolia" },
         { BigInteger.Parse(Chain.TestnetPolygonAmoy.GetChainId()), "amoy" }, 
         { BigInteger.Parse(Chain.TestnetAstarZKyoto.GetChainId()), "astar-zkyoto" }, 
-        { BigInteger.Parse(Chain.TestnetXrSepolia.GetChainId()), "xr-sepolia-testnet" },
+        { BigInteger.Parse(Chain.TestnetXrSepolia.GetChainId()), "xr-sepolia" },
         { BigInteger.Parse(Chain.TestnetXaiSepolia.GetChainId()), "xai-sepolia" }, 
     };
 

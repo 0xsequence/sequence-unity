@@ -34,7 +34,7 @@ namespace Sequence.Provider
             { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
             { Chain.TestnetPolygonAmoy, "amoy" }, 
             { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
-            { Chain.TestnetXrSepolia, "xr-sepolia-testnet" },
+            { Chain.TestnetXrSepolia, "xr-sepolia" },
             { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
         };
         
