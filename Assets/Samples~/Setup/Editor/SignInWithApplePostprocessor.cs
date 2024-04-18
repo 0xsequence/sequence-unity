@@ -1,9 +1,9 @@
 #if UNITY_IOS
 using AppleAuth.Editor;
+using UnityEditor.iOS.Xcode;
 #endif
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.iOS.Xcode;
 
 namespace Sequence.Editor
 {

@@ -69,5 +69,10 @@ namespace Sequence.Authentication
         {
             OnLoginSuccess?.Invoke("1234567890", "0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
         }
+
+        public bool IsLoggingIn()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

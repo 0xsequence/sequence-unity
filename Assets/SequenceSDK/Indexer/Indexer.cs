@@ -62,21 +62,31 @@ namespace Sequence
         private static readonly Dictionary<BigInteger, string> IndexerNames
         = new Dictionary<BigInteger, string>
     {
-        { (int)Chain.Ethereum, "mainnet" },
-        { (int)Chain.Polygon, "polygon" },
-        { (int)Chain.PolygonZkEvm, "polygon-zkevm" },
-        { (int)Chain.BNBSmartChain, "bsc" },
-        { (int)Chain.ArbitrumOne, "arbitrum" },
-        { (int)Chain.ArbitrumNova, "arbitrum-nova" },
-        { (int)Chain.Optimism, "optimism" },
-        { (int)Chain.Avalanche, "avalanche" },
-        { (int)Chain.Gnosis, "gnosis" },
-        { (int)Chain.Base, "base"},
+        { BigInteger.Parse(Chain.Ethereum.GetChainId()), "mainnet" },
+        { BigInteger.Parse(Chain.Polygon.GetChainId()), "polygon" },
+        { BigInteger.Parse(Chain.PolygonZkEvm.GetChainId()), "polygon-zkevm" },
+        { BigInteger.Parse(Chain.BNBSmartChain.GetChainId()), "bsc" },
+        { BigInteger.Parse(Chain.ArbitrumOne.GetChainId()), "arbitrum" },
+        { BigInteger.Parse(Chain.ArbitrumNova.GetChainId()), "arbitrum-nova" },
+        { BigInteger.Parse(Chain.Optimism.GetChainId()), "optimism" },
+        { BigInteger.Parse(Chain.Avalanche.GetChainId()), "avalanche" },
+        { BigInteger.Parse(Chain.Gnosis.GetChainId()), "gnosis" },
+        { BigInteger.Parse(Chain.Base.GetChainId()), "base" },
+        { BigInteger.Parse(Chain.OasysHomeverse.GetChainId()), "homeverse" },
+        { BigInteger.Parse(Chain.AstarZKEvm.GetChainId()), "astar-zkevm" },
+        { BigInteger.Parse(Chain.Xai.GetChainId()), "xai" },
 
-        { (int)Chain.TestnetGoerli, "goerli" },
-        { (int)Chain.TestnetSepolia, "sepolia" },
-        { (int)Chain.TestnetPolygonMumbai, "mumbai" },
-        { (int)Chain.TestnetBNBSmartChain, "bsc-testnet" },
+        { BigInteger.Parse(Chain.TestnetSepolia.GetChainId()), "sepolia" },
+        { BigInteger.Parse(Chain.TestnetArbitrumSepolia.GetChainId()), "arbitrum-sepolia" },
+        { BigInteger.Parse(Chain.TestnetBNBSmartChain.GetChainId()), "bsc-testnet" },
+        { BigInteger.Parse(Chain.TestnetBaseSepolia.GetChainId()), "base-sepolia" },
+        { BigInteger.Parse(Chain.TestnetOasysHomeverse.GetChainId()), "homeverse-testnet" },
+        { BigInteger.Parse(Chain.TestnetAvalanche.GetChainId()), "avalanche-testnet" },
+        { BigInteger.Parse(Chain.TestnetOptimisticSepolia.GetChainId()), "optimism-sepolia" },
+        { BigInteger.Parse(Chain.TestnetPolygonAmoy.GetChainId()), "amoy" }, 
+        { BigInteger.Parse(Chain.TestnetAstarZKyoto.GetChainId()), "astar-zkyoto" }, 
+        { BigInteger.Parse(Chain.TestnetXrSepolia.GetChainId()), "xr-sepolia" },
+        { BigInteger.Parse(Chain.TestnetXaiSepolia.GetChainId()), "xai-sepolia" }, 
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
@@ -243,7 +253,7 @@ namespace Sequence
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
-            req.SetRequestHeader("X-Access-Key", "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"); // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
+            req.SetRequestHeader("X-Access-Key", _builderApiKey); 
             req.method = UnityWebRequest.kHttpVerbPOST;
             req.timeout = 10; // Request will timeout after 10 seconds
                 

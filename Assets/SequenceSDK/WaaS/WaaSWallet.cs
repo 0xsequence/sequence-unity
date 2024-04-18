@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Authentication;
+using Sequence.Config;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
@@ -19,6 +20,7 @@ namespace Sequence.WaaS
         private HttpClient _httpClient;
         private IIntentSender _intentSender;
         private const string _sequenceCreatedContractEvent = "CreatedContract(address)";
+        private string _builderApiKey;
 
         public WaaSWallet(Address address, string sessionId, IIntentSender intentSender)
         {
@@ -26,6 +28,7 @@ namespace Sequence.WaaS
             _httpClient = new HttpClient("https://api.sequence.app/rpc");
             _intentSender = intentSender;
             SessionId = sessionId;
+            _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
         }
 
         public Address GetWalletAddress()
@@ -54,9 +57,14 @@ namespace Sequence.WaaS
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature)
         {
+            if (string.IsNullOrWhiteSpace(_builderApiKey))
+            {
+                throw SequenceConfig.MissingConfigError("Builder API Key");
+            }
+            
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
-            new Dictionary<string, string>() {{"X-Access-Key", "YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA"}}); // Todo: temporary access key while we wait for prod env deployment. Currently, we are using the staging env and we don't have a staging env for indexer that we can hit publicly
+            new Dictionary<string, string>() {{"X-Access-Key", _builderApiKey}}); 
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;

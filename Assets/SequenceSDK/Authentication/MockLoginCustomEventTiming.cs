@@ -58,5 +58,10 @@ namespace Sequence.Authentication
         {
             
         }
+
+        public bool IsLoggingIn()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
