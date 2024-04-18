@@ -10,7 +10,7 @@ namespace Sequence.WaaS
 
         public IsValidMessageSignatureArgs(Chain chain, string walletAddress, string message, string signature)
         {
-            this.chainId = ((int)chain).ToString();
+            this.chainId = chain.GetChainId();
             this.walletAddress = walletAddress;
             this.message = message;
             this.signature = signature;

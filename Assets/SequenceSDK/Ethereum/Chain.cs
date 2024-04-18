@@ -16,17 +16,22 @@ namespace Sequence
         Gnosis = 100,
         Base = 8453,
         OasysHomeverse = 19011,
+        AstarZKEvm = 3776,
+        Xai = 660279,
         
         // Testnets
-        TestnetGoerli = 5,
         TestnetSepolia = 11155111,
-        TestnetPolygonMumbai = 80001,
+        TestnetPolygonAmoy = 80002,
         TestnetArbitrumSepolia = 421614,
         TestnetBNBSmartChain = 97,
         TestnetBaseSepolia = 84532,
         TestnetAvalanche = 43113,
         TestnetOasysHomeverse = 40875,
         TestnetOptimisticSepolia = 11155420,
+        TestnetAstarZKyoto = 6038361,
+        TestnetXrSepolia = 2730,
+        
+        TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
         // Null
         None = 0
