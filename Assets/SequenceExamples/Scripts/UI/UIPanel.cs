@@ -12,6 +12,7 @@ namespace Sequence.Demo
         
         protected Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
         protected UIPage _page;
+        private bool _isOpen = false;
         
         protected struct PageWithArgs
         {
@@ -44,19 +45,24 @@ namespace Sequence.Demo
             _gameObject.SetActive(true);
             _animator.AnimateIn( _openAnimationDurationInSeconds);
             StartCoroutine(OpenInitialPage(args));
+            _isOpen = true;
         }
 
         public override void Close()
         {
             base.Close();
             ClearStack();
+            _isOpen = false;
         }
 
         public virtual IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            ClearStack();
-            yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
-            yield return StartCoroutine(SetUIPage(InitialPage, openArgs));
+            if (InitialPage != null)
+            {
+                ClearStack();
+                yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
+                yield return StartCoroutine(SetUIPage(InitialPage, openArgs));
+            }
         }
         
         public virtual void OpenWithDelay(float delayInSeconds, params object[] args)
@@ -111,7 +117,21 @@ namespace Sequence.Demo
         public void ClearStack()
         {
             _pageStack = new Stack<PageWithArgs>();
+            if (_page != null)
+            {
+                _page.Close();
+            }
             _page = null;
+        }
+
+        public float GetCloseAnimationDuration()
+        {
+            return _closeAnimationDurationInSeconds;
+        }
+
+        public bool IsOpen()
+        {
+            return _isOpen;
         }
     }
 }

@@ -67,5 +67,7 @@ namespace Sequence.Authentication
         /// Social login may also emit relevant events
         /// </summary>
         public void AppleLogin();
+
+        public bool IsLoggingIn();
     }
 }
