@@ -12,8 +12,14 @@ namespace Sequence.Authenticator.Tests
         {
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app";
+            bool signInFailedEventReceived = false;
+            authenticator.OnSignInFailed += s =>
+            {
+                signInFailedEventReceived = true;
+                Assert.AreEqual("Unexpected deep link: https://sequence.app", s);
+            };
             authenticator.HandleDeepLink(url);
-            LogAssert.Expect(LogType.Error, "Unexpected deep link: https://sequence.app");
+            Assert.IsTrue(signInFailedEventReceived);
         }
         
         [Test]
@@ -21,8 +27,14 @@ namespace Sequence.Authenticator.Tests
         {
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?code=123456";
+            bool signInFailedEventReceived = false;
+            authenticator.OnSignInFailed += s =>
+            {
+                signInFailedEventReceived = true;
+                Assert.AreEqual("State token missing", s);
+            };
             authenticator.HandleDeepLink(url);
-            LogAssert.Expect(LogType.Error, "State token missing");
+            Assert.IsTrue(signInFailedEventReceived);
         }
 
         [Test]
@@ -30,8 +42,14 @@ namespace Sequence.Authenticator.Tests
         {
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?code=123456&state=123456";
+            bool signInFailedEventReceived = false;
+            authenticator.OnSignInFailed += s =>
+            {
+                signInFailedEventReceived = true;
+                Assert.AreEqual("State token mismatch", s);
+            };
             authenticator.HandleDeepLink(url);
-            LogAssert.Expect(LogType.Error, "State token mismatch");
+            Assert.IsTrue(signInFailedEventReceived);
         }
         
         [Test]
@@ -40,8 +58,14 @@ namespace Sequence.Authenticator.Tests
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?state=123456";
             authenticator.InjectStateTokenForTesting("123456");
+            bool signInFailedEventReceived = false;
+            authenticator.OnSignInFailed += s =>
+            {
+                signInFailedEventReceived = true;
+                Assert.AreEqual("Unexpected deep link: https://sequence.app?state=123456", s);
+            };
             authenticator.HandleDeepLink(url);
-            LogAssert.Expect(LogType.Error, "Unexpected deep link: https://sequence.app?state=123456");
+            Assert.IsTrue(signInFailedEventReceived);
         }
 
         [Test]
