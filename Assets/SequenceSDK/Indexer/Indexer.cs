@@ -72,11 +72,17 @@ namespace Sequence
         { (int)Chain.Avalanche, "avalanche" },
         { (int)Chain.Gnosis, "gnosis" },
         { (int)Chain.Base, "base"},
+        { (int)Chain.OasysHomeverse, "homeverse"},
 
         { (int)Chain.TestnetGoerli, "goerli" },
         { (int)Chain.TestnetSepolia, "sepolia" },
         { (int)Chain.TestnetPolygonMumbai, "mumbai" },
+        { (int)Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
         { (int)Chain.TestnetBNBSmartChain, "bsc-testnet" },
+        { (int)Chain.TestnetBaseSepolia, "base-sepolia" },
+        { (int)Chain.TestnetAvalanche, "avalanche-testnet" },
+        { (int)Chain.TestnetOasysHomeverse, "homeverse-testnet" },
+        { (int)Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
