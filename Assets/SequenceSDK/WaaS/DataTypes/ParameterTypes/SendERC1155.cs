@@ -5,7 +5,7 @@ using SequenceSDK.WaaS;
 namespace Sequence.WaaS
 {
     [Serializable]
-    public class SendERC1155 : SequenceSDK.WaaS.Transaction
+    public class SendERC1155 : Sequence.WaaS.Transaction
     {
         public const string TypeIdentifier = "erc1155send";
         public string data { get; private set; }

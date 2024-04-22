@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace SequenceSDK.WaaS
 {
     [System.Serializable]
-    public class SendERC20 : SequenceSDK.WaaS.Transaction
+    public class SendERC20 : Sequence.WaaS.Transaction
     {
         public const string TypeIdentifier = "erc20send";
         public string to { get; private set; }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SequenceSDK.WaaS
 {
     [Serializable]
-    public class SendERC721 : SequenceSDK.WaaS.Transaction
+    public class SendERC721 : Sequence.WaaS.Transaction
     {
         public const string TypeIdentifier = "erc721send";
         public string data { get; private set; }

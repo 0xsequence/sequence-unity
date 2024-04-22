@@ -1,4 +1,4 @@
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     [System.Serializable]
     public abstract class Transaction

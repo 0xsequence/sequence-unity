@@ -16,14 +16,14 @@ namespace Sequence.WaaS
 
         public static readonly string transactionTypeIdentifier = "type";
 
-        public IntentDataSendTransaction(string walletAddress, string network, SequenceSDK.WaaS.Transaction[] transactions)
+        public IntentDataSendTransaction(string walletAddress, string network, Sequence.WaaS.Transaction[] transactions)
         {
             this.wallet = walletAddress;
             this.network = network;
             this.transactions = transactions;
         }
         
-        public IntentDataSendTransaction(string walletAddress, Chain network, SequenceSDK.WaaS.Transaction[] transactions)
+        public IntentDataSendTransaction(string walletAddress, Chain network, Sequence.WaaS.Transaction[] transactions)
         {
             uint networkId = (uint)network;
             this.wallet = walletAddress;
@@ -37,7 +37,7 @@ namespace Sequence.WaaS
             this.network = network;
             this.wallet = wallet;
             int transactionCount = transactions.Length;
-            this.transactions = new SequenceSDK.WaaS.Transaction[transactionCount];
+            this.transactions = new Sequence.WaaS.Transaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
                 if (transactions[i].TryGetValue(transactionTypeIdentifier, out var type))

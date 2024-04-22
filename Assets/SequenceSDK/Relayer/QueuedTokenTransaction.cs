@@ -40,6 +40,7 @@ namespace Sequence.Relayer
             ContractAddress = contractAddress;
             TokenId = tokenId;
             Amount = amount;
+            FromAddress = fromAddress;
             ToAddress = toAddress;
         }
 

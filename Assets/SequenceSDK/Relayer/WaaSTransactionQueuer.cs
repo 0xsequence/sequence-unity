@@ -61,7 +61,7 @@ namespace Sequence.Relayer
             return result;
         }
 
-        private Transaction[] BuildTransactions()
+        public Transaction[] BuildTransactions()
         {
             int transactions = _queue.Count;
             Transaction[] builtTransactions = new Transaction[transactions];

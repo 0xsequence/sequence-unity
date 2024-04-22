@@ -1,4 +1,4 @@
-using SequenceSDK.WaaS;
+using Sequence.WaaS;
 
 namespace Sequence.Relayer
 {
