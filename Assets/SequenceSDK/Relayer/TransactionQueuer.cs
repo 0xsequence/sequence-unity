@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 using Sequence;
 using Sequence.WaaS;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Sequence.Relayer
 {
     public abstract class TransactionQueuer<TQueueableType, TReturnType> : MonoBehaviour
     {
-        [SerializeField] private bool _autoSubmitTransactions = false;
-        [SerializeField] private float _thresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds = 60f; // If _autoSubmitTransactions, we will submit all the transactions in the queue if the threshold time lapses between adding subsequent items to the queue
-        [SerializeField] private float _minimumTimeBetweenTransactionSubmissionsInSeconds = 30f; // The minimum time before a transaction can be submitted on-chain after the last one was submitted
+        [FormerlySerializedAs("_autoSubmitTransactions")] public bool AutoSubmitTransactions = false;
+        [FormerlySerializedAs("_thresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds")] public float ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds = 60f; // If _autoSubmitTransactions, we will submit all the transactions in the queue if the threshold time lapses between adding subsequent items to the queue
+        [FormerlySerializedAs("_minimumTimeBetweenTransactionSubmissionsInSeconds")] public float MinimumTimeBetweenTransactionSubmissionsInSeconds = 30f; // The minimum time before a transaction can be submitted on-chain after the last one was submitted
 
         protected List<TQueueableType> _queue = new List<TQueueableType>();
         protected float _lastTransactionAddedTime = 0f;
@@ -29,8 +30,8 @@ namespace Sequence.Relayer
 
         private void Update()
         {
-            if (!_autoSubmitTransactions) return;
-            if (_lastTransactionAddedTime > 0f && Time.time - _lastTransactionAddedTime > _thresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds)
+            if (!AutoSubmitTransactions) return;
+            if (_lastTransactionAddedTime > 0f && Time.time - _lastTransactionAddedTime > ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds)
             {
                 SubmitTransactions();
             }
@@ -49,7 +50,7 @@ namespace Sequence.Relayer
                 throw new Exception("Wallet cannot be null. User had likely not signed in yet.");
             }
             
-            if (!overrideWait && Time.time - _lastTransactionSubmittedTime < _minimumTimeBetweenTransactionSubmissionsInSeconds && _lastTransactionSubmittedTime > 0f)
+            if (!overrideWait && Time.time - _lastTransactionSubmittedTime < MinimumTimeBetweenTransactionSubmissionsInSeconds && _lastTransactionSubmittedTime > 0f)
             {
                 return default;
             }
@@ -68,6 +69,10 @@ namespace Sequence.Relayer
         public override string ToString()
         {
             int transactions = _queue.Count;
+            if (transactions == 0)
+            {
+                return "0 Queued Transactions";
+            }
             StringBuilder result = new StringBuilder($"{transactions} Queued Transactions: ");
             for (int i = 0; i < transactions - 1; i++)
             {
