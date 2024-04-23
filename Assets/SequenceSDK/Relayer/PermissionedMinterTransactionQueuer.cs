@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence;
 using Sequence.Relayer;
+using Sequence.Utils;
 using Sequence.WaaS;
 using UnityEngine;
 
@@ -9,7 +11,7 @@ namespace Sequence.Relayer
 {
     public class PermissionedMinterTransactionQueuer : TransactionQueuer<PermissionedMintTransaction, PermissionedMinterQueueSubmissionResult>
     {
-        private PermissionedMinter _minter;
+        private IMinter _minter;
         
         public void Setup(IWallet wallet, Chain chain, string mintEndpoint, string contractAddress)
         {
@@ -57,7 +59,7 @@ namespace Sequence.Relayer
         {
             int transactions = _queue.Count;
             bool success = true;
-            string[] transactionHashes = new string[transactions];
+            List<string> transactionHashes = new List<string>();
             for (int i = 0; i < transactions; i++)
             {
                 PermissionedMintTransaction transaction = _queue[i];
@@ -66,11 +68,17 @@ namespace Sequence.Relayer
                 if (string.IsNullOrEmpty(transactionHash) || transactionHash.Contains('{'))
                 {
                     success = false;
+                    continue;
                 }
-                transactionHashes[i] = transactionHash;
+                transactionHashes.Add(transactionHash);
             }
 
-            return new PermissionedMinterQueueSubmissionResult(success, transactionHashes);
+            return new PermissionedMinterQueueSubmissionResult(success, transactionHashes.ToArray());
+        }
+
+        public void InjectNewMinter(IMinter minter)
+        {
+            _minter = minter;
         }
     }
 

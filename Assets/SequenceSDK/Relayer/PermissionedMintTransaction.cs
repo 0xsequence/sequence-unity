@@ -13,7 +13,7 @@ namespace Sequence.Relayer
 
         public override string ToString()
         {
-            return $"Cloudflare mint {Amount} of tokenId: {TokenId}";
+            return $"Mint {Amount} of Token Id {TokenId}";
         }
     }
 }
