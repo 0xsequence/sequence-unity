@@ -137,5 +137,24 @@ namespace Sequence.Demo
 
             return shifted;
         }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+#if !UNITY_IOS
+            if (hasFocus)
+            {
+                StartCoroutine(DestroyIfNotLoggingIn());
+            }
+#endif
+        }
+
+        private IEnumerator DestroyIfNotLoggingIn()
+        {
+            yield return new WaitForSecondsRealtime(0.1f);
+            if (!_loginPanel.LoginHandler.IsLoggingIn())
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 }

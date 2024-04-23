@@ -1,3 +1,4 @@
+using Sequence.WaaS;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -28,6 +29,17 @@ namespace Sequence.Demo
             {
                 InitialPanel = _loginPanel;
             }
+
+            WaaSWallet.OnWaaSWalletCreated += wallet =>
+            {
+                wallet.OnDropSessionComplete += s =>
+                {
+                    if (s == wallet.SessionId)
+                    {
+                        ReplaceWithLoginPanel();
+                    }
+                };
+            };
         }
 
         public void Start()
@@ -68,6 +80,33 @@ namespace Sequence.Demo
         public void OpenSendTransactionPanelWithDelay(float delayInSeconds, params object[] openArgs)
         {
             _sendTransactionPanel.OpenWithDelay(delayInSeconds, openArgs);
+        }
+
+        private void ReplaceWithLoginPanel()
+        {
+            float delayInSeconds = 0;
+            if (_transitionPanel.IsOpen())
+            {
+                _transitionPanel.Close();
+                delayInSeconds = _transitionPanel.GetCloseAnimationDuration();
+            }
+            if (_signMessagePanel.IsOpen())
+            {
+                _signMessagePanel.Close();
+                delayInSeconds = _signMessagePanel.GetCloseAnimationDuration();
+            }
+            if (_sendTransactionPanel.IsOpen())
+            {
+                _sendTransactionPanel.Close();
+                delayInSeconds = _sendTransactionPanel.GetCloseAnimationDuration();
+            }
+            if (_walletPanel.IsOpen())
+            {
+                _walletPanel.Close();
+                delayInSeconds = _walletPanel.GetCloseAnimationDuration();
+            }
+            
+            _loginPanel.OpenWithDelay(delayInSeconds);
         }
     }
 }

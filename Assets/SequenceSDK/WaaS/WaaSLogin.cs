@@ -30,6 +30,8 @@ namespace Sequence.WaaS
         private EthWallet _sessionWallet;
         private string _sessionId;
 
+        private bool _isLoggingIn = false;
+
         public WaaSLogin(IValidator validator = null)
         {
             SequenceConfig config = SequenceConfig.GetConfig();
@@ -203,6 +205,11 @@ namespace Sequence.WaaS
             _authenticator.AppleSignIn();
         }
 
+        public bool IsLoggingIn()
+        {
+            return _isLoggingIn;
+        }
+
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
             ConnectToWaaS(result.IdToken, result.Method);
@@ -215,7 +222,7 @@ namespace Sequence.WaaS
 
         public async Task ConnectToWaaS(string idToken, LoginMethod method)
         {
-
+            _isLoggingIn = true;
             IntentSender sender = new IntentSender(
                 new HttpClient(WaaSWithAuthUrl),
                 _sessionWallet,
@@ -231,15 +238,17 @@ namespace Sequence.WaaS
                 string walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
-                WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
                 string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
+                _isLoggingIn = false;
+                WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
             {
                 OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message);
+                _isLoggingIn = false;
                 return;
             }
         }
