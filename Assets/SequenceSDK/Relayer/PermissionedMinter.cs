@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 
 namespace Sequence.Relayer
 {
-    public class PermissionedMinter
+    public class PermissionedMinter : IMinter
     {
         private string _mintEndpoint;
         

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Sequence;
 using Sequence.Demo;
 using Sequence.Demo.ScriptableObjects;
+using Sequence.WaaS;
 using SequenceExamples.Scripts.Tests.Utils;
 using TMPro;
 using UnityEditor;

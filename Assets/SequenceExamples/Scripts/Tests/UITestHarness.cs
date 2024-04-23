@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Sequence;
 using Sequence.Demo;
 using Sequence.Utils;
+using Sequence.WaaS;
 using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;

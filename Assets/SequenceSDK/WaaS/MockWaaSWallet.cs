@@ -5,9 +5,9 @@ using Sequence.WaaS;
 using Sequence.WaaS.Authentication;
 using SequenceSDK.WaaS;
 
-namespace SequenceExamples.Scripts.Tests.Utils
+namespace Sequence.WaaS
 {
-    public class MockWaaSWallet : Sequence.WaaS.IWallet
+    public class MockWaaSWallet : IWallet
     {
         public static readonly Address TestAddress = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
         

@@ -7,7 +7,7 @@ using StringExtensions = Sequence.Utils.StringExtensions;
 namespace Sequence.WaaS
 {
     [System.Serializable]
-    public class RawTransaction : SequenceSDK.WaaS.Transaction
+    public class RawTransaction : Sequence.WaaS.Transaction
     {
         public const string TypeIdentifier = "transaction";
         public string data { get; private set; }

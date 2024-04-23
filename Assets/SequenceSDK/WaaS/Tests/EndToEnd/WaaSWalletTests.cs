@@ -71,7 +71,7 @@ namespace Sequence.WaaS.Tests
 
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new RawTransaction(_toAddress, "1"),
                     });
@@ -100,7 +100,7 @@ namespace Sequence.WaaS.Tests
 
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new SendERC20(_erc20Address, _toAddress, "1"),
                     });
@@ -131,7 +131,7 @@ namespace Sequence.WaaS.Tests
 
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new RawTransaction(erc20.Transfer(_toAddress, 1)),
                     });
@@ -179,7 +179,7 @@ namespace Sequence.WaaS.Tests
 
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new SendERC20(_erc20Address, _toAddress, "1"),
                         new SendERC721(_erc721Address, _toAddress, _erc721TokenId),
@@ -229,7 +229,7 @@ namespace Sequence.WaaS.Tests
 
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new SendERC20(_erc20Address, _toAddress, "1"),
                         new SendERC1155(_erc1155Address, _toAddress, new SendERC1155Values[]
@@ -268,7 +268,7 @@ namespace Sequence.WaaS.Tests
 
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
                             abi,
@@ -305,7 +305,7 @@ namespace Sequence.WaaS.Tests
                     await Erc20BalanceChecker.CreateAsync(_polygonIndexer, _toAddress, _erc20Address);
                 TransactionReturn result = await _wallet.SendTransaction(
                     Chain.Polygon,
-                    new SequenceSDK.WaaS.Transaction[]
+                    new Sequence.WaaS.Transaction[]
                     {
                         new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
                             abi,

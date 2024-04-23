@@ -7,7 +7,7 @@ using Sequence.Relayer;
 using Sequence.WaaS;
 using SequenceSDK.WaaS;
 using UnityEngine;
-using Transaction = SequenceSDK.WaaS.Transaction;
+using Transaction = Sequence.WaaS.Transaction;
 
 public class GameStateSaver
 {
