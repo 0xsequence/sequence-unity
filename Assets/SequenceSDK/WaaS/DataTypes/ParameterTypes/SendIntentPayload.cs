@@ -1,6 +1,6 @@
 using System;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     [Serializable]
     public class SendIntentPayload

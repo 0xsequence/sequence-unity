@@ -1,4 +1,4 @@
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     public class RegisterSessionIntent
     {

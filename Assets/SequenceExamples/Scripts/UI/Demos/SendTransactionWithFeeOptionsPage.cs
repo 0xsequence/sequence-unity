@@ -3,13 +3,12 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using Sequence.WaaS;
-using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class SendTransactionPage : DemoPage
+    public class SendTransactionWithFeeOptionsPage : DemoPage
     {
         [SerializeField] private TMP_InputField _toAddressInputField;
         [SerializeField] private TMP_InputField _amountInputField;
@@ -49,8 +48,19 @@ namespace Sequence.Demo
         {
             Debug.LogError($"Transaction failed: {transactionReturn.error}");
         }
-        
-        public void SendTransaction()
+
+        public void GetFeeOptions()
+        {
+            Address toAddress = GetAddress();
+            string amount = DecimalNormalizer.Normalize(float.Parse(_amountInputField.text));
+
+            _wallet.GetFeeOptions(_chain, new Transaction[]
+            {
+                new RawTransaction(toAddress, amount)
+            });
+        }
+
+        private Address GetAddress()
         {
             Address toAddress;
             try
@@ -60,8 +70,15 @@ namespace Sequence.Demo
             catch (Exception e)
             {
                 Debug.LogError($"Invalid address: {_toAddressInputField.text}");
-                return;
+                return null;
             }
+
+            return toAddress;
+        }
+        
+        public void SendTransaction()
+        {
+            Address toAddress = GetAddress();
 
             string amount = DecimalNormalizer.Normalize(float.Parse(_amountInputField.text));
             _wallet.SendTransaction(_chain, new Transaction[]

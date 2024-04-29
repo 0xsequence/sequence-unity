@@ -234,5 +234,23 @@ namespace Sequence.WaaS
 
             return successfulTransactionReturn;
         }
+
+        public async Task<IntentResponseFeeOptions> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
+        {
+            IntentDataFeeOptions feeOptions = new IntentDataFeeOptions(network, _address, transactions);
+            try
+            {
+                IntentResponseFeeOptions options = await
+                    _intentSender.SendIntent<IntentResponseFeeOptions, IntentDataFeeOptions>(feeOptions, IntentType.FeeOptions,
+                        timeBeforeExpiry);
+                return options;
+            }
+            catch (Exception e)
+            {
+                OnSendTransactionFailed?.Invoke(new FailedTransactionReturn($"Unable to get fee options: {e.Message}", 
+                    new IntentDataSendTransaction(_address, network, transactions)));
+                return null;
+            }
+        }
     }
 }
