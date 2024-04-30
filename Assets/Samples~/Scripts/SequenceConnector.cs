@@ -13,7 +13,7 @@ namespace Samples.Scripts
     /// </summary>
     public class SequenceConnector : MonoBehaviour
     {
-        public Chain Chain { get; private set; }
+        public Chain Chain = Chain.TestnetArbitrumSepolia;
         public static SequenceConnector Instance { get; private set; }
         
         public WaaSWallet Wallet { get; private set; }
