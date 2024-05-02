@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace Sequence.WaaS
 {
@@ -8,6 +9,7 @@ namespace Sequence.WaaS
         public string sessionId;
         public string wallet;
 
+        [JsonConstructor]
         public IntentResponseSessionOpened(string sessionId, string wallet)
         {
             this.sessionId = sessionId;

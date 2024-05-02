@@ -94,9 +94,8 @@ namespace Sequence.WaaS
             return (request, curlRequest, url);
         }
 
-        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        private async Task<string> SendRequestAndReturnResponseAsJson((UnityWebRequest, string, string) newRequest)
         {
-            (UnityWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
             UnityWebRequest request = newRequest.Item1;
             string curlRequest = newRequest.Item2;
             string url = newRequest.Item3;
@@ -107,27 +106,19 @@ namespace Sequence.WaaS
             
                 if (request.error != null || request.result != UnityWebRequest.Result.Success || request.responseCode < 200 || request.responseCode > 299)
                 {
-                    throw new Exception($"Error sending request to {url}: {request.responseCode} {request.error}");
+                    throw new HttpRequestException($"Error sending request to {url}: {request.responseCode} {request.error}");
                 }
                 else
                 {
                     byte[] results = request.downloadHandler.data;
                     request.Dispose();
                     var responseJson = Encoding.UTF8.GetString(results);
-                    try
-                    {
-                        T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
-                        return result;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new Exception($"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
-                    }
+                    return responseJson;
                 }
             }
             catch (HttpRequestException e)
             {
-                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + e.Message  + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
@@ -139,6 +130,22 @@ namespace Sequence.WaaS
             }
             catch (Exception e) {
                 throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+            }
+        }
+
+        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        {
+            (UnityWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
+            string url = newRequest.Item3;
+            string responseJson = await SendRequestAndReturnResponseAsJson(newRequest);
+            try
+            {
+                T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
             }
         }
 

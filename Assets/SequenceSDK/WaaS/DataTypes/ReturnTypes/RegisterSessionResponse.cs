@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Sequence.WaaS;
 
 namespace SequenceSDK.WaaS
@@ -7,6 +8,7 @@ namespace SequenceSDK.WaaS
         public WaaSSession session;
         public Response<IntentResponseSessionOpened> response;
         
+        [JsonConstructor]
         public RegisterSessionResponse(WaaSSession session, Response<IntentResponseSessionOpened> response)
         {
             this.session = session;
