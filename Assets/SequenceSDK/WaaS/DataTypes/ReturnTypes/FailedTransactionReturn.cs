@@ -8,9 +8,9 @@ namespace Sequence.WaaS
     public class FailedTransactionReturn : TransactionReturn
     {
         public const string IdentifyingCode = "transactionFailed";
-        public string error { get; private set; }
-        public IntentPayload request { get; private set; }
-        public SimulateResult[] simulations { get; private set; }
+        public string error;
+        public IntentPayload request;
+        public SimulateResult[] simulations;
 
         [JsonConstructor]
         public FailedTransactionReturn(string error, IntentPayload request, SimulateResult[] simulations)

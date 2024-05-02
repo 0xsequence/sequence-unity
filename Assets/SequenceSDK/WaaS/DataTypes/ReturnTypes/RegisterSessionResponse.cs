@@ -4,8 +4,8 @@ namespace SequenceSDK.WaaS
 {
     public class RegisterSessionResponse
     {
-        public WaaSSession session { get; private set; }
-        public Response<IntentResponseSessionOpened> response { get; private set; }
+        public WaaSSession session;
+        public Response<IntentResponseSessionOpened> response;
         
         public RegisterSessionResponse(WaaSSession session, Response<IntentResponseSessionOpened> response)
         {

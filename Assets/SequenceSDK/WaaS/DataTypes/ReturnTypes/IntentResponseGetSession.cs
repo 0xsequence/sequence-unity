@@ -5,9 +5,9 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class IntentResponseGetSession
     {
-        public string sessionId { get; private set; }
-        public string wallet { get; private set; }
-        public bool validated { get; private set; }
+        public string sessionId;
+        public string wallet;
+        public bool validated;
         
         public IntentResponseGetSession(string sessionId, string wallet, bool validated)
         {

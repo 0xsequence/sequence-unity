@@ -5,7 +5,7 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class IntentDataCloseSession
     {
-        public string sessionId { get; private set; }
+        public string sessionId;
 
         public IntentDataCloseSession(string sessionId)
         {

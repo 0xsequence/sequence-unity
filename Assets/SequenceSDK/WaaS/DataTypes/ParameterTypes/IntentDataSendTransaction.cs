@@ -9,10 +9,10 @@ namespace Sequence.WaaS
     [System.Serializable]
     public class IntentDataSendTransaction
     {
-        public string identifier { get; private set; } = Guid.NewGuid().ToString();
-        public string network { get; private set; }
-        public Transaction[] transactions { get; private set; }
-        public string wallet { get; private set; }
+        public string identifier = Guid.NewGuid().ToString();
+        public string network;
+        public Transaction[] transactions;
+        public string wallet;
 
         public static readonly string transactionTypeIdentifier = "type";
 

@@ -5,7 +5,7 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class SendIntentPayload
     {
-        public IntentPayload intent {get; private set;}
+        public IntentPayload intent;
         
         public SendIntentPayload(IntentPayload intent)
         {

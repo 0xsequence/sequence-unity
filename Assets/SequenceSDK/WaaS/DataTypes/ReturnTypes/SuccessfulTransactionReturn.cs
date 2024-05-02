@@ -7,12 +7,12 @@ namespace Sequence.WaaS
     public class SuccessfulTransactionReturn : TransactionReturn
     {
         public const string IdentifyingCode = "transactionReceipt";
-        public string txHash { get; private set; }
-        public string metaTxHash { get; private set; }
-        public IntentPayload request { get; private set; }
-        public MetaTxnReceipt receipt { get; private set; }
-        public JObject nativeReceipt { get; private set; }
-        public SimulateResult[] simulations { get; private set; }
+        public string txHash;
+        public string metaTxHash;
+        public IntentPayload request;
+        public MetaTxnReceipt receipt;
+        public JObject nativeReceipt;
+        public SimulateResult[] simulations;
 
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {

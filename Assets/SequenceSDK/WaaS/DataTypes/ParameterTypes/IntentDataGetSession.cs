@@ -5,8 +5,8 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class IntentDataGetSession
     {
-        public string sessionId { get; private set; }
-        public string wallet { get; private set; }
+        public string sessionId;
+        public string wallet;
 
         public IntentDataGetSession(string sessionId, string walletAddress)
         {

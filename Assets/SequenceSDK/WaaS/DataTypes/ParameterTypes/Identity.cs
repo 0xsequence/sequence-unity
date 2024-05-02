@@ -5,10 +5,10 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class Identity
     {
-        public string type { get; private set; }
-        public string iss { get; private set; }
-        public string sub { get; private set; }
-        public string email { get; private set; }
+        public string type;
+        public string iss;
+        public string sub;
+        public string email;
 
         public Identity(string type, string iss, string sub, string email)
         {

@@ -8,9 +8,9 @@ namespace SequenceSDK.WaaS
     [Serializable]
     public class IntentDataOpenSession
     {
-        public string email { get; private set; }
-        public string idToken { get; private set; }
-        public string sessionId { get; private set; }
+        public string email;
+        public string idToken;
+        public string sessionId;
 
         public IntentDataOpenSession(Address sessionWallet, string email = null, string idToken = null)
         {
