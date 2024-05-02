@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace SequenceSDK.WaaS
 {
@@ -10,6 +11,7 @@ namespace SequenceSDK.WaaS
         public string sub;
         public string email;
 
+        [JsonConstructor]
         public Identity(string type, string iss, string sub, string email)
         {
             this.type = type;
