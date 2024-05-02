@@ -1,12 +1,12 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "displayName": "Sequence WaaS SDK",
   "description": "A Unity SDK for the Sequence WaaS API",
   "unity": "2021.3",
   "keywords": ["Unity", "Package", "wallet", "ethereum", "web3", "sequence", "waas"],
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json" : "3.0.2"
+    "com.unity.nuget.newtonsoft-json" : "3.2.1"
   },
   "author": {
     "name": "0xsequence",
