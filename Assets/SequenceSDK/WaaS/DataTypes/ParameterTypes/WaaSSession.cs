@@ -16,6 +16,18 @@ namespace Sequence.WaaS
         public DateTime createdAt;
         public DateTime refreshedAt;
         public DateTime expiresAt;
-            
+
+        public WaaSSession(string id, string address, string userId, int projectId, Identity identity, string friendlyName, DateTime createdAt, DateTime refreshedAt, DateTime expiresAt)
+        {
+            this.id = id;
+            this.address = address;
+            this.userId = userId;
+            this.projectId = projectId;
+            this.identity = identity;
+            this.friendlyName = friendlyName;
+            this.createdAt = createdAt;
+            this.refreshedAt = refreshedAt;
+            this.expiresAt = expiresAt;
+        }
     }
 }
