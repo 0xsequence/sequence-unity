@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Authentication;
@@ -235,7 +236,7 @@ namespace Sequence.WaaS
             return successfulTransactionReturn;
         }
 
-        public async Task<IntentResponseFeeOptions> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
+        public async Task<FeeOptionsResponse> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
         {
             IntentDataFeeOptions feeOptions = new IntentDataFeeOptions(network, _address, transactions);
             try
@@ -243,13 +244,81 @@ namespace Sequence.WaaS
                 IntentResponseFeeOptions options = await
                     _intentSender.SendIntent<IntentResponseFeeOptions, IntentDataFeeOptions>(feeOptions, IntentType.FeeOptions,
                         timeBeforeExpiry);
-                return options;
+
+                FeeOptionsResponse feeOptionsResponse = await DetermineWhichFeeOptionsUserHasInWallet(options, network);
+                
+                return feeOptionsResponse; 
             }
             catch (Exception e)
             {
                 OnSendTransactionFailed?.Invoke(new FailedTransactionReturn($"Unable to get fee options: {e.Message}", 
                     new IntentDataSendTransaction(_address, network, transactions)));
                 return null;
+            }
+        }
+
+        private async Task<FeeOptionsResponse> DetermineWhichFeeOptionsUserHasInWallet(IntentResponseFeeOptions feeOptions, Chain network)
+        {
+            try
+            {
+                IIndexer indexer = new ChainIndexer(network);
+                int feeOptionsLength = feeOptions.feeOptions.Length;
+                FeeOptionReturn[] decoratedFeeOptions = new FeeOptionReturn[feeOptionsLength];
+                for (int i = 0; i < feeOptionsLength; i++)
+                {
+                    FeeToken token = feeOptions.feeOptions[i].token;
+                    BigInteger requiredBalance = BigInteger.Parse(feeOptions.feeOptions[i].value);
+                    switch (token.type)
+                    {
+                        case FeeTokenType.unknown:
+                            EtherBalance etherBalance = await indexer.GetEtherBalance(_address);
+                            decoratedFeeOptions[i] = new FeeOptionReturn(feeOptions.feeOptions[i],
+                                requiredBalance <= etherBalance.balanceWei);
+                            break;
+                        case FeeTokenType.erc20Token:
+                            GetTokenBalancesReturn tokenBalances = await indexer.GetTokenBalances(new GetTokenBalancesArgs(
+                                _address, token.contractAddress));
+                            if (tokenBalances.balances.Length > 0)
+                            {
+                                if (tokenBalances.balances[0].contractAddress != token.contractAddress)
+                                {
+                                    throw new Exception(
+                                        $"Expected contract address from indexer response ({tokenBalances.balances[0].contractAddress}) to match contract address we queried ({token.contractAddress})");
+                                }
+
+                                decoratedFeeOptions[i] = new FeeOptionReturn(feeOptions.feeOptions[i],
+                                    requiredBalance <= tokenBalances.balances[0].balance);
+                            }
+                            else
+                            {
+                                decoratedFeeOptions[i] = new FeeOptionReturn(feeOptions.feeOptions[i], false);
+                            }
+
+                            break;
+                        case FeeTokenType.erc1155Token:
+                            Dictionary<BigInteger, TokenBalance> sftBalances =
+                                await indexer.GetTokenBalancesOrganizedInDictionary(_address, token.contractAddress,
+                                    false);
+                            if (sftBalances.TryGetValue(BigInteger.Parse(token.tokenID), out TokenBalance balance))
+                            {
+                                decoratedFeeOptions[i] = new FeeOptionReturn(feeOptions.feeOptions[i],
+                                    requiredBalance <= balance.balance);
+                            }
+                            else
+                            {
+                                decoratedFeeOptions[i] = new FeeOptionReturn(feeOptions.feeOptions[i], false);
+                            }
+
+                            break;
+                    }
+                }
+
+                return new FeeOptionsResponse(decoratedFeeOptions, feeOptions.feeQuote);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Unable to determine which fee option tokens the user has in their wallet: " +
+                                    e.Message);
             }
         }
     }

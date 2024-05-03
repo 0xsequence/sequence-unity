@@ -66,7 +66,7 @@ namespace Sequence.WaaS
             throw new NotImplementedException();
         }
 
-        public Task<IntentResponseFeeOptions> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
+        public Task<FeeOptionsResponse> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
         {
             throw new NotImplementedException();
         }
