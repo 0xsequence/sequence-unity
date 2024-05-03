@@ -23,7 +23,7 @@ namespace Sequence.Authentication
             _authenticationUrl = authenticationUrl;
         }
 
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")]
         private static extern void SocialSignIn(string url);
 
