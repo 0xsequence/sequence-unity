@@ -6,7 +6,7 @@ namespace Sequence.Authentication
 {
     public class IosBrowser : IBrowser
     {
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
         private OpenIdAuthenticator _authenticator;
         private static IosBrowser _instance;
         
@@ -93,10 +93,20 @@ namespace Sequence.Authentication
         {
             _instance.mOnAuthenticationSessionCompleted(session, callbackUrl, errorCode, errorMessage);
         }
+
+        public void SetState(string state)
+        {
+            
+        }
 #else
         public void Authenticate(string url, string redirectUrl = "")
         {
             throw new NotImplementedException("iOS browser is only supported on iOS.");
+        }
+
+        public void SetState(string state)
+        {
+            
         }
 #endif
     }

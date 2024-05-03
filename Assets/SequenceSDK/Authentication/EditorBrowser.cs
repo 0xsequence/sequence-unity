@@ -6,5 +6,10 @@ namespace Sequence.Authentication
         {
             throw new System.Exception("Social sign in not supported in the editor.");
         }
+
+        public void SetState(string state)
+        {
+            
+        }
     }
 }

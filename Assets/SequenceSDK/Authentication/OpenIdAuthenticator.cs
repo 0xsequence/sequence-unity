@@ -24,7 +24,7 @@ namespace Sequence.Authentication
         private string FacebookClientId;
         private string AppleClientId;
         
-        private static string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
+        private static string RedirectUrl = "http://localhost:8080/";
 
         private string _stateToken = Guid.NewGuid().ToString();
 
@@ -69,7 +69,7 @@ namespace Sequence.Authentication
         private IBrowser CreateBrowser()
         {
 #if UNITY_WEBGL
-            return new WebGLBrowser();
+            return new WebBrowser(this, RedirectUrl);
 #elif UNITY_EDITOR
             return new EditorBrowser();
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
@@ -91,7 +91,10 @@ namespace Sequence.Authentication
                 {
                     throw SequenceConfig.MissingConfigError("Google Client Id");
                 }
-                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, nameof(LoginMethod.Google));
+
+                string state = GenerateState(LoginMethod.Google);
+                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, state);
+                _browser.SetState(state);
                 _browser.Authenticate(googleSignInUrl, ReverseClientId(GoogleClientId));
             }
             catch (Exception e)
@@ -115,8 +118,11 @@ namespace Sequence.Authentication
                 {
                     throw SequenceConfig.MissingConfigError("Discord Client Id");
                 }
+
+                string state = GenerateState(LoginMethod.Discord);
                 string discordSignInUrl =
                     GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
+                _browser.SetState(state);
                 _browser.Authenticate(discordSignInUrl);
             }
             catch (Exception e)
@@ -133,8 +139,11 @@ namespace Sequence.Authentication
                 {
                     throw SequenceConfig.MissingConfigError("Facebook Client Id");
                 }
+
+                string state = GenerateState(LoginMethod.Facebook);
                 string facebookSignInUrl =
                     GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
+                _browser.SetState(state);
                 _browser.Authenticate(facebookSignInUrl);
             }
             catch (Exception e)
@@ -151,13 +160,16 @@ namespace Sequence.Authentication
                 {
                     throw SequenceConfig.MissingConfigError("Apple Client Id");
                 }
+
+                string state = GenerateState(LoginMethod.Apple);
                 string appleSignInUrl =
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
                 appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
+                _browser.SetState(state);
 #if UNITY_IOS
                 GameObject appleSignInObject = Object.Instantiate(new GameObject());
                 SignInWithApple appleSignIn = appleSignInObject.AddComponent<SignInWithApple>();
-                appleSignIn.LoginToApple(this, _sessionId, _stateToken);
+                appleSignIn.LoginToApple(this, _sessionId, state);
 #else
                 _browser.Authenticate(appleSignInUrl);
 #endif
@@ -168,7 +180,13 @@ namespace Sequence.Authentication
             }
         }
 
-        private string GenerateSignInUrl(string baseUrl, string clientId, string method)
+        private string GenerateState(LoginMethod method)
+        {
+            string state = $"{_urlScheme + "---" + _stateToken + method}";
+            return state;
+        }
+
+        private string GenerateSignInUrl(string baseUrl, string clientId, string state)
         {
             if (string.IsNullOrWhiteSpace(clientId))
             {
@@ -187,7 +205,7 @@ namespace Sequence.Authentication
             _stateToken = Guid.NewGuid().ToString();
             
             string url =
-                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={_urlScheme + "---" + _stateToken + method}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={state}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
@@ -369,6 +387,10 @@ namespace Sequence.Authentication
             _stateToken = stateToken;
         }
 #endif
+        internal void BrowserModifyStateToken(string stateToken)
+        {
+            _stateToken = stateToken;
+        }
     }
 
     public class OpenIdAuthenticationResult
