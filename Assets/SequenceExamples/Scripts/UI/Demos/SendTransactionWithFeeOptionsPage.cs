@@ -54,10 +54,29 @@ namespace Sequence.Demo
             Address toAddress = GetAddress();
             string amount = DecimalNormalizer.Normalize(float.Parse(_amountInputField.text));
 
-            _wallet.GetFeeOptions(_chain, new Transaction[]
+            WaitForFeeOptionsAndSubmitFirstAvailable(toAddress, amount);
+        }
+
+        private async Task WaitForFeeOptionsAndSubmitFirstAvailable(Address toAddress, string amount)
+        {
+            Transaction[] transactions = new Transaction[]
             {
                 new RawTransaction(toAddress, amount)
-            });
+            };
+            FeeOptionsResponse response = await _wallet.GetFeeOptions(_chain, transactions);
+
+            int options = response.FeeOptions.Length;
+            for (int i = 0; i < options; i++)
+            {
+                if (response.FeeOptions[i].InWallet)
+                {
+                    await _wallet.SendTransactionWithFeeOptions(_chain, transactions, response.FeeOptions[i].FeeOption,
+                        response.FeeQuote);
+                    return;
+                }
+            }
+            
+            Debug.LogError("The user does not have enough of the valid FeeOptions in their wallet");
         }
 
         private Address GetAddress()
@@ -74,17 +93,6 @@ namespace Sequence.Demo
             }
 
             return toAddress;
-        }
-        
-        public void SendTransaction()
-        {
-            Address toAddress = GetAddress();
-
-            string amount = DecimalNormalizer.Normalize(float.Parse(_amountInputField.text));
-            _wallet.SendTransaction(_chain, new Transaction[]
-            {
-                new RawTransaction(toAddress, amount)
-            });
         }
 
         public void OpenBlockExplorer()

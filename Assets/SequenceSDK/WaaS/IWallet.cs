@@ -26,5 +26,8 @@ namespace Sequence.WaaS
         public Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(
             SuccessfulTransactionReturn successfulTransactionReturn);
         public Task<FeeOptionsResponse> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30);
+
+        public Task<TransactionReturn> SendTransactionWithFeeOptions(Chain network, Transaction[] transactions,
+            FeeOption feeOption, string feeQuote, bool waitForReceipt = true, uint timeBeforeExpiry = 30);
     }
 }

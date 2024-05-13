@@ -45,6 +45,12 @@ namespace Sequence.WaaS
             }
             this.type = type;
         }
+
+        public override string ToString()
+        {
+            return
+                $"chainId: {chainId}, contractAddress: {contractAddress}, decimals: {decimals}, logoUrl: {logoURL}, name: {name}, symbol: {symbol}, tokenID: {tokenID}, type: {type}";
+        }
     }
 
     public enum FeeTokenType

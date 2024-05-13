@@ -76,35 +76,7 @@ namespace Sequence.WaaS
             IntentDataSendTransaction args = new IntentDataSendTransaction(_address, network, transactions);
             try
             {
-                var result = await _intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(args, IntentType.SendTransaction, timeBeforeExpiry);
-                if (result is SuccessfulTransactionReturn successfulTransactionReturn)
-                {
-                    if (waitForReceipt)
-                    {
-                        while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
-                        {
-                            try
-                            {
-                                successfulTransactionReturn = await _intentSender.GetTransactionReceipt(successfulTransactionReturn);
-                            }
-                            catch (Exception e)
-                            {
-                                Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
-                                OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
-                                return result;
-                            }
-                        }
-
-                        OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
-                        return successfulTransactionReturn;
-                    }
-                    OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
-                }
-                else
-                {
-                    OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
-                }
-                return result;
+                return await SendTransactionIntent(args, waitForReceipt, timeBeforeExpiry);
             }
             catch (Exception e)
             {
@@ -112,6 +84,39 @@ namespace Sequence.WaaS
                 OnSendTransactionFailed?.Invoke(result);
                 return result;
             }
+        }
+
+        private async Task<TransactionReturn> SendTransactionIntent(IntentDataSendTransaction args, bool waitForReceipt, uint timeBeforeExpiry)
+        {
+            var result = await _intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(args, IntentType.SendTransaction, timeBeforeExpiry);
+            if (result is SuccessfulTransactionReturn successfulTransactionReturn)
+            {
+                if (waitForReceipt)
+                {
+                    while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
+                    {
+                        try
+                        {
+                            successfulTransactionReturn = await _intentSender.GetTransactionReceipt(successfulTransactionReturn);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                            OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
+                            return result;
+                        }
+                    }
+
+                    OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
+                    return successfulTransactionReturn;
+                }
+                OnSendTransactionComplete?.Invoke((SuccessfulTransactionReturn)result);
+            }
+            else
+            {
+                OnSendTransactionFailed?.Invoke((FailedTransactionReturn)result);
+            }
+            return result;
         }
 
         public event Action<SuccessfulContractDeploymentReturn> OnDeployContractComplete;
@@ -320,6 +325,45 @@ namespace Sequence.WaaS
                 throw new Exception("Unable to determine which fee option tokens the user has in their wallet: " +
                                     e.Message);
             }
+        }
+
+        public async Task<TransactionReturn> SendTransactionWithFeeOptions(Chain network, Transaction[] transactions, FeeOption feeOption, string feeQuote,
+            bool waitForReceipt = true, uint timeBeforeExpiry = 30)
+        {
+            FeeToken token = feeOption.token;
+            if (network.GetChainId() != token.chainId.ToString())
+            {
+                FailedTransactionReturn failedTransactionReturn = new FailedTransactionReturn(
+                    $"Failed to send transaction with Fee Options: Specified network ({network}) id {network.GetChainId()} does not match the network id in the {nameof(feeOption)} {token.chainId}",
+                    new IntentDataSendTransaction(_address, network, transactions, feeQuote));
+                OnSendTransactionFailed?.Invoke(failedTransactionReturn);
+                return failedTransactionReturn;
+            }
+
+            try
+            {
+                int transactionCount = transactions.Length;
+                Transaction[] transactionsWithFeeOption = new Transaction[transactionCount + 1];
+                transactionsWithFeeOption[0] = feeOption.CreateTransaction();
+                for (int i = 0; i < transactionCount; i++)
+                {
+                    transactionsWithFeeOption[i + 1] = transactions[i];
+                }
+
+                IntentDataSendTransaction args =
+                    new IntentDataSendTransaction(_address, network, transactionsWithFeeOption, feeQuote);
+
+                return await SendTransactionIntent(args, waitForReceipt, timeBeforeExpiry);
+            }
+            catch (Exception e)
+            {
+                FailedTransactionReturn failedTransactionReturn = new FailedTransactionReturn(
+                    $"Failed to send transaction with FeeOption [{feeOption}]: {e.Message}",
+                    new IntentDataSendTransaction(_address, network, transactions, feeQuote));
+                OnSendTransactionFailed?.Invoke(failedTransactionReturn);
+                return failedTransactionReturn;
+            }
+            
         }
     }
 }
