@@ -24,7 +24,7 @@ namespace Sequence.Authentication
         private string FacebookClientId;
         private string AppleClientId;
         
-        private static string RedirectUrl = "https://dev2-api.sequence.app/oauth/callback";
+        private static string RedirectUrl = "https://api.sequence.app/oauth/callback";
 
         private string _stateToken = Guid.NewGuid().ToString();
 
@@ -33,6 +33,16 @@ namespace Sequence.Authentication
         private IBrowser _browser;
         
         private static bool _windowsSetup = false;
+
+        /// <summary>
+        /// Use this if you'd prefer to redirect to your own URL for Oauth
+        /// Your server will need to redirect the URL retrieved during the social sign in process to the custom URL scheme you've set in SequenceConfig
+        /// </summary>
+        /// <param name="redirectUrl"></param>
+        public static void InJectRedirectUrl(string redirectUrl)
+        {
+            RedirectUrl = redirectUrl;
+        }
 
         public OpenIdAuthenticator(string sessionId)
         {
