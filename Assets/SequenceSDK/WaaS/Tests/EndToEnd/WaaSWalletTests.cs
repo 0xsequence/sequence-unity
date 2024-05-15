@@ -270,11 +270,11 @@ namespace Sequence.WaaS.Tests
                     Chain.Polygon,
                     new Sequence.WaaS.Transaction[]
                     {
-                        new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
+                        new DelayedEncode(_erc20Address, "0", new DelayedEncodeData(
                             abi,
                             new object[]
                             {
-                                _erc20Address, "1"
+                                _toAddress, "1"
                             },
                             "transfer")),
                     });
@@ -307,11 +307,11 @@ namespace Sequence.WaaS.Tests
                     Chain.Polygon,
                     new Sequence.WaaS.Transaction[]
                     {
-                        new DelayedEncode(_toAddress, "0", new DelayedEncodeData(
+                        new DelayedEncode(_erc20Address, "0", new DelayedEncodeData(
                             abi,
                             new object[]
                             {
-                                _erc20Address, "1"
+                                _toAddress, "1"
                             },
                             "transfer")),
                         new RawTransaction(_toAddress, "1")

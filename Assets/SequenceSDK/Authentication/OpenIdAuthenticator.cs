@@ -34,6 +34,16 @@ namespace Sequence.Authentication
         
         private static bool _windowsSetup = false;
 
+        /// <summary>
+        /// Use this if you'd prefer to redirect to your own URL for Oauth
+        /// Your server will need to redirect the URL retrieved during the social sign in process to the custom URL scheme you've set in SequenceConfig
+        /// </summary>
+        /// <param name="redirectUrl"></param>
+        public static void InJectRedirectUrl(string redirectUrl)
+        {
+            RedirectUrl = redirectUrl;
+        }
+
         public OpenIdAuthenticator(string sessionId)
         {
             SequenceConfig config = SequenceConfig.GetConfig();

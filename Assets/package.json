@@ -32,11 +32,6 @@
       "displayName": "Useful Scripts",
       "description": "Basic scripts that are helpful for getting started with the SDK",
       "path": "Samples~/Scripts"
-    },
-    {
-      "displayName": "Demo Tower Defense Game",
-      "description": "Demo - using the SDK to replace the save system in Unity's Tower Defense sample game: https://assetstore.unity.com/packages/essentials/tutorial-projects/tower-defense-template-107692",
-      "path": "Samples~/DemoTowerDefenseGame"
     }
   ],
   "documentationUrl": "https://docs.sequence.xyz/unity-waas-sdk",
