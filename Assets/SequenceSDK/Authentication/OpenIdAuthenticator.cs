@@ -67,11 +67,11 @@ namespace Sequence.Authentication
         }
 
         private IBrowser CreateBrowser()
-        {
-#if UNITY_WEBGL
+        { 
+#if UNITY_EDITOR
+            return new EditorBrowser(this, RedirectUrl);
+#elif UNITY_WEBGL 
             return new WebBrowser(this, RedirectUrl);
-#elif UNITY_EDITOR
-            return new EditorBrowser();
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new StandaloneBrowser();
 #elif UNITY_IOS

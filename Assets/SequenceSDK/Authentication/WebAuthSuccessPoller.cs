@@ -49,7 +49,7 @@ namespace Sequence.Authentication
 
         private async Task<bool> SendGetSuccessRequest()
         {
-            string url = _authenticationUrl.RemoveTrailingSlash() + $"/getResult?state={_state}/";
+            string url = _authenticationUrl.RemoveTrailingSlash() + $"/getResult?state={_state}";
             UnityWebRequest request = UnityWebRequest.Get(url);
             string curlRequest = $"curl {url}";
 
