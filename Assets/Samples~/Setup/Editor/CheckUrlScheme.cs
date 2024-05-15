@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Callbacks;
 using UnityEngine;
-#if UNITY_IOS || UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX && !UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor.iOS.Xcode;
 #endif
@@ -45,7 +45,7 @@ namespace Sequence.Editor
         
         private static void CheckPlistUrlScheme()
         {
-#if UNITY_STANDALONE_OSX
+#if UNITY_STANDALONE_OSX && !UNITY_EDITOR
             PlistDocument plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
 
