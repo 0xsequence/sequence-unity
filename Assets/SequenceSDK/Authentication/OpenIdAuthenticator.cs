@@ -24,7 +24,7 @@ namespace Sequence.Authentication
         private string FacebookClientId;
         private string AppleClientId;
         
-        private static string RedirectUrl = "http://localhost:8080/";
+        internal static string RedirectUrl = "https://api.sequence.app/oauth/callback";
 
         private string _stateToken = Guid.NewGuid().ToString();
 
@@ -54,16 +54,20 @@ namespace Sequence.Authentication
             _sessionId = sessionId;
             
             _browser = CreateBrowser();
+            
+#if UNITY_EDITOR
+            InJectRedirectUrl("http://localhost:8080/");
+#endif
         }
 
         private void SetClientIds(SequenceConfig config)
         {
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
             GoogleClientId = config.GoogleClientIdIOS;
             DiscordClientId = config.DiscordClientIdIOS;
             FacebookClientId = config.FacebookClientIdIOS;
             AppleClientId = config.AppleClientIdIOS;
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID && !UNITY_EDITOR
             GoogleClientId = config.GoogleClientIdAndroid;
             DiscordClientId = config.DiscordClientIdAndroid;    
             FacebookClientId = config.FacebookClientIAndroid;
@@ -79,7 +83,7 @@ namespace Sequence.Authentication
         private IBrowser CreateBrowser()
         { 
 #if UNITY_EDITOR
-            return new EditorBrowser(this, RedirectUrl);
+            return new EditorBrowser(this);
 #elif UNITY_WEBGL 
             return new WebBrowser();
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX

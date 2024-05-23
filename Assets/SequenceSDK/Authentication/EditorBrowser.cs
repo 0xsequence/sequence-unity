@@ -6,13 +6,11 @@ namespace Sequence.Authentication
     public class EditorBrowser : IBrowser
     {
         private OpenIdAuthenticator _authenticator;
-        private string _authenticationUrl;
         private string _state;
 
-        public EditorBrowser(OpenIdAuthenticator authenticator, string authenticationUrl)
+        public EditorBrowser(OpenIdAuthenticator authenticator)
         {
             _authenticator = authenticator;
-            _authenticationUrl = authenticationUrl;
         }
         
         public void SetState(string state)
@@ -35,7 +33,7 @@ namespace Sequence.Authentication
         {
             GameObject successPoller = UnityEngine.Object.Instantiate(new GameObject("SuccessPoller")) as GameObject;
             WebAuthSuccessPoller poller = successPoller.AddComponent<WebAuthSuccessPoller>();
-            poller.Setup(_authenticator, _authenticationUrl, _state);
+            poller.Setup(_authenticator, OpenIdAuthenticator.RedirectUrl, _state);
             poller.PollForAuthSuccess();
         }
     }
