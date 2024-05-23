@@ -60,8 +60,9 @@ namespace Sequence.WaaS
             
             _sessionWallet = new EthWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
-            
-            _authenticator = new OpenIdAuthenticator(SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix());
+
+            string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
+            _authenticator = new OpenIdAuthenticator(nonce);
             _authenticator.PlatformSpecificSetup();
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
@@ -75,7 +76,7 @@ namespace Sequence.WaaS
 
             try
             {
-                _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId);
+                _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId, nonce);
             }
             catch (Exception e)
             {
