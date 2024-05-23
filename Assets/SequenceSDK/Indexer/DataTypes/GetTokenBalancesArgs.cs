@@ -30,6 +30,7 @@ namespace Sequence
             this.contractAddress = contractAddress;
             this.includeMetadata = includeMetadata;
         }
+        
         public GetTokenBalancesArgs(string accountAddress, string contractAddress, Page page)
         {
             this.accountAddress = accountAddress;

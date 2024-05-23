@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -48,6 +49,15 @@ namespace Sequence
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args);
+
+        /// <summary>
+        /// Retrieve an account's token balances organized in a Dictionary mapping token id to the associated TokenBalance
+        /// Useful for easy lookup of token balances
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(
+            string accountAddress, string contractAddress, bool includeMetadata = false);
 
         /// <summary>
         /// Retrieve the token supply for a given contract

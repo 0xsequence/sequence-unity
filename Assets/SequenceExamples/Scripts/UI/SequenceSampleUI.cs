@@ -16,6 +16,7 @@ namespace Sequence.Demo
         private WalletPanel _walletPanel;
         private SignMessagePanel _signMessagePanel;
         private SendTransactionPanel _sendTransactionPanel;
+        private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
 
         private void Awake()
         {
@@ -24,6 +25,7 @@ namespace Sequence.Demo
             _walletPanel = GetComponentInChildren<WalletPanel>();
             _signMessagePanel = GetComponentInChildren<SignMessagePanel>();
             _sendTransactionPanel = GetComponentInChildren<SendTransactionPanel>();
+            _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
 
             if (!IsTesting)
             {
@@ -80,6 +82,11 @@ namespace Sequence.Demo
         public void OpenSendTransactionPanelWithDelay(float delayInSeconds, params object[] openArgs)
         {
             _sendTransactionPanel.OpenWithDelay(delayInSeconds, openArgs);
+        }
+        
+        public void OpenSendTransactionWithFeeOptionsPanelWithDelay(float delayInSeconds, params object[] openArgs)
+        {
+            _sendTransactionWithFeeOptionsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
 
         private void ReplaceWithLoginPanel()

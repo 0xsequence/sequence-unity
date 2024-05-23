@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 
@@ -50,6 +51,34 @@ namespace Sequence
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)
         {
             return Indexer.GetTokenBalances(_chainId, args);
+        }
+
+        public async Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(
+            string accountAddress, string contractAddress, bool includeMetadata = false)
+        {
+            GetTokenBalancesReturn tokenBalances = await GetTokenBalances(new GetTokenBalancesArgs(accountAddress, contractAddress, includeMetadata));
+            Dictionary<BigInteger, TokenBalance> result =
+                new Dictionary<BigInteger, TokenBalance>();
+            result = await AddBalancesToDictionary(result, tokenBalances.balances);
+            while (tokenBalances.page.more)
+            {
+                tokenBalances = await GetTokenBalances(new GetTokenBalancesArgs(accountAddress, contractAddress, includeMetadata, tokenBalances.page));
+                result = await AddBalancesToDictionary(result, tokenBalances.balances);
+            }
+
+            return result;
+        }
+
+        private async Task<Dictionary<BigInteger, TokenBalance>> AddBalancesToDictionary(
+            Dictionary<BigInteger, TokenBalance> dictionary, TokenBalance[] balances)
+        {
+            int length = balances.Length;
+            for (int i = 0; i < length; i++)
+            {
+                dictionary[balances[i].tokenID] = balances[i];
+            }
+
+            return dictionary;
         }
 
         public Task<GetTokenSuppliesReturn> GetTokenSupplies(GetTokenSuppliesArgs args)

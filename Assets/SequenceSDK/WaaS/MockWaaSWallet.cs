@@ -65,5 +65,16 @@ namespace Sequence.WaaS
         {
             throw new NotImplementedException();
         }
+
+        public Task<FeeOptionsResponse> GetFeeOptions(Chain network, Transaction[] transactions, uint timeBeforeExpiry = 30)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TransactionReturn> SendTransactionWithFeeOptions(Chain network, Transaction[] transactions, FeeOption feeOption, string feeQuote,
+            bool waitForReceipt = true, uint timeBeforeExpiry = 30)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
