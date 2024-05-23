@@ -39,7 +39,7 @@ namespace Sequence.Authentication
         /// Your server will need to redirect the URL retrieved during the social sign in process to the custom URL scheme you've set in SequenceConfig
         /// </summary>
         /// <param name="redirectUrl"></param>
-        public static void InJectRedirectUrl(string redirectUrl)
+        public static void InjectRedirectUrl(string redirectUrl)
         {
             RedirectUrl = redirectUrl;
         }
@@ -56,7 +56,7 @@ namespace Sequence.Authentication
             _browser = CreateBrowser();
             
 #if UNITY_EDITOR
-            InJectRedirectUrl("http://localhost:8080/");
+            InjectRedirectUrl("http://localhost:8080/");
 #endif
         }
 
