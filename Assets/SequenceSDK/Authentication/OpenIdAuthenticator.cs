@@ -51,13 +51,13 @@ namespace Sequence.Authentication
             _urlScheme = config.UrlScheme;
             SetClientIds(config);
             
-            _sessionId = sessionId;
-            
-            _browser = CreateBrowser();
-            
 #if UNITY_EDITOR
             InjectRedirectUrl("http://localhost:8080/");
 #endif
+            
+            _sessionId = sessionId;
+            
+            _browser = CreateBrowser();
         }
 
         private void SetClientIds(SequenceConfig config)
