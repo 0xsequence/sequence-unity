@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.WaaS
 {
     [Serializable]
     public class IntentPayload
@@ -57,6 +57,7 @@ namespace SequenceSDK.WaaS
             {IntentType.SignMessage, "signMessage"},
             {IntentType.SendTransaction, "sendTransaction"},
             {IntentType.GetTransactionReceipt, "getTransactionReceipt"},
+            {IntentType.FeeOptions, "feeOptions"}
         };
     }
 
@@ -71,6 +72,7 @@ namespace SequenceSDK.WaaS
         SignMessage,
         SendTransaction,
         GetTransactionReceipt,
+        FeeOptions,
         None
     }
 }

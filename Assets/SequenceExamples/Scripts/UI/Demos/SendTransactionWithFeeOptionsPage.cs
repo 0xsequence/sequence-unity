@@ -3,13 +3,12 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using Sequence.WaaS;
-using SequenceSDK.WaaS;
 using TMPro;
 using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class SendTransactionPage : DemoPage
+    public class SendTransactionWithFeeOptionsPage : DemoPage
     {
         [SerializeField] private TMP_InputField _toAddressInputField;
         [SerializeField] private TMP_InputField _amountInputField;
@@ -49,8 +48,38 @@ namespace Sequence.Demo
         {
             Debug.LogError($"Transaction failed: {transactionReturn.error}");
         }
-        
-        public void SendTransaction()
+
+        public void GetFeeOptions()
+        {
+            Address toAddress = GetAddress();
+            string amount = DecimalNormalizer.Normalize(float.Parse(_amountInputField.text));
+
+            WaitForFeeOptionsAndSubmitFirstAvailable(toAddress, amount);
+        }
+
+        private async Task WaitForFeeOptionsAndSubmitFirstAvailable(Address toAddress, string amount)
+        {
+            Transaction[] transactions = new Transaction[]
+            {
+                new RawTransaction(toAddress, amount)
+            };
+            FeeOptionsResponse response = await _wallet.GetFeeOptions(_chain, transactions);
+
+            int options = response.FeeOptions.Length;
+            for (int i = 0; i < options; i++)
+            {
+                if (response.FeeOptions[i].InWallet)
+                {
+                    await _wallet.SendTransactionWithFeeOptions(_chain, transactions, response.FeeOptions[i].FeeOption,
+                        response.FeeQuote);
+                    return;
+                }
+            }
+            
+            Debug.LogError("The user does not have enough of the valid FeeOptions in their wallet");
+        }
+
+        private Address GetAddress()
         {
             Address toAddress;
             try
@@ -60,14 +89,10 @@ namespace Sequence.Demo
             catch (Exception e)
             {
                 Debug.LogError($"Invalid address: {_toAddressInputField.text}");
-                return;
+                return null;
             }
 
-            string amount = DecimalNormalizer.Normalize(float.Parse(_amountInputField.text));
-            _wallet.SendTransaction(_chain, new Transaction[]
-            {
-                new RawTransaction(toAddress, amount)
-            });
+            return toAddress;
         }
 
         public void OpenBlockExplorer()

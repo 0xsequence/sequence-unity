@@ -39,5 +39,10 @@ namespace Sequence.Demo
         {
             _ui.OpenSendTransactionPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
+
+        public void OpenSendTransactionWithFeeOptionsPanel()
+        {
+            _ui.OpenSendTransactionWithFeeOptionsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
     }
 }

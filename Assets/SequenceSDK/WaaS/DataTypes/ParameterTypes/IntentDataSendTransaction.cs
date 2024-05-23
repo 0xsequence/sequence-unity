@@ -12,30 +12,39 @@ namespace Sequence.WaaS
         public string identifier { get; private set; } = Guid.NewGuid().ToString();
         public string network { get; private set; }
         public Transaction[] transactions { get; private set; }
+        public string transactionsFeeQuote { get; private set; }
         public string wallet { get; private set; }
 
         public static readonly string transactionTypeIdentifier = "type";
 
-        public IntentDataSendTransaction(string walletAddress, string network, Sequence.WaaS.Transaction[] transactions)
+        public IntentDataSendTransaction(string walletAddress, string network, Sequence.WaaS.Transaction[] transactions, string transactionsFeeQuote = "")
         {
             this.wallet = walletAddress;
             this.network = network;
             this.transactions = transactions;
+            if (!string.IsNullOrWhiteSpace(transactionsFeeQuote))
+            {
+                this.transactionsFeeQuote = transactionsFeeQuote;
+            }
         }
         
-        public IntentDataSendTransaction(string walletAddress, Chain network, Sequence.WaaS.Transaction[] transactions)
+        public IntentDataSendTransaction(string walletAddress, Chain network, Sequence.WaaS.Transaction[] transactions, string transactionsFeeQuote = "")
         {
-            uint networkId = (uint)network;
             this.wallet = walletAddress;
-            this.network = networkId.ToString();
+            this.network = network.GetChainId();
             this.transactions = transactions;
+            if (!string.IsNullOrWhiteSpace(transactionsFeeQuote))
+            {
+                this.transactionsFeeQuote = transactionsFeeQuote;
+            }
         }
 
         [JsonConstructor]
-        public IntentDataSendTransaction(string code, uint expires, uint issued, string network, JObject[] transactions, string wallet)
+        public IntentDataSendTransaction(string code, uint expires, uint issued, string network, JObject[] transactions, string transactionsFeeQuote, string wallet)
         {
             this.network = network;
             this.wallet = wallet;
+            this.transactionsFeeQuote = transactionsFeeQuote;
             int transactionCount = transactions.Length;
             this.transactions = new Sequence.WaaS.Transaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
