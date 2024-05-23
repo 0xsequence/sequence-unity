@@ -17,11 +17,13 @@ namespace Sequence.Authentication
     {
         private string _region;
         private string _cognitoClientId;
+        private string _nonce;
         
-        public AWSEmailSignIn(string region, string cognitoClientId)
+        public AWSEmailSignIn(string region, string cognitoClientId, string nonce)
         {
             _region = region;
             _cognitoClientId = cognitoClientId;
+            _nonce = nonce;
         }
         
         public async Task<string> SignIn(string email)
@@ -34,7 +36,11 @@ namespace Sequence.Authentication
                 {
                     { "USERNAME", email }
                 },
-                ClientId = _cognitoClientId
+                ClientId = _cognitoClientId,
+                ClientMetadata = new Dictionary<string, string>()
+                {
+                    { "SESSION_HASH", _nonce}
+                }
             };
             try
             {
@@ -59,15 +65,12 @@ namespace Sequence.Authentication
                     { "ANSWER", code }
                 },
                 ClientId = _cognitoClientId,
-                Session = challengeSession
-            };
-            if (!string.IsNullOrWhiteSpace(sessionWalletAddress))
-            {
-                request.ClientMetadata = new Dictionary<string, string>
+                Session = challengeSession,
+                ClientMetadata = new Dictionary<string, string>()
                 {
-                    { "SESSION_HASH", sessionWalletAddress }
-                };
-            }
+                    { "SESSION_HASH", _nonce}
+                }
+            };
             
             try
             {
