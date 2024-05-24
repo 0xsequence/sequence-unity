@@ -8,5 +8,10 @@ namespace Sequence.Authentication
         {
             Application.OpenURL(url);
         }
+
+        public void SetState(string state)
+        {
+            
+        }
     }
 }
