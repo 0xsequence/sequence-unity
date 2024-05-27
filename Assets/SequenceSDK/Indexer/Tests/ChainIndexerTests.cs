@@ -18,7 +18,7 @@ namespace Sequence.Indexer.Tests
             try
             {
                 ChainIndexer chainIndexer = new ChainIndexer(chain);
-                Assert.AreEqual(BigInteger.Parse(chain.GetChainId()), chainIndexer.GetChainID());
+                Assert.AreEqual(chain.GetChainId(), chainIndexer.ChainId);
                 Assert.AreEqual(chain, chainIndexer.GetChain());
             }
             catch (Exception e)
