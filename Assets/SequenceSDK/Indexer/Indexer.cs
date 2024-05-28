@@ -27,7 +27,8 @@ namespace Sequence
         ERC20_BRIDGE,
         ERC721_BRIDGE,
         ERC1155_BRIDGE,
-        NATIVE
+        NATIVE,
+        SEQ_MARKETPLACE
     }
 
     public enum EventLogType
@@ -41,7 +42,8 @@ namespace Sequence
     {
         UNKNOWN,
         TOKEN_TRANSFER,
-        SEQUENCE_TXN
+        SEQUENCE_TXN,
+        NATIVE_TOKEN_TRANSFER
     }
 
     public enum TxnTransferType
