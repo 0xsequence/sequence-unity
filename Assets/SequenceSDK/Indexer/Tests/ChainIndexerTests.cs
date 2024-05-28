@@ -201,5 +201,50 @@ namespace Sequence.Indexer.Tests
             Assert.IsNotNull(history.transactions);
             Assert.Greater(history.transactions.Length, 0);
         }
+    
+        [Test]
+        public async Task TestGetTokenSuppliesMap()
+        {
+            IIndexer indexer = new ChainIndexer(Chain.Polygon);
+            string usdcAddress = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359".ToLower();
+            string wmaticAddress = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270".ToLower();
+            string skyweaverAddress = "0x631998e91476da5b870d741192fc5cbc55f5a52e".ToLower();
+            string skyweaverTokenId1 = "68657";
+            string skyweaverTokenId2 = "66669";
+            string skyweaverTokenId3 = "66668";
+            GetTokenSuppliesMapReturn suppliesMap = null;
+            try
+            {
+                suppliesMap = await indexer.GetTokenSuppliesMap(new GetTokenSuppliesMapArgs(
+                    new Dictionary<string, string[]>()
+                    {
+                        { usdcAddress, new string[] { } },
+                        { wmaticAddress, new string[] { "0" } },
+                        { skyweaverAddress, new string[] { skyweaverTokenId1, skyweaverTokenId2, skyweaverTokenId3 } },
+                    }));
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Encountered exception when none was expected: " + e.Message);
+            }
+
+            Assert.IsNotNull(suppliesMap);
+            Assert.IsNotNull(suppliesMap.supplies);
+            Assert.AreEqual(3, suppliesMap.supplies.Count);
+            Assert.IsTrue(suppliesMap.supplies.ContainsKey(usdcAddress));
+            Assert.IsTrue(suppliesMap.supplies.ContainsKey(wmaticAddress));
+            Assert.IsTrue(suppliesMap.supplies.ContainsKey(skyweaverAddress));
+            Assert.IsNotNull(suppliesMap.supplies[usdcAddress]);
+            Assert.IsNotNull(suppliesMap.supplies[wmaticAddress]);
+            Assert.IsNotNull(suppliesMap.supplies[skyweaverAddress]);
+            Assert.AreEqual(1, suppliesMap.supplies[usdcAddress].Length);
+            Assert.AreEqual(1, suppliesMap.supplies[wmaticAddress].Length);
+            Assert.AreEqual(3, suppliesMap.supplies[skyweaverAddress].Length, 0);
+            Assert.Greater(suppliesMap.supplies[usdcAddress][0].supply.Length, 0);
+            Assert.Greater(suppliesMap.supplies[wmaticAddress][0].supply.Length, 0);
+            Assert.Greater(suppliesMap.supplies[skyweaverAddress][0].supply.Length, 0);
+            Assert.Greater(suppliesMap.supplies[skyweaverAddress][1].supply.Length, 0);
+            Assert.Greater(suppliesMap.supplies[skyweaverAddress][2].supply.Length, 0);
+        }
     }
 }
