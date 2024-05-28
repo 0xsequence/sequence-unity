@@ -53,17 +53,39 @@ namespace Sequence.Contracts
             throw new NotImplementedException();
         }
         
+        /// <summary>
+        /// Encode the call data for the given functionName and functionArgs
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <param name="functionArgs"></param>
+        /// <returns></returns>
         public string AssembleCallData(string functionName, params object[] functionArgs)
         {
             return GetData(functionName, functionArgs);
         }
 
+        
+        /// <summary>
+        /// Create a CallContractFunction for the given functionName and functionArgs
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <param name="functionArgs"></param>
+        /// <returns></returns>
         public CallContractFunction CallFunction(string functionName, params object[] functionArgs)
         {
             string callData = GetData(functionName, functionArgs);
             return new CallContractFunction(callData, address);
         }
 
+        /// <summary>
+        /// Create a QueryContractMessageSender<T> delegate for the given query functionName and args
+        /// The delegate, when called with an IEthClient, will perform the designated query
+        /// </summary>
+        /// <param name="functionName"></param>
+        /// <param name="args"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public QueryContractMessageSender<T> QueryContract<T>(string functionName, params object[] args)
         {
             if (this.functionAbi == null)

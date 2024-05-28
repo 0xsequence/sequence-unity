@@ -17,6 +17,12 @@ namespace Sequence.Contracts
             this.Address = address;
         }
 
+        /// <summary>
+        /// Create an EthTransaction with estimated gasPrice and gasLimit using the calling wallet's current nonce for a given ContractCall
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="contractCall"></param>
+        /// <returns></returns>
         public async Task<EthTransaction> Create(IEthClient client, ContractCall contractCall)
         {
             GasLimitEstimator estimator = new GasLimitEstimator(client, contractCall.from);
@@ -24,6 +30,15 @@ namespace Sequence.Contracts
             return transaction;
         }
 
+        /// <summary>
+        /// Send a transaction calling the contract using the wallet's current nonce, estimating the gasPrice and gasLimit if not provided
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="wallet"></param>
+        /// <param name="value"></param>
+        /// <param name="gasPrice"></param>
+        /// <param name="gasLimit"></param>
+        /// <returns>Transaction hash string</returns>
         public async Task<string> Invoke(IEthClient client, IWallet wallet, BigInteger? value = null,
             BigInteger? gasPrice = null, BigInteger? gasLimit = null)
         {

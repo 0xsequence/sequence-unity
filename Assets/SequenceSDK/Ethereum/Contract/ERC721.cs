@@ -19,6 +19,12 @@ namespace Sequence.Contracts
             this.Contract = contract;
         }
 
+        /// <summary>
+        /// Create an ERC721 contract
+        /// Use the default ABI if none is provided
+        /// </summary>
+        /// <param name="contractAddress"></param>
+        /// <param name="abi"></param>
         public ERC721(string contractAddress, string abi = null) : base (contractAddress)
         {
             if (abi == null)

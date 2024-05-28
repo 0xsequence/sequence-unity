@@ -17,6 +17,12 @@ namespace Sequence.Contracts
             this.Contract = contract;
         }
 
+        /// <summary>
+        /// Create an Ownable smart contract
+        /// Uses default ABI if none provided
+        /// </summary>
+        /// <param name="contractAddress"></param>
+        /// <param name="abi"></param>
         public Ownable(string contractAddress, string abi = null)
         {
             if (abi == null)

@@ -12,6 +12,16 @@ namespace Sequence.Contracts
 {
     public static class ContractDeployer
     {
+        /// <summary>
+        /// Use the wallet and client to deploy a smart contract using the compiled bytecode string
+        /// gasPrice and gasLimit will be estimated if not provided
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="wallet"></param>
+        /// <param name="bytecode"></param>
+        /// <param name="gasPrice"></param>
+        /// <param name="gasLimit"></param>
+        /// <returns></returns>
         public static async Task<ContractDeploymentResult> Deploy(
             IEthClient client,
             IWallet wallet,
@@ -24,6 +34,12 @@ namespace Sequence.Contracts
             return result;
         }
 
+        /// <summary>
+        /// Used to precalculate the contract deployment address
+        /// </summary>
+        /// <param name="nonce"></param>
+        /// <param name="senderAddress"></param>
+        /// <returns></returns>
         public static string CalculateContractAddress(BigInteger nonce, string senderAddress)
         {
             byte[] addressBytes = SequenceCoder.HexStringToByteArray(senderAddress);

@@ -17,6 +17,16 @@ namespace Sequence.Transactions {
             this.wallet = wallet;
         }
 
+        /// <summary>
+        /// Build a TransactionCreator delegate that, when called, will return an EthTransaction with estimated gasPrice and gasLimit and the wallet's current nonce
+        /// </summary>
+        /// <param name="to"></param>
+        /// <param name="data"></param>
+        /// <param name="value"></param>
+        /// <param name="gasPrice"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="nonce"></param>
+        /// <returns></returns>
         public TransactionCreator BuildTransactionCreator(string to, string data = null, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, BigInteger? nonce = null) {
             return async () => {
                 if (value == null)
@@ -55,6 +65,16 @@ namespace Sequence.Transactions {
             };
         }
 
+        /// <summary>
+        /// Await to receive an EthTransaction with estimated gasPrice and gasLimit and the wallet's current nonce
+        /// </summary>
+        /// <param name="to"></param>
+        /// <param name="data"></param>
+        /// <param name="value"></param>
+        /// <param name="gasPrice"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="nonce"></param>
+        /// <returns></returns>
         public async Task<EthTransaction> BuildTransaction(string to, string data = null, BigInteger? value = null, BigInteger? gasPrice = null, BigInteger? gasLimit = null, BigInteger? nonce = null)
         {
             return await BuildTransactionCreator(to, data, value, gasPrice, gasLimit, nonce)();
