@@ -68,6 +68,10 @@ namespace Sequence.Authentication
         /// </summary>
         public void AppleLogin();
 
+        /// <summary>
+        /// Returns true iff there is an authentication attempt in process
+        /// </summary>
+        /// <returns></returns>
         public bool IsLoggingIn();
     }
 }
