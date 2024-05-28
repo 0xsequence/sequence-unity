@@ -1,6 +1,6 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "displayName": "Sequence WaaS SDK",
   "description": "A Unity SDK for the Sequence WaaS API",
   "unity": "2021.3",
@@ -21,20 +21,20 @@
     {
       "displayName": "Setup",
       "description": "Import this into your project to get started",
-      "path": "Samples~/Setup"
+      "path": "Sequence/Samples~/Setup"
     },
     {
       "displayName": "Demo Scene",
       "description": "Basic demo scene showcasing the SDK functionality",
-      "path": "Samples~/DemoScene"
+      "path": "Sequence/Samples~/DemoScene"
     },
     {
       "displayName": "Useful Scripts",
       "description": "Basic scripts that are helpful for getting started with the SDK",
-      "path": "Samples~/Scripts"
+      "path": "Sequence/Samples~/Scripts"
     }
   ],
-  "documentationUrl": "https://docs.sequence.xyz/unity-waas-sdk",
+  "documentationUrl": "https://docs.sequence.xyz/sdk/unity/overview/",
   "changelogUrl": "https://github.com/0xsequence/sequence-unity/releases",
   "licensesUrl": "https://github.com/0xsequence/sequence-unity/blob/master/LICENSE"
 }
