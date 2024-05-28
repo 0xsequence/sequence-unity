@@ -12,7 +12,7 @@ namespace Sequence
         public string ver;
         public string branch;
         public string commitHash;
-        public BigInteger chainID;
+        public string chainID;
         public RuntimeChecks checks;
     }
 }

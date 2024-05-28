@@ -10,6 +10,8 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using System.Net;
 using Sequence.Config;
+using Sequence.Provider;
+using Sequence.Utils;
 
 namespace Sequence
 {
@@ -24,7 +26,8 @@ namespace Sequence
         SEQUENCE_WALLET,
         ERC20_BRIDGE,
         ERC721_BRIDGE,
-        ERC1155_BRIDGE
+        ERC1155_BRIDGE,
+        NATIVE
     }
 
     public enum EventLogType
@@ -90,6 +93,11 @@ namespace Sequence
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+        
+        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
         
         /// <summary>
         /// Combines <see cref="PATH"/> and <paramref name="name"/> to suffix on to the Base Address
@@ -305,7 +313,7 @@ namespace Sequence
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
             
-            string requestJson = JsonConvert.SerializeObject(args);
+            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
@@ -389,35 +397,6 @@ namespace Sequence
                 Debug.LogError("Error building response" + e.Message);
             }
             return default;
-        }
-    }
-
-    public static class ExtensionMethods
-    {
-        public static TaskAwaiter GetAwaiter(this AsyncOperation asyncOp)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            asyncOp.completed += obj => { tcs.SetResult(null); };
-            return ((Task)tcs.Task).GetAwaiter();
-        }
-
-        public static TaskAwaiter GetAwaiter(this UnityWebRequestAsyncOperation webReqOp)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            webReqOp.completed += obj =>
-            {
-                {
-                    if (webReqOp.webRequest.responseCode != 200)
-                    {
-                        tcs.SetException(new FileLoadException(webReqOp.webRequest.error));
-                    }
-                    else
-                    {
-                        tcs.SetResult(null);
-                    }
-                }
-            };
-            return ((Task)tcs.Task).GetAwaiter();
         }
     }
 }
