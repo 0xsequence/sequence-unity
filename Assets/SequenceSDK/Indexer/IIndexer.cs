@@ -69,10 +69,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(GetTokenSuppliesMapArgs args);
 
-        /// <summary>
-        /// Retrieve <see cref="GetBalanceUpdatesReturn"/>
-        /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        [Obsolete]
         public Task<GetBalanceUpdatesReturn> GetBalanceUpdates(GetBalanceUpdatesArgs args);
 
         /// <summary>

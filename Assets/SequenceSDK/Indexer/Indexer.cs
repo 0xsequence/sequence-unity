@@ -272,10 +272,7 @@ namespace Sequence
             return await GetBalanceUpdates(chainID.ToString(), args);
         }
 
-        /// <summary>
-        /// Retrieve <see cref="GetBalanceUpdatesReturn"/>
-        /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        [Obsolete]
         public static async Task<GetBalanceUpdatesReturn> GetBalanceUpdates(string chainID, GetBalanceUpdatesArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetBalanceUpdates", args);

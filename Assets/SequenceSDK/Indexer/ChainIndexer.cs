@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -91,6 +92,7 @@ namespace Sequence
             return Indexer.GetTokenSuppliesMap(ChainId, args);
         }
 
+        [Obsolete]
         public Task<GetBalanceUpdatesReturn> GetBalanceUpdates(GetBalanceUpdatesArgs args)
         {
             return Indexer.GetBalanceUpdates(ChainId, args);
