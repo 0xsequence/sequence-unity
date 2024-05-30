@@ -35,7 +35,7 @@ namespace Sequence.Contracts
         }
 
         /// <summary>
-        /// Used to precalculate the contract deployment address
+        /// Precalculate the contract deployment address
         /// </summary>
         /// <param name="nonce"></param>
         /// <param name="senderAddress"></param>
