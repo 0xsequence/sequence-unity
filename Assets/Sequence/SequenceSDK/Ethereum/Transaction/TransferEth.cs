@@ -51,6 +51,17 @@ namespace Sequence.Transactions
             this.nonce = nonce;
         }
 
+        /// <summary>
+        /// Await to receive an EthTransaction for a basic transfer with estimated gasPrice and gasLimit and the wallet's current nonce
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="fromWallet"></param>
+        /// <param name="toAddress"></param>
+        /// <param name="value"></param>
+        /// <param name="gasPrice"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="nonce"></param>
+        /// <returns></returns>
         public static async Task<EthTransaction> CreateTransaction(
             IEthClient client,
             IWallet fromWallet,

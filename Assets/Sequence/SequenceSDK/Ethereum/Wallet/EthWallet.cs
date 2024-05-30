@@ -73,12 +73,22 @@ namespace Sequence.Wallet
             return receipt;
         }
 
+        /// <summary>
+        /// Get the balance of native currency (e.g. ETH) held by this wallet
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
         public async Task<BigInteger> GetBalance(IEthClient client)
         {
             BigInteger balance = await client.BalanceAt(GetAddress(), "latest");
             return balance;
         }
 
+        /// <summary>
+        /// Get the current nonce (as BigInteger) for this wallet
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
         public async Task<BigInteger> GetNonce(IEthClient client)
         {
             return await client.NonceAt(GetAddress());
@@ -249,7 +259,13 @@ namespace Sequence.Wallet
             return IWallet.PrefixedMessage(message);
         }
 
-        public string Recover(string message, string signature)
+        /// <summary>
+        /// Recovers the Ethereum address from a message and its signature.
+        /// </summary>
+        /// <param name="message">The message that was signed.</param>
+        /// <param name="signature">The signature of the message.</param>
+        /// <returns>The Ethereum address as a string.</returns>
+        public static string Recover(string message, string signature)
         {
             return IWallet.Recover(message, signature);
         }

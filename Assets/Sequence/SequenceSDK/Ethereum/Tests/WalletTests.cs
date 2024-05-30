@@ -322,7 +322,7 @@ public class EthWalletTests
 
         string sig = await wallet.SignMessage(testMessage);
 
-        string recoveredAddr = wallet.Recover("this is a test", sig);
+        string recoveredAddr = IWallet.Recover("this is a test", sig);
 
         Assert.AreEqual(address, recoveredAddr);
     }
