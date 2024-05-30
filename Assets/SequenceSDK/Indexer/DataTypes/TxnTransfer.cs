@@ -13,7 +13,7 @@ namespace Sequence
         public string to;
         public BigInteger[] tokenIds;
         public BigInteger[] amounts;
-        public int logIndex;
+        public BigInteger logIndex;
         public ContractInfo contractInfo;
         public Dictionary<string, TokenMetadata> tokenMetaData;
     }

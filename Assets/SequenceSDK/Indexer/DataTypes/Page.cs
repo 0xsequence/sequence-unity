@@ -8,7 +8,7 @@ namespace Sequence
         public object before;
         public object after;
         public SortBy[] sort;
-        public int pageSize = 50;
+        public int pageSize = 40;
         public bool more;
     }
 }
