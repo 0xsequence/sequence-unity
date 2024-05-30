@@ -255,12 +255,12 @@ namespace Sequence.Indexer.Tests
         public async Task TestRequestErrorHandling(bool logError)
         {
             bool errorEventFired = false;
-            IIndexer.OnIndexerQueryError += s =>
+
+            ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
+            indexer.OnIndexerQueryError += s =>
             {
                 errorEventFired = true;
             };
-
-            ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
             indexer.InjectCustomHttpHandler(new MockHttpHandler(new Exception("some error with request")));
 
             if (logError)
@@ -278,12 +278,12 @@ namespace Sequence.Indexer.Tests
         public async Task TestRequestDecodingErrorHandling(bool logError)
         {
             bool errorEventFired = false;
-            IIndexer.OnIndexerQueryError += s =>
+
+            ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
+            indexer.OnIndexerQueryError += s =>
             {
                 errorEventFired = true;
             };
-
-            ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
             indexer.InjectCustomHttpHandler(new MockHttpHandler("some random garbage"));
 
             if (logError)

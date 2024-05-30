@@ -95,6 +95,9 @@ namespace Sequence
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+        
+        public static Action<string> OnIndexerQueryFailed;
+        public static Action<string> OnIndexerQueryIssue;
 
         public static async Task<T[]> FetchMultiplePages<T>(Func<int, Task<(Page, T[])>> func, int maxPages)
         {
@@ -126,10 +129,16 @@ namespace Sequence
         /// </summary>
         /// <returns>true if this chain's indexer is good, false otherwise</returns>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<bool> Ping(string chainID, IHttpHandler httpHandler = null)
+        public static async Task<bool> Ping(string chainID, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            string responseBody = await HttpPost(chainID, "Ping", null, 0, httpHandler);
-            return BuildResponse<PingReturn>(responseBody).status;
+            string responseBody = await HttpPost(chainID, "Ping", null, 0, httpHandler, caller);
+            PingReturn result = BuildResponse<PingReturn>(responseBody, caller);
+            if (result != default)
+            {
+                return result.status;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -142,10 +151,16 @@ namespace Sequence
         /// Retrieve indexer version information.
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<Version> Version(string chainID, IHttpHandler httpHandler = null)
+        public static async Task<Version> Version(string chainID, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "Version", null, 0 , httpHandler);
-            return BuildResponse<VersionReturn>(responseBody).version;
+            var responseBody = await HttpPost(chainID, "Version", null, 0 , httpHandler, caller);
+            VersionReturn result = BuildResponse<VersionReturn>(responseBody, caller);
+            if (result != default)
+            {
+                return result.version;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -158,10 +173,16 @@ namespace Sequence
         /// Retrieve indexer runtime status information
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<RuntimeStatus> RuntimeStatus(string chainID, IHttpHandler httpHandler = null)
+        public static async Task<RuntimeStatus> RuntimeStatus(string chainID, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "RuntimeStatus", null, 0, httpHandler);
-            return BuildResponse<RuntimeStatusReturn>(responseBody).status;
+            var responseBody = await HttpPost(chainID, "RuntimeStatus", null, 0, httpHandler, caller);
+            RuntimeStatusReturn result = BuildResponse<RuntimeStatusReturn>(responseBody, caller);
+            if (result != null)
+            {
+                return result.status;
+            }
+
+            return default;
         }
 
         /// <summary>
@@ -171,7 +192,13 @@ namespace Sequence
         public static async Task<BigInteger> GetChainID(BigInteger chainID)
         {
             var responseBody = await HttpPost(chainID, "GetChainID", null);
-            return BuildResponse<GetChainIDReturn>(responseBody).chainID;
+            GetChainIDReturn result = BuildResponse<GetChainIDReturn>(responseBody);
+            if (result != default)
+            {
+                return result.chainID;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -184,10 +211,16 @@ namespace Sequence
         /// Retrieve the balance of a network's native token for a given account address
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<EtherBalance> GetEtherBalance(string chainID, string accountAddress, int retries = 0, IHttpHandler httpHandler = null)
+        public static async Task<EtherBalance> GetEtherBalance(string chainID, string accountAddress, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress), retries, httpHandler);
-            return BuildResponse<GetEtherBalanceReturn>(responseBody).balance;
+            var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress), retries, httpHandler, caller);
+            GetEtherBalanceReturn result = BuildResponse<GetEtherBalanceReturn>(responseBody, caller);
+            if (result != default)
+            {
+                return result.balance;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -200,10 +233,10 @@ namespace Sequence
         /// Retrieve an account's token balances, optionally for a specific contract
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenBalancesReturn> GetTokenBalances(string chainID, GetTokenBalancesArgs args, int retries = 0, IHttpHandler httpHandler = null)
+        public static async Task<GetTokenBalancesReturn> GetTokenBalances(string chainID, GetTokenBalancesArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTokenBalances", args, retries, httpHandler);
-            return BuildResponse<GetTokenBalancesReturn>(responseBody);
+            var responseBody = await HttpPost(chainID, "GetTokenBalances", args, retries, httpHandler, caller);
+            return BuildResponse<GetTokenBalancesReturn>(responseBody, caller);
         }
 
         [Obsolete]
@@ -216,10 +249,10 @@ namespace Sequence
         /// Retrieve the token supply for a given contract
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(string chainID, GetTokenSuppliesArgs args, int retries = 0, IHttpHandler httpHandler = null)
+        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(string chainID, GetTokenSuppliesArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTokenSupplies", args, retries, httpHandler);
-            return BuildResponse<GetTokenSuppliesReturn>(responseBody);
+            var responseBody = await HttpPost(chainID, "GetTokenSupplies", args, retries, httpHandler, caller);
+            return BuildResponse<GetTokenSuppliesReturn>(responseBody, caller);
         }
 
         [Obsolete]
@@ -232,10 +265,10 @@ namespace Sequence
         /// Retrieve <see cref="GetTokenSuppliesMapReturn"/>
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(string chainID, GetTokenSuppliesMapArgs args, int retries = 0, IHttpHandler httpHandler = null)
+        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(string chainID, GetTokenSuppliesMapArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTokenSuppliesMap", args, retries, httpHandler);
-            return BuildResponse<GetTokenSuppliesMapReturn>(responseBody);
+            var responseBody = await HttpPost(chainID, "GetTokenSuppliesMap", args, retries, httpHandler, caller);
+            return BuildResponse<GetTokenSuppliesMapReturn>(responseBody, caller);
         }
 
         [Obsolete]
@@ -261,9 +294,9 @@ namespace Sequence
         /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(string chainID, GetTransactionHistoryArgs args, int retries = 0, IHttpHandler httpHandler = null)
+        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(string chainID, GetTransactionHistoryArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTransactionHistory", args, retries, httpHandler);
+            var responseBody = await HttpPost(chainID, "GetTransactionHistory", args, retries, httpHandler, caller);
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
         }
 
@@ -277,7 +310,7 @@ namespace Sequence
         /// Makes an HTTP Post Request with content-type set to application/json
         /// </summary>
         /// <returns></returns>
-        private static async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0, IHttpHandler httpHandler = null)
+        private static async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
             if (httpHandler == null)
             {
@@ -286,7 +319,7 @@ namespace Sequence
                     throw SequenceConfig.MissingConfigError("Builder API Key");
                 }
                 
-                httpHandler = new HttpHandler(_builderApiKey);
+                httpHandler = new HttpHandler(_builderApiKey, caller);
             }
 
             string result = "";
@@ -297,7 +330,11 @@ namespace Sequence
             }
             catch (Exception e)
             {
-               IIndexer.OnIndexerQueryError?.Invoke(e.Message);
+               OnIndexerQueryFailed?.Invoke(e.Message);
+               if (caller != null)
+               {
+                   caller.OnIndexerQueryFailed(e.Message);
+               }
             }
 
             return result;
@@ -309,7 +346,7 @@ namespace Sequence
         /// <typeparam name="T"></typeparam>
         /// <param name="text"></param>
         /// <returns></returns>
-        private static T BuildResponse<T>(string text)
+        private static T BuildResponse<T>(string text, IIndexer caller = null)
         {
             try
             {
@@ -318,7 +355,13 @@ namespace Sequence
             }
             catch (Exception e)
             {
-                IIndexer.OnIndexerQueryError?.Invoke($"Error deserializing response into type: {typeof(T)}, given: {text}, reason: {e.Message}");
+                string error =
+                    $"Error deserializing response into type: {typeof(T)}, given: {text}, reason: {e.Message}";
+                OnIndexerQueryFailed?.Invoke(error);
+                if (caller != null)
+                {
+                    caller.OnIndexerQueryFailed(error);
+                }
             }
             return default;
         }

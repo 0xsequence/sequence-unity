@@ -12,21 +12,24 @@ namespace Sequence
 
         private IHttpHandler _customHttpHandler = null;
         
-        private static int _counter = 0;
-        private int _instanceId;
+        public Action<string> OnIndexerQueryError;
+        public Action<string> OnIndexerQueryIssue;
+
+        private bool _logErrors;
+        private bool _logWarnings;
 
         public ChainIndexer(BigInteger chainId, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chainId.ToString();
-            _instanceId = ++_counter;
-            SetupLogging(logErrors, logWarnings);
+            _logErrors = logErrors;
+            _logWarnings = logWarnings;
         }
         
         public ChainIndexer(Chain chain, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chain.GetChainId();
-            _instanceId = ++_counter;
-            SetupLogging(logErrors, logWarnings);
+            _logErrors = logErrors;
+            _logWarnings = logWarnings;
         }
 
         /// <summary>
@@ -38,50 +41,44 @@ namespace Sequence
             _customHttpHandler = httpHandler;
         }
 
-        private void SetupLogging(bool logErrors, bool logWarnings)
+        public void OnIndexerQueryFailed(string error)
         {
-            for (int i = 0; i < 1000; i++)
+            error = "Indexer query failed: " + error;
+            if (_logErrors)
             {
-                IIndexer.OnIndexerQueryError -= HandleQueryFailed;
-                IIndexer.OnIndexerQueryIssue -= HandleQueryFailed;
+                Debug.LogError(error);
             }
             
-            if (logErrors)
+            OnIndexerQueryError?.Invoke(error);
+        }
+
+        public void OnIndexerQueryEncounteredAnIssue(string error)
+        {
+            string issue = "Indexer query encountered an issue: " + error;
+            if (_logWarnings)
             {
-                IIndexer.OnIndexerQueryError += HandleQueryFailed;
+                Debug.LogWarning(issue);
             }
 
-            if (logWarnings)
-            {
-                IIndexer.OnIndexerQueryIssue += HandleQueryIssue;
-            }
+            OnIndexerQueryIssue?.Invoke(issue);
         }
 
-        private void HandleQueryFailed(string error)
-        {
-            Debug.LogError(_instanceId + "Indexer query failed: " + error);
-        }
-
-        private void HandleQueryIssue(string error)
-        {
-            Debug.LogWarning(_instanceId + "Indexer query encountered an issue: " + error);
-        }
-        
         public Task<bool> Ping()
         {
-            return Indexer.Ping(ChainId, _customHttpHandler);
+            return Indexer.Ping(ChainId, _customHttpHandler, this);
         }
 
         public Task<Version> Version()
         {
-            return Indexer.Version(ChainId, _customHttpHandler);
+            return Indexer.Version(ChainId, _customHttpHandler, this);
         }
 
         public Task<RuntimeStatus> RuntimeStatus()
         {
-            return Indexer.RuntimeStatus(ChainId, _customHttpHandler);
+            return Indexer.RuntimeStatus(ChainId, _customHttpHandler, this);
         }
 
+        [Obsolete]
         public BigInteger GetChainID()
         {
             return BigInteger.Parse(ChainId);
@@ -94,12 +91,12 @@ namespace Sequence
 
         public Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
-            return Indexer.GetEtherBalance(ChainId, accountAddress, 0, _customHttpHandler);
+            return Indexer.GetEtherBalance(ChainId, accountAddress, 0, _customHttpHandler, this);
         }
 
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)
         {
-            return Indexer.GetTokenBalances(ChainId, args, 0, _customHttpHandler);
+            return Indexer.GetTokenBalances(ChainId, args, 0, _customHttpHandler, this);
         }
 
         public async Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(
@@ -132,12 +129,12 @@ namespace Sequence
 
         public Task<GetTokenSuppliesReturn> GetTokenSupplies(GetTokenSuppliesArgs args)
         {
-            return Indexer.GetTokenSupplies(ChainId, args, 0, _customHttpHandler);
+            return Indexer.GetTokenSupplies(ChainId, args, 0, _customHttpHandler, this);
         }
 
         public Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(GetTokenSuppliesMapArgs args)
         {
-            return Indexer.GetTokenSuppliesMap(ChainId, args, 0, _customHttpHandler);
+            return Indexer.GetTokenSuppliesMap(ChainId, args, 0, _customHttpHandler, this);
         }
 
         [Obsolete]
@@ -148,7 +145,7 @@ namespace Sequence
 
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args)
         {
-            return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler);
+            return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler, this);
         }
     }
 }

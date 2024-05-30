@@ -14,10 +14,12 @@ namespace Sequence
     public class HttpHandler : IHttpHandler
     {
         private string _builderApiKey;
+        private IIndexer _caller;
 
-        public HttpHandler(string builderApiKey)
+        public HttpHandler(string builderApiKey, IIndexer caller = null)
         {
             _builderApiKey = builderApiKey;
+            _caller = caller;
         }
 
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
@@ -70,13 +72,25 @@ namespace Sequence
                     }
                     else
                     {
-                        IIndexer.OnIndexerQueryIssue?.Invoke($"Sequence server rate limit exceeded, trying again... Retries so far: {retries}" + "\nCurl-equivalent request: " + curlRequest);
+                        string issue =
+                            $"Sequence server rate limit exceeded, trying again... Retries so far: {retries}" +
+                            "\nCurl-equivalent request: " + curlRequest;
+                        Indexer.OnIndexerQueryIssue?.Invoke(issue);
+                        if (_caller != null)
+                        {
+                            _caller.OnIndexerQueryEncounteredAnIssue(issue);
+                        }
                         return await RetryHttpPost(chainID, endPoint, args, 5 * retries, retries);
                     }
                 }   
                 else
                 {
-                    IIndexer.OnIndexerQueryIssue?.Invoke("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                    string issue = "File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest;
+                    Indexer.OnIndexerQueryIssue?.Invoke(issue);
+                    if (_caller != null)
+                    {
+                        _caller.OnIndexerQueryEncounteredAnIssue(issue);
+                    }
                 }
             }
             catch (Exception e) {
