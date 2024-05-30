@@ -10,54 +10,76 @@ namespace Sequence
     {
         public string ChainId { get; private set; }
 
+        private IHttpHandler _customHttpHandler = null;
+        
+        private static int _counter = 0;
+        private int _instanceId;
+
         public ChainIndexer(BigInteger chainId, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chainId.ToString();
+            _instanceId = ++_counter;
             SetupLogging(logErrors, logWarnings);
         }
         
         public ChainIndexer(Chain chain, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chain.GetChainId();
+            _instanceId = ++_counter;
             SetupLogging(logErrors, logWarnings);
+        }
+
+        /// <summary>
+        /// Inject a custom http handler - useful for testing or customization
+        /// </summary>
+        /// <param name="httpHandler"></param>
+        public void InjectCustomHttpHandler(IHttpHandler httpHandler)
+        {
+            _customHttpHandler = httpHandler;
         }
 
         private void SetupLogging(bool logErrors, bool logWarnings)
         {
+            for (int i = 0; i < 1000; i++)
+            {
+                IIndexer.OnIndexerQueryError -= HandleQueryFailed;
+                IIndexer.OnIndexerQueryIssue -= HandleQueryFailed;
+            }
+            
             if (logErrors)
             {
-                Indexer.OnIndexerQueryFailed += HandleQueryFailed;
+                IIndexer.OnIndexerQueryError += HandleQueryFailed;
             }
 
             if (logWarnings)
             {
-                Indexer.OnIndexerQueryIssue += HandleQueryIssue;
+                IIndexer.OnIndexerQueryIssue += HandleQueryIssue;
             }
         }
 
         private void HandleQueryFailed(string error)
         {
-            Debug.LogError("Indexer query failed: " + error);
+            Debug.LogError(_instanceId + "Indexer query failed: " + error);
         }
 
         private void HandleQueryIssue(string error)
         {
-            Debug.LogWarning("Indexer query encountered an issue: " + error);
+            Debug.LogWarning(_instanceId + "Indexer query encountered an issue: " + error);
         }
         
         public Task<bool> Ping()
         {
-            return Indexer.Ping(ChainId);
+            return Indexer.Ping(ChainId, _customHttpHandler);
         }
 
         public Task<Version> Version()
         {
-            return Indexer.Version(ChainId);
+            return Indexer.Version(ChainId, _customHttpHandler);
         }
 
         public Task<RuntimeStatus> RuntimeStatus()
         {
-            return Indexer.RuntimeStatus(ChainId);
+            return Indexer.RuntimeStatus(ChainId, _customHttpHandler);
         }
 
         public BigInteger GetChainID()
@@ -72,12 +94,12 @@ namespace Sequence
 
         public Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
-            return Indexer.GetEtherBalance(ChainId, accountAddress);
+            return Indexer.GetEtherBalance(ChainId, accountAddress, 0, _customHttpHandler);
         }
 
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)
         {
-            return Indexer.GetTokenBalances(ChainId, args);
+            return Indexer.GetTokenBalances(ChainId, args, 0, _customHttpHandler);
         }
 
         public async Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(
@@ -110,12 +132,12 @@ namespace Sequence
 
         public Task<GetTokenSuppliesReturn> GetTokenSupplies(GetTokenSuppliesArgs args)
         {
-            return Indexer.GetTokenSupplies(ChainId, args);
+            return Indexer.GetTokenSupplies(ChainId, args, 0, _customHttpHandler);
         }
 
         public Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(GetTokenSuppliesMapArgs args)
         {
-            return Indexer.GetTokenSuppliesMap(ChainId, args);
+            return Indexer.GetTokenSuppliesMap(ChainId, args, 0, _customHttpHandler);
         }
 
         [Obsolete]
@@ -126,7 +148,7 @@ namespace Sequence
 
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args)
         {
-            return Indexer.GetTransactionHistory(ChainId, args);
+            return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler);
         }
     }
 }

@@ -8,6 +8,9 @@ namespace Sequence
 {
     public interface IIndexer
     {
+        public static Action<string> OnIndexerQueryError;
+        public static Action<string> OnIndexerQueryIssue;
+        
         /// <summary>
         /// Retrieve indexer status
         /// </summary>
