@@ -269,8 +269,8 @@ namespace Sequence
                     req.result == UnityWebRequest.Result.ConnectionError ||
                     req.result == UnityWebRequest.Result.ProtocolError)
                 {
-                    throw new Exception("Failed to make request, non-200 status code " + req.responseCode +
-                                        " with error: " + req.error);
+                    OnIndexerQueryFailed?.Invoke("Failed to make request, non-200 status code " + req.responseCode +
+                                                 " with error: " + req.error + "\nCurl-equivalent request: " + curlRequest);
                 }
 
                 string returnText = req.downloadHandler.text;
@@ -333,7 +333,7 @@ namespace Sequence
             }
             catch (Exception e)
             {
-                OnIndexerQueryFailed?.Invoke("Error building response" + e.Message);
+                OnIndexerQueryFailed?.Invoke($"Error deserializing response into type: {typeof(T)}, given: {text}, reason: {e.Message}");
             }
             return default;
         }
