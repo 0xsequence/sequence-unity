@@ -134,6 +134,11 @@ namespace Sequence.Transactions
             }
         }
 
+        /// <summary>
+        /// RLP encodes and signs a transaction using the provided EthWallet
+        /// </summary>
+        /// <param name="wallet"></param>
+        /// <returns></returns>
         public string SignAndEncodeTransaction(EthWallet wallet)
         {
             string encoded_signing = this.RLPEncode();

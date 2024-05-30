@@ -12,6 +12,17 @@ namespace Sequence.Contracts
 {
     public static class ContractTransactionSender
     {
+        /// <summary>
+        /// Send a transaction calling a method on a smart contract identified by the functionName and functionArgs
+        /// Using the wallet's current nonce and estimating the gasPrice and gasLimit
+        /// </summary>
+        /// <param name="contract"></param>
+        /// <param name="wallet"></param>
+        /// <param name="client"></param>
+        /// <param name="value"></param>
+        /// <param name="functionName"></param>
+        /// <param name="functionArgs"></param>
+        /// <returns>Transaction hash string</returns>
         public static async Task<string> SendTransactionMethod(
             this Contract contract,
             IWallet wallet,
@@ -26,6 +37,18 @@ namespace Sequence.Contracts
             return result;
         }
 
+        /// <summary>
+        /// Send a transaction calling a method on a smart contract identified by the functionName and functionArgs
+        /// Using the wallet's current nonce and estimating the gasPrice and gasLimit
+        /// Then continually poll the IEthClient for a TransactionReceipt
+        /// </summary>
+        /// <param name="contract"></param>
+        /// <param name="wallet"></param>
+        /// <param name="client"></param>
+        /// <param name="value"></param>
+        /// <param name="functionName"></param>
+        /// <param name="functionArgs"></param>
+        /// <returns></returns>
         public static async Task<TransactionReceipt> SendTransactionMethodAndWaitForReceipt(
             this Contract contract,
             IWallet wallet,
@@ -39,6 +62,15 @@ namespace Sequence.Contracts
             return receipt;
         }
 
+        /// <summary>
+        /// Send a transaction calling a method on a smart contract identified by the functionName and functionArgs
+        /// Using the wallet's current nonce and estimating the gasPrice and gasLimit
+        /// </summary>
+        /// <param name="transactionCreator"></param>
+        /// <param name="wallet"></param>
+        /// <param name="client"></param>
+        /// <param name="value"></param>
+        /// <returns>Transaction hash string</returns>
         public static async Task<string> SendTransactionMethod(
             this CallContractFunction transactionCreator,
             IWallet wallet,
@@ -50,6 +82,16 @@ namespace Sequence.Contracts
             return result;
         }
 
+        /// <summary>
+        /// Send a transaction calling a method on a smart contract identified by the functionName and functionArgs
+        /// Using the wallet's current nonce and estimating the gasPrice and gasLimit
+        /// Then continually poll the IEthClient for a TransactionReceipt
+        /// </summary>
+        /// <param name="transactionCreator"></param>
+        /// <param name="wallet"></param>
+        /// <param name="client"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static async Task<TransactionReceipt> SendTransactionMethodAndWaitForReceipt(
             this CallContractFunction transactionCreator,
             IWallet wallet,

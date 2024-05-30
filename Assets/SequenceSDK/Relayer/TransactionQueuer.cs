@@ -37,12 +37,28 @@ namespace Sequence.Relayer
             }
         }
         
+        /// <summary>
+        /// Add a TQueueableType to the _queue and update _lastTransactionAddedTime
+        /// </summary>
+        /// <param name="transaction"></param>
         public virtual void Enqueue(TQueueableType transaction)
         {
             _queue.Add(transaction);
             _lastTransactionAddedTime = Time.time;
         }
 
+        /// <summary>
+        /// Submit transactions in the queue
+        ///
+        /// If overrideWait, do not wait for any MinimumTimeBetweenTransactionSubmissionsInSeconds, just submit the transactions when called
+        ///
+        /// Optionally specify whether you want to waitForReceipt in the event that the API times out while waiting for the TransactionReceipt
+        /// In this case, the SDK will continually attempt to fetch the TransactionReceipt
+        /// </summary>
+        /// <param name="overrideWait"></param>
+        /// <param name="waitForReceipt"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<TReturnType> SubmitTransactions(bool overrideWait = false, bool waitForReceipt = true)
         {
             if (_wallet == null)

@@ -26,6 +26,12 @@ namespace Sequence.Authentication
             _nonce = nonce;
         }
         
+        /// <summary>
+        /// Initiate email sign in process with AWS Cognito
+        /// This will send an OTP email to the email provided
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task<string> SignIn(string email)
         {
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
@@ -53,6 +59,15 @@ namespace Sequence.Authentication
             }
         }
 
+        /// <summary>
+        /// Finish email sign in process with AWS Cognito
+        /// Requires the `code` given to the user via OTP email 
+        /// </summary>
+        /// <param name="challengeSession"></param>
+        /// <param name="email"></param>
+        /// <param name="code"></param>
+        /// <param name="sessionWalletAddress"></param>
+        /// <returns></returns>
         public async Task<string> Login(string challengeSession, string email, string code, string sessionWalletAddress = "")
         {
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
@@ -87,6 +102,11 @@ namespace Sequence.Authentication
             }
         }
 
+        /// <summary>
+        /// Used if the user is not registered with AWS Cognito to register them
+        /// </summary>
+        /// <param name="email"></param>
+        /// <exception cref="Exception"></exception>
         public async Task SignUp(string email)
         {
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
