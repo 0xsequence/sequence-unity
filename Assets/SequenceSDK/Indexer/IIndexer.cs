@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Numerics;
@@ -8,7 +9,7 @@ namespace Sequence
     public interface IIndexer
     {
         /// <summary>
-        /// Retrive indexer status
+        /// Retrieve indexer status
         /// </summary>
         /// <returns>true if this chain's indexer is good, false otherwise</returns>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
@@ -26,10 +27,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public Task<RuntimeStatus> RuntimeStatus();
 
-        /// <summary>
-        /// Retrieve the chain ID for a given BlockChainType
-        /// </summary>
-
+        [Obsolete("If needed, access the ChainId variable on the implementing object")]
         public BigInteger GetChainID();
 
         /// <summary>
@@ -71,10 +69,7 @@ namespace Sequence
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(GetTokenSuppliesMapArgs args);
 
-        /// <summary>
-        /// Retrieve <see cref="GetBalanceUpdatesReturn"/>
-        /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        [Obsolete]
         public Task<GetBalanceUpdatesReturn> GetBalanceUpdates(GetBalanceUpdatesArgs args);
 
         /// <summary>

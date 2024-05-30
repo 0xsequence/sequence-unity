@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -7,17 +8,17 @@ namespace Sequence
 {
     public class ChainIndexer : IIndexer
     {
-        private BigInteger _chainId;
+        public string ChainId { get; private set; }
 
         public ChainIndexer(BigInteger chainId, bool logErrors = true, bool logWarnings = true)
         {
-            this._chainId = chainId;
+            this.ChainId = chainId.ToString();
             SetupLogging(logErrors, logWarnings);
         }
         
         public ChainIndexer(Chain chain, bool logErrors = true, bool logWarnings = true)
         {
-            this._chainId = BigInteger.Parse(chain.GetChainId());
+            this.ChainId = chain.GetChainId();
             SetupLogging(logErrors, logWarnings);
         }
 
@@ -46,37 +47,37 @@ namespace Sequence
         
         public Task<bool> Ping()
         {
-            return Indexer.Ping(_chainId);
+            return Indexer.Ping(ChainId);
         }
 
         public Task<Version> Version()
         {
-            return Indexer.Version(_chainId);
+            return Indexer.Version(ChainId);
         }
 
         public Task<RuntimeStatus> RuntimeStatus()
         {
-            return Indexer.RuntimeStatus(_chainId);
+            return Indexer.RuntimeStatus(ChainId);
         }
 
         public BigInteger GetChainID()
         {
-            return _chainId;
+            return BigInteger.Parse(ChainId);
         }
 
         public Chain GetChain()
         {
-            return (Chain)(int)_chainId;
+            return ChainDictionaries.ChainById[ChainId];
         }
 
         public Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
-            return Indexer.GetEtherBalance(_chainId, accountAddress);
+            return Indexer.GetEtherBalance(ChainId, accountAddress);
         }
 
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)
         {
-            return Indexer.GetTokenBalances(_chainId, args);
+            return Indexer.GetTokenBalances(ChainId, args);
         }
 
         public async Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(
@@ -109,22 +110,23 @@ namespace Sequence
 
         public Task<GetTokenSuppliesReturn> GetTokenSupplies(GetTokenSuppliesArgs args)
         {
-            return Indexer.GetTokenSupplies(_chainId, args);
+            return Indexer.GetTokenSupplies(ChainId, args);
         }
 
         public Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(GetTokenSuppliesMapArgs args)
         {
-            return Indexer.GetTokenSuppliesMap(_chainId, args);
+            return Indexer.GetTokenSuppliesMap(ChainId, args);
         }
 
+        [Obsolete]
         public Task<GetBalanceUpdatesReturn> GetBalanceUpdates(GetBalanceUpdatesArgs args)
         {
-            return Indexer.GetBalanceUpdates(_chainId, args);
+            return Indexer.GetBalanceUpdates(ChainId, args);
         }
 
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args)
         {
-            return Indexer.GetTransactionHistory(_chainId, args);
+            return Indexer.GetTransactionHistory(ChainId, args);
         }
     }
 }

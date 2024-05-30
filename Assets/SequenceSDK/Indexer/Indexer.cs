@@ -10,6 +10,8 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using System.Net;
 using Sequence.Config;
+using Sequence.Provider;
+using Sequence.Utils;
 
 namespace Sequence
 {
@@ -24,7 +26,9 @@ namespace Sequence
         SEQUENCE_WALLET,
         ERC20_BRIDGE,
         ERC721_BRIDGE,
-        ERC1155_BRIDGE
+        ERC1155_BRIDGE,
+        NATIVE,
+        SEQ_MARKETPLACE
     }
 
     public enum EventLogType
@@ -38,7 +42,8 @@ namespace Sequence
     {
         UNKNOWN,
         TOKEN_TRANSFER,
-        SEQUENCE_TXN
+        SEQUENCE_TXN,
+        NATIVE_TOKEN_TRANSFER
     }
 
     public enum TxnTransferType
@@ -62,44 +67,49 @@ namespace Sequence
         
         private const string PATH = "/rpc/Indexer/";
 
-        private static readonly Dictionary<BigInteger, string> IndexerNames
-        = new Dictionary<BigInteger, string>
+        private static readonly Dictionary<string, string> IndexerNames
+        = new Dictionary<string, string>
     {
-        { BigInteger.Parse(Chain.Ethereum.GetChainId()), "mainnet" },
-        { BigInteger.Parse(Chain.Polygon.GetChainId()), "polygon" },
-        { BigInteger.Parse(Chain.PolygonZkEvm.GetChainId()), "polygon-zkevm" },
-        { BigInteger.Parse(Chain.BNBSmartChain.GetChainId()), "bsc" },
-        { BigInteger.Parse(Chain.ArbitrumOne.GetChainId()), "arbitrum" },
-        { BigInteger.Parse(Chain.ArbitrumNova.GetChainId()), "arbitrum-nova" },
-        { BigInteger.Parse(Chain.Optimism.GetChainId()), "optimism" },
-        { BigInteger.Parse(Chain.Avalanche.GetChainId()), "avalanche" },
-        { BigInteger.Parse(Chain.Gnosis.GetChainId()), "gnosis" },
-        { BigInteger.Parse(Chain.Base.GetChainId()), "base" },
-        { BigInteger.Parse(Chain.OasysHomeverse.GetChainId()), "homeverse" },
-        { BigInteger.Parse(Chain.AstarZKEvm.GetChainId()), "astar-zkevm" },
-        { BigInteger.Parse(Chain.Xai.GetChainId()), "xai" },
+        { Chain.Ethereum.GetChainId(), "mainnet" },
+        { Chain.Polygon.GetChainId(), "polygon" },
+        { Chain.PolygonZkEvm.GetChainId(), "polygon-zkevm" },
+        { Chain.BNBSmartChain.GetChainId(), "bsc" },
+        { Chain.ArbitrumOne.GetChainId(), "arbitrum" },
+        { Chain.ArbitrumNova.GetChainId(), "arbitrum-nova" },
+        { Chain.Optimism.GetChainId(), "optimism" },
+        { Chain.Avalanche.GetChainId(), "avalanche" },
+        { Chain.Gnosis.GetChainId(), "gnosis" },
+        { Chain.Base.GetChainId(), "base" },
+        { Chain.OasysHomeverse.GetChainId(), "homeverse" },
+        { Chain.AstarZKEvm.GetChainId(), "astar-zkevm" },
+        { Chain.Xai.GetChainId(), "xai" },
 
-        { BigInteger.Parse(Chain.TestnetSepolia.GetChainId()), "sepolia" },
-        { BigInteger.Parse(Chain.TestnetArbitrumSepolia.GetChainId()), "arbitrum-sepolia" },
-        { BigInteger.Parse(Chain.TestnetBNBSmartChain.GetChainId()), "bsc-testnet" },
-        { BigInteger.Parse(Chain.TestnetBaseSepolia.GetChainId()), "base-sepolia" },
-        { BigInteger.Parse(Chain.TestnetOasysHomeverse.GetChainId()), "homeverse-testnet" },
-        { BigInteger.Parse(Chain.TestnetAvalanche.GetChainId()), "avalanche-testnet" },
-        { BigInteger.Parse(Chain.TestnetOptimisticSepolia.GetChainId()), "optimism-sepolia" },
-        { BigInteger.Parse(Chain.TestnetPolygonAmoy.GetChainId()), "amoy" }, 
-        { BigInteger.Parse(Chain.TestnetAstarZKyoto.GetChainId()), "astar-zkyoto" }, 
-        { BigInteger.Parse(Chain.TestnetXrSepolia.GetChainId()), "xr-sepolia" },
-        { BigInteger.Parse(Chain.TestnetXaiSepolia.GetChainId()), "xai-sepolia" }, 
+        { Chain.TestnetSepolia.GetChainId(), "sepolia" },
+        { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
+        { Chain.TestnetBNBSmartChain.GetChainId(), "bsc-testnet" },
+        { Chain.TestnetBaseSepolia.GetChainId(), "base-sepolia" },
+        { Chain.TestnetOasysHomeverse.GetChainId(), "homeverse-testnet" },
+        { Chain.TestnetAvalanche.GetChainId(), "avalanche-testnet" },
+        { Chain.TestnetOptimisticSepolia.GetChainId(), "optimism-sepolia" },
+        { Chain.TestnetPolygonAmoy.GetChainId(), "amoy" }, 
+        { Chain.TestnetAstarZKyoto.GetChainId(), "astar-zkyoto" }, 
+        { Chain.TestnetXrSepolia.GetChainId(), "xr-sepolia" },
+        { Chain.TestnetXaiSepolia.GetChainId(), "xai-sepolia" }, 
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
-
+        
+        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
+        
         /// <summary>
         /// Combines <see cref="PATH"/> and <paramref name="name"/> to suffix on to the Base Address
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static string Url(BigInteger chainID, string endPoint)
+        private static string Url(string chainID, string endPoint)
         {
             return $"{HostName(chainID)}{PATH}{endPoint}";
         }
@@ -110,7 +120,7 @@ namespace Sequence
         /// <param name="chainID"></param>
         /// <returns></returns>
         /// <exception>Throws if the chainID isn't a Sequence-supported chain.</exception>
-        private static string HostName(BigInteger chainID)
+        private static string HostName(string chainID)
         {
             var indexerName = IndexerNames[chainID];
             return $"https://{indexerName}-indexer.sequence.app";
@@ -135,34 +145,50 @@ namespace Sequence
             return allItems.ToArray();
         }
 
+        [Obsolete]
+        public static async Task<bool> Ping(BigInteger chainID)
+        {
+            return await Ping(chainID.ToString());
+        }
+        
         /// <summary>
         /// Retrive indexer status
         /// </summary>
         /// <returns>true if this chain's indexer is good, false otherwise</returns>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<bool> Ping(BigInteger chainID)
+        public static async Task<bool> Ping(string chainID)
         {
             string responseBody = await HttpPost(chainID, "Ping", null);
             return BuildResponse<PingReturn>(responseBody).status;
+        }
+
+        [Obsolete]
+        public static async Task<Version> Version(BigInteger chainID)
+        {
+            return await Version(chainID.ToString());
         }
 
         /// <summary>
         /// Retrieve indexer version information.
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<Version> Version(BigInteger chainID)
+        public static async Task<Version> Version(string chainID)
         {
-
-
             var responseBody = await HttpPost(chainID, "Version", null);
             return BuildResponse<VersionReturn>(responseBody).version;
+        }
+
+        [Obsolete]
+        public static async Task<RuntimeStatus> RuntimeStatus(BigInteger chainID)
+        {
+            return await RuntimeStatus(chainID.ToString());
         }
 
         /// <summary>
         /// Retrieve indexer runtime status information
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<RuntimeStatus> RuntimeStatus(BigInteger chainID)
+        public static async Task<RuntimeStatus> RuntimeStatus(string chainID)
         {
             var responseBody = await HttpPost(chainID, "RuntimeStatus", null);
             return BuildResponse<RuntimeStatusReturn>(responseBody).status;
@@ -179,80 +205,117 @@ namespace Sequence
             return BuildResponse<GetChainIDReturn>(responseBody).chainID;
         }
 
+        [Obsolete]
+        public static async Task<EtherBalance> GetEtherBalance(BigInteger chainID, string accountAddress)
+        {
+            return await GetEtherBalance(chainID.ToString(), accountAddress);
+        }
+
         /// <summary>
         /// Retrieve the balance of a network's native token for a given account address
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<EtherBalance> GetEtherBalance(BigInteger chainID, string accountAddress)
+        public static async Task<EtherBalance> GetEtherBalance(string chainID, string accountAddress)
         {
             var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress));
             return BuildResponse<GetEtherBalanceReturn>(responseBody).balance;
+        }
+
+        [Obsolete]
+        public static async Task<GetTokenBalancesReturn> GetTokenBalances(BigInteger chainID, GetTokenBalancesArgs args)
+        {
+            return await GetTokenBalances(chainID.ToString(), args);
         }
 
         /// <summary>
         /// Retrieve an account's token balances, optionally for a specific contract
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenBalancesReturn> GetTokenBalances(BigInteger chainID, GetTokenBalancesArgs args)
+        public static async Task<GetTokenBalancesReturn> GetTokenBalances(string chainID, GetTokenBalancesArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetTokenBalances", args);
             return BuildResponse<GetTokenBalancesReturn>(responseBody);
+        }
+
+        [Obsolete]
+        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(BigInteger chainID, GetTokenSuppliesArgs args)
+        {
+            return await GetTokenSupplies(chainID.ToString(), args);
         }
 
         /// <summary>
         /// Retrieve the token supply for a given contract
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(BigInteger chainID, GetTokenSuppliesArgs args)
+        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(string chainID, GetTokenSuppliesArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetTokenSupplies", args);
             return BuildResponse<GetTokenSuppliesReturn>(responseBody);
+        }
+
+        [Obsolete]
+        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(BigInteger chainID, GetTokenSuppliesMapArgs args)
+        {
+            return await GetTokenSuppliesMap(chainID.ToString(), args);
         }
 
         /// <summary>
         /// Retrieve <see cref="GetTokenSuppliesMapReturn"/>
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(BigInteger chainID, GetTokenSuppliesMapArgs args)
+        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(string chainID, GetTokenSuppliesMapArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetTokenSuppliesMap", args);
             return BuildResponse<GetTokenSuppliesMapReturn>(responseBody);
-
         }
 
-        /// <summary>
-        /// Retrieve <see cref="GetBalanceUpdatesReturn"/>
-        /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        [Obsolete]
         public static async Task<GetBalanceUpdatesReturn> GetBalanceUpdates(BigInteger chainID, GetBalanceUpdatesArgs args)
+        {
+            return await GetBalanceUpdates(chainID.ToString(), args);
+        }
+
+        [Obsolete]
+        public static async Task<GetBalanceUpdatesReturn> GetBalanceUpdates(string chainID, GetBalanceUpdatesArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetBalanceUpdates", args);
             return BuildResponse<GetBalanceUpdatesReturn>(responseBody);
+        }
+
+        [Obsolete]
+        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(BigInteger chainID, GetTransactionHistoryArgs args)
+        {
+            return await GetTransactionHistory(chainID.ToString(), args);
         }
 
         /// <summary>
         /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-
-        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(BigInteger chainID, GetTransactionHistoryArgs args)
+        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(string chainID, GetTransactionHistoryArgs args)
         {
             var responseBody = await HttpPost(chainID, "GetTransactionHistory", args);
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
+        }
+
+        [Obsolete]
+        private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
+        {
+            return await HttpPost(chainID.ToString(), endPoint, args, retries);
         }
 
         /// <summary>
         /// Makes an HTTP Post Request with content-type set to application/json
         /// </summary>
         /// <returns></returns>
-        private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
+        private static async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0)
         {
             if (string.IsNullOrWhiteSpace(_builderApiKey))
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
             
-            string requestJson = JsonConvert.SerializeObject(args);
+            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
@@ -312,7 +375,7 @@ namespace Sequence
             return "";
         }
 
-        private static async Task<string> RetryHttpPost(BigInteger chainID, string endPoint, object args, float waitInSeconds, int retries)
+        private static async Task<string> RetryHttpPost(string chainID, string endPoint, object args, float waitInSeconds, int retries)
         {
             await AsyncExtensions.DelayTask(waitInSeconds);
             return await HttpPost(chainID, endPoint, args, retries + 1);
@@ -336,35 +399,6 @@ namespace Sequence
                 OnIndexerQueryFailed?.Invoke($"Error deserializing response into type: {typeof(T)}, given: {text}, reason: {e.Message}");
             }
             return default;
-        }
-    }
-
-    public static class ExtensionMethods
-    {
-        public static TaskAwaiter GetAwaiter(this AsyncOperation asyncOp)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            asyncOp.completed += obj => { tcs.SetResult(null); };
-            return ((Task)tcs.Task).GetAwaiter();
-        }
-
-        public static TaskAwaiter GetAwaiter(this UnityWebRequestAsyncOperation webReqOp)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            webReqOp.completed += obj =>
-            {
-                {
-                    if (webReqOp.webRequest.responseCode != 200)
-                    {
-                        tcs.SetException(new FileLoadException(webReqOp.webRequest.error));
-                    }
-                    else
-                    {
-                        tcs.SetResult(null);
-                    }
-                }
-            };
-            return ((Task)tcs.Task).GetAwaiter();
         }
     }
 }
