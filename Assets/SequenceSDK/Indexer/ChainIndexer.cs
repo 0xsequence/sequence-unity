@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Sequence
 {
@@ -8,14 +9,39 @@ namespace Sequence
     {
         private BigInteger _chainId;
 
-        public ChainIndexer(BigInteger chainId)
+        public ChainIndexer(BigInteger chainId, bool logErrors = true, bool logWarnings = true)
         {
             this._chainId = chainId;
+            SetupLogging(logErrors, logWarnings);
         }
         
-        public ChainIndexer(Chain chain)
+        public ChainIndexer(Chain chain, bool logErrors = true, bool logWarnings = true)
         {
             this._chainId = BigInteger.Parse(chain.GetChainId());
+            SetupLogging(logErrors, logWarnings);
+        }
+
+        private void SetupLogging(bool logErrors, bool logWarnings)
+        {
+            if (logErrors)
+            {
+                Indexer.OnIndexerQueryFailed += HandleQueryFailed;
+            }
+
+            if (logWarnings)
+            {
+                Indexer.OnIndexerQueryIssue += HandleQueryIssue;
+            }
+        }
+
+        private void HandleQueryFailed(string error)
+        {
+            Debug.LogError("Indexer query failed: " + error);
+        }
+
+        private void HandleQueryIssue(string error)
+        {
+            Debug.LogWarning("Indexer query encountered an issue: " + error);
         }
         
         public Task<bool> Ping()

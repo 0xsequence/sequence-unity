@@ -57,6 +57,9 @@ namespace Sequence
 
     public static class Indexer
     {
+        public static Action<string> OnIndexerQueryFailed;
+        public static Action<string> OnIndexerQueryIssue;
+        
         private const string PATH = "/rpc/Indexer/";
 
         private static readonly Dictionary<BigInteger, string> IndexerNames
@@ -276,11 +279,11 @@ namespace Sequence
             }
             catch (HttpRequestException e)
             {
-                Debug.LogError("HTTP Request failed: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                OnIndexerQueryFailed?.Invoke("HTTP Request failed: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                Debug.LogError("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                OnIndexerQueryFailed?.Invoke("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
@@ -288,7 +291,7 @@ namespace Sequence
                 {
                     if (retries == 5)
                     {
-                        Debug.LogError("Sequence server rate limit exceeded, giving up after 5 retries..." + "\nCurl-equivalent request: " + curlRequest);
+                        OnIndexerQueryFailed?.Invoke("Sequence server rate limit exceeded, giving up after 5 retries..." + "\nCurl-equivalent request: " + curlRequest);
                     }
                     else
                     {
@@ -303,7 +306,7 @@ namespace Sequence
                 }
             }
             catch (Exception e) {
-                Debug.LogError("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                OnIndexerQueryFailed?.Invoke("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
 
             return "";
@@ -330,7 +333,7 @@ namespace Sequence
             }
             catch (Exception e)
             {
-                Debug.LogError("Error building response" + e.Message);
+                OnIndexerQueryFailed?.Invoke("Error building response" + e.Message);
             }
             return default;
         }
