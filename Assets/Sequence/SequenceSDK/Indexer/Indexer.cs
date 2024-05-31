@@ -147,12 +147,6 @@ namespace Sequence
             return await Version(chainID.ToString());
         }
 
-        [Obsolete]
-        public static async Task<Version> Version(BigInteger chainID)
-        {
-            return await Version(chainID.ToString());
-        }
-
         /// <summary>
         /// Retrieve indexer version information.
         /// </summary>
@@ -167,12 +161,6 @@ namespace Sequence
             }
 
             return default;
-        }
-
-        [Obsolete]
-        public static async Task<RuntimeStatus> RuntimeStatus(BigInteger chainID)
-        {
-            return await RuntimeStatus(chainID.ToString());
         }
 
         [Obsolete]
@@ -219,12 +207,6 @@ namespace Sequence
             return await GetEtherBalance(chainID.ToString(), accountAddress);
         }
 
-        [Obsolete]
-        public static async Task<EtherBalance> GetEtherBalance(BigInteger chainID, string accountAddress)
-        {
-            return await GetEtherBalance(chainID.ToString(), accountAddress);
-        }
-
         /// <summary>
         /// Retrieve the balance of a network's native token for a given account address
         /// </summary>
@@ -247,12 +229,6 @@ namespace Sequence
             return await GetTokenBalances(chainID.ToString(), args);
         }
 
-        [Obsolete]
-        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(BigInteger chainID, GetTokenSuppliesArgs args)
-        {
-            return await GetTokenSupplies(chainID.ToString(), args);
-        }
-
         /// <summary>
         /// Retrieve an account's token balances, optionally for a specific contract
         /// </summary>
@@ -267,12 +243,6 @@ namespace Sequence
         public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(BigInteger chainID, GetTokenSuppliesArgs args)
         {
             return await GetTokenSupplies(chainID.ToString(), args);
-        }
-
-        [Obsolete]
-        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(BigInteger chainID, GetTokenSuppliesMapArgs args)
-        {
-            return await GetTokenSuppliesMap(chainID.ToString(), args);
         }
 
         /// <summary>
