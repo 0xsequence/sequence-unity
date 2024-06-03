@@ -63,7 +63,12 @@ namespace Sequence.WaaS
 
             string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
             _authenticator = new OpenIdAuthenticator(nonce);
-            _authenticator.PlatformSpecificSetup();
+            try {
+                _authenticator.PlatformSpecificSetup();
+            }
+            catch (Exception e) {
+                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
+            }
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
             _authenticator.OnSignInFailed += OnSocialSignInFailed;

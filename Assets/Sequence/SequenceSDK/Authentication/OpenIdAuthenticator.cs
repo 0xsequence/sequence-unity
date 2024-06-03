@@ -196,6 +196,7 @@ namespace Sequence.Authentication
 
         private string GenerateState(LoginMethod method)
         {
+            _stateToken = Guid.NewGuid().ToString();
             string state = $"{_urlScheme + "---" + _stateToken + method}";
             return state;
         }
@@ -215,9 +216,7 @@ namespace Sequence.Authentication
 #if UNITY_IOS
             RedirectUrl = $"{ReverseClientId(clientId)}://";
 #endif
-            
-            _stateToken = Guid.NewGuid().ToString();
-            
+
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={state}/";
             if (PlayerPrefs.HasKey(LoginEmail))
@@ -245,6 +244,7 @@ namespace Sequence.Authentication
                 $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell\\open /f",
                 $"add HKEY_CURRENT_USER\\Software\\Classes\\{_urlScheme}\\shell\\open\\command /t REG_SZ /d \"\\\"{appPath}\\\" \\\"%1\\\"\" /f",
             };
+#if ENABLE_MONO
             foreach(var args in commands) {
                 var command = new System.Diagnostics.ProcessStartInfo();
                 command.FileName = "C:\\Windows\\System32\\reg.exe";
@@ -253,6 +253,25 @@ namespace Sequence.Authentication
                 command.CreateNoWindow = true;
                 System.Diagnostics.Process.Start(command);
             }
+#elif ENABLE_IL2CPP
+            try
+            {
+                foreach(var args in commands) {
+                    var command = new System.Diagnostics.ProcessStartInfo();
+                    command.FileName = "C:\\Windows\\System32\\reg.exe";
+                    command.Arguments = args;
+                    command.UseShellExecute = false;
+                    command.CreateNoWindow = true;
+                    System.Diagnostics.Process.Start(command);
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = $"Failed to register URL scheme '{_urlScheme}': {ex.Message}" + "\nSocial sign in is not currently supported on IL2CPP";
+                Debug.LogWarning(message);
+                throw new Exception(message);
+            }
+#endif
             
             StartWindowsServer();
 #elif UNITY_STANDALONE_OSX
