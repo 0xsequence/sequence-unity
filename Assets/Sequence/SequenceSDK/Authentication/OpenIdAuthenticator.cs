@@ -349,7 +349,7 @@ namespace Sequence.Authentication
             {
                 if (!state.Contains(_stateToken))
                 {
-                    OnSignInFailed?.Invoke("State token mismatch");
+                    OnSignInFailed?.Invoke("State token mismatch, given state: " + state + " expected: " + _stateToken);
                     return;
                 }
                 method = GetMethodFromState(state);
