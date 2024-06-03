@@ -196,6 +196,7 @@ namespace Sequence.Authentication
 
         private string GenerateState(LoginMethod method)
         {
+            _stateToken = Guid.NewGuid().ToString();
             string state = $"{_urlScheme + "---" + _stateToken + method}";
             return state;
         }
@@ -215,9 +216,7 @@ namespace Sequence.Authentication
 #if UNITY_IOS
             RedirectUrl = $"{ReverseClientId(clientId)}://";
 #endif
-            
-            _stateToken = Guid.NewGuid().ToString();
-            
+
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={state}/";
             if (PlayerPrefs.HasKey(LoginEmail))
