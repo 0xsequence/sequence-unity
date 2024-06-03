@@ -9,6 +9,22 @@ namespace Sequence
     public interface IIndexer
     {
         /// <summary>
+        /// Handle a failed indexer query
+        ///
+        /// If provided to Indexer static class when calling a function, Indexer should call this method when needed
+        /// </summary>
+        /// <param name="error"></param>
+        public void OnIndexerQueryFailed(string error);
+        
+        /// <summary>
+        /// Handle an issue during an indexer query
+        ///
+        /// If provided to Indexer static class when calling a function, Indexer should call this method when needed
+        /// </summary>
+        /// <param name="error"></param>
+        public void OnIndexerQueryEncounteredAnIssue(string error);
+        
+        /// <summary>
         /// Retrieve indexer status
         /// </summary>
         /// <returns>true if this chain's indexer is good, false otherwise</returns>

@@ -62,9 +62,9 @@ namespace Sequence
 
     public static class Indexer
     {
-        private const string PATH = "/rpc/Indexer/";
+        internal const string PATH = "/rpc/Indexer/";
 
-        private static readonly Dictionary<string, string> IndexerNames
+        internal static readonly Dictionary<string, string> IndexerNames
         = new Dictionary<string, string>
     {
         { Chain.Ethereum.GetChainId(), "mainnet" },
@@ -96,32 +96,8 @@ namespace Sequence
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
         
-        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore
-        };
-        
-        /// <summary>
-        /// Combines <see cref="PATH"/> and <paramref name="name"/> to suffix on to the Base Address
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private static string Url(string chainID, string endPoint)
-        {
-            return $"{HostName(chainID)}{PATH}{endPoint}";
-        }
-
-        /// <summary>
-        /// Get HostName directing to specific <paramref name="chainID"/>
-        /// </summary>
-        /// <param name="chainID"></param>
-        /// <returns></returns>
-        /// <exception>Throws if the chainID isn't a Sequence-supported chain.</exception>
-        private static string HostName(string chainID)
-        {
-            var indexerName = IndexerNames[chainID];
-            return $"https://{indexerName}-indexer.sequence.app";
-        }
+        public static Action<string> OnIndexerQueryFailed;
+        public static Action<string> OnIndexerQueryIssue;
 
         public static async Task<T[]> FetchMultiplePages<T>(Func<int, Task<(Page, T[])>> func, int maxPages)
         {
@@ -153,10 +129,16 @@ namespace Sequence
         /// </summary>
         /// <returns>true if this chain's indexer is good, false otherwise</returns>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<bool> Ping(string chainID)
+        public static async Task<bool> Ping(string chainID, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            string responseBody = await HttpPost(chainID, "Ping", null);
-            return BuildResponse<PingReturn>(responseBody).status;
+            string responseBody = await HttpPost(chainID, "Ping", null, 0, httpHandler, caller);
+            PingReturn result = BuildResponse<PingReturn>(responseBody, caller);
+            if (result != default)
+            {
+                return result.status;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -169,10 +151,16 @@ namespace Sequence
         /// Retrieve indexer version information.
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<Version> Version(string chainID)
+        public static async Task<Version> Version(string chainID, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "Version", null);
-            return BuildResponse<VersionReturn>(responseBody).version;
+            var responseBody = await HttpPost(chainID, "Version", null, 0 , httpHandler, caller);
+            VersionReturn result = BuildResponse<VersionReturn>(responseBody, caller);
+            if (result != default)
+            {
+                return result.version;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -185,21 +173,32 @@ namespace Sequence
         /// Retrieve indexer runtime status information
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<RuntimeStatus> RuntimeStatus(string chainID)
+        public static async Task<RuntimeStatus> RuntimeStatus(string chainID, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "RuntimeStatus", null);
-            return BuildResponse<RuntimeStatusReturn>(responseBody).status;
+            var responseBody = await HttpPost(chainID, "RuntimeStatus", null, 0, httpHandler, caller);
+            RuntimeStatusReturn result = BuildResponse<RuntimeStatusReturn>(responseBody, caller);
+            if (result != null)
+            {
+                return result.status;
+            }
+
+            return default;
         }
 
         /// <summary>
         /// Retrieve the chain ID for a given BlockChainType
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-
         public static async Task<BigInteger> GetChainID(BigInteger chainID)
         {
             var responseBody = await HttpPost(chainID, "GetChainID", null);
-            return BuildResponse<GetChainIDReturn>(responseBody).chainID;
+            GetChainIDReturn result = BuildResponse<GetChainIDReturn>(responseBody);
+            if (result != default)
+            {
+                return result.chainID;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -212,10 +211,16 @@ namespace Sequence
         /// Retrieve the balance of a network's native token for a given account address
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<EtherBalance> GetEtherBalance(string chainID, string accountAddress)
+        public static async Task<EtherBalance> GetEtherBalance(string chainID, string accountAddress, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress));
-            return BuildResponse<GetEtherBalanceReturn>(responseBody).balance;
+            var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress), retries, httpHandler, caller);
+            GetEtherBalanceReturn result = BuildResponse<GetEtherBalanceReturn>(responseBody, caller);
+            if (result != default)
+            {
+                return result.balance;
+            }
+
+            return default;
         }
 
         [Obsolete]
@@ -228,10 +233,10 @@ namespace Sequence
         /// Retrieve an account's token balances, optionally for a specific contract
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenBalancesReturn> GetTokenBalances(string chainID, GetTokenBalancesArgs args)
+        public static async Task<GetTokenBalancesReturn> GetTokenBalances(string chainID, GetTokenBalancesArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTokenBalances", args);
-            return BuildResponse<GetTokenBalancesReturn>(responseBody);
+            var responseBody = await HttpPost(chainID, "GetTokenBalances", args, retries, httpHandler, caller);
+            return BuildResponse<GetTokenBalancesReturn>(responseBody, caller);
         }
 
         [Obsolete]
@@ -244,10 +249,10 @@ namespace Sequence
         /// Retrieve the token supply for a given contract
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(string chainID, GetTokenSuppliesArgs args)
+        public static async Task<GetTokenSuppliesReturn> GetTokenSupplies(string chainID, GetTokenSuppliesArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTokenSupplies", args);
-            return BuildResponse<GetTokenSuppliesReturn>(responseBody);
+            var responseBody = await HttpPost(chainID, "GetTokenSupplies", args, retries, httpHandler, caller);
+            return BuildResponse<GetTokenSuppliesReturn>(responseBody, caller);
         }
 
         [Obsolete]
@@ -260,10 +265,10 @@ namespace Sequence
         /// Retrieve <see cref="GetTokenSuppliesMapReturn"/>
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(string chainID, GetTokenSuppliesMapArgs args)
+        public static async Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(string chainID, GetTokenSuppliesMapArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTokenSuppliesMap", args);
-            return BuildResponse<GetTokenSuppliesMapReturn>(responseBody);
+            var responseBody = await HttpPost(chainID, "GetTokenSuppliesMap", args, retries, httpHandler, caller);
+            return BuildResponse<GetTokenSuppliesMapReturn>(responseBody, caller);
         }
 
         [Obsolete]
@@ -289,9 +294,9 @@ namespace Sequence
         /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(string chainID, GetTransactionHistoryArgs args)
+        public static async Task<GetTransactionHistoryReturn> GetTransactionHistory(string chainID, GetTransactionHistoryArgs args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "GetTransactionHistory", args);
+            var responseBody = await HttpPost(chainID, "GetTransactionHistory", args, retries, httpHandler, caller);
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
         }
 
@@ -305,77 +310,34 @@ namespace Sequence
         /// Makes an HTTP Post Request with content-type set to application/json
         /// </summary>
         /// <returns></returns>
-        private static async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0)
+        private static async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            if (string.IsNullOrWhiteSpace(_builderApiKey))
+            if (httpHandler == null)
             {
-                throw SequenceConfig.MissingConfigError("Builder API Key");
-            }
-            
-            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
-            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
-            req.SetRequestHeader("Content-Type", "application/json");
-            req.SetRequestHeader("Accept", "application/json");
-            req.SetRequestHeader("X-Access-Key", _builderApiKey); 
-            req.method = UnityWebRequest.kHttpVerbPOST;
-            req.timeout = 10; // Request will timeout after 10 seconds
+                if (string.IsNullOrWhiteSpace(_builderApiKey))
+                {
+                    throw SequenceConfig.MissingConfigError("Builder API Key");
+                }
                 
-            string curlRequest = 
-                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
+                httpHandler = new HttpHandler(_builderApiKey, caller);
+            }
+
+            string result = "";
+
             try
             {
-                await req.SendWebRequest();
-                if (req.responseCode < 200 || req.responseCode > 299 || req.error != null ||
-                    req.result == UnityWebRequest.Result.ConnectionError ||
-                    req.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    throw new Exception("Failed to make request, non-200 status code " + req.responseCode +
-                                        " with error: " + req.error);
-                }
-
-                string returnText = req.downloadHandler.text;
-                req.Dispose();
-                return returnText;
+                result = await httpHandler.HttpPost(chainID, endPoint, args, retries);
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
-                Debug.LogError("HTTP Request failed: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
-            }
-            catch (FormatException e)
-            {
-                Debug.LogError("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
-            }
-            catch (FileLoadException e)
-            {
-                if (e.Message.Contains($"{(int)HttpStatusCode.TooManyRequests}"))
-                {
-                    if (retries == 5)
-                    {
-                        Debug.LogError("Sequence server rate limit exceeded, giving up after 5 retries..." + "\nCurl-equivalent request: " + curlRequest);
-                    }
-                    else
-                    {
-                        
-                        Debug.LogWarning($"Sequence server rate limit exceeded, trying again... Retries so far: {retries}" + "\nCurl-equivalent request: " + curlRequest);
-                        return await RetryHttpPost(chainID, endPoint, args, 5 * retries, retries);
-                    }
-                }   
-                else
-                {
-                    Debug.LogWarning("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
-                }
-            }
-            catch (Exception e) {
-                Debug.LogError("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+               OnIndexerQueryFailed?.Invoke(e.Message);
+               if (caller != null)
+               {
+                   caller.OnIndexerQueryFailed(e.Message);
+               }
             }
 
-            return "";
-        }
-
-        private static async Task<string> RetryHttpPost(string chainID, string endPoint, object args, float waitInSeconds, int retries)
-        {
-            await AsyncExtensions.DelayTask(waitInSeconds);
-            return await HttpPost(chainID, endPoint, args, retries + 1);
+            return result;
         }
 
         /// <summary>
@@ -384,7 +346,7 @@ namespace Sequence
         /// <typeparam name="T"></typeparam>
         /// <param name="text"></param>
         /// <returns></returns>
-        private static T BuildResponse<T>(string text)
+        private static T BuildResponse<T>(string text, IIndexer caller = null)
         {
             try
             {
@@ -393,7 +355,13 @@ namespace Sequence
             }
             catch (Exception e)
             {
-                Debug.LogError("Error building response" + e.Message);
+                string error =
+                    $"Error deserializing response into type: {typeof(T)}, given: {text}, reason: {e.Message}";
+                OnIndexerQueryFailed?.Invoke(error);
+                if (caller != null)
+                {
+                    caller.OnIndexerQueryFailed(error);
+                }
             }
             return default;
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Sequence
 {
@@ -9,31 +10,75 @@ namespace Sequence
     {
         public string ChainId { get; private set; }
 
-        public ChainIndexer(BigInteger chainId)
+        private IHttpHandler _customHttpHandler = null;
+        
+        public Action<string> OnIndexerQueryError;
+        public Action<string> OnIndexerQueryIssue;
+
+        private bool _logErrors;
+        private bool _logWarnings;
+
+        public ChainIndexer(BigInteger chainId, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chainId.ToString();
+            _logErrors = logErrors;
+            _logWarnings = logWarnings;
         }
         
-        public ChainIndexer(Chain chain)
+        public ChainIndexer(Chain chain, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chain.GetChainId();
+            _logErrors = logErrors;
+            _logWarnings = logWarnings;
         }
-        
+
+        /// <summary>
+        /// Inject a custom http handler - useful for testing or customization
+        /// </summary>
+        /// <param name="httpHandler"></param>
+        public void InjectCustomHttpHandler(IHttpHandler httpHandler)
+        {
+            _customHttpHandler = httpHandler;
+        }
+
+        public void OnIndexerQueryFailed(string error)
+        {
+            error = "Indexer query failed: " + error;
+            if (_logErrors)
+            {
+                Debug.LogError(error);
+            }
+            
+            OnIndexerQueryError?.Invoke(error);
+        }
+
+        public void OnIndexerQueryEncounteredAnIssue(string error)
+        {
+            string issue = "Indexer query encountered an issue: " + error;
+            if (_logWarnings)
+            {
+                Debug.LogWarning(issue);
+            }
+
+            OnIndexerQueryIssue?.Invoke(issue);
+        }
+
         public Task<bool> Ping()
         {
-            return Indexer.Ping(ChainId);
+            return Indexer.Ping(ChainId, _customHttpHandler, this);
         }
 
         public Task<Version> Version()
         {
-            return Indexer.Version(ChainId);
+            return Indexer.Version(ChainId, _customHttpHandler, this);
         }
 
         public Task<RuntimeStatus> RuntimeStatus()
         {
-            return Indexer.RuntimeStatus(ChainId);
+            return Indexer.RuntimeStatus(ChainId, _customHttpHandler, this);
         }
 
+        [Obsolete]
         public BigInteger GetChainID()
         {
             return BigInteger.Parse(ChainId);
@@ -46,12 +91,12 @@ namespace Sequence
 
         public Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
-            return Indexer.GetEtherBalance(ChainId, accountAddress);
+            return Indexer.GetEtherBalance(ChainId, accountAddress, 0, _customHttpHandler, this);
         }
 
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)
         {
-            return Indexer.GetTokenBalances(ChainId, args);
+            return Indexer.GetTokenBalances(ChainId, args, 0, _customHttpHandler, this);
         }
 
         public async Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(
@@ -84,12 +129,12 @@ namespace Sequence
 
         public Task<GetTokenSuppliesReturn> GetTokenSupplies(GetTokenSuppliesArgs args)
         {
-            return Indexer.GetTokenSupplies(ChainId, args);
+            return Indexer.GetTokenSupplies(ChainId, args, 0, _customHttpHandler, this);
         }
 
         public Task<GetTokenSuppliesMapReturn> GetTokenSuppliesMap(GetTokenSuppliesMapArgs args)
         {
-            return Indexer.GetTokenSuppliesMap(ChainId, args);
+            return Indexer.GetTokenSuppliesMap(ChainId, args, 0, _customHttpHandler, this);
         }
 
         [Obsolete]
@@ -100,7 +145,7 @@ namespace Sequence
 
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args)
         {
-            return Indexer.GetTransactionHistory(ChainId, args);
+            return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler, this);
         }
     }
 }
