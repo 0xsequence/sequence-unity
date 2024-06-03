@@ -1,6 +1,10 @@
 {
   "name": "xyz.0xsequence.waas-unity",
+<<<<<<< Fix/il2cppPCException
   "version": "2.8.3",
+=======
+  "version": "2.8.1",
+>>>>>>> master
   "displayName": "Sequence Embedded Wallet SDK",
   "description": "A Unity SDK for the Sequence WaaS API",
   "unity": "2021.3",
