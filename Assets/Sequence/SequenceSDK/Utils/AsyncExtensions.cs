@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Sequence
+namespace Sequence.Utils
 {
     public static class AsyncExtensions
     {
