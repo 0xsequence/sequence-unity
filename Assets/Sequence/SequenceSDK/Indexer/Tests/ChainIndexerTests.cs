@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence;
 using Sequence.Utils;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Sequence.Indexer.Tests
 {
@@ -245,6 +248,52 @@ namespace Sequence.Indexer.Tests
             Assert.Greater(suppliesMap.supplies[skyweaverAddress][0].supply.Length, 0);
             Assert.Greater(suppliesMap.supplies[skyweaverAddress][1].supply.Length, 0);
             Assert.Greater(suppliesMap.supplies[skyweaverAddress][2].supply.Length, 0);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task TestRequestErrorHandling(bool logError)
+        {
+            bool errorEventFired = false;
+
+            ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
+            indexer.OnIndexerQueryError += s =>
+            {
+                errorEventFired = true;
+            };
+            indexer.InjectCustomHttpHandler(new MockHttpHandler(new Exception("some error with request")));
+
+            if (logError)
+            {
+                LogAssert.Expect(LogType.Error, new Regex("Indexer query failed:.* some error with request.*"));
+            }
+
+            await indexer.Ping();
+            
+            Assert.IsTrue(errorEventFired);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task TestRequestDecodingErrorHandling(bool logError)
+        {
+            bool errorEventFired = false;
+
+            ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
+            indexer.OnIndexerQueryError += s =>
+            {
+                errorEventFired = true;
+            };
+            indexer.InjectCustomHttpHandler(new MockHttpHandler("some random garbage"));
+
+            if (logError)
+            {
+                LogAssert.Expect(LogType.Error, new Regex("Indexer query failed:.* some random garbage.*"));
+            }
+
+            await indexer.GetEtherBalance(_address);
+            
+            Assert.IsTrue(errorEventFired);
         }
     }
 }
