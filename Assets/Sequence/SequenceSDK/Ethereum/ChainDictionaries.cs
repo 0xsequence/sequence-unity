@@ -19,6 +19,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "Oasys Homeverse" },
             { Chain.Xai, "Xai" },
             { Chain.AstarZKEvm, "Astar zkEVM" },
+            { Chain.Telos, "Telos" },
             
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -48,6 +49,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "OAS"},
             { Chain.AstarZKEvm, "ETH" },
             { Chain.Xai, "XAI" },
+            { Chain.Telos, "TLOS" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -77,6 +79,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "https://explorer.oasys.homeverse.games/" },
             { Chain.AstarZKEvm, "https://astar-zkevm.explorer.startale.com/" },
             { Chain.Xai, "https://explorer.xai-chain.net/" }, 
+            { Chain.Telos, "https://explorer.telos.net/" },
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -108,6 +111,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "19011" },
             { Chain.AstarZKEvm, "3776" },
             { Chain.Xai, "660279" },
+            { Chain.Telos, "40" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -137,6 +141,7 @@ namespace Sequence
             { "19011", Chain.OasysHomeverse },
             { "3776", Chain.AstarZKEvm },
             { "660279", Chain.Xai },
+            { "40", Chain.Telos },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },

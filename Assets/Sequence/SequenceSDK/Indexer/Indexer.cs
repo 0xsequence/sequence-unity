@@ -80,6 +80,7 @@ namespace Sequence
         { Chain.OasysHomeverse.GetChainId(), "homeverse" },
         { Chain.AstarZKEvm.GetChainId(), "astar-zkevm" },
         { Chain.Xai.GetChainId(), "xai" },
+        { Chain.Telos.GetChainId(), "telos" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
