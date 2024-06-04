@@ -41,13 +41,6 @@ namespace Sequence.Authentication
             }
             return (clientId, nonce);
         }
-        
-        private AndroidJavaObject GetSignInWithGoogleOption(string clientId, string nonce)
-        {
-            AndroidJavaObject optionBuilder = new AndroidJavaObject("com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption$Builder", clientId);
-            optionBuilder.Call<AndroidJavaObject>("setNonce", nonce);
-            return optionBuilder.Call<AndroidJavaObject>("build");
-        }
  
         private AndroidJavaObject GetCurrentActivity()
         {
