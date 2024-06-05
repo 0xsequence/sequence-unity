@@ -18,6 +18,7 @@ namespace Sequence
         OasysHomeverse = 19011,
         AstarZKEvm = 3776,
         Xai = 660279,
+        Telos = 40,
         
         // Testnets
         TestnetSepolia = 11155111,
