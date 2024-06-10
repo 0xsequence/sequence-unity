@@ -12,7 +12,7 @@ namespace Sequence.Demo
         
         protected Stack<PageWithArgs> _pageStack = new Stack<PageWithArgs>();
         protected UIPage _page;
-        private bool _isOpen = false;
+        protected bool _isOpen = false;
         
         protected struct PageWithArgs
         {

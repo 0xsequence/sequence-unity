@@ -127,10 +127,11 @@ namespace Sequence.Demo
             }
             else if (_storeSessionInfoAndSkipLoginWhenPossible)
             {
-                _storeSessionInfoAndSkipLoginWhenPossible = false;
-                Open();
+                _gameObject.SetActive(true);
+                _animator.AnimateIn( _openAnimationDurationInSeconds);
+                _isOpen = true;
+                
                 StartCoroutine(SetUIPage(_loginSuccessPage));
-                _storeSessionInfoAndSkipLoginWhenPossible = true;
             }
         }
     }
