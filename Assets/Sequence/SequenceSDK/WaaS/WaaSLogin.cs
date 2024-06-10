@@ -146,7 +146,7 @@ namespace Sequence.WaaS
         private async Task EnsureSessionIsValid(WaaSWallet wallet)
         {
             WaaSSession[] activeSessions = await wallet.ListSessions();
-            if (activeSessions.Length == 0)
+            if (activeSessions == null || activeSessions.Length == 0)
             {
                 FailedLoginWithStoredSessionWallet("No active sessions found");
                 return;
