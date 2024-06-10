@@ -11,6 +11,7 @@ namespace Sequence.Demo
     public class LoginPanel : UIPanel
     {
         [SerializeField] private GameObject _waaSSessionManagerPrefab;
+        [SerializeField] private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
@@ -32,7 +33,9 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            ILogin loginHandler = new WaaSLogin();
+            WaaSWallet.OnFailedToLoginWithStoredSessionWallet += OnFailedToLoginWithStoredSessionWalletHandler;
+            
+            ILogin loginHandler = new WaaSLogin(_storeSessionInfoAndSkipLoginWhenPossible);
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
@@ -41,6 +44,15 @@ namespace Sequence.Demo
             {
                 _urlScheme = SequenceConfig.GetConfig().UrlScheme;
             }
+        }
+
+        public override void Open(params object[] args)
+        {
+            if (_storeSessionInfoAndSkipLoginWhenPossible)
+            {
+                return;
+            }
+            base.Open(args);
         }
 
         public void SetupLoginHandler(ILogin loginHandler)
@@ -57,6 +69,13 @@ namespace Sequence.Demo
 
             Instantiate(_waaSSessionManagerPrefab);
         } 
+        
+        private void OnFailedToLoginWithStoredSessionWalletHandler(string error)
+        {
+            Debug.LogWarning($"Failed to connect to Sequence API with stored session wallet: {error}");
+            _storeSessionInfoAndSkipLoginWhenPossible = false;
+            Open();
+        }
 
         public void OpenTransitionPanel()
         {
@@ -105,6 +124,13 @@ namespace Sequence.Demo
             if (_waasDemoPage != null)
             {
                 _waasDemoPage.Open(wallet);
+            }
+            else if (_storeSessionInfoAndSkipLoginWhenPossible)
+            {
+                _storeSessionInfoAndSkipLoginWhenPossible = false;
+                Open();
+                StartCoroutine(SetUIPage(_loginSuccessPage));
+                _storeSessionInfoAndSkipLoginWhenPossible = true;
             }
         }
     }
