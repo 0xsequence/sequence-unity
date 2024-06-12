@@ -36,8 +36,9 @@ namespace Sequence.WaaS
         private const string _walletKey = "SessionWallet";
         private const string _waasWalletAddressKey = "WaaSWalletAddress";
 
-        public WaaSLogin(bool storeSessionWallet)
+        public WaaSLogin(IValidator validator = null)
         {
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage;
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
@@ -46,13 +47,8 @@ namespace Sequence.WaaS
             }
             else
             {
-                CreateWallet();
+                CreateWallet(validator);
             }
-        }
-
-        public WaaSLogin(IValidator validator = null)
-        {
-            CreateWallet(validator);
         }
 
         private void CreateWallet(IValidator validator = null)
@@ -125,7 +121,15 @@ namespace Sequence.WaaS
 
         private void TryToLoginWithStoredSessionWallet()
         {
-            (EthWallet, string) walletInfo = AttemptToCreateWalletFromSecureStorage();
+            (EthWallet, string) walletInfo = (null, "");
+            try
+            {
+                walletInfo = AttemptToCreateWalletFromSecureStorage();
+            }
+            catch (Exception e)
+            {
+                FailedLoginWithStoredSessionWallet(e.Message);
+            }
             if (walletInfo.Item1 == null || string.IsNullOrWhiteSpace(walletInfo.Item2))
             {
                 FailedLoginWithStoredSessionWallet("No stored wallet info found");

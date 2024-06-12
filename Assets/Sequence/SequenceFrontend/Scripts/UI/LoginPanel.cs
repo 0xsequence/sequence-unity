@@ -12,7 +12,7 @@ namespace Sequence.Demo
     public class LoginPanel : UIPanel
     {
         [SerializeField] private GameObject _waaSSessionManagerPrefab;
-        [SerializeField] private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
+        private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
@@ -35,8 +35,10 @@ namespace Sequence.Demo
             SequenceConfig config = SequenceConfig.GetConfig();
             
             WaaSWallet.OnFailedToLoginWithStoredSessionWallet += OnFailedToLoginWithStoredSessionWalletHandler;
+
+            _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
             
-            ILogin loginHandler = new WaaSLogin(_storeSessionInfoAndSkipLoginWhenPossible);
+            ILogin loginHandler = new WaaSLogin();
             SetupLoginHandler(loginHandler);
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sequence.Config;
 using UnityEngine;
 
 namespace Sequence.WaaS
@@ -32,6 +33,11 @@ namespace Sequence.WaaS
 
         private void OnApplicationQuit()
         {
+            if (SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage)
+            {
+                return;
+            }
+            
             int sessionsCount = _sessions.Count;
             for (int i = 0; i < sessionsCount; i++)
             {
