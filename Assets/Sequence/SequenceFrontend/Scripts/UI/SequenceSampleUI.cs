@@ -113,7 +113,7 @@ namespace Sequence.Demo
                 delayInSeconds = _walletPanel.GetCloseAnimationDuration();
             }
             
-            _loginPanel.OpenWithDelay(delayInSeconds);
+            _loginPanel.OpenWithDelay(delayInSeconds, true);
         }
     }
 }

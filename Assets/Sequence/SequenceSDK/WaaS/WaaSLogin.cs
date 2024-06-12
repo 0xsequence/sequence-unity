@@ -57,8 +57,14 @@ namespace Sequence.WaaS
 
         private void CreateWallet(IValidator validator = null)
         {
-            ConfigJwt configJwt = Configure();
-            
+            Configure();
+
+            SetupAuthenticator(validator);
+        }
+
+        public void SetupAuthenticator(IValidator validator = null)
+        {
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
             _sessionWallet = new EthWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
 
@@ -90,7 +96,7 @@ namespace Sequence.WaaS
             }
         }
 
-        private ConfigJwt Configure()
+        private void Configure()
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             string waasVersion = config.WaaSVersion;
@@ -115,8 +121,6 @@ namespace Sequence.WaaS
                 throw SequenceConfig.MissingConfigError("Project ID");
             }
             _waasProjectId = projectId;
-
-            return configJwt;
         }
 
         private void TryToLoginWithStoredSessionWallet()

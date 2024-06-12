@@ -5,6 +5,7 @@ using Sequence.WaaS;
 using TMPro;
 using UnityEngine;
 using Sequence.Config;
+using Sequence.Utils;
 
 namespace Sequence.Demo
 {
@@ -42,15 +43,26 @@ namespace Sequence.Demo
             
             if (_urlScheme == null) 
             {
-                _urlScheme = SequenceConfig.GetConfig().UrlScheme;
+                _urlScheme = config.UrlScheme;
             }
         }
 
+        /// <summary>
+        /// Open LoginPanel, include bool: true if you wish to open the login page after attempting to restore a session
+        /// </summary>
+        /// <param name="args"></param>
         public override void Open(params object[] args)
         {
-            if (_storeSessionInfoAndSkipLoginWhenPossible)
+            bool alreadyAttemptedToRestoreSession = args.GetObjectOfTypeIfExists<bool>();
+
+            if (_storeSessionInfoAndSkipLoginWhenPossible && !alreadyAttemptedToRestoreSession)
             {
                 return;
+            }
+
+            if (_storeSessionInfoAndSkipLoginWhenPossible)
+            {
+                LoginHandler.SetupAuthenticator();
             }
             base.Open(args);
         }
@@ -73,8 +85,7 @@ namespace Sequence.Demo
         private void OnFailedToLoginWithStoredSessionWalletHandler(string error)
         {
             Debug.LogWarning($"Failed to connect to Sequence API with stored session wallet: {error}");
-            _storeSessionInfoAndSkipLoginWhenPossible = false;
-            Open();
+            Open(true);
         }
 
         public void OpenTransitionPanel()
