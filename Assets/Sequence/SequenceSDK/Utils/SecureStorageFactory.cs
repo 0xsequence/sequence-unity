@@ -12,5 +12,14 @@ namespace Sequence.Utils
             throw new NotImplementedException("Secure storage is not currently implemented for this platform.");
 #endif
         }
+
+        public static bool IsSupportedPlatform()
+        {
+#if UNITY_IOS && !UNITY_EDITOR
+            return true;
+#else
+            return false;
+#endif
+        }
     }
 }

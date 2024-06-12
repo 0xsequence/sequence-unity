@@ -346,7 +346,7 @@ namespace Sequence.WaaS
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
-                if (_storeSessionWallet)
+                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
                 {
                     StoreWalletSecurely(walletAddress);
                 }
