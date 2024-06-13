@@ -65,16 +65,14 @@ namespace Sequence.WaaS
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
 
             string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
-            _authenticator = new OpenIdAuthenticator(nonce);
-            try {
-                _authenticator.PlatformSpecificSetup();
+            if (OpenIdAuthenticator.Instance == null)
+            {
+                SetAuthenticatorAndSetupListeners(nonce);
             }
-            catch (Exception e) {
-                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
+            else
+            {
+                SetAuthenticator(nonce);
             }
-            Application.deepLinkActivated += _authenticator.HandleDeepLink;
-            _authenticator.SignedIn += OnSocialLogin;
-            _authenticator.OnSignInFailed += OnSocialSignInFailed;
 
             if (validator == null)
             {
@@ -90,6 +88,25 @@ namespace Sequence.WaaS
             {
                 Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
             }
+        }
+
+        private void SetAuthenticator(string nonce)
+        {
+            _authenticator = OpenIdAuthenticator.GetInstance(nonce);
+        }
+
+        private void SetAuthenticatorAndSetupListeners(string nonce)
+        {
+            SetAuthenticator(nonce);
+            try {
+                _authenticator.PlatformSpecificSetup();
+            }
+            catch (Exception e) {
+                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
+            }
+            Application.deepLinkActivated += _authenticator.HandleDeepLink;
+            _authenticator.SignedIn += OnSocialLogin;
+            _authenticator.OnSignInFailed += OnSocialSignInFailed;
         }
 
         private void Configure()
