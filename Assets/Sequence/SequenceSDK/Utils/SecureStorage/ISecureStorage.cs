@@ -1,4 +1,4 @@
-namespace Sequence.Utils
+namespace Sequence.Utils.SecureStorage
 {
     public interface ISecureStorage
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.Utils
+namespace Sequence.Utils.SecureStorage
 {
     public static class SecureStorageFactory
     {

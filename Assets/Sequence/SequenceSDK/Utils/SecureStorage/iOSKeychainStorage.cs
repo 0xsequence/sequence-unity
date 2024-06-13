@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace Sequence.Utils
+namespace Sequence.Utils.SecureStorage
 {
     public class iOSKeychainStorage : ISecureStorage
     {
