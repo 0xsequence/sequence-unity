@@ -26,12 +26,12 @@ namespace Sequence.Utils.SecureStorage
         
         public void StoreString(string key, string value)
         {
-            SaveKeychainValue(DecorateKey(key), value);
+            SaveKeychainValue(key, value);
         }
 
         public string RetrieveString(string key)
         {
-            IntPtr valuePtr = GetKeychainValue(DecorateKey(key));
+            IntPtr valuePtr = GetKeychainValue(key);
             if (valuePtr != IntPtr.Zero)
             {
                 string value = Marshal.PtrToStringUTF8(valuePtr);
@@ -39,11 +39,6 @@ namespace Sequence.Utils.SecureStorage
                 return value;
             }
             return null;
-        }
-
-        private string DecorateKey(string key)
-        {
-            return Application.companyName + "-" + Application.productName + "-" + key; // This should help ensure the key is unique for each app
         }
     }
 }
