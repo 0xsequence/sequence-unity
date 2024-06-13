@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using Sequence.Config;
 using Sequence.Utils;
+using Sequence.Utils.SecureStorage;
 
 namespace Sequence.Demo
 {
