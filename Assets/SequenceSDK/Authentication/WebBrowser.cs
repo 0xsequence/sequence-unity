@@ -37,15 +37,16 @@ namespace Sequence.Authentication
         public void Authenticate(string url, string redirectUrl = "")
         {
             Dictionary<string, string> queryParams = url.ExtractQueryAndHashParameters();
-            if (queryParams.TryGetValue("client_id", out string clientId) && queryParams.TryGetValue("nonce", out string nonce))
+            if (queryParams.TryGetValue("client_id", out string clientId) && queryParams.TryGetValue("nonce", out string nonce) && queryParams.TryGetValue("state", out string state))
             {
                 GameObject receiver = new GameObject("WebBrowserMessageReceiver");
                 receiver.AddComponent<WebBrowserMessageReceiver>().SetWebBrowser(this);
-                GoogleSignIn(clientId, nonce); // Todo replace this should figure out which provider to use
+                ISocialSignIn socialSignIn = WebSocialSignInFactory.Create(_authenticator.GetMethodFromState(state));
+                socialSignIn.SignIn(clientId, nonce);
             }
             else
             {
-                _authenticator.OnSignInFailed?.Invoke("Social sign in failed: missing client_id or nonce");
+                _authenticator.OnSignInFailed?.Invoke("Social sign in failed: missing client_id, nonce, or state");
             }
         }
 #else
@@ -63,6 +64,33 @@ namespace Sequence.Authentication
         public void OnGoogleSignIn(string idToken)
         {
             _authenticator.SignedIn?.Invoke(new OpenIdAuthenticationResult(idToken, LoginMethod.Google));
+        }
+
+        private static class WebSocialSignInFactory
+        {
+            public static ISocialSignIn Create(LoginMethod method)
+            {
+                switch (method)
+                {
+                    case LoginMethod.Google:
+                        return new WebGoogleSignIn();
+                    default:
+                        throw new NotImplementedException("Social sign in method is not implemented on web platforms for the specified LoginMethod " + method);
+                }
+            }
+        }
+        
+        private interface ISocialSignIn
+        {
+            public void SignIn(string clientId, string nonce);
+        }
+        
+        private class WebGoogleSignIn : ISocialSignIn
+        {
+            public void SignIn(string clientId, string nonce)
+            {
+                GoogleSignIn(clientId, nonce);
+            }
         }
     }
     

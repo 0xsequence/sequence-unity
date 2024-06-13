@@ -356,7 +356,7 @@ namespace Sequence.Authentication
             }
         }
 
-        private LoginMethod GetMethodFromState(string state)
+        internal LoginMethod GetMethodFromState(string state)
         {
             if (state.EndsWith(nameof(LoginMethod.Google)))
             {
