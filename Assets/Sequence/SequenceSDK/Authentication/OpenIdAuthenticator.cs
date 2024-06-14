@@ -208,7 +208,7 @@ namespace Sequence.Authentication
                 throw SequenceConfig.MissingConfigError("Url Scheme");
             }
             
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
             RedirectUrl = $"{ReverseClientId(clientId)}://";
 #endif
 
