@@ -67,12 +67,7 @@ namespace Sequence.Authentication
             DiscordClientId = config.DiscordClientIdIOS;
             FacebookClientId = config.FacebookClientIdIOS;
             AppleClientId = config.AppleClientIdIOS;
-#elif UNITY_ANDROID && !UNITY_EDITOR
-            GoogleClientId = config.GoogleClientIdAndroid;
-            DiscordClientId = config.DiscordClientIdAndroid;    
-            FacebookClientId = config.FacebookClientIAndroid;
-            AppleClientId = config.AppleClientIdAndroid;
-#else
+#else // Todo get Android client ids on Android platform
             GoogleClientId = config.GoogleClientId;
             DiscordClientId = config.DiscordClientId;
             FacebookClientId = config.FacebookClientId;
@@ -85,7 +80,7 @@ namespace Sequence.Authentication
 #if UNITY_EDITOR
             return new EditorBrowser(this);
 #elif UNITY_WEBGL 
-            return new WebBrowser();
+            return new WebBrowser(this);
 #elif UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
             return new StandaloneBrowser();
 #elif UNITY_IOS
@@ -389,7 +384,7 @@ namespace Sequence.Authentication
             }
         }
 
-        private LoginMethod GetMethodFromState(string state)
+        internal LoginMethod GetMethodFromState(string state)
         {
             if (state.EndsWith(nameof(LoginMethod.Google)))
             {
