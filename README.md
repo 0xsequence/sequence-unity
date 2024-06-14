@@ -1,7 +1,10 @@
 # Sequence Unity SDK
 
 ## Documentation
-https://docs.sequence.xyz/unity-waas-sdk
+https://docs.sequence.xyz/sdk/unity/overview
+
+## Building a game guide
+https://docs.sequence.xyz/guides/unity-guide/
 
 ## Requirements
 Unity 2021.3.6f1 or later
@@ -10,26 +13,23 @@ Unity 2021.3.6f1 or later
 
 - Android
 - iOS
-- PC standalone
-- Mac standalone -> (Mono builds only when using OpenIdAuthentication -> in our testing MacOS doesn't pick up custom URL schemes automatically unless you run some system commands first; these system commands only work on Mono -> see OpenIdAuthentication.PlatformSpecificSetup)
-- WebGL (excluding OpenIdAuthentication)
+- PC standalone -> (Mono builds only when using OpenIdAuthentication -> the platform specific setup requires system commands that don't work on IL2CPP -> see OpenIdAuthentication.PlatformSpecificSetup)
+- Mac standalone -> (Mono builds only when using OpenIdAuthentication -> in our testing MacOS doesn't pick up custom URL schemes automatically unless you run some system commands first; these system commands that don't work on IL2CPP -> see OpenIdAuthentication.PlatformSpecificSetup)
+- WebGL + WebGPU
 
 ## Contributing
 
-As an open source project, we welcome and encourage your contributions! However, due to security reasons, we require that all commits be signed and verified on GitHub in order to merge into our master branch. So before contributing, you'll want to spend a few minutes setting that up if you haven't already.
+As an open source project, we welcome and encourage your contributions!
 
-To start signing your commits, please see: https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits
+Please make sure to increment the package version in `Assets/package.json` according to [Semantic Versioning](https://semver.org/) along with your submissions.
 
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 
 Unity by navigating to `Window > General > Test Runner`.
 
-Many of the tests make use of a Hardhat-based testchain. This testchain can be found 
-in the root folder of the project - in case you are experiencing issues with it.
+Many of the tests, specifically those for our custom Ethereum client, make use of a Hardhat-based testchain. This testchain can be found in the root folder of the project - in case you are experiencing issues with it.
 
-Before running tests, boot up the test chain with `make start-testchain`. You may find 
-that you need to stop (control + c) the testchain and restart it between some of the 
-tests.
+Before running tests, boot up the test chain with `make start-testchain`. You may find that you need to stop (control + c) the testchain and restart it when running the test suite again.
 
 ### Testing via command line
 It can sometimes be useful to quickly test the project via command line. This can be done without opening Unity or starting the testchain.
@@ -50,12 +50,10 @@ The test results can be found in `TestResults.xml` located in the root directory
 When a test fails, it is recommended that you open up Unity and test via the usual method.
 Note: Please do not run `make test` while you have the project open in Unity - the tests will not run and you will need to `touch TestResults.xml` again.
 ### Testing the test chain
-Occasionally, it may be necessary to test the testchain to a) confirm it is 
-giving the behaviours you expect and b) to use for comparison with our 
-Unity tests. We can safely assume that ethers (which we use to test the 
-testchain) works correctly. To test please use `make test-testchain`. Test output will be in 
-chaintest.out and will also be printed to the terminal. If you need to end the test suite 
-early, use `Control+C` and `make stop`.
+Occasionally, it may be necessary to test the testchain to 
+a) confirm it is giving the behaviours you expect and 
+b) to use for comparison with our Unity tests. 
+We can safely assume that ethers (which we use to test the testchain) works correctly. To test please use `make test-testchain`. Test output will be in chaintest.out and will also be printed to the terminal. If you need to end the test suite early, use `Control+C` and `make stop`.
 *Note: if you already have an instance of Unity running, this will open up a new instance of Unity that will terminate upon completion.
 
 ### Troubleshooting
@@ -64,10 +62,55 @@ Here are a few things to try:
 1. If you are or were using a debugger, disconnect the debugger from Unity and then reconnect
 2. Restart the test chain `Control+C` and `make start-testchain`
 3. Restart Unity
-* Also note that since tests on the testchain are being run sequentially, if a prior test fails, it may not 
-have unwound properly and may leave the next test in an unexpected state - causing it to fail.
+* Also note that since tests on the testchain are being run sequentially, if a prior test fails, it may not have unwound properly and may leave the next test in an unexpected state - causing it to fail.
 
-## Component Overview
+## Samples
+
+The SDK comes with a number of samples that can be imported via `Samples` using the Package Manager. The most important of these is `Setup` which contains a number of Editor scripts and the `SequenceConfig` scriptable object resource that need to live in the `Assets` folder to function correctly with the Unity Editor. 
+
+These live inside the `Samples~` folder as required by the [Package Manager specification](https://docs.unity3d.com/Manual/cus-samples.html). However, the Unity Editor will ignore any folders/files with a '~' character in their name and will not create a `.meta` file for them or import them. In order to facilitate our development, we create a symbolic link named `Samples` that points to the `Samples~` folder - allowing us to see and interact with our Samples and Setup scripts.
+
+## Assembly Overview
+
+The SDK is split into a number of assemblies with different purposes. Each assembly also has a Test assembly or assembly reference containing tests - this way, our tests aren't included in builds.
+
+### SequenceExamples
+
+This contains front-end and example code. Front-end/UI code is considered "example" code for the purposes of this SDK, though it may still be used in production applications.
+
+### SequenceAuthentication
+
+This contains code related to authentication via Email + OTP, [OIDC](https://openid.net/developers/how-connect-works/), or other means.
+
+### SequenceConfig
+
+Defines the `SequenceConfig` scriptable object and scripts needed to read it. Configuration is done in conjunction with the [Sequence Builder](https://sequence.build/).
+
+### SequenceEthereum
+
+This is our custom Ethereum library, purpose-built for Unity.
+
+### SequenceIndexer
+
+The integration with our [Indexer API](https://docs.sequence.xyz/api/indexer/overview). Used to quickly index/read on-chain data.
+
+### SequenceIntegrations
+
+Houses code integrating with third-party service providers like [Transak](https://transak.com/).
+
+### SequenceRelayer
+
+SDK-side extensions to our Sequence Relayer - e.g. transaction queuers.
+
+### SequenceUtils
+
+Universally useful extension methods, helpers, and platform native code used throughout the SDK for a variety of purposes.
+
+### SequenceWaaS
+
+The integration with our [WaaS/Embedded Wallet API](https://docs.sequence.xyz/solutions/wallets/embedded-wallet/overview). Used to provide users with a seemless and invisible Web3 wallet experience.
+
+## Component Overview - Ethereum Client (SequenceEthereum)
 The SDK is broken into a number of components with different responsibilities. This section will give an overview of some of the most important components for users and their intended purposes.
 
 ### Client
@@ -83,7 +126,7 @@ A transaction, as implemented in EthTransaction, contains all the data and param
 A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
 
 ## Sample UI
-A sample UI scene can be found under `Assets > SequenceExamples > Scenes > Demo.unity`
+A sample UI scene can be found under `Assets > Sequence > SequenceFrontend > Scenes > Demo.unity`
 This scene contains sample Sequence UI (with integration) for login flow and wallet view, settings, and transaction flow.
 
 ### How It Works
@@ -110,10 +153,8 @@ To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence >
 
 ## Architecture Decision Records
 
-Please add any ADRs below. In the future, it may be worthwhile to move these into 
-separate files, but for now since there are few ADRs, the README should suffice. 
-Please use [Michael Nygard's template for 
-ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
+Please add any ADRs below. In the future, it may be worthwhile to move these into separate files, but for now since there are few ADRs, the README should suffice. 
+Please use [Michael Nygard's template for ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
 
 ### ADR 3 - WaaS Client
 August 2, 2023 - author: Quinn Purdy
@@ -170,17 +211,11 @@ June 21, 2023 - author: Quinn Purdy
 This ADR document is being made retroactively after inheriting the project.
 
 #### Context
-Sequence Unity SDK v1 was made quickly as a proof of concept. The SDK relies on 
-Nethereum; a library that is overly heavy-weight. The SDK also relies on the Vuplex 
-webview unity package - this package is not free, leading to developer frustrations.
+Sequence Unity SDK v1 was made quickly as a proof of concept. The SDK relies on Nethereum; a library that is overly heavy-weight. The SDK also relies on the Vuplex webview unity package - this package is not free, leading to developer frustrations.
 
 #### Decision
-Modifying the existing v1 SDK was deemed to be unworthy undertaking. Building a new 
-SDK from scratch was determined to be faster and easier.
+Modifying the existing v1 SDK was deemed to be unworthy undertaking. Building a new SDK from scratch was determined to be faster and easier.
 
 #### Consequences
 Iteration on SDK v2 during development will be significantly faster and lower risk 
-than modifying the 
-existing SDK the customers are currently using. However, this means that current 
-customers using v1 of the SDK can expect limited support during the development of SDK 
-v2 as v1 will be deprecated. 
+than modifying the existing SDK the customers are currently using. However, this means that current customers using v1 of the SDK can expect limited support during the development of SDK v2 as v1 will be deprecated. 
