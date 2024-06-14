@@ -92,22 +92,22 @@ namespace Sequence.Demo
         private void ReplaceWithLoginPanel()
         {
             float delayInSeconds = 0;
-            if (_transitionPanel.IsOpen())
+            if (_transitionPanel != null && _transitionPanel.IsOpen())
             {
                 _transitionPanel.Close();
                 delayInSeconds = _transitionPanel.GetCloseAnimationDuration();
             }
-            if (_signMessagePanel.IsOpen())
+            if (_signMessagePanel != null && _signMessagePanel.IsOpen())
             {
                 _signMessagePanel.Close();
                 delayInSeconds = _signMessagePanel.GetCloseAnimationDuration();
             }
-            if (_sendTransactionPanel.IsOpen())
+            if (_sendTransactionPanel != null && _sendTransactionPanel.IsOpen())
             {
                 _sendTransactionPanel.Close();
                 delayInSeconds = _sendTransactionPanel.GetCloseAnimationDuration();
             }
-            if (_walletPanel.IsOpen())
+            if (_walletPanel != null && _walletPanel.IsOpen())
             {
                 _walletPanel.Close();
                 delayInSeconds = _walletPanel.GetCloseAnimationDuration();
