@@ -29,7 +29,9 @@ namespace Sequence.Integrations.Transak
 
         public string AsQueryParameters()
         {
-            return $"apiKey={apiKey}&referrerDomain={referrerDomain}&walletAddress={walletAddress}&fiatCurrency={fiatCurrency}&disableWalletAddressForm={disableWalletAddressForm}&defaultFiatAmount={defaultFiatAmount}&defaultCryptoCurrency={defaultCryptoCurrency}&networks={networks}";
+            string url = $"apiKey={apiKey}&referrerDomain={referrerDomain}&walletAddress={walletAddress}&fiatCurrency={fiatCurrency}&disableWalletAddressForm={disableWalletAddressForm}&defaultFiatAmount={defaultFiatAmount}&defaultCryptoCurrency={defaultCryptoCurrency}&networks={networks}";
+            url = url.Replace(" ", "");
+            return url;
         }
     }
 }
