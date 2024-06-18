@@ -137,8 +137,9 @@ namespace Sequence.WaaS
             _waasProjectId = projectId;
         }
 
-        private void TryToLoginWithStoredSessionWallet()
+        private async Task TryToLoginWithStoredSessionWallet()
         {
+            await AsyncExtensions.DelayTask(.001f); // This is a band-aid fix. The issue is that this method in the constructor fails, it will fire the FailedLoginWithStoredSessionWallet event before the constructor is completed and cause a null reference exception in LoginPanel or any other subscribers that attempt to call a method on WaaSLogin to recover 
             (EthWallet, string) walletInfo = (null, "");
             try
             {
@@ -147,6 +148,7 @@ namespace Sequence.WaaS
             catch (Exception e)
             {
                 FailedLoginWithStoredSessionWallet(e.Message);
+                return;
             }
             if (walletInfo.Item1 == null || string.IsNullOrWhiteSpace(walletInfo.Item2))
             {
