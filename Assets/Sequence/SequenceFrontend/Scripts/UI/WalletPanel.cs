@@ -67,7 +67,6 @@ namespace Sequence.Demo
         public override void Close()
         {
             base.Close();
-            _walletPage.Close();
             _tokenContentFetcher.OnTokenFetchSuccess -= HandleTokenFetchSuccess;
             _nftContentFetcher.OnNftFetchSuccess -= _collectionNftMapper.HandleNftFetch;
             _collectionNftMapper.Evict();
