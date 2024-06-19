@@ -35,11 +35,11 @@ namespace Sequence.Authentication
         public void Authenticate(string url, string redirectUrl = "")
         {
             Dictionary<string, string> queryParams = url.ExtractQueryAndHashParameters();
-            if (queryParams.TryGetValue("client_id", out string clientId) && queryParams.TryGetValue("nonce", out string nonce) && queryParams.TryGetValue("state", out string state))
+            if (queryParams.TryGetValue("client_id", out string clientId) && queryParams.TryGetValue("nonce", out string nonce))
             {
                 GameObject receiver = new GameObject("WebBrowserMessageReceiver");
                 receiver.AddComponent<WebBrowserMessageReceiver>().SetWebBrowser(this);
-                ISocialSignIn socialSignIn = WebSocialSignInFactory.Create(_authenticator.GetMethodFromState(state));
+                ISocialSignIn socialSignIn = WebSocialSignInFactory.Create(_authenticator.GetMethodFromState(_state));
                 socialSignIn.SignIn(clientId, nonce);
             }
             else
