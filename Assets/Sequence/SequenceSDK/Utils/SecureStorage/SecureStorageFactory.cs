@@ -8,6 +8,8 @@ namespace Sequence.Utils.SecureStorage
         {
 #if UNITY_IOS && !UNITY_EDITOR
             return new iOSKeychainStorage();
+#elif UNITY_STANDALONE_OSX && !UNITY_EDITOR
+            return new MacOSKeychainStorage();
 #else
             return new NotImplementedStorage();
 #endif
