@@ -24,7 +24,6 @@ namespace Sequence.Provider
             { Chain.OasysHomeverse, "homeverse" },
             { Chain.AstarZKEvm, "astar-zkevm" },
             { Chain.Xai, "xai" },
-            { Chain.Telos, "telos" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
