@@ -41,6 +41,7 @@ namespace Sequence.Demo
             
             ILogin loginHandler = new WaaSLogin();
             SetupLoginHandler(loginHandler);
+            loginHandler.TryToRestoreSession();
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
             

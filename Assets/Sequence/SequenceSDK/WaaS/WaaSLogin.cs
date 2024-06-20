@@ -44,7 +44,6 @@ namespace Sequence.WaaS
             {
                 _storeSessionWallet = true;
                 Configure();
-                TryToLoginWithStoredSessionWallet();
             }
             else
             {
@@ -89,6 +88,15 @@ namespace Sequence.WaaS
             {
                 Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
             }
+        }
+
+        public void TryToRestoreSession()
+        {
+            if (!_storeSessionWallet)
+            {
+                return;
+            }
+            TryToLoginWithStoredSessionWallet();
         }
 
         private void SetAuthenticator(string nonce)
@@ -137,9 +145,8 @@ namespace Sequence.WaaS
             _waasProjectId = projectId;
         }
 
-        private async Task TryToLoginWithStoredSessionWallet()
+        private void TryToLoginWithStoredSessionWallet()
         {
-            await AsyncExtensions.DelayTask(.001f); // This is a band-aid fix. The issue is that this method in the constructor fails, it will fire the FailedLoginWithStoredSessionWallet event before the constructor is completed and cause a null reference exception in LoginPanel or any other subscribers that attempt to call a method on WaaSLogin to recover 
             (EthWallet, string) walletInfo = (null, "");
             try
             {
