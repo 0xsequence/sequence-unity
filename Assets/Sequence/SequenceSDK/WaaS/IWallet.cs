@@ -133,5 +133,18 @@ namespace Sequence.WaaS
         /// <returns></returns>
         public Task<TransactionReturn> SendTransactionWithFeeOptions(Chain network, Transaction[] transactions,
             FeeOption feeOption, string feeQuote, bool waitForReceipt = true, uint timeBeforeExpiry = 30);
+        
+        public event Action<string> OnSessionAuthProofGenerated;
+        public event Action<string> OnFailedToGenerateSessionAuthProof;
+
+        /// <summary>
+        /// Get a valid session auth proof for this session and (optional) nonce
+        ///
+        /// Can be awaited directly or you can subscribe to the OnSessionAuthProofGenerated and OnFailedToGenerateSessionAuthProof events to get success and failed responses respectively
+        /// </summary>
+        /// <param name="network"></param>
+        /// <param name="nonce"></param>
+        /// <returns></returns>
+        public Task<string> GetSessionAuthProof(Chain network, string nonce = null);
     }
 }

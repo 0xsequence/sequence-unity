@@ -76,5 +76,13 @@ namespace Sequence.WaaS
         {
             throw new NotImplementedException();
         }
+
+        public event Action<string> OnSessionAuthProofGenerated;
+        public event Action<string> OnFailedToGenerateSessionAuthProof;
+
+        public Task<string> GetSessionAuthProof(Chain network, string nonce = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
