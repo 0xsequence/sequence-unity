@@ -23,6 +23,8 @@ namespace Sequence.Demo
         private static string _urlScheme;
         internal ILogin LoginHandler { get; private set; }
         
+        private bool _alreadyAttemptedToRestoreSession = false;
+        
         protected override void Awake()
         {
             base.Awake();
@@ -57,11 +59,14 @@ namespace Sequence.Demo
         /// <param name="args"></param>
         public override void Open(params object[] args)
         {
-            bool alreadyAttemptedToRestoreSession = args.GetObjectOfTypeIfExists<bool>();
+            if (!_alreadyAttemptedToRestoreSession)
+            {
+                _alreadyAttemptedToRestoreSession = args.GetObjectOfTypeIfExists<bool>();
+            }
 
             if (SecureStorageFactory.IsSupportedPlatform())
             {
-                if (_storeSessionInfoAndSkipLoginWhenPossible && !alreadyAttemptedToRestoreSession)
+                if (_storeSessionInfoAndSkipLoginWhenPossible && !_alreadyAttemptedToRestoreSession)
                 {
                     return;
                 }
