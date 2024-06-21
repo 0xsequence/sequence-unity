@@ -35,7 +35,6 @@ namespace Sequence.WaaS
         
         private bool _storeSessionWallet = false;
         private const string _walletKey = "SessionWallet";
-        private const string _waasWalletAddressKey = "WaaSWalletAddress";
 
         public WaaSLogin(IValidator validator = null)
         {
@@ -204,12 +203,14 @@ namespace Sequence.WaaS
         private (EthWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string privateKey = secureStorage.RetrieveString(_walletKey);
-            if (string.IsNullOrEmpty(privateKey))
+            string walletInfo = secureStorage.RetrieveString(_walletKey);
+            if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "");
             }
-            string waasWalletAddress = secureStorage.RetrieveString(_waasWalletAddressKey);
+            string[] walletInfoSplit = walletInfo.Split('-');
+            string privateKey = walletInfoSplit[0];
+            string waasWalletAddress = walletInfoSplit[1];
             EthWallet wallet = new EthWallet(privateKey);
             return (wallet, waasWalletAddress);
         }
@@ -400,8 +401,7 @@ namespace Sequence.WaaS
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(_walletKey, privateKey);
-            secureStorage.StoreString(_waasWalletAddressKey, waasWalletAddress);
+            secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
         }
     }
 }
