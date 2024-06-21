@@ -87,7 +87,7 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
+                // Todo once email sign in is fully live, we should log a warning here. For now, it is better to silently fail
             }
         }
 
