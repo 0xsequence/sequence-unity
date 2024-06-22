@@ -33,6 +33,8 @@ namespace Sequence.Authentication
         private IBrowser _browser;
         
         private static bool _windowsSetup = false;
+        
+        public static OpenIdAuthenticator Instance;
 
         /// <summary>
         /// Use this if you'd prefer to redirect to your own URL for Oauth
@@ -58,6 +60,18 @@ namespace Sequence.Authentication
             _sessionId = sessionId;
             
             _browser = CreateBrowser();
+
+            Instance = this;
+        }
+        
+        public static OpenIdAuthenticator GetInstance(string sessionId)
+        {
+            if (Instance == null)
+            {
+                return new OpenIdAuthenticator(sessionId);
+            }
+            Instance._sessionId = sessionId;
+            return Instance;
         }
 
         private void SetClientIds(SequenceConfig config)
