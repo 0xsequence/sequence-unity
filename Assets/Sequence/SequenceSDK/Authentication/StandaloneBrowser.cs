@@ -1,4 +1,4 @@
-using UnityEngine.Device;
+using UnityEngine;
 
 namespace Sequence.Authentication
 {
