@@ -7,8 +7,8 @@ namespace Sequence.WaaS
     public class IntentDataSessionAuthProof
     {
         public string network;
-        public string wallet;
         public string nonce = null;
+        public string wallet;
 
         [JsonConstructor]
         public IntentDataSessionAuthProof(string network, string wallet, string nonce)

@@ -44,5 +44,11 @@ namespace Sequence.Demo
         {
             _ui.OpenSendTransactionWithFeeOptionsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
+        
+        public void LinkEOAWallet()
+        {
+            EOAWalletLinker linker = new EOAWalletLinker(Wallet);
+            linker.OpenEOAWalletLink(Chain.ArbitrumNova);
+        }
     }
 }

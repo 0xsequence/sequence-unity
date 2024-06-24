@@ -47,6 +47,7 @@ namespace Sequence.WaaS
             [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             string url = _url.AppendTrailingSlashIfNeeded() + path;
+            url = url.RemoveTrailingSlash();
             if (overrideUrl != null)
             {
                 url = overrideUrl.AppendTrailingSlashIfNeeded() + path;
