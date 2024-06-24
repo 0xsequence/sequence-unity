@@ -366,18 +366,17 @@ namespace Sequence.WaaS
             
         }
 
-        public event Action<string> OnSessionAuthProofGenerated;
+        public event Action<IntentResponseSessionAuthProof> OnSessionAuthProofGenerated;
         public event Action<string> OnFailedToGenerateSessionAuthProof;
 
-        public async Task<string> GetSessionAuthProof(Chain network, string nonce = null)
+        public async Task<IntentResponseSessionAuthProof> GetSessionAuthProof(Chain network, string nonce = null)
         {
             IntentDataSessionAuthProof args = new IntentDataSessionAuthProof(network, _address, nonce);
             try
             {
                 var result = await _intentSender.SendIntent<IntentResponseSessionAuthProof, IntentDataSessionAuthProof>(args, IntentType.SessionAuthProof);
-                string proof = result.signature;
-                OnSessionAuthProofGenerated?.Invoke(proof);
-                return proof;
+                OnSessionAuthProofGenerated?.Invoke(result);
+                return result;
             }
             catch (Exception e)
             {

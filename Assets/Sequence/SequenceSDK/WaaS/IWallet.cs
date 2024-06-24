@@ -134,7 +134,7 @@ namespace Sequence.WaaS
         public Task<TransactionReturn> SendTransactionWithFeeOptions(Chain network, Transaction[] transactions,
             FeeOption feeOption, string feeQuote, bool waitForReceipt = true, uint timeBeforeExpiry = 30);
         
-        public event Action<string> OnSessionAuthProofGenerated;
+        public event Action<IntentResponseSessionAuthProof> OnSessionAuthProofGenerated;
         public event Action<string> OnFailedToGenerateSessionAuthProof;
 
         /// <summary>
@@ -145,6 +145,6 @@ namespace Sequence.WaaS
         /// <param name="network"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-        public Task<string> GetSessionAuthProof(Chain network, string nonce = null);
+        public Task<IntentResponseSessionAuthProof> GetSessionAuthProof(Chain network, string nonce = null);
     }
 }
