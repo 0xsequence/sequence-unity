@@ -32,6 +32,7 @@ namespace Sequence.Config
 
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
+        public bool StoreSessionPrivateKeyInSecureStorage = false;
         
         private static SequenceConfig _config;
 

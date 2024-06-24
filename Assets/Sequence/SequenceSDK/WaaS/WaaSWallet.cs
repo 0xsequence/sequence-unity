@@ -15,7 +15,9 @@ namespace Sequence.WaaS
 {
     public class WaaSWallet : IWallet
     {
-        public static Action<WaaSWallet> OnWaaSWalletCreated; 
+        public static Action<WaaSWallet> OnWaaSWalletCreated;
+        public static Action<string> OnFailedToLoginWithStoredSessionWallet;
+        
         public string SessionId { get; private set; }
         private Address _address;
         private HttpClient _httpClient;
@@ -218,7 +220,15 @@ namespace Sequence.WaaS
         public event Action<WaaSSession[]> OnSessionsFound;
         public async Task<WaaSSession[]> ListSessions()
         {
-            WaaSSession[] results = await _intentSender.ListSessions();
+            WaaSSession[] results = null;
+            try
+            {
+                results = await _intentSender.ListSessions();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Failed to list sessions: " + e.Message);
+            }
             OnSessionsFound?.Invoke(results);
             return results;
         }
