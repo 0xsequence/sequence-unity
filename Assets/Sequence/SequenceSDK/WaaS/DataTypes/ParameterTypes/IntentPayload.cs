@@ -57,7 +57,8 @@ namespace Sequence.WaaS
             {IntentType.SignMessage, "signMessage"},
             {IntentType.SendTransaction, "sendTransaction"},
             {IntentType.GetTransactionReceipt, "getTransactionReceipt"},
-            {IntentType.FeeOptions, "feeOptions"}
+            {IntentType.FeeOptions, "feeOptions"},
+            {IntentType.SessionAuthProof, "sessionAuthProof"},
         };
     }
 
@@ -73,6 +74,7 @@ namespace Sequence.WaaS
         SendTransaction,
         GetTransactionReceipt,
         FeeOptions,
+        SessionAuthProof,
         None
     }
 }

@@ -46,27 +46,32 @@ namespace Sequence.WaaS
         public (UnityWebRequest, string, string) BuildRequest<T>(string path, T args,
             [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
-            string url = _url + "/" + path;
+            string url = _url.AppendTrailingSlashIfNeeded() + path;
+            url = url.RemoveTrailingSlash();
             if (overrideUrl != null)
             {
                 url = overrideUrl.AppendTrailingSlashIfNeeded() + path;
             }
 
-            string requestJson = "";
-            if (typeof(T) == typeof(string))
-            {
-                requestJson = args as string;
-            }
-            else
-            {
-                requestJson = JsonConvert.SerializeObject(args, serializerSettings);
-            }
             UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
-            byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
-            request.uploadHandler = new UploadHandlerRaw(requestData);
-            request.uploadHandler.contentType = "application/json";
+            SetHeaders(request, headers);
+            
+            string requestJson = SetRequestData(request, args);
+            
+            string method = request.method;
+            string headersString = ExtractHeaders(request);
+            string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
+            if (requestJson == "")
+            {
+                curlRequest = $"curl -X {method} '{url}' {headersString}";
+            }
 
+            return (request, curlRequest, url);
+        }
+
+        private void SetHeaders(UnityWebRequest request, Dictionary<string, string> headers)
+        {
             if (headers == null)
             {
                 headers = _defaultHeaders;
@@ -86,12 +91,23 @@ namespace Sequence.WaaS
             {
                 request.SetRequestHeader(key, headers[key]);
             }
-            
-            string method = request.method;
-            string headersString = ExtractHeaders(request);
-            string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
+        }
 
-            return (request, curlRequest, url);
+        private string SetRequestData<T>(UnityWebRequest request, T args)
+        {
+            string requestJson = "";
+            if (typeof(T) == typeof(string))
+            {
+                requestJson = args as string;
+            }
+            else
+            {
+                requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            }
+            byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
+            request.uploadHandler = new UploadHandlerRaw(requestData);
+            request.uploadHandler.contentType = "application/json";
+            return requestJson;
         }
 
         public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)

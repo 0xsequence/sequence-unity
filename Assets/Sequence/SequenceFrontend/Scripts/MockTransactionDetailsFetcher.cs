@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using NBitcoin.RPC;
 using Sequence.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
