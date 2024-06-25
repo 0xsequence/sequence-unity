@@ -19,7 +19,7 @@ namespace Sequence.WaaS.Tests
         private string _erc721TokenId = "18744835910876056821490721563850010263377359459933499228339117876467177683972";
         private string _erc1155Address = "0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb";
         private string _erc1155TokenId = "86";
-        private IIndexer _polygonIndexer = new ChainIndexer(BigInteger.Parse(Chain.Polygon.GetChainId()));
+        private IIndexer _polygonIndexer = new ChainIndexer(Chain.Polygon);
 
         private IEthClient _client;
         
