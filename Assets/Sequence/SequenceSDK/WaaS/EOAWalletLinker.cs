@@ -5,19 +5,19 @@ namespace Sequence.WaaS
 {
     public class EOAWalletLinker
     {
-        private static string NonceGenerationLink =
-            "https://demo-waas-wallet-link-server.tpin.workers.dev/generateNonce";
+        private string _nonceGenerationLink;
         
         private IWallet _wallet;
 
-        public EOAWalletLinker(IWallet wallet)
+        public EOAWalletLinker(IWallet wallet, string nonceGenerationLink)
         {
             _wallet = wallet;
+            _nonceGenerationLink = nonceGenerationLink;
         }
 
         public async Task<string> GenerateEOAWalletLink(Chain chain)
         {
-            IHttpClient client = new HttpClient(NonceGenerationLink);
+            IHttpClient client = new HttpClient(_nonceGenerationLink);
             NonceResponseData nonceResponse =
                 await client.SendRequest<NonceRequestData, NonceResponseData>("",
                     new NonceRequestData(_wallet.GetWalletAddress()));
@@ -30,11 +30,6 @@ namespace Sequence.WaaS
         {
             string link = await GenerateEOAWalletLink(chain);
             Application.OpenURL(link);
-        }
-        
-        public static void InjectNonceGenerationLink(string link)
-        {
-            NonceGenerationLink = link;
         }
     }
 
