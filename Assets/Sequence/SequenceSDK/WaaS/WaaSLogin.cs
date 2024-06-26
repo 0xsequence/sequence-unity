@@ -23,7 +23,7 @@ namespace Sequence.WaaS
 
         private int _waasProjectId;
         private string _waasVersion;
-        private OpenIdAuthenticator _authenticator;
+        private IAuthenticator _authenticator;
         private IValidator _validator;
         private IEmailSignIn _emailSignIn;
         private string _challengeSession;
@@ -35,8 +35,20 @@ namespace Sequence.WaaS
         
         private bool _storeSessionWallet = false;
         private const string _walletKey = "SessionWallet";
+        
+        private static WaaSLogin _instance;
+        
+        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null)
+        {
+            if (_instance == null)
+            {
+                _instance = new WaaSLogin(validator, authenticator);
+            }
+            return _instance;
+        }
 
-        public WaaSLogin(IValidator validator = null)
+        [Obsolete("Use GetInstance() instead.")]
+        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null)
         {
             bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage;
             if (storeSessionWallet)
@@ -46,32 +58,34 @@ namespace Sequence.WaaS
             }
             else
             {
-                CreateWallet(validator);
+                CreateWallet(validator, authenticator);
             }
         }
 
-        private void CreateWallet(IValidator validator = null)
+        private void CreateWallet(IValidator validator = null, IAuthenticator authenticator = null)
         {
             Configure();
 
-            SetupAuthenticator(validator);
+            SetupAuthenticator(validator, authenticator);
         }
 
-        public void SetupAuthenticator(IValidator validator = null)
+        public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
             _sessionWallet = new EthWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
 
             string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
-            if (OpenIdAuthenticator.Instance == null)
+
+            if (authenticator != null)
             {
-                SetAuthenticatorAndSetupListeners(nonce);
+                _authenticator = authenticator;
             }
             else
             {
-                SetAuthenticator(nonce);
+                _authenticator = new OpenIdAuthenticator();
             }
+            SetupAuthenticatorAndListeners(nonce);
 
             if (validator == null)
             {
@@ -98,14 +112,9 @@ namespace Sequence.WaaS
             TryToLoginWithStoredSessionWallet();
         }
 
-        private void SetAuthenticator(string nonce)
+        private void SetupAuthenticatorAndListeners(string nonce)
         {
-            _authenticator = OpenIdAuthenticator.GetInstance(nonce);
-        }
-
-        private void SetAuthenticatorAndSetupListeners(string nonce)
-        {
-            SetAuthenticator(nonce);
+            _authenticator.SetNonce(nonce);
             try {
                 _authenticator.PlatformSpecificSetup();
             }

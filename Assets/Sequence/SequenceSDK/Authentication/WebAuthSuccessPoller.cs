@@ -12,12 +12,12 @@ namespace Sequence.Authentication
 {
     public class WebAuthSuccessPoller : MonoBehaviour
     {
-        private OpenIdAuthenticator _authenticator;
+        private IAuthenticator _authenticator;
         private string _authenticationUrl;
         private string _state;
         private WaitForSecondsRealtime _delayBetweenChecks = new WaitForSecondsRealtime(.1f);
 
-        public void Setup(OpenIdAuthenticator authenticator, string authenticationUrl, string state)
+        public void Setup(IAuthenticator authenticator, string authenticationUrl, string state)
         {
             _authenticator = authenticator;
             _authenticationUrl = authenticationUrl;

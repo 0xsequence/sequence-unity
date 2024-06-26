@@ -64,6 +64,11 @@ namespace Sequence.Authentication
             throw new System.NotImplementedException();
         }
 
+        public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
+        {
+            
+        }
+
         public void SetupAuthenticator(IValidator validator = null)
         {
             
