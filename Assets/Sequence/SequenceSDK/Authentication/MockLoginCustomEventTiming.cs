@@ -68,5 +68,10 @@ namespace Sequence.Authentication
         {
             
         }
+
+        public void TryToRestoreSession()
+        {
+            
+        }
     }
 }

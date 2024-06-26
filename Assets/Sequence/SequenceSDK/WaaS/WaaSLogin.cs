@@ -35,7 +35,6 @@ namespace Sequence.WaaS
         
         private bool _storeSessionWallet = false;
         private const string _walletKey = "SessionWallet";
-        private const string _waasWalletAddressKey = "WaaSWalletAddress";
 
         public WaaSLogin(IValidator validator = null)
         {
@@ -44,7 +43,6 @@ namespace Sequence.WaaS
             {
                 _storeSessionWallet = true;
                 Configure();
-                TryToLoginWithStoredSessionWallet();
             }
             else
             {
@@ -87,8 +85,17 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                // Todo once email sign in is fully live, we should log a warning here. For now, it is better to silently fail
+                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
             }
+        }
+
+        public void TryToRestoreSession()
+        {
+            if (!_storeSessionWallet)
+            {
+                return;
+            }
+            TryToLoginWithStoredSessionWallet();
         }
 
         private void SetAuthenticator(string nonce)
@@ -147,6 +154,7 @@ namespace Sequence.WaaS
             catch (Exception e)
             {
                 FailedLoginWithStoredSessionWallet(e.Message);
+                return;
             }
             if (walletInfo.Item1 == null || string.IsNullOrWhiteSpace(walletInfo.Item2))
             {
@@ -195,12 +203,14 @@ namespace Sequence.WaaS
         private (EthWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string privateKey = secureStorage.RetrieveString(_walletKey);
-            if (string.IsNullOrEmpty(privateKey))
+            string walletInfo = secureStorage.RetrieveString(_walletKey);
+            if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "");
             }
-            string waasWalletAddress = secureStorage.RetrieveString(_waasWalletAddressKey);
+            string[] walletInfoSplit = walletInfo.Split('-');
+            string privateKey = walletInfoSplit[0];
+            string waasWalletAddress = walletInfoSplit[1];
             EthWallet wallet = new EthWallet(privateKey);
             return (wallet, waasWalletAddress);
         }
@@ -391,8 +401,7 @@ namespace Sequence.WaaS
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(_walletKey, privateKey);
-            secureStorage.StoreString(_waasWalletAddressKey, waasWalletAddress);
+            secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
         }
     }
 }
