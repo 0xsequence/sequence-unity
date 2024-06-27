@@ -10,11 +10,11 @@ using Object = UnityEngine.Object;
 
 namespace Sequence.Authentication
 {
-    public class OpenIdAuthenticator
+    public class OpenIdAuthenticator : IAuthenticator
     {
         public const string LoginEmail = "LoginEmail";
-        public Action<OpenIdAuthenticationResult> SignedIn;
-        public Action<string> OnSignInFailed;
+        public event Action<OpenIdAuthenticationResult> SignedIn;
+        public event Action<string> OnSignInFailed;
         private string _urlScheme;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
@@ -24,7 +24,7 @@ namespace Sequence.Authentication
         private string FacebookClientId;
         private string AppleClientId;
         
-        internal static string RedirectUrl = "https://api.sequence.app/oauth/callback";
+        private static string _redirectUrl = "https://api.sequence.app/oauth/callback";
 
         private string _stateToken = Guid.NewGuid().ToString();
 
@@ -33,8 +33,6 @@ namespace Sequence.Authentication
         private IBrowser _browser;
         
         private static bool _windowsSetup = false;
-        
-        public static OpenIdAuthenticator Instance;
 
         /// <summary>
         /// Use this if you'd prefer to redirect to your own URL for Oauth
@@ -43,11 +41,12 @@ namespace Sequence.Authentication
         /// <param name="redirectUrl"></param>
         public static void InjectRedirectUrl(string redirectUrl)
         {
-            RedirectUrl = redirectUrl;
+            _redirectUrl = redirectUrl;
         }
 
-        public OpenIdAuthenticator(string sessionId)
+        public OpenIdAuthenticator(string nonce = null)
         {
+            _sessionId = nonce;
             SequenceConfig config = SequenceConfig.GetConfig();
 
             _urlScheme = config.UrlScheme;
@@ -56,22 +55,7 @@ namespace Sequence.Authentication
 #if UNITY_EDITOR
             InjectRedirectUrl("http://localhost:8080/");
 #endif
-            
-            _sessionId = sessionId;
-            
             _browser = CreateBrowser();
-
-            Instance = this;
-        }
-        
-        public static OpenIdAuthenticator GetInstance(string sessionId)
-        {
-            if (Instance == null)
-            {
-                return new OpenIdAuthenticator(sessionId);
-            }
-            Instance._sessionId = sessionId;
-            return Instance;
         }
 
         private void SetClientIds(SequenceConfig config)
@@ -203,6 +187,26 @@ namespace Sequence.Authentication
             }
         }
 
+        public void InvokeSignedIn(OpenIdAuthenticationResult result)
+        {
+            SignedIn?.Invoke(result);
+        }
+
+        public void InvokeSignInFailed(string errorMessage)
+        {
+            OnSignInFailed?.Invoke(errorMessage);
+        }
+
+        public string GetRedirectUrl()
+        {
+            return _redirectUrl;
+        }
+
+        public void SetNonce(string nonce)
+        {
+            _sessionId = nonce;
+        }
+
         private string GenerateState(LoginMethod method)
         {
             _stateToken = Guid.NewGuid().ToString();
@@ -223,14 +227,15 @@ namespace Sequence.Authentication
             }
             
 #if UNITY_IOS && !UNITY_EDITOR
-            RedirectUrl = $"{ReverseClientId(clientId)}://";
+            _redirectUrl = $"{ReverseClientId(clientId)}://";
 #endif
 
             string url =
-                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={RedirectUrl}&nonce={_sessionId}&scope=openid+email&state={state}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={_redirectUrl}&nonce={_sessionId}&scope=openid+email&state={state}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
+                url = url.Replace(" ", "");
             }
 
             return url;
@@ -432,18 +437,6 @@ namespace Sequence.Authentication
         internal void BrowserModifyStateToken(string stateToken)
         {
             _stateToken = stateToken;
-        }
-    }
-
-    public class OpenIdAuthenticationResult
-    {
-        public string IdToken { get; private set; }
-        public LoginMethod Method { get; private set; }
-
-        public OpenIdAuthenticationResult(string idToken, LoginMethod method)
-        {
-            IdToken = idToken;
-            Method = method;
         }
     }
 }

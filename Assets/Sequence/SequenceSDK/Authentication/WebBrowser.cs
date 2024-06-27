@@ -44,7 +44,7 @@ namespace Sequence.Authentication
             }
             else
             {
-                _authenticator.OnSignInFailed?.Invoke("Social sign in failed: missing client_id, nonce, or state");
+                _authenticator.InvokeSignInFailed("Social sign in failed: missing client_id, nonce, or state");
             }
         }
 #else
@@ -66,7 +66,7 @@ namespace Sequence.Authentication
 
         public void OnGoogleSignIn(string idToken)
         {
-            _authenticator.SignedIn?.Invoke(new OpenIdAuthenticationResult(idToken, LoginMethod.Google));
+            _authenticator.InvokeSignedIn(new OpenIdAuthenticationResult(idToken, LoginMethod.Google));
         }
 
         private static class WebSocialSignInFactory

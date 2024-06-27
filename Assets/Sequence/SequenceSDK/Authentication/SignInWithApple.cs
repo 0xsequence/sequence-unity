@@ -28,7 +28,7 @@ namespace Sequence.Authentication
             }
         }
 
-        public void LoginToApple(OpenIdAuthenticator authenticator, string nonce, string state)
+        public void LoginToApple(IAuthenticator authenticator, string nonce, string state)
         {
             if (m_AppleAuthManager == null)
             {
@@ -56,21 +56,21 @@ namespace Sequence.Authentication
                         {
                             Error =
                                 "Sign-in with Apple error. Message: state token received doesn't match what was given";
-                            authenticator.OnSignInFailed?.Invoke(Error);
+                            authenticator.InvokeSignInFailed(Error);
                         }
                         
-                        authenticator.SignedIn?.Invoke(new OpenIdAuthenticationResult(Token, LoginMethod.Apple));
+                        authenticator.InvokeSignedIn(new OpenIdAuthenticationResult(Token, LoginMethod.Apple));
                     }
                     else
                     {
                         Error = "Sign-in with Apple error. Message: appleIDCredential is null";
-                        authenticator.OnSignInFailed?.Invoke(Error);
+                        authenticator.InvokeSignInFailed(Error);
                     }
                 },
                 error =>
                 {
                     Error = "Sign-in with Apple error. Message: " + error;
-                    authenticator.OnSignInFailed?.Invoke(Error);
+                    authenticator.InvokeSignInFailed(Error);
                 }
             );
         }

@@ -77,7 +77,7 @@ namespace Sequence.Authentication
         /// <summary>
         /// Used to setup or reset the authenticator for the ILogin
         /// </summary>
-        public void SetupAuthenticator(IValidator validator = null);
+        public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null);
         
         /// <summary>
         /// Using securely saved credentials, try to restore the session

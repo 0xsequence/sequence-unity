@@ -41,7 +41,7 @@ namespace Sequence.Demo
 
             _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
             
-            ILogin loginHandler = new WaaSLogin();
+            ILogin loginHandler = WaaSLogin.GetInstance();
             SetupLoginHandler(loginHandler);
             loginHandler.TryToRestoreSession();
 
