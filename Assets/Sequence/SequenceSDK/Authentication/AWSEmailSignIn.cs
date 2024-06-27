@@ -34,6 +34,7 @@ namespace Sequence.Authentication
         /// <returns></returns>
         public async Task<string> SignIn(string email)
         {
+            email = email.ToLower();
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
             InitiateAuthRequest request = new InitiateAuthRequest
             {
@@ -70,6 +71,7 @@ namespace Sequence.Authentication
         /// <returns></returns>
         public async Task<string> Login(string challengeSession, string email, string code, string sessionWalletAddress = "")
         {
+            email = email.ToLower();
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
             RespondToAuthChallengeRequest request = new RespondToAuthChallengeRequest
             {
@@ -109,6 +111,7 @@ namespace Sequence.Authentication
         /// <exception cref="Exception"></exception>
         public async Task SignUp(string email)
         {
+            email = email.ToLower();
             using AmazonCognitoIdentityProviderClient client = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.GetBySystemName(_region));
             SignUpRequest request = new SignUpRequest
             {
