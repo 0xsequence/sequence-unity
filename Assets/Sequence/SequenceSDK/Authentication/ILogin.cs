@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Sequence.Authentication
@@ -74,9 +75,7 @@ namespace Sequence.Authentication
         /// <returns></returns>
         public bool IsLoggingIn();
 
-        /// <summary>
-        /// Used to setup or reset the authenticator for the ILogin
-        /// </summary>
+        [Obsolete("Not needed. ILogin implementations should set themselves up.")]
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null);
         
         /// <summary>
