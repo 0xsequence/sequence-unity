@@ -43,7 +43,6 @@ namespace Sequence.Demo
             
             ILogin loginHandler = WaaSLogin.GetInstance();
             SetupLoginHandler(loginHandler);
-            loginHandler.TryToRestoreSession();
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
             
@@ -51,6 +50,11 @@ namespace Sequence.Demo
             {
                 _urlScheme = config.UrlScheme;
             }
+        }
+
+        private void Start()
+        {
+            LoginHandler.TryToRestoreSession();
         }
 
         /// <summary>
