@@ -72,6 +72,11 @@ namespace Sequence.Demo
                     LoginHandler.TryToRestoreSession();
                     return;
                 }
+
+                if (_storeSessionInfoAndSkipLoginWhenPossible)
+                {
+                    LoginHandler.SetupAuthenticator();
+                }
             }
 
             base.Open(args);
