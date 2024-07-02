@@ -24,6 +24,7 @@ namespace Sequence.Demo
         internal ILogin LoginHandler { get; private set; }
         
         private bool _alreadyAttemptedToRestoreSession = false;
+        private GameObject _sessionManager;
         
         protected override void Awake()
         {
@@ -82,6 +83,7 @@ namespace Sequence.Demo
         private void OnDestroy()
         {
             WaaSWallet.OnFailedToLoginWithStoredSessionWallet -= OnFailedToLoginWithStoredSessionWalletHandler;
+            TearDownLoginHandler();
         }
 
         public void SetupLoginHandler(ILogin loginHandler)
@@ -96,7 +98,15 @@ namespace Sequence.Demo
             
             WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
 
-            Instantiate(_waaSSessionManagerPrefab);
+            _sessionManager = Instantiate(_waaSSessionManagerPrefab);
+        } 
+        
+        private void TearDownLoginHandler()
+        {
+            LoginHandler.OnMFAEmailSent -= OnMFAEmailSentHandler;
+            LoginHandler.OnLoginSuccess -= OnLoginSuccessHandler;
+            WaaSWallet.OnWaaSWalletCreated -= OnWaaSWalletCreatedHandler;
+            Destroy(_sessionManager);
         } 
         
         private void OnFailedToLoginWithStoredSessionWalletHandler(string error)
