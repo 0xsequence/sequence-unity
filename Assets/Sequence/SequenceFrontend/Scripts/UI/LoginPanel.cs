@@ -79,6 +79,11 @@ namespace Sequence.Demo
             base.Open(args);
         }
 
+        private void OnDestroy()
+        {
+            WaaSWallet.OnFailedToLoginWithStoredSessionWallet -= OnFailedToLoginWithStoredSessionWalletHandler;
+        }
+
         public void SetupLoginHandler(ILogin loginHandler)
         {
             LoginHandler = loginHandler;
