@@ -5,13 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Sequence/Samples/DemoScene/Demo.unity
     guid: d87896574aa4f42aab6b98685b555474
   - enabled: 0
     path: Assets/Sequence/SequenceSDK/WaaS/Tests/EndToEnd/WaaSEndToEndTests.unity
     guid: 6a48e95d2401d41339a9d99c129ae1f9
-  - enabled: 1
+  - enabled: 0
     path: Assets/Sequence/SequenceFrontend/Scenes/Tests.unity
     guid: 4dfb06a7c845a4513907bd9b1a335575
   m_configObjects:
