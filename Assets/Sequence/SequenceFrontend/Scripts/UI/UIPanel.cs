@@ -57,7 +57,7 @@ namespace Sequence.Demo
 
         public virtual IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            if (InitialPage != null)
+            if (InitialPage != null && InitialPage != _page)
             {
                 ClearStack();
                 yield return new WaitForSeconds(base._openAnimationDurationInSeconds);
