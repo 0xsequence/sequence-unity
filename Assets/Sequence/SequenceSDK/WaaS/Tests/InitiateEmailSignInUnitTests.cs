@@ -7,7 +7,7 @@ namespace Sequence.WaaS.Tests
     {
         private string _email = "email@domain.com";
         
-        private WaaSLogin _waasLogin = new WaaSLogin();
+        private WaaSLogin _waasLogin = WaaSLogin.GetInstance();
         
         [Test]
         public void TestLogin_Success()

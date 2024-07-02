@@ -53,11 +53,6 @@ namespace Sequence.Demo
             }
         }
 
-        private void Start()
-        {
-            LoginHandler.TryToRestoreSession();
-        }
-
         /// <summary>
         /// Open LoginPanel, include bool: true if you wish to open the login page after attempting to restore a session
         /// </summary>
@@ -73,6 +68,8 @@ namespace Sequence.Demo
             {
                 if (_storeSessionInfoAndSkipLoginWhenPossible && !_alreadyAttemptedToRestoreSession)
                 {
+                    _alreadyAttemptedToRestoreSession = true;
+                    LoginHandler.TryToRestoreSession();
                     return;
                 }
             }
