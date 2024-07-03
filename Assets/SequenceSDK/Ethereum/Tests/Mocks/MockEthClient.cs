@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Sequence;
 using Sequence.Provider;
 
-namespace SequenceSDK.Ethereum.Provider
+namespace Sequence.Mocks
 {
     public class MockEthClient : IEthClient
     {

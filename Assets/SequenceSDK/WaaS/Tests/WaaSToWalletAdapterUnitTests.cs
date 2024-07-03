@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.Mocks;
 using Sequence.Provider;
 using Sequence.Transactions;
-using SequenceSDK.Ethereum.Provider;
 
 namespace Sequence.WaaS.Tests
 {

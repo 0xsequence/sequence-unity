@@ -4,7 +4,6 @@ using NUnit.Framework;
 using NUnit.Framework.Internal.Commands;
 using Sequence.WaaS;
 using SequenceExamples.Scripts.Tests.Utils;
-using SequenceSDK.Ethereum.Provider;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
