@@ -43,6 +43,6 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0",
-    "xyz.0xsequence.waas-unity": "file:../LocalPackages/Sequence-Unity"
+    "xyz.0xsequence.waas-unity": "file:../Packages/Sequence-Unity"
   }
 }

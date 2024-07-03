@@ -175,9 +175,9 @@
       "url": "https://packages.unity.com"
     },
     "xyz.0xsequence.waas-unity": {
-      "version": "file:../LocalPackages/Sequence-Unity",
+      "version": "file:Sequence-Unity",
       "depth": 0,
-      "source": "local",
+      "source": "embedded",
       "dependencies": {
         "com.unity.nuget.newtonsoft-json": "3.0.2"
       }
