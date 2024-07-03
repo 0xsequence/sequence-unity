@@ -7,6 +7,7 @@ using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Utils;
 using Sequence.WaaS.Authentication;
+using Sequence.WaaS.DataTypes;
 using SequenceSDK.WaaS;
 using UnityEditor;
 using UnityEngine;
@@ -38,23 +39,49 @@ namespace Sequence.WaaS
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
         }
 
-        public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30)
+        public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
         {
             string payload = AssemblePayloadJson(args);
-            object intentPayload = await AssembleIntentPayload(payload, type, timeBeforeExpiryInSeconds);
+            object intentPayload = await AssembleIntentPayload(payload, type, timeBeforeExpiryInSeconds, currentTime);
             string path = "SendIntent";
-            if (type == IntentType.OpenSession)
+            try
             {
-                path = "RegisterSession";
-                RegisterSessionIntent intent = intentPayload as RegisterSessionIntent;
-                string intentPayloadJson = JsonConvert.SerializeObject(intent, serializerSettings);
-                RegisterSessionResponse registerSessionResponse = await PostIntent<RegisterSessionResponse>(intentPayloadJson, path);
-                return (T)(object)(registerSessionResponse.response.data);
+                if (type == IntentType.OpenSession)
+                {
+                    path = "RegisterSession";
+                    RegisterSessionIntent intent = intentPayload as RegisterSessionIntent;
+                    string intentPayloadJson = JsonConvert.SerializeObject(intent, serializerSettings);
+                    RegisterSessionResponse registerSessionResponse =
+                        await PostIntent<RegisterSessionResponse>(intentPayloadJson, path);
+                    return (T)(object)(registerSessionResponse.response.data);
+                }
+
+                SendIntentPayload sendIntentPayload = new SendIntentPayload(intentPayload as IntentPayload);
+                string sendIntentPayloadJson = JsonConvert.SerializeObject(sendIntentPayload, serializerSettings);
+                IntentResponse<T> result = await PostIntent<IntentResponse<T>>(sendIntentPayloadJson, path);
+                return result.response.data;
             }
-            SendIntentPayload sendIntentPayload = new SendIntentPayload(intentPayload as IntentPayload);
-            string sendIntentPayloadJson = JsonConvert.SerializeObject(sendIntentPayload, serializerSettings);
-            IntentResponse<T> result = await PostIntent<IntentResponse<T>>(sendIntentPayloadJson, path);
-            return result.response.data;
+            catch (TimeMismatchException e)
+            {
+                long currentTimeAccordingToServer = e.CurrentTime;
+                if (currentTimeAccordingToServer == 0)
+                {
+                    throw;
+                }
+
+                IntentPayload intent = intentPayload as IntentPayload;
+                long currentTimeAccordingToIntent = intent.issuedAt;
+                if (currentTimeAccordingToServer > currentTimeAccordingToIntent + 1 ||
+                    currentTimeAccordingToServer < currentTimeAccordingToIntent - 1)
+                {
+                    Debug.LogWarning("Time mismatch detected. Retrying with server time.");
+                    return await SendIntent<T, T2>(args, type, timeBeforeExpiryInSeconds, (uint)currentTimeAccordingToServer);
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         private async Task<IntentResponse<TransactionReturn>> SendTransactionIntent(string intent,
@@ -82,10 +109,10 @@ namespace Sequence.WaaS
             return JsonConvert.SerializeObject(args, serializerSettings);
         }
 
-        private async Task<object> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds)
+        private async Task<object> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds, uint currentTime)
         {
             JObject packet = JsonConvert.DeserializeObject<JObject>(payload);
-            IntentPayload toSign = new IntentPayload(_waasVersion, type, packet, null, timeToLiveInSeconds);
+            IntentPayload toSign = new IntentPayload(_waasVersion, type, packet, null, timeToLiveInSeconds, currentTime);
             string toSignJson = JsonConvert.SerializeObject(toSign, serializerSettings);
             string signedPayload = await _sessionWallet.SignMessage(SequenceCoder.KeccakHash(toSignJson.ToByteArray()));
             IntentPayload intentPayload = new IntentPayload(_waasVersion, type, toSign.expiresAt, toSign.issuedAt, packet,

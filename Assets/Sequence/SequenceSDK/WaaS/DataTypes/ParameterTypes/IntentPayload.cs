@@ -36,13 +36,18 @@ namespace Sequence.WaaS
             this.signatures = signatures;
         }
 
-        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30)
+        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
         {
             this.version = version;
             this.name = IntentNames[type];
             this.data = data;
             this.signatures = signatures;
             this.issuedAt = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            if (currentTime != 0)
+            {
+                this.issuedAt = currentTime;
+            }
+            
             this.expiresAt = this.issuedAt + timeBeforeExpiryInSeconds;
         }
 
