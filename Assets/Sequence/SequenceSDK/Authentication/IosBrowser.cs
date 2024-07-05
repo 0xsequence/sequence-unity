@@ -7,7 +7,7 @@ namespace Sequence.Authentication
     public class IosBrowser : IBrowser
     {
 #if UNITY_IOS && !UNITY_EDITOR
-        private OpenIdAuthenticator _authenticator;
+        private IAuthenticator _authenticator;
         private static IosBrowser _instance;
         
         private IosBrowser(OpenIdAuthenticator authenticator)
@@ -43,7 +43,7 @@ namespace Sequence.Authentication
             Auth_ASWebAuthenticationSession_SetPrefersEphemeralWebBrowserSession(sessionPointer, 0);
             if (Auth_ASWebAuthenticationSession_Start(sessionPointer) == 0)
             {
-                _authenticator.OnSignInFailed?.Invoke("Failed to start Sign in with Apple Authentication Session");
+                _authenticator.InvokeSignInFailed("Failed to start Sign in with Apple Authentication Session");
             };
         }
         
@@ -75,11 +75,11 @@ namespace Sequence.Authentication
                 {
                     errorMessage += "\nThe user most likely canceled the sign in process.";
                 }
-                _authenticator.OnSignInFailed?.Invoke("Social sign in error: " + errorMessage);
+                _authenticator.InvokeSignInFailed("Social sign in error: " + errorMessage);
             }
             else if (errorCode != 0)
             {
-                _authenticator.OnSignInFailed?.Invoke($"Social sign in error code: {errorCode}");
+                _authenticator.InvokeSignInFailed($"Social sign in error code: {errorCode}");
             }
             else
             {

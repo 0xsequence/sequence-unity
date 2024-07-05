@@ -5,12 +5,15 @@ using Sequence.WaaS;
 using TMPro;
 using UnityEngine;
 using Sequence.Config;
+using Sequence.Utils;
+using Sequence.Utils.SecureStorage;
 
 namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
         [SerializeField] private GameObject _waaSSessionManagerPrefab;
+        private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
         private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
@@ -19,6 +22,8 @@ namespace Sequence.Demo
         private WaaSDemoPage _waasDemoPage;
         private static string _urlScheme;
         internal ILogin LoginHandler { get; private set; }
+        
+        private bool _alreadyAttemptedToRestoreSession = false;
         
         protected override void Awake()
         {
@@ -32,15 +37,47 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            ILogin loginHandler = new WaaSLogin();
+            WaaSWallet.OnFailedToLoginWithStoredSessionWallet += OnFailedToLoginWithStoredSessionWalletHandler;
+
+            _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
+            
+            ILogin loginHandler = WaaSLogin.GetInstance();
             SetupLoginHandler(loginHandler);
+            loginHandler.TryToRestoreSession();
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
             
             if (_urlScheme == null) 
             {
-                _urlScheme = SequenceConfig.GetConfig().UrlScheme;
+                _urlScheme = config.UrlScheme;
             }
+        }
+
+        /// <summary>
+        /// Open LoginPanel, include bool: true if you wish to open the login page after attempting to restore a session
+        /// </summary>
+        /// <param name="args"></param>
+        public override void Open(params object[] args)
+        {
+            if (!_alreadyAttemptedToRestoreSession)
+            {
+                _alreadyAttemptedToRestoreSession = args.GetObjectOfTypeIfExists<bool>();
+            }
+
+            if (SecureStorageFactory.IsSupportedPlatform())
+            {
+                if (_storeSessionInfoAndSkipLoginWhenPossible && !_alreadyAttemptedToRestoreSession)
+                {
+                    return;
+                }
+
+                if (_storeSessionInfoAndSkipLoginWhenPossible)
+                {
+                    LoginHandler.SetupAuthenticator();
+                }
+            }
+
+            base.Open(args);
         }
 
         public void SetupLoginHandler(ILogin loginHandler)
@@ -57,6 +94,12 @@ namespace Sequence.Demo
 
             Instantiate(_waaSSessionManagerPrefab);
         } 
+        
+        private void OnFailedToLoginWithStoredSessionWalletHandler(string error)
+        {
+            Debug.LogWarning($"Failed to connect to Sequence API with stored session wallet: {error}");
+            Open(true);
+        }
 
         public void OpenTransitionPanel()
         {
@@ -105,6 +148,14 @@ namespace Sequence.Demo
             if (_waasDemoPage != null)
             {
                 _waasDemoPage.Open(wallet);
+            }
+            else if (_storeSessionInfoAndSkipLoginWhenPossible)
+            {
+                _gameObject.SetActive(true);
+                _animator.AnimateIn( _openAnimationDurationInSeconds);
+                _isOpen = true;
+                
+                StartCoroutine(SetUIPage(_loginSuccessPage));
             }
         }
     }

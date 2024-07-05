@@ -33,7 +33,7 @@ namespace Sequence.Authentication
         {
             GameObject successPoller = UnityEngine.Object.Instantiate(new GameObject("SuccessPoller")) as GameObject;
             WebAuthSuccessPoller poller = successPoller.AddComponent<WebAuthSuccessPoller>();
-            poller.Setup(_authenticator, OpenIdAuthenticator.RedirectUrl, _state);
+            poller.Setup(_authenticator, _authenticator.GetRedirectUrl(), _state);
             poller.PollForAuthSuccess();
         }
     }

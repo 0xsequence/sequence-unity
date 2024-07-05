@@ -7,6 +7,7 @@ using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Utils;
+using Sequence.Utils.SecureStorage;
 using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
 using SequenceSDK.WaaS;
@@ -22,7 +23,7 @@ namespace Sequence.WaaS
 
         private int _waasProjectId;
         private string _waasVersion;
-        private OpenIdAuthenticator _authenticator;
+        private IAuthenticator _authenticator;
         private IValidator _validator;
         private IEmailSignIn _emailSignIn;
         private string _challengeSession;
@@ -31,8 +32,101 @@ namespace Sequence.WaaS
         private string _sessionId;
 
         private bool _isLoggingIn = false;
+        
+        private bool _storeSessionWallet = false;
+        private const string _walletKey = "SessionWallet";
+        
+        private static WaaSLogin _instance;
+        
+        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null)
+        {
+            if (_instance == null)
+            {
+                _instance = new WaaSLogin(validator, authenticator);
+            }
+            return _instance;
+        }
 
-        public WaaSLogin(IValidator validator = null)
+        [Obsolete("Use GetInstance() instead.")]
+        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null)
+        {
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage;
+            if (storeSessionWallet)
+            {
+                _storeSessionWallet = true;
+                Configure();
+            }
+            else
+            {
+                CreateWallet(validator, authenticator);
+            }
+        }
+
+        private void CreateWallet(IValidator validator = null, IAuthenticator authenticator = null)
+        {
+            Configure();
+
+            SetupAuthenticator(validator, authenticator);
+        }
+
+        public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
+        {
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            _sessionWallet = new EthWallet();
+            _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+
+            string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
+
+            if (authenticator != null)
+            {
+                _authenticator = authenticator;
+            }
+            else
+            {
+                _authenticator = new OpenIdAuthenticator();
+            }
+            SetupAuthenticatorAndListeners(nonce);
+
+            if (validator == null)
+            {
+                validator = new Validator();
+            }
+            _validator = validator;
+
+            try
+            {
+                _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId, nonce);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
+            }
+        }
+
+        public void TryToRestoreSession()
+        {
+            if (!_storeSessionWallet)
+            {
+                return;
+            }
+            TryToLoginWithStoredSessionWallet();
+        }
+
+        private void SetupAuthenticatorAndListeners(string nonce)
+        {
+            _authenticator.SetNonce(nonce);
+            try {
+                _authenticator.PlatformSpecificSetup();
+            }
+            catch (Exception e) {
+                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
+            }
+            Application.deepLinkActivated += _authenticator.HandleDeepLink;
+            _authenticator.SignedIn += OnSocialLogin;
+            _authenticator.OnSignInFailed += OnSocialSignInFailed;
+        }
+
+        private void Configure()
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             string waasVersion = config.WaaSVersion;
@@ -57,36 +151,77 @@ namespace Sequence.WaaS
                 throw SequenceConfig.MissingConfigError("Project ID");
             }
             _waasProjectId = projectId;
-            
-            _sessionWallet = new EthWallet();
-            _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+        }
 
-            string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
-            _authenticator = new OpenIdAuthenticator(nonce);
-            try {
-                _authenticator.PlatformSpecificSetup();
-            }
-            catch (Exception e) {
-                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
-            }
-            Application.deepLinkActivated += _authenticator.HandleDeepLink;
-            _authenticator.SignedIn += OnSocialLogin;
-            _authenticator.OnSignInFailed += OnSocialSignInFailed;
-
-            if (validator == null)
-            {
-                validator = new Validator();
-            }
-            _validator = validator;
-
+        private void TryToLoginWithStoredSessionWallet()
+        {
+            (EthWallet, string) walletInfo = (null, "");
             try
             {
-                _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId, nonce);
+                walletInfo = AttemptToCreateWalletFromSecureStorage();
             }
             catch (Exception e)
             {
-                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
+                FailedLoginWithStoredSessionWallet(e.Message);
+                return;
             }
+            if (walletInfo.Item1 == null || string.IsNullOrWhiteSpace(walletInfo.Item2))
+            {
+                FailedLoginWithStoredSessionWallet("No stored wallet info found");
+                return;
+            }
+            
+            _sessionWallet = walletInfo.Item1;
+            
+            _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+            
+            WaaSWallet wallet = new WaaSWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion));
+
+            EnsureSessionIsValid(wallet);
+        }
+
+        private void FailedLoginWithStoredSessionWallet(string error)
+        {
+            CreateWallet();
+            WaaSWallet.OnFailedToLoginWithStoredSessionWallet?.Invoke(error);
+        }
+
+        private async Task EnsureSessionIsValid(WaaSWallet wallet)
+        {
+            WaaSSession[] activeSessions = await wallet.ListSessions();
+            if (activeSessions == null || activeSessions.Length == 0)
+            {
+                FailedLoginWithStoredSessionWallet("No active sessions found");
+                return;
+            }
+
+            int sessions = activeSessions.Length;
+            string expectedSessionId = wallet.SessionId;
+            for (int i = 0; i < sessions; i++)
+            {
+                if (activeSessions[i].id == expectedSessionId)
+                {
+                    WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
+                    return;
+                }
+            }
+            
+            FailedLoginWithStoredSessionWallet("Stored session wallet is not active");
+        }
+
+        private (EthWallet, string) AttemptToCreateWalletFromSecureStorage()
+        {
+            ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
+            string walletInfo = secureStorage.RetrieveString(_walletKey);
+            if (string.IsNullOrEmpty(walletInfo))
+            {
+                return (null, "");
+            }
+            string[] walletInfoSplit = walletInfo.Split('-');
+            string privateKey = walletInfoSplit[0];
+            string waasWalletAddress = walletInfoSplit[1];
+            EthWallet wallet = new EthWallet(privateKey);
+            return (wallet, waasWalletAddress);
         }
         
         public void InjectEmailSignIn(IEmailSignIn emailSignIn)
@@ -248,6 +383,10 @@ namespace Sequence.WaaS
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
+                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
+                {
+                    StoreWalletSecurely(walletAddress);
+                }
                 _isLoggingIn = false;
                 WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
             }
@@ -263,6 +402,15 @@ namespace Sequence.WaaS
         {
             IntentDataOpenSession intent = new IntentDataOpenSession(sessionWallet.GetAddress(), null, idToken);
             return intent;
+        }
+        
+        private void StoreWalletSecurely(string waasWalletAddress)
+        {
+            ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
+            byte[] privateKeyBytes = new byte[32];
+            _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
+            string privateKey = privateKeyBytes.ByteArrayToHexString();
+            secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
         }
     }
 }

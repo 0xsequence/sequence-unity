@@ -15,7 +15,9 @@ namespace Sequence.WaaS
 {
     public class WaaSWallet : IWallet
     {
-        public static Action<WaaSWallet> OnWaaSWalletCreated; 
+        public static Action<WaaSWallet> OnWaaSWalletCreated;
+        public static Action<string> OnFailedToLoginWithStoredSessionWallet;
+        
         public string SessionId { get; private set; }
         private Address _address;
         private HttpClient _httpClient;
@@ -218,7 +220,15 @@ namespace Sequence.WaaS
         public event Action<WaaSSession[]> OnSessionsFound;
         public async Task<WaaSSession[]> ListSessions()
         {
-            WaaSSession[] results = await _intentSender.ListSessions();
+            WaaSSession[] results = null;
+            try
+            {
+                results = await _intentSender.ListSessions();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Failed to list sessions: " + e.Message);
+            }
             OnSessionsFound?.Invoke(results);
             return results;
         }
@@ -364,6 +374,25 @@ namespace Sequence.WaaS
                 return failedTransactionReturn;
             }
             
+        }
+
+        public event Action<IntentResponseSessionAuthProof> OnSessionAuthProofGenerated;
+        public event Action<string> OnFailedToGenerateSessionAuthProof;
+
+        public async Task<IntentResponseSessionAuthProof> GetSessionAuthProof(Chain network, string nonce = null)
+        {
+            IntentDataSessionAuthProof args = new IntentDataSessionAuthProof(network, _address, nonce);
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseSessionAuthProof, IntentDataSessionAuthProof>(args, IntentType.SessionAuthProof);
+                OnSessionAuthProofGenerated?.Invoke(result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                OnFailedToGenerateSessionAuthProof?.Invoke("Failed to generate session auth proof: " + e.Message);
+                return null;
+            }
         }
     }
 }
