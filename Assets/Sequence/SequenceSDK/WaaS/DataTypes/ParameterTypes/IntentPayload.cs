@@ -60,6 +60,7 @@ namespace Sequence.WaaS
             {IntentType.FeeOptions, "feeOptions"},
             {IntentType.SessionAuthProof, "sessionAuthProof"},
             {IntentType.InitiateAuth, "initiateAuth"},
+            {IntentType.FederateAccount, "federateAccount"},
         };
     }
 
@@ -77,6 +78,7 @@ namespace Sequence.WaaS
         FeeOptions,
         SessionAuthProof,
         InitiateAuth,
+        FederateAccount,
         None
     }
 }
