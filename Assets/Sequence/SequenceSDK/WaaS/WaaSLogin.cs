@@ -25,31 +25,37 @@ namespace Sequence.WaaS
         private string _waasVersion;
         private IAuthenticator _authenticator;
         private IValidator _validator;
-        private IEmailSignIn _emailSignIn;
         private EthWallet _sessionWallet;
         private string _sessionId;
         private IntentSender _intentSender;
         private EmailConnector _emailConnector;
+        private IWaaSConnector _connector;
 
         private bool _isLoggingIn = false;
         
         private bool _storeSessionWallet = false;
         private const string _walletKey = "SessionWallet";
-        
+
         private static WaaSLogin _instance;
         
-        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null)
+        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null)
         {
             if (_instance == null)
             {
-                _instance = new WaaSLogin(validator, authenticator);
+                _instance = new WaaSLogin(validator, authenticator, connector);
             }
             return _instance;
         }
 
         [Obsolete("Use GetInstance() instead.")]
-        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null)
+        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null)
         {
+            if (connector == null)
+            {
+                connector = this;
+            }
+            _connector = connector;
+            
             bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage;
             if (storeSessionWallet)
             {
@@ -94,16 +100,7 @@ namespace Sequence.WaaS
             }
             _validator = validator;
 
-            _emailConnector = new EmailConnector(_sessionId, _sessionWallet, this, _validator);
-            
-            try
-            {
-                _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId, nonce);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning("AWS config not found in config key. Email sign in will not work. Please contact Sequence support for more information.");
-            }
+            _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
         }
 
         public void TryToRestoreSession()
@@ -228,11 +225,6 @@ namespace Sequence.WaaS
             string waasWalletAddress = walletInfoSplit[1];
             EthWallet wallet = new EthWallet(privateKey);
             return (wallet, waasWalletAddress);
-        }
-        
-        public void InjectEmailSignIn(IEmailSignIn emailSignIn)
-        {
-            _emailSignIn = emailSignIn;
         }
         
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;

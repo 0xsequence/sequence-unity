@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Sequence.WaaS
 {
-    internal interface IWaaSConnector
+    public interface IWaaSConnector
     {
         public Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent);
         public Task ConnectToWaaS(IntentDataOpenSession loginIntent, LoginMethod method, string email = "");

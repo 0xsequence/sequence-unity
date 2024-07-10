@@ -14,7 +14,6 @@ namespace Sequence.WaaS
         private IWaaSConnector _connector;
         private IValidator _validator;
         private string _emailChallenge;
-        private int _retries;
 
         public EmailConnector(string sessionId, Wallet.IWallet sessionWallet, IWaaSConnector connector, IValidator validator)
         {
@@ -24,7 +23,7 @@ namespace Sequence.WaaS
             _validator = validator;
         }
 
-        public async Task<string> InitiateAuthEmail(string email)
+        private async Task<string> InitiateAuthEmail(string email)
         {
             IntentDataInitiateAuth initiateAuthIntent = AssembleEmailInitiateAuthIntent(email);
 
