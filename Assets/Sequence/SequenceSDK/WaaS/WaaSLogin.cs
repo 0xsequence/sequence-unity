@@ -353,35 +353,11 @@ namespace Sequence.WaaS
             
             _isLoggingIn = true;
             
-            IntentDataInitiateAuth initiateAuthIntent = AssembleOIDCInitiateAuthIntent(idToken, _sessionId);
-
-            string challenge = await InitiateAuth(initiateAuthIntent);
+            OIDCConnector oidcConnector = new OIDCConnector(idToken, _sessionId, _sessionWallet, _connector);
             
-            IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent(idToken, _sessionWallet);
-
-            string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
-            await ConnectToWaaS(loginIntent, method, email);
-        }
-        
-        private IntentDataInitiateAuth AssembleOIDCInitiateAuthIntent(string idToken, string sessionId)
-        {
-            IdTokenJwtPayload idTokenPayload = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken);
-            string idTokenHash = SequenceCoder.KeccakHashASCII(idToken).WithoutHexPrefix();
-            string verifier = $"{idTokenHash};{idTokenPayload.exp}";
-            IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.OIDC, sessionId, verifier);
-            return intent;
+            await oidcConnector.ConnectToWaaSViaSocialLogin(idToken, method);
         }
 
-        private IntentDataOpenSession AssembleOIDCOpenSessionIntent(string idToken, Wallet.IWallet sessionWallet)
-        {
-            IdTokenJwtPayload idTokenPayload = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken);
-            string idTokenHash = SequenceCoder.KeccakHashASCII(idToken).EnsureHexPrefix();
-            string verifier = $"{idTokenHash};{idTokenPayload.exp}";
-            IntentDataOpenSession intent =
-                new IntentDataOpenSession(sessionWallet.GetAddress(), IdentityType.OIDC, verifier, idToken);
-            return intent;
-        }
-        
         private void StoreWalletSecurely(string waasWalletAddress)
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
