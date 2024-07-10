@@ -16,7 +16,7 @@ using UnityEngine.Serialization;
 
 namespace Sequence.WaaS
 {
-    public class WaaSLogin : ILogin 
+    public class WaaSLogin : ILogin, IWaaSConnector
     {
         public static string WaaSWithAuthUrl { get; private set; }
         public const string WaaSLoginMethod = "WaaSLoginMethod";
@@ -26,10 +26,10 @@ namespace Sequence.WaaS
         private IAuthenticator _authenticator;
         private IValidator _validator;
         private IEmailSignIn _emailSignIn;
-        private string _challengeSession;
-        private int retries = 0;
         private EthWallet _sessionWallet;
         private string _sessionId;
+        private IntentSender _intentSender;
+        private EmailConnector _emailConnector;
 
         private bool _isLoggingIn = false;
         
@@ -74,6 +74,7 @@ namespace Sequence.WaaS
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
             _sessionWallet = new EthWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+            _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
             string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
 
@@ -93,6 +94,8 @@ namespace Sequence.WaaS
             }
             _validator = validator;
 
+            _emailConnector = new EmailConnector(_sessionId, _sessionWallet, this, _validator);
+            
             try
             {
                 _emailSignIn = new AWSEmailSignIn(configJwt.emailRegion, configJwt.emailClientId, nonce);
@@ -144,6 +147,9 @@ namespace Sequence.WaaS
                 throw SequenceConfig.MissingConfigError("RPC Server");
             }
             WaaSWithAuthUrl = $"{rpcUrl.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator";
+            
+            // Todo remove
+            WaaSWithAuthUrl = "https://dev-waas.sequence.app/rpc/WaasAuthenticator";
             
             int projectId = configJwt.projectId;
             if (string.IsNullOrWhiteSpace(projectId.ToString()))
@@ -236,58 +242,11 @@ namespace Sequence.WaaS
 
         public async Task Login(string email)
         {
-            if (!_validator.ValidateEmail(email))
-            {
-                OnMFAEmailFailedToSend?.Invoke(email, $"Invalid email: {email}");
-                return;
-            }
-            
             try
             {
-                if (_emailSignIn == null)
-                {
-                    OnMFAEmailFailedToSend?.Invoke(email, "Email sign in not available. Please check for logged warnings; there is most likely a configuration issue.");
-                    return;
-                }
-                _challengeSession = await _emailSignIn.SignIn(email);
-                if (string.IsNullOrEmpty(_challengeSession))
-                {
-                    OnMFAEmailFailedToSend?.Invoke(email, "Unknown error establishing AWS session");
-                    return;
-                }
-
-                if (_challengeSession.Contains("user not found"))
-                {
-                    if (retries > 1)
-                    {
-                        OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
-                        return;
-                    }
-                    await SignUpThenRetryLogin(email);
-                    return;
-                }
-                
-                if (_challengeSession.StartsWith("Error"))
-                {
-                    OnMFAEmailFailedToSend?.Invoke(email, _challengeSession);
-                    return;
-                }
-                
+                _isLoggingIn = true;
+                await _emailConnector.Login(email);
                 OnMFAEmailSent?.Invoke(email);
-            }
-            catch (Exception e)
-            {
-                OnMFAEmailFailedToSend?.Invoke(email, e.Message);
-            }
-        }
-
-        public async Task SignUpThenRetryLogin(string email)
-        {
-            try
-            {
-                await _emailSignIn.SignUp(email);
-                retries++;
-                await Login(email);
             }
             catch (Exception e)
             {
@@ -297,33 +256,8 @@ namespace Sequence.WaaS
 
         public async Task Login(string email, string code)
         {
-            if (!_validator.ValidateCode(code))
-            {
-                OnLoginFailed?.Invoke($"Invalid code: {code}");
-                return;
-            }
-            
-            try
-            {
-                string idToken = await _emailSignIn.Login(_challengeSession, email, code, _sessionWallet.GetAddress());
-                if (string.IsNullOrEmpty(idToken))
-                {
-                    OnLoginFailed?.Invoke("Unknown error establishing AWS session");
-                    return;
-                }
-
-                if (idToken.StartsWith("Error"))
-                {
-                    OnLoginFailed?.Invoke(idToken);
-                    return;
-                }
-                
-                await ConnectToWaaS(idToken, LoginMethod.Email);
-            }
-            catch (Exception e)
-            {
-                OnLoginFailed?.Invoke(e.Message);
-            }
+            _isLoggingIn = true;
+            await _emailConnector.ConnectToWaaSViaEmail(email, code);
         }
 
         public void GoogleLogin()
@@ -353,7 +287,7 @@ namespace Sequence.WaaS
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            ConnectToWaaS(result.IdToken, result.Method);
+            ConnectToWaaSViaSocialLogin(result.IdToken, result.Method);
         }
 
         private void OnSocialSignInFailed(string error)
@@ -361,25 +295,15 @@ namespace Sequence.WaaS
             OnLoginFailed?.Invoke("Connecting to WaaS API failed due to error with social sign in: " + error);
         }
 
-        public async Task ConnectToWaaS(string idToken, LoginMethod method)
+        public async Task ConnectToWaaS(IntentDataOpenSession loginIntent, LoginMethod method, string email = "")
         {
-            _isLoggingIn = true;
-            IntentSender sender = new IntentSender(
-                new HttpClient(WaaSWithAuthUrl),
-                _sessionWallet,
-                _sessionId,
-                _waasProjectId,
-                _waasVersion);
-            IntentDataOpenSession loginIntent = AssembleLoginIntent(idToken, _sessionWallet);
-
             try
             {
-                IntentResponseSessionOpened registerSessionResponse = await sender.SendIntent<IntentResponseSessionOpened, IntentDataOpenSession>(loginIntent, IntentType.OpenSession);
+                IntentResponseSessionOpened registerSessionResponse = await _intentSender.SendIntent<IntentResponseSessionOpened, IntentDataOpenSession>(loginIntent, IntentType.OpenSession);
                 string sessionId = registerSessionResponse.sessionId;
                 string walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
-                string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
@@ -394,13 +318,75 @@ namespace Sequence.WaaS
             {
                 OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message);
                 _isLoggingIn = false;
-                return;
             }
         }
 
-        private IntentDataOpenSession AssembleLoginIntent(string idToken, Wallet.IWallet sessionWallet)
+        public async Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent)
         {
-            IntentDataOpenSession intent = new IntentDataOpenSession(sessionWallet.GetAddress(), null, idToken);
+            string challenge = "";
+
+            try
+            {
+                IntentResponseAuthInitiated initiateAuthResponse = await _intentSender.SendIntent<IntentResponseAuthInitiated, IntentDataInitiateAuth>(initiateAuthIntent, IntentType.InitiateAuth);
+                string sessionId = initiateAuthResponse.sessionId;
+                if (sessionId != _sessionId)
+                {
+                    throw new Exception($"Session Id received from WaaS server doesn't match, received {sessionId}, sent {_sessionId}");
+                }
+
+                if (!initiateAuthResponse.ValidateChallenge())
+                {
+                    throw new Exception("Invalid challenge received from WaaS server, received: " + initiateAuthResponse.challenge);
+                }
+                
+                challenge = initiateAuthResponse.challenge;
+            }
+            catch (Exception e)
+            {
+                OnLoginFailed?.Invoke("Error initiating auth: " + e.Message);
+                _isLoggingIn = false;
+            }
+
+            return challenge;
+        }
+
+        public async Task ConnectToWaaSViaSocialLogin(string idToken, LoginMethod method)
+        {
+            if (!method.IsOIDC())
+            {
+                OnLoginFailed?.Invoke($"Invalid login method, given: {method}, expected one of {nameof(IdentityType)}: {nameof(IdentityType.OIDC)}");
+                _isLoggingIn = false;
+                return;
+            }
+            
+            _isLoggingIn = true;
+            
+            IntentDataInitiateAuth initiateAuthIntent = AssembleOIDCInitiateAuthIntent(idToken, _sessionId);
+
+            string challenge = await InitiateAuth(initiateAuthIntent);
+            
+            IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent(idToken, _sessionWallet);
+
+            string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
+            await ConnectToWaaS(loginIntent, method, email);
+        }
+        
+        private IntentDataInitiateAuth AssembleOIDCInitiateAuthIntent(string idToken, string sessionId)
+        {
+            IdTokenJwtPayload idTokenPayload = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken);
+            string idTokenHash = SequenceCoder.KeccakHashASCII(idToken).WithoutHexPrefix();
+            string verifier = $"{idTokenHash};{idTokenPayload.exp}";
+            IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.OIDC, sessionId, verifier);
+            return intent;
+        }
+
+        private IntentDataOpenSession AssembleOIDCOpenSessionIntent(string idToken, Wallet.IWallet sessionWallet)
+        {
+            IdTokenJwtPayload idTokenPayload = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken);
+            string idTokenHash = SequenceCoder.KeccakHashASCII(idToken).EnsureHexPrefix();
+            string verifier = $"{idTokenHash};{idTokenPayload.exp}";
+            IntentDataOpenSession intent =
+                new IntentDataOpenSession(sessionWallet.GetAddress(), IdentityType.OIDC, verifier, idToken);
             return intent;
         }
         

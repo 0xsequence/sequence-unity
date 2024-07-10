@@ -8,6 +8,8 @@ namespace Sequence.Authentication
         Discord,
         Apple,
         Custom,
-        None
+        None,
+        PlayFab,
+        Guest
     }
 }

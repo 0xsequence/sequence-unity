@@ -143,19 +143,29 @@ namespace Sequence.WaaS
             }
             catch (HttpRequestException e)
             {
-                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("HTTP Request failed: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                throw new Exception("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("Invalid URL format: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                throw new Exception("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("File load exception: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
-                throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("An unexpected error occurred: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
             }
+        }
+
+        private string GetRequestErrorIfAvailable(UnityWebRequest request)
+        {
+            if (request.downloadHandler != null && request.downloadHandler.data != null)
+            {
+                return " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data);
+            }
+
+            return "";
         }
 
         private string ExtractHeaders(UnityWebRequest request)

@@ -59,6 +59,7 @@ namespace Sequence.WaaS
             {IntentType.GetTransactionReceipt, "getTransactionReceipt"},
             {IntentType.FeeOptions, "feeOptions"},
             {IntentType.SessionAuthProof, "sessionAuthProof"},
+            {IntentType.InitiateAuth, "initiateAuth"},
         };
     }
 
@@ -75,6 +76,7 @@ namespace Sequence.WaaS
         GetTransactionReceipt,
         FeeOptions,
         SessionAuthProof,
+        InitiateAuth,
         None
     }
 }
