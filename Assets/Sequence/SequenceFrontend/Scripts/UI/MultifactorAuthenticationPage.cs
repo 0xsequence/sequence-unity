@@ -37,7 +37,6 @@ namespace Sequence.Demo
         public void SetupLogin(ILogin loginHandler)
         {
             LoginHandler = loginHandler;
-            LoginHandler.OnLoginFailed += OnLoginFailedHandler;
         }
 
         public override void Open(params object[] args)
@@ -60,6 +59,7 @@ namespace Sequence.Demo
             }
             _enterCodeText.text = $"Enter the code sent to\n<b>{email}</b>";
             _inputField.text = "";
+            LoginHandler.OnLoginFailed += OnLoginFailedHandler;
         }
 
         private void OnInputValueChanged(string newValue)
