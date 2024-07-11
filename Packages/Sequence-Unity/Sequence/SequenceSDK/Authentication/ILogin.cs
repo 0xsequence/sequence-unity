@@ -83,5 +83,10 @@ namespace Sequence.Authentication
         /// Using securely saved credentials, try to restore the session
         /// </summary>
         public void TryToRestoreSession();
+
+        /// <summary>
+        /// Login as a guest
+        /// </summary>
+        public void GuestLogin();
     }
 }

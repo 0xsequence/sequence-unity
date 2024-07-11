@@ -89,5 +89,10 @@ namespace Sequence.Authentication
         {
             
         }
+
+        public void GuestLogin()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

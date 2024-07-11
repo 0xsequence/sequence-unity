@@ -112,6 +112,11 @@ namespace Sequence.WaaS
             TryToLoginWithStoredSessionWallet();
         }
 
+        public void GuestLogin()
+        {
+            ConnectToWaaSAsGuest();
+        }
+
         private void SetupAuthenticatorAndListeners(string nonce)
         {
             _authenticator.SetNonce(nonce);
@@ -356,6 +361,13 @@ namespace Sequence.WaaS
             OIDCConnector oidcConnector = new OIDCConnector(idToken, _sessionId, _sessionWallet, _connector);
             
             await oidcConnector.ConnectToWaaSViaSocialLogin(idToken, method);
+        }
+
+        public async Task ConnectToWaaSAsGuest()
+        {
+            _isLoggingIn = true;
+            GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
+            await connector.ConnectToWaaSViaGuest();
         }
 
         private void StoreWalletSecurely(string waasWalletAddress)
