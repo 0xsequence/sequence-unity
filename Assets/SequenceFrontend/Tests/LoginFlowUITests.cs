@@ -31,7 +31,6 @@ namespace SequenceExamples.Scripts.Tests
             _ui = ui;
             _loginPanel = loginPanel;
             _loginPage = loginPage;
-            _loginPage.NotifyUserIfTheyAreLoggingInWithADifferentAccountFromLastTime = false;
             _mfaPage = mfaPage;
             _loginSuccessPage = loginSuccessPage;
             _walletPanel = walletPanel;
