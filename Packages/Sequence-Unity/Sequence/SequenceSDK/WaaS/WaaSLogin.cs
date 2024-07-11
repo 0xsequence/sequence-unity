@@ -360,7 +360,23 @@ namespace Sequence.WaaS
             
             OIDCConnector oidcConnector = new OIDCConnector(idToken, _sessionId, _sessionWallet, _connector);
             
-            await oidcConnector.ConnectToWaaSViaSocialLogin(idToken, method);
+            await oidcConnector.ConnectToWaaSViaSocialLogin(method);
+        }
+        
+        public async Task ConnectToWaaSViaPlayFab(string titleId, string sessionTicket, string email)
+        {
+            if (string.IsNullOrWhiteSpace(titleId) || string.IsNullOrWhiteSpace(sessionTicket))
+            {
+                OnLoginFailed?.Invoke($"Invalid titleId: {titleId} or sessionTicket: {sessionTicket}");
+                _isLoggingIn = false;
+                return;
+            }
+            
+            _isLoggingIn = true;
+            
+            PlayFabConnector playFabConnector = new PlayFabConnector(titleId, sessionTicket, _sessionId, _sessionWallet, _connector);
+            
+            await playFabConnector.ConnectToWaaSViaPlayFab(email);
         }
 
         public async Task ConnectToWaaSAsGuest()

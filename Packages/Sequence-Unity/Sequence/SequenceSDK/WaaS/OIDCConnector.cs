@@ -21,35 +21,35 @@ namespace Sequence.WaaS
             _connector = connector;
         }
         
-        public async Task ConnectToWaaSViaSocialLogin(string idToken, LoginMethod method)
+        public async Task ConnectToWaaSViaSocialLogin(LoginMethod method)
         {
-            IntentDataInitiateAuth initiateAuthIntent = AssembleOIDCInitiateAuthIntent(idToken, _sessionId);
+            IntentDataInitiateAuth initiateAuthIntent = AssembleOIDCInitiateAuthIntent(_sessionId);
 
             await _connector.InitiateAuth(initiateAuthIntent);
             
-            IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent(idToken, _sessionWallet);
+            IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent(_idToken, _sessionWallet);
 
-            string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken).email;
+            string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(_idToken).email;
             await _connector.ConnectToWaaS(loginIntent, method, email);
         }
         
-        private IntentDataInitiateAuth AssembleOIDCInitiateAuthIntent(string idToken, string sessionId)
+        private IntentDataInitiateAuth AssembleOIDCInitiateAuthIntent(string sessionId)
         {
-            string verifier = GetVerifier(idToken);
+            string verifier = GetVerifier();
             IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.OIDC, sessionId, verifier);
             return intent;
         }
 
-        private string GetVerifier(string idToken)
+        private string GetVerifier()
         {
-            IdTokenJwtPayload idTokenPayload = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(idToken);
-            string idTokenHash = SequenceCoder.KeccakHashASCII(idToken).EnsureHexPrefix();
+            IdTokenJwtPayload idTokenPayload = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(_idToken);
+            string idTokenHash = SequenceCoder.KeccakHashASCII(_idToken).EnsureHexPrefix();
             return $"{idTokenHash};{idTokenPayload.exp}";
         }
 
         private IntentDataOpenSession AssembleOIDCOpenSessionIntent(string idToken, Wallet.IWallet sessionWallet)
         {
-            string verifier = GetVerifier(idToken);
+            string verifier = GetVerifier();
             IntentDataOpenSession intent =
                 new IntentDataOpenSession(sessionWallet.GetAddress(), IdentityType.OIDC, verifier, idToken);
             return intent;
