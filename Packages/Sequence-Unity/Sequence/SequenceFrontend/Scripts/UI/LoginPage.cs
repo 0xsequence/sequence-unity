@@ -28,7 +28,7 @@ namespace Sequence.Demo
             _loginButtonHighlighter = GetComponent<LoginButtonHighlighter>();
         }
 
-        private void Start()
+        protected virtual void Start()
         {
             _loginMethod = GetLoginMethod();
             
@@ -38,11 +38,8 @@ namespace Sequence.Demo
             }
 
             _loginEmail = GetLoginEmail();
-
-            if (_loginMethod == LoginMethod.Email)
-            {
-                _inputField.text = _loginEmail;
-            }
+            
+            _inputField.text = _loginEmail;
         }
 
         public override void Close()
