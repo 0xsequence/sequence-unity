@@ -23,7 +23,7 @@ namespace Sequence.WaaS.Tests
             _exception = exception;
         }
         
-        public Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent)
+        public Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent, LoginMethod method)
         {
             if (_exception != null)
             {

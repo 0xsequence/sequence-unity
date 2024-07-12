@@ -5331,6 +5331,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 171231629}
     m_Modifications:
+    - target: {fileID: 3911810626490335499, guid: 4f2f5ce343de8447088bc48817965287, type: 3}
+      propertyPath: _federatedAuthPopupPanelPrefab
+      value: 
+      objectReference: {fileID: 2514093716324091886, guid: 17697e40d94be4c1f951d6dd39a9ea2e, type: 3}
     - target: {fileID: 3911810626490335500, guid: 4f2f5ce343de8447088bc48817965287, type: 3}
       propertyPath: m_Name
       value: LoginPanel

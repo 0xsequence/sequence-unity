@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sequence.Authentication;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = System.Random;
@@ -57,7 +58,7 @@ namespace Sequence.Demo
             Destroy(gameObject);
         }
         
-        private void OnLoginFailedHandler(string error)
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email)
         {
             Destroy(gameObject);
         }

@@ -56,7 +56,7 @@ namespace Sequence.Authentication
                         {
                             Error =
                                 "Sign-in with Apple error. Message: state token received doesn't match what was given";
-                            authenticator.InvokeSignInFailed(Error);
+                            authenticator.AppleInvokeSignInFailed(Error);
                         }
                         
                         authenticator.InvokeSignedIn(new OpenIdAuthenticationResult(Token, LoginMethod.Apple));
@@ -64,13 +64,13 @@ namespace Sequence.Authentication
                     else
                     {
                         Error = "Sign-in with Apple error. Message: appleIDCredential is null";
-                        authenticator.InvokeSignInFailed(Error);
+                        authenticator.AppleInvokeSignInFailed(Error);
                     }
                 },
                 error =>
                 {
                     Error = "Sign-in with Apple error. Message: " + error;
-                    authenticator.InvokeSignInFailed(Error);
+                    authenticator.AppleInvokeSignInFailed(Error);
                 }
             );
         }

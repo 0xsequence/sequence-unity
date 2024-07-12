@@ -14,7 +14,7 @@ namespace Sequence.Authentication
     {
         public const string LoginEmail = "LoginEmail";
         public event Action<OpenIdAuthenticationResult> SignedIn;
-        public event Action<string> OnSignInFailed;
+        public event Action<string, LoginMethod> OnSignInFailed;
         private string _urlScheme;
         
         public static readonly int WINDOWS_IPC_PORT = 52836;
@@ -106,7 +106,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                OnSignInFailed?.Invoke($"Google sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Google sign in error: {e.Message}", LoginMethod.Google);
             }
         }
 
@@ -134,7 +134,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                OnSignInFailed?.Invoke($"Discord sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Discord sign in error: {e.Message}", LoginMethod.Discord);
             }
         }
 
@@ -155,7 +155,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                OnSignInFailed?.Invoke($"Facebook sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Facebook sign in error: {e.Message}", LoginMethod.Facebook);
             }
         }
         
@@ -183,7 +183,7 @@ namespace Sequence.Authentication
             }
             catch (Exception e)
             {
-                OnSignInFailed?.Invoke($"Apple sign in error: {e.Message}");
+                OnSignInFailed?.Invoke($"Apple sign in error: {e.Message}", LoginMethod.Apple);
             }
         }
 
@@ -192,9 +192,9 @@ namespace Sequence.Authentication
             SignedIn?.Invoke(result);
         }
 
-        public void InvokeSignInFailed(string errorMessage)
+        public void AppleInvokeSignInFailed(string errorMessage)
         {
-            OnSignInFailed?.Invoke(errorMessage);
+            OnSignInFailed?.Invoke(errorMessage, LoginMethod.Apple);
         }
 
         public string GetRedirectUrl()
@@ -375,21 +375,21 @@ namespace Sequence.Authentication
             Dictionary<string, string> queryParams = link.ExtractQueryAndHashParameters();
             if (queryParams == null)
             {
-                OnSignInFailed?.Invoke($"Unexpected deep link: {link}");
+                OnSignInFailed?.Invoke($"Unexpected deep link: {link}", method);
                 return;
             }
             if (queryParams.TryGetValue("state", out string state))
             {
+                method = GetMethodFromState(state);
                 if (!state.Contains(_stateToken))
                 {
-                    OnSignInFailed?.Invoke("State token mismatch");
+                    OnSignInFailed?.Invoke("State token mismatch", method);
                     return;
                 }
-                method = GetMethodFromState(state);
             }
             else
             {
-                OnSignInFailed?.Invoke("State token missing");
+                OnSignInFailed?.Invoke("State token missing", method);
                 return;
             }
             
@@ -399,7 +399,7 @@ namespace Sequence.Authentication
             }
             else
             {
-                OnSignInFailed?.Invoke($"Unexpected deep link: {link}");
+                OnSignInFailed?.Invoke($"Unexpected deep link: {link}", method);
             }
         }
 

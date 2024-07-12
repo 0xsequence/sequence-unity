@@ -7,13 +7,13 @@ namespace Sequence.Authentication
         public void PlatformSpecificSetup();
         public void HandleDeepLink(string url);
         public event Action<OpenIdAuthenticationResult> SignedIn;
-        public event Action<string> OnSignInFailed;
+        public event Action<string, LoginMethod> OnSignInFailed;
         public void GoogleSignIn();
         public void DiscordSignIn();
         public void FacebookSignIn();
         public void AppleSignIn();
         public void InvokeSignedIn(OpenIdAuthenticationResult result);
-        public void InvokeSignInFailed(string errorMessage);
+        public void AppleInvokeSignInFailed(string errorMessage);
         public string GetRedirectUrl();
         public void SetNonce(string nonce);
     }

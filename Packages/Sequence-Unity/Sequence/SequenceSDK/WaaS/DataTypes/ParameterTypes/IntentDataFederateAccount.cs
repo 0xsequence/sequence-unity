@@ -29,5 +29,14 @@ namespace Sequence.WaaS
             this.answer = answer;
             this.sessionId = IntentDataOpenSession.CreateSessionId(wallet);
         }
+
+        public IntentDataFederateAccount(IntentDataOpenSession openSessionIntent, string wallet)
+        {
+            this.sessionId = openSessionIntent.sessionId;
+            this.wallet = wallet;
+            this.identityType = openSessionIntent.identityType;
+            this.verifier = openSessionIntent.verifier;
+            this.answer = openSessionIntent.answer;
+        }
     }
 }

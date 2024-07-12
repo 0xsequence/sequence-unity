@@ -44,7 +44,7 @@ namespace Sequence.Authentication
             }
             else
             {
-                _authenticator.InvokeSignInFailed("Social sign in failed: missing client_id, nonce, or state");
+                _authenticator.AppleInvokeSignInFailed("Social sign in failed: missing client_id, nonce, or state");
             }
         }
 #else

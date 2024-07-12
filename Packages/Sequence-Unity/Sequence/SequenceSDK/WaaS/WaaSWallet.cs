@@ -17,6 +17,8 @@ namespace Sequence.WaaS
     {
         public static Action<WaaSWallet> OnWaaSWalletCreated;
         public static Action<string> OnFailedToLoginWithStoredSessionWallet;
+        public static Action<Account> OnAccountFederated;
+        public static Action<string> OnAccountFederationFailed;
         
         public string SessionId { get; private set; }
         private Address _address;

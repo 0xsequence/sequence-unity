@@ -27,7 +27,7 @@ namespace Sequence.WaaS
         {
             IntentDataInitiateAuth initiateAuthIntent = AssembleEmailInitiateAuthIntent(email);
 
-            _emailChallenge = await _connector.InitiateAuth(initiateAuthIntent);
+            _emailChallenge = await _connector.InitiateAuth(initiateAuthIntent, LoginMethod.Email);
             return _emailChallenge;
         }
 

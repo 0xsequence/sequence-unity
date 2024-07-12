@@ -13,6 +13,7 @@ namespace Sequence.Demo
     public class LoginPanel : UIPanel
     {
         [SerializeField] private GameObject _waaSSessionManagerPrefab;
+        [SerializeField] private GameObject _federatedAuthPopupPanelPrefab;
         private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
         private TransitionPanel _transitionPanel;
@@ -21,6 +22,7 @@ namespace Sequence.Demo
         private LoginSuccessPage _loginSuccessPage;
         private WaaSDemoPage _waasDemoPage;
         private static string _urlScheme;
+        private FederatedAuthPopupPanel _federatedAuthPopupPanel;
         internal ILogin LoginHandler { get; private set; }
         
         private bool _alreadyAttemptedToRestoreSession = false;
@@ -91,6 +93,15 @@ namespace Sequence.Demo
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
             WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+            
+            GameObject popupPanel = Instantiate(_federatedAuthPopupPanelPrefab, transform.parent);
+            _federatedAuthPopupPanel = popupPanel.GetComponent<FederatedAuthPopupPanel>();
+            if (_federatedAuthPopupPanel != null)
+            {
+                _federatedAuthPopupPanel.InjectILogin(loginHandler);
+            }
+
+            popupPanel.SetActive(false);
 
             Instantiate(_waaSSessionManagerPrefab);
         } 

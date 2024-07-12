@@ -43,7 +43,7 @@ namespace Sequence.Authentication
             Auth_ASWebAuthenticationSession_SetPrefersEphemeralWebBrowserSession(sessionPointer, 0);
             if (Auth_ASWebAuthenticationSession_Start(sessionPointer) == 0)
             {
-                _authenticator.InvokeSignInFailed("Failed to start Sign in with Apple Authentication Session");
+                _authenticator.AppleInvokeSignInFailed("Failed to start Sign in with Apple Authentication Session");
             };
         }
         
@@ -75,11 +75,11 @@ namespace Sequence.Authentication
                 {
                     errorMessage += "\nThe user most likely canceled the sign in process.";
                 }
-                _authenticator.InvokeSignInFailed("Social sign in error: " + errorMessage);
+                _authenticator.AppleInvokeSignInFailed("Social sign in error: " + errorMessage);
             }
             else if (errorCode != 0)
             {
-                _authenticator.InvokeSignInFailed($"Social sign in error code: {errorCode}");
+                _authenticator.AppleInvokeSignInFailed($"Social sign in error code: {errorCode}");
             }
             else
             {

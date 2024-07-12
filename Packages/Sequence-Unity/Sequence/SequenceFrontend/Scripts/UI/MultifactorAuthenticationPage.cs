@@ -92,7 +92,7 @@ namespace Sequence.Demo
             InstantiateLoadingScreen();
         }
 
-        private void OnLoginFailedHandler(string error)
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email)
         {
             Debug.LogError($"Failed login: {error}");
             _errorText.text = error;

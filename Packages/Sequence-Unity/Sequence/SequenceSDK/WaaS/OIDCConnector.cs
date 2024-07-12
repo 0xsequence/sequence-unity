@@ -25,7 +25,7 @@ namespace Sequence.WaaS
         {
             IntentDataInitiateAuth initiateAuthIntent = AssembleOIDCInitiateAuthIntent(_sessionId);
 
-            await _connector.InitiateAuth(initiateAuthIntent);
+            await _connector.InitiateAuth(initiateAuthIntent, method);
             
             IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent(_idToken, _sessionWallet);
 

@@ -16,7 +16,7 @@ namespace GuestLogin
         private void Awake()
         {
             _login = WaaSLogin.GetInstance();
-            _login.OnLoginFailed += error =>
+            _login.OnLoginFailed += (error, method, email) =>
             {
                 Debug.LogError(error);
             };

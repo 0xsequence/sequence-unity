@@ -23,7 +23,7 @@ namespace Sequence.WaaS
         {
             IntentDataInitiateAuth initiateAuthIntent = AssembleGuestInitiateAuthIntent();
 
-            string challenge = await _connector.InitiateAuth(initiateAuthIntent);
+            string challenge = await _connector.InitiateAuth(initiateAuthIntent, LoginMethod.Guest);
             
             IntentDataOpenSession loginIntent = AssembleGuestOpenSessionIntent(challenge);
 

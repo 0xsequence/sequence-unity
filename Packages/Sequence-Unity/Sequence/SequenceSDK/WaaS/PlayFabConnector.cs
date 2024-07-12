@@ -27,7 +27,7 @@ namespace Sequence.WaaS
         {
             IntentDataInitiateAuth initiateAuthIntent = AssemblePlayFabInitiateAuthIntent();
 
-            await _connector.InitiateAuth(initiateAuthIntent);
+            await _connector.InitiateAuth(initiateAuthIntent, LoginMethod.PlayFab);
             
             IntentDataOpenSession loginIntent = AssemblePlayFabOpenSessionIntent();
 

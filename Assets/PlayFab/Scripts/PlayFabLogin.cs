@@ -92,12 +92,12 @@ namespace PlayFab.Scripts
             string sessionTicket = result.SessionTicket;
             string titleId = PlayFabSettings.staticSettings.TitleId;
             
-            WaaSLogin login = WaaSLogin.GetInstance();
-            login.OnLoginFailed += error =>
+            ILogin login = WaaSLogin.GetInstance();
+            login.OnLoginFailed += (error, method, email) =>
             {
                 Debug.LogError(error);
             };
-            login.ConnectToWaaSViaPlayFab(titleId, sessionTicket, GetEmail());
+            login.PlayFabLogin(titleId, sessionTicket, GetEmail());
         }
 
         private string GetEmail()
@@ -157,12 +157,12 @@ namespace PlayFab.Scripts
             string sessionTicket = result.SessionTicket;
             string titleId = PlayFabSettings.staticSettings.TitleId;
             
-            WaaSLogin login = WaaSLogin.GetInstance();
-            login.OnLoginFailed += error =>
+            ILogin login = WaaSLogin.GetInstance();
+            login.OnLoginFailed += (error, method, email) =>
             {
                 Debug.LogError(error);
             };
-            login.ConnectToWaaSViaPlayFab(titleId, sessionTicket, GetEmail());
+            login.PlayFabLogin(titleId, sessionTicket, GetEmail());
         }
         
         private void OnRegisterFailure(PlayFabError error)

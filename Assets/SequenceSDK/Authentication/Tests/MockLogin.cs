@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sequence.Authentication
@@ -32,18 +33,18 @@ namespace Sequence.Authentication
         {
             if (!_validator.ValidateEmail(email))
             {
-                OnLoginFailed?.Invoke("Login failed because of invalid email");
+                OnLoginFailed?.Invoke("Login failed because of invalid email", LoginMethod.Email);
                 return;
             }
             if (!_validator.ValidateCode(code))
             {
-                OnLoginFailed?.Invoke("Login failed because of invalid code");
+                OnLoginFailed?.Invoke("Login failed because of invalid code", LoginMethod.Email);
                 return;
             }
             await Task.Delay(1000);
             if (email == "failLogin@noReason.net")
             {
-                OnLoginFailed?.Invoke("Login failed for some reason");
+                OnLoginFailed?.Invoke("Login failed for some reason", LoginMethod.Email);
                 return;
             }
             
@@ -91,6 +92,21 @@ namespace Sequence.Authentication
         }
 
         public void GuestLogin()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void PlayFabLogin(string titleId, string sessionTicket, string email)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OverrideAccount()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<LoginMethod> GetLoginMethodsAssociatedWithEmail(string email)
         {
             throw new System.NotImplementedException();
         }

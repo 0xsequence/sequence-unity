@@ -105,7 +105,7 @@ namespace Sequence.Demo
             _errorText.text = error;
         }
         
-        private void OnLoginFailedHandler(string error)
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email)
         {
             Debug.LogError($"Failed to sign in to WaaS API with error: {error}");
             _errorText.text = error;

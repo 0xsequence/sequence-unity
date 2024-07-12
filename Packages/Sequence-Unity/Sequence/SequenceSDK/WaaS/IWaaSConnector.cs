@@ -9,7 +9,7 @@ namespace Sequence.WaaS
 {
     public interface IWaaSConnector
     {
-        public Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent);
+        public Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent, LoginMethod method);
         public Task ConnectToWaaS(IntentDataOpenSession loginIntent, LoginMethod method, string email = "");
     }
 }

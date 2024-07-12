@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sequence.Authentication
@@ -7,7 +8,7 @@ namespace Sequence.Authentication
         public delegate void OnLoginSuccessHandler(string sessionId, string walletAddress);
         public event OnLoginSuccessHandler OnLoginSuccess;
 
-        public delegate void OnLoginFailedHandler(string error);
+        public delegate void OnLoginFailedHandler(string error, LoginMethod method, string email = "");
         public event OnLoginFailedHandler OnLoginFailed;
 
         public delegate void OnMFAEmailSentHandler(string email);
@@ -88,5 +89,22 @@ namespace Sequence.Authentication
         /// Login as a guest
         /// </summary>
         public void GuestLogin();
+
+        /// <summary>
+        /// Login with PlayFab
+        /// </summary>
+        public void PlayFabLogin(string titleId, string sessionTicket, string email);
+        
+        /// <summary>
+        /// Retry authentication, forcing a new account to be created. This will delete and override the account with the cached email if it exists.
+        /// </summary>
+        public void OverrideAccount();
+
+        /// <summary>
+        /// Get all the login methods that are associated with an email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public List<LoginMethod> GetLoginMethodsAssociatedWithEmail(string email);
     }
 }

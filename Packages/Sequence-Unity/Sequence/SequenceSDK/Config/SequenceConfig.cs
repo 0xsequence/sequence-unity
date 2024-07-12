@@ -29,6 +29,7 @@ namespace Sequence.Config
         [Header("WaaS Configuration")]
         public string WaaSVersion = "1.0.0";
         public string WaaSConfigKey;
+        public bool EnableAccountOverride = false;
 
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;

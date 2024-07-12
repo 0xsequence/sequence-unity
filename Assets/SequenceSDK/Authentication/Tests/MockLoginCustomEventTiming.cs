@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sequence.Authentication
@@ -16,7 +17,7 @@ namespace Sequence.Authentication
         
         public void FireOnLoginFailedEvent()
         {
-            OnLoginFailed?.Invoke("");
+            OnLoginFailed?.Invoke("", LoginMethod.None);
         }
         
         public void FireOnMFAEmailSentEvent()
@@ -80,6 +81,21 @@ namespace Sequence.Authentication
         }
 
         public void GuestLogin()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void PlayFabLogin(string titleId, string sessionTicket, string email)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void OverrideAccount()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<LoginMethod> GetLoginMethodsAssociatedWithEmail(string email)
         {
             throw new System.NotImplementedException();
         }

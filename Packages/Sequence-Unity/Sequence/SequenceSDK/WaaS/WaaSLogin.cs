@@ -35,10 +35,15 @@ namespace Sequence.WaaS
         
         private bool _storeSessionWallet = false;
         private const string _walletKey = "SessionWallet";
+        
+        private IntentDataOpenSession _failedLoginIntent;
+        private LoginMethod _failedLoginMethod;
+        private string _failedLoginEmail;
+        private bool _automaticallyFederateAccountsWhenPossible;
 
         private static WaaSLogin _instance;
         
-        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null)
+        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
         {
             if (_instance == null)
             {
@@ -48,13 +53,15 @@ namespace Sequence.WaaS
         }
 
         [Obsolete("Use GetInstance() instead.")]
-        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null)
+        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
         {
             if (connector == null)
             {
                 connector = this;
             }
             _connector = connector;
+            
+            _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
             
             bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage;
             if (storeSessionWallet)
@@ -287,22 +294,24 @@ namespace Sequence.WaaS
             ConnectToWaaSViaSocialLogin(result.IdToken, result.Method);
         }
 
-        private void OnSocialSignInFailed(string error)
+        private void OnSocialSignInFailed(string error, LoginMethod method)
         {
-            OnLoginFailed?.Invoke("Connecting to WaaS API failed due to error with social sign in: " + error);
+            OnLoginFailed?.Invoke($"Connecting to WaaS API failed due to error with {method} sign in: {error}", method);
         }
 
         public async Task ConnectToWaaS(IntentDataOpenSession loginIntent, LoginMethod method, string email = "")
         {
+            string walletAddress = "";
             try
             {
                 IntentResponseSessionOpened registerSessionResponse = await _intentSender.SendIntent<IntentResponseSessionOpened, IntentDataOpenSession>(loginIntent, IntentType.OpenSession);
                 string sessionId = registerSessionResponse.sessionId;
-                string walletAddress = registerSessionResponse.wallet;
+                walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+                PlayerPrefs.SetInt($"{email}-{method}", 1);
                 PlayerPrefs.Save();
                 if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
                 {
@@ -313,12 +322,21 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message);
+                OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message, method, email);
                 _isLoggingIn = false;
+                _failedLoginIntent = loginIntent;
+                _failedLoginMethod = method;
+                _failedLoginEmail = email;
+                return;
+            }
+
+            if (_automaticallyFederateAccountsWhenPossible && _failedLoginEmail == email && !loginIntent.forceCreateAccount) // forceCreateAccount should only be true if we are overriding an account, meaning we don't have a failed login method that needs federating
+            {
+                await FederateAccount(new IntentDataFederateAccount(_failedLoginIntent, walletAddress), _failedLoginMethod, email);
             }
         }
 
-        public async Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent)
+        public async Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent, LoginMethod method)
         {
             string challenge = "";
 
@@ -331,8 +349,7 @@ namespace Sequence.WaaS
                     throw new Exception($"Session Id received from WaaS server doesn't match, received {sessionId}, sent {_sessionId}");
                 }
 
-                if (!initiateAuthResponse.ValidateChallenge())
-                {
+                if (!initiateAuthResponse.ValidateChallenge()) {
                     throw new Exception("Invalid challenge received from WaaS server, received: " + initiateAuthResponse.challenge);
                 }
                 
@@ -340,7 +357,7 @@ namespace Sequence.WaaS
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error initiating auth: " + e.Message);
+                OnLoginFailed?.Invoke("Error initiating auth: " + e.Message, method);
                 _isLoggingIn = false;
             }
 
@@ -351,7 +368,7 @@ namespace Sequence.WaaS
         {
             if (!method.IsOIDC())
             {
-                OnLoginFailed?.Invoke($"Invalid login method, given: {method}, expected one of {nameof(IdentityType)}: {nameof(IdentityType.OIDC)}");
+                OnLoginFailed?.Invoke($"Invalid login method, given: {method}, expected one of {nameof(IdentityType)}: {nameof(IdentityType.OIDC)}", method);
                 _isLoggingIn = false;
                 return;
             }
@@ -362,12 +379,39 @@ namespace Sequence.WaaS
             
             await oidcConnector.ConnectToWaaSViaSocialLogin(method);
         }
-        
+
+        public void PlayFabLogin(string titleId, string sessionTicket, string email)
+        {
+            ConnectToWaaSViaPlayFab(titleId, sessionTicket, email);
+        }
+
+        public void OverrideAccount()
+        {
+            OverrideWaaSAccount();
+        }
+
+        private async Task OverrideWaaSAccount()
+        {
+            _failedLoginIntent.forceCreateAccount = true;
+            
+            await ConnectToWaaS(_failedLoginIntent, _failedLoginMethod, _failedLoginEmail);
+            
+            List<LoginMethod> loginMethods = EnumExtensions.GetEnumValuesAsList<LoginMethod>();
+            loginMethods.Remove(LoginMethod.None);
+            int loginMethodsCount = loginMethods.Count;
+            for (int i = 0; i < loginMethodsCount; i++)
+            {
+                LoginMethod method = loginMethods[i];
+                PlayerPrefs.SetInt($"{_failedLoginEmail}-{method}", 0);
+            }
+            PlayerPrefs.Save();
+        }
+
         public async Task ConnectToWaaSViaPlayFab(string titleId, string sessionTicket, string email)
         {
             if (string.IsNullOrWhiteSpace(titleId) || string.IsNullOrWhiteSpace(sessionTicket))
             {
-                OnLoginFailed?.Invoke($"Invalid titleId: {titleId} or sessionTicket: {sessionTicket}");
+                OnLoginFailed?.Invoke($"Invalid titleId: {titleId} or sessionTicket: {sessionTicket}", LoginMethod.PlayFab);
                 _isLoggingIn = false;
                 return;
             }
@@ -386,6 +430,23 @@ namespace Sequence.WaaS
             await connector.ConnectToWaaSViaGuest();
         }
 
+        public List<LoginMethod> GetLoginMethodsAssociatedWithEmail(string email)
+        {
+            List<LoginMethod> result = new List<LoginMethod>();
+            List<LoginMethod> loginMethods = EnumExtensions.GetEnumValuesAsList<LoginMethod>();
+            loginMethods.Remove(LoginMethod.None);
+            int loginMethodsCount = loginMethods.Count;
+            for (int i = 0; i < loginMethodsCount; i++)
+            {
+                LoginMethod method = loginMethods[i];
+                if (PlayerPrefs.GetInt($"{email}-{method}", 0) == 1)
+                {
+                    result.Add(method);
+                }
+            }
+            return result;
+        }
+
         private void StoreWalletSecurely(string waasWalletAddress)
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
@@ -393,6 +454,31 @@ namespace Sequence.WaaS
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
             secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
+        }
+
+        public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)
+        {
+            try
+            {
+                IntentResponseAccountFederated federateAccountResponse = await _intentSender.SendIntent<IntentResponseAccountFederated, IntentDataFederateAccount>(federateAccount, IntentType.FederateAccount);
+                Account account = federateAccountResponse.account;
+                string responseEmail = account.email;
+                if (responseEmail != email)
+                {
+                    throw new Exception($"Email received from WaaS server doesn't match, received {responseEmail}, sent {email}");
+                }
+                
+                PlayerPrefs.SetInt($"{email}-{method}", 1);
+                PlayerPrefs.Save();
+                _failedLoginEmail = "";
+                _failedLoginIntent = null;
+                _failedLoginMethod = LoginMethod.None;
+                WaaSWallet.OnAccountFederated?.Invoke(account);
+            }
+            catch (Exception e)
+            {
+                WaaSWallet.OnAccountFederationFailed?.Invoke("Error federating account: " + e.Message);
+            }
         }
     }
 }

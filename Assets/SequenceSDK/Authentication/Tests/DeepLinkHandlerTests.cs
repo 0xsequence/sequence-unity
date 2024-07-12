@@ -13,7 +13,7 @@ namespace Sequence.Authenticator.Tests
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app";
             bool signInFailedEventReceived = false;
-            authenticator.OnSignInFailed += s =>
+            authenticator.OnSignInFailed += (s, method) =>
             {
                 signInFailedEventReceived = true;
                 Assert.AreEqual("Unexpected deep link: https://sequence.app", s);
@@ -28,7 +28,7 @@ namespace Sequence.Authenticator.Tests
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?code=123456";
             bool signInFailedEventReceived = false;
-            authenticator.OnSignInFailed += s =>
+            authenticator.OnSignInFailed += (s, method) =>
             {
                 signInFailedEventReceived = true;
                 Assert.AreEqual("State token missing", s);
@@ -43,7 +43,7 @@ namespace Sequence.Authenticator.Tests
             OpenIdAuthenticator authenticator = new OpenIdAuthenticator("");
             string url = "https://sequence.app?code=123456&state=123456";
             bool signInFailedEventReceived = false;
-            authenticator.OnSignInFailed += s =>
+            authenticator.OnSignInFailed += (s, method) =>
             {
                 signInFailedEventReceived = true;
                 Assert.AreEqual("State token mismatch", s);
@@ -59,7 +59,7 @@ namespace Sequence.Authenticator.Tests
             string url = "https://sequence.app?state=123456";
             authenticator.InjectStateTokenForTesting("123456");
             bool signInFailedEventReceived = false;
-            authenticator.OnSignInFailed += s =>
+            authenticator.OnSignInFailed += (s, method) =>
             {
                 signInFailedEventReceived = true;
                 Assert.AreEqual("Unexpected deep link: https://sequence.app?state=123456", s);
