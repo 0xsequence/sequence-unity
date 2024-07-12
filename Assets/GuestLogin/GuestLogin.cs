@@ -31,7 +31,7 @@ namespace GuestLogin
         private void OnWaaSWalletCreated(WaaSWallet wallet)
         {
             TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
-            text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
+            text.text = "Logged in as: " + wallet.GetWalletAddress();
             _wallet = wallet;
             
             StartCoroutine(SignOutThenSignBackIn());

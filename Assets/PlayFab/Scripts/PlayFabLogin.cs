@@ -18,11 +18,11 @@ namespace PlayFab.Scripts
             UsernamePassword
         }
 
-        [SerializeField] private LoginMethod _loginMethod;
         [SerializeField] private string _email;
         [SerializeField] private string _password;
         [SerializeField] private string _username;
         [SerializeField] private string _titleId = "A1B62";
+        private LoginMethod _loginMethod;
 
         private int _signOuts = 0;
         private IWallet _wallet;
@@ -38,11 +38,13 @@ namespace PlayFab.Scripts
 
             PlayFabSettings.staticSettings.TitleId = "8F854"; // Todo remove this dev env credential
             
-            SignIn();
+            SignIn(LoginMethod.Guest);
         }
 
-        private void SignIn() {
-            switch (_loginMethod)
+        private void SignIn(LoginMethod loginMethod)
+        {
+            _loginMethod = loginMethod;
+            switch (loginMethod)
             {
                 case LoginMethod.Guest:
                     GuestLogin();
@@ -53,11 +55,14 @@ namespace PlayFab.Scripts
                 case LoginMethod.UsernamePassword:
                     UsernamePasswordLogin();
                     break;
+                default:
+                    Debug.Log("Done");
+                    break;
             }
         }
     
 
-    private void GuestLogin()
+        private void GuestLogin()
         {
             var request = new LoginWithCustomIDRequest { CustomId = "GettingStartedGuide", CreateAccount = true};
             PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
@@ -87,7 +92,7 @@ namespace PlayFab.Scripts
 
         private void OnLoginSuccess(LoginResult result)
         {
-            Debug.Log("Logged in with PlayFab - connecting to WaaS now");
+            Debug.Log($"Logged in with PlayFab via {_loginMethod.ToString()} - connecting to WaaS now");
 
             string sessionTicket = result.SessionTicket;
             string titleId = PlayFabSettings.staticSettings.TitleId;
@@ -174,31 +179,42 @@ namespace PlayFab.Scripts
         private void OnWaaSWalletCreated(WaaSWallet wallet)
         {
             TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
-            text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
+            string email = PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                text.text = "Logged in as: " + wallet.GetWalletAddress();
+            }
+            else
+            {
+                text.text = "Logged in as: " + email;
+            }
             _wallet = wallet;
             
-            StartCoroutine(SignOutThenSignBackIn());
+            StartCoroutine(SignOutThenSignBackIn(_loginMethod));
         }
 
-        private IEnumerator SignOutThenSignBackIn()
+        private IEnumerator SignOutThenSignBackIn(LoginMethod loginMethod)
         {
+            yield return new WaitForSeconds(3f);
+            
+            TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
+            text.text = "Logged out";
+
+            Task signOutTask = _wallet.DropThisSession();
+            yield return new WaitUntil(() => signOutTask.IsCompleted);
+            
             if (_signOuts > 1)
             {
+                _signOuts = 0;
+                SignIn(loginMethod + 1);
                 yield return null;
             }
             else
             {
-                yield return new WaitForSeconds(3f);
-                
-                TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
-                text.text = "Logged out";
-
-                Task signOutTask = _wallet.DropThisSession();
-                yield return new WaitUntil(() => signOutTask.IsCompleted);
                 _signOuts++;
                 _wallet = null;
                 
-                SignIn();
+                SignIn(loginMethod);
             }
         }
     }
