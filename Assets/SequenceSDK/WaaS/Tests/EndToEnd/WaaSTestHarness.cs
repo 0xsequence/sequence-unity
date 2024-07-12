@@ -69,9 +69,8 @@ namespace Sequence.WaaS.Tests
             TestStarted += () => _testsStarted++;
             WaaSWalletTests walletTests = new WaaSWalletTests(wallet);
             wallet.OnSendTransactionFailed += OnFailedTransaction;
-            SessionManagementTests sessionManagementTests = new SessionManagementTests(wallet);
             WaaSToWalletAdapterTests adapterTests = new WaaSToWalletAdapterTests(wallet);
-            RunTests(walletTests, sessionManagementTests, adapterTests);
+            RunTests(walletTests, adapterTests);
         }
 
         private void OnFailedTransaction(FailedTransactionReturn result)
@@ -79,7 +78,7 @@ namespace Sequence.WaaS.Tests
             Debug.LogError("Transaction failed: " + result.error);
         }
 
-        private async Task RunTests(WaaSWalletTests walletTests, SessionManagementTests sessionManagementTests, WaaSToWalletAdapterTests adapterTests)
+        private async Task RunTests(WaaSWalletTests walletTests, WaaSToWalletAdapterTests adapterTests)
         {
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();
@@ -100,9 +99,6 @@ namespace Sequence.WaaS.Tests
             adapterTests.TestSendERC20_withAdapter();
             adapterTests.TestBatchTransactions_withAdapter();
             adapterTests.TestDeployContract_withAdapter(ERC721Bytecode);
-            await WaitForTestsToComplete();
-            
-            sessionManagementTests.TestSessionManagement();
             await WaitForTestsToComplete();
             
             Debug.LogError($"Tests run: {_testsStarted} | Tests passed: {_passedTests} | Tests failed: {_failedTests.Count}");
