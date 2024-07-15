@@ -13,9 +13,9 @@ using UnityEngine;
 
 namespace Sequence.WaaS
 {
-    public class WaaSWallet : IWallet
+    public class EmbeddedWallet : IWallet
     {
-        public static Action<WaaSWallet> OnWaaSWalletCreated;
+        public static Action<EmbeddedWallet> OnWaaSWalletCreated;
         public static Action<string> OnFailedToLoginWithStoredSessionWallet;
         public static Action<Account> OnAccountFederated;
         public static Action<string> OnAccountFederationFailed;
@@ -27,7 +27,7 @@ namespace Sequence.WaaS
         private const string _sequenceCreatedContractEvent = "CreatedContract(address)";
         private string _builderApiKey;
 
-        public WaaSWallet(Address address, string sessionId, IIntentSender intentSender)
+        public EmbeddedWallet(Address address, string sessionId, IIntentSender intentSender)
         {
             _address = address;
             _httpClient = new HttpClient("https://api.sequence.app/rpc");

@@ -29,7 +29,7 @@ namespace PlayFab.Scripts
 
         public void Start()
         {
-            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreated;
+            EmbeddedWallet.OnWaaSWalletCreated += OnWaaSWalletCreated;
 
             if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
             {
@@ -174,7 +174,7 @@ namespace PlayFab.Scripts
             Debug.LogError(errorMessage);
         }
 
-        private void OnWaaSWalletCreated(WaaSWallet wallet)
+        private void OnWaaSWalletCreated(EmbeddedWallet wallet)
         {
             TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
             string email = PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);

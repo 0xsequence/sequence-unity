@@ -14,8 +14,8 @@ namespace Sequence.Ethereum.Tests
 {
     public class TransferEthTests
     {
-        EthWallet wallet1 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-        EthWallet wallet2 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
+        EoaWallet wallet1 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+        EoaWallet wallet2 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
         SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
 
         [Test]

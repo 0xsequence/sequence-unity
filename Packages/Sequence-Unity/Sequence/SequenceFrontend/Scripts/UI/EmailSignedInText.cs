@@ -9,11 +9,11 @@ namespace Sequence.Demo
 {
     public class EmailSignedInText : MonoBehaviour
     {
-        private WaaSWallet _wallet;
+        private EmbeddedWallet _wallet;
 
         void Awake()
         {
-            WaaSWallet.OnWaaSWalletCreated += wallet =>
+            EmbeddedWallet.OnWaaSWalletCreated += wallet =>
             {
                 TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
                 text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);

@@ -16,7 +16,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionSuccessEvent()
         {
             IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn("0xaeaeaf3bac46dfb11ca18ab318dbc36362b1033a3d637e1b1c49496bab9581a3","",null,null));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSendTransactionComplete += (result)=>
@@ -39,7 +39,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionFailedEvent()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("",null,null));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSendTransactionComplete += (result)=>
@@ -62,7 +62,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionException()
         {
             IIntentSender intentSender = new MockIntentSender(new Exception("Something bad happened"));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSendTransactionComplete += (result)=>
@@ -85,7 +85,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSignMessageSuccessEvent()
         {
             IIntentSender intentSender = new MockIntentSender(new IntentResponseSignedMessage("",""));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSignMessageComplete += (result)=>
@@ -121,7 +121,7 @@ namespace Sequence.WaaS.Tests
                     }, null, "")
                 }, ""));
             IIntentSender intentSender = new MockIntentSender(response);
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             
             bool successTransactionEventHit = false;
@@ -184,7 +184,7 @@ namespace Sequence.WaaS.Tests
                     }, null, "")
                 }, ""));
             IIntentSender intentSender = new MockIntentSender(response);
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             
             bool successTransactionEventHit = false;
@@ -228,7 +228,7 @@ namespace Sequence.WaaS.Tests
         {
             FailedTransactionReturn response = new FailedTransactionReturn("some error", null, null);
             IIntentSender intentSender = new MockIntentSender(response);
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             
             bool successTransactionEventHit = false;
@@ -272,7 +272,7 @@ namespace Sequence.WaaS.Tests
         {
             Exception exception = new Exception("some error");
             IIntentSender intentSender = new MockIntentSender(exception);
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             
             bool successTransactionEventHit = false;
@@ -330,7 +330,7 @@ namespace Sequence.WaaS.Tests
 
             MockIntentSender intentSender =
                 new MockIntentSender(mockReturnObjects.AppendObject(resultWithTransactionHash));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSendTransactionComplete += (result)=>
@@ -377,7 +377,7 @@ namespace Sequence.WaaS.Tests
             MockIntentSender intentSender =
                 new MockIntentSender(mockReturnObjects.AppendObject(resultWithTransactionHash));
             intentSender.InjectException(new Exception("some random error"));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSendTransactionComplete += (result)=>
@@ -425,7 +425,7 @@ namespace Sequence.WaaS.Tests
 
             MockIntentSender intentSender =
                 new MockIntentSender(mockReturnObjects.AppendObject(resultWithTransactionHash));
-            WaaSWallet wallet = new WaaSWallet(address, "", intentSender);
+            EmbeddedWallet wallet = new EmbeddedWallet(address, "", intentSender);
             
             bool successEventHit = false;
             wallet.OnSendTransactionComplete += (result)=>

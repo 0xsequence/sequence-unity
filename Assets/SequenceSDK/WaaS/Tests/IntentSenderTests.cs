@@ -15,7 +15,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task SendTransactionIntentTest_FailedTransaction()
         {
-            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsFailedTransaction(), new EthWallet(), "", 0, "");
+            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsFailedTransaction(), new EoaWallet(), "", 0, "");
             var result =
                 await intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(
                     new IntentDataSendTransaction("", "", null), IntentType.SendTransaction);
@@ -32,7 +32,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task SendTransactionIntentTest_UnknownResponseCode()
         {
-            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsUnknownCode(), new EthWallet(), "", 0, "");
+            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsUnknownCode(), new EoaWallet(), "", 0, "");
             try
             {
                 var result =
@@ -50,7 +50,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task SendTransactionIntentTest_SuccessfulTransactionResponse()
         {
-            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsSuccessfulTransaction(), new EthWallet(), "", 0, "");
+            IntentSender intentSender = new IntentSender(new MockHttpClientReturnsSuccessfulTransaction(), new EoaWallet(), "", 0, "");
             var result =
                 await intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(
                     new IntentDataSendTransaction("", "", null), IntentType.SendTransaction);
@@ -67,7 +67,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestGetTransactionReceipt()
         {
-            EthWallet wallet = new EthWallet();
+            EoaWallet wallet = new EoaWallet();
             IntentDataSendTransaction intentDataSendTransaction =
                 new IntentDataSendTransaction(wallet.GetAddress(), Chain.None, null);
             string intentJson = JsonConvert.SerializeObject(intentDataSendTransaction);
@@ -84,7 +84,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestGetTransactionReceipt_noNetwork()
         {
-            EthWallet wallet = new EthWallet();
+            EoaWallet wallet = new EoaWallet();
             IsValidMessageSignatureArgs intentData =
                 new IsValidMessageSignatureArgs(Chain.None, "", "", "");
             string intentJson = JsonConvert.SerializeObject(intentData);
@@ -107,7 +107,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestGetTransactionReceipt_noWallet()
         {
-            EthWallet wallet = new EthWallet();
+            EoaWallet wallet = new EoaWallet();
             JObjectWithoutWallet intentData =
                 new JObjectWithoutWallet(Chain.None.ToString());
             string intentJson = JsonConvert.SerializeObject(intentData);

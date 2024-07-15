@@ -10,7 +10,7 @@ namespace Sequence.Ethereum.Tests
 {
         public class FunctionAbiTests
         {
-                private static EthWallet wallet1 = new EthWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+                private static EoaWallet wallet1 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
 
                 private static readonly object[] GetAbisForFunctionTests = 
                 {

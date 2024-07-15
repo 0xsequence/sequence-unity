@@ -25,7 +25,7 @@ namespace Sequence.WaaS
         private string _waasVersion;
         private IAuthenticator _authenticator;
         private IValidator _validator;
-        private EthWallet _sessionWallet;
+        private EoaWallet _sessionWallet;
         private string _sessionId;
         private IntentSender _intentSender;
         private EmailConnector _emailConnector;
@@ -85,7 +85,7 @@ namespace Sequence.WaaS
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            _sessionWallet = new EthWallet();
+            _sessionWallet = new EoaWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
@@ -167,7 +167,7 @@ namespace Sequence.WaaS
 
         private void TryToLoginWithStoredSessionWallet()
         {
-            (EthWallet, string) walletInfo = (null, "");
+            (EoaWallet, string) walletInfo = (null, "");
             try
             {
                 walletInfo = AttemptToCreateWalletFromSecureStorage();
@@ -187,7 +187,7 @@ namespace Sequence.WaaS
             
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
-            WaaSWallet wallet = new WaaSWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion));
+            EmbeddedWallet wallet = new EmbeddedWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion));
 
             EnsureSessionIsValid(wallet);
         }
@@ -195,10 +195,10 @@ namespace Sequence.WaaS
         private void FailedLoginWithStoredSessionWallet(string error)
         {
             CreateWallet();
-            WaaSWallet.OnFailedToLoginWithStoredSessionWallet?.Invoke(error);
+            EmbeddedWallet.OnFailedToLoginWithStoredSessionWallet?.Invoke(error);
         }
 
-        private async Task EnsureSessionIsValid(WaaSWallet wallet)
+        private async Task EnsureSessionIsValid(EmbeddedWallet wallet)
         {
             WaaSSession[] activeSessions = await wallet.ListSessions();
             if (activeSessions == null || activeSessions.Length == 0)
@@ -213,7 +213,7 @@ namespace Sequence.WaaS
             {
                 if (activeSessions[i].id == expectedSessionId)
                 {
-                    WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
+                    EmbeddedWallet.OnWaaSWalletCreated?.Invoke(wallet);
                     return;
                 }
             }
@@ -221,7 +221,7 @@ namespace Sequence.WaaS
             FailedLoginWithStoredSessionWallet("Stored session wallet is not active");
         }
 
-        private (EthWallet, string) AttemptToCreateWalletFromSecureStorage()
+        private (EoaWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             string walletInfo = secureStorage.RetrieveString(_walletKey);
@@ -232,7 +232,7 @@ namespace Sequence.WaaS
             string[] walletInfoSplit = walletInfo.Split('-');
             string privateKey = walletInfoSplit[0];
             string waasWalletAddress = walletInfoSplit[1];
-            EthWallet wallet = new EthWallet(privateKey);
+            EoaWallet wallet = new EoaWallet(privateKey);
             return (wallet, waasWalletAddress);
         }
         
@@ -305,7 +305,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.sessionId;
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                WaaSWallet wallet = new WaaSWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
+                EmbeddedWallet wallet = new EmbeddedWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.SetInt($"{email}-{method}", 1);
@@ -315,7 +315,7 @@ namespace Sequence.WaaS
                     StoreWalletSecurely(walletAddress);
                 }
                 _isLoggingIn = false;
-                WaaSWallet.OnWaaSWalletCreated?.Invoke(wallet);
+                EmbeddedWallet.OnWaaSWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
             {
@@ -470,11 +470,11 @@ namespace Sequence.WaaS
                 _failedLoginEmail = "";
                 _failedLoginIntent = null;
                 _failedLoginMethod = LoginMethod.None;
-                WaaSWallet.OnAccountFederated?.Invoke(account);
+                EmbeddedWallet.OnAccountFederated?.Invoke(account);
             }
             catch (Exception e)
             {
-                WaaSWallet.OnAccountFederationFailed?.Invoke("Error federating account: " + e.Message);
+                EmbeddedWallet.OnAccountFederationFailed?.Invoke("Error federating account: " + e.Message);
             }
         }
         

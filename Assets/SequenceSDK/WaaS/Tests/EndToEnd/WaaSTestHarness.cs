@@ -39,7 +39,7 @@ namespace Sequence.WaaS.Tests
             DisableAllUIPages();
             OpenUIPanel(_loginPanel);
             
-            WaaSWallet.OnWaaSWalletCreated += InitiateTests;
+            EmbeddedWallet.OnWaaSWalletCreated += InitiateTests;
         }
         
         private void DisableAllUIPages()
@@ -57,7 +57,7 @@ namespace Sequence.WaaS.Tests
             panel.Open(openArgs);
         }
 
-        private void InitiateTests(WaaSWallet wallet)
+        private void InitiateTests(EmbeddedWallet wallet)
         {
             Debug.LogError("Wallet created. Initiating tests...");
             TestFailed += (failed) =>

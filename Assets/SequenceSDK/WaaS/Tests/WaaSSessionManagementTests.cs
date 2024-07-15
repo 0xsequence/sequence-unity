@@ -20,7 +20,7 @@ namespace Sequence.WaaS.Tests
                     Assert.Fail(error);
                 };
                 int repetitions = 0;
-                WaaSWallet.OnWaaSWalletCreated += async wallet =>
+                EmbeddedWallet.OnWaaSWalletCreated += async wallet =>
                 {
                     if (repetitions < 3)
                     {
@@ -65,7 +65,7 @@ namespace Sequence.WaaS.Tests
                 Assert.Fail(error);
             };
             int repetitions = 0;
-            WaaSWallet.OnWaaSWalletCreated += async wallet =>
+            EmbeddedWallet.OnWaaSWalletCreated += async wallet =>
             {
                 if (repetitions < 3)
                 {
