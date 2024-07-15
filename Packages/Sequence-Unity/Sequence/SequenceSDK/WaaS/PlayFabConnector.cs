@@ -34,7 +34,7 @@ namespace Sequence.WaaS
             await _connector.ConnectToWaaS(loginIntent, LoginMethod.PlayFab, email);
         }
         
-        private IntentDataInitiateAuth AssemblePlayFabInitiateAuthIntent()
+        public IntentDataInitiateAuth AssemblePlayFabInitiateAuthIntent()
         {
             string verifier = GetVerifier();
             IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.PlayFab, _sessionId, verifier);
@@ -47,7 +47,7 @@ namespace Sequence.WaaS
             return $"{_titleId}|{sessionTicketHash}";
         }
         
-        private IntentDataOpenSession AssemblePlayFabOpenSessionIntent()
+        public IntentDataOpenSession AssemblePlayFabOpenSessionIntent()
         {
             string verifier = GetVerifier();
             IntentDataOpenSession intent =
