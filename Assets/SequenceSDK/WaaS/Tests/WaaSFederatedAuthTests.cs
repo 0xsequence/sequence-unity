@@ -4,6 +4,8 @@ using PlayFab;
 using PlayFab.ClientModels;
 using Sequence.Authentication;
 using Sequence.Wallet;
+using SequenceSDK.WaaS;
+using UnityEngine;
 
 namespace Sequence.WaaS.Tests
 {
@@ -15,47 +17,41 @@ namespace Sequence.WaaS.Tests
             try
             {
                 WaaSLogin login = WaaSLogin.GetInstance();
-                login.OnLoginFailed += (error, method, email) =>
-                {
-                    Assert.Fail(error);
-                };
+                login.OnLoginFailed += (error, method, email) => { Assert.Fail(error); };
                 string email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
+                bool accountFederated = false;
                 WaaSWallet.OnAccountFederated += account =>
                 {
                     Assert.Equals(account.email, email);
+                    accountFederated = true;
                 };
-                WaaSWallet.OnAccountFederationFailed += error =>
-                {
-                    Assert.Fail(error);
-                };
+                WaaSWallet.OnAccountFederationFailed += error => { Assert.Fail(error); };
                 WaaSWallet.OnWaaSWalletCreated += async wallet =>
                 {
                     string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
-            
+
                     if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
                     {
                         PlayFabSettings.staticSettings.TitleId = titleId;
                     }
 
-                    PlayFabSettings.staticSettings.TitleId = "8F854"; // Todo remove this dev env credential
-                    
-            
-                    var request = new LoginWithCustomIDRequest { CustomId = "WaaSSessionManagementTests", CreateAccount = true};
-                    PlayFabClientAPI.LoginWithCustomID(request, 
+
+                    var request = new LoginWithCustomIDRequest
+                        { CustomId = "WaaSSessionManagementTests", CreateAccount = true };
+                    PlayFabClientAPI.LoginWithCustomID(request,
                         async result =>
                         {
-                            PlayFabConnector playFabConnector = new PlayFabConnector(titleId, result.SessionTicket, wallet.SessionId, new EthWallet(), login);
-                            await login.InitiateAuth(playFabConnector.AssemblePlayFabInitiateAuthIntent(), LoginMethod.PlayFab);
-                            await login.FederateAccount(
-                                new IntentDataFederateAccount(playFabConnector.AssemblePlayFabOpenSessionIntent(),
-                                    wallet.GetWalletAddress()), LoginMethod.PlayFab, email);
-                        }, 
-                        error =>
-                        {
-                            Assert.Fail(error.ErrorMessage);
-                        });
+                            await login.FederateAccountPlayFab(PlayFabSettings.staticSettings.TitleId,
+                                result.SessionTicket,
+                                email);
+                        },
+                        error => { Assert.Fail(error.ErrorMessage); });
                 };
                 await login.ConnectToWaaSAsGuest();
+                while (!accountFederated)
+                {
+                    await Task.Yield();
+                }
             }
             catch (System.Exception e)
             {

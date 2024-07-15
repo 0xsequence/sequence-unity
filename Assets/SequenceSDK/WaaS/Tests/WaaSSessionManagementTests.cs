@@ -53,8 +53,6 @@ namespace Sequence.WaaS.Tests
             {
                 PlayFabSettings.staticSettings.TitleId = titleId;
             }
-
-            PlayFabSettings.staticSettings.TitleId = "8F854"; // Todo remove this dev env credential
             
             WaaSLogin login = WaaSLogin.GetInstance();
             login.OnLoginFailed += (error, method, email) =>

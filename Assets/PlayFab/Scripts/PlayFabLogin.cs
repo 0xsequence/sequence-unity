@@ -35,8 +35,6 @@ namespace PlayFab.Scripts
             {
                 PlayFabSettings.staticSettings.TitleId = _titleId;
             }
-
-            PlayFabSettings.staticSettings.TitleId = "8F854"; // Todo remove this dev env credential
             
             SignIn(LoginMethod.Guest);
         }
