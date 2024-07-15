@@ -37,6 +37,11 @@ namespace Sequence.WaaS.Tests
                     }
                 };
                 await login.ConnectToWaaSAsGuest();
+
+                while (repetitions < 3)
+                {
+                    await Task.Yield();
+                }
             }
             catch (System.Exception e)
             {
@@ -81,6 +86,11 @@ namespace Sequence.WaaS.Tests
                 {
                     Assert.Fail(error.ErrorMessage);
                 });
+
+            while (repetitions < 3)
+            {
+                await Task.Yield();
+            }
         }
     }
 }
