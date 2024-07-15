@@ -28,8 +28,6 @@ namespace Sequence.Authentication
 
         private string _stateToken = Guid.NewGuid().ToString();
 
-        private string _sessionId; // Session Id is expected to be hex(keccak256(sessionWalletAddress))
-
         private IBrowser _browser;
         
         private static bool _windowsSetup = false;
@@ -46,7 +44,6 @@ namespace Sequence.Authentication
 
         public OpenIdAuthenticator(string nonce = null)
         {
-            _sessionId = nonce;
             SequenceConfig config = SequenceConfig.GetConfig();
 
             _urlScheme = config.UrlScheme;
@@ -176,7 +173,7 @@ namespace Sequence.Authentication
 #if UNITY_IOS
                 GameObject appleSignInObject = Object.Instantiate(new GameObject());
                 SignInWithApple appleSignIn = appleSignInObject.AddComponent<SignInWithApple>();
-                appleSignIn.LoginToApple(this, _sessionId, state);
+                appleSignIn.LoginToApple(this, state);
 #else
                 _browser.Authenticate(appleSignInUrl);
 #endif
@@ -200,11 +197,6 @@ namespace Sequence.Authentication
         public string GetRedirectUrl()
         {
             return _redirectUrl;
-        }
-
-        public void SetNonce(string nonce)
-        {
-            _sessionId = nonce;
         }
 
         private string GenerateState(LoginMethod method)
@@ -231,7 +223,7 @@ namespace Sequence.Authentication
 #endif
 
             string url =
-                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={_redirectUrl}&nonce={_sessionId}&scope=openid+email&state={state}/";
+                $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={_redirectUrl}&scope=openid+email&state={state}/";
             if (PlayerPrefs.HasKey(LoginEmail))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();

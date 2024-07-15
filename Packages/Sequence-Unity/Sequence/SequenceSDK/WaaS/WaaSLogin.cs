@@ -89,8 +89,6 @@ namespace Sequence.WaaS
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
-            string nonce = SequenceCoder.KeccakHashASCII(_sessionId).EnsureHexPrefix();
-
             if (authenticator != null)
             {
                 _authenticator = authenticator;
@@ -99,7 +97,7 @@ namespace Sequence.WaaS
             {
                 _authenticator = new OpenIdAuthenticator();
             }
-            SetupAuthenticatorAndListeners(nonce);
+            SetupAuthenticatorAndListeners();
 
             if (validator == null)
             {
@@ -124,9 +122,8 @@ namespace Sequence.WaaS
             ConnectToWaaSAsGuest();
         }
 
-        private void SetupAuthenticatorAndListeners(string nonce)
+        private void SetupAuthenticatorAndListeners()
         {
-            _authenticator.SetNonce(nonce);
             try {
                 _authenticator.PlatformSpecificSetup();
             }

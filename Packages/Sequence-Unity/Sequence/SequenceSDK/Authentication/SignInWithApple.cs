@@ -28,15 +28,14 @@ namespace Sequence.Authentication
             }
         }
 
-        public void LoginToApple(IAuthenticator authenticator, string nonce, string state)
+        public void LoginToApple(IAuthenticator authenticator, string state)
         {
             if (m_AppleAuthManager == null)
             {
                 Initialize();
             }
 
-            var loginArgs = new AppleAuthLoginArgs(LoginOptions.IncludeEmail | LoginOptions.IncludeFullName,
-                nonce, state);
+            var loginArgs = new AppleAuthLoginArgs(LoginOptions.IncludeEmail | LoginOptions.IncludeFullName, null, state);
 
             m_AppleAuthManager.LoginWithAppleId(
                 loginArgs,

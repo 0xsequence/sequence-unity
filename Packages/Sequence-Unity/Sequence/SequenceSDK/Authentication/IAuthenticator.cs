@@ -15,7 +15,6 @@ namespace Sequence.Authentication
         public void InvokeSignedIn(OpenIdAuthenticationResult result);
         public void AppleInvokeSignInFailed(string errorMessage);
         public string GetRedirectUrl();
-        public void SetNonce(string nonce);
     }
 
     public class OpenIdAuthenticationResult
