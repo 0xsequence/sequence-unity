@@ -21,13 +21,17 @@ namespace Sequence.WaaS
 
         public async Task ConnectToWaaSViaGuest()
         {
-            IntentDataInitiateAuth initiateAuthIntent = AssembleGuestInitiateAuthIntent();
-
-            string challenge = await _connector.InitiateAuth(initiateAuthIntent, LoginMethod.Guest);
+            string challenge = await InitiateAuth();
             
             IntentDataOpenSession loginIntent = AssembleGuestOpenSessionIntent(challenge);
 
             await _connector.ConnectToWaaS(loginIntent, LoginMethod.Guest);
+        }
+        
+        private async Task<string> InitiateAuth()
+        {
+            IntentDataInitiateAuth intent = AssembleGuestInitiateAuthIntent();
+            return await _connector.InitiateAuth(intent, LoginMethod.Guest);
         }
         
         private IntentDataInitiateAuth AssembleGuestInitiateAuthIntent()
@@ -42,6 +46,19 @@ namespace Sequence.WaaS
             string answer = SequenceCoder.KeccakHashASCII(answerPreHash).EnsureHexPrefix();
             IntentDataOpenSession intent =
                 new IntentDataOpenSession(_sessionWallet.GetAddress(), IdentityType.Guest, _sessionId, answer);
+            return intent;
+        }
+
+        public async Task FederateAccount()
+        {
+            string challenge = await InitiateAuth();
+            IntentDataFederateAccount intent = AssembleGuestFederateAccountIntent(challenge);
+            await _connector.FederateAccount(intent, LoginMethod.Guest, "");
+        }
+        
+        private IntentDataFederateAccount AssembleGuestFederateAccountIntent(string challenge)
+        {
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleGuestOpenSessionIntent(challenge), _sessionWallet.GetAddress());
             return intent;
         }
     }

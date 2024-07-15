@@ -23,20 +23,24 @@ namespace Sequence.WaaS
         
         public async Task ConnectToWaaSViaSocialLogin(LoginMethod method)
         {
-            IntentDataInitiateAuth initiateAuthIntent = AssembleOIDCInitiateAuthIntent(_sessionId);
-
-            await _connector.InitiateAuth(initiateAuthIntent, method);
+            await InitiateAuth(method);
             
-            IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent(_idToken, _sessionWallet);
+            IntentDataOpenSession loginIntent = AssembleOIDCOpenSessionIntent();
 
             string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(_idToken).email;
             await _connector.ConnectToWaaS(loginIntent, method, email);
         }
         
-        private IntentDataInitiateAuth AssembleOIDCInitiateAuthIntent(string sessionId)
+        private async Task InitiateAuth(LoginMethod method)
+        {
+            IntentDataInitiateAuth intent = AssembleOIDCInitiateAuthIntent();
+            await _connector.InitiateAuth(intent, method);
+        }
+
+        private IntentDataInitiateAuth AssembleOIDCInitiateAuthIntent()
         {
             string verifier = GetVerifier();
-            IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.OIDC, sessionId, verifier);
+            IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.OIDC, _sessionId, verifier);
             return intent;
         }
 
@@ -47,11 +51,25 @@ namespace Sequence.WaaS
             return $"{idTokenHash};{idTokenPayload.exp}";
         }
 
-        private IntentDataOpenSession AssembleOIDCOpenSessionIntent(string idToken, Wallet.IWallet sessionWallet)
+        private IntentDataOpenSession AssembleOIDCOpenSessionIntent()
         {
             string verifier = GetVerifier();
             IntentDataOpenSession intent =
-                new IntentDataOpenSession(sessionWallet.GetAddress(), IdentityType.OIDC, verifier, idToken);
+                new IntentDataOpenSession(_sessionWallet.GetAddress(), IdentityType.OIDC, verifier, _idToken);
+            return intent;
+        }
+
+        public async Task FederateAccount(LoginMethod method)
+        {
+            await InitiateAuth(method);
+            IntentDataFederateAccount intent = AssembleOIDCFederateAccountIntent();
+            string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(_idToken).email;
+            await _connector.FederateAccount(intent, method, email);
+        }
+        
+        private IntentDataFederateAccount AssembleOIDCFederateAccountIntent()
+        {
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleOIDCOpenSessionIntent(), _sessionWallet.GetAddress());
             return intent;
         }
     }

@@ -41,5 +41,10 @@ namespace Sequence.WaaS.Tests
         {
             throw new NotImplementedException();
         }
+
+        public Task FederateAccount(IntentDataFederateAccount federateAccountIntent, LoginMethod method, string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

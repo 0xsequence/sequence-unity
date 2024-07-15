@@ -330,7 +330,7 @@ namespace Sequence.WaaS
                 return;
             }
 
-            if (_automaticallyFederateAccountsWhenPossible && _failedLoginEmail == email && !loginIntent.forceCreateAccount) // forceCreateAccount should only be true if we are overriding an account, meaning we don't have a failed login method that needs federating
+            if (_automaticallyFederateAccountsWhenPossible && _failedLoginEmail == email && !loginIntent.forceCreateAccount) // forceCreateAccount should only be true if we are creating another account for the same email address, meaning we don't have a failed login method that needs federating
             {
                 await FederateAccount(new IntentDataFederateAccount(_failedLoginIntent, walletAddress), _failedLoginMethod, email);
             }
@@ -479,6 +479,29 @@ namespace Sequence.WaaS
             {
                 WaaSWallet.OnAccountFederationFailed?.Invoke("Error federating account: " + e.Message);
             }
+        }
+        
+        public async Task FederateAccountPlayFab(string titleId, string sessionTicket, string email)
+        {
+            PlayFabConnector playFabConnector = new PlayFabConnector(titleId, sessionTicket, _sessionId, _sessionWallet, _connector);
+            await playFabConnector.FederateAccount(email);
+        }
+        
+        public async Task FederateAccountGuest()
+        {
+            GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
+            await connector.FederateAccount();
+        }
+        
+        public async Task FederateAccountSocial(string idToken, LoginMethod method)
+        {
+            OIDCConnector oidcConnector = new OIDCConnector(idToken, _sessionId, _sessionWallet, _connector);
+            await oidcConnector.FederateAccount(method);
+        }
+        
+        public async Task FederateEmail(string email, string code)
+        {
+            await _emailConnector.FederateAccount(email, code);
         }
     }
 }

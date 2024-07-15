@@ -25,16 +25,20 @@ namespace Sequence.WaaS
         
         public async Task ConnectToWaaSViaPlayFab(string email)
         {
-            IntentDataInitiateAuth initiateAuthIntent = AssemblePlayFabInitiateAuthIntent();
-
-            await _connector.InitiateAuth(initiateAuthIntent, LoginMethod.PlayFab);
+            await InitiateAuth();
             
             IntentDataOpenSession loginIntent = AssemblePlayFabOpenSessionIntent();
 
             await _connector.ConnectToWaaS(loginIntent, LoginMethod.PlayFab, email);
         }
         
-        public IntentDataInitiateAuth AssemblePlayFabInitiateAuthIntent()
+        private async Task InitiateAuth()
+        {
+            IntentDataInitiateAuth intent = AssemblePlayFabInitiateAuthIntent();
+            await _connector.InitiateAuth(intent, LoginMethod.PlayFab);
+        }
+        
+        private IntentDataInitiateAuth AssemblePlayFabInitiateAuthIntent()
         {
             string verifier = GetVerifier();
             IntentDataInitiateAuth intent = new IntentDataInitiateAuth(IdentityType.PlayFab, _sessionId, verifier);
@@ -47,11 +51,26 @@ namespace Sequence.WaaS
             return $"{_titleId}|{sessionTicketHash}";
         }
         
-        public IntentDataOpenSession AssemblePlayFabOpenSessionIntent()
+        private IntentDataOpenSession AssemblePlayFabOpenSessionIntent()
         {
             string verifier = GetVerifier();
             IntentDataOpenSession intent =
                 new IntentDataOpenSession(_sessionWallet.GetAddress(), IdentityType.PlayFab, verifier, _sessionTicket);
+            return intent;
+        }
+        
+        public async Task FederateAccount(string email)
+        {
+            await InitiateAuth();
+            
+            IntentDataFederateAccount federateIntent = AssemblePlayFabFederateAccountIntent();
+            await _connector.FederateAccount(federateIntent, LoginMethod.PlayFab, email);
+        }
+        
+        private IntentDataFederateAccount AssemblePlayFabFederateAccountIntent()
+        {
+            string verifier = GetVerifier();
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(_sessionId, _sessionWallet.GetAddress(), IdentityType.PlayFab.ToString(), verifier, _sessionTicket);
             return intent;
         }
     }

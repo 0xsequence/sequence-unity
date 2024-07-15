@@ -33,11 +33,17 @@ namespace Sequence.WaaS
 
         public async Task ConnectToWaaSViaEmail(string email, string code)
         {
+            IntentDataOpenSession loginIntent = AssembleEmailOpenSessionIntent(email, code);
+            await _connector.ConnectToWaaS(loginIntent, LoginMethod.Email, email);
+        }
+        
+        private IntentDataOpenSession AssembleEmailOpenSessionIntent(string email, string code)
+        {
             string answerPreHash = _emailChallenge + code;
             string answer = SequenceCoder.KeccakHashASCII(answerPreHash).EnsureHexPrefix();
             string verifier = GetVerifier(email, _sessionId);
             IntentDataOpenSession loginIntent = new IntentDataOpenSession(_sessionWallet.GetAddress(), IdentityType.Email, verifier, answer);
-            await _connector.ConnectToWaaS(loginIntent, LoginMethod.Email, email);
+            return loginIntent;
         }
 
         private IntentDataInitiateAuth AssembleEmailInitiateAuthIntent(string email)
@@ -77,6 +83,18 @@ namespace Sequence.WaaS
             {
                 throw new Exception(e.Message);
             }
+        }
+        
+        public async Task FederateAccount(string email, string code)
+        {
+            IntentDataFederateAccount intent = AssembleEmailFederateAccountIntent(email, code);
+            await _connector.FederateAccount(intent, LoginMethod.Email, email);
+        }
+        
+        private IntentDataFederateAccount AssembleEmailFederateAccountIntent(string email, string code)
+        {
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleEmailOpenSessionIntent(email, code), _sessionWallet.GetAddress());
+            return intent;
         }
     }
 }
