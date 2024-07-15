@@ -4,7 +4,7 @@ using Sequence.Utils;
 
 namespace Sequence.Demo
 {
-    public class OverrideAccountConfirmationPage :UIPage
+    public class NewAccountConfirmationPage :UIPage
     {
         private FederatedAuthPopupPanel _federatedAuthPopupPanel;
         private ILogin _login;
@@ -28,7 +28,7 @@ namespace Sequence.Demo
             }
         }
 
-        public void ReplaceAccount()
+        public void NewAccount()
         {
             _login.OverrideAccount();
             _federatedAuthPopupPanel.Close();

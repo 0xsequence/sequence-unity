@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using Sequence.Authentication;
 using Sequence.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Sequence.Demo
 {
     public class FederatedAuthPopupPanel : UIPanel
     {
-        [SerializeField] private  OverrideAccountConfirmationPage _overrideAccountConfirmationPage;
+        [FormerlySerializedAs("_overrideAccountConfirmationPage")] [SerializeField] private  NewAccountConfirmationPage newAccountConfirmationPage;
         private LoginPanel _loginPanel;
         private ILogin _login;
         private string _email;
@@ -40,7 +41,7 @@ namespace Sequence.Demo
         
         public void OverrideAccount()
         {
-            StartCoroutine(SetUIPage(_overrideAccountConfirmationPage, this, _login));
+            StartCoroutine(SetUIPage(newAccountConfirmationPage, this, _login));
         }
 
         public void OnLoginFailed(string message, LoginMethod method, string email)

@@ -82,11 +82,11 @@ namespace Sequence.Demo
             _federatedAuthPopupPanel.ReturnToLogin();
         }
 
-        public void OverrideAccount()
+        public void NewAccount()
         {
             if (!SequenceConfig.GetConfig().EnableAccountOverride)
             {
-                throw new SystemException("Account override is not enabled");
+                throw new SystemException("Creating accounts with the same email is not enabled");
             }
             _federatedAuthPopupPanel.OverrideAccount();
         }

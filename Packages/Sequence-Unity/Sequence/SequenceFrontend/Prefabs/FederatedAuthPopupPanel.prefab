@@ -640,7 +640,7 @@ MonoBehaviour:
   _closeAnimationDurationInSeconds: 0.125
   _animation: 0
   InitialPage: {fileID: 7796254247326606283}
-  _overrideAccountConfirmationPage: {fileID: 7796254246603904516}
+  newAccountConfirmationPage: {fileID: 7796254246603904516}
 --- !u!1 &7796254245313528309
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,7 +842,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Replace Account
+  m_text: New Account
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1170,7 +1170,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7796254247326606283}
         m_TargetAssemblyTypeName: Sequence.Demo.FederatedAuthExplanationPage, SequenceExamples
-        m_MethodName: OverrideAccount
+        m_MethodName: NewAccount
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1246,10 +1246,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Are you sure you wish to replace your account? Please be aware that you
-    will no longer have access to your account, your in-game items, or any tokens
-    or funds owned by your account. This action is irreversible! Please think very
-    carefully before proceeding!
+  m_text: Are you sure you wish to create a new account? Please be aware that this
+    will be an entirely separate account that will not have your in-game items, any
+    tokens, or funds owned by your other account.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1276,7 +1275,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21.9
+  m_fontSize: 24
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1329,7 +1328,7 @@ GameObject:
   - component: {fileID: 7796254246603904517}
   - component: {fileID: 7796254246603904516}
   m_Layer: 5
-  m_Name: OverrideAccountConfirmationPage
+  m_Name: NewAccountConfirmationPage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1698,7 +1697,7 @@ MonoBehaviour:
       - m_Target: {fileID: 7796254246603904516}
         m_TargetAssemblyTypeName: Sequence.Demo.OverrideAccountConfirmationPage,
           SequenceExamples
-        m_MethodName: ReplaceAccount
+        m_MethodName: NewAccount
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1839,7 +1838,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Replace Account
+  m_text: New Account
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
