@@ -12,11 +12,11 @@ using SequenceSDK.WaaS;
 
 namespace Sequence.WaaS
 {
-    public class WaaSToWalletAdapter : Sequence.Wallet.IWallet
+    public class WalletToEoaWalletAdapter : Sequence.Wallet.IWallet
     {
         private IWallet _wallet;
 
-        public WaaSToWalletAdapter(IWallet wallet)
+        public WalletToEoaWalletAdapter(IWallet wallet)
         {
             _wallet = wallet;
         }
