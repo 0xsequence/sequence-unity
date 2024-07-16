@@ -39,7 +39,7 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            EmbeddedWallet.OnFailedToLoginWithStoredSessionWallet += OnFailedToLoginWithStoredSessionWalletHandler;
+            EmbeddedWallet.OnFailedToRecoverSession += OnFailedToLoginWithStoredSessionWalletHandler;
 
             _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
             

@@ -195,7 +195,7 @@ namespace Sequence.WaaS
         private void FailedLoginWithStoredSessionWallet(string error)
         {
             CreateWallet();
-            EmbeddedWallet.OnFailedToLoginWithStoredSessionWallet?.Invoke(error);
+            EmbeddedWallet.OnFailedToRecoverSession?.Invoke(error);
         }
 
         private async Task EnsureSessionIsValid(EmbeddedWallet wallet)

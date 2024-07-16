@@ -16,7 +16,7 @@ namespace Sequence.WaaS
     public class EmbeddedWallet : IWallet
     {
         public static Action<EmbeddedWallet> OnWaaSWalletCreated;
-        public static Action<string> OnFailedToLoginWithStoredSessionWallet;
+        public static Action<string> OnFailedToRecoverSession;
         public static Action<Account> OnAccountFederated;
         public static Action<string> OnAccountFederationFailed;
         
