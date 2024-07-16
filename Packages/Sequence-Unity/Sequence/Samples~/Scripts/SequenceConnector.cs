@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace Samples.Scripts
 {
     /// <summary>
-    /// Attach this to a GameObject in your scene. It will automatically capture a WaaSWallet when it is created and setup all event handlers (fill in your own logic).
+    /// Attach this to a GameObject in your scene. It will automatically capture a SequenceWallet when it is created and setup all event handlers (fill in your own logic).
     /// This mono behaviour will persist between scenes and is accessed via SequenceConnector.Instance singleton.
     /// </summary>
     public class SequenceConnector : MonoBehaviour
@@ -16,7 +16,7 @@ namespace Samples.Scripts
         public Chain Chain = Chain.TestnetArbitrumSepolia;
         public static SequenceConnector Instance { get; private set; }
         
-        public WaaSWallet Wallet { get; private set; }
+        public SequenceWallet Wallet { get; private set; }
         public IIndexer Indexer { get; private set; }
         
         private void Awake()
@@ -31,11 +31,11 @@ namespace Samples.Scripts
                 Destroy(gameObject);
             }
 
-            WaaSWallet.OnWaaSWalletCreated += OnWaaSWalletCreated;
+            SequenceWallet.OnWalletCreated += OnWalletCreated;
             Indexer = new ChainIndexer(Chain);
         }
 
-        private void OnWaaSWalletCreated(WaaSWallet wallet)
+        private void OnWalletCreated(SequenceWallet wallet)
         {
             Wallet = wallet;
             Wallet.OnSendTransactionComplete += OnSendTransactionCompleteHandler;
