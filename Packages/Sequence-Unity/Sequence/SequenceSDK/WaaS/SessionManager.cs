@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace Sequence.WaaS
 {
-    public class WaaSSessionManager : MonoBehaviour
+    public class SessionManager : MonoBehaviour
     {
-        public static WaaSSessionManager Instance;
+        public static SessionManager Instance;
         
         private List<Wallet> _sessions = new List<Wallet>();
 
