@@ -154,9 +154,6 @@ namespace Sequence.WaaS
             }
             WaaSWithAuthUrl = $"{rpcUrl.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator";
             
-            // Todo remove
-            WaaSWithAuthUrl = "https://dev-waas.sequence.app/rpc/WaasAuthenticator";
-            
             int projectId = configJwt.projectId;
             if (string.IsNullOrWhiteSpace(projectId.ToString()))
             {
