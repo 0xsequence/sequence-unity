@@ -113,9 +113,9 @@ namespace Sequence.Demo
         
         private LoginMethod GetLoginMethod()
         {
-            if (PlayerPrefs.HasKey(WaaSLogin.WaaSLoginMethod))
+            if (PlayerPrefs.HasKey(SequenceLogin.WaaSLoginMethod))
             {
-                return (LoginMethod) PlayerPrefs.GetInt(WaaSLogin.WaaSLoginMethod);
+                return (LoginMethod) PlayerPrefs.GetInt(SequenceLogin.WaaSLoginMethod);
             }
 
             return LoginMethod.None;

@@ -95,7 +95,7 @@ namespace PlayFab.Scripts
             string sessionTicket = result.SessionTicket;
             string titleId = PlayFabSettings.staticSettings.TitleId;
             
-            ILogin login = WaaSLogin.GetInstance();
+            ILogin login = SequenceLogin.GetInstance();
             login.OnLoginFailed += (error, method, email) =>
             {
                 Debug.LogError(error);
@@ -160,7 +160,7 @@ namespace PlayFab.Scripts
             string sessionTicket = result.SessionTicket;
             string titleId = PlayFabSettings.staticSettings.TitleId;
             
-            ILogin login = WaaSLogin.GetInstance();
+            ILogin login = SequenceLogin.GetInstance();
             login.OnLoginFailed += (error, method, email) =>
             {
                 Debug.LogError(error);

@@ -11,7 +11,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public void TestLogin_Success()
         {
-            WaaSLogin waasLogin = WaaSLogin.GetInstance(null, null, new MockWaaSConnector("success"));
+            SequenceLogin waasLogin = SequenceLogin.GetInstance(null, null, new MockWaaSConnector("success"));
             
             waasLogin.OnMFAEmailFailedToSend += (email, error) => Assert.Fail($"Unexpected error: {error}");
             waasLogin.OnMFAEmailSent += (email) => Assert.Pass();
@@ -22,7 +22,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public void TestLogin_MissingChallenge()
         {
-            WaaSLogin waasLogin = WaaSLogin.GetInstance(null, null, new MockWaaSConnector(""));
+            SequenceLogin waasLogin = SequenceLogin.GetInstance(null, null, new MockWaaSConnector(""));
             
             waasLogin.OnMFAEmailFailedToSend += (email, error) => Assert.AreEqual("Email challenge is missing from response from WaaS API", error);
             waasLogin.OnMFAEmailSent += (email) => Assert.Fail($"Unexpected success");
@@ -33,7 +33,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public void TestLogin_UnexpectedError()
         {
-            WaaSLogin waasLogin = WaaSLogin.GetInstance(null, null, new MockWaaSConnector("Error: something happened"));
+            SequenceLogin waasLogin = SequenceLogin.GetInstance(null, null, new MockWaaSConnector("Error: something happened"));
             
             waasLogin.OnMFAEmailFailedToSend += (email, error) => Assert.AreEqual("Error: something happened", error);
             waasLogin.OnMFAEmailSent += (email) => Assert.Fail($"Unexpected success");
@@ -44,7 +44,7 @@ namespace Sequence.WaaS.Tests
         [Test]
         public void TestLogin_ExceptionThrown()
         {
-            WaaSLogin waasLogin = WaaSLogin.GetInstance(null, null, new MockWaaSConnector(new Exception("Error: something happened")));
+            SequenceLogin waasLogin = SequenceLogin.GetInstance(null, null, new MockWaaSConnector(new Exception("Error: something happened")));
             
             waasLogin.OnMFAEmailFailedToSend += (email, error) => Assert.AreEqual("Error: something happened", error);
             waasLogin.OnMFAEmailSent += (email) => Assert.Fail($"Unexpected success");

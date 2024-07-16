@@ -16,7 +16,7 @@ namespace Sequence.WaaS.Tests
         {
             try
             {
-                WaaSLogin login = WaaSLogin.GetInstance();
+                SequenceLogin login = SequenceLogin.GetInstance();
                 login.OnLoginFailed += (error, method, email) => { Assert.Fail(error); };
                 string email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
                 bool accountFederated = false;

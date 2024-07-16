@@ -16,7 +16,7 @@ using UnityEngine.Serialization;
 
 namespace Sequence.WaaS
 {
-    public class WaaSLogin : ILogin, IWaaSConnector
+    public class SequenceLogin : ILogin, IWaaSConnector
     {
         public static string WaaSWithAuthUrl { get; private set; }
         public const string WaaSLoginMethod = "WaaSLoginMethod";
@@ -41,19 +41,19 @@ namespace Sequence.WaaS
         private string _failedLoginEmail;
         private bool _automaticallyFederateAccountsWhenPossible;
 
-        private static WaaSLogin _instance;
+        private static SequenceLogin _instance;
         
-        public static WaaSLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+        public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
         {
             if (_instance == null)
             {
-                _instance = new WaaSLogin(validator, authenticator, connector);
+                _instance = new SequenceLogin(validator, authenticator, connector);
             }
             return _instance;
         }
 
         [Obsolete("Use GetInstance() instead.")]
-        public WaaSLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+        public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
         {
             if (connector == null)
             {
@@ -305,7 +305,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.sessionId;
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
+                SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.SetInt($"{email}-{method}", 1);

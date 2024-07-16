@@ -15,7 +15,7 @@ namespace GuestLogin
         private IWallet _wallet;
         private void Awake()
         {
-            _login = WaaSLogin.GetInstance();
+            _login = SequenceLogin.GetInstance();
             _login.OnLoginFailed += (error, method, email) =>
             {
                 Debug.LogError(error);

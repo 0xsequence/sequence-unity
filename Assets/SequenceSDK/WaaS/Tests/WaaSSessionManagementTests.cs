@@ -14,7 +14,7 @@ namespace Sequence.WaaS.Tests
         {
             try
             {
-                WaaSLogin login = WaaSLogin.GetInstance();
+                SequenceLogin login = SequenceLogin.GetInstance();
                 login.OnLoginFailed += (error, method, email) =>
                 {
                     Assert.Fail(error);
@@ -59,7 +59,7 @@ namespace Sequence.WaaS.Tests
                 PlayFabSettings.staticSettings.TitleId = titleId;
             }
             
-            WaaSLogin login = WaaSLogin.GetInstance();
+            SequenceLogin login = SequenceLogin.GetInstance();
             login.OnLoginFailed += (error, method, email) =>
             {
                 Assert.Fail(error);
