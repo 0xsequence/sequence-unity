@@ -53,7 +53,7 @@ namespace Sequence.Authentication
             SetClientIds(config);
             
 #if UNITY_EDITOR
-            InjectRedirectUrl("https://be9d-184-146-195-10.ngrok-free.app");
+            InjectRedirectUrl("http://localhost:8080/");
 #endif
             _browser = CreateBrowser();
         }
