@@ -24,7 +24,7 @@ namespace Sequence.WaaS
                 Destroy(gameObject);
             }
             
-            EmbeddedWallet.OnWaaSWalletCreated += AddSession;
+            EmbeddedWallet.OnWalletCreated += AddSession;
         }
 
         private void AddSession(EmbeddedWallet sessionWallet)
@@ -48,7 +48,7 @@ namespace Sequence.WaaS
 
         private void OnDestroy()
         {
-            EmbeddedWallet.OnWaaSWalletCreated -= AddSession;
+            EmbeddedWallet.OnWalletCreated -= AddSession;
             _sessions = new List<EmbeddedWallet>();
         }
     }

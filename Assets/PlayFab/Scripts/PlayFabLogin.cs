@@ -29,7 +29,7 @@ namespace PlayFab.Scripts
 
         public void Start()
         {
-            EmbeddedWallet.OnWaaSWalletCreated += OnWaaSWalletCreated;
+            EmbeddedWallet.OnWalletCreated += OnWaaSWalletCreated;
 
             if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
             {

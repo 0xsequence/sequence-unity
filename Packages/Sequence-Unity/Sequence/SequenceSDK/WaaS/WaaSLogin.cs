@@ -213,7 +213,7 @@ namespace Sequence.WaaS
             {
                 if (activeSessions[i].id == expectedSessionId)
                 {
-                    EmbeddedWallet.OnWaaSWalletCreated?.Invoke(wallet);
+                    EmbeddedWallet.OnWalletCreated?.Invoke(wallet);
                     return;
                 }
             }
@@ -315,7 +315,7 @@ namespace Sequence.WaaS
                     StoreWalletSecurely(walletAddress);
                 }
                 _isLoggingIn = false;
-                EmbeddedWallet.OnWaaSWalletCreated?.Invoke(wallet);
+                EmbeddedWallet.OnWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
             {

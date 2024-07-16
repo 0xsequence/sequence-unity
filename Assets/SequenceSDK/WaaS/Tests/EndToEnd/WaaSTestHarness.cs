@@ -39,7 +39,7 @@ namespace Sequence.WaaS.Tests
             DisableAllUIPages();
             OpenUIPanel(_loginPanel);
             
-            EmbeddedWallet.OnWaaSWalletCreated += InitiateTests;
+            EmbeddedWallet.OnWalletCreated += InitiateTests;
         }
         
         private void DisableAllUIPages()

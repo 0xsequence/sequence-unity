@@ -26,7 +26,7 @@ namespace Sequence.WaaS.Tests
                     accountFederated = true;
                 };
                 EmbeddedWallet.OnAccountFederationFailed += error => { Assert.Fail(error); };
-                EmbeddedWallet.OnWaaSWalletCreated += async wallet =>
+                EmbeddedWallet.OnWalletCreated += async wallet =>
                 {
                     string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
 

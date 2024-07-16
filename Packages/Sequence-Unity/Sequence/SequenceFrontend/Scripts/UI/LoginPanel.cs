@@ -92,7 +92,7 @@ namespace Sequence.Demo
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
-            EmbeddedWallet.OnWaaSWalletCreated += OnWaaSWalletCreatedHandler;
+            EmbeddedWallet.OnWalletCreated += OnWaaSWalletCreatedHandler;
             
             GameObject popupPanel = Instantiate(_federatedAuthPopupPanelPrefab, transform.parent);
             _federatedAuthPopupPanel = popupPanel.GetComponent<FederatedAuthPopupPanel>();

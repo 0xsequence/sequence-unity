@@ -13,7 +13,7 @@ namespace Sequence.Demo
 
         void Awake()
         {
-            EmbeddedWallet.OnWaaSWalletCreated += wallet =>
+            EmbeddedWallet.OnWalletCreated += wallet =>
             {
                 TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
                 text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);

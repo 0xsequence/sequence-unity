@@ -20,7 +20,7 @@ namespace GuestLogin
             {
                 Debug.LogError(error);
             };
-            EmbeddedWallet.OnWaaSWalletCreated += OnWaaSWalletCreated;
+            EmbeddedWallet.OnWalletCreated += OnWaaSWalletCreated;
         }
 
         private void Start()
