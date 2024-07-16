@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.WaaS.Authentication
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class WaaSPayload

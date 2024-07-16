@@ -2,7 +2,7 @@ using System;
 using NUnit.Framework;
 using Sequence.Authentication;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class InitiateEmailSignInUnitTests
     {

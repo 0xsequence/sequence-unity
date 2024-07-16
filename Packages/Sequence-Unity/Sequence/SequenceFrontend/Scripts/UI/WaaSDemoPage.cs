@@ -6,10 +6,7 @@ using Sequence.Contracts;
 using Sequence.Provider;
 using Sequence.Transactions;
 using Sequence.Utils;
-using Sequence.WaaS;
-using Sequence.WaaS.Authentication;
-using Sequence.Utils;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 using IWallet = Sequence.Wallet.IWallet;
@@ -20,18 +17,18 @@ namespace Sequence.Demo
     {
         [SerializeField] private TextMeshProUGUI _resultText;
         
-        private WaaS.SequenceWallet _wallet;
+        private SequenceWallet _wallet;
         private Address _address;
         private IWallet _adapter;
         
         public override void Open(params object[] args)
         {
             _wallet =
-                args.GetObjectOfTypeIfExists<WaaS.SequenceWallet>();
+                args.GetObjectOfTypeIfExists<SequenceWallet>();
             if (_wallet == default)
             {
                 throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(WaaS.SequenceWallet)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(SequenceWallet)} as an argument");
             }
             _gameObject.SetActive(true);
             _animator.AnimateIn( _openAnimationDurationInSeconds);
@@ -66,7 +63,7 @@ namespace Sequence.Demo
         {
             _wallet.SendTransaction(
                 Chain.Polygon,
-                new Sequence.WaaS.Transaction[]
+                new Transaction[]
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "1")
                 });
@@ -99,7 +96,7 @@ namespace Sequence.Demo
         {
             _wallet.SendTransaction(
                 Chain.Polygon,
-                new Sequence.WaaS.Transaction[]
+                new Transaction[]
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", "99000000000000000000")
                 });
@@ -119,7 +116,7 @@ namespace Sequence.Demo
 
         public void SendErc20Transfer()
         {
-            _wallet.SendTransaction(Chain.Polygon, new Sequence.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new Transaction[]
                 {
                     new SendERC20(
                         "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
@@ -130,7 +127,7 @@ namespace Sequence.Demo
         
         public void SendErc721Transfer()
         {
-            _wallet.SendTransaction(Chain.Polygon, new Sequence.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new Transaction[]
                 {
                     new SendERC721(
                         "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
@@ -141,7 +138,7 @@ namespace Sequence.Demo
         
         public void SendErc1155Transfer()
         {
-            _wallet.SendTransaction(Chain.Polygon, new Sequence.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new Transaction[]
                 {
                     new SendERC1155(
                         "0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb",
@@ -155,7 +152,7 @@ namespace Sequence.Demo
 
         public void SendMultipleTransferTypes()
         {
-            _wallet.SendTransaction(Chain.Polygon, new Sequence.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new Transaction[]
                 {
                     new RawTransaction("0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f", DecimalNormalizer.Normalize(1)),
                     new SendERC20(
@@ -224,7 +221,7 @@ namespace Sequence.Demo
             
             // or
             
-            // _wallet.SendTransaction(Chain.Polygon, new SequenceSDK.WaaS.Transaction[]
+            // _wallet.SendTransaction(Chain.Polygon, new Transaction[]
             //     {
             //         new RawTransaction(nftTransfer),
             //         new RawTransaction(sftTransfer),
@@ -240,7 +237,7 @@ namespace Sequence.Demo
         {
             ERC721 nft = new ERC721("0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f");
             ERC1155 sft = new ERC1155("0x44b3f42e2bf34f62868ff9e9dab7c2f807ba97cb");
-            _wallet.SendTransaction(Chain.Polygon, new Sequence.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new Transaction[]
                 {
                     new RawTransaction(nft.Contract, "transferFrom", _adapter.GetAddress().Value,
                         "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f",
@@ -254,7 +251,7 @@ namespace Sequence.Demo
 
         public void DelayedEncode()
         {
-            _wallet.SendTransaction(Chain.Polygon, new Sequence.WaaS.Transaction[]
+            _wallet.SendTransaction(Chain.Polygon, new Transaction[]
                 {
                     new DelayedEncode("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", "0", new DelayedEncodeData(
                         "transfer(address,uint256)",

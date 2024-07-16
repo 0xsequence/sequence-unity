@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class EOAWalletLinker
     {

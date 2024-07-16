@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     [JsonConverter(typeof(DelayedEncodeDataConverter))]

@@ -4,10 +4,10 @@ using Sequence.Contracts;
 using Sequence.Transactions;
 using StringExtensions = Sequence.Utils.StringExtensions;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [System.Serializable]
-    public class RawTransaction : Sequence.WaaS.Transaction
+    public class RawTransaction : Transaction
     {
         public const string TypeIdentifier = "transaction";
         public string data { get; private set; }

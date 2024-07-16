@@ -1,4 +1,4 @@
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -32,7 +32,7 @@ namespace Sequence.Demo
                 InitialPanel = _loginPanel;
             }
 
-            WaaS.SequenceWallet.OnWalletCreated += wallet =>
+            SequenceWallet.OnWalletCreated += wallet =>
             {
                 wallet.OnDropSessionComplete += s =>
                 {

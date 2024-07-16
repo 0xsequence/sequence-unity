@@ -1,4 +1,4 @@
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class IntentResponseSessionAuthProof
     {

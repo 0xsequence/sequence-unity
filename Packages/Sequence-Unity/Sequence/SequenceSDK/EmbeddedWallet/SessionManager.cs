@@ -4,7 +4,7 @@ using Sequence.Config;
 using Sequence.Utils.SecureStorage;
 using UnityEngine;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class SessionManager : MonoBehaviour
     {

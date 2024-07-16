@@ -2,8 +2,7 @@ using System;
 using System.Numerics;
 using Sequence;
 using Sequence.Contracts;
-using Sequence.WaaS;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Relayer
 {

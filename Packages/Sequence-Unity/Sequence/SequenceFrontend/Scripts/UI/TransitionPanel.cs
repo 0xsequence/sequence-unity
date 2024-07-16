@@ -1,6 +1,6 @@
 using System;
 using Sequence.Utils;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Demo
 {
@@ -18,7 +18,7 @@ namespace Sequence.Demo
         {
             base.Awake();
             _ui = FindObjectOfType<SequenceSampleUI>();
-            WaaS.SequenceWallet.OnWalletCreated += (wallet =>
+            SequenceWallet.OnWalletCreated += (wallet =>
             {
                 Wallet = wallet;
             });

@@ -5,7 +5,7 @@ using Sequence.Mocks;
 using Sequence.Provider;
 using Sequence.Transactions;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class WaaSToWalletAdapterUnitTests
     {

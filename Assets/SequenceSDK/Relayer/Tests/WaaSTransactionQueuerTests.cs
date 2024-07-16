@@ -2,7 +2,7 @@ using System.Collections;
 using System.Numerics;
 using NUnit.Framework;
 using Sequence.Contracts;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.TestTools;
 

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using NUnit.Framework.Internal.Commands;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;

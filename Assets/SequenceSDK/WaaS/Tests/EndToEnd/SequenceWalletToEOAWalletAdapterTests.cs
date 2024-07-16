@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Sequence.Contracts;
 using Sequence.Provider;
 using Sequence.Transactions;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
-    public class WaaSToWalletAdapterTests
+    public class SequenceWalletToEOAWalletAdapterTests
     {
         private Sequence.Wallet.IWallet _wallet;
         private string _address;
@@ -23,7 +23,7 @@ namespace Sequence.WaaS.Tests
 
         private IEthClient _client;
         
-        public WaaSToWalletAdapterTests(WaaS.IWallet wallet)
+        public SequenceWalletToEOAWalletAdapterTests(EmbeddedWallet.IWallet wallet)
         {
             _wallet = new SequenceWalletToEOAWalletAdapter(wallet);
             GetAddress();

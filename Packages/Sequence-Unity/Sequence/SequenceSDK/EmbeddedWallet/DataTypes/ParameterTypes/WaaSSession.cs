@@ -1,8 +1,6 @@
 using System;
-using Newtonsoft.Json.Linq;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class WaaSSession

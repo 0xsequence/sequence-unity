@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Provider;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class BalanceChecker
     {

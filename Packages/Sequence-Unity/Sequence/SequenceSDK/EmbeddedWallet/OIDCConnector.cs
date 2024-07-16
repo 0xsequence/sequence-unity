@@ -2,9 +2,8 @@ using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Utils;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class OIDCConnector
     {

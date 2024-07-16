@@ -5,7 +5,7 @@ using PlayFab.ClientModels;
 using Sequence.Authentication;
 using UnityEngine;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class WaaSSessionManagementTests
     {

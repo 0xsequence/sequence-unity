@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sequence;
 using Sequence.Contracts;
-using Sequence.WaaS;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.Serialization;
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class IntentResponseSessionClosed

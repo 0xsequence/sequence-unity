@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class Erc721BalanceChecker
     {

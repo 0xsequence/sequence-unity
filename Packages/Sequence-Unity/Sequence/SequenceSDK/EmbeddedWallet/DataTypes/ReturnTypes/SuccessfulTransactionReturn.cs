@@ -1,7 +1,6 @@
 using Newtonsoft.Json.Linq;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [System.Serializable]
     public class SuccessfulTransactionReturn : TransactionReturn

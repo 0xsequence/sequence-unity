@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class IntentDataFederateAccount
     {

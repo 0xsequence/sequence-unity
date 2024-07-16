@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Sequence;
 using Sequence.Relayer;
 using Sequence.Utils;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 
 namespace Sequence.Relayer

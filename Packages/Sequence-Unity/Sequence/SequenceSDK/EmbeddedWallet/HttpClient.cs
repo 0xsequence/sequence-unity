@@ -13,7 +13,7 @@ using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class HttpClient : IHttpClient
     {

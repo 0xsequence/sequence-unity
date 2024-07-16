@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Sequence.Utils;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class IntentDataSignMessage

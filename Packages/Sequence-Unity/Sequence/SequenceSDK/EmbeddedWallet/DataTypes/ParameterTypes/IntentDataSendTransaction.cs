@@ -1,10 +1,8 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SequenceSDK.WaaS;
-using UnityEditor;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [System.Serializable]
     public class IntentDataSendTransaction
@@ -17,7 +15,7 @@ namespace Sequence.WaaS
 
         public static readonly string transactionTypeIdentifier = "type";
 
-        public IntentDataSendTransaction(string walletAddress, string network, Sequence.WaaS.Transaction[] transactions, string transactionsFeeQuote = "")
+        public IntentDataSendTransaction(string walletAddress, string network, Transaction[] transactions, string transactionsFeeQuote = "")
         {
             this.wallet = walletAddress;
             this.network = network;
@@ -28,7 +26,7 @@ namespace Sequence.WaaS
             }
         }
         
-        public IntentDataSendTransaction(string walletAddress, Chain network, Sequence.WaaS.Transaction[] transactions, string transactionsFeeQuote = "")
+        public IntentDataSendTransaction(string walletAddress, Chain network, Transaction[] transactions, string transactionsFeeQuote = "")
         {
             this.wallet = walletAddress;
             this.network = network.GetChainId();
@@ -46,7 +44,7 @@ namespace Sequence.WaaS
             this.wallet = wallet;
             this.transactionsFeeQuote = transactionsFeeQuote;
             int transactionCount = transactions.Length;
-            this.transactions = new Sequence.WaaS.Transaction[transactionCount];
+            this.transactions = new Transaction[transactionCount];
             for (int i = 0; i < transactionCount; i++)
             {
                 if (transactions[i].TryGetValue(transactionTypeIdentifier, out var type))

@@ -1,9 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Sequence.WaaS.Authentication;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {   
     public interface IWallet
     {

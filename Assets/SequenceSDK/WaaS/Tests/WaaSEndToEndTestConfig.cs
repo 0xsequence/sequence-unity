@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     [CreateAssetMenu(fileName = "WaaSEndToEndTestConfig", menuName = "Sequence/WaaSEndToEndTestConfig", order = 2)]
     public class WaaSEndToEndTestConfig : ScriptableObject

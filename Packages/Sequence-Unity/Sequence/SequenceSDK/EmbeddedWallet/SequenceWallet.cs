@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.ABI;
-using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Utils;
-using Sequence.WaaS.Authentication;
-using Sequence.Wallet;
-using SequenceSDK.WaaS;
 using UnityEngine;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class SequenceWallet : IWallet
     {

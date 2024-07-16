@@ -1,7 +1,7 @@
-namespace SequenceSDK.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [System.Serializable]
-    public class DelayedEncode : Sequence.WaaS.Transaction
+    public class DelayedEncode : Transaction
     {
         public const string TypeIdentifier = "delayedEncode";
         public DelayedEncodeData data { get; private set; }

@@ -1,8 +1,8 @@
 using NUnit.Framework;
 using Sequence;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class JwtHelperTests
     {

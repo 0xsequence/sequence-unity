@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class IntentResponseAuthInitiated
     {

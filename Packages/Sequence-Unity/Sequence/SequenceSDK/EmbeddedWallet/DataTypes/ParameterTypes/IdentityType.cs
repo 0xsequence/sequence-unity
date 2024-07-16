@@ -1,6 +1,6 @@
 using Sequence.Authentication;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public enum IdentityType
     {

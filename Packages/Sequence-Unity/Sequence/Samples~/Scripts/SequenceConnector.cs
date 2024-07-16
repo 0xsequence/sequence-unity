@@ -1,7 +1,6 @@
 using System;
 using Sequence;
-using Sequence.WaaS;
-using Sequence.WaaS.Authentication;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.Serialization;
 

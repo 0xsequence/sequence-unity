@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json.Linq;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class IntentResponse<T>

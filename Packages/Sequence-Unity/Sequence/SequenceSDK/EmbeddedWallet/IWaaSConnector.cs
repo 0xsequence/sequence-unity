@@ -1,11 +1,7 @@
-using System;
 using System.Threading.Tasks;
 using Sequence.Authentication;
-using Sequence.Utils.SecureStorage;
-using SequenceSDK.WaaS;
-using UnityEngine;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public interface IWaaSConnector
     {

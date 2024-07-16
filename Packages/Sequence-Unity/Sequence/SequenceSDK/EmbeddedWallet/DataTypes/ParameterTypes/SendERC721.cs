@@ -2,10 +2,10 @@ using System;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
-    public class SendERC721 : Sequence.WaaS.Transaction
+    public class SendERC721 : Transaction
     {
         public const string TypeIdentifier = "erc721send";
         public string data { get; private set; }

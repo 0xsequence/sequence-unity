@@ -2,7 +2,7 @@ using System.IO;
 using System.Security.Cryptography;
 using Sequence.Utils;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public static class Encryptor
     {

@@ -6,16 +6,12 @@ using Sequence.Wallet;
 using Sequence.ABI;
 using Sequence.Provider;
 using System.Text;
-using NBitcoin.Secp256k1;
 using System;
-using Sequence;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Numerics;
 using Sequence.Transactions;
 using Sequence.Contracts;
 using Sequence.Utils;
-using Sequence.WaaS;
 using ContractDeploymentResult = Sequence.Contracts.ContractDeploymentResult;
 using IWallet = Sequence.Wallet.IWallet;
 

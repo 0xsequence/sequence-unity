@@ -6,7 +6,7 @@ using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class WaaSWalletUnitTests
     {

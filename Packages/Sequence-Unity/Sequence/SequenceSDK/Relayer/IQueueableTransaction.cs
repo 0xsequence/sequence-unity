@@ -1,4 +1,4 @@
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Relayer
 {

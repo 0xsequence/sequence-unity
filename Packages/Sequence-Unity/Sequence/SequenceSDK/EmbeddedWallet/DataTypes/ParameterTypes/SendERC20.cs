@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [System.Serializable]
-    public class SendERC20 : Sequence.WaaS.Transaction
+    public class SendERC20 : Transaction
     {
         public const string TypeIdentifier = "erc20send";
         public string to { get; private set; }

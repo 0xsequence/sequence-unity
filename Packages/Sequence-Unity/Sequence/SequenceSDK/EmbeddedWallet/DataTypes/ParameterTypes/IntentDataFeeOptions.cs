@@ -1,10 +1,7 @@
 using System;
 using Newtonsoft.Json;
-using Sequence;
-using Sequence.WaaS;
-using UnityEditor;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class IntentDataFeeOptions
     {

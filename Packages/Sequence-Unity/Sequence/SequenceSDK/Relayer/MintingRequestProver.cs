@@ -18,10 +18,10 @@ namespace Sequence.Relayer
             _proofSigner = new EOAProofSigner(eoaWallet, _chain);
         }
         
-        public MintingRequestProver(Sequence.WaaS.IWallet waasWallet, Chain chain)
+        public MintingRequestProver(Sequence.EmbeddedWallet.IWallet waasWallet, Chain chain)
         {
             _chain = chain;
-            _proofSigner = new WaaSProofSigner(waasWallet, _chain);
+            _proofSigner = new SequenceWalletProofSigner(waasWallet, _chain);
         }
 
         public async Task<MintingRequestProof> GenerateProof(string contractAddress, string tokenId, uint amount)
@@ -77,25 +77,25 @@ namespace Sequence.Relayer
             }
         }
         
-        private class WaaSProofSigner : IProofSigner
+        private class SequenceWalletProofSigner : IProofSigner
         {
-            private Sequence.WaaS.IWallet _waasWallet;
+            private Sequence.EmbeddedWallet.IWallet _wallet;
             private Chain _chain;
 
-            public WaaSProofSigner(Sequence.WaaS.IWallet waasWallet, Chain chain)
+            public SequenceWalletProofSigner(Sequence.EmbeddedWallet.IWallet wallet, Chain chain)
             {
-                _waasWallet = waasWallet;
+                _wallet = wallet;
                 _chain = chain;
             }
             
             public async Task<string> SignProof(string proof)
             {
-                return await _waasWallet.SignMessage(_chain, proof);
+                return await _wallet.SignMessage(_chain, proof);
             }
             
             public string SigningAddress()
             {
-                return _waasWallet.GetWalletAddress();
+                return _wallet.GetWalletAddress();
             }
         }
     }

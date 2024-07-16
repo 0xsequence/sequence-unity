@@ -6,10 +6,9 @@ using Sequence.Config;
 using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
 using Sequence.Wallet;
-using SequenceSDK.WaaS;
 using UnityEngine;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class SequenceLogin : ILogin, IWaaSConnector
     {

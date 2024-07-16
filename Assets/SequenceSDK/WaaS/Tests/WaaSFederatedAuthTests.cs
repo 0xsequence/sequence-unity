@@ -2,12 +2,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using PlayFab;
 using PlayFab.ClientModels;
-using Sequence.Authentication;
-using Sequence.Wallet;
-using SequenceSDK.WaaS;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class WaaSFederatedAuthTests
     {

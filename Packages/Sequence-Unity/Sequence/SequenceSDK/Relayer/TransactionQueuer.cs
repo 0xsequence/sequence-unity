@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Sequence;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.Serialization;
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using PlayFab;
 using PlayFab.ClientModels;
 using Sequence.Authentication;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Net.Sockets;
 using Sequence.Authentication;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 using Sequence.Config;
@@ -39,7 +39,7 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            WaaS.SequenceWallet.OnFailedToRecoverSession += OnFailedToLoginWithStoredSessionWalletHandler;
+            SequenceWallet.OnFailedToRecoverSession += OnFailedToLoginWithStoredSessionWalletHandler;
 
             _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
             
@@ -92,7 +92,7 @@ namespace Sequence.Demo
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
-            WaaS.SequenceWallet.OnWalletCreated += OnWaaSWalletCreatedHandler;
+            SequenceWallet.OnWalletCreated += OnWaaSWalletCreatedHandler;
             
             GameObject popupPanel = Instantiate(_federatedAuthPopupPanelPrefab, transform.parent);
             _federatedAuthPopupPanel = popupPanel.GetComponent<FederatedAuthPopupPanel>();
@@ -154,7 +154,7 @@ namespace Sequence.Demo
         }
 #endif
 
-        private void OnWaaSWalletCreatedHandler(WaaS.SequenceWallet wallet)
+        private void OnWaaSWalletCreatedHandler(SequenceWallet wallet)
         {
             if (_waasDemoPage != null)
             {

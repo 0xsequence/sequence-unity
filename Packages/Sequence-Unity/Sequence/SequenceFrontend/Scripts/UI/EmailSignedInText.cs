@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 
@@ -9,11 +9,11 @@ namespace Sequence.Demo
 {
     public class EmailSignedInText : MonoBehaviour
     {
-        private WaaS.SequenceWallet _wallet;
+        private SequenceWallet _wallet;
 
         void Awake()
         {
-            WaaS.SequenceWallet.OnWalletCreated += wallet =>
+            SequenceWallet.OnWalletCreated += wallet =>
             {
                 TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
                 text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);

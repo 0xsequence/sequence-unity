@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Sequence.Wallet;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class IntentSenderTests
     {

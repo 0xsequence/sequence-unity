@@ -1,7 +1,7 @@
 using System;
 using Sequence.Authentication;
 using Sequence.Demo.Tweening;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;

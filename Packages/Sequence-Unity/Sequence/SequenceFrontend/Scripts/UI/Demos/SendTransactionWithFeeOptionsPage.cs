@@ -2,7 +2,7 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 

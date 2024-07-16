@@ -1,10 +1,8 @@
 using System;
 using Newtonsoft.Json;
-using Sequence;
 using Sequence.Utils;
-using Sequence.WaaS;
 
-namespace SequenceSDK.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class IntentDataOpenSession

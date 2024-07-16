@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using Sequence.Config;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class HttpClientTests
     {

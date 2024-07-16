@@ -1,6 +1,4 @@
-using Sequence.WaaS;
-
-namespace SequenceSDK.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class RegisterSessionResponse
     {

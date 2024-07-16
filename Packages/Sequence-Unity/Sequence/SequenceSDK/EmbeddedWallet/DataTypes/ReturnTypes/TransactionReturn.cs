@@ -1,6 +1,4 @@
-using System;
-
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public abstract class TransactionReturn
     {

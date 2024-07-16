@@ -5,10 +5,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.ABI;
 using Sequence.Utils;
-using SequenceSDK.WaaS;
 using UnityEngine;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class IntentSender : IIntentSender
     {

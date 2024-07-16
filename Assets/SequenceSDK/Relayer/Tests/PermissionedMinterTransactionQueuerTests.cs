@@ -1,6 +1,6 @@
 using System.Collections;
 using NUnit.Framework;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.TestTools;
 

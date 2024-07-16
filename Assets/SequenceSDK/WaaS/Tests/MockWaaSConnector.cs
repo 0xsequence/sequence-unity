@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Sequence.Authentication;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class MockWaaSConnector : IWaaSConnector
     {

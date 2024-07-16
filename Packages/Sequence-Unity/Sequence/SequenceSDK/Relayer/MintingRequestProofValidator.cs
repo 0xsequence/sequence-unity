@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Sequence.Config;
 using Sequence.Provider;
 using Sequence.Utils;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -15,7 +15,7 @@ namespace Sequence.Relayer
     {
         public static async Task<bool> IsValidMintingRequestProof(Chain chain, MintingRequestProof proof)
         {
-            WaaS.SequenceWallet wallet = new WaaS.SequenceWallet(proof.SigningAddress, null, null);
+            SequenceWallet wallet = new SequenceWallet(proof.SigningAddress, null, null);
 
             try
             {

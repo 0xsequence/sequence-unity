@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public interface IHttpClient
     {

@@ -1,7 +1,6 @@
 using System;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class FeeOption

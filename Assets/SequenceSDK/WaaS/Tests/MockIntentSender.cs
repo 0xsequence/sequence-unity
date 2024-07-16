@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using Sequence.WaaS.Authentication;
-using SequenceSDK.WaaS;
+using Sequence.EmbeddedWallet;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class MockIntentSender : IIntentSender
     {

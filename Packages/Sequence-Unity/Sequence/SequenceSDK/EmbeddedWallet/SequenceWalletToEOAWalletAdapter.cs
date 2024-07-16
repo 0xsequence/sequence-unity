@@ -1,16 +1,10 @@
-using System.Collections.Generic;
-using System.Numerics;
 using System.Threading.Tasks;
-using Sequence;
 using Sequence.Provider;
-using Sequence.WaaS;
 using System;
 using Sequence.ABI;
 using Sequence.Transactions;
-using Sequence.Utils;
-using SequenceSDK.WaaS;
 
-namespace Sequence.WaaS
+namespace Sequence.EmbeddedWallet
 {
     public class SequenceWalletToEOAWalletAdapter : Sequence.Wallet.IWallet
     {

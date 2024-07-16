@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public static class CustomAssert
     {

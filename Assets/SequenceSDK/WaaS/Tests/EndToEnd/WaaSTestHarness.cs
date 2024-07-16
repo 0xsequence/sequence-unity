@@ -5,7 +5,7 @@ using Sequence.Contracts;
 using Sequence.Demo;
 using UnityEngine;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class WaaSTestHarness : MonoBehaviour
     {
@@ -69,7 +69,7 @@ namespace Sequence.WaaS.Tests
             TestStarted += () => _testsStarted++;
             WaaSWalletTests walletTests = new WaaSWalletTests(wallet);
             wallet.OnSendTransactionFailed += OnFailedTransaction;
-            WaaSToWalletAdapterTests adapterTests = new WaaSToWalletAdapterTests(wallet);
+            SequenceWalletToEOAWalletAdapterTests adapterTests = new SequenceWalletToEOAWalletAdapterTests(wallet);
             RunTests(walletTests, adapterTests);
         }
 
@@ -78,7 +78,7 @@ namespace Sequence.WaaS.Tests
             Debug.LogError("Transaction failed: " + result.error);
         }
 
-        private async Task RunTests(WaaSWalletTests walletTests, WaaSToWalletAdapterTests adapterTests)
+        private async Task RunTests(WaaSWalletTests walletTests, SequenceWalletToEOAWalletAdapterTests adapterTests)
         {
             walletTests.TestMessageSigning("Hello world", Chain.Polygon);
             walletTests.TestTransfer();

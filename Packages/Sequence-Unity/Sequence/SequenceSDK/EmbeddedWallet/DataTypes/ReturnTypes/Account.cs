@@ -1,5 +1,4 @@
-namespace Sequence.WaaS
-{
+namespace Sequence.EmbeddedWallet {
     public class Account
     {
         public string email;

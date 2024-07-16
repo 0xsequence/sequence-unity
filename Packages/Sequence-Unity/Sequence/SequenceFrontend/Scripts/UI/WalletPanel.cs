@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Sequence.Demo.ScriptableObjects;
 using Sequence.Utils;
-using Sequence.WaaS;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 
