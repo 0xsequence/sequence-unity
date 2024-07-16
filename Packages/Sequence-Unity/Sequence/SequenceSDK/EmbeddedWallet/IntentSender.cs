@@ -4,11 +4,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.ABI;
-using Sequence.Authentication;
 using Sequence.Utils;
-using Sequence.WaaS.Authentication;
 using SequenceSDK.WaaS;
-using UnityEditor;
 using UnityEngine;
 
 namespace Sequence.WaaS

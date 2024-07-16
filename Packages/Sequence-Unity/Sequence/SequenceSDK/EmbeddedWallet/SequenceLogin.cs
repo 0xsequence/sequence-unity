@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Amazon.CognitoIdentity.Model;
-using Newtonsoft.Json;
-using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
-using Sequence.WaaS.Authentication;
 using Sequence.Wallet;
 using SequenceSDK.WaaS;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Sequence.WaaS
 {
