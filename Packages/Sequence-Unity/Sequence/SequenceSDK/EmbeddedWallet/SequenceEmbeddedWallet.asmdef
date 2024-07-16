@@ -1,5 +1,5 @@
 {
-    "name": "SequenceWaaS",
+    "name": "SequenceEmbeddedWallet",
     "rootNamespace": "",
     "references": [
         "GUID:f7fd4ba36aabd1d499450c174865e70b",
