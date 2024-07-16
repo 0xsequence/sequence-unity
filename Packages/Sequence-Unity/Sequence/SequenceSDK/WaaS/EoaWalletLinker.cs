@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace Sequence.WaaS
 {
-    public class EOAWalletLinker
+    public class EoaWalletLinker
     {
         private string _nonceGenerationLink;
         
         private IWallet _wallet;
 
-        public EOAWalletLinker(IWallet wallet, string nonceGenerationLink)
+        public EoaWalletLinker(IWallet wallet, string nonceGenerationLink)
         {
             _wallet = wallet;
             _nonceGenerationLink = nonceGenerationLink;
         }
 
-        public async Task<string> GenerateEOAWalletLink(Chain chain)
+        public async Task<string> GenerateEoaWalletLink(Chain chain)
         {
             IHttpClient client = new HttpClient(_nonceGenerationLink);
             NonceResponseData nonceResponse =
@@ -26,9 +26,9 @@ namespace Sequence.WaaS
             return eoaWalletLink;
         }
         
-        public async Task OpenEOAWalletLink(Chain chain)
+        public async Task OpenEoaWalletLink(Chain chain)
         {
-            string link = await GenerateEOAWalletLink(chain);
+            string link = await GenerateEoaWalletLink(chain);
             Application.OpenURL(link);
         }
     }

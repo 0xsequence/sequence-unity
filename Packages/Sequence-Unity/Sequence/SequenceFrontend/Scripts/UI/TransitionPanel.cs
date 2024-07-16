@@ -47,8 +47,8 @@ namespace Sequence.Demo
         
         public void LinkEOAWallet()
         {
-            EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://demo-waas-wallet-link-server.tpin.workers.dev/generateNonce");
-            linker.OpenEOAWalletLink(Chain.ArbitrumNova);
+            EoaWalletLinker linker = new EoaWalletLinker(Wallet, "https://demo-waas-wallet-link-server.tpin.workers.dev/generateNonce");
+            linker.OpenEoaWalletLink(Chain.ArbitrumNova);
         }
     }
 }
