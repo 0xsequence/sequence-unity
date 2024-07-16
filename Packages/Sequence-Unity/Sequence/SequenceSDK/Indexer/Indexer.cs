@@ -96,8 +96,8 @@ namespace Sequence
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
         
-        public static Action<string> OnIndexerQueryFailed;
-        public static Action<string> OnIndexerQueryIssue;
+        public static Action<string> OnQueryFailed;
+        public static Action<string> OnQueryIssue;
 
         public static async Task<T[]> FetchMultiplePages<T>(Func<int, Task<(Page, T[])>> func, int maxPages)
         {
@@ -330,10 +330,10 @@ namespace Sequence
             }
             catch (Exception e)
             {
-               OnIndexerQueryFailed?.Invoke(e.Message);
+               OnQueryFailed?.Invoke(e.Message);
                if (caller != null)
                {
-                   caller.OnIndexerQueryFailed(e.Message);
+                   caller.OnQueryFailed(e.Message);
                }
             }
 
@@ -357,10 +357,10 @@ namespace Sequence
             {
                 string error =
                     $"Error deserializing response into type: {typeof(T)}, given: {text}, reason: {e.Message}";
-                OnIndexerQueryFailed?.Invoke(error);
+                OnQueryFailed?.Invoke(error);
                 if (caller != null)
                 {
-                    caller.OnIndexerQueryFailed(error);
+                    caller.OnQueryFailed(error);
                 }
             }
             return default;

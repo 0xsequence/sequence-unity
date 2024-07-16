@@ -75,10 +75,10 @@ namespace Sequence
                         string issue =
                             $"Sequence server rate limit exceeded, trying again... Retries so far: {retries}" +
                             "\nCurl-equivalent request: " + curlRequest;
-                        Indexer.OnIndexerQueryIssue?.Invoke(issue);
+                        Indexer.OnQueryIssue?.Invoke(issue);
                         if (_caller != null)
                         {
-                            _caller.OnIndexerQueryEncounteredAnIssue(issue);
+                            _caller.OnQueryEncounteredAnIssue(issue);
                         }
                         return await RetryHttpPost(chainID, endPoint, args, 5 * retries, retries);
                     }
@@ -86,10 +86,10 @@ namespace Sequence
                 else
                 {
                     string issue = "File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest;
-                    Indexer.OnIndexerQueryIssue?.Invoke(issue);
+                    Indexer.OnQueryIssue?.Invoke(issue);
                     if (_caller != null)
                     {
-                        _caller.OnIndexerQueryEncounteredAnIssue(issue);
+                        _caller.OnQueryEncounteredAnIssue(issue);
                     }
                 }
             }

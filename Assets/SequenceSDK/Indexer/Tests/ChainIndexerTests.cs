@@ -257,7 +257,7 @@ namespace Sequence.Indexer.Tests
             bool errorEventFired = false;
 
             ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
-            indexer.OnIndexerQueryError += s =>
+            indexer.OnQueryError += s =>
             {
                 errorEventFired = true;
             };
@@ -280,7 +280,7 @@ namespace Sequence.Indexer.Tests
             bool errorEventFired = false;
 
             ChainIndexer indexer = new ChainIndexer(Chain.Polygon, logError);
-            indexer.OnIndexerQueryError += s =>
+            indexer.OnQueryError += s =>
             {
                 errorEventFired = true;
             };

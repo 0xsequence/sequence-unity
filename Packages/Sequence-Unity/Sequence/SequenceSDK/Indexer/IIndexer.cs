@@ -14,7 +14,7 @@ namespace Sequence
         /// If provided to Indexer static class when calling a function, Indexer should call this method when needed
         /// </summary>
         /// <param name="error"></param>
-        public void OnIndexerQueryFailed(string error);
+        public void OnQueryFailed(string error);
         
         /// <summary>
         /// Handle an issue during an indexer query
@@ -22,7 +22,7 @@ namespace Sequence
         /// If provided to Indexer static class when calling a function, Indexer should call this method when needed
         /// </summary>
         /// <param name="error"></param>
-        public void OnIndexerQueryEncounteredAnIssue(string error);
+        public void OnQueryEncounteredAnIssue(string error);
         
         /// <summary>
         /// Retrieve indexer status

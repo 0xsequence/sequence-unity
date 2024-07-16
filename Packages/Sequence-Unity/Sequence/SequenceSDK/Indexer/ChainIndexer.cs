@@ -12,8 +12,8 @@ namespace Sequence
 
         private IHttpHandler _customHttpHandler = null;
         
-        public Action<string> OnIndexerQueryError;
-        public Action<string> OnIndexerQueryIssue;
+        public Action<string> OnQueryError;
+        public Action<string> OnQueryIssue;
 
         private bool _logErrors;
         private bool _logWarnings;
@@ -41,7 +41,7 @@ namespace Sequence
             _customHttpHandler = httpHandler;
         }
 
-        public void OnIndexerQueryFailed(string error)
+        public void OnQueryFailed(string error)
         {
             error = "Indexer query failed: " + error;
             if (_logErrors)
@@ -49,10 +49,10 @@ namespace Sequence
                 Debug.LogError(error);
             }
             
-            OnIndexerQueryError?.Invoke(error);
+            OnQueryError?.Invoke(error);
         }
 
-        public void OnIndexerQueryEncounteredAnIssue(string error)
+        public void OnQueryEncounteredAnIssue(string error)
         {
             string issue = "Indexer query encountered an issue: " + error;
             if (_logWarnings)
@@ -60,7 +60,7 @@ namespace Sequence
                 Debug.LogWarning(issue);
             }
 
-            OnIndexerQueryIssue?.Invoke(issue);
+            OnQueryIssue?.Invoke(issue);
         }
 
         public Task<bool> Ping()
