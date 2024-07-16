@@ -10,7 +10,7 @@ namespace Sequence.Relayer.Tests
         [Test]
         public async Task TestBuildMintTokenRequestJson()
         {
-            EoaWallet wallet = new EoaWallet();
+            EOAWallet wallet = new EOAWallet();
             PermissionedMinter minter = new PermissionedMinter(new MintingRequestProver(wallet, Chain.Polygon),
                 "", "0x75700a9dC31ff38b93EafDC380c28e1B816f6799");
 

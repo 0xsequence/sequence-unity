@@ -16,16 +16,16 @@ using UnityEngine;
 
 namespace Sequence.Wallet
 {
-    public class EoaWallet : IWallet
+    public class EOAWallet : IWallet
     {
         public ECPrivKey privKey;
         public ECPubKey pubKey;
         private Address address;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EoaWallet"/> class with a randomly generated private key.
+        /// Initializes a new instance of the <see cref="EOAWallet"/> class with a randomly generated private key.
         /// </summary>
-        public EoaWallet()
+        public EOAWallet()
         {
             byte[] seed = Org.BouncyCastle.Security.SecureRandom.GetInstance("SHA256PRNG").GenerateSeed(64);
             privKey = ECPrivKey.Create(seed);
@@ -33,10 +33,10 @@ namespace Sequence.Wallet
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EoaWallet"/> class with the specified private key.
+        /// Initializes a new instance of the <see cref="EOAWallet"/> class with the specified private key.
         /// </summary>
         /// <param name="_privateKey">The private key as a hexadecimal string.</param>
-        public EoaWallet(string _privateKey)
+        public EOAWallet(string _privateKey)
         {
             privKey = ECPrivKey.Create(SequenceCoder.HexStringToByteArray(_privateKey));
             pubKey = privKey.CreatePubKey();

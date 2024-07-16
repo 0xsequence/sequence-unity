@@ -17,7 +17,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionFailed()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("something happened",null,null));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             try
             {
@@ -35,7 +35,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionException()
         {
             IIntentSender intentSender = new MockIntentSender(new Exception("some bad stuff happened"));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             try
             {
@@ -53,7 +53,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionSuccess()
         {
             IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn("a cool hash","",null,null));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             string transactionHash = await adapter.SendTransaction(_client,
                 new EthTransaction(0, 1, 1, address, 0, "", Chain.Polygon.AsHexString()));
@@ -64,7 +64,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionBatchFailed()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("something happened",null,null));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             try
             {
@@ -86,7 +86,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionBatchSuccess()
         {
             IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn("a cool hash","",null,null));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             
             string[] transactionHash = await adapter.SendTransactionBatch(_client,
@@ -103,7 +103,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestSendTransactionBatchEmptyBatch()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("something happened",null,null));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             try
             {
@@ -121,7 +121,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestDeployContractFailed()
         {
             IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("something happened",null,null));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             try
             {
@@ -138,7 +138,7 @@ namespace Sequence.WaaS.Tests
         public async Task TestDeployContractTransactionException()
         {
             IIntentSender intentSender = new MockIntentSender(new Exception("something happened"));
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
 
             try
             {
@@ -174,7 +174,7 @@ namespace Sequence.WaaS.Tests
                     }, null, "")
                 }, ""));
             IIntentSender intentSender = new MockIntentSender(response);
-            SequenceWalletToEoaWalletAdapter adapter = new SequenceWalletToEoaWalletAdapter(new SequenceWallet(address, "", intentSender));
+            SequenceWalletToEOAWalletAdapter adapter = new SequenceWalletToEOAWalletAdapter(new SequenceWallet(address, "", intentSender));
             IEthClient client = new MockEthClient(Chain.Polygon.AsHexString(), new TransactionReceipt());
             
             TransactionReceipt receipt = await adapter.DeployContract(client, "");

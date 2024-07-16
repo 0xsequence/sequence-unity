@@ -135,11 +135,11 @@ namespace Sequence.Transactions
         }
 
         /// <summary>
-        /// RLP encodes and signs a transaction using the provided EoaWallet
+        /// RLP encodes and signs a transaction using the provided EOAWallet
         /// </summary>
         /// <param name="wallet"></param>
         /// <returns></returns>
-        public string SignAndEncodeTransaction(EoaWallet wallet)
+        public string SignAndEncodeTransaction(EOAWallet wallet)
         {
             string encoded_signing = this.RLPEncode();
             string signingHash = SequenceCoder.KeccakHash(encoded_signing).EnsureHexPrefix();

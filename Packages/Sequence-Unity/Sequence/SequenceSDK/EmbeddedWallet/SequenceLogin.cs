@@ -25,7 +25,7 @@ namespace Sequence.WaaS
         private string _waasVersion;
         private IAuthenticator _authenticator;
         private IValidator _validator;
-        private EoaWallet _sessionWallet;
+        private EOAWallet _sessionWallet;
         private string _sessionId;
         private IntentSender _intentSender;
         private EmailConnector _emailConnector;
@@ -85,7 +85,7 @@ namespace Sequence.WaaS
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            _sessionWallet = new EoaWallet();
+            _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
@@ -164,7 +164,7 @@ namespace Sequence.WaaS
 
         private void TryToLoginWithStoredSessionWallet()
         {
-            (EoaWallet, string) walletInfo = (null, "");
+            (EOAWallet, string) walletInfo = (null, "");
             try
             {
                 walletInfo = AttemptToCreateWalletFromSecureStorage();
@@ -218,7 +218,7 @@ namespace Sequence.WaaS
             FailedLoginWithStoredSessionWallet("Stored session wallet is not active");
         }
 
-        private (EoaWallet, string) AttemptToCreateWalletFromSecureStorage()
+        private (EOAWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             string walletInfo = secureStorage.RetrieveString(_walletKey);
@@ -229,7 +229,7 @@ namespace Sequence.WaaS
             string[] walletInfoSplit = walletInfo.Split('-');
             string privateKey = walletInfoSplit[0];
             string waasWalletAddress = walletInfoSplit[1];
-            EoaWallet wallet = new EoaWallet(privateKey);
+            EOAWallet wallet = new EOAWallet(privateKey);
             return (wallet, waasWalletAddress);
         }
         

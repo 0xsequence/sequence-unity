@@ -7,9 +7,9 @@ namespace Sequence.Relayer.Tests
     public class MintingRequestProverTests
     {
         [Test]
-        public async Task TestEoaAuthenticationProofGeneration()
+        public async Task TestEOAAuthenticationProofGeneration()
         {
-            EoaWallet wallet = new EoaWallet();
+            EOAWallet wallet = new EOAWallet();
             MintingRequestProver prover = new MintingRequestProver(wallet, Chain.Polygon);
 
             MintingRequestProof mintingRequestProof = await prover.GenerateProof("0x75700a9dC31ff38b93EafDC380c28e1B816f6799", "tokenId", 5);

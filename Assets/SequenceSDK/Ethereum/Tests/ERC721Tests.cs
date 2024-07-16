@@ -17,9 +17,9 @@ namespace Sequence.Ethereum.Tests
     // Note - these tests are designed to be ran sequentially as they will all share the same testnet
     public class ERC721Tests
     {
-        EoaWallet wallet1 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-        EoaWallet wallet2 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
-        EoaWallet randomWallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000006");
+        EOAWallet wallet1 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+        EOAWallet wallet2 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
+        EOAWallet randomWallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000006");
         SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
         string contractAddress;
 

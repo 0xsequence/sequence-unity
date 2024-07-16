@@ -25,7 +25,7 @@ namespace Sequence.WaaS.Tests
         
         public WaaSToWalletAdapterTests(WaaS.IWallet wallet)
         {
-            _wallet = new SequenceWalletToEoaWalletAdapter(wallet);
+            _wallet = new SequenceWalletToEOAWalletAdapter(wallet);
             GetAddress();
             _client = new SequenceEthClient(_polygonNode);
         }

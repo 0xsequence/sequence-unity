@@ -42,40 +42,40 @@ namespace Sequence.Ethereum.Tests
         public void TestChain_AddressesTests()
         {
             string address_0_expected = "0xc683a014955b75F5ECF991d4502427c8fa1Aa249";
-            EoaWallet wallet0 = new EoaWallet(privKey0);
+            EOAWallet wallet0 = new EOAWallet(privKey0);
             string address_0 = wallet0.GetAddress();
             Debug.Log("address 0 from wallet: " + address_0);
             CollectionAssert.AreEqual(address_0_expected, address_0);
 
 
             string address_1_expected = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
-            EoaWallet wallet1 = new EoaWallet(privKey1);
+            EOAWallet wallet1 = new EOAWallet(privKey1);
             string address_1 = wallet1.GetAddress();
             Debug.Log("address 1 from wallet: " + address_1);
             CollectionAssert.AreEqual(address_1_expected, address_1);
 
             string address_2_expected = "0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa";
-            EoaWallet wallet2 = new EoaWallet(privKey2);
+            EOAWallet wallet2 = new EOAWallet(privKey2);
             string address_2 = wallet2.GetAddress();
             Debug.Log("address 2 from wallet: " + address_2);
             CollectionAssert.AreEqual(address_2_expected, address_2);
 
 
             string address_3_expected = "0xb396CbD9b745Ffc4a9C9A6D43D7957b1350Be153";
-            EoaWallet wallet3 = new EoaWallet(privKey3);
+            EOAWallet wallet3 = new EOAWallet(privKey3);
             string address_3 = wallet3.GetAddress();
             Debug.Log("address 3 from wallet: " + address_3);
             CollectionAssert.AreEqual(address_3_expected, address_3);
 
 
             string address_4_expected = "0x6F5Ddb00e3cb99Dfd9A07885Ea91303629D1DA94";
-            EoaWallet wallet4 = new EoaWallet(privKey4);
+            EOAWallet wallet4 = new EOAWallet(privKey4);
             string address_4 = wallet4.GetAddress();
             Debug.Log("address 4 from wallet: " + address_4);
             CollectionAssert.AreEqual(address_4_expected, address_4);
 
             string address_5_expected = "0x3F96a0D6697e5E7ACEC56A21681195dC6262b06C";
-            EoaWallet wallet5 = new EoaWallet(privKey5);
+            EOAWallet wallet5 = new EOAWallet(privKey5);
             string address_5 = wallet5.GetAddress();
             Debug.Log("address 5 from wallet: " + address_5);
             CollectionAssert.AreEqual(address_5_expected, address_5);
@@ -90,7 +90,7 @@ namespace Sequence.Ethereum.Tests
             //{ from: account0Address, to: account1Address, value: "12300000000000000000", gasLimit: 100000, gasPrice: 100 } 
             try
             {
-                EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+                EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
                 SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
                 string to = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
                 BigInteger value = 12300000000;
@@ -114,7 +114,7 @@ namespace Sequence.Ethereum.Tests
         {
             try
             {
-                EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+                EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
                 SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
                 string to = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
                 BigInteger value = 12300000000;
@@ -140,7 +140,7 @@ namespace Sequence.Ethereum.Tests
             try
             {
                 SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
-                EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+                EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
                 ContractDeploymentResult result = await ContractDeployer.Deploy(client, wallet, bytecode_ERC20Mock,
                     gasPrice_ERC20Mock, gasLimit_ERC20Mock);
                 TransactionReceipt receipt = result.Receipt;
@@ -162,7 +162,7 @@ namespace Sequence.Ethereum.Tests
             {
                 //Deploy First
                 SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
-                EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+                EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
                 ContractDeploymentResult deployResult = await ContractDeployer.Deploy(client, wallet, bytecode_ERC20Mock,
                     gasPrice_ERC20Mock, gasLimit_ERC20Mock);
                 TransactionReceipt receipt = deployResult.Receipt;
@@ -179,7 +179,7 @@ namespace Sequence.Ethereum.Tests
                     }
                  */
 
-                EoaWallet wallet2 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
+                EOAWallet wallet2 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
                 Contract mockERC20 = new Contract(receipt.contractAddress);
                 string result = await mockERC20.SendTransactionMethod(wallet2, client, 0,
                     "mockMint(address , uint256)",
@@ -219,7 +219,7 @@ namespace Sequence.Ethereum.Tests
 
             string expected_signed_transaction =
                 "0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83";
-            EoaWallet wallet = new EoaWallet("0x4646464646464646464646464646464646464646464646464646464646464646");
+            EOAWallet wallet = new EOAWallet("0x4646464646464646464646464646464646464646464646464646464646464646");
             (string v, string r, string s) =
                 wallet.SignTransaction(SequenceCoder.HexStringToByteArray(expected_signing_hash), "1");
             int id = "1".HexStringToInt();
@@ -234,7 +234,7 @@ namespace Sequence.Ethereum.Tests
         [Test]
         public void TestWalletRandom()
         {
-            EoaWallet wallet = new EoaWallet();
+            EOAWallet wallet = new EOAWallet();
             Assert.NotNull(wallet);
 
         }
@@ -242,7 +242,7 @@ namespace Sequence.Ethereum.Tests
         [Test]
         public async Task TestWalletSignMessage()
         {
-            EoaWallet wallet = new EoaWallet();
+            EOAWallet wallet = new EOAWallet();
 
             string address = wallet.GetAddress();
             Assert.NotNull(address);
@@ -256,9 +256,9 @@ namespace Sequence.Ethereum.Tests
 
         private static IEnumerable<object[]> iWalletTestCases()
         {
-            yield return new object[] { new EoaWallet(), "SDK by Horizon", Chain.Polygon };
-            yield return new object[] { new EoaWallet(), "",  Chain.Ethereum };
-            yield return new object[] { new EoaWallet(), DecodeABITests.longMultiLineString, Chain.TestnetSepolia };
+            yield return new object[] { new EOAWallet(), "SDK by Horizon", Chain.Polygon };
+            yield return new object[] { new EOAWallet(), "",  Chain.Ethereum };
+            yield return new object[] { new EOAWallet(), DecodeABITests.longMultiLineString, Chain.TestnetSepolia };
         }
 
         [TestCaseSource(nameof(iWalletTestCases))]
@@ -277,7 +277,7 @@ namespace Sequence.Ethereum.Tests
         [Test]
         public async Task TestWalletSignMessageExistingPrefix()
         {
-            EoaWallet wallet = new EoaWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+            EOAWallet wallet = new EOAWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
             CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
             string address = wallet.GetAddress();
@@ -295,7 +295,7 @@ namespace Sequence.Ethereum.Tests
         public async Task TestWalletSignMessageFromPrivateKey()
         {
 
-            EoaWallet wallet = new EoaWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+            EOAWallet wallet = new EOAWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
              CollectionAssert.AreEqual(  SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
             string address = wallet.GetAddress();
@@ -313,7 +313,7 @@ namespace Sequence.Ethereum.Tests
         [Test]
         public async Task TestWalletSignAndRecover()
         {
-            EoaWallet wallet = new EoaWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
+            EOAWallet wallet = new EOAWallet("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01");
             CollectionAssert.AreEqual(SequenceCoder.HexStringToByteArray("b3c503217dbb0fae8950dadf73e2f500e968abddb95e22306ba95bbc7301cc01"), wallet.privKey.sec.ToBytes());
 
             string address = wallet.GetAddress();
@@ -332,7 +332,7 @@ namespace Sequence.Ethereum.Tests
         [Test]
         public async Task TestSendTransactionBatchAndWaitForReceipts()
         {
-            EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             string recipient1 = "0x1099542D7dFaF6757527146C0aB9E70A967f71C0";
             string recipient2 = "0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa";
@@ -358,7 +358,7 @@ namespace Sequence.Ethereum.Tests
         [Test]
         public async Task TestSendTransactionBatchAndWaitForReceipts_emptyBatch()
         {
-            EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
             SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
             EthTransaction[] transactions = new EthTransaction[] {};
 

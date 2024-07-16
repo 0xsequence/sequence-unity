@@ -49,7 +49,7 @@ namespace Sequence.Demo
 
         private async Task CreateAdapter()
         {
-            _adapter = new SequenceWalletToEoaWalletAdapter(_wallet);
+            _adapter = new SequenceWalletToEOAWalletAdapter(_wallet);
         }
         
         public void SignMessage()

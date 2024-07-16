@@ -22,8 +22,8 @@ namespace Sequence.Ethereum.Tests
         float blockTimeInSeconds = 2f;
         IRpcClient failingClient = new FailingRpcClient();
         const string validAddress = "0x3F96a0D6697e5E7ACEC56A21681195dC6262b06C";
-        EoaWallet wallet1 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-        EoaWallet wallet2 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
+        EOAWallet wallet1 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+        EOAWallet wallet2 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
 
         [Test]
         public async Task TestBalanceAt()
@@ -394,8 +394,8 @@ namespace Sequence.Ethereum.Tests
         {
             try
             {
-                EoaWallet wallet = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
-                EoaWallet wallet2 = new EoaWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
+                EOAWallet wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+                EOAWallet wallet2 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
                 SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
                 string result = await wallet.SendTransaction(client, wallet2.GetAddress(), 1);
 
