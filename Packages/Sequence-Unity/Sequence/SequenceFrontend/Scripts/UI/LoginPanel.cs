@@ -39,7 +39,7 @@ namespace Sequence.Demo
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            WaaS.Wallet.OnFailedToRecoverSession += OnFailedToLoginWithStoredSessionWalletHandler;
+            WaaS.SequenceWallet.OnFailedToRecoverSession += OnFailedToLoginWithStoredSessionWalletHandler;
 
             _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
             
@@ -92,7 +92,7 @@ namespace Sequence.Demo
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
-            WaaS.Wallet.OnWalletCreated += OnWaaSWalletCreatedHandler;
+            WaaS.SequenceWallet.OnWalletCreated += OnWaaSWalletCreatedHandler;
             
             GameObject popupPanel = Instantiate(_federatedAuthPopupPanelPrefab, transform.parent);
             _federatedAuthPopupPanel = popupPanel.GetComponent<FederatedAuthPopupPanel>();
@@ -154,7 +154,7 @@ namespace Sequence.Demo
         }
 #endif
 
-        private void OnWaaSWalletCreatedHandler(WaaS.Wallet wallet)
+        private void OnWaaSWalletCreatedHandler(WaaS.SequenceWallet wallet)
         {
             if (_waasDemoPage != null)
             {

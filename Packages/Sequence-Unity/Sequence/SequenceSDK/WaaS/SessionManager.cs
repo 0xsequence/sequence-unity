@@ -10,7 +10,7 @@ namespace Sequence.WaaS
     {
         public static SessionManager Instance;
         
-        private List<Wallet> _sessions = new List<Wallet>();
+        private List<SequenceWallet> _sessions = new List<SequenceWallet>();
 
         private void Awake()
         {
@@ -24,10 +24,10 @@ namespace Sequence.WaaS
                 Destroy(gameObject);
             }
             
-            Wallet.OnWalletCreated += AddSession;
+            SequenceWallet.OnWalletCreated += AddSession;
         }
 
-        private void AddSession(Wallet sessionWallet)
+        private void AddSession(SequenceWallet sessionWallet)
         {
             _sessions.Add(sessionWallet);
         }
@@ -48,8 +48,8 @@ namespace Sequence.WaaS
 
         private void OnDestroy()
         {
-            Wallet.OnWalletCreated -= AddSession;
-            _sessions = new List<Wallet>();
+            SequenceWallet.OnWalletCreated -= AddSession;
+            _sessions = new List<SequenceWallet>();
         }
     }
 }

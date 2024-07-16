@@ -15,7 +15,7 @@ namespace Sequence.Relayer
     {
         public static async Task<bool> IsValidMintingRequestProof(Chain chain, MintingRequestProof proof)
         {
-            WaaS.Wallet wallet = new WaaS.Wallet(proof.SigningAddress, null, null);
+            WaaS.SequenceWallet wallet = new WaaS.SequenceWallet(proof.SigningAddress, null, null);
 
             try
             {

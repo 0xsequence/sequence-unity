@@ -20,18 +20,18 @@ namespace Sequence.Demo
     {
         [SerializeField] private TextMeshProUGUI _resultText;
         
-        private WaaS.Wallet _wallet;
+        private WaaS.SequenceWallet _wallet;
         private Address _address;
         private IWallet _adapter;
         
         public override void Open(params object[] args)
         {
             _wallet =
-                args.GetObjectOfTypeIfExists<WaaS.Wallet>();
+                args.GetObjectOfTypeIfExists<WaaS.SequenceWallet>();
             if (_wallet == default)
             {
                 throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(WaaS.Wallet)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(WaaS.SequenceWallet)} as an argument");
             }
             _gameObject.SetActive(true);
             _animator.AnimateIn( _openAnimationDurationInSeconds);
@@ -49,7 +49,7 @@ namespace Sequence.Demo
 
         private async Task CreateAdapter()
         {
-            _adapter = new WalletToEoaWalletAdapter(_wallet);
+            _adapter = new SequenceWalletToEoaWalletAdapter(_wallet);
         }
         
         public void SignMessage()

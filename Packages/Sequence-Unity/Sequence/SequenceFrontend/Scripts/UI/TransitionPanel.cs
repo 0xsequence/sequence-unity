@@ -18,7 +18,7 @@ namespace Sequence.Demo
         {
             base.Awake();
             _ui = FindObjectOfType<SequenceSampleUI>();
-            WaaS.Wallet.OnWalletCreated += (wallet =>
+            WaaS.SequenceWallet.OnWalletCreated += (wallet =>
             {
                 Wallet = wallet;
             });

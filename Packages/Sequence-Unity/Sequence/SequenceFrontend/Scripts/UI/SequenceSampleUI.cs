@@ -32,7 +32,7 @@ namespace Sequence.Demo
                 InitialPanel = _loginPanel;
             }
 
-            WaaS.Wallet.OnWalletCreated += wallet =>
+            WaaS.SequenceWallet.OnWalletCreated += wallet =>
             {
                 wallet.OnDropSessionComplete += s =>
                 {

@@ -20,13 +20,13 @@ namespace Sequence.WaaS.Tests
                 login.OnLoginFailed += (error, method, email) => { Assert.Fail(error); };
                 string email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
                 bool accountFederated = false;
-                Wallet.OnAccountFederated += account =>
+                SequenceWallet.OnAccountFederated += account =>
                 {
                     Assert.Equals(account.email, email);
                     accountFederated = true;
                 };
-                Wallet.OnAccountFederationFailed += error => { Assert.Fail(error); };
-                Wallet.OnWalletCreated += async wallet =>
+                SequenceWallet.OnAccountFederationFailed += error => { Assert.Fail(error); };
+                SequenceWallet.OnWalletCreated += async wallet =>
                 {
                     string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
 

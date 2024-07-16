@@ -187,7 +187,7 @@ namespace Sequence.WaaS
             
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
-            Wallet wallet = new Wallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion));
+            SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion));
 
             EnsureSessionIsValid(wallet);
         }
@@ -195,10 +195,10 @@ namespace Sequence.WaaS
         private void FailedLoginWithStoredSessionWallet(string error)
         {
             CreateWallet();
-            Wallet.OnFailedToRecoverSession?.Invoke(error);
+            SequenceWallet.OnFailedToRecoverSession?.Invoke(error);
         }
 
-        private async Task EnsureSessionIsValid(Wallet wallet)
+        private async Task EnsureSessionIsValid(SequenceWallet wallet)
         {
             WaaSSession[] activeSessions = await wallet.ListSessions();
             if (activeSessions == null || activeSessions.Length == 0)
@@ -213,7 +213,7 @@ namespace Sequence.WaaS
             {
                 if (activeSessions[i].id == expectedSessionId)
                 {
-                    Wallet.OnWalletCreated?.Invoke(wallet);
+                    SequenceWallet.OnWalletCreated?.Invoke(wallet);
                     return;
                 }
             }
@@ -305,7 +305,7 @@ namespace Sequence.WaaS
                 string sessionId = registerSessionResponse.sessionId;
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                Wallet wallet = new Wallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
+                SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(WaaSLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.SetInt($"{email}-{method}", 1);
@@ -315,7 +315,7 @@ namespace Sequence.WaaS
                     StoreWalletSecurely(walletAddress);
                 }
                 _isLoggingIn = false;
-                Wallet.OnWalletCreated?.Invoke(wallet);
+                SequenceWallet.OnWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
             {
@@ -470,11 +470,11 @@ namespace Sequence.WaaS
                 _failedLoginEmail = "";
                 _failedLoginIntent = null;
                 _failedLoginMethod = LoginMethod.None;
-                Wallet.OnAccountFederated?.Invoke(account);
+                SequenceWallet.OnAccountFederated?.Invoke(account);
             }
             catch (Exception e)
             {
-                Wallet.OnAccountFederationFailed?.Invoke("Error federating account: " + e.Message);
+                SequenceWallet.OnAccountFederationFailed?.Invoke("Error federating account: " + e.Message);
             }
         }
         
