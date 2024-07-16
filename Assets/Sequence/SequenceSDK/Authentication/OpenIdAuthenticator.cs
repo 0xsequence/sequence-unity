@@ -121,6 +121,7 @@ namespace Sequence.Authentication
         {
             try
             {
+                throw new NotImplementedException("Discord sign in is not yet supported");
                 if (string.IsNullOrWhiteSpace(DiscordClientId))
                 {
                     throw SequenceConfig.MissingConfigError("Discord Client Id");
@@ -142,6 +143,7 @@ namespace Sequence.Authentication
         {
             try
             {
+                throw new NotImplementedException("Facebook sign in is not yet supported");
                 if (string.IsNullOrWhiteSpace(FacebookClientId))
                 {
                     throw SequenceConfig.MissingConfigError("Facebook Client Id");
