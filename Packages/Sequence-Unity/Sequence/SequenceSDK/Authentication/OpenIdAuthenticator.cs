@@ -50,7 +50,7 @@ namespace Sequence.Authentication
             SetClientIds(config);
             
 #if UNITY_EDITOR
-            InjectRedirectUrl("https://be9d-184-146-195-10.ngrok-free.app");
+            InjectRedirectUrl("http://localhost:8080/");
 #endif
             _browser = CreateBrowser();
         }
@@ -118,6 +118,7 @@ namespace Sequence.Authentication
         {
             try
             {
+                throw new NotImplementedException("Discord sign in is not yet supported");
                 if (string.IsNullOrWhiteSpace(DiscordClientId))
                 {
                     throw SequenceConfig.MissingConfigError("Discord Client Id");
@@ -139,6 +140,7 @@ namespace Sequence.Authentication
         {
             try
             {
+                throw new NotImplementedException("Facebook sign in is not yet supported");
                 if (string.IsNullOrWhiteSpace(FacebookClientId))
                 {
                     throw SequenceConfig.MissingConfigError("Facebook Client Id");
