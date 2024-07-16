@@ -11,10 +11,10 @@ namespace Sequence.WaaS
         private string _titleId;
         private string _sessionTicket;
         private string _sessionId;
-        private Wallet.IWallet _sessionWallet;
+        private Sequence.Wallet.IWallet _sessionWallet;
         private IWaaSConnector _connector;
         
-        public PlayFabConnector(string titleId, string sessionTicket, string sessionId, Wallet.IWallet sessionWallet, IWaaSConnector connector)
+        public PlayFabConnector(string titleId, string sessionTicket, string sessionId, Sequence.Wallet.IWallet sessionWallet, IWaaSConnector connector)
         {
             _titleId = titleId;
             _sessionTicket = sessionTicket;

@@ -9,10 +9,10 @@ namespace Sequence.WaaS
     public class GuestConnector
     {
         private string _sessionId;
-        private Wallet.IWallet _sessionWallet;
+        private Sequence.Wallet.IWallet _sessionWallet;
         private IWaaSConnector _connector;
 
-        public GuestConnector(string sessionId, Wallet.IWallet sessionWallet, IWaaSConnector connector)
+        public GuestConnector(string sessionId, Sequence.Wallet.IWallet sessionWallet, IWaaSConnector connector)
         {
             _sessionId = sessionId;
             _sessionWallet = sessionWallet;

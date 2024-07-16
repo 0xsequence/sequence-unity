@@ -10,7 +10,7 @@ namespace Sequence.WaaS.Tests
 {
     public class WaaSToWalletAdapterTests
     {
-        private Wallet.IWallet _wallet;
+        private Sequence.Wallet.IWallet _wallet;
         private string _address;
         private string _toAddress = "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f";
         private string _polygonNode = "https://polygon-bor.publicnode.com";

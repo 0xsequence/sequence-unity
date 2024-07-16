@@ -28,7 +28,7 @@ namespace Sequence.WaaS
         
         private static string PrepareMessage(string message)
         {
-            return Wallet.IWallet.PrefixedMessage(Encoding.UTF8.GetBytes(message)).ByteArrayToHexString().ToUpper().EnsureHexPrefix();
+            return Sequence.Wallet.IWallet.PrefixedMessage(Encoding.UTF8.GetBytes(message)).ByteArrayToHexString().ToUpper().EnsureHexPrefix();
         }
     }
 }

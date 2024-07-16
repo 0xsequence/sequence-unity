@@ -10,12 +10,12 @@ namespace Sequence.WaaS
     internal class EmailConnector
     {
         private string _sessionId;
-        private Wallet.IWallet _sessionWallet;
+        private Sequence.Wallet.IWallet _sessionWallet;
         private IWaaSConnector _connector;
         private IValidator _validator;
         private string _emailChallenge;
 
-        public EmailConnector(string sessionId, Wallet.IWallet sessionWallet, IWaaSConnector connector, IValidator validator)
+        public EmailConnector(string sessionId, Sequence.Wallet.IWallet sessionWallet, IWaaSConnector connector, IValidator validator)
         {
             _sessionId = sessionId;
             _sessionWallet = sessionWallet;

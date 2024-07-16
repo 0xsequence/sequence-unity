@@ -20,7 +20,7 @@ namespace GuestLogin
             {
                 Debug.LogError(error);
             };
-            EmbeddedWallet.OnWalletCreated += OnWaaSWalletCreated;
+            Wallet.OnWalletCreated += OnWaaSWalletCreated;
         }
 
         private void Start()
@@ -28,7 +28,7 @@ namespace GuestLogin
             _login.GuestLogin();
         }
 
-        private void OnWaaSWalletCreated(EmbeddedWallet wallet)
+        private void OnWaaSWalletCreated(Wallet wallet)
         {
             TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
             text.text = "Logged in as: " + wallet.GetWalletAddress();

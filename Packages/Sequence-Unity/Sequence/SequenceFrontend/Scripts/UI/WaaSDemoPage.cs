@@ -20,18 +20,18 @@ namespace Sequence.Demo
     {
         [SerializeField] private TextMeshProUGUI _resultText;
         
-        private EmbeddedWallet _wallet;
+        private WaaS.Wallet _wallet;
         private Address _address;
         private IWallet _adapter;
         
         public override void Open(params object[] args)
         {
             _wallet =
-                args.GetObjectOfTypeIfExists<EmbeddedWallet>();
+                args.GetObjectOfTypeIfExists<WaaS.Wallet>();
             if (_wallet == default)
             {
                 throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(EmbeddedWallet)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(WaaS.Wallet)} as an argument");
             }
             _gameObject.SetActive(true);
             _animator.AnimateIn( _openAnimationDurationInSeconds);

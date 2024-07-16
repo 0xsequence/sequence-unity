@@ -10,10 +10,10 @@ namespace Sequence.WaaS
     {
         private string _idToken;
         private string _sessionId;
-        private Wallet.IWallet _sessionWallet;
+        private Sequence.Wallet.IWallet _sessionWallet;
         private IWaaSConnector _connector;
 
-        public OIDCConnector(string idToken, string sessionId, Wallet.IWallet sessionWallet, IWaaSConnector connector)
+        public OIDCConnector(string idToken, string sessionId, Sequence.Wallet.IWallet sessionWallet, IWaaSConnector connector)
         {
             _idToken = idToken;
             _sessionId = sessionId;
