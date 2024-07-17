@@ -121,6 +121,7 @@ namespace Sequence.Authentication
         {
             try
             {
+                throw new NotImplementedException("Discord sign in is not yet supported");
                 if (string.IsNullOrWhiteSpace(DiscordClientId))
                 {
                     throw SequenceConfig.MissingConfigError("Discord Client Id");
@@ -128,7 +129,7 @@ namespace Sequence.Authentication
 
                 string state = GenerateState(LoginMethod.Discord);
                 string discordSignInUrl =
-                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, nameof(LoginMethod.Discord));
+                    GenerateSignInUrl("https://discord.com/api/oauth2/authorize", DiscordClientId, state);
                 _browser.SetState(state);
                 _browser.Authenticate(discordSignInUrl);
             }
@@ -142,6 +143,7 @@ namespace Sequence.Authentication
         {
             try
             {
+                throw new NotImplementedException("Facebook sign in is not yet supported");
                 if (string.IsNullOrWhiteSpace(FacebookClientId))
                 {
                     throw SequenceConfig.MissingConfigError("Facebook Client Id");
@@ -149,7 +151,7 @@ namespace Sequence.Authentication
 
                 string state = GenerateState(LoginMethod.Facebook);
                 string facebookSignInUrl =
-                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, nameof(LoginMethod.Facebook));
+                    GenerateSignInUrl("https://www.facebook.com/v18.0/dialog/oauth", FacebookClientId, state);
                 _browser.SetState(state);
                 _browser.Authenticate(facebookSignInUrl);
             }
@@ -170,7 +172,7 @@ namespace Sequence.Authentication
 
                 string state = GenerateState(LoginMethod.Apple);
                 string appleSignInUrl =
-                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, nameof(LoginMethod.Apple));
+                    GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, state);
                 appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
                 _browser.SetState(state);
 #if UNITY_IOS
