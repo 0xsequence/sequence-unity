@@ -59,14 +59,13 @@ namespace Sequence.EmbeddedWallet
 
         public async Task Login(string email)
         {
-            if (!_validator.ValidateEmail(email))
-            {
-                throw new Exception($"Invalid email: {email}");
-                return;
-            }
-            
             try
             {
+                if (!_validator.ValidateEmail(email))
+                {
+                    throw new Exception($"Invalid email: {email}");
+                }
+                
                 string emailChallenge = await InitiateAuthEmail(email);
                 if (string.IsNullOrEmpty(emailChallenge))
                 {

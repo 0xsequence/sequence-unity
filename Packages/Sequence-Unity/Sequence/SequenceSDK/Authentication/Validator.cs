@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace Sequence.Authentication
@@ -6,8 +7,16 @@ namespace Sequence.Authentication
     {
         public bool ValidateEmail(string email)
         {
-            string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            return Regex.IsMatch(email, pattern);
+            try
+            {
+                MailAddress mailAddress = new MailAddress(email);
+                bool isValid = mailAddress.Address == email;
+                return isValid;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool ValidateCode(string code)

@@ -346,6 +346,7 @@ namespace Sequence.EmbeddedWallet
             catch (Exception e)
             {
                 OnLoginFailed?.Invoke("Error initiating auth: " + e.Message, method);
+                challenge = "Error initiating auth: " + e.Message;
                 _isLoggingIn = false;
             }
 
