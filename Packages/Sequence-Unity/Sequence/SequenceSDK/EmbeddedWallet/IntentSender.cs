@@ -116,9 +116,9 @@ namespace Sequence.EmbeddedWallet
             return result;
         }
 
-        public async Task<WaaSSession[]> ListSessions()
+        public async Task<Session[]> ListSessions()
         {
-            WaaSSession[] sessions = await SendIntent<WaaSSession[], IntentDataListSessions>(
+            Session[] sessions = await SendIntent<Session[], IntentDataListSessions>(
                 new IntentDataListSessions(_sessionWallet.GetAddress()), IntentType.ListSessions);
             return sessions;
         }

@@ -41,7 +41,7 @@ namespace Sequence.Editor
         }
 
         private static Exception _missingUrlSchemeException = new BuildFailedException(
-            "URL Scheme not set in Unity Editor. Please follow the instructions here or social sign in will not work! https://docs.sequence.xyz/unity-waas-sdk/authentication");
+            "URL Scheme not set in Unity Editor. Please follow the instructions here or social sign in will not work! https://docs.sequence.xyz/sdk/unity/authentication");
         
         private static void CheckPlistUrlScheme()
         {

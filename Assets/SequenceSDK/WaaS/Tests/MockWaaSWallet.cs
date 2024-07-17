@@ -53,8 +53,8 @@ namespace Sequence.EmbeddedWallet
             throw new NotImplementedException();
         }
 
-        public event Action<WaaSSession[]> OnSessionsFound;
-        public Task<WaaSSession[]> ListSessions()
+        public event Action<Session[]> OnSessionsFound;
+        public Task<Session[]> ListSessions()
         {
             throw new NotImplementedException();
         }

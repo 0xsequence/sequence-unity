@@ -191,7 +191,7 @@ namespace Sequence.EmbeddedWallet
 
         private async Task EnsureSessionIsValid(SequenceWallet wallet)
         {
-            WaaSSession[] activeSessions = await wallet.ListSessions();
+            Session[] activeSessions = await wallet.ListSessions();
             if (activeSessions == null || activeSessions.Length == 0)
             {
                 FailedLoginWithStoredSessionWallet("No active sessions found");

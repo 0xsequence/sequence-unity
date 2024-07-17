@@ -3,7 +3,7 @@ using System;
 namespace Sequence.EmbeddedWallet
 {
     [Serializable]
-    public class WaaSSession
+    public class Session
     {
         public string id;
         public string address;

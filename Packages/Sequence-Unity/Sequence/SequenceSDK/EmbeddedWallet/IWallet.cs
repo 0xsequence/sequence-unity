@@ -78,7 +78,7 @@ namespace Sequence.EmbeddedWallet
         /// </summary>
         /// <returns></returns>
         public Task<bool> DropThisSession();
-        public event Action<WaaSSession[]> OnSessionsFound;
+        public event Action<Session[]> OnSessionsFound;
         
         /// <summary>
         /// Find all active sessions registered with the API associated with this user
@@ -86,7 +86,7 @@ namespace Sequence.EmbeddedWallet
         /// Can be awaited directly and/or you can subscribe to the OnSessionsFound event
         /// </summary>
         /// <returns></returns>
-        public Task<WaaSSession[]> ListSessions();
+        public Task<Session[]> ListSessions();
         
         /// <summary>
         /// Continually poll the API for a TransactionReceipt

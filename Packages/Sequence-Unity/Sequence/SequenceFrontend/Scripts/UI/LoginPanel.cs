@@ -12,7 +12,7 @@ namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
-        [SerializeField] private GameObject _waaSSessionManagerPrefab;
+        [SerializeField] private GameObject _sessionManagerPrefab;
         [SerializeField] private GameObject _federatedAuthPopupPanelPrefab;
         private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
@@ -20,7 +20,7 @@ namespace Sequence.Demo
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
-        private WaaSDemoPage _waasDemoPage;
+        private EmbeddedWalletDemoPage _demoPage;
         private static string _urlScheme;
         private FederatedAuthPopupPanel _federatedAuthPopupPanel;
         internal ILogin LoginHandler { get; private set; }
@@ -35,11 +35,11 @@ namespace Sequence.Demo
             _loginPage = GetComponentInChildren<LoginPage>();
             _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
 
-            _waasDemoPage = FindObjectOfType<WaaSDemoPage>();
+            _demoPage = FindObjectOfType<EmbeddedWalletDemoPage>();
 
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            SequenceWallet.OnFailedToRecoverSession += OnFailedToLoginWithStoredSessionWalletHandler;
+            SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
 
             _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
             
@@ -92,7 +92,7 @@ namespace Sequence.Demo
             _mfaPage.SetupLogin(loginHandler);
             loginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             
-            SequenceWallet.OnWalletCreated += OnWaaSWalletCreatedHandler;
+            SequenceWallet.OnWalletCreated += OnWalletCreatedHandler;
             
             GameObject popupPanel = Instantiate(_federatedAuthPopupPanelPrefab, transform.parent);
             _federatedAuthPopupPanel = popupPanel.GetComponent<FederatedAuthPopupPanel>();
@@ -103,12 +103,12 @@ namespace Sequence.Demo
 
             popupPanel.SetActive(false);
 
-            Instantiate(_waaSSessionManagerPrefab);
+            Instantiate(_sessionManagerPrefab);
         } 
         
-        private void OnFailedToLoginWithStoredSessionWalletHandler(string error)
+        private void OnFailedToRecoverSession(string error)
         {
-            Debug.LogWarning($"Failed to connect to Sequence API with stored session wallet: {error}");
+            Debug.LogWarning($"Failed to recover session with Sequence API using stored session wallet: {error}");
             Open(true);
         }
 
@@ -154,11 +154,11 @@ namespace Sequence.Demo
         }
 #endif
 
-        private void OnWaaSWalletCreatedHandler(SequenceWallet wallet)
+        private void OnWalletCreatedHandler(SequenceWallet wallet)
         {
-            if (_waasDemoPage != null)
+            if (_demoPage != null)
             {
-                _waasDemoPage.Open(wallet);
+                _demoPage.Open(wallet);
             }
             else if (_storeSessionInfoAndSkipLoginWhenPossible)
             {

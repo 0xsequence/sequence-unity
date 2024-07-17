@@ -13,7 +13,7 @@ using IWallet = Sequence.Wallet.IWallet;
 
 namespace Sequence.Demo
 {
-    public class WaaSDemoPage : UIPage
+    public class EmbeddedWalletDemoPage : UIPage
     {
         [SerializeField] private TextMeshProUGUI _resultText;
         
@@ -269,7 +269,7 @@ namespace Sequence.Demo
             _wallet.ListSessions();
         }
         
-        private void OnSessionsListed(WaaSSession[] sessions)
+        private void OnSessionsListed(Session[] sessions)
         {
             _resultText.text = $"Found {sessions.Length} sessions";
         }

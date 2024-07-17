@@ -215,10 +215,10 @@ namespace Sequence.EmbeddedWallet
             return DropSession(SessionId);
         }
 
-        public event Action<WaaSSession[]> OnSessionsFound;
-        public async Task<WaaSSession[]> ListSessions()
+        public event Action<Session[]> OnSessionsFound;
+        public async Task<Session[]> ListSessions()
         {
-            WaaSSession[] results = null;
+            Session[] results = null;
             try
             {
                 results = await _intentSender.ListSessions();
