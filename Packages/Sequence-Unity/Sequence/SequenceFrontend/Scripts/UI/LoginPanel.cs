@@ -7,12 +7,13 @@ using UnityEngine;
 using Sequence.Config;
 using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
+using UnityEngine.Serialization;
 
 namespace Sequence.Demo
 {
     public class LoginPanel : UIPanel
     {
-        [SerializeField] private GameObject _sessionManagerPrefab;
+        [FormerlySerializedAs("_waaSSessionManagerPrefab")] [SerializeField] private GameObject _sessionManagerPrefab;
         [SerializeField] private GameObject _federatedAuthPopupPanelPrefab;
         private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
