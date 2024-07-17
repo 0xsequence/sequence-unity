@@ -78,7 +78,6 @@ namespace Sequence.Indexer.Tests
             {
                 IIndexer chainIndexer = new ChainIndexer(chain);
                 result = await chainIndexer.RuntimeStatus();
-                
             }
             catch (Exception e)
             {
