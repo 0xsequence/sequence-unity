@@ -27,9 +27,9 @@ namespace Sequence.Config
         public string AppleClientIdAndroid;
 
         [Header("WaaS Configuration")]
-        public string WaaSVersion = "1.0.0";
         public string WaaSConfigKey;
         public bool EnableAccountOverride = false;
+        public string WaaSVersion { get; private set; } = "1.3.0";
 
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
