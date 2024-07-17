@@ -19,7 +19,7 @@ namespace Sequence.EmbeddedWallet
         {
             if (to == StringExtensions.ZeroAddress)
             {
-                to = WaaSZeroAddress;
+                to = ZeroAddress;
             }
             this.to = to;
             this.value = value;
@@ -31,7 +31,7 @@ namespace Sequence.EmbeddedWallet
             string to = transaction.To;
             if (to == StringExtensions.ZeroAddress)
             {
-                to = WaaSZeroAddress;
+                to = ZeroAddress;
             }
             this.to = to;
             this.value = transaction.Value.ToString();
@@ -43,7 +43,7 @@ namespace Sequence.EmbeddedWallet
             string to = contract.GetAddress();
             if (to == StringExtensions.ZeroAddress)
             {
-                to = WaaSZeroAddress;
+                to = ZeroAddress;
             }
             this.to = to;
             this.value = BigInteger.Zero.ToString();
@@ -55,7 +55,7 @@ namespace Sequence.EmbeddedWallet
             string to = callContractFunction.Address;
             if (to == StringExtensions.ZeroAddress)
             {
-                to = WaaSZeroAddress;
+                to = ZeroAddress;
             }
 
             this.to = to;

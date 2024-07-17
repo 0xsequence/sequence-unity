@@ -222,9 +222,9 @@ namespace Sequence.EmbeddedWallet
             }
             string[] walletInfoSplit = walletInfo.Split('-');
             string privateKey = walletInfoSplit[0];
-            string waasWalletAddress = walletInfoSplit[1];
+            string walletAddress = walletInfoSplit[1];
             EOAWallet wallet = new EOAWallet(privateKey);
-            return (wallet, waasWalletAddress);
+            return (wallet, walletAddress);
         }
         
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
@@ -310,7 +310,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error registering waaSSession: " + e.Message, method, email);
+                OnLoginFailed?.Invoke("Error registering session: " + e.Message, method, email);
                 _isLoggingIn = false;
                 _failedLoginIntent = loginIntent;
                 _failedLoginMethod = method;
@@ -373,12 +373,12 @@ namespace Sequence.EmbeddedWallet
             ConnectToWaaSViaPlayFab(titleId, sessionTicket, email);
         }
 
-        public void OverrideAccount()
+        public void ForceCreateAccount()
         {
-            OverrideWaaSAccount();
+            ForceCreateWaaSAccount();
         }
 
-        private async Task OverrideWaaSAccount()
+        private async Task ForceCreateWaaSAccount()
         {
             _failedLoginIntent.forceCreateAccount = true;
             

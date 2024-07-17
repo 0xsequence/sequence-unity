@@ -11,7 +11,7 @@ namespace Sequence.Relayer.Tests
     public class WaaSTransactionQueuerTests : MonoBehaviour
     {
         private MonoBehaviour _testMonobehaviour;
-        private WaaSTransactionQueuer _queuer;
+        private SequenceWalletTransactionQueuer _queuer;
         private Address _fromAddress = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
         private Address _toAddress = new Address("0x1099542D7dFaF6757527146C0aB9E70A967f71C0");
         private Address _contract = new Address("0x606e6d28e9150D8A3C070AEfB751a2D0C5DB19fa");
@@ -21,7 +21,7 @@ namespace Sequence.Relayer.Tests
         {
             GameObject testObject = Instantiate(new GameObject("TestObject"));
             _testMonobehaviour = testObject.AddComponent<TestClass>();
-            _queuer = _testMonobehaviour.gameObject.AddComponent<WaaSTransactionQueuer>();
+            _queuer = _testMonobehaviour.gameObject.AddComponent<SequenceWalletTransactionQueuer>();
             _queuer.Setup(new MockWaaSWallet(), Chain.None);
             yield return null;
         }

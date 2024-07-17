@@ -98,7 +98,7 @@ namespace Sequence.Authentication
         /// <summary>
         /// Retry authentication, forcing a new account to be created. This will delete and override the account with the cached email if it exists.
         /// </summary>
-        public void OverrideAccount();
+        public void ForceCreateAccount();
 
         /// <summary>
         /// Get all the login methods that are associated with an email

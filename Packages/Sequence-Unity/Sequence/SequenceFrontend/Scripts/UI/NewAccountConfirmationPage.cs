@@ -30,7 +30,7 @@ namespace Sequence.Demo
 
         public void NewAccount()
         {
-            _login.OverrideAccount();
+            _login.ForceCreateAccount();
             _federatedAuthPopupPanel.Close();
         }
 

@@ -18,10 +18,10 @@ namespace Sequence.Relayer
             _proofSigner = new EOAProofSigner(eoaWallet, _chain);
         }
         
-        public MintingRequestProver(Sequence.EmbeddedWallet.IWallet waasWallet, Chain chain)
+        public MintingRequestProver(Sequence.EmbeddedWallet.IWallet wallet, Chain chain)
         {
             _chain = chain;
-            _proofSigner = new SequenceWalletProofSigner(waasWallet, _chain);
+            _proofSigner = new SequenceWalletProofSigner(wallet, _chain);
         }
 
         public async Task<MintingRequestProof> GenerateProof(string contractAddress, string tokenId, uint amount)

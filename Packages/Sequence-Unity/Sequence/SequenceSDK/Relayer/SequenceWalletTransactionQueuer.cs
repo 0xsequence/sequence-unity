@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 
 namespace Sequence.Relayer
 {
-    public class WaaSTransactionQueuer : TransactionQueuer<IQueueableTransaction, TransactionReturn>
+    public class SequenceWalletTransactionQueuer : TransactionQueuer<IQueueableTransaction, TransactionReturn>
     {
         public override void Enqueue(IQueueableTransaction transaction)
         {

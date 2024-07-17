@@ -101,7 +101,7 @@ namespace Sequence.Authentication
             throw new System.NotImplementedException();
         }
 
-        public void OverrideAccount()
+        public void ForceCreateAccount()
         {
             throw new System.NotImplementedException();
         }
