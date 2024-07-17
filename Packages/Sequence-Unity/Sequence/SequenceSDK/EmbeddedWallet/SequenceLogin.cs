@@ -57,7 +57,7 @@ namespace Sequence.EmbeddedWallet
             
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
             
-            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage;
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform();
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
