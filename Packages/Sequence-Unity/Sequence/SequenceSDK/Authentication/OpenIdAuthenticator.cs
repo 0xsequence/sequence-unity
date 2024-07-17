@@ -399,6 +399,7 @@ namespace Sequence.Authentication
 
         internal LoginMethod GetMethodFromState(string state)
         {
+            state = state.RemoveTrailingSlash();
             if (state.EndsWith(nameof(LoginMethod.Google)))
             {
                 return LoginMethod.Google;
