@@ -174,7 +174,12 @@ namespace Sequence.Ethereum.Tests
         public async Task TestEstimateGas(string url) {
             try {
                 var client = new SequenceEthClient(url);
-                BigInteger gas = await client.EstimateGas(new TransactionCall());
+                BigInteger gas = await client.EstimateGas(new TransactionCall()
+                {
+                    from = wallet1.GetAddress(),
+                    to = wallet2.GetAddress(),
+                    value = 0,
+                });
                 Assert.Greater(gas, BigInteger.Zero);
             }
             catch (Exception ex) {
