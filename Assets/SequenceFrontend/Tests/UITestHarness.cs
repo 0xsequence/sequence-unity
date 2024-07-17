@@ -39,7 +39,7 @@ namespace SequenceExamples.Scripts.Tests
         public IEnumerator LoadSceneAndWaitForAwakeAndStartAndFetchMajorElements()
         {
             SequenceSampleUI.IsTesting = true;
-            SceneManager.LoadScene("SequenceExamples/Scenes/Tests");
+            SceneManager.LoadScene("SequenceFrontend/Scenes/Tests");
             while (_ui == null)
             {
                 yield return null; // Allow object to load
