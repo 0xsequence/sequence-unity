@@ -75,6 +75,12 @@ namespace Sequence.Relayer
                     string transactionHash = request.downloadHandler.text;
                     request.Dispose();
 
+                    if (!transactionHash.StartsWith("0x"))
+                    {
+                        OnMintTokenFailed?.Invoke("Error minting using permissioned minter: " + transactionHash + "\nCurl request: " + curlRequest);
+                        return null;
+                    }
+
                     OnMintTokenSuccess?.Invoke(transactionHash);
                     return transactionHash;
                 }
