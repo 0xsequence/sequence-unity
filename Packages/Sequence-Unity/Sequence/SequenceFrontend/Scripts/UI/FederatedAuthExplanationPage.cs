@@ -13,7 +13,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _overrideAccountButton;
         [SerializeField] private TextMeshProUGUI _explanationText;
         
-        private bool _enableAccountOverride;
+        private bool _enableMultipleAccountsPerEmail;
         private FederatedAuthPopupPanel _federatedAuthPopupPanel;
 
         public override void Open(params object[] args)
@@ -39,10 +39,10 @@ namespace Sequence.Demo
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(List<LoginMethod>)} as an argument");
             }
 
-            _enableAccountOverride = SequenceConfig.GetConfig().EnableAccountOverride;
+            _enableMultipleAccountsPerEmail = SequenceConfig.GetConfig().EnableMultipleAccountsPerEmail;
 
             
-            _overrideAccountButton.SetActive(_enableAccountOverride);
+            _overrideAccountButton.SetActive(_enableMultipleAccountsPerEmail);
             string explanation =
                 $"You've already used this email to sign in with another method. If you'd like to be able to sign in with {loginMethod} in the future, you'll need to login with ";
             int methods = loginMethods.Count;
@@ -69,7 +69,7 @@ namespace Sequence.Demo
             }
             explanation += " first.";
 
-            if (_enableAccountOverride)
+            if (_enableMultipleAccountsPerEmail)
             {
                 explanation += "\nAlternatively, we can the delete the account associated with this email and create a new one for you.";
             }
@@ -84,7 +84,7 @@ namespace Sequence.Demo
 
         public void NewAccount()
         {
-            if (!SequenceConfig.GetConfig().EnableAccountOverride)
+            if (!SequenceConfig.GetConfig().EnableMultipleAccountsPerEmail)
             {
                 throw new SystemException("Creating accounts with the same email is not enabled");
             }

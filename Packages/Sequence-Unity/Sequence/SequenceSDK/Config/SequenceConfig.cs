@@ -28,7 +28,7 @@ namespace Sequence.Config
 
         [Header("WaaS Configuration")]
         public string WaaSConfigKey;
-        public bool EnableAccountOverride = false;
+        [FormerlySerializedAs("EnableAccountOverride")] public bool EnableMultipleAccountsPerEmail = false;
         public string WaaSVersion { get; private set; } = "1.3.0";
 
         [Header("Sequence SDK Configuration")] 
