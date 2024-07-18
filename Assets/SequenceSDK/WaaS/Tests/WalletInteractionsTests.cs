@@ -24,10 +24,10 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
             {
                 try
                 {
-                    string signature = await wallet.SignMessage(Chain.Polygon, message);
+                    string signature = await wallet.SignMessage(Chain.ArbitrumNova, message);
                     Assert.IsNotNull(signature);
                     
-                    IsValidMessageSignatureReturn isValid = await wallet.IsValidMessageSignature(Chain.Polygon, message, signature);
+                    IsValidMessageSignatureReturn isValid = await wallet.IsValidMessageSignature(Chain.ArbitrumNova, message, signature);
                     Assert.IsNotNull(isValid);
                     Assert.IsTrue(isValid.isValid);
                     checkComplete = true;
