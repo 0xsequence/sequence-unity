@@ -27,6 +27,7 @@ namespace Sequence.Demo
         internal ILogin LoginHandler { get; private set; }
         
         private bool _alreadyAttemptedToRestoreSession = false;
+        private GameObject _sessionManager;
         
         protected override void Awake()
         {
@@ -46,7 +47,6 @@ namespace Sequence.Demo
             
             ILogin loginHandler = SequenceLogin.GetInstance();
             SetupLoginHandler(loginHandler);
-            loginHandler.TryToRestoreSession();
 
             _loginSuccessPage = GetComponentInChildren<LoginSuccessPage>();
             
@@ -71,6 +71,8 @@ namespace Sequence.Demo
             {
                 if (_storeSessionInfoAndSkipLoginWhenPossible && !_alreadyAttemptedToRestoreSession)
                 {
+                    _alreadyAttemptedToRestoreSession = true;
+                    LoginHandler.TryToRestoreSession();
                     return;
                 }
 
@@ -81,6 +83,12 @@ namespace Sequence.Demo
             }
 
             base.Open(args);
+        }
+
+        private void OnDestroy()
+        {
+            SequenceWallet.OnFailedToRecoverSession -= OnFailedToRecoverSession;
+            TearDownLoginHandler();
         }
 
         public void SetupLoginHandler(ILogin loginHandler)
@@ -105,6 +113,14 @@ namespace Sequence.Demo
             popupPanel.SetActive(false);
 
             Instantiate(_sessionManagerPrefab);
+        } 
+        
+        private void TearDownLoginHandler()
+        {
+            LoginHandler.OnMFAEmailSent -= OnMFAEmailSentHandler;
+            LoginHandler.OnLoginSuccess -= OnLoginSuccessHandler;
+            SequenceWallet.OnWalletCreated -= OnWalletCreatedHandler;
+            Destroy(_sessionManager);
         } 
         
         private void OnFailedToRecoverSession(string error)
