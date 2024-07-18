@@ -44,6 +44,14 @@ namespace Sequence.Demo
 
         protected virtual void SetEmailInputInitialText()
         {
+            if (_inputField == null)
+            {
+                _inputField = GetComponentInChildren<TMP_InputField>();
+                if (_inputField == null)
+                {
+                    return;
+                }
+            }
             _inputField.text = _loginEmail;
         }
 
