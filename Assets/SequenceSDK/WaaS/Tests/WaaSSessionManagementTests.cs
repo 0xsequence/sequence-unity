@@ -14,7 +14,7 @@ namespace Sequence.EmbeddedWallet.Tests
         {
             try
             {
-                SequenceLogin login = SequenceLogin.GetInstance();
+                SequenceLogin login = new SequenceLogin();
                 await Task.Delay(100);
                 login.OnLoginFailed += (error, method, email) =>
                 {
@@ -60,7 +60,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 PlayFabSettings.staticSettings.TitleId = titleId;
             }
             
-            SequenceLogin login = SequenceLogin.GetInstance();
+            SequenceLogin login = new SequenceLogin();
             await Task.Delay(100);
             login.OnLoginFailed += (error, method, email) =>
             {

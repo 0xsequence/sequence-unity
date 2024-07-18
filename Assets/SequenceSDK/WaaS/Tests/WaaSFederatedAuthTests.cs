@@ -13,7 +13,7 @@ namespace Sequence.EmbeddedWallet.Tests
         {
             try
             {
-                SequenceLogin login = SequenceLogin.GetInstance();
+                SequenceLogin login = new SequenceLogin();
                 login.OnLoginFailed += (error, method, email) => { Assert.Fail(error); };
                 string email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
                 bool accountFederated = false;
