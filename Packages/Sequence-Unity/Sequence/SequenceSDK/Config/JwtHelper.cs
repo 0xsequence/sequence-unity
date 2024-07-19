@@ -20,12 +20,6 @@ namespace Sequence.Config
                 throw new Exception("Config Key decoding failed: " + ex.Message + " Please double check that you've input the key correctly then contact Sequence support.");
             }
 
-            string validEmailConfig = CheckValidEmailConfigJwt(payload);
-            if (validEmailConfig != null)
-            {
-                Debug.LogWarning("Config Key decoding failed to find AWS config values: " + validEmailConfig + "\nEmail sign in will not work.");
-            }
-
             return payload;
         }
         
@@ -66,16 +60,6 @@ namespace Sequence.Config
             {
                 throw new Exception("Config JWT missing projectId.");
             }
-        }
-        
-        private static string CheckValidEmailConfigJwt(ConfigJwt payload)
-        {
-            if (string.IsNullOrWhiteSpace(payload.emailClientId))
-            {
-                return "Config JWT missing emailClientId.";
-            }
-
-            return null;
         }
     }
 }
