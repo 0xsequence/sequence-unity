@@ -84,7 +84,7 @@ namespace Samples.Scripts
             // Do something
         }
         
-        private void OnSessionsFoundHandler(WaaSSession[] sessions) {
+        private void OnSessionsFoundHandler(Session[] sessions) {
             // Do something
         }
     }

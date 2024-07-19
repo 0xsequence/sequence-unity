@@ -179,6 +179,8 @@ The tests, mocks, and related files are no longer included inside the SDK that g
 
 Intellisense and other IDE features (like refactoring) may be less refined when working within the Packages folder than within the Assets folder.
 
+Scripts in the samples folder of the SDK are not checked for compile errors by Unity. When modifying these, we will need to make sure to import them to make sure they work and compile (though we should always be doing this anyways).
+
 ### ADR 4 - New WaaS auth system
 July 19, 2024 - author: Quinn Purdy
 
