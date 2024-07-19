@@ -48,16 +48,16 @@ namespace Sequence.EmbeddedWallet
             return intent;
         }
 
-        public async Task FederateAccount()
+        public async Task FederateAccount(string walletAddress)
         {
             string challenge = await InitiateAuth();
-            IntentDataFederateAccount intent = AssembleGuestFederateAccountIntent(challenge);
-            await _connector.FederateAccount(intent, LoginMethod.Guest, "");
+            IntentDataFederateAccount intent = AssembleGuestFederateAccountIntent(challenge, walletAddress);
+            await _connector.FederateAccount(intent, LoginMethod.Guest, walletAddress);
         }
         
-        private IntentDataFederateAccount AssembleGuestFederateAccountIntent(string challenge)
+        private IntentDataFederateAccount AssembleGuestFederateAccountIntent(string challenge, string walletAddress)
         {
-            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleGuestOpenSessionIntent(challenge), _sessionWallet.GetAddress());
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleGuestOpenSessionIntent(challenge), walletAddress);
             return intent;
         }
     }

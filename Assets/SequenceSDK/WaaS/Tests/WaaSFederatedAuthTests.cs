@@ -1,30 +1,35 @@
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PlayFab;
 using PlayFab.ClientModels;
 using Sequence.EmbeddedWallet;
+using Sequence.WaaS.Tests;
+using UnityEngine;
 
 namespace Sequence.EmbeddedWallet.Tests
 {
     public class WaaSFederatedAuthTests
     {
+        private string _email;
+        private TaskCompletionSource<bool> _tcs;
+        private string _walletAddress;
+        SequenceLogin _login;
+
         [Test]
         public async Task TestAccountAssociation()
         {
-            try
+            _login = new SequenceLogin();
+            SequenceWallet.OnAccountFederated += OnAccountFederated;
+            _tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness(_login);
+
+            await testHarness.Login(async wallet =>
             {
-                SequenceLogin login = new SequenceLogin();
-                login.OnLoginFailed += (error, method, email) => { Assert.Fail(error); };
-                string email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
-                bool accountFederated = false;
-                SequenceWallet.OnAccountFederated += account =>
+                try
                 {
-                    Assert.Equals(account.email, email);
-                    accountFederated = true;
-                };
-                SequenceWallet.OnAccountFederationFailed += error => { Assert.Fail(error); };
-                SequenceWallet.OnWalletCreated += async wallet =>
-                {
+                    _walletAddress = wallet.GetWalletAddress();
+                    _email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
                     string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
 
                     if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
@@ -32,28 +37,120 @@ namespace Sequence.EmbeddedWallet.Tests
                         PlayFabSettings.staticSettings.TitleId = titleId;
                     }
 
-
-                    var request = new LoginWithCustomIDRequest
-                        { CustomId = "WaaSSessionManagementTests", CreateAccount = true };
-                    PlayFabClientAPI.LoginWithCustomID(request,
-                        async result =>
-                        {
-                            await login.FederateAccountPlayFab(PlayFabSettings.staticSettings.TitleId,
-                                result.SessionTicket,
-                                email);
-                        },
-                        error => { Assert.Fail(error.ErrorMessage); });
-                };
-                await login.ConnectToWaaSAsGuest();
-                while (!accountFederated)
+                    var request = new LoginWithEmailAddressRequest
+                    {
+                        Email = _email,
+                        Password = WaaSEndToEndTestConfig.GetConfig().PlayFabPassword
+                    };
+                    PlayFabClientAPI.LoginWithEmailAddress(request, PlayFabLoginResult, PlayFabLoginFailed);
+                }
+                catch (Exception e)
                 {
-                    await Task.Yield();
+                    _tcs.TrySetException(e);
+                }
+            }, (error, method, email) =>
+            {
+                _tcs.TrySetException(new Exception(error));
+            });
+
+            await _tcs.Task;
+        }
+
+        private void PlayFabLoginResult(LoginResult result)
+        {
+            LoginWithPlayFab(result.SessionTicket);
+        }
+
+        private async Task LoginWithPlayFab(string sessionTicket)
+        {
+            SequenceWallet.OnAccountFederationFailed += RetryIfAlreadyLinked;
+            try
+            {
+                await _login.FederateAccountPlayFab(PlayFabSettings.staticSettings.TitleId,
+                    sessionTicket,
+                    _email, _walletAddress);
+            }
+            catch (Exception e)
+            {
+                if (!e.Message.Contains("AccountAlreadyLinked"))
+                {
+                    _tcs.TrySetException(e);
                 }
             }
-            catch (System.Exception e)
+            finally
             {
-                Assert.Fail(e.Message);
+                SequenceWallet.OnAccountFederationFailed -= RetryIfAlreadyLinked;
             }
+        }
+
+        private void RetryIfAlreadyLinked(string error)
+        {
+            if (error.Contains("AccountAlreadyLinked"))
+            {
+                _email = "a" + _email;
+                var request = new LoginWithEmailAddressRequest
+                {
+                    Email = _email,
+                    Password = WaaSEndToEndTestConfig.GetConfig().PlayFabPassword
+                };
+                PlayFabClientAPI.LoginWithEmailAddress(request, PlayFabLoginResult, PlayFabLoginFailed);
+            }
+            else
+            {
+                _tcs.TrySetException(new Exception(error));
+            }
+        }
+
+        private void PlayFabLoginFailed(PlayFabError error)
+        {
+            string errorMessage = error.GenerateErrorReport();
+            if (errorMessage.Contains("User not found"))
+            {
+                Debug.Log("User not found, creating new user");
+                var request = new RegisterPlayFabUserRequest
+                {
+                    Email = _email,
+                    Password = WaaSEndToEndTestConfig.GetConfig().PlayFabPassword,
+                    RequireBothUsernameAndEmail = false
+                };
+                PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterSuccess, OnRegisterFailure);
+            }
+            else
+            {
+                _tcs.TrySetException(new Exception(errorMessage));
+            }
+        }
+
+        private void OnRegisterSuccess(RegisterPlayFabUserResult result)
+        {
+            try
+            {
+                Debug.Log("Registered new user with PlayFab - connecting to WaaS now");
+
+                string sessionTicket = result.SessionTicket;
+                string titleId = PlayFabSettings.staticSettings.TitleId;
+                _login.FederateAccountPlayFab(titleId, sessionTicket, _email, _walletAddress);
+            }
+            catch (Exception e)
+            {
+                _tcs.TrySetException(e);
+            }
+        }
+
+        private void OnRegisterFailure(PlayFabError error)
+        {
+            string errorMessage = error.GenerateErrorReport();
+            _tcs.TrySetException(new Exception(errorMessage));
+        }
+
+        private void OnAccountFederated(Account account)
+        {
+            if (account.email != _email.ToLower())
+            {
+                _tcs.TrySetException(new Exception($"Emails do not match {_email} != {account.email}"));
+            }
+            _tcs.SetResult(true);
+            SequenceWallet.OnAccountFederated -= OnAccountFederated;
         }
     }
 }

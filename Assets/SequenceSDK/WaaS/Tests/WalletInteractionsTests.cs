@@ -2,7 +2,9 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.Authentication;
 using Sequence.Utils;
+using Sequence.WaaS.Tests;
 
 namespace Sequence.EmbeddedWallet.Tests
 {
@@ -15,14 +17,9 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
         public async Task TestSignMessage(string message)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var login = new SequenceLogin();
-
-            login.OnLoginFailed += (error, method, email) =>
-            {
-                tcs.TrySetException(new Exception(error));
-            };
-
-            SequenceWallet.OnWalletCreated += async wallet =>
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            
+            await testHarness.Login(async wallet =>
             {
                 try
                 {
@@ -38,9 +35,10 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            };
-
-            login.GuestLogin();
+            }, (error, method, email) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
 
             await tcs.Task;
         }
@@ -49,14 +47,9 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
         public async Task TestDelayedEncode()
         {
             var tcs = new TaskCompletionSource<bool>();
-            var login = new SequenceLogin();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
 
-            login.OnLoginFailed += (error, method, email) =>
-            {
-                tcs.TrySetException(new Exception(error));
-            };
-
-            SequenceWallet.OnWalletCreated += async wallet =>
+            testHarness.Login(async wallet =>
             {
                 try
                 {
@@ -74,6 +67,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                     {
                         balance = balanceReturn.balances[0].balance;
                     }
+
                     TransactionReturn transactionReturn = await wallet.SendTransaction(Chain.ArbitrumNova,
                         new Transaction[]
                         {
@@ -86,6 +80,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                         });
                     Assert.IsNotNull(transactionReturn);
                     Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    await Task.Delay(5000); // Allow indexer some time to pick up transaction
                     balanceReturn =
                         await indexer.GetTokenBalances(
                             new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20Address));
@@ -97,9 +92,10 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            };
-
-            login.GuestLogin();
+            }, (error, method, email) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
 
             await tcs.Task;
         }

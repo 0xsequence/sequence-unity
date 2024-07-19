@@ -58,17 +58,17 @@ namespace Sequence.EmbeddedWallet
             return intent;
         }
 
-        public async Task FederateAccount(LoginMethod method)
+        public async Task FederateAccount(LoginMethod method, string walletAddress)
         {
             await InitiateAuth(method);
-            IntentDataFederateAccount intent = AssembleOIDCFederateAccountIntent();
+            IntentDataFederateAccount intent = AssembleOIDCFederateAccountIntent(walletAddress);
             string email = Sequence.Authentication.JwtHelper.GetIdTokenJwtPayload(_idToken).email;
             await _connector.FederateAccount(intent, method, email);
         }
         
-        private IntentDataFederateAccount AssembleOIDCFederateAccountIntent()
+        private IntentDataFederateAccount AssembleOIDCFederateAccountIntent(string walletAddress)
         {
-            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleOIDCOpenSessionIntent(), _sessionWallet.GetAddress());
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleOIDCOpenSessionIntent(), walletAddress);
             return intent;
         }
     }

@@ -174,7 +174,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e541aa38fbc441079fa9e84a777df0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _loginMethod: 2
   _email: 032940@gmail.com
   _password: Letmeinprettyplease123$
   _username: wickedawesomename

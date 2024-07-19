@@ -58,18 +58,18 @@ namespace Sequence.EmbeddedWallet
             return intent;
         }
         
-        public async Task FederateAccount(string email)
+        public async Task FederateAccount(string email, string walletAddress)
         {
             await InitiateAuth();
             
-            IntentDataFederateAccount federateIntent = AssemblePlayFabFederateAccountIntent();
+            IntentDataFederateAccount federateIntent = AssemblePlayFabFederateAccountIntent(walletAddress);
             await _connector.FederateAccount(federateIntent, LoginMethod.PlayFab, email);
         }
         
-        private IntentDataFederateAccount AssemblePlayFabFederateAccountIntent()
+        private IntentDataFederateAccount AssemblePlayFabFederateAccountIntent(string walletAddress)
         {
             string verifier = GetVerifier();
-            IntentDataFederateAccount intent = new IntentDataFederateAccount(_sessionId, _sessionWallet.GetAddress(), IdentityType.PlayFab.ToString(), verifier, _sessionTicket);
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(_sessionId, walletAddress, IdentityType.PlayFab.ToString(), verifier, _sessionTicket);
             return intent;
         }
     }

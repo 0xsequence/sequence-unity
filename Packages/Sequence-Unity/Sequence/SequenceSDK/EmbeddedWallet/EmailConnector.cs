@@ -83,15 +83,15 @@ namespace Sequence.EmbeddedWallet
             }
         }
         
-        public async Task FederateAccount(string email, string code)
+        public async Task FederateAccount(string email, string code, string walletAddress)
         {
-            IntentDataFederateAccount intent = AssembleEmailFederateAccountIntent(email, code);
+            IntentDataFederateAccount intent = AssembleEmailFederateAccountIntent(email, code, walletAddress);
             await _connector.FederateAccount(intent, LoginMethod.Email, email);
         }
         
-        private IntentDataFederateAccount AssembleEmailFederateAccountIntent(string email, string code)
+        private IntentDataFederateAccount AssembleEmailFederateAccountIntent(string email, string code, string walletAddress)
         {
-            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleEmailOpenSessionIntent(email, code), _sessionWallet.GetAddress());
+            IntentDataFederateAccount intent = new IntentDataFederateAccount(AssembleEmailOpenSessionIntent(email, code), walletAddress);
             return intent;
         }
     }

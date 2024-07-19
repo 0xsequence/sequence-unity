@@ -459,7 +459,7 @@ namespace Sequence.EmbeddedWallet
                 IntentResponseAccountFederated federateAccountResponse = await _intentSender.SendIntent<IntentResponseAccountFederated, IntentDataFederateAccount>(federateAccount, IntentType.FederateAccount);
                 Account account = federateAccountResponse.account;
                 string responseEmail = account.email;
-                if (responseEmail != email)
+                if (responseEmail != email.ToLower())
                 {
                     throw new Exception($"Email received from WaaS server doesn't match, received {responseEmail}, sent {email}");
                 }
@@ -477,27 +477,27 @@ namespace Sequence.EmbeddedWallet
             }
         }
         
-        public async Task FederateAccountPlayFab(string titleId, string sessionTicket, string email)
+        public async Task FederateAccountPlayFab(string titleId, string sessionTicket, string email, string walletAddress)
         {
             PlayFabConnector playFabConnector = new PlayFabConnector(titleId, sessionTicket, _sessionId, _sessionWallet, _connector);
-            await playFabConnector.FederateAccount(email);
+            await playFabConnector.FederateAccount(email, walletAddress);
         }
         
-        public async Task FederateAccountGuest()
+        public async Task FederateAccountGuest(string walletAddress)
         {
             GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
-            await connector.FederateAccount();
+            await connector.FederateAccount(walletAddress);
         }
         
-        public async Task FederateAccountSocial(string idToken, LoginMethod method)
+        public async Task FederateAccountSocial(string idToken, LoginMethod method, string walletAddress)
         {
             OIDCConnector oidcConnector = new OIDCConnector(idToken, _sessionId, _sessionWallet, _connector);
-            await oidcConnector.FederateAccount(method);
+            await oidcConnector.FederateAccount(method, walletAddress);
         }
         
-        public async Task FederateEmail(string email, string code)
+        public async Task FederateEmail(string email, string code, string walletAddress)
         {
-            await _emailConnector.FederateAccount(email, code);
+            await _emailConnector.FederateAccount(email, code, walletAddress);
         }
     }
 }
