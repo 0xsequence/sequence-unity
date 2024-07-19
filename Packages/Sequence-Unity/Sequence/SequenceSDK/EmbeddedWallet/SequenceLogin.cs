@@ -34,6 +34,7 @@ namespace Sequence.EmbeddedWallet
         private LoginMethod _failedLoginMethod;
         private string _failedLoginEmail;
         private bool _automaticallyFederateAccountsWhenPossible;
+        private bool _authenticatorSetup = false;
 
         private static SequenceLogin _instance;
         
@@ -78,6 +79,10 @@ namespace Sequence.EmbeddedWallet
 
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
+            if (_authenticatorSetup)
+            {
+                return;
+            }
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
             _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
@@ -100,6 +105,8 @@ namespace Sequence.EmbeddedWallet
             _validator = validator;
 
             _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
+
+            _authenticatorSetup = true;
         }
 
         public void TryToRestoreSession()
