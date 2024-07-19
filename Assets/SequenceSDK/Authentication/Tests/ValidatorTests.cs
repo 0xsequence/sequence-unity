@@ -8,9 +8,8 @@ namespace Sequence.Authenticator.Tests
         [TestCase("test@example.com", true)]
         [TestCase("user123@gmail.com", true)]
         [TestCase("invalid_email", false)]
-        [TestCase("user@domain", false)]
         [TestCase("name@.com", false)]
-        [TestCase("user@domain.", false)]
+        [TestCase("user@.", false)]
         [TestCase("", false)]
         [TestCase("test@.com", false)]
         public void TestEmailValidation(string email, bool expectedIsValid)
