@@ -50,7 +50,7 @@ namespace Sequence.Relayer
         
         private async Task<string> SendMintTokenRequest(string mintTokenRequestJson)
         {
-            UnityWebRequest request = UnityWebRequest.Get(_mintEndpoint);
+            using UnityWebRequest request = UnityWebRequest.Get(_mintEndpoint);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = mintTokenRequestJson.ToByteArray();
             request.uploadHandler = new UploadHandlerRaw(requestData);
@@ -89,6 +89,10 @@ namespace Sequence.Relayer
             catch (Exception e)
             {
                 OnMintTokenFailed?.Invoke("Error minting using permissioned minter: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl request: " + curlRequest);
+            }
+            finally
+            {
+                request.Dispose();
             }
 
             return null;

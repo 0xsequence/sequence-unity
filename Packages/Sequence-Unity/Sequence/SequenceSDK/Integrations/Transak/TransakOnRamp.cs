@@ -26,7 +26,7 @@ namespace Sequence.Integrations.Transak
         
         public static async Task<SupportedCountry[]> GetSupportedCountries()
         {
-            UnityWebRequest request = UnityWebRequest.Get("https://api.transak.com/api/v2/countries");
+            using UnityWebRequest request = UnityWebRequest.Get("https://api.transak.com/api/v2/countries");
             string url = request.url;
             string curlRequest = $"curl -X GET {url}";
             try
@@ -72,6 +72,10 @@ namespace Sequence.Integrations.Transak
             }
             catch (Exception e) {
                 throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+            }
+            finally
+            {
+                request.Dispose();
             }
         }
         

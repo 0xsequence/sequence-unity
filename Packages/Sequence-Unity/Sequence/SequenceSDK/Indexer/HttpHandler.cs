@@ -96,6 +96,10 @@ namespace Sequence
             catch (Exception e) {
                 throw new Exception("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
+            finally
+            {
+                req.Dispose();
+            }
 
             return "";
         }

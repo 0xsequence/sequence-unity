@@ -101,6 +101,10 @@ namespace Sequence.Provider
             catch (Exception e) {
                 throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
             }
+            finally
+            {
+                request.Dispose();
+            }
         }
     }
 }

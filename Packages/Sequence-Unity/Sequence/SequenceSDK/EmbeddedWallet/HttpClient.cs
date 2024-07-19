@@ -120,8 +120,9 @@ namespace Sequence.EmbeddedWallet
             try
             {
                 await request.SendWebRequest();
-            
-                if (request.error != null || request.result != UnityWebRequest.Result.Success || request.responseCode < 200 || request.responseCode > 299)
+
+                if (request.error != null || request.result != UnityWebRequest.Result.Success ||
+                    request.responseCode < 200 || request.responseCode > 299)
                 {
                     throw new Exception($"Error sending request to {url}: {request.responseCode} {request.error}");
                 }
@@ -137,24 +138,34 @@ namespace Sequence.EmbeddedWallet
                     }
                     catch (Exception e)
                     {
-                        throw new Exception($"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
+                        throw new Exception(
+                            $"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
                     }
                 }
             }
             catch (HttpRequestException e)
             {
-                throw new Exception("HTTP Request failed: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("HTTP Request failed: " + e.Message + GetRequestErrorIfAvailable(request) +
+                                    "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                throw new Exception("Invalid URL format: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("Invalid URL format: " + e.Message + GetRequestErrorIfAvailable(request) +
+                                    "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                throw new Exception("File load exception: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("File load exception: " + e.Message + GetRequestErrorIfAvailable(request) +
+                                    "\nCurl-equivalent request: " + curlRequest);
             }
-            catch (Exception e) {
-                throw new Exception("An unexpected error occurred: " + e.Message + GetRequestErrorIfAvailable(request) + "\nCurl-equivalent request: " + curlRequest);
+            catch (Exception e)
+            {
+                throw new Exception("An unexpected error occurred: " + e.Message + GetRequestErrorIfAvailable(request) +
+                                    "\nCurl-equivalent request: " + curlRequest);
+            }
+            finally
+            {
+                request.Dispose();
             }
         }
 
