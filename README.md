@@ -156,6 +156,46 @@ To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence >
 Please add any ADRs below. In the future, it may be worthwhile to move these into separate files, but for now since there are few ADRs, the README should suffice. 
 Please use [Michael Nygard's template for ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
 
+### ADR 5 - SDK as a Local Package
+July 19, 2024 - author: Quinn Purdy
+
+#### Status
+Approved
+
+#### Context
+The SDK is currently inside the Assets folder.
+
+#### Decision
+The project is refactored such that the SDK now lives in the Packages folder as a LocalPackage. The tests, mocks, and other similar files/scripts/resources will remain in the Assets folder. The git url for importing the SDK is updated in the documentation. 
+
+#### Consequences
+Users who have imported the SDK via Package Manager using git url will need to remove the package and then re-add it using the new URL in order to update to the latest version.
+
+The SDK will be easier to submit to the Unity Asset store using the Asset Store Tools to upload it as a Local Package.
+
+It is now easier to include other dependancies, like the PlayFab SDK, that do not define package.json files without introducing dependancy conflicts into integrator projects. If we wanted to include any of these packages into our project before we would've had to modify the git url installation link anyways to a subfolder inside of Assets.
+
+The tests, mocks, and related files are no longer included inside the SDK that gets shipped to users. This reduces file size; however, users will need to check the repo to see more example use cases (i.e. to see the tests.)
+
+Intellisense and other IDE features (like refactoring) may be less refined when working within the Packages folder than within the Assets folder.
+
+### ADR 4 - New WaaS auth system
+July 19, 2024 - author: Quinn Purdy
+
+#### Status
+Approved
+
+#### Context
+The current WaaS auth system is restricted to OIDC implicit flow and requires a nonce `hex(keccak256(sessionWalletAddress))` included in the idToken. This flow is rather restrictive. Additionally, the flow requires us to use AWS Cognito for email sign in and there is a limit to how many partner ids we can configure with AWS Cognitor, limiting our ability to scale efficiently.
+
+#### Decision
+The WaaS auth system is being migrated to a new system that no longer solely relies upon OIDC implicit flow. This new authentication flow requires the RegisterSession call be split into two separate calls. Initiate Auth and Open Session. The Initiate Auth call will, in some cases, return a challenge. The two calls must be joined together in order for a session to be opened - this is done by specifying the `identityType`, `verifier`, and, in the case of Open Session, the `answer`.
+
+#### Consequences
+WaaSLogin, now renamed to SequenceLogin, has been re-written to accomodate for the new flow. The AWS SDK and all its consumers have been removed from the SDK. 
+
+The OpenIdAuthenticator and related classes in the Sequence.Authentication assembly have become more usable in a general context and have become more replaceable/customizable for integrators.
+
 ### ADR 3 - WaaS Client
 August 2, 2023 - author: Quinn Purdy
 Updated Aug 16, 2023 - author: Quinn Purdy
