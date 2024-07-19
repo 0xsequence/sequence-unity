@@ -1,5 +1,8 @@
+using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.Utils;
 
 namespace Sequence.EmbeddedWallet.Tests
 {
@@ -11,39 +14,94 @@ longer message that spans
 multiple lines. and has funky characters like this one $ and this one ~ and all of these '~!@#$%^&*()_+{}|:""<>,.?/")]
         public async Task TestSignMessage(string message)
         {
-            SequenceLogin login = new SequenceLogin();
-            
+            var tcs = new TaskCompletionSource<bool>();
+            var login = new SequenceLogin();
+
             login.OnLoginFailed += (error, method, email) =>
             {
-                Assert.Fail(error);
+                tcs.TrySetException(new Exception(error));
             };
 
-            bool checkComplete = false;
-            
             SequenceWallet.OnWalletCreated += async wallet =>
             {
                 try
                 {
                     string signature = await wallet.SignMessage(Chain.ArbitrumNova, message);
                     Assert.IsNotNull(signature);
-                    
+
                     IsValidMessageSignatureReturn isValid = await wallet.IsValidMessageSignature(Chain.ArbitrumNova, message, signature);
                     Assert.IsNotNull(isValid);
                     Assert.IsTrue(isValid.isValid);
-                    checkComplete = true;
+                    tcs.TrySetResult(true);
                 }
                 catch (System.Exception e)
                 {
-                    Assert.Fail(e.Message);
+                    tcs.TrySetException(e);
                 }
             };
-            
+
             login.GuestLogin();
 
-            while (!checkComplete)
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestDelayedEncode()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            var login = new SequenceLogin();
+
+            login.OnLoginFailed += (error, method, email) =>
             {
-                await Task.Yield();
-            }
+                tcs.TrySetException(new Exception(error));
+            };
+
+            SequenceWallet.OnWalletCreated += async wallet =>
+            {
+                try
+                {
+                    string erc20Address = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
+                    ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
+                    GetTokenBalancesReturn balanceReturn =
+                        await indexer.GetTokenBalances(
+                            new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20Address));
+                    BigInteger balance;
+                    if (balanceReturn == null || balanceReturn.balances.Length == 0)
+                    {
+                        balance = 0;
+                    }
+                    else
+                    {
+                        balance = balanceReturn.balances[0].balance;
+                    }
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(Chain.ArbitrumNova,
+                        new Transaction[]
+                        {
+                            new DelayedEncode(erc20Address, "0",
+                                new DelayedEncodeData("mint(address,uint256)",
+                                    new object[]
+                                    {
+                                        wallet.GetWalletAddress().Value, DecimalNormalizer.Normalize(1)
+                                    }, "mint"))
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    balanceReturn =
+                        await indexer.GetTokenBalances(
+                            new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20Address));
+                    BigInteger balance2 = balanceReturn.balances[0].balance;
+                    Assert.Greater(balance2, balance);
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            };
+
+            login.GuestLogin();
+
+            await tcs.Task;
         }
     }
 }
