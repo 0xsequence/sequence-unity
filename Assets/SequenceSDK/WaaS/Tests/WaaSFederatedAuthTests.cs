@@ -48,7 +48,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 {
                     _tcs.TrySetException(e);
                 }
-            }, (error, method, email) =>
+            }, (error, method, email, methods) =>
             {
                 _tcs.TrySetException(new Exception(error));
             });

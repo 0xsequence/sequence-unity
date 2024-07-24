@@ -8,7 +8,14 @@ namespace Sequence.Authentication
         public delegate void OnLoginSuccessHandler(string sessionId, string walletAddress);
         public event OnLoginSuccessHandler OnLoginSuccess;
 
-        public delegate void OnLoginFailedHandler(string error, LoginMethod method, string email = "");
+        /// <summary>
+        /// Includes:
+        /// string error received when attempting to log in
+        /// LoginMethod method used to attempt to log in
+        /// string email the user attempted to log in with if available
+        /// List<LoginMethod> loginMethods associated with the email the user attempted to login with - included if received an email already in use error
+        /// </summary>
+        public delegate void OnLoginFailedHandler(string error, LoginMethod method, string email = "", List<LoginMethod> loginMethods = default);
         public event OnLoginFailedHandler OnLoginFailed;
 
         public delegate void OnMFAEmailSentHandler(string email);
@@ -99,12 +106,5 @@ namespace Sequence.Authentication
         /// Retry authentication, forcing a new account to be created. This will delete and override the account with the cached email if it exists.
         /// </summary>
         public void ForceCreateAccount();
-
-        /// <summary>
-        /// Get all the login methods that are associated with an email
-        /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
-        public List<LoginMethod> GetLoginMethodsAssociatedWithEmail(string email);
     }
 }
