@@ -10,6 +10,8 @@ namespace Sequence.Utils.SecureStorage
             return new iOSKeychainStorage();
 #elif UNITY_STANDALONE_OSX && !UNITY_EDITOR
             return new MacOSKeychainStorage();
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            return new WebSecureStorage();
 #else
             return new NotImplementedStorage();
 #endif

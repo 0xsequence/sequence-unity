@@ -195,6 +195,11 @@ namespace Sequence.Authentication
         {
             OnSignInFailed?.Invoke(errorMessage, LoginMethod.Apple);
         }
+        
+        public void InvokeSignInFailed(string errorMessage, LoginMethod method)
+        {
+            OnSignInFailed?.Invoke(errorMessage, method);
+        }
 
         public string GetRedirectUrl()
         {

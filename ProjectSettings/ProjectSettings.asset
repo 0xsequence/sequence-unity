@@ -804,7 +804,7 @@ PlayerSettings:
   webGLDebugSymbols: 0
   webGLEmscriptenArgs: 
   webGLModulesDirectory: 
-  webGLTemplate: APPLICATION:Default
+  webGLTemplate: PROJECT:SequenceReact
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
   webGLCompressionFormat: 2
@@ -815,7 +815,7 @@ PlayerSettings:
   scriptingDefineSymbols:
     Android: 
     Server: 
-    Standalone: 
+    Standalone: UNITY_ASTOOLS_EXPERIMENTAL
     WebGL: VUPLEX_CCU;VUPLEX_STANDALONE
     iPhone: APPLE_AUTH_MANAGER_NATIVE_IMPLEMENTATION_AVAILABLE
   additionalCompilerArguments: {}
