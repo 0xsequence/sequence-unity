@@ -1,0 +1,40 @@
+{
+  "name": "xyz.0xsequence.waas-unity",
+  "version": "3.1.1",
+  "displayName": "Sequence Embedded Wallet SDK",
+  "description": "A Unity SDK for the Sequence WaaS API",
+  "unity": "2021.3",
+  "keywords": ["Unity", "Package", "wallet", "ethereum", "web3", "sequence", "waas", "oidc"],
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json" : "3.0.2"
+  },
+  "author": {
+    "name": "0xsequence",
+    "url": "https://sequence.xyz/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xsequence/sequence-unity.git"
+  },
+  "category": "web3",
+  "samples": [
+    {
+      "displayName": "Setup",
+      "description": "Import this into your project to get started",
+      "path": "Sequence/Samples~/Setup"
+    },
+    {
+      "displayName": "Demo Scene",
+      "description": "Basic demo scene showcasing the SDK functionality",
+      "path": "Sequence/Samples~/DemoScene"
+    },
+    {
+      "displayName": "Useful Scripts",
+      "description": "Basic scripts that are helpful for getting started with the SDK",
+      "path": "Sequence/Samples~/Scripts"
+    }
+  ],
+  "documentationUrl": "https://docs.sequence.xyz/sdk/unity/overview/",
+  "changelogUrl": "https://github.com/0xsequence/sequence-unity/releases",
+  "licensesUrl": "https://github.com/0xsequence/sequence-unity/blob/master/LICENSE"
+}
