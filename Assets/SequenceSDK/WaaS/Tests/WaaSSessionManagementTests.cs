@@ -4,7 +4,6 @@ using NUnit.Framework;
 using PlayFab;
 using PlayFab.ClientModels;
 using Sequence.Authentication;
-using Sequence.WaaS.Tests;
 using UnityEngine;
 
 namespace Sequence.EmbeddedWallet.Tests

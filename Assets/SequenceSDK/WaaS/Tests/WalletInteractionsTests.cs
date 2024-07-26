@@ -10,7 +10,6 @@ using Sequence.Authentication;
 using Sequence.Contracts;
 using Sequence.Ethereum.Tests;
 using Sequence.Utils;
-using Sequence.WaaS.Tests;
 using Sequence.Wallet;
 
 namespace Sequence.EmbeddedWallet.Tests
@@ -110,7 +109,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
         }
 
         [Test]
-        public async Task TestTransferErc20()
+        public async Task TestSendErc20()
         {
             var tcs = new TaskCompletionSource<bool>();
             EndToEndTestHarness testHarness = new EndToEndTestHarness();
