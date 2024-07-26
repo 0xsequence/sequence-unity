@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Sequence.Utils.SecureStorage
 {
@@ -12,6 +13,8 @@ namespace Sequence.Utils.SecureStorage
             return new MacOSKeychainStorage();
 #elif UNITY_WEBGL && !UNITY_EDITOR
             return new WebSecureStorage();
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            return new WindowsProtectedDataStorage();
 #else
             return new NotImplementedStorage();
 #endif
