@@ -1,8 +1,10 @@
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PlayFab;
 using PlayFab.ClientModels;
 using Sequence.Authentication;
+using Sequence.WaaS.Tests;
 using UnityEngine;
 
 namespace Sequence.EmbeddedWallet.Tests
@@ -93,6 +95,36 @@ namespace Sequence.EmbeddedWallet.Tests
             {
                 await Task.Yield();
             }
+        }
+
+        [Test]
+        public async Task TestGetSessionAuthProof()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    IntentResponseSessionAuthProof proof = await wallet.GetSessionAuthProof(Chain.ArbitrumNova);
+                    Assert.IsNotNull(proof);
+                    Assert.False(string.IsNullOrWhiteSpace(proof.wallet));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.signature));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.message));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.network));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.signature));
+                        
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
         }
     }
 }
