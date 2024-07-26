@@ -2,9 +2,13 @@ using System;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using NUnit.Framework;
+using PlayFab;
+using PlayFab.ClientModels;
 using Sequence.Authentication;
 using Sequence.Contracts;
+using Sequence.Ethereum.Tests;
 using Sequence.Utils;
 using Sequence.WaaS.Tests;
 using Sequence.Wallet;
@@ -324,6 +328,100 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
             });
 
             await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestGetFeeOptions()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            string toAddress = "0xc683a014955b75F5ECF991d4502427c8fa1Aa249";
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    Transaction[] toSend = new Transaction[]
+                    {
+                        new RawTransaction(toAddress, "0")
+                    };
+                    FeeOptionsResponse feeOptionsResponse = await wallet.GetFeeOptions(_chain, toSend);
+                    Assert.IsNotNull(feeOptionsResponse);
+                    Assert.IsNotNull(feeOptionsResponse.FeeOptions);
+                    int length = feeOptionsResponse.FeeOptions.Length;
+                    Assert.Greater(length, 0);
+                    Assert.False(string.IsNullOrWhiteSpace(feeOptionsResponse.FeeQuote));
+                        
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+        }
+
+        [Test]
+        public async Task TestFeeOptionsAndSend()
+        {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            string toAddress = "0xc683a014955b75F5ECF991d4502427c8fa1Aa249";
+
+            string email = config.PlayFabEmail;
+            var request = new LoginWithEmailAddressRequest { Email = email, Password = config.PlayFabPassword };
+            PlayFabClientAPI.LoginWithEmailAddress(request, result =>
+            {
+                testHarness.LoginWithPlayFab(result, email, async wallet =>
+                {
+                    try
+                    {
+                        Transaction[] toSend = new Transaction[]
+                        {
+                            new RawTransaction(toAddress, "0")
+                        };
+                        FeeOptionsResponse feeOptionsResponse = await wallet.GetFeeOptions(_chain, toSend);
+                        Assert.IsNotNull(feeOptionsResponse);
+                        Assert.IsNotNull(feeOptionsResponse.FeeOptions);
+                        int length = feeOptionsResponse.FeeOptions.Length;
+                        Assert.Greater(length, 0);
+                        Assert.False(string.IsNullOrWhiteSpace(feeOptionsResponse.FeeQuote));
+
+                        int hasIndex = -1;
+                        for (int i = 0; i < length; i++)
+                        {
+                            if (feeOptionsResponse.FeeOptions[i].InWallet)
+                            {
+                                hasIndex = i;
+                                break;
+                            }
+                        }
+                        Assert.Greater(hasIndex, -1);
+
+                        TransactionReturn transactionReturn = await wallet.SendTransactionWithFeeOptions(_chain, toSend,
+                            feeOptionsResponse.FeeOptions[hasIndex].FeeOption, feeOptionsResponse.FeeQuote);
+                        Assert.IsNotNull(transactionReturn);
+                        Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                        
+                        tcs.TrySetResult(true);
+                    }
+                    catch (System.Exception e)
+                    {
+                        tcs.TrySetException(e);
+                    }
+                }, (error, method, email) =>
+                {
+                    tcs.TrySetException(new Exception(error));
+                });
+            
+            }, error =>
+            {
+                tcs.TrySetException(new Exception(error.GenerateErrorReport()));
+            });
         }
     }
 }
