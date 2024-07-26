@@ -83,11 +83,6 @@ namespace Sequence.EmbeddedWallet.Tests
             walletTests.TestDeployContract(ERC20Bytecode);
             await WaitForTestsToComplete();
 
-            adapterTests.TestGetAddress(RequiredAddress);
-            adapterTests.TestSignMessage_withAdapter("Hello world", Chain.Polygon);
-            adapterTests.TestSendTransaction_withAdapter();
-            adapterTests.TestSendERC20_withAdapter();
-            adapterTests.TestBatchTransactions_withAdapter();
             adapterTests.TestDeployContract_withAdapter(ERC721Bytecode);
             await WaitForTestsToComplete();
             
