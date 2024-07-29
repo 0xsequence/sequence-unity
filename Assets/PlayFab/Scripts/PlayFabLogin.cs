@@ -96,7 +96,7 @@ namespace PlayFab.Scripts
             string titleId = PlayFabSettings.staticSettings.TitleId;
             
             ILogin login = SequenceLogin.GetInstance();
-            login.OnLoginFailed += (error, method, email) =>
+            login.OnLoginFailed += (error, method, email, methods) =>
             {
                 Debug.LogError(error);
             };
@@ -161,7 +161,7 @@ namespace PlayFab.Scripts
             string titleId = PlayFabSettings.staticSettings.TitleId;
             
             ILogin login = SequenceLogin.GetInstance();
-            login.OnLoginFailed += (error, method, email) =>
+            login.OnLoginFailed += (error, method, email, methods) =>
             {
                 Debug.LogError(error);
             };

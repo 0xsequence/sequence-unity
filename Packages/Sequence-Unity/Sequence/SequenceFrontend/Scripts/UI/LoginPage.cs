@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sequence.Authentication;
 using Sequence.Demo.Tweening;
 using Sequence.EmbeddedWallet;
@@ -113,7 +114,7 @@ namespace Sequence.Demo
             _errorText.text = error;
         }
         
-        private void OnLoginFailedHandler(string error, LoginMethod method, string email)
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
         {
             Debug.LogError($"Failed to sign in to WaaS API with error: {error}");
             _errorText.text = error;

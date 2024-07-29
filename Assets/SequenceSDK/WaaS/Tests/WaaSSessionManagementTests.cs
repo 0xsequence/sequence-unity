@@ -16,7 +16,7 @@ namespace Sequence.EmbeddedWallet.Tests
             {
                 SequenceLogin login = new SequenceLogin();
                 await Task.Delay(100);
-                login.OnLoginFailed += (error, method, email) =>
+                login.OnLoginFailed += (error, method, email, methods) =>
                 {
                     Assert.Fail(error);
                 };
@@ -62,7 +62,7 @@ namespace Sequence.EmbeddedWallet.Tests
             
             SequenceLogin login = new SequenceLogin();
             await Task.Delay(100);
-            login.OnLoginFailed += (error, method, email) =>
+            login.OnLoginFailed += (error, method, email, methods) =>
             {
                 Assert.Fail(error);
             };
