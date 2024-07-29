@@ -361,6 +361,8 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
             {
                 tcs.TrySetException(new Exception(error));
             });
+
+            await tcs.Task;
         }
 
         [Test]
@@ -421,6 +423,8 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
             {
                 tcs.TrySetException(new Exception(error.GenerateErrorReport()));
             });
+
+            await tcs.Task;
         }
     }
 }
