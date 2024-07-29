@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -10,6 +11,7 @@ using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Provider;
 using Sequence.Utils;
+using Sequence.WaaS.DataTypes;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -155,8 +157,31 @@ namespace Sequence.EmbeddedWallet
             }
             catch (FileLoadException e)
             {
-                throw new Exception("File load exception: " + e.Message + GetRequestErrorIfAvailable(request) +
-                                    "\nCurl-equivalent request: " + curlRequest);
+                string errorReason = GetRequestErrorIfAvailable(request);
+                string exceptionMessage = "File load exception: " + e.Message + " reason: " + errorReason +
+                                          "\nCurl-equivalent request: " + curlRequest;
+                if (errorReason.Contains("intent is invalid: intent expired") || errorReason.Contains("intent is invalid: intent issued in the future"))
+                {
+                    string dateHeader = request.GetResponseHeader("date");
+                    if (string.IsNullOrWhiteSpace(dateHeader))
+                    {
+                        exceptionMessage += "\nNo date header found in response";
+                        throw new Exception(exceptionMessage);
+                    }
+
+                    if (DateTime.TryParseExact(dateHeader, "ddd, dd MMM yyyy HH:mm:ss 'GMT'",
+                            CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime dateTime))
+                    {
+                        long currentTimeAccordingToServer = ((DateTimeOffset)dateTime).ToUnixTimeSeconds();
+                        throw new TimeMismatchException(exceptionMessage, currentTimeAccordingToServer);
+                    }
+                    else
+                    {
+                        exceptionMessage += "\nUnable to parse server time from date header in response";
+                        throw new Exception(exceptionMessage);
+                    }
+                }
+                throw new Exception(exceptionMessage);
             }
             catch (Exception e)
             {

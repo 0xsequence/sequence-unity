@@ -16,7 +16,7 @@ namespace GuestLogin
         private void Awake()
         {
             _login = SequenceLogin.GetInstance();
-            _login.OnLoginFailed += (error, method, email) =>
+            _login.OnLoginFailed += (error, method, email, methods) =>
             {
                 Debug.LogError(error);
             };

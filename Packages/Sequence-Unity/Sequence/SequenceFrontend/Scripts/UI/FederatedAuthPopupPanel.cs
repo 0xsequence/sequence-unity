@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -15,6 +16,7 @@ namespace Sequence.Demo
         private ILogin _login;
         private string _email;
         private LoginMethod _loginMethod;
+        private List<LoginMethod> _loginMethods;
 
         protected override void Awake()
         {
@@ -29,8 +31,7 @@ namespace Sequence.Demo
 
         public override IEnumerator OpenInitialPage(params object[] openArgs)
         {
-            List<LoginMethod> loginMethods = _login.GetLoginMethodsAssociatedWithEmail(_email);
-            yield return base.OpenInitialPage(openArgs, loginMethods, _loginMethod);
+            yield return base.OpenInitialPage(openArgs, _loginMethods, _loginMethod);
         }
         
         public void ReturnToLogin()
@@ -44,12 +45,17 @@ namespace Sequence.Demo
             StartCoroutine(SetUIPage(newAccountConfirmationPage, this, _login));
         }
 
-        public void OnLoginFailed(string message, LoginMethod method, string email)
+        public void OnLoginFailed(string message, LoginMethod method, string email, List<LoginMethod> loginMethods = default)
         {
-            if (!string.IsNullOrWhiteSpace(email) && message.Contains("EmailAlreadyInUse"))
+            if (!string.IsNullOrWhiteSpace(email) && message.Contains(SequenceLogin.EmailInUseError))
             {
                 _email = email;
                 _loginMethod = method;
+                _loginMethods = loginMethods;
+                if (_loginMethods == default)
+                {
+                    throw new Exception("No login methods provided");
+                }
                 Open();
             }
         }

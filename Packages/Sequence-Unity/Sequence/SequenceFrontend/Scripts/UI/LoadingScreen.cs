@@ -58,7 +58,7 @@ namespace Sequence.Demo
             Destroy(gameObject);
         }
         
-        private void OnLoginFailedHandler(string error, LoginMethod method, string email)
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
         {
             Destroy(gameObject);
         }

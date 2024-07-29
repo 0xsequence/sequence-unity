@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Sequence.Authentication;
 using Sequence.Utils;
 using TMPro;
@@ -92,7 +93,7 @@ namespace Sequence.Demo
             InstantiateLoadingScreen();
         }
 
-        private void OnLoginFailedHandler(string error, LoginMethod method, string email)
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
         {
             Debug.LogError($"Failed login: {error}");
             _errorText.text = error;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Utils;
@@ -14,6 +15,7 @@ namespace Sequence.EmbeddedWallet
     {
         public static string WaaSWithAuthUrl { get; private set; }
         public const string WaaSLoginMethod = "WaaSLoginMethod";
+        public const string EmailInUseError = "EmailAlreadyInUse";
 
         private int _waasProjectId;
         private string _waasVersion;
@@ -306,7 +308,6 @@ namespace Sequence.EmbeddedWallet
                 SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
-                PlayerPrefs.SetInt($"{email}-{method}", 1);
                 PlayerPrefs.Save();
                 if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
                 {
@@ -317,7 +318,15 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error registering session: " + e.Message, method, email);
+                if (e.Message.Contains(EmailInUseError))
+                {
+                    List<LoginMethod> associatedLoginMethods = ParseLoginMethods(e.Message);
+                    OnLoginFailed?.Invoke("Error registering session: " + e.Message, method, email, associatedLoginMethods);
+                }
+                else
+                {
+                    OnLoginFailed?.Invoke("Error registering session: " + e.Message, method, email);
+                }
                 _isLoggingIn = false;
                 _failedLoginIntent = loginIntent;
                 _failedLoginMethod = method;
@@ -329,6 +338,75 @@ namespace Sequence.EmbeddedWallet
             {
                 await FederateAccount(new IntentDataFederateAccount(_failedLoginIntent, walletAddress), _failedLoginMethod, email);
             }
+        }
+
+        private List<LoginMethod> ParseLoginMethods(string errorMessage)
+        {
+            if (!errorMessage.Contains(EmailInUseError))
+            {
+                throw new ArgumentException($"Error message must contain {EmailInUseError}. Given: {errorMessage}");
+            }
+            
+            string[] errorComponents = errorMessage.Split('{');
+            string errorLeft = "{" + errorComponents[1];
+            errorComponents = errorLeft.Split('}');
+            string error = errorComponents[0] + "}";
+
+            ErrorResponse response = JsonConvert.DeserializeObject<ErrorResponse>(error);
+            string cause = response.cause;
+            string[] methodStrings = cause.Split(',');
+            List<LoginMethod> methods = new List<LoginMethod>();
+            int count = methodStrings.Length;
+            for (int i = 0; i < count; i++)
+            {
+                string[] components = methodStrings[i].Trim().Split('|');
+                IdentityType identityType = (IdentityType)Enum.Parse(typeof(IdentityType), components[0]);
+                switch (identityType)
+                {
+                    case IdentityType.OIDC:
+                        if (components.Length < 3)
+                        {
+                            Debug.LogError(
+                                "Invalid response from WaaS server, expected at least 3 components in OIDC login method string");
+                        }
+
+                        if (components[2].Contains("google"))
+                        {
+                            methods.Add(LoginMethod.Google);
+                        }
+                        else if (components[2].Contains("apple"))
+                        {
+                            methods.Add(LoginMethod.Apple);
+                        }
+                        else if (components[2].Contains("discord"))
+                        {
+                            methods.Add(LoginMethod.Discord);
+                        }
+                        else if (components[2].Contains("facebook"))
+                        {
+                            methods.Add(LoginMethod.Facebook);
+                        }
+                        else
+                        {
+                            Debug.LogError("Unexpected OIDC login method string: " + components[2]);
+                        }
+                        break;
+                    case IdentityType.Email:
+                        methods.Add(LoginMethod.Email);
+                        break;
+                    case IdentityType.Guest:
+                        methods.Add(LoginMethod.Guest);
+                        break;
+                    case IdentityType.PlayFab:
+                        methods.Add(LoginMethod.PlayFab);
+                        break;
+                    default:
+                        Debug.LogError("Unexpected identity type " + identityType);
+                        break;
+                }
+            }
+
+            return methods;
         }
 
         public async Task<string> InitiateAuth(IntentDataInitiateAuth initiateAuthIntent, LoginMethod method)
@@ -392,14 +470,8 @@ namespace Sequence.EmbeddedWallet
             
             await ConnectToWaaS(_failedLoginIntent, _failedLoginMethod, _failedLoginEmail);
             
-            List<LoginMethod> loginMethods = EnumExtensions.GetEnumValuesAsList<LoginMethod>();
-            loginMethods.Remove(LoginMethod.None);
-            int loginMethodsCount = loginMethods.Count;
-            for (int i = 0; i < loginMethodsCount; i++)
-            {
-                LoginMethod method = loginMethods[i];
-                PlayerPrefs.SetInt($"{_failedLoginEmail}-{method}", 0);
-            }
+            PlayerPrefs.SetInt(WaaSLoginMethod, (int)_failedLoginMethod);
+            PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, _failedLoginEmail);
             PlayerPrefs.Save();
         }
 
@@ -426,23 +498,6 @@ namespace Sequence.EmbeddedWallet
             await connector.ConnectToWaaSViaGuest();
         }
 
-        public List<LoginMethod> GetLoginMethodsAssociatedWithEmail(string email)
-        {
-            List<LoginMethod> result = new List<LoginMethod>();
-            List<LoginMethod> loginMethods = EnumExtensions.GetEnumValuesAsList<LoginMethod>();
-            loginMethods.Remove(LoginMethod.None);
-            int loginMethodsCount = loginMethods.Count;
-            for (int i = 0; i < loginMethodsCount; i++)
-            {
-                LoginMethod method = loginMethods[i];
-                if (PlayerPrefs.GetInt($"{email}-{method}", 0) == 1)
-                {
-                    result.Add(method);
-                }
-            }
-            return result;
-        }
-
         private void StoreWalletSecurely(string waasWalletAddress)
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
@@ -464,7 +519,8 @@ namespace Sequence.EmbeddedWallet
                     throw new Exception($"Email received from WaaS server doesn't match, received {responseEmail}, sent {email}");
                 }
                 
-                PlayerPrefs.SetInt($"{email}-{method}", 1);
+                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
+                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
                 _failedLoginEmail = "";
                 _failedLoginIntent = null;

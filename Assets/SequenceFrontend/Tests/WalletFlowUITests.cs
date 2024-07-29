@@ -593,6 +593,7 @@ namespace SequenceExamples.Scripts.Tests
         
         public IEnumerator EndToEndTestFetchWalletContent()
         {
+            yield return new WaitForSeconds(1f); // Allow a moment for the test to finish setting up
             yield return _testMonobehaviour.StartCoroutine(AssertContentIsFetchedAndDisplayedProperly());
             
             WalletUIElement[] elements = GetWalletElements();

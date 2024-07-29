@@ -97,7 +97,7 @@ namespace Sequence.Demo
         {
             _tokenFetcher = tokenContentFetcher;
             _tokenFetcher.OnTokenFetchSuccess += HandleTokenFetchSuccess;
-            _tokenFetcher.Refresh();;
+            _tokenFetcher.Refresh();
             _nftFetcher = nftContentFetcher;
             _nftFetcher.OnNftFetchSuccess += HandleNftFetchSuccess;
             _nftFetcher.Refresh();
