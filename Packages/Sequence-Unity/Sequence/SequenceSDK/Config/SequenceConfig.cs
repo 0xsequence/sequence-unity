@@ -29,7 +29,7 @@ namespace Sequence.Config
         [Header("WaaS Configuration")]
         public string WaaSConfigKey;
         [FormerlySerializedAs("EnableAccountOverride")] public bool EnableMultipleAccountsPerEmail = false;
-        public string WaaSVersion { get; private set; } = "1.3.0";
+        public string WaaSVersion { get; private set; }
 
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
@@ -42,6 +42,7 @@ namespace Sequence.Config
             if (_config == null)
             {
                 _config = Resources.Load<SequenceConfig>("SequenceConfig");
+                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
             }
 
             if (_config == null)
