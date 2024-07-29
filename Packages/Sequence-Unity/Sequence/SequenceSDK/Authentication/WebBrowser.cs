@@ -34,17 +34,18 @@ namespace Sequence.Authentication
         
         public void Authenticate(string url, string redirectUrl = "")
         {
+            LoginMethod method = _authenticator.GetMethodFromState(_state);
             Dictionary<string, string> queryParams = url.ExtractQueryAndHashParameters();
-            if (queryParams.TryGetValue("client_id", out string clientId) && queryParams.TryGetValue("nonce", out string nonce))
+            if (queryParams.TryGetValue("client_id", out string clientId))
             {
                 GameObject receiver = new GameObject("WebBrowserMessageReceiver");
                 receiver.AddComponent<WebBrowserMessageReceiver>().SetWebBrowser(this);
-                ISocialSignIn socialSignIn = WebSocialSignInFactory.Create(_authenticator.GetMethodFromState(_state));
-                socialSignIn.SignIn(clientId, nonce);
+                ISocialSignIn socialSignIn = WebSocialSignInFactory.Create(method);
+                socialSignIn.SignIn(clientId, "");
             }
             else
             {
-                _authenticator.AppleInvokeSignInFailed("Social sign in failed: missing client_id, nonce, or state");
+                _authenticator.InvokeSignInFailed("Social sign in failed: missing client_id, nonce, or state", method);
             }
         }
 #else
