@@ -25,7 +25,7 @@ namespace Sequence.EmbeddedWallet
             _exception = e;
         }
         
-        public async Task<T> SendIntent<T, T2>(T2 args, IntentType type = IntentType.None, uint timeBeforeExpiryInSeconds = 30)
+        public async Task<T> SendIntent<T, T2>(T2 args, IntentType type = IntentType.None, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
         {
             if (_exception != null && !(_numberOfCalls == 0 && _returnObjects != null && _returnObjects.Length > 1))
             {

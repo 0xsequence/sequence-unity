@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Sequence.Config;
 using Sequence.Wallet;
 using Sequence.EmbeddedWallet;
+using Sequence.Utils;
+using Sequence.WaaS.DataTypes;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Sequence.EmbeddedWallet.Tests
 {
@@ -124,6 +130,26 @@ namespace Sequence.EmbeddedWallet.Tests
             catch (Exception e)
             {
                 Assert.AreEqual("Wallet address not found in response", e.Message);
+            }
+        }
+
+        [TestCase(-1000)] // intent will have expired
+        [TestCase(1000)] // intent will have been issued in the future
+        public async Task TestTimeMismatchExceptionResultsInRetry(int timeOffset)
+        {
+            SequenceConfig config = SequenceConfig.GetConfig();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            IntentSender intentSender = new IntentSender(new HttpClient($"{configJwt.rpcServer.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator"), new EOAWallet(), "", configJwt.projectId, config.WaaSVersion);
+            LogAssert.Expect(LogType.Warning, new Regex("Time mismatch*"));
+            try
+            {
+                var result = await intentSender.SendIntent<TransactionReturn, IntentDataSendTransaction>(
+                    new IntentDataSendTransaction("", "", null), IntentType.SendTransaction, 30, (uint)(DateTimeOffset.UtcNow.ToUnixTimeSeconds() + timeOffset));
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.True(e is not TimeMismatchException);
             }
         }
 
