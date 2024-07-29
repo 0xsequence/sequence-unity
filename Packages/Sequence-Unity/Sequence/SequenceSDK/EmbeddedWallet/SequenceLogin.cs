@@ -38,19 +38,40 @@ namespace Sequence.EmbeddedWallet
         private bool _automaticallyFederateAccountsWhenPossible;
         private bool _authenticatorSetup = false;
 
+        private Address _connectedWalletAddress;
+
         private static SequenceLogin _instance;
-        
-        public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+
+        public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null,
+            IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true,
+            Address connectedWalletAddress = null)
         {
             if (_instance == null)
             {
-                _instance = new SequenceLogin(validator, authenticator, connector);
+                _instance = new SequenceLogin(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress);
             }
             return _instance;
         }
 
+        public static SequenceLogin GetInstanceToFederateAuth(Address connectedWalletAddress, IValidator validator = null,
+            IAuthenticator authenticator = null,
+            IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+        {
+            if (_instance == null)
+            {
+                _instance = new SequenceLogin(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress);
+            }
+            _instance.SetConnectedWalletAddress(connectedWalletAddress);
+            return _instance;
+        }
+        
+        public void SetConnectedWalletAddress(Address connectedWalletAddress)
+        {
+            _connectedWalletAddress = connectedWalletAddress;
+        }
+
         [Obsolete("Use GetInstance() instead.")]
-        public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+        public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true, Address connectedWalletAddress = null)
         {
             if (connector == null)
             {
@@ -59,6 +80,7 @@ namespace Sequence.EmbeddedWallet
             _connector = connector;
             
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
+            SetConnectedWalletAddress(connectedWalletAddress);
             
             bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform();
             if (storeSessionWallet)
@@ -79,6 +101,12 @@ namespace Sequence.EmbeddedWallet
             SetupAuthenticator(validator, authenticator);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="validator"></param>
+        /// <param name="authenticator"></param>
+        /// <param name="federateAuth"></param>
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             if (_authenticatorSetup)
@@ -288,7 +316,14 @@ namespace Sequence.EmbeddedWallet
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            ConnectToWaaSViaSocialLogin(result.IdToken, result.Method);
+            if (_connectedWalletAddress != null)
+            {
+                FederateAccountSocial(result.IdToken, result.Method, _connectedWalletAddress);
+            }
+            else
+            {
+                ConnectToWaaSViaSocialLogin(result.IdToken, result.Method);
+            }
         }
 
         private void OnSocialSignInFailed(string error, LoginMethod method)
