@@ -18,6 +18,7 @@ namespace Sequence
         private bool _logErrors;
         private bool _logWarnings;
 
+        [Obsolete("Use the constructor that takes a Chain object instead")]
         public ChainIndexer(BigInteger chainId, bool logErrors = true, bool logWarnings = true)
         {
             this.ChainId = chainId.ToString();

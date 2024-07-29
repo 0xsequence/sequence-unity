@@ -36,7 +36,7 @@ namespace Sequence.Demo
             int chains = _includeChains.Count;
             for (int i = 0; i < chains; i++)
             {
-                _indexers.Add(new ChainIndexer((int)_includeChains[i]));
+                _indexers.Add(new ChainIndexer(_includeChains[i]));
             }
 
             _collectionsToProcess = new Queue<TokenBalance>[chains];
@@ -70,6 +70,11 @@ namespace Sequence.Demo
                     
                     pageNumber = 0;
                     IncrementChainIndex(indexers);
+                    if (_indexers[_chainIndex].GetChain() == Chain.TestnetOptimisticSepolia)
+                    {
+                        Debug.Log("Something wonky happens here...");
+                        IncrementChainIndex(indexers);
+                    }
 
                     continue;
                 }
@@ -103,7 +108,7 @@ namespace Sequence.Demo
             }
             else
             {
-                Debug.Log($"Moving to next chain... {(Chain)(int)_indexers[_chainIndex].GetChainID()}");
+                Debug.Log($"Moving to next chain... {_indexers[_chainIndex].GetChain()}");
             }
         }
 
@@ -157,7 +162,7 @@ namespace Sequence.Demo
             Queue<TokenBalance> toProcess = _collectionsToProcess[chainIndex];
             while (toProcess.TryDequeue(out TokenBalance tokenBalance))
             {
-                Debug.Log($"Processing collections from {(Chain)(int)_indexers[chainIndex].GetChainID()}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
+                Debug.Log($"Processing collections from {_indexers[chainIndex].GetChain()}. Collections to process: {_collectionsToProcess[chainIndex].Count}");
                 await ProcessCollection(tokenBalance, _indexers[chainIndex], pageSize);
             }
         }

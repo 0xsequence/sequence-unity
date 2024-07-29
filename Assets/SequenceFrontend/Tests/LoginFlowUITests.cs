@@ -350,7 +350,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return WaitForAnimationTime;
             CheckLoadingScreenPresence(true);
             loginHandler.FireOnLoginFailedEvent();
-            LogAssert.Expect(LogType.Error, "Failed login: ");
+            LogAssert.Expect(LogType.Error, "Failed to sign in to WaaS API with error: ");
             yield return null;
             CheckLoadingScreenPresence(false);
 
@@ -359,7 +359,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return WaitForAnimationTime;
             CheckLoadingScreenPresence(true);
             loginHandler.FireOnLoginFailedEvent();
-            LogAssert.Expect(LogType.Error, "Failed login: ");
+            LogAssert.Expect(LogType.Error, "Failed to sign in to WaaS API with error: ");
             yield return null;
             CheckLoadingScreenPresence(false);
 
@@ -368,7 +368,7 @@ namespace SequenceExamples.Scripts.Tests
             yield return WaitForAnimationTime;
             CheckLoadingScreenPresence(true);
             loginHandler.FireOnLoginFailedEvent();
-            LogAssert.Expect(LogType.Error, "Failed login: ");
+            LogAssert.Expect(LogType.Error, "Failed to sign in to WaaS API with error: ");
             yield return null;
             CheckLoadingScreenPresence(false);
             

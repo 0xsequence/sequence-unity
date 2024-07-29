@@ -780,7 +780,7 @@ MonoBehaviour:
   _openAnimationDurationInSeconds: 0
   _closeAnimationDurationInSeconds: 0
   _animation: 0
-  InitialPage: {fileID: 1094787529}
+  InitialPage: {fileID: 0}
 --- !u!1 &1327297838
 GameObject:
   m_ObjectHideFlags: 0
