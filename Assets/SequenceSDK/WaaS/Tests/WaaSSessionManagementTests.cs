@@ -51,7 +51,7 @@ namespace Sequence.EmbeddedWallet.Tests
             }
         }
         
-        [Test]
+        [Test] // Todo: fix this test. Note that the behaviour we're trying to test works, see PlayFabLogin. For some reason, the text context breaks it (I haven't figure out why yet)
         public async Task SignInAndOutRepeatedly_PlayFabGuest()
         {
             string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
