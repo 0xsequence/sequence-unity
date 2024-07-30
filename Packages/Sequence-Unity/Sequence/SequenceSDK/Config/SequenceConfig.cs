@@ -42,7 +42,15 @@ namespace Sequence.Config
             if (_config == null)
             {
                 _config = Resources.Load<SequenceConfig>("SequenceConfig");
-                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
+                TextAsset versionFile = Resources.Load<TextAsset>("sequence-unity-version");
+                if (versionFile != null)
+                {
+                    _config.WaaSVersion = $"1 (Unity {versionFile.text})";
+                }
+                else
+                {
+                    _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
+                }
             }
 
             if (_config == null)
