@@ -50,6 +50,10 @@ namespace Sequence.EmbeddedWallet
             {
                 _instance = new SequenceLogin(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress);
             }
+            if (connectedWalletAddress != null)
+            {
+                _instance.SetConnectedWalletAddress(connectedWalletAddress);
+            }
             return _instance;
         }
 
@@ -82,7 +86,7 @@ namespace Sequence.EmbeddedWallet
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
             SetConnectedWalletAddress(connectedWalletAddress);
             
-            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform();
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
@@ -141,7 +145,7 @@ namespace Sequence.EmbeddedWallet
 
         public void TryToRestoreSession()
         {
-            if (!_storeSessionWallet)
+            if (!_storeSessionWallet || _connectedWalletAddress != null)
             {
                 return;
             }
@@ -349,6 +353,13 @@ namespace Sequence.EmbeddedWallet
                     StoreWalletSecurely(walletAddress);
                 }
                 _isLoggingIn = false;
+                wallet.OnDropSessionComplete += session =>
+                {
+                    if (session == sessionId)
+                    {
+                        _connectedWalletAddress = null;
+                    }
+                };
                 SequenceWallet.OnWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
