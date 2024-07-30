@@ -153,6 +153,7 @@ namespace Sequence.EmbeddedWallet
             if (_connectedWalletAddress != null)
             {
                 FailedLoginWithStoredSessionWallet("Cannot restore session when connected wallet address is set");
+                return;
             }
             TryToLoginWithStoredSessionWallet();
         }
