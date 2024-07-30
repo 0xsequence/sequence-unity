@@ -145,15 +145,25 @@ namespace Sequence.EmbeddedWallet
 
         public void TryToRestoreSession()
         {
-            if (!_storeSessionWallet || _connectedWalletAddress != null)
+            if (!_storeSessionWallet)
             {
                 return;
+            }
+
+            if (_connectedWalletAddress != null)
+            {
+                FailedLoginWithStoredSessionWallet("Cannot restore session when connected wallet address is set");
             }
             TryToLoginWithStoredSessionWallet();
         }
 
         public void GuestLogin()
         {
+            if (_connectedWalletAddress != null)
+            {
+                FederateAccountGuest(_connectedWalletAddress);
+                return;
+            }
             ConnectToWaaSAsGuest();
         }
 
@@ -290,7 +300,14 @@ namespace Sequence.EmbeddedWallet
         public async Task Login(string email, string code)
         {
             _isLoggingIn = true;
-            await _emailConnector.ConnectToWaaSViaEmail(email, code);
+            if (_connectedWalletAddress != null)
+            {
+                await FederateEmail(email, code, _connectedWalletAddress);
+            }
+            else
+            {
+                await _emailConnector.ConnectToWaaSViaEmail(email, code);
+            }
         }
 
         public void GoogleLogin()
@@ -502,7 +519,14 @@ namespace Sequence.EmbeddedWallet
 
         public void PlayFabLogin(string titleId, string sessionTicket, string email)
         {
-            ConnectToWaaSViaPlayFab(titleId, sessionTicket, email);
+            if (_connectedWalletAddress != null)
+            {
+                FederateAccountPlayFab(titleId, sessionTicket, email, _connectedWalletAddress);
+            }
+            else
+            {
+                ConnectToWaaSViaPlayFab(titleId, sessionTicket, email);
+            }
         }
 
         public void ForceCreateAccount()
