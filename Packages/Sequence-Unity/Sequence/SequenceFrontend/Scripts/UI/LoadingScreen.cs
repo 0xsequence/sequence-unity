@@ -78,7 +78,7 @@ namespace Sequence.Demo
             Destroy(gameObject);
         }
         
-        private void OnAccountFederatedHandler(string walletAddress)
+        private void OnAccountFederatedHandler(Account account)
         {
             Destroy(gameObject);
         }
