@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Sequence.ABI;
 using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.Provider;
@@ -26,14 +28,18 @@ namespace Sequence.EmbeddedWallet
             NullValueHandling = NullValueHandling.Ignore
         };
 
+        private ResponseSignatureValidator _signatureValidator;
+
         public HttpClient(string url)
         {
+            _signatureValidator = new ResponseSignatureValidator();
             _url = url;
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
             SequenceConfig config = SequenceConfig.GetConfig();
             _defaultHeaders["X-Access-Key"] = config.BuilderAPIKey;
+            _defaultHeaders["Accept-Signature"] = "sig=()";
             if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
@@ -130,9 +136,21 @@ namespace Sequence.EmbeddedWallet
                 }
                 else
                 {
-                    byte[] results = request.downloadHandler.data;
+                    while (!_signatureValidator.PublicKeyFetched)
+                    {
+                        await Task.Yield();
+                    }
+
+                    string responseJson = "";
+                    try
+                    {
+                        responseJson = _signatureValidator.ValidateResponse(request);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Error validating response: " + e.Message + " Warning: this response may have been tampered with!");
+                    }
                     request.Dispose();
-                    var responseJson = Encoding.UTF8.GetString(results);
                     try
                     {
                         T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
@@ -158,7 +176,7 @@ namespace Sequence.EmbeddedWallet
             catch (FileLoadException e)
             {
                 string errorReason = GetRequestErrorIfAvailable(request);
-                string exceptionMessage = "File load exception: " + e.Message + " reason: " + errorReason +
+                string exceptionMessage = "File load exception: " + e.Message + " response: " + errorReason +
                                           "\nCurl-equivalent request: " + curlRequest;
                 if (errorReason.Contains("intent is invalid: intent expired") || errorReason.Contains("intent is invalid: intent issued in the future"))
                 {
@@ -198,7 +216,7 @@ namespace Sequence.EmbeddedWallet
         {
             if (request.downloadHandler != null && request.downloadHandler.data != null)
             {
-                return " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data);
+                return " response: " + Encoding.UTF8.GetString(request.downloadHandler.data);
             }
 
             return "";

@@ -430,9 +430,10 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error initiating auth: " + e.Message, method);
-                challenge = "Error initiating auth: " + e.Message;
+                string error = "Error initiating auth: " + e.Message;
+                OnLoginFailed?.Invoke(error, method);
                 _isLoggingIn = false;
+                throw new Exception(error);
             }
 
             return challenge;
