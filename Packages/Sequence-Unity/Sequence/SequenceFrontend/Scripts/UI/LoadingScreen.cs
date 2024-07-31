@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = System.Random;
@@ -27,6 +28,8 @@ namespace Sequence.Demo
                 _loginPanel.LoginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
                 _loginPanel.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
                 _loginPanel.LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
+                SequenceWallet.OnAccountFederationFailed += OnAccountFederationFailedHandler;
+                SequenceWallet.OnAccountFederated += OnAccountFederatedHandler;
             }
             else
             {
@@ -45,6 +48,8 @@ namespace Sequence.Demo
                 _loginPanel.LoginHandler.OnMFAEmailSent -= OnMFAEmailSentHandler;
                 _loginPanel.LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
                 _loginPanel.LoginHandler.OnMFAEmailFailedToSend -= OnMFAEmailFailedToSendHandler;
+                SequenceWallet.OnAccountFederationFailed -= OnAccountFederationFailedHandler;
+                SequenceWallet.OnAccountFederated -= OnAccountFederatedHandler;
             }
         }
 
@@ -64,6 +69,16 @@ namespace Sequence.Demo
         }
         
         private void OnMFAEmailFailedToSendHandler(string email, string error)
+        {
+            Destroy(gameObject);
+        }
+        
+        private void OnAccountFederationFailedHandler(string error)
+        {
+            Destroy(gameObject);
+        }
+        
+        private void OnAccountFederatedHandler(string walletAddress)
         {
             Destroy(gameObject);
         }
