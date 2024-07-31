@@ -62,6 +62,7 @@ namespace Sequence.Demo
             _errorText.text = "";
             LoginHandler.OnMFAEmailFailedToSend -= OnMFAEmailFailedToSendHandler;
             LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
+            SequenceWallet.OnAccountFederationFailed -= OnAccountFederationFailedHandler;
         }
 
         public void SetupLogin(ILogin loginHandler)
@@ -69,6 +70,7 @@ namespace Sequence.Demo
             LoginHandler = loginHandler;
             LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
             LoginHandler.OnLoginFailed += OnLoginFailedHandler;
+            SequenceWallet.OnAccountFederationFailed += OnAccountFederationFailedHandler;
         }
 
         public void Login()
@@ -117,6 +119,12 @@ namespace Sequence.Demo
         private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
         {
             Debug.LogError($"Failed to sign in to WaaS API with error: {error}");
+            _errorText.text = error;
+        }
+        
+        private void OnAccountFederationFailedHandler(string error)
+        {
+            Debug.LogError($"Failed to federate account with Sequence API: {error}");
             _errorText.text = error;
         }
         
