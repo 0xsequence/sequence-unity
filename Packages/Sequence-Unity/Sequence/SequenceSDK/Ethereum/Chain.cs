@@ -18,6 +18,7 @@ namespace Sequence
         OasysHomeverse = 19011,
         AstarZKEvm = 3776,
         Xai = 660279,
+        Blast = 81457,
         
         // Testnets
         TestnetSepolia = 11155111,
@@ -30,6 +31,9 @@ namespace Sequence
         TestnetOptimisticSepolia = 11155420,
         TestnetAstarZKyoto = 6038361,
         TestnetXrSepolia = 2730,
+        TestnetB3Sepolia = 1993,
+        TestnetAPEChain = 33111,
+        TestnetBlastSepolia = 168587773,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         

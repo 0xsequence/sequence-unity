@@ -24,6 +24,7 @@ namespace Sequence.Provider
             { Chain.OasysHomeverse, "homeverse" },
             { Chain.AstarZKEvm, "astar-zkevm" },
             { Chain.Xai, "xai" },
+            { Chain.Blast, "blast" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
@@ -36,6 +37,9 @@ namespace Sequence.Provider
             { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
             { Chain.TestnetXrSepolia, "xr-sepolia" },
             { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
+            { Chain.TestnetB3Sepolia, "b3-sepolia" },
+            { Chain.TestnetAPEChain, "apechain-testnet" },
+            { Chain.TestnetBlastSepolia, "blast-sepolia" }
         };
         
         private const string _baseUrl = "https://nodes.sequence.app/";
