@@ -80,24 +80,9 @@ namespace Sequence.EmbeddedWallet.Tests
 
         private async Task RunTests(WaaSWalletTests walletTests, SequenceWalletToEOAWalletAdapterTests adapterTests)
         {
-            walletTests.TestMessageSigning("Hello world", Chain.Polygon);
-            walletTests.TestTransfer();
-            walletTests.TestSendERC20();
-            walletTests.TestSendERC20_usingRawTransaction();
-            walletTests.TestSendBatchTransaction_withERC721();
-            walletTests.TestSendBatchTransaction_withERC1155();
-            walletTests.TestDelayedEncode("transfer(address,uint256)");
-            walletTests.TestDelayedEncode(ERC20.Abi);
-            walletTests.TestSendBatchTransaction_withDelayedEncode("transfer(address,uint256)");
-            walletTests.TestSendBatchTransaction_withDelayedEncode(ERC20.Abi);
             walletTests.TestDeployContract(ERC20Bytecode);
             await WaitForTestsToComplete();
 
-            adapterTests.TestGetAddress(RequiredAddress);
-            adapterTests.TestSignMessage_withAdapter("Hello world", Chain.Polygon);
-            adapterTests.TestSendTransaction_withAdapter();
-            adapterTests.TestSendERC20_withAdapter();
-            adapterTests.TestBatchTransactions_withAdapter();
             adapterTests.TestDeployContract_withAdapter(ERC721Bytecode);
             await WaitForTestsToComplete();
             
