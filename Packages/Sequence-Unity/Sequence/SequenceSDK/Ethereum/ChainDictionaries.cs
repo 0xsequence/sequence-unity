@@ -52,7 +52,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "OAS"},
             { Chain.AstarZKEvm, "ETH" },
             { Chain.Xai, "XAI" },
-            { Chain.Blast, "BLAST" },
+            { Chain.Blast, "ETH" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -66,8 +66,8 @@ namespace Sequence
             { Chain.TestnetXrSepolia, "tXR" },
             { Chain.TestnetXaiSepolia, "sXAI" },
             { Chain.TestnetB3Sepolia, "ETH" },
-            { Chain.TestnetAPEChain, "ETH" },
-            { Chain.TestnetBlastSepolia, "BLAST" }
+            { Chain.TestnetAPEChain, "APE" },
+            { Chain.TestnetBlastSepolia, "ETH" }
         };
 
         public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
@@ -99,7 +99,7 @@ namespace Sequence
             { Chain.TestnetXrSepolia, "https://xr-sepolia-testnet.explorer.caldera.xyz/" },
             { Chain.TestnetXaiSepolia, "https://testnet-explorer-v2.xai-chain.net/" },
             { Chain.TestnetB3Sepolia, "https://sepolia.explorer.b3.fun/" },
-            { Chain.TestnetAPEChain, "" }, // Not found
+            { Chain.TestnetAPEChain, "https://curtis.explorer.caldera.xyz/" }, 
             { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" }
         };
         
