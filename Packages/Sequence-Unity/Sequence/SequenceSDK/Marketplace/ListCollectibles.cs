@@ -42,12 +42,13 @@ namespace Sequence.Marketplace
         public async Task<CollectibleOrder[]> ListAllCollectibleWithLowestListing(string contractAddress,
             CollectiblesFilter filter = default)
         {
-            CollectibleOrder[] collectibles = Array.Empty<CollectibleOrder>();
             ListCollectiblesWithLowestListingReturn result = await ListCollectiblesWithLowestListing(contractAddress, filter);
             if (result == null)
             {
                 return null;
             }
+
+            CollectibleOrder[] collectibles = result.collectibles;
             while (result.page != null && result.page.more)
             {
                 collectibles = ArrayUtils.CombineArrays(collectibles, result.collectibles);

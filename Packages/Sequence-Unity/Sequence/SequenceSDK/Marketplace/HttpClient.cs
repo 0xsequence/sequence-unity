@@ -28,9 +28,13 @@ namespace Sequence.Marketplace
         {
             string url = _baseUrl + ChainDictionaries.PathOf[chain] + _endUrl + endpoint;
             string requestJson = JsonConvert.SerializeObject(args);
-            using UnityWebRequest request = UnityWebRequest.Post(url, requestJson);
+            using UnityWebRequest request = UnityWebRequest.Get(url);
+            request.method = UnityWebRequest.kHttpVerbPOST;
+            byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
+            request.uploadHandler = new UploadHandlerRaw(requestData);
             request.uploadHandler.contentType = "application/json";
             request.SetRequestHeader("X-Access-Key", _apiKey);
+            request.SetRequestHeader("Content-Type", "application/json");
             string headersString = ExtractHeaders(request);
             string method = request.method;
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
