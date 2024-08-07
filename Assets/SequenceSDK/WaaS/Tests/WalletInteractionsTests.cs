@@ -159,7 +159,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            }, (error, method, email) =>
+            }, (error, method, email, methods) =>
             {
                 tcs.TrySetException(new Exception(error));
             });
@@ -219,7 +219,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            }, (error, method, email) =>
+            }, (error, method, email, methods) =>
             {
                 tcs.TrySetException(new Exception(error));
             });
@@ -271,7 +271,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            }, (error, method, email) =>
+            }, (error, method, email, methods) =>
             {
                 tcs.TrySetException(new Exception(error));
             });
@@ -321,7 +321,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            }, (error, method, email) =>
+            }, (error, method, email, methods) =>
             {
                 tcs.TrySetException(new Exception(error));
             });
@@ -357,7 +357,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                 {
                     tcs.TrySetException(e);
                 }
-            }, (error, method, email) =>
+            }, (error, method, email, methods) =>
             {
                 tcs.TrySetException(new Exception(error));
             });
@@ -414,7 +414,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                     {
                         tcs.TrySetException(e);
                     }
-                }, (error, method, email) =>
+                }, (error, method, email, methods) =>
                 {
                     tcs.TrySetException(new Exception(error));
                 });
