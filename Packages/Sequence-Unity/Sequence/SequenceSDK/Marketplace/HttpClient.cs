@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Config;
 using Sequence.Utils;
-using Sequence.WaaS.DataTypes;
 using UnityEngine.Networking;
 
 namespace Sequence.Marketplace

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace Sequence.Marketplace
 {
@@ -13,7 +12,7 @@ namespace Sequence.Marketplace
         public string image;
         public string video;
         public string audio;
-        public Dictionary<string, object> attributes;
+        public Dictionary<string, object>[] attributes;
         public string image_data;
         public string external_url;
         public string background_color;
@@ -22,7 +21,7 @@ namespace Sequence.Marketplace
         public string updatedAt;
         public Asset[] assets;
 
-        public TokenMetadata(string tokenId, string name, Dictionary<string, object> attributes, string description = null, string image = null, string video = null, string audio = null, string imageData = null, string externalURL = null, string backgroundColor = null, string animationURL = null, uint decimals = default, string updatedAt = null, Asset[] assets = null)
+        public TokenMetadata(string tokenId, string name, Dictionary<string, object>[] attributes, string description = null, string image = null, string video = null, string audio = null, string imageData = null, string externalURL = null, string backgroundColor = null, string animationURL = null, uint decimals = default, string updatedAt = null, Asset[] assets = null)
         {
             this.tokenId = tokenId;
             this.name = name;
