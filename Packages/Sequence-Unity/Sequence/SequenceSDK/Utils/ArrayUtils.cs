@@ -84,5 +84,23 @@ namespace Sequence.Utils
 
             return newList;
         }
+        
+        public static T[] CombineArrays<T>(T[] arr1, T[] arr2)
+        {
+            int length1 = arr1.Length;
+            int length2 = arr2.Length;
+            T[] newArr = new T[length1 + length2];
+            for (int i = 0; i < length1; i++)
+            {
+                newArr[i] = arr1[i];
+            }
+
+            for (int i = 0; i < length2; i++)
+            {
+                newArr[i + length1] = arr2[i];
+            }
+
+            return newArr;
+        }
     }
 }
