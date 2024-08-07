@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace Sequence.Marketplace
 {
@@ -8,7 +9,7 @@ namespace Sequence.Marketplace
         public bool includeEmpty;
         public string searchText = "";
         public PropertyFilter[] properties = null;
-        public MarketplaceKind[] marketplaces = null;
+        public string[] marketplaces = null;
         public string[] inAccounts = null;
         public string[] notInAccounts = null;
         public string[] ordersCreatedBy = null;
@@ -19,11 +20,36 @@ namespace Sequence.Marketplace
             this.includeEmpty = includeEmpty;
             this.searchText = searchText;
             this.properties = properties;
+            this.marketplaces = MarketplacesToStringArray(marketplaces);
+            this.inAccounts = inAccounts;
+            this.notInAccounts = notInAccounts;
+            this.ordersCreatedBy = ordersCreatedBy;
+            this.ordersNotCreatedBy = ordersNotCreatedBy;
+        }
+
+        [JsonConstructor]
+        public CollectiblesFilter(bool includeEmpty, string searchText, PropertyFilter[] properties, string[] marketplaces, string[] inAccounts, string[] notInAccounts, string[] ordersCreatedBy, string[] ordersNotCreatedBy)
+        {
+            this.includeEmpty = includeEmpty;
+            this.searchText = searchText;
+            this.properties = properties;
             this.marketplaces = marketplaces;
             this.inAccounts = inAccounts;
             this.notInAccounts = notInAccounts;
             this.ordersCreatedBy = ordersCreatedBy;
             this.ordersNotCreatedBy = ordersNotCreatedBy;
+        }
+
+        private string[] MarketplacesToStringArray(MarketplaceKind[] marketplaces)
+        {
+            int length = marketplaces.Length;
+            string[] marketplacesString = new string[length];
+            for (int i = 0; i < length; i++)
+            {
+                marketplacesString[i] = marketplaces[i].AsString();
+            }
+
+            return marketplacesString;
         }
     }
 }

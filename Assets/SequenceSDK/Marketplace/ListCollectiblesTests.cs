@@ -28,9 +28,9 @@ namespace SequenceSDK.Marketplace
             CollectibleOrder[] collectibles = await listCollectibles.ListAllCollectibleWithLowestListing(contractAddress, filter);
             
             Assert.IsNotNull(collectibles);
-            Assert.Greater(collectibles.Length, 0);
             Assert.Greater(successEvents, 0);
             Assert.AreEqual(failEvents, 0);
+            Assert.Greater(collectibles.Length, 0);
         }
     }
 }
