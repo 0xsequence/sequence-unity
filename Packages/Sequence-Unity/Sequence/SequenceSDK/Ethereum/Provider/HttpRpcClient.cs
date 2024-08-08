@@ -75,6 +75,7 @@ namespace Sequence.Provider
                     byte[] results = request.downloadHandler.data;
                     request.Dispose();
                     var responseJson = Encoding.UTF8.GetString(results);
+
                     try
                     {
                         RpcResponse result = JsonConvert.DeserializeObject<RpcResponse>(responseJson);

@@ -18,7 +18,9 @@ namespace Sequence.EmbeddedWallet
             this.request = request;
             this.simulations = simulations;
         }
-        
+
+        public FailedTransactionReturn() { }
+
         public FailedTransactionReturn(string error, IntentDataSendTransaction request)
         {
             this.error = error;
@@ -26,6 +28,19 @@ namespace Sequence.EmbeddedWallet
             JObject requestJObject = JObject.Parse(requestJson);
             this.request = new IntentPayload("", IntentType.SendTransaction, requestJObject, null);
             this.simulations = null;
+        }
+    }
+
+    public class FailedBatchTransactionReturn : FailedTransactionReturn
+    {
+        public SuccessfulTransactionReturn[] SuccessfulTransactionReturns { get; private set; }
+
+        public FailedTransactionReturn[] FailedTransactionReturns { get; private set; }
+
+        public FailedBatchTransactionReturn(SuccessfulTransactionReturn[] successfullTransactionReturns, FailedTransactionReturn[] failedTransactionReturns)
+        {
+            SuccessfulTransactionReturns = successfullTransactionReturns;
+            FailedTransactionReturns = failedTransactionReturns;
         }
     }
 }

@@ -7,7 +7,8 @@ namespace Sequence.EmbeddedWallet
     {
         public Address GetWalletAddress();
         public event Action<string> OnSignMessageComplete;
-        
+        public event Action<string> OnSignMessageFailed;
+
         /// <summary>
         /// Sign the specified message on the specified network
         /// Can be awaited directly and/or you can subscribe to the OnSignMessageComplete method
