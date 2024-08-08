@@ -11,7 +11,7 @@ using NUnit.Framework;
 
 namespace Sequence.WaaS.Tests
 {
-    public class WalletToWaasTest
+    public class EOAWalletToSequenceWalletTest
     {
         string _toAddress = "0x9766bf76b2E3e7BCB8c61410A3fC873f1e89b43f";
 
@@ -26,14 +26,14 @@ namespace Sequence.WaaS.Tests
         Chain chain = Chain.Polygon;
 
         EOAWallet wallet;
-        public EOAWalletToEmbeddedWalletAdapter adapter;
+        public EOAWalletToSequenceWalletAdapter adapter;
 
         [SetUp]
         public void  Setup()
         {
             wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
             client = new SequenceEthClient("http://localhost:8545/");
-            adapter = new EOAWalletToEmbeddedWalletAdapter(wallet, client);
+            adapter = new EOAWalletToSequenceWalletAdapter(wallet, client);
 
             adapter.OnSignMessageComplete += OnMessageSigned;
             adapter.OnSendTransactionComplete += OnTransactionSent;
