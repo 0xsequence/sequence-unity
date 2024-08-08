@@ -15,7 +15,7 @@ namespace Sequence.EmbeddedWallet
         public static Action<string> OnFailedToRecoverSession;
         public static Action<Account> OnAccountFederated;
         public static Action<string> OnAccountFederationFailed;
-        
+
         public string SessionId { get; private set; }
         private Address _address;
         private HttpClient _httpClient;
@@ -62,10 +62,10 @@ namespace Sequence.EmbeddedWallet
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
-            
+
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
-            new Dictionary<string, string>() {{"X-Access-Key", _builderApiKey}}); 
+            new Dictionary<string, string>() { { "X-Access-Key", _builderApiKey } });
         }
 
         public event Action<SuccessfulTransactionReturn> OnSendTransactionComplete;
@@ -135,7 +135,7 @@ namespace Sequence.EmbeddedWallet
                             bytecode,
                         }, "createContract"))
                 });
-            
+
             if (transactionReturn is SuccessfulTransactionReturn successfulTransactionReturn)
             {
                 string topic = SequenceCoder.KeccakHashASCII(_sequenceCreatedContractEvent);
@@ -150,7 +150,7 @@ namespace Sequence.EmbeddedWallet
                 }
                 string deployedContractAddressString = log.data.RemoveZeroPadding();
                 Address deployedContractAddress = new Address(deployedContractAddressString);
-                
+
                 SuccessfulContractDeploymentReturn result = new SuccessfulContractDeploymentReturn(successfulTransactionReturn, deployedContractAddress);
                 OnDeployContractComplete?.Invoke(result);
                 return result;
@@ -169,7 +169,7 @@ namespace Sequence.EmbeddedWallet
                 return result;
             }
         }
-        
+
         private MetaTxnReceiptLog FindLogWithTopic(MetaTxnReceipt receipt, string topic)
         {
             topic = topic.EnsureHexPrefix();
@@ -194,7 +194,7 @@ namespace Sequence.EmbeddedWallet
             return null;
         }
 
-        public event Action<string> OnDropSessionComplete; 
+        public event Action<string> OnDropSessionComplete;
 
         public async Task<bool> DropSession(string dropSessionId)
         {
@@ -259,12 +259,12 @@ namespace Sequence.EmbeddedWallet
                         timeBeforeExpiry);
 
                 FeeOptionsResponse feeOptionsResponse = await DetermineWhichFeeOptionsUserHasInWallet(options, network);
-                
-                return feeOptionsResponse; 
+
+                return feeOptionsResponse;
             }
             catch (Exception e)
             {
-                OnSendTransactionFailed?.Invoke(new FailedTransactionReturn($"Unable to get fee options: {e.Message}", 
+                OnSendTransactionFailed?.Invoke(new FailedTransactionReturn($"Unable to get fee options: {e.Message}",
                     new IntentDataSendTransaction(_address, network, transactions)));
                 return null;
             }
@@ -371,7 +371,7 @@ namespace Sequence.EmbeddedWallet
                 OnSendTransactionFailed?.Invoke(failedTransactionReturn);
                 return failedTransactionReturn;
             }
-            
+
         }
 
         public event Action<IntentResponseSessionAuthProof> OnSessionAuthProofGenerated;
@@ -392,5 +392,26 @@ namespace Sequence.EmbeddedWallet
                 return null;
             }
         }
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public async Task<IntentResponseGetIdToken> GetIdToken(string nonce = null)
+        {
+            IntentDataGetIdToken args = new IntentDataGetIdToken(SessionId, _address, nonce);
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseGetIdToken, IntentDataGetIdToken>(args, IntentType.GetIdToken);
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                OnFailedToRetrieveIdToken?.Invoke("Failed to retrieve Id Token : " + e.Message);
+                return null;
+            }
+        }
+
     }
 }
+    
