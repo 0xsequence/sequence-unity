@@ -11,7 +11,7 @@ namespace Sequence.Provider
 {
     public class SequenceEthClient : IEthClient
     {
-        public IRpcClient _httpRpcClient { get; private set; }
+        private IRpcClient _httpRpcClient;
         private readonly string url = "";
         private string chainId = null;
 

@@ -72,36 +72,39 @@ namespace Sequence.EmbeddedWallet
                 string toAddress;
                 BigInteger value;
                 string data = null;
+
                 switch (transactions[i])
                 {
                     case RawTransaction tx:
                         toAddress = tx.to;
                         value = BigInteger.Parse(tx.value);
                         data = tx.data;
-                        transaction = await new GasLimitEstimator(client, _wallet.GetAddress())
-                                                                   .BuildTransaction(toAddress, data, value);
-                        break;
 
+                        transaction = await new GasLimitEstimator(client, _wallet.GetAddress())
+                                                 .BuildTransaction(toAddress, data, value);
+                        break;
+                        
                     case SendERC20 tx:
                         toAddress = tx.to;
                         value = BigInteger.Parse(tx.value);
-                        transaction = await new GasLimitEstimator(client, _wallet.GetAddress())
-                                                                    .BuildTransaction(toAddress, data, value);
+
+                        var erc20 = new ERC20(tx.tokenAddress);
+                        transaction = await erc20.TransferFrom(_wallet.GetAddress(), toAddress, value)
+                                                    .Create(client, new ContractCall(_wallet.GetAddress()));
                         break;
 
                     case SendERC721 tx:
                         toAddress = tx.to;
-                        var erc721 = new ERC721(tx.tokenAddress);
 
+                        var erc721 = new ERC721(tx.tokenAddress);
                         transaction = await erc721.SafeTransferFrom(_wallet.GetAddress(), toAddress, BigInteger.Parse(tx.id), Encoding.UTF8.GetBytes(tx.data))
                                                     .Create(client, new ContractCall(_wallet.GetAddress()));
-
                         break;
 
                     case SendERC1155 tx:
                         toAddress = tx.to;
-                        var erc1155 = new ERC1155(tx.tokenAddress);
 
+                        var erc1155 = new ERC1155(tx.tokenAddress);
                         BigInteger[] tokenIds = new BigInteger[tx.vals.Length];
                         BigInteger[] tokenValues = new BigInteger[tx.vals.Length];
 
@@ -109,15 +112,16 @@ namespace Sequence.EmbeddedWallet
                         {
                             tokenIds[j] = BigInteger.Parse(tx.vals[j].id);
                             tokenValues[j] = BigInteger.Parse(tx.vals[j].amount);
-
                         }
+
                         transaction = await erc1155.SafeBatchTransferFrom(_wallet.GetAddress(), toAddress, tokenIds, tokenValues, Encoding.UTF8.GetBytes(tx.data))
                                                     .Create(client, new ContractCall(_wallet.GetAddress()));
-
                         break;
+
                     default:
                         return new FailedTransactionReturn("Error adapting to EthTransaction type. Unable to determine transaction type for:" + transactions[i].ToString(), null);
                 }
+
                 if (waitForReceipt)
                 {
                     try

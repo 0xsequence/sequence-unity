@@ -21,7 +21,7 @@ namespace Sequence.Relayer
             {
                 IsValidMessageSignatureReturn result =
                     await wallet.IsValidMessageSignature(chain, proof.Proof, proof.SignedProof);
-                return result.IsValid;
+                return result.isValid;
             }
             catch (Exception e)
             {

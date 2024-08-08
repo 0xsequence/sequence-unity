@@ -30,9 +30,9 @@ namespace Sequence.EmbeddedWallet
     {
         public SuccessfulTransactionReturn[] SuccessfulTransactionReturns { get; private set; }
 
-        public SuccessfulBatchTransactionReturn(SuccessfulTransactionReturn[] successfullTransactionReturns)
+        public SuccessfulBatchTransactionReturn(SuccessfulTransactionReturn[] successfulTransactionReturns)
         {
-            SuccessfulTransactionReturns = successfullTransactionReturns;
+            SuccessfulTransactionReturns = successfulTransactionReturns;
         }
     }
 
