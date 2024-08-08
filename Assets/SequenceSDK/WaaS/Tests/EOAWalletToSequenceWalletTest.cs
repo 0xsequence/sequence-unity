@@ -33,7 +33,7 @@ namespace Sequence.WaaS.Tests
         {
             wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
             client = new SequenceEthClient("http://localhost:8545/");
-            adapter = new EOAWalletToSequenceWalletAdapter(wallet, client);
+            adapter = new EOAWalletToSequenceWalletAdapter(wallet);
 
             adapter.OnSignMessageComplete += OnMessageSigned;
             adapter.OnSendTransactionComplete += OnTransactionSent;

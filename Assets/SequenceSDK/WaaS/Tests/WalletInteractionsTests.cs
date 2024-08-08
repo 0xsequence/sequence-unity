@@ -36,7 +36,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
 
                     IsValidMessageSignatureReturn isValid = await wallet.IsValidMessageSignature(_chain, message, signature);
                     Assert.IsNotNull(isValid);
-                    Assert.IsTrue(isValid.isValid);
+                    Assert.IsTrue(isValid.IsValid);
                     tcs.TrySetResult(true);
                 }
                 catch (System.Exception e)

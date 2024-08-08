@@ -139,7 +139,7 @@ namespace Sequence.EmbeddedWallet
         public async Task<bool> IsValidSignature(string signature, string message, Chain chain)
         {
             var result = await _wallet.IsValidMessageSignature(chain, message, signature);
-            return result.isValid;
+            return result.IsValid;
         }
     }
 }
