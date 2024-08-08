@@ -38,6 +38,7 @@ namespace Sequence.EmbeddedWallet
         }
 
         public event Action<string> OnSignMessageComplete;
+        public event Action<string> OnSignMessageFailed;
 
         public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
@@ -46,13 +47,21 @@ namespace Sequence.EmbeddedWallet
                 IntentDataSignMessage args = new IntentDataSignMessage(_address, network, message);
                 var result = await _intentSender.SendIntent<IntentResponseSignedMessage, IntentDataSignMessage>(args, IntentType.SignMessage, timeBeforeExpiry);
                 string signature = result.signature;
-                OnSignMessageComplete?.Invoke(signature);
-                return signature;
+
+                if (signature == "")
+                {
+                    throw new Exception("Message could not be signed.");
+                }
+                else
+                {
+                    OnSignMessageComplete?.Invoke(signature);
+                    return signature;
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
-                return null;
+                OnSignMessageFailed?.Invoke(e.Message);
+                return e.Message;
             }
         }
 

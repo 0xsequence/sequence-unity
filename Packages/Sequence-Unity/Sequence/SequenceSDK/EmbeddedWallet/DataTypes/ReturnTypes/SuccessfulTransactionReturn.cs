@@ -13,6 +13,8 @@ namespace Sequence.EmbeddedWallet
         public JObject nativeReceipt { get; private set; }
         public SimulateResult[] simulations { get; private set; }
 
+        public SuccessfulTransactionReturn() { }
+
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {
             this.txHash = txHash;
@@ -23,4 +25,15 @@ namespace Sequence.EmbeddedWallet
             this.simulations = simulations;
         }
     }
+
+    public class SuccessfulBatchTransactionReturn : SuccessfulTransactionReturn
+    {
+        public SuccessfulTransactionReturn[] SuccessfulTransactionReturns { get; private set; }
+
+        public SuccessfulBatchTransactionReturn(SuccessfulTransactionReturn[] successfullTransactionReturns)
+        {
+            SuccessfulTransactionReturns = successfullTransactionReturns;
+        }
+    }
+
 }
