@@ -144,5 +144,10 @@ namespace Sequence.EmbeddedWallet
         /// <param name="nonce"></param>
         /// <returns></returns>
         public Task<IntentResponseSessionAuthProof> GetSessionAuthProof(Chain network, string nonce = null);
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public Task<IntentResponseGetIdToken> GetIdToken(string nonce = null);
     }
 }
