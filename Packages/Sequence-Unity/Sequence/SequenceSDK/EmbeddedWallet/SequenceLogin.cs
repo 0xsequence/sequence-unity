@@ -86,7 +86,7 @@ namespace Sequence.EmbeddedWallet
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
             SetConnectedWalletAddress(connectedWalletAddress);
             
-            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
@@ -267,7 +267,7 @@ namespace Sequence.EmbeddedWallet
         private (EOAWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string walletInfo = secureStorage.RetrieveString(_walletKey);
+            string walletInfo = secureStorage.RetrieveString(Application.companyName + "-" + Application.productName + "-" + _walletKey);
             if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "");
@@ -575,7 +575,7 @@ namespace Sequence.EmbeddedWallet
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
+            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress);
         }
 
         public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)

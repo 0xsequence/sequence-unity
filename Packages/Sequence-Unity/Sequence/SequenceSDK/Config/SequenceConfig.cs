@@ -34,6 +34,7 @@ namespace Sequence.Config
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
         public bool StoreSessionPrivateKeyInSecureStorage = false;
+        public bool EditorStoreSessionPrivateKeyInSecureStorage = false;
         
         private static SequenceConfig _config;
 
@@ -75,6 +76,15 @@ namespace Sequence.Config
             }
 
             return JwtHelper.GetConfigJwt(configKey);
+        }
+
+        public bool StoreSessionKey()
+        {
+#if UNITY_EDITOR
+            return EditorStoreSessionPrivateKeyInSecureStorage;
+#else
+            return StoreSessionPrivateKeyInSecureStorage;
+#endif
         }
     }
 }
