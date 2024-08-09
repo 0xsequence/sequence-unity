@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -18,12 +20,24 @@ namespace Sequence.EmbeddedWallet
         public async Task<string> GenerateEOAWalletLink(Chain chain)
         {
             IHttpClient client = new HttpClient(_nonceGenerationLink);
-            NonceResponseData nonceResponse =
-                await client.SendRequest<NonceRequestData, NonceResponseData>("",
-                    new NonceRequestData(_wallet.GetWalletAddress()));
-            IntentResponseSessionAuthProof proof = await _wallet.GetSessionAuthProof(chain, nonceResponse.nonce);
-            string eoaWalletLink = $"{nonceResponse.verificationUrl}?nonce={nonceResponse.nonce}&signature={proof.signature}&sessionId={proof.sessionId}&chainId={chain.GetChainId()}";
-            return eoaWalletLink;
+            try
+            {
+                NonceResponseData nonceResponse =
+                    await client.SendRequest<NonceRequestData, NonceResponseData>("",
+                        new NonceRequestData(_wallet.GetWalletAddress()));
+                IntentResponseSessionAuthProof proof = await _wallet.GetSessionAuthProof(chain, nonceResponse.nonce);
+                if (proof == null)
+                {
+                    throw new Exception("Received null session auth proof");
+                }
+                string eoaWalletLink = $"{nonceResponse.verificationUrl}?nonce={nonceResponse.nonce}&signature={proof.signature}&sessionId={proof.sessionId}&chainId={chain.GetChainId()}";
+                return eoaWalletLink;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to generate EOA Wallet Link: {e}");
+                return null;
+            }
         }
         
         public async Task OpenEOAWalletLink(Chain chain)
