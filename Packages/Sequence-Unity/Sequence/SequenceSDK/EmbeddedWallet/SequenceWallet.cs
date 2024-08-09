@@ -402,6 +402,7 @@ namespace Sequence.EmbeddedWallet
             try
             {
                 var result = await _intentSender.SendIntent<IntentResponseGetIdToken, IntentDataGetIdToken>(args, IntentType.GetIdToken);
+                OnIdTokenRetrieved?.Invoke(result);
                 return result;
             }
 
