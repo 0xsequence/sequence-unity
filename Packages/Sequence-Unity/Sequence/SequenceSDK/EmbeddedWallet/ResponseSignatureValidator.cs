@@ -1,7 +1,6 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Sequence.Utils;
 using UnityEngine;
@@ -13,26 +12,18 @@ namespace Sequence.EmbeddedWallet
     {
         private RSAParameters _waasPublicKey;
         public bool PublicKeyFetched { get; private set; }
-        private const string _jwksUrl = "https://waas.sequence.app/.well-known/jwks.json";
+        private const string _jwks = "{\"keys\":[{\"alg\":\"RS256\",\"e\":\"AQAB\",\"kid\":\"nWh-_3nQ1lnhhI1ZSQTQmw\",\"kty\":\"RSA\",\"n\":\"pECaEq2k0k22J9e7hFLAFmKbzPLlWToUJJmFeWAdEiU4zpW17EUEOyfjRzjgBewc7KFJQEblC3eTD7Vc5bh9-rafPEj8LaKyZzzS5Y9ZATXhlMo5Pnlar3BrTm48XcnT6HnLsvDeJHUVbrYd1JyE1kqeTjUKWvgKX4mgIJiuYhpdzbOC22cPaWb1dYCVhArDVAPHGqaEwRjX7JneETdY5hLJ6JhsAws706W7fwfNKddPQo2mY95S9q8HFxMr5EaXEMmhwxk8nT5k-Ouar2dobMXRMmQiEZSt9fJaGKlK7KWJSnbPOVa2cZud1evs1Rz2SdCSA2bhuZ6NnZCxkqnagw\",\"use\":\"sig\"}]}";
         
         public ResponseSignatureValidator()
         {
-            FetchPublicKey();
+            LoadPublicKey();
         }
 
-        private async Task FetchPublicKey()
+        private void LoadPublicKey()
         {
             try
             {
-                using UnityWebRequest request = UnityWebRequest.Get(_jwksUrl);
-                await request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    throw new Exception($"Failed to get JWKS: {request.error}");
-                }
-
-                var json = JObject.Parse(request.downloadHandler.text);
+                var json = JObject.Parse(_jwks);
                 var key = json["keys"][0];
 
                 string exponent = key["e"].ToString();
@@ -50,7 +41,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception ex)
             {
-                string error = $"Error fetching public key from WaaS API: {ex.Message}";
+                string error = $"Error loading public key from JWKS: {ex.Message}";
                 Debug.LogError(error);
                 throw new Exception(error);
             }
