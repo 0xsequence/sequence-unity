@@ -50,5 +50,10 @@ namespace Sequence.Demo
             EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://dev-api.sequence.app/rpc/API/GenerateWaaSVerificationURL");
             linker.OpenEOAWalletLink(Chain.ArbitrumNova);
         }
+        
+        public void OpenSeeMarketplaceListingsPanel()
+        {
+            _ui.OpenSeeMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
     }
 }
