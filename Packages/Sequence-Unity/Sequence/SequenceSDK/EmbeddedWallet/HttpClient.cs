@@ -91,6 +91,10 @@ namespace Sequence.EmbeddedWallet
             
             foreach (string key in headers.Keys)
             {
+                if (headers[key] == null)
+                {
+                    continue;
+                }
                 request.SetRequestHeader(key, headers[key]);
             }
         }

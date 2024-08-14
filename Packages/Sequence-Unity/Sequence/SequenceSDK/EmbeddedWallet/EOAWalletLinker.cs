@@ -11,6 +11,8 @@ namespace Sequence.EmbeddedWallet
         
         private IWallet _wallet;
 
+        private const string _verificationUrl = "https://demo-waas-wallet-link.pages.dev/";
+
         public EOAWalletLinker(IWallet wallet, string nonceGenerationLink)
         {
             _wallet = wallet;
@@ -24,13 +26,17 @@ namespace Sequence.EmbeddedWallet
             {
                 NonceResponseData nonceResponse =
                     await client.SendRequest<NonceRequestData, NonceResponseData>("",
-                        new NonceRequestData(_wallet.GetWalletAddress()));
+                        new NonceRequestData(_wallet.GetWalletAddress()),
+                        new Dictionary<string, string>()
+                        {
+                            { "X-Access-Key", null }
+                        });
                 IntentResponseSessionAuthProof proof = await _wallet.GetSessionAuthProof(chain, nonceResponse.nonce);
                 if (proof == null)
                 {
                     throw new Exception("Received null session auth proof");
                 }
-                string eoaWalletLink = $"{nonceResponse.verificationUrl}?nonce={nonceResponse.nonce}&signature={proof.signature}&sessionId={proof.sessionId}&chainId={chain.GetChainId()}";
+                string eoaWalletLink = $"{_verificationUrl}?nonce={nonceResponse.nonce}&signature={proof.signature}&sessionId={proof.sessionId}&chainId={chain.GetChainId()}";
                 return eoaWalletLink;
             }
             catch (System.Exception e)
