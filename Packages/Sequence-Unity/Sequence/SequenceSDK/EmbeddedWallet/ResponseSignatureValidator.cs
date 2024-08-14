@@ -11,7 +11,7 @@ namespace Sequence.EmbeddedWallet
 {
     public class ResponseSignatureValidator
     {
-        private string _waasPublicKey;
+        private RSAParameters _waasPublicKey;
         public bool PublicKeyFetched { get; private set; }
         private const string _jwksUrl = "https://waas.sequence.app/.well-known/jwks.json";
         
@@ -38,21 +38,14 @@ namespace Sequence.EmbeddedWallet
                 string exponent = key["e"].ToString();
                 string modulus = key["n"].ToString();
 
-                exponent = Convert.ToBase64String(Encoding.UTF8.GetBytes(exponent));
-                modulus = Convert.ToBase64String(Encoding.UTF8.GetBytes(modulus));
-                
-                byte[] exponentBytes = Convert.FromBase64String(exponent);
-                byte[] modulusBytes = Convert.FromBase64String(modulus);
+                byte[] exponentBytes = Base64UrlDecode(exponent);
+                byte[] modulusBytes = Base64UrlDecode(modulus);
 
-                var rsaParams = new RSAParameters
+                _waasPublicKey = new RSAParameters
                 {
                     Exponent = exponentBytes,
                     Modulus = modulusBytes
                 };
-
-                using var rsa = new RSACryptoServiceProvider();
-                rsa.ImportParameters(rsaParams);
-                _waasPublicKey = rsa.ToXmlString(false);
                 PublicKeyFetched = true;
             }
             catch (Exception ex)
@@ -61,6 +54,17 @@ namespace Sequence.EmbeddedWallet
                 Debug.LogError(error);
                 throw new Exception(error);
             }
+        }
+        
+        private byte[] Base64UrlDecode(string input)
+        {
+            string output = input.Replace('-', '+').Replace('_', '/');
+            switch (output.Length % 4)
+            {
+                case 2: output += "=="; break;
+                case 3: output += "="; break;
+            }
+            return Convert.FromBase64String(output);
         }
         
         public string ValidateResponse(UnityWebRequest request)
@@ -78,7 +82,7 @@ namespace Sequence.EmbeddedWallet
             string expectedDigestBase64 = Convert.ToBase64String(expectedDigest);
             if (digest != expectedDigestBase64)
             {
-                throw new Exception($"Content-Digest header does not match response content: {contentDigest} != {expectedDigest}");
+                throw new Exception($"Content-Digest header does not match response content: {contentDigest} != {expectedDigestBase64}");
             }
             
             string signatureItem = request.GetResponseHeader("Signature");
@@ -93,9 +97,10 @@ namespace Sequence.EmbeddedWallet
             {
                 throw new Exception("No Signature-Input header found in response");
             }
+            string signatureInputValue = signatureInput.Replace("sig=", "");
             
             string signatureBase = $"\"content-digest\": {contentDigest}\n" +
-                                   $"\"@signature-params\": {signatureInput}";
+                                   $"\"@signature-params\": {signatureInputValue}";
             
             VerifySignature(signatureBase, signature);
 
@@ -108,11 +113,11 @@ namespace Sequence.EmbeddedWallet
             {
                 byte[] signatureBytes = Convert.FromBase64String(signature);
                 byte[] dataBytes = Encoding.UTF8.GetBytes(signatureBase);
+                
+                using var rsa = new RSACryptoServiceProvider();
+                rsa.ImportParameters(_waasPublicKey);
 
-                using RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-                rsa.FromXmlString(_waasPublicKey);
-
-                bool valid = rsa.VerifyData(dataBytes, CryptoConfig.MapNameToOID("SHA256"), signatureBytes);
+                bool valid = rsa.VerifyData(dataBytes, signatureBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
                 if (!valid)
                 {
                     throw new Exception("Signature is invalid");
