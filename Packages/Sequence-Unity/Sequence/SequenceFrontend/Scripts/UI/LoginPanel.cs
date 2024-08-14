@@ -43,7 +43,7 @@ namespace Sequence.Demo
             
             SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
 
-            _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionPrivateKeyInSecureStorage;
+            _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
             
             ILogin loginHandler = SequenceLogin.GetInstance();
             SetupLoginHandler(loginHandler);
