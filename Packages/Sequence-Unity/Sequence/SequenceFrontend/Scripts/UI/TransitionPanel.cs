@@ -50,5 +50,10 @@ namespace Sequence.Demo
             EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://demo-waas-wallet-link-server.tpin.workers.dev/generateNonce");
             linker.OpenEOAWalletLink(Chain.ArbitrumNova);
         }
+        
+        public void OpenSeeMarketplaceListingsPanel()
+        {
+            _ui.OpenSeeMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
     }
 }

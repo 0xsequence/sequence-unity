@@ -1,9 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using PlayFab;
+using PlayFab.ClientModels;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
+using Sequence.EmbeddedWallet.Tests;
 
-namespace Sequence.WaaS.Tests
+namespace Sequence.EmbeddedWallet.Tests
 {
     public class EndToEndTestHarness
     {
@@ -26,6 +29,16 @@ namespace Sequence.WaaS.Tests
             _login.OnLoginFailed += OnFailedLogin;
             SequenceWallet.OnWalletCreated += OnLogin;
             await _login.ConnectToWaaSAsGuest();
+            _login.OnLoginFailed -= OnFailedLogin;
+            SequenceWallet.OnWalletCreated -= OnLogin;
+        }
+
+        public async Task LoginWithPlayFab(LoginResult result, string email, Action<SequenceWallet> OnLogin,
+            ILogin.OnLoginFailedHandler OnFailedLogin)
+        {
+            _login.OnLoginFailed += OnFailedLogin;
+            SequenceWallet.OnWalletCreated += OnLogin;
+            await _login.ConnectToWaaSViaPlayFab(PlayFabSettings.staticSettings.TitleId, result.SessionTicket, email);
             _login.OnLoginFailed -= OnFailedLogin;
             SequenceWallet.OnWalletCreated -= OnLogin;
         }

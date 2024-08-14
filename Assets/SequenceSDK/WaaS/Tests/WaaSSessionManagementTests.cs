@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PlayFab;
@@ -50,7 +51,7 @@ namespace Sequence.EmbeddedWallet.Tests
             }
         }
         
-        [Test]
+        [Test] // Todo: fix this test. Note that the behaviour we're trying to test works, see PlayFabLogin. For some reason, the text context breaks it (I haven't figure out why yet)
         public async Task SignInAndOutRepeatedly_PlayFabGuest()
         {
             string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
@@ -93,6 +94,36 @@ namespace Sequence.EmbeddedWallet.Tests
             {
                 await Task.Yield();
             }
+        }
+
+        [Test]
+        public async Task TestGetSessionAuthProof()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    IntentResponseSessionAuthProof proof = await wallet.GetSessionAuthProof(Chain.ArbitrumNova);
+                    Assert.IsNotNull(proof);
+                    Assert.False(string.IsNullOrWhiteSpace(proof.wallet));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.signature));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.message));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.network));
+                    Assert.False(string.IsNullOrWhiteSpace(proof.signature));
+                        
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
         }
     }
 }

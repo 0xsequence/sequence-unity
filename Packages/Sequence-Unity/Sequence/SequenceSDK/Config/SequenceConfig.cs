@@ -34,6 +34,7 @@ namespace Sequence.Config
         [Header("Sequence SDK Configuration")] 
         public string BuilderAPIKey;
         public bool StoreSessionPrivateKeyInSecureStorage = false;
+        public bool EditorStoreSessionPrivateKeyInSecureStorage = false;
         
         private static SequenceConfig _config;
 
@@ -42,7 +43,15 @@ namespace Sequence.Config
             if (_config == null)
             {
                 _config = Resources.Load<SequenceConfig>("SequenceConfig");
-                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
+                TextAsset versionFile = Resources.Load<TextAsset>("sequence-unity-version");
+                if (versionFile != null)
+                {
+                    _config.WaaSVersion = $"1 (Unity {versionFile.text})";
+                }
+                else
+                {
+                    _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
+                }
             }
 
             if (_config == null)
@@ -67,6 +76,15 @@ namespace Sequence.Config
             }
 
             return JwtHelper.GetConfigJwt(configKey);
+        }
+
+        public bool StoreSessionKey()
+        {
+#if UNITY_EDITOR
+            return EditorStoreSessionPrivateKeyInSecureStorage;
+#else
+            return StoreSessionPrivateKeyInSecureStorage;
+#endif
         }
     }
 }

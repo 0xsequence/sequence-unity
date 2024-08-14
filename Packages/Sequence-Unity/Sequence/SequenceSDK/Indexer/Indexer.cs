@@ -80,6 +80,7 @@ namespace Sequence
         { Chain.OasysHomeverse.GetChainId(), "homeverse" },
         { Chain.AstarZKEvm.GetChainId(), "astar-zkevm" },
         { Chain.Xai.GetChainId(), "xai" },
+        { Chain.Blast.GetChainId(), "blast" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
@@ -92,6 +93,9 @@ namespace Sequence
         { Chain.TestnetAstarZKyoto.GetChainId(), "astar-zkyoto" }, 
         { Chain.TestnetXrSepolia.GetChainId(), "xr-sepolia" },
         { Chain.TestnetXaiSepolia.GetChainId(), "xai-sepolia" }, 
+        { Chain.TestnetB3Sepolia.GetChainId(), "b3-sepolia" },
+        { Chain.TestnetAPEChain.GetChainId(), "apechain-testnet" },
+        { Chain.TestnetBlastSepolia.GetChainId(), "blast-sepolia" }
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;

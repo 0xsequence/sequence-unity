@@ -19,6 +19,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "Oasys Homeverse" },
             { Chain.Xai, "Xai" },
             { Chain.AstarZKEvm, "Astar zkEVM" },
+            { Chain.Blast, "Blast" },
             
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -30,7 +31,10 @@ namespace Sequence
             { Chain.TestnetPolygonAmoy, "Polygon Amoy" },
             { Chain.TestnetAstarZKyoto, "Astar zKyoto Testnet"},
             { Chain.TestnetXrSepolia, "XR Sepolia" },
-            { Chain.TestnetXaiSepolia, "Xai Sepolia" }
+            { Chain.TestnetXaiSepolia, "Xai Sepolia" },
+            { Chain.TestnetB3Sepolia, "B3 Sepolia" },
+            { Chain.TestnetAPEChain, "APE Chain Testnet" },
+            { Chain.TestnetBlastSepolia, "Blast Sepolia" }
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -48,6 +52,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "OAS"},
             { Chain.AstarZKEvm, "ETH" },
             { Chain.Xai, "XAI" },
+            { Chain.Blast, "ETH" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -59,7 +64,10 @@ namespace Sequence
             { Chain.TestnetPolygonAmoy, "MATIC" },
             { Chain.TestnetAstarZKyoto, "ETH"},
             { Chain.TestnetXrSepolia, "tXR" },
-            { Chain.TestnetXaiSepolia, "sXAI" }
+            { Chain.TestnetXaiSepolia, "sXAI" },
+            { Chain.TestnetB3Sepolia, "ETH" },
+            { Chain.TestnetAPEChain, "APE" },
+            { Chain.TestnetBlastSepolia, "ETH" }
         };
 
         public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
@@ -77,6 +85,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "https://explorer.oasys.homeverse.games/" },
             { Chain.AstarZKEvm, "https://astar-zkevm.explorer.startale.com/" },
             { Chain.Xai, "https://explorer.xai-chain.net/" }, 
+            { Chain.Blast, "https://blastscan.io/" },
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -88,7 +97,10 @@ namespace Sequence
             { Chain.TestnetPolygonAmoy, "https://amoy.polygonscan.com/" },
             { Chain.TestnetAstarZKyoto, "https://astar-zkyoto.blockscout.com/" }, 
             { Chain.TestnetXrSepolia, "https://xr-sepolia-testnet.explorer.caldera.xyz/" },
-            { Chain.TestnetXaiSepolia, "https://testnet-explorer-v2.xai-chain.net/" } 
+            { Chain.TestnetXaiSepolia, "https://testnet-explorer-v2.xai-chain.net/" },
+            { Chain.TestnetB3Sepolia, "https://sepolia.explorer.b3.fun/" },
+            { Chain.TestnetAPEChain, "https://curtis.explorer.caldera.xyz/" }, 
+            { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" }
         };
         
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -108,6 +120,7 @@ namespace Sequence
             { Chain.OasysHomeverse, "19011" },
             { Chain.AstarZKEvm, "3776" },
             { Chain.Xai, "660279" },
+            { Chain.Blast, "81457" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -119,7 +132,10 @@ namespace Sequence
             { Chain.TestnetOptimisticSepolia, "11155420" },
             { Chain.TestnetAstarZKyoto, "6038361" },
             { Chain.TestnetXrSepolia, "2730" },
-            { Chain.TestnetXaiSepolia, "37714555429" }
+            { Chain.TestnetXaiSepolia, "37714555429" },
+            { Chain.TestnetB3Sepolia, "1993" },
+            { Chain.TestnetAPEChain, "33111" },
+            { Chain.TestnetBlastSepolia, "168587773" }
         };
         
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -137,6 +153,7 @@ namespace Sequence
             { "19011", Chain.OasysHomeverse },
             { "3776", Chain.AstarZKEvm },
             { "660279", Chain.Xai },
+            { "81457", Chain.Blast },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -148,7 +165,43 @@ namespace Sequence
             { "11155420", Chain.TestnetOptimisticSepolia },
             { "6038361", Chain.TestnetAstarZKyoto },
             { "2730", Chain.TestnetXrSepolia },
-            { "37714555429", Chain.TestnetXaiSepolia }
+            { "37714555429", Chain.TestnetXaiSepolia },
+            { "1993", Chain.TestnetB3Sepolia },
+            { "33111", Chain.TestnetAPEChain },
+            { "168587773", Chain.TestnetBlastSepolia }
+        };
+        
+        public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
+        {
+            { Chain.Ethereum, "mainnet" },
+            { Chain.Polygon, "polygon" },
+            { Chain.BNBSmartChain, "bsc" },
+            { Chain.PolygonZkEvm, "polygon-zkevm" },
+            { Chain.ArbitrumOne, "arbitrum" },
+            { Chain.ArbitrumNova, "arbitrum-nova" },
+            { Chain.Optimism, "optimism" },
+            { Chain.Avalanche, "avalanche" },
+            { Chain.Gnosis, "gnosis" },
+            { Chain.Base, "base" },
+            { Chain.OasysHomeverse, "homeverse" },
+            { Chain.AstarZKEvm, "astar-zkevm" },
+            { Chain.Xai, "xai" },
+            { Chain.Blast, "blast" },
+
+            { Chain.TestnetSepolia, "sepolia" },
+            { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
+            { Chain.TestnetBNBSmartChain, "bsc-testnet" },
+            { Chain.TestnetBaseSepolia, "base-sepolia" },
+            { Chain.TestnetOasysHomeverse, "homeverse-testnet" },
+            { Chain.TestnetAvalanche, "avalanche-testnet" },
+            { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
+            { Chain.TestnetPolygonAmoy, "amoy" }, 
+            { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
+            { Chain.TestnetXrSepolia, "xr-sepolia" },
+            { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
+            { Chain.TestnetB3Sepolia, "b3-sepolia" },
+            { Chain.TestnetAPEChain, "apechain-testnet" },
+            { Chain.TestnetBlastSepolia, "blast-sepolia" }
         };
     }
 }

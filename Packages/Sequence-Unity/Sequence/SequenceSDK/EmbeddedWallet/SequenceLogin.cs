@@ -38,21 +38,46 @@ namespace Sequence.EmbeddedWallet
         private bool _automaticallyFederateAccountsWhenPossible;
         private bool _authenticatorSetup = false;
 
+        private Address _connectedWalletAddress;
+
         private static SequenceLogin _instance;
 
         private string _verifierToReject; // Since email auth is two separate requests, an invalid signature error may go unnoticed. So, we cache the verifier used in an initiateAuth attempt that had an invalid signature and reject the corresponding openSession attempt if it uses the same verifier.
-        
-        public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+
+        public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null,
+            IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true,
+            Address connectedWalletAddress = null)
         {
             if (_instance == null)
             {
-                _instance = new SequenceLogin(validator, authenticator, connector);
+                _instance = new SequenceLogin(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress);
+            }
+            if (connectedWalletAddress != null)
+            {
+                _instance.SetConnectedWalletAddress(connectedWalletAddress);
             }
             return _instance;
         }
 
+        public static SequenceLogin GetInstanceToFederateAuth(Address connectedWalletAddress, IValidator validator = null,
+            IAuthenticator authenticator = null,
+            IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+        {
+            if (_instance == null)
+            {
+                _instance = new SequenceLogin(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress);
+            }
+            _instance.SetConnectedWalletAddress(connectedWalletAddress);
+            return _instance;
+        }
+        
+        public void SetConnectedWalletAddress(Address connectedWalletAddress)
+        {
+            _connectedWalletAddress = connectedWalletAddress;
+        }
+
         [Obsolete("Use GetInstance() instead.")]
-        public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true)
+        public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true, Address connectedWalletAddress = null)
         {
             if (connector == null)
             {
@@ -61,8 +86,9 @@ namespace Sequence.EmbeddedWallet
             _connector = connector;
             
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
+            SetConnectedWalletAddress(connectedWalletAddress);
             
-            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform();
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
@@ -119,11 +145,22 @@ namespace Sequence.EmbeddedWallet
             {
                 return;
             }
+
+            if (_connectedWalletAddress != null)
+            {
+                FailedLoginWithStoredSessionWallet("Cannot restore session when connected wallet address is set");
+                return;
+            }
             TryToLoginWithStoredSessionWallet();
         }
 
         public void GuestLogin()
         {
+            if (_connectedWalletAddress != null)
+            {
+                FederateAccountGuest(_connectedWalletAddress);
+                return;
+            }
             ConnectToWaaSAsGuest();
         }
 
@@ -226,7 +263,7 @@ namespace Sequence.EmbeddedWallet
         private (EOAWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string walletInfo = secureStorage.RetrieveString(_walletKey);
+            string walletInfo = secureStorage.RetrieveString(Application.companyName + "-" + Application.productName + "-" + _walletKey);
             if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "");
@@ -260,7 +297,14 @@ namespace Sequence.EmbeddedWallet
         public async Task Login(string email, string code)
         {
             _isLoggingIn = true;
-            await _emailConnector.ConnectToWaaSViaEmail(email, code);
+            if (_connectedWalletAddress != null)
+            {
+                await FederateEmail(email, code, _connectedWalletAddress);
+            }
+            else
+            {
+                await _emailConnector.ConnectToWaaSViaEmail(email, code);
+            }
         }
 
         public void GoogleLogin()
@@ -290,7 +334,14 @@ namespace Sequence.EmbeddedWallet
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
-            ConnectToWaaSViaSocialLogin(result.IdToken, result.Method);
+            if (_connectedWalletAddress != null)
+            {
+                FederateAccountSocial(result.IdToken, result.Method, _connectedWalletAddress);
+            }
+            else
+            {
+                ConnectToWaaSViaSocialLogin(result.IdToken, result.Method);
+            }
         }
 
         private void OnSocialSignInFailed(string error, LoginMethod method)
@@ -322,6 +373,13 @@ namespace Sequence.EmbeddedWallet
                     StoreWalletSecurely(walletAddress);
                 }
                 _isLoggingIn = false;
+                wallet.OnDropSessionComplete += session =>
+                {
+                    if (session == sessionId)
+                    {
+                        _connectedWalletAddress = null;
+                    }
+                };
                 SequenceWallet.OnWalletCreated?.Invoke(wallet);
             }
             catch (Exception e)
@@ -469,7 +527,14 @@ namespace Sequence.EmbeddedWallet
 
         public void PlayFabLogin(string titleId, string sessionTicket, string email)
         {
-            ConnectToWaaSViaPlayFab(titleId, sessionTicket, email);
+            if (_connectedWalletAddress != null)
+            {
+                FederateAccountPlayFab(titleId, sessionTicket, email, _connectedWalletAddress);
+            }
+            else
+            {
+                ConnectToWaaSViaPlayFab(titleId, sessionTicket, email);
+            }
         }
 
         public void ForceCreateAccount()
@@ -517,7 +582,7 @@ namespace Sequence.EmbeddedWallet
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
+            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress);
         }
 
         public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)
