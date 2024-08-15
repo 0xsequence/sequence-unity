@@ -29,6 +29,7 @@ namespace Sequence.EmbeddedWallet
         };
 
         private ResponseSignatureValidator _signatureValidator;
+        private string _waasUrl;
 
         public HttpClient(string url)
         {
@@ -44,6 +45,14 @@ namespace Sequence.EmbeddedWallet
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
+            
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            string rpcUrl = configJwt.rpcServer;
+            if (string.IsNullOrWhiteSpace(rpcUrl))
+            {
+                throw SequenceConfig.MissingConfigError("RPC Server");
+            }
+            _waasUrl = rpcUrl;
         }
 
         public void AddDefaultHeader(string key, string value)
@@ -142,13 +151,21 @@ namespace Sequence.EmbeddedWallet
                     }
 
                     string responseJson = "";
-                    try
+                    if (url.Contains(_waasUrl))
                     {
-                        responseJson = _signatureValidator.ValidateResponse(request);
+                        try
+                        {
+                            responseJson = _signatureValidator.ValidateResponse(request);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new Exception("Error validating response: " + e.Message + " Warning: this response may have been tampered with!");
+                        }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        throw new Exception("Error validating response: " + e.Message + " Warning: this response may have been tampered with!");
+                        byte[] results = request.downloadHandler.data;
+                        responseJson = Encoding.UTF8.GetString(results);
                     }
                     request.Dispose();
                     try
