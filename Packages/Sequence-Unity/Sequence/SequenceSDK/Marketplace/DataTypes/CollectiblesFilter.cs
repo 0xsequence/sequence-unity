@@ -42,6 +42,10 @@ namespace Sequence.Marketplace
 
         private string[] MarketplacesToStringArray(MarketplaceKind[] marketplaces)
         {
+            if (marketplaces == null)
+            {
+                return null;
+            }
             int length = marketplaces.Length;
             string[] marketplacesString = new string[length];
             for (int i = 0; i < length; i++)

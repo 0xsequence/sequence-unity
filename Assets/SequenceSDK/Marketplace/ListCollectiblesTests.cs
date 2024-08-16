@@ -10,9 +10,9 @@ namespace SequenceSDK.Marketplace
         [Test]
         public async Task TestListAllCollectiblesWithLowestListing()
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             ListCollectibles listCollectibles = new ListCollectibles(chain);
-            string contractAddress = "0x4279aa50a32b8c892206f4ef1a25befb6fd33922";
+            string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             int successEvents = 0;
             int failEvents = 0;

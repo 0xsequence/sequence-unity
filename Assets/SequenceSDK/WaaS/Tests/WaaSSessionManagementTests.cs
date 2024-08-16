@@ -124,6 +124,8 @@ namespace Sequence.EmbeddedWallet.Tests
             {
                 tcs.TrySetException(new Exception(error));
             });
+            
+            await tcs.Task;
         }
     }
 }

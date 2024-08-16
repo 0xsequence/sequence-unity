@@ -42,6 +42,8 @@ namespace Sequence.EmbeddedWallet
 
         private static SequenceLogin _instance;
 
+        private string _verifierToReject; // Since email auth is two separate requests, an invalid signature error may go unnoticed. So, we cache the verifier used in an initiateAuth attempt that had an invalid signature and reject the corresponding openSession attempt if it uses the same verifier.
+
         public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null,
             IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true,
             Address connectedWalletAddress = null)
@@ -105,12 +107,6 @@ namespace Sequence.EmbeddedWallet
             SetupAuthenticator(validator, authenticator);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="validator"></param>
-        /// <param name="authenticator"></param>
-        /// <param name="federateAuth"></param>
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             if (_authenticatorSetup)
@@ -356,6 +352,12 @@ namespace Sequence.EmbeddedWallet
         public async Task ConnectToWaaS(IntentDataOpenSession loginIntent, LoginMethod method, string email = "")
         {
             string walletAddress = "";
+            if (_verifierToReject == loginIntent.verifier)
+            {
+                OnLoginFailed?.Invoke("The initiateAuth request associated with this login attempt received a response with an invalid signature. For security reasons, this login request will not be sent to the API as your network traffic may be being monitored. Please try initiating auth again.", method);
+                _isLoggingIn = false;
+                return;
+            }
             try
             {
                 IntentResponseSessionOpened registerSessionResponse = await _intentSender.SendIntent<IntentResponseSessionOpened, IntentDataOpenSession>(loginIntent, IntentType.OpenSession);
@@ -494,9 +496,14 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error initiating auth: " + e.Message, method);
-                challenge = "Error initiating auth: " + e.Message;
+                string error = "Error initiating auth: " + e.Message;
+                if (error.Contains("Error validating response"))
+                {
+                    _verifierToReject = initiateAuthIntent.verifier;
+                }
+                OnLoginFailed?.Invoke(error, method);
                 _isLoggingIn = false;
+                throw new Exception(error);
             }
 
             return challenge;
