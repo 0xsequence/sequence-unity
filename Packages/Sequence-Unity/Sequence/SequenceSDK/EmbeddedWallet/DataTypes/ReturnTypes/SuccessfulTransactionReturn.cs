@@ -13,7 +13,10 @@ namespace Sequence.EmbeddedWallet
         public string metaTxHash { get; private set; }
         public IntentPayload request { get; private set; }
         public MetaTxnReceipt receipt { get; private set; }
-        public TransactionReceipt nativeReceipt { get; private set; }
+
+        [Obsolete("nativeReceipt is deprecated. Please use nativeTransactionReceipt instead.")]
+        public JObject nativeReceipt { get; private set; }
+        public TransactionReceipt nativeTransactionReceipt { get; private set; }
         public SimulateResult[] simulations { get; private set; }
 
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
@@ -22,7 +25,7 @@ namespace Sequence.EmbeddedWallet
             this.metaTxHash = metaTxHash;
             this.request = request;
             this.receipt = receipt;
-            this.nativeReceipt = nativeReceipt.ToObject<TransactionReceipt>(new JsonSerializer { Converters = { new TransactionReceiptConverter() } });
+            this.nativeTransactionReceipt = nativeReceipt.ToObject<TransactionReceipt>(new JsonSerializer { Converters = { new TransactionReceiptConverter() } });
             this.simulations = simulations;
         }
     }
