@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sequence.Transactions;
 using Sequence.Contracts;
 using Sequence.Provider;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 namespace Sequence.EmbeddedWallet
@@ -118,6 +119,22 @@ namespace Sequence.EmbeddedWallet
                                                     .Create(client, new ContractCall(_wallet.GetAddress()));
                         break;
 
+                    case DelayedEncode tx:
+
+                        try
+                        {
+                            var contract = new Contract(tx.to, tx.data.abi);
+
+                            transaction = await contract.CallFunction(tx.data.func, tx.data.args).Create(client, new ContractCall(_wallet.GetAddress()));
+                        }
+                        catch (Exception e)
+                        {
+                            var contract = new Contract(tx.to);
+                            transaction = await contract.CallFunction(tx.data.abi, tx.data.args).Create(client, new ContractCall(_wallet.GetAddress()));
+                        }
+                                              
+
+                        break;
                     default:
                         return new FailedTransactionReturn("Error adapting to EthTransaction type. Unable to determine transaction type for:" + transactions[i].ToString(), null);
                 }
@@ -207,7 +224,6 @@ namespace Sequence.EmbeddedWallet
         public async Task<ContractDeploymentReturn> DeployContract(Chain network, string bytecode, string value)
         {
             var client = new SequenceEthClient(network);
-
 
             ContractDeploymentReturn contractDeploymentReturn;
             try
