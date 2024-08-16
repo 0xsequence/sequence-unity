@@ -20,7 +20,9 @@ namespace Sequence.EmbeddedWallet
             this.request = request;
             this.receipt = receipt;
             this.nativeReceipt = nativeReceipt;
-            this.simulations = simulations;
+
+            ; this.simulations = simulations;
         }
     }
+
 }
