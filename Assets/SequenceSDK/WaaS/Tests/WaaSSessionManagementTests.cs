@@ -131,50 +131,50 @@ namespace Sequence.EmbeddedWallet.Tests
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            
-                var login = SequenceLogin.GetInstance();
+            var login = SequenceLogin.GetInstance();
 
-                login.OnLoginFailed += (error, method, email, methods) =>
+            login.OnLoginFailed += (error, method, email, methods) =>
+            {
+
+                Assert.Fail("Login failed: " + error);
+                tcs.TrySetResult(false);
+
+            };
+
+            SequenceWallet.OnWalletCreated += async wallet =>
+            {
+                try
                 {
-                    tcs.TrySetResult(false);
-
-                    Assert.Fail("Login failed: "+error);
-                };
-
-                SequenceWallet.OnWalletCreated += async wallet =>
-                {
-                    try
+                    wallet.OnIdTokenRetrieved += (idToken) =>
                     {
-                        wallet.OnIdTokenRetrieved += (idToken) =>
-                        {
-                            Assert.IsNotNull(idToken);
-                            Assert.IsFalse(string.IsNullOrWhiteSpace(idToken.IdToken));
-                            tcs.TrySetResult(true);
-                        };
+                        Assert.IsNotNull(idToken);
+                        Assert.IsFalse(string.IsNullOrWhiteSpace(idToken.IdToken));
+                        Debug.Log(idToken.IdToken);
+                        tcs.TrySetResult(true);
+                    };
 
-                        wallet.OnFailedToRetrieveIdToken += (error) =>
-                        {
-                            tcs.TrySetResult(false);
-
-                        };
-
-                        await wallet.GetIdToken();
-                    }
-                    catch (Exception e)
+                    wallet.OnFailedToRetrieveIdToken += (error) =>
                     {
+                        Assert.Fail("Failed to retrieve Id token : " + error);
                         tcs.TrySetResult(false);
 
-                        Assert.Fail("Login failed: " + e.Message);
+                    };
 
-                    }
+                    await wallet.GetIdToken();
+                }
+                catch (Exception e)
+                {
+                    Assert.Fail("Login failed: " + e.Message);
+                    tcs.TrySetResult(false);
 
-                    login.GuestLogin();
+                }
 
-                };
-            
-            
-            await tcs.Task;
+                var result = await tcs.Task;
 
+                Assert.IsTrue(result);
+            };
+
+            await login.ConnectToWaaSAsGuest();
 
         }
     }
