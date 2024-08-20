@@ -62,39 +62,44 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestSendTransactionT()
         {
-            //var erc20 = await MakeERC20Transaction(await TestDeployERC20(_erc20ByteCode));
-            //var erc721 = await MakeERC721Transaction(await TestDeployERC721(_erc721Bytecode));
-            //var erc1155 = await MakeERC1155Transaction(await TestDeployERC1155(_erc1155ByteCode));
+            var erc20 = await MakeERC20Transaction(await TestDeployERC20(_erc20ByteCode));
+            var erc721 = await MakeERC721Transaction(await TestDeployERC721(_erc721Bytecode));
+             var erc1155 = await MakeERC1155Transaction(await TestDeployERC1155(_erc1155ByteCode));
             var delayedEncode = MakeDelayedEncodeMint(contractAddress);
             var delayedEncode1 = MakeDelayedEncodeApprove(contractAddress);
 
 
-            var txs = new Transaction[] {  delayedEncode, delayedEncode1 };
+            var txs = new Transaction[] { erc20, erc721, erc1155,  delayedEncode, delayedEncode1 };
             var txreturn = await adapter.SendTransaction(chain, txs, true);
 
             if (txreturn is SuccessfulBatchTransactionReturn successfulBatchTransactionReturn)
             {
                 foreach (var item in successfulBatchTransactionReturn.SuccessfulTransactionReturns)
                 {
-                    Debug.Log(item.txHash);
+                    Assert.IsNotNull(item);
+                    Assert.IsNotNull(item.txHash);
+                    Assert.IsNotEmpty(item.txHash);
                 }
             }
             else if (txreturn is SuccessfulTransactionReturn successfulTransactionReturn)
             {
-                Debug.Log(successfulTransactionReturn.txHash);
-
-                Debug.Log(successfulTransactionReturn.nativeReceipt);
-
+                Assert.IsNotEmpty(successfulTransactionReturn.txHash);
             }
             else if (txreturn is FailedTransactionReturn failedTransactionReturn)
             {
-                Debug.Log("Failed transaction return: "+ failedTransactionReturn.error );
+                Assert.Fail("Failed transaction return: "+ failedTransactionReturn.error );
             }
             else if (txreturn is FailedBatchTransactionReturn failedBatchTransactionReturn)
             {
                 foreach (var item in failedBatchTransactionReturn.FailedTransactionReturns)
                 {
-                    Debug.Log(item.error);
+                    Assert.Fail("Failed transaction return: " + item.error);
+                }
+                foreach (var item in failedBatchTransactionReturn.SuccessfulTransactionReturns)
+                {
+                    Assert.IsNotNull(item);
+                    Assert.IsNotNull(item.txHash);
+                    Assert.IsNotEmpty(item.txHash);
                 }
             }
         }
@@ -125,9 +130,7 @@ namespace Sequence.WaaS.Tests
             }
             catch (Exception ex)
             {
-
-                Debug.Log($"Error occurred during ERC20 contract deployment: {ex.Message}");
-                throw;
+                throw new Exception($"Error occurred during ERC20 contract deployment: {ex.Message}");
             }
             throw new Exception("Failed deployment transaction.");
         }
@@ -150,11 +153,11 @@ namespace Sequence.WaaS.Tests
             catch (Exception ex)
             {
 
-                Debug.Log($"Error occurred while minting ERC20 tokens: {ex.Message}");
-                throw; 
+                throw new Exception($"Error occurred while minting ERC20 tokens: {ex.Message}");
+
             }
 
-           
+
         }
         async Task<ERC721> TestDeployERC721(string byteCode)
         {
@@ -172,10 +175,8 @@ namespace Sequence.WaaS.Tests
                 }
             }
             catch (Exception ex)
-            {
-
-                Debug.Log($"Error occurred during ERC721 contract deployment: {ex.Message}");
-                throw;
+            {                
+                throw new Exception($"Error occurred during ERC721 contract deployment: {ex.Message}");
             }
             throw new Exception("Failed deployment transaction.");
         }
@@ -197,9 +198,7 @@ namespace Sequence.WaaS.Tests
             }
             catch (Exception ex)
             {
-
-                Debug.Log($"Error occurred while minting ERC721 tokens: {ex.Message}");
-                throw; 
+                throw new Exception($"Error occurred while minting ERC721 tokens: {ex.Message}");
             }
         }
 
@@ -220,11 +219,8 @@ namespace Sequence.WaaS.Tests
             }
             catch (Exception ex)
             {
-               
-                Debug.Log($"Error occurred during ERC1155 contract deployment: {ex.Message}");
-                throw;
+                throw new Exception($"Error occurred during ERC1155 contract deployment: {ex.Message}");
             }
-
             throw new Exception("Failed deployment transaction.");
         }
 
@@ -247,9 +243,7 @@ namespace Sequence.WaaS.Tests
             }
             catch (Exception ex)
             {
-
-                Debug.Log($"Error occurred while minting ERC1155 tokens: {ex.Message}");
-                throw; 
+                throw new Exception($"Error occurred while minting ERC1155 tokens: {ex.Message}");
             }
         }
 
