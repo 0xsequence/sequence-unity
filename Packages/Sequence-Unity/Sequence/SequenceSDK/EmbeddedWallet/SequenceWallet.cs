@@ -392,5 +392,23 @@ namespace Sequence.EmbeddedWallet
                 return null;
             }
         }
+        
+        public event Action<IntentResponseAccountList> OnAccountListGenerated;
+        public event Action<string> OnFailedToGenerateAccountList;
+        
+        public async Task<IntentResponseAccountList> GetAccountList()
+        {
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseAccountList, IntentDataListAccounts>(new IntentDataListAccounts(_address), IntentType.ListAccounts);
+                OnAccountListGenerated?.Invoke(result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                OnFailedToGenerateAccountList?.Invoke("Failed to generate account list: " + e.Message);
+                return null;
+            }
+        }
     }
 }
