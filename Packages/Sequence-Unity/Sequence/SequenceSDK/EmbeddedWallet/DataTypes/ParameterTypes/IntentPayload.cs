@@ -66,6 +66,7 @@ namespace Sequence.EmbeddedWallet
             {IntentType.SessionAuthProof, "sessionAuthProof"},
             {IntentType.InitiateAuth, "initiateAuth"},
             {IntentType.FederateAccount, "federateAccount"},
+            {IntentType.ListAccounts, "listAccounts"},
         };
     }
 
@@ -84,6 +85,7 @@ namespace Sequence.EmbeddedWallet
         SessionAuthProof,
         InitiateAuth,
         FederateAccount,
+        ListAccounts,
         None
     }
 }
