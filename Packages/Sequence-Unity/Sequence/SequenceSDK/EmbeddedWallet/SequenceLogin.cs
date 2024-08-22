@@ -114,7 +114,10 @@ namespace Sequence.EmbeddedWallet
                 return;
             }
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            _sessionWallet = new EOAWallet();
+            if (_connectedWalletAddress == null || _sessionWallet == null)
+            {
+                _sessionWallet = new EOAWallet();
+            }
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
