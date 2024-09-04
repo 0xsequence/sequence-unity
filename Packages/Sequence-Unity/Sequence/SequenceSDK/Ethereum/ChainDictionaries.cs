@@ -40,8 +40,8 @@ namespace Sequence
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "ETH" },
-            { Chain.Polygon, "MATIC" },
-            { Chain.PolygonZkEvm, "MATIC" },
+            { Chain.Polygon, "POL" },
+            { Chain.PolygonZkEvm, "POL" },
             { Chain.BNBSmartChain, "BNB" },
             { Chain.ArbitrumOne, "AETH" },
             { Chain.ArbitrumNova, "AETH" },
@@ -61,7 +61,7 @@ namespace Sequence
             { Chain.TestnetOasysHomeverse, "OAS"},
             { Chain.TestnetAvalanche, "AVAX"},
             { Chain.TestnetOptimisticSepolia, "OP"},
-            { Chain.TestnetPolygonAmoy, "MATIC" },
+            { Chain.TestnetPolygonAmoy, "POL" },
             { Chain.TestnetAstarZKyoto, "ETH"},
             { Chain.TestnetXrSepolia, "tXR" },
             { Chain.TestnetXaiSepolia, "sXAI" },
