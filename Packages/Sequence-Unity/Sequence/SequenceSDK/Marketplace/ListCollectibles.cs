@@ -7,7 +7,7 @@ namespace Sequence.Marketplace
     public class ListCollectibles
     {
         private Chain _chain;
-        private HttpClient _client;
+        private IHttpClient _client;
         
         public ListCollectibles(Chain chain)
         {

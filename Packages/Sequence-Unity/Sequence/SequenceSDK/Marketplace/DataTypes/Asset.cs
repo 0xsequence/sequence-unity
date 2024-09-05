@@ -1,7 +1,9 @@
+using System;
 using System.Numerics;
 
 namespace Sequence.Marketplace
 {
+    [Serializable]
     public class Asset
     {
         public BigInteger id;

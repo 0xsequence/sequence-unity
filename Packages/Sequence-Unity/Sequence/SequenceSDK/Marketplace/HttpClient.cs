@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 
 namespace Sequence.Marketplace
 {
-    public class HttpClient
+    public class HttpClient : IHttpClient
     {
         private string _apiKey;
         private const string _baseUrl = "https://marketplace-api.sequence.app/";
