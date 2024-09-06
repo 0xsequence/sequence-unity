@@ -155,5 +155,10 @@ namespace Sequence.EmbeddedWallet
         /// </summary>
         /// <returns></returns>
         public Task<IntentResponseAccountList> GetAccountList();
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public Task<IntentResponseGetIdToken> GetIdToken(string nonce = null);
     }
 }

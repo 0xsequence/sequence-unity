@@ -67,6 +67,7 @@ namespace Sequence.EmbeddedWallet
             {IntentType.InitiateAuth, "initiateAuth"},
             {IntentType.FederateAccount, "federateAccount"},
             {IntentType.ListAccounts, "listAccounts"},
+            {IntentType.GetIdToken, "getIdToken"},
         };
     }
 
@@ -86,6 +87,7 @@ namespace Sequence.EmbeddedWallet
         InitiateAuth,
         FederateAccount,
         ListAccounts,
+        GetIdToken,
         None
     }
 }

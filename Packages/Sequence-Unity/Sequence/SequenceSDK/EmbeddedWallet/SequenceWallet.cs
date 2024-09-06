@@ -62,7 +62,7 @@ namespace Sequence.EmbeddedWallet
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
-            
+
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
             new Dictionary<string, string>() {{"X-Access-Key", _builderApiKey}}); 
@@ -410,5 +410,26 @@ namespace Sequence.EmbeddedWallet
                 return null;
             }
         }
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public async Task<IntentResponseGetIdToken> GetIdToken(string nonce = null)
+        {
+            IntentDataGetIdToken args = new IntentDataGetIdToken(SessionId, _address, nonce);
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseGetIdToken, IntentDataGetIdToken>(args, IntentType.GetIdToken);
+                OnIdTokenRetrieved?.Invoke(result);
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                OnFailedToRetrieveIdToken?.Invoke("Failed to retrieve Id Token : " + e.Message);
+                return null;
+            }
+        }
+
     }
 }

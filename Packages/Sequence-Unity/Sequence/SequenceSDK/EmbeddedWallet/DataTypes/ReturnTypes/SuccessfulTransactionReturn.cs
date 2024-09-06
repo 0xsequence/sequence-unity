@@ -23,4 +23,5 @@ namespace Sequence.EmbeddedWallet
             this.simulations = simulations;
         }
     }
+
 }

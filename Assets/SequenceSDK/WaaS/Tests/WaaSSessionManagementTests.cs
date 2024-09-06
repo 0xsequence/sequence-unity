@@ -157,5 +157,49 @@ namespace Sequence.EmbeddedWallet.Tests
             
             await tcs.Task;
         }
+
+        [Test]
+        public async Task GetIdTokenTest()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            
+            var login = SequenceLogin.GetInstance();
+
+            login.OnLoginFailed += (error, method, email, methods) =>
+            {
+                string errorMessage = "Login failed: " + error;
+                tcs.TrySetException(new Exception(errorMessage));
+
+                Assert.Fail(errorMessage);
+            };
+
+            SequenceWallet.OnWalletCreated += async wallet =>
+            {
+                try
+                {
+                    wallet.OnIdTokenRetrieved += (idToken) =>
+                    {
+                        Assert.IsNotNull(idToken);
+                        Assert.IsFalse(string.IsNullOrWhiteSpace(idToken.IdToken));
+                        tcs.TrySetResult(true);
+                    };
+
+                    wallet.OnFailedToRetrieveIdToken += (error) =>
+                    {
+                        tcs.TrySetException(new Exception(error));
+                        Assert.Fail(error);
+                    };
+
+                    await wallet.GetIdToken();
+                }
+                catch (Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            };
+            login.GuestLogin();
+            await tcs.Task;
+        }
     }
 }

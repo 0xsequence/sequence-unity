@@ -89,5 +89,13 @@ namespace Sequence.EmbeddedWallet
         {
             throw new NotImplementedException();
         }
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public Task<IntentResponseGetIdToken> GetIdToken(string nonce = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
