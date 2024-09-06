@@ -131,14 +131,15 @@ namespace Sequence.EmbeddedWallet.Tests
         {
             var tcs = new TaskCompletionSource<bool>();
 
+            
             var login = SequenceLogin.GetInstance();
 
             login.OnLoginFailed += (error, method, email, methods) =>
             {
+                string errorMessage = "Login failed: " + error;
+                tcs.TrySetException(new Exception(errorMessage));
 
-                Assert.Fail("Login failed: " + error);
-                tcs.TrySetResult(false);
-
+                Assert.Fail(errorMessage);
             };
 
             SequenceWallet.OnWalletCreated += async wallet =>
@@ -149,33 +150,24 @@ namespace Sequence.EmbeddedWallet.Tests
                     {
                         Assert.IsNotNull(idToken);
                         Assert.IsFalse(string.IsNullOrWhiteSpace(idToken.IdToken));
-                        Debug.Log(idToken.IdToken);
                         tcs.TrySetResult(true);
                     };
 
                     wallet.OnFailedToRetrieveIdToken += (error) =>
                     {
-                        Assert.Fail("Failed to retrieve Id token : " + error);
-                        tcs.TrySetResult(false);
-
+                        tcs.TrySetException(new Exception(error));
+                        Assert.Fail(error);
                     };
 
                     await wallet.GetIdToken();
                 }
                 catch (Exception e)
                 {
-                    Assert.Fail("Login failed: " + e.Message);
-                    tcs.TrySetResult(false);
-
+                    tcs.TrySetException(e);
                 }
-
-                var result = await tcs.Task;
-
-                Assert.IsTrue(result);
             };
-
-            await login.ConnectToWaaSAsGuest();
-
+            login.GuestLogin();
+            await tcs.Task;
         }
     }
 }
