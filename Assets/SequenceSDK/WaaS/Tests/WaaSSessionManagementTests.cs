@@ -124,6 +124,38 @@ namespace Sequence.EmbeddedWallet.Tests
             {
                 tcs.TrySetException(new Exception(error));
             });
+            
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestListAccounts()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    IntentResponseAccountList list = await wallet.GetAccountList();
+                    Assert.IsNotNull(list);
+                    Assert.False(string.IsNullOrWhiteSpace(list.currentAccountId));
+                    Assert.IsNotNull(list.accounts);
+                    Assert.Greater(list.accounts.Length, 0);
+                        
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+            
+            await tcs.Task;
         }
 
         [Test]

@@ -144,6 +144,17 @@ namespace Sequence.EmbeddedWallet
         /// <param name="nonce"></param>
         /// <returns></returns>
         public Task<IntentResponseSessionAuthProof> GetSessionAuthProof(Chain network, string nonce = null);
+        
+        public event Action<IntentResponseAccountList> OnAccountListGenerated;
+        public event Action<string> OnFailedToGenerateAccountList;
+        
+        /// <summary>
+        /// Get a list of Accounts associated with this wallet
+        ///
+        /// Can be awaited directly or you can subscribe to the OnAccountListGenerated and OnFailedToGenerateAccountList events to get success and failed responses respectively
+        /// </summary>
+        /// <returns></returns>
+        public Task<IntentResponseAccountList> GetAccountList();
 
         public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
         public event Action<string> OnFailedToRetrieveIdToken;

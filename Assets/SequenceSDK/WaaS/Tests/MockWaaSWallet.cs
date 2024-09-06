@@ -83,6 +83,13 @@ namespace Sequence.EmbeddedWallet
             throw new NotImplementedException();
         }
 
+        public event Action<IntentResponseAccountList> OnAccountListGenerated;
+        public event Action<string> OnFailedToGenerateAccountList;
+        public Task<IntentResponseAccountList> GetAccountList()
+        {
+            throw new NotImplementedException();
+        }
+
         public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
         public event Action<string> OnFailedToRetrieveIdToken;
 
