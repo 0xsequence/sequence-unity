@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Config;
 using Sequence.Utils;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace Sequence.Integrations.Sardine

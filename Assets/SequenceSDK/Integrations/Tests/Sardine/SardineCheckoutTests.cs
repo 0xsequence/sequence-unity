@@ -27,5 +27,16 @@ namespace Sequence.Integrations.Tests.Sardine
             Assert.NotNull(regions);
             Assert.Greater(regions.Length, 0);
         }
+
+        [Test]
+        public async Task TestGetSardineClientToken()
+        {
+            SardineCheckout sardine = new SardineCheckout(Chain.Polygon);
+
+            string token = await sardine.GetSardineClientToken();
+            
+            Assert.NotNull(token);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(token));
+        }
     }
 }

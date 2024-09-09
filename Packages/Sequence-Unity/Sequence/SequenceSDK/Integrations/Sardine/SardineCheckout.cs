@@ -65,5 +65,16 @@ namespace Sequence.Integrations.Sardine
                 throw new Exception("Error fetching Sardine supported regions: " + e.Message);
             }
         }
+
+        public async Task<string> GetSardineClientToken()
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "GetSardineClientToken";
+            try {
+                SardineTokenResponse response = await _client.SendRequest<SardineTokenResponse>(url);
+                return response.token;
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine client token: " + e.Message);
+            }
+        }
     }
 }
