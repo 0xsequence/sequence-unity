@@ -10,6 +10,8 @@ namespace Sequence.Integrations.Sardine
         private Chain _chain;
         private string _apiKey;
         private HttpClient _client;
+        
+        private const string _baseUrl = "https://api.sequence.app/rpc/API";
 
         public SardineCheckout(Chain chain)
         {
@@ -21,7 +23,7 @@ namespace Sequence.Integrations.Sardine
 
         public async Task<bool> CheckSardineWhitelistStatus(Address marketplaceAddress)
         {
-            string url = "https://api.sequence.app/rpc/API/GetSardineNFTCheckoutToken";
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "GetSardineNFTCheckoutToken";
             string referenceId = "sequence-unity-sardine-whitelist-check";
             string name = "whitelist-check";
             string imageUrl = "https://www.sequence.market/images/placeholder.png";
@@ -51,6 +53,16 @@ namespace Sequence.Integrations.Sardine
                     return false;
                 }
                 throw new Exception("Error fetching Sardine whitelist status: " + e.Message);
+            }
+        }
+
+        public async Task<SardineRegion[]> GetSardineSupportedRegions()
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "GetSardineSupportedRegions";
+            try {
+                return await _client.SendRequest<SardineRegion[]>(url);
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine supported regions: " + e.Message);
             }
         }
     }

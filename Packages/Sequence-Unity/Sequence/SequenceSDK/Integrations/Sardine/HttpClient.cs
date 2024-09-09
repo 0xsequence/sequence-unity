@@ -20,10 +20,19 @@ namespace Sequence.Integrations.Sardine
             _apiKey = apiKey;
         }
 
+        public async Task<ReturnType> SendRequest<ReturnType>(string url)
+        {
+            return await SendRequest<object, ReturnType>(url, null);
+        }
+
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
         {
-            RequestParams<ArgType> requestParams = new RequestParams<ArgType>(args);
-            string requestJson = JsonConvert.SerializeObject(requestParams);
+            string requestJson = "";
+            if (args != null)
+            {
+                RequestParams<ArgType> requestParams = new RequestParams<ArgType>(args);
+                requestJson = JsonConvert.SerializeObject(requestParams);
+            }
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);

@@ -16,5 +16,16 @@ namespace Sequence.Integrations.Tests.Sardine
 
             Assert.False(result);
         }
+
+        [Test]
+        public async Task TestGetSardineSupportedRegions()
+        {
+            SardineCheckout sardine = new SardineCheckout(Chain.Polygon);
+            
+            SardineRegion[] regions = await sardine.GetSardineSupportedRegions();
+            
+            Assert.NotNull(regions);
+            Assert.Greater(regions.Length, 0);
+        }
     }
 }
