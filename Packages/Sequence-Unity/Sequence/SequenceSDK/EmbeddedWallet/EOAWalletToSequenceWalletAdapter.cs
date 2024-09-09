@@ -14,8 +14,15 @@ namespace Sequence.EmbeddedWallet
     public class EOAWalletToSequenceWalletAdapter : IWallet
     {
         Sequence.Wallet.IWallet _wallet;
+        SequenceEthClient client;
         public EOAWalletToSequenceWalletAdapter(Sequence.Wallet.IWallet wallet)
         {
+            _wallet = wallet;
+        }
+
+        public EOAWalletToSequenceWalletAdapter(Sequence.Wallet.IWallet wallet, SequenceEthClient testClient)
+        {
+            client = testClient;
             _wallet = wallet;
         }
         public Address GetWalletAddress()
@@ -62,7 +69,7 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, bool waitForReceipt = true, uint timeBeforeExpiry = 30)
         {
-            var client = new SequenceEthClient(network);
+            //var client = new SequenceEthClient(network);
             EthTransaction[] ethTransactions = new EthTransaction[transactions.Length];
             List<FailedTransactionReturn> failedTransactionReturns = new List<FailedTransactionReturn>();
             List<SuccessfulTransactionReturn> successfulTransactionReturns = new List<SuccessfulTransactionReturn>();
@@ -223,15 +230,18 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<ContractDeploymentReturn> DeployContract(Chain network, string bytecode, string value)
         {
-            var client = new SequenceEthClient(network);
+            //var client = new SequenceEthClient(network);
 
-            ContractDeploymentReturn contractDeploymentReturn;
             try
             {
                 ContractDeploymentResult result = await ContractDeployer.Deploy(client, _wallet, bytecode);
                 if (result.DeployedContractAddress != null)
                 {
-                    contractDeploymentReturn = new SuccessfulContractDeploymentReturn(new SuccessfulTransactionReturn(result.Receipt.transactionHash, null, null, null), result.DeployedContractAddress);
+                    SuccessfulContractDeploymentReturn contractDeploymentReturn = new SuccessfulContractDeploymentReturn(new SuccessfulTransactionReturn(result.Receipt.transactionHash, null, null, null), result.DeployedContractAddress);
+                    OnDeployContractComplete?.Invoke(contractDeploymentReturn);
+
+                    return contractDeploymentReturn;
+
                 }
                 else
                 {
@@ -240,10 +250,10 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception ex)
             {
-                Debug.LogError("Contract deployment failed.");
-                contractDeploymentReturn = new FailedContractDeploymentReturn(new FailedTransactionReturn("Contract deployment failed.", null), "Contract deployment failed."+ex.Message);
-            }   
-            return contractDeploymentReturn;
+                FailedContractDeploymentReturn contractDeploymentReturn = new FailedContractDeploymentReturn(new FailedTransactionReturn("Contract deployment failed.", null), ex.Message);
+                OnDeployContractFailed?.Invoke(contractDeploymentReturn);
+                return contractDeploymentReturn;
+            } 
         }
                 
 
