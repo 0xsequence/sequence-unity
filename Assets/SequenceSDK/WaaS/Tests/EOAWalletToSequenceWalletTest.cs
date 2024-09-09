@@ -42,23 +42,35 @@ namespace Sequence.WaaS.Tests
             adapter = new EOAWalletToSequenceWalletAdapter(wallet);
 
             adapter.OnSignMessageComplete += OnMessageSigned;
+            adapter.OnSignMessageFailed += OnMessageFailed;
             adapter.OnSendTransactionComplete += OnTransactionSent;
             adapter.OnDeployContractComplete += OnContractDeployed;
 
         }
-      
+
+        int successfullSignatureCounter;
+        int failedSignatureCounter;
 
         [Test]
         public async Task TestSignMessageT()
         {
+            successfullSignatureCounter = 0;
+            failedSignatureCounter = 0;
             var signature = await adapter.SignMessage(chain, "TestSingature");
-            Debug.Log(signature);
+            Assert.AreEqual(1, successfullSignatureCounter);
+            Assert.Zero(failedSignatureCounter);
+            Assert.IsNotNull(signature);
+            Assert.IsNotEmpty(signature);
         }
         void OnMessageSigned(string signature)
         {
-            Debug.Log(signature);
+            successfullSignatureCounter++;
         }
 
+        void OnMessageFailed(string error)
+        {
+            failedSignatureCounter++;
+        }
         [Test]
         public async Task TestSendTransactionT()
         {
@@ -249,7 +261,6 @@ namespace Sequence.WaaS.Tests
 
         DelayedEncode MakeDelayedEncodeMint(string contractAddress)
         {
-            // make more
             var delayedEncode = 
                             new DelayedEncode(contractAddress, "0",
                                 new DelayedEncodeData("mint(address,uint256)",
@@ -262,7 +273,6 @@ namespace Sequence.WaaS.Tests
         }
         DelayedEncode MakeDelayedEncodeApprove(string contractAddress)
         {
-            // make more
             var delayedEncode =
                             new DelayedEncode(contractAddress, "0",
                                 new DelayedEncodeData("approve(address, uint256)",
