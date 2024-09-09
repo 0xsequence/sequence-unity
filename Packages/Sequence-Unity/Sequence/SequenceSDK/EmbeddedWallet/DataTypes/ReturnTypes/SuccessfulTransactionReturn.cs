@@ -29,10 +29,8 @@ namespace Sequence.EmbeddedWallet
             this.simulations = simulations;
         }
     }
-
     public class TransactionReceiptConverter : JsonConverter
     {
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(TransactionReceipt);
@@ -40,36 +38,42 @@ namespace Sequence.EmbeddedWallet
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            JObject jsonObject = JObject.Load(reader);
-
-            var enumerator = jsonObject.Properties().GetEnumerator();
-            if (!enumerator.MoveNext())
+            JObject jsonObject;
+            try
             {
-                throw new JsonSerializationException("Invalid JSON format for TransactionReceipt.");
+                jsonObject = JObject.Load(reader);
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to load JSON: {ex.Message}");
+                throw;
             }
 
-            JProperty dynamicKeyProperty = enumerator.Current;
+            TransactionReceipt receipt = new TransactionReceipt();
 
-            JObject receiptObject = (JObject)dynamicKeyProperty.Value;
-
-            TransactionReceipt receipt = new TransactionReceipt
+            try
             {
-                transactionHash = receiptObject["transactionHash"]?.ToObject<string>(),
-                transactionIndex = receiptObject["transactionIndex"]?.ToObject<string>(),
-                blockHash = receiptObject["blockHash"]?.ToObject<string>(),
-                blockNumber = receiptObject["blockNumber"]?.ToObject<string>(),
-                from = receiptObject["from"]?.ToObject<string>(),
-                to = receiptObject["to"]?.ToObject<string>(),
-                cumulativeGasUsed = receiptObject["cumulativeGasUsed"]?.ToObject<string>(),
-                effectiveGasPrice = receiptObject["effectiveGasPrice"]?.ToObject<string>(),
-                gasUsed = receiptObject["gasUsed"]?.ToObject<string>(),
-                contractAddress = receiptObject["contractAddress"]?.ToObject<string>(),
-                logs = receiptObject["logs"]?.ToObject<List<Log>>(serializer),
-                logsBloom = receiptObject["logsBloom"]?.ToObject<string>(),
-                type = receiptObject["type"]?.ToObject<string>(),
-                root = receiptObject["root"]?.ToObject<string>(),
-                status = receiptObject["status"]?.ToObject<string>()
-            };
+                receipt.transactionHash = jsonObject["transactionHash"]?.ToString();
+                receipt.transactionIndex = jsonObject["transactionIndex"]?.ToString();
+                receipt.blockHash = jsonObject["blockHash"]?.ToString();
+                receipt.blockNumber = jsonObject["blockNumber"]?.ToString();
+                receipt.from = jsonObject["from"]?.ToString();
+                receipt.to = jsonObject["to"]?.ToString();
+                receipt.cumulativeGasUsed = jsonObject["cumulativeGasUsed"]?.ToString();
+                receipt.effectiveGasPrice = jsonObject["effectiveGasPrice"]?.ToString();
+                receipt.gasUsed = jsonObject["gasUsed"]?.ToString();
+                receipt.contractAddress = jsonObject["contractAddress"]?.ToString();
+                receipt.logsBloom = jsonObject["logsBloom"]?.ToString();
+                receipt.type = jsonObject["type"]?.ToString();
+                receipt.root = jsonObject["root"]?.ToString();
+                receipt.status = jsonObject["status"]?.ToString();
+                receipt.logs = jsonObject["logs"]?.ToObject<List<Log>>(serializer);
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Error during JSON conversion: {ex.Message}");
+                throw;
+            }
 
             return receipt;
         }
@@ -78,37 +82,26 @@ namespace Sequence.EmbeddedWallet
         {
             TransactionReceipt receipt = (TransactionReceipt)value;
 
-            // Create a JObject to hold the TransactionReceipt properties
             JObject receiptObject = new JObject
-    {
-        { "transactionHash", JToken.FromObject(receipt.transactionHash) },
-        { "transactionIndex", JToken.FromObject(receipt.transactionIndex) },
-        { "blockHash", JToken.FromObject(receipt.blockHash) },
-        { "blockNumber", JToken.FromObject(receipt.blockNumber) },
-        { "from", JToken.FromObject(receipt.from) },
-        { "to", JToken.FromObject(receipt.to) },
-        { "cumulativeGasUsed", JToken.FromObject(receipt.cumulativeGasUsed) },
-        { "effectiveGasPrice", JToken.FromObject(receipt.effectiveGasPrice) },
-        { "gasUsed", JToken.FromObject(receipt.gasUsed) },
-        { "contractAddress", JToken.FromObject(receipt.contractAddress) },
-        { "logs", JArray.FromObject(receipt.logs, serializer) },
-        { "logsBloom", JToken.FromObject(receipt.logsBloom) },
-        { "type", JToken.FromObject(receipt.type) },
-        { "root", JToken.FromObject(receipt.root) },
-        { "status", JToken.FromObject(receipt.status) }
-    };
+        {
+            { "transactionHash", JToken.FromObject(receipt.transactionHash) },
+            { "transactionIndex", JToken.FromObject(receipt.transactionIndex) },
+            { "blockHash", JToken.FromObject(receipt.blockHash) },
+            { "blockNumber", JToken.FromObject(receipt.blockNumber) },
+            { "from", JToken.FromObject(receipt.from) },
+            { "to", JToken.FromObject(receipt.to) },
+            { "cumulativeGasUsed", JToken.FromObject(receipt.cumulativeGasUsed) },
+            { "effectiveGasPrice", JToken.FromObject(receipt.effectiveGasPrice) },
+            { "gasUsed", JToken.FromObject(receipt.gasUsed) },
+            { "contractAddress", JToken.FromObject(receipt.contractAddress) },
+            { "logsBloom", JToken.FromObject(receipt.logsBloom) },
+            { "type", JToken.FromObject(receipt.type) },
+            { "root", JToken.FromObject(receipt.root) },
+            { "status", JToken.FromObject(receipt.status) },
+            { "logs", JToken.FromObject(receipt.logs, serializer) }
+        };
 
-            // Use the transaction hash as the dynamic key
-            string dynamicKey = receipt.transactionHash;
-
-            // Create the final JSON object with the dynamic key wrapping the receiptObject
-            JObject jsonObject = new JObject
-    {
-        { dynamicKey, receiptObject }
-    };
-
-            // Write the JSON to the writer
-            jsonObject.WriteTo(writer);
+            receiptObject.WriteTo(writer);
         }
     }
 }
