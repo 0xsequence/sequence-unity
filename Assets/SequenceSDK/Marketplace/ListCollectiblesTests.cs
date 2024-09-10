@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Sequence;
 using Sequence.Marketplace;
 
-namespace SequenceSDK.Marketplace
+namespace Sequence.Marketplace
 {
     public class ListCollectiblesTests
     {

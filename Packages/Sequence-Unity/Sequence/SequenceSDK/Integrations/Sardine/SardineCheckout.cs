@@ -1,6 +1,10 @@
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Config;
+using Sequence.Contracts;
+using Sequence.Marketplace;
+using Sequence.Provider;
 using Sequence.Utils;
 
 namespace Sequence.Integrations.Sardine
@@ -75,6 +79,30 @@ namespace Sequence.Integrations.Sardine
             } catch (Exception e) {
                 throw new Exception("Error fetching Sardine client token: " + e.Message);
             }
+        }
+        
+        public async Task<SardineNFTCheckout> GetSardineNFTCheckoutToken(CollectibleOrder order, Address recipient, BigInteger quantity, string callData)
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "GetSardineNFTCheckoutToken";
+            string priceSymbol = await new ERC20(order.order.priceCurrencyAddress).Symbol(new SequenceEthClient(_chain));
+            GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
+                new PaymentMethodTypeConfig(EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(),
+                    PaymentMethod.us_debit),
+                order.metadata.image, _chain, recipient, new Address(order.order.collectionContractAddress), order.metadata.tokenId, quantity, order.order.quantityDecimals,
+                order.order.priceAmount,
+                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name, order.order.marketplace.AsString());
+            try {
+                return await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, SardineNFTCheckout>(url, request);
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine NFT checkout token: " + e.Message);
+            }
+        }
+
+        public Task<SardineNFTCheckout> GetSardineNFTCheckoutToken(CollectibleOrder order, Address recipient,
+            BigInteger quantity, Contract contract, string functionName, params object[] functionArgs)
+        {
+            string callData = contract.CallFunction(functionName, functionArgs).CallData;
+            return GetSardineNFTCheckoutToken(order, recipient, quantity, callData);
         }
     }
 }

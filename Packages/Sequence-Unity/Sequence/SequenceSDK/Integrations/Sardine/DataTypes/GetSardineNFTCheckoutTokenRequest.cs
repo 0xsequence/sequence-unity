@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Newtonsoft.Json;
 
 namespace Sequence.Integrations.Sardine
@@ -17,15 +18,15 @@ namespace Sequence.Integrations.Sardine
         public string platform;
         public string executionType;
         public string blockchainNftId;
-        public uint quantity;
-        public uint decimals;
+        public BigInteger quantity;
+        public BigInteger decimals;
         public string tokenAmount;
         public Address tokenAddress;
         public string tokenSymbol;
-        public uint tokenDecimals;
+        public BigInteger tokenDecimals;
         public string callData;
 
-        public GetSardineNFTCheckoutTokenRequest(PaymentMethodTypeConfig paymentMethodTypeConfig, string imageUrl, Chain network, Address recipientAddress, Address contractAddress, string blockchainNftId, uint quantity, uint decimals, string tokenAmount, Address tokenAddress, string tokenSymbol, uint tokenDecimals, string callData, string name = "whitelist-check", string platform = "calldata_execution", string executionType = "smart_contract", uint expiresIn = 3600)
+        public GetSardineNFTCheckoutTokenRequest(PaymentMethodTypeConfig paymentMethodTypeConfig, string imageUrl, Chain network, Address recipientAddress, Address contractAddress, string blockchainNftId, BigInteger quantity, BigInteger decimals, string tokenAmount, Address tokenAddress, string tokenSymbol, BigInteger tokenDecimals, string callData, string name = "whitelist-check", string platform = "calldata_execution", string executionType = "smart_contract", uint expiresIn = 3600)
         {
             this.paymentMethodTypeConfig = paymentMethodTypeConfig;
             this.name = name;
@@ -47,7 +48,7 @@ namespace Sequence.Integrations.Sardine
         }
 
         [JsonConstructor]
-        public GetSardineNFTCheckoutTokenRequest(string referenceId, uint expiresIn, PaymentMethodTypeConfig paymentMethodTypeConfig, string name, string imageUrl, string network, string recipientAddress, string contractAddress, string platform, string executionType, string blockchainNftId, uint quantity, uint decimals, string tokenAmount, string tokenAddress, string tokenSymbol, uint tokenDecimals, string callData)
+        public GetSardineNFTCheckoutTokenRequest(string referenceId, uint expiresIn, PaymentMethodTypeConfig paymentMethodTypeConfig, string name, string imageUrl, string network, string recipientAddress, string contractAddress, string platform, string executionType, string blockchainNftId, BigInteger quantity, BigInteger decimals, string tokenAmount, string tokenAddress, string tokenSymbol, BigInteger tokenDecimals, string callData)
         {
             this.referenceId = referenceId;
             this.expiresIn = expiresIn;
