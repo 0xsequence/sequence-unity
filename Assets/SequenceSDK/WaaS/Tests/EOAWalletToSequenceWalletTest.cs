@@ -34,7 +34,7 @@ namespace Sequence.WaaS.Tests
         [SetUp]
         public void  Setup()
         {
-            wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000001");
+            wallet = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
             client = new SequenceEthClient("http://localhost:8545/");
 
             //pass this  client to the adapter for testing
@@ -74,17 +74,16 @@ namespace Sequence.WaaS.Tests
         [Test]
         public async Task TestSendTransactionT()
         {
-            //var erc20 = await MakeERC20Transaction(await TestDeployERC20(_erc20ByteCode));
-            //var erc721 = await MakeERC721Transaction(await TestDeployERC721(_erc721Bytecode));
+            var erc20 = await MakeERC20Transaction(await TestDeployERC20(_erc20ByteCode));
 
-            var smth = await  TestDeployERC1155(_erc1155ByteCode);
+            var erc721 = await MakeERC721Transaction(await TestDeployERC721(_erc721Bytecode));
 
-            var erc1155 = await MakeERC1155Transaction(smth);
-            //var delayedEncode = MakeDelayedEncodeMint(contractAddress);
-            //var delayedEncode1 = MakeDelayedEncodeApprove(contractAddress);
+            var erc1155 = await MakeERC1155Transaction(await TestDeployERC1155(_erc1155ByteCode));
+
+            var delayedEncode = MakeDelayedEncodeApprove(contractAddress);
 
 
-            var txs = new Transaction[] { /*erc20, erc721,*/ erc1155/*, delayedEncode, delayedEncode1*/ };
+            var txs = new Transaction[] { /*erc20,*/ erc721 , erc1155 , delayedEncode };
             var txreturn = await adapter.SendTransaction(chain, txs, true);
 
             if (txreturn is SuccessfulBatchTransactionReturn successfulBatchTransactionReturn)
@@ -125,7 +124,7 @@ namespace Sequence.WaaS.Tests
         }
         void OnContractDeployed(SuccessfulContractDeploymentReturn deploymentReturn)
         {
-            Debug.Log("DEPLOYEDCONTRACT" + deploymentReturn.DeployedContractAddress);
+            Debug.Log("Deployed contract" + deploymentReturn.DeployedContractAddress);
         }
         void OnContractNotDeployed(FailedContractDeploymentReturn deploymentReturn)
         {
@@ -159,15 +158,36 @@ namespace Sequence.WaaS.Tests
             throw new Exception("Failed deployment transaction.");
         }
 
+        DelayedEncode MakeERC20DelayedEncodeMint(string contractAddress)
+        {
+            try
+            {
+                var delayedEncode = new DelayedEncode(contractAddress, "0",
+                                                new DelayedEncodeData("mint(address,uint256)",
+                                                    new object[]
+                                                    {
+                                        wallet.GetAddress(), BigInteger.Parse(DecimalNormalizer.Normalize(1000000000000000000))
+                                                    }, "mint"));
+
+                return delayedEncode;
+            }
+            catch (Exception)
+            {
+
+                throw new Exception("make delayed enode mint failed");
+            }
+
+        }
+
         async Task<SendERC20> MakeERC20Transaction(ERC20 erc20)
         {
             try
             {
-                TransactionReceipt receipt = await erc20.Mint(adapter.GetWalletAddress(), BigInteger.Parse("1")).SendTransactionMethodAndWaitForReceipt(wallet, client);
+                var receipt =  await adapter.SendTransaction(chain, new Transaction[] { MakeERC20DelayedEncodeMint(erc20.Contract.GetAddress())}, true);
 
                 if (receipt != null )
                 {
-                    return new SendERC20(receipt.contractAddress, _toAddress, "1");
+                    return new SendERC20(erc20.Contract.GetAddress(), _toAddress, "1");
                 }
                 else
                 {
@@ -212,9 +232,9 @@ namespace Sequence.WaaS.Tests
         {
             try
             {
-                var txHash = await erc721.SafeMint(adapter.GetWalletAddress(), BigInteger.One).SendTransactionMethod(wallet, client);
+                var txHash = await adapter.SendTransaction(chain, new Transaction[] { MakeERC721DelayedEncodeMint(erc721.Contract.GetAddress()) }, true);
 
-                if (txHash != null)
+                if (txHash != null && txHash is SuccessfulTransactionReturn successfulTransactionReturn)
                 {
                     return new SendERC721(erc721.Contract.GetAddress(), _toAddress, "1");
                 }
@@ -235,6 +255,7 @@ namespace Sequence.WaaS.Tests
             {
                 var deployedERC1155return = await adapter.DeployContract(chain, byteCode, "1");
 
+                Assert.IsNotNull(deployedERC1155return);
 
                 if (deployedERC1155return is SuccessfulContractDeploymentReturn successfulContractDeploymentReturn)
                 {
@@ -258,12 +279,7 @@ namespace Sequence.WaaS.Tests
         {
             try
             {
-                //TransactionReceipt receipt = await erc1155.Mint(adapter.GetWalletAddress(), BigInteger.One, BigInteger.Parse(_erc1155TokenAmount)).SendTransactionMethodAndWaitForReceipt(wallet, client);
-
-                var delayedEncoded  = MakeDelayedEncodeMint(erc1155.Contract.GetAddress());
-
-                var tx = new Transaction[] { delayedEncoded };
-                var receipt = await adapter.SendTransaction(chain, tx, true);
+                var receipt = await adapter.SendTransaction(chain, new Transaction[] { MakeERC1155DelayedEncodeMint(erc1155.Contract.GetAddress(), adapter.GetWalletAddress(), BigInteger.One, BigInteger.One, "Made using unitySDK".ToByteArray()) }, true);
 
                 if (receipt != null )
                 {
@@ -283,27 +299,53 @@ namespace Sequence.WaaS.Tests
             }
         }
 
-        DelayedEncode MakeDelayedEncodeMint(string contractAddress)
+        DelayedEncode MakeERC721DelayedEncodeMint(string contractAddress)
         {
             try
             {
                 var delayedEncode =
-                                            new DelayedEncode(contractAddress, "0",
-                                                new DelayedEncodeData("mint(address,uint256)",
-                                                    new object[]
-                                                    {
-                                        wallet.GetAddress(), BigInteger.Parse(DecimalNormalizer.Normalize(1))
-                                                    }, "mint"));
+                    new DelayedEncode(contractAddress, "0",
+                        new DelayedEncodeData("safeMint(address, uint256)",
+                            new object[]
+                            {
+                        wallet.GetAddress(), BigInteger.Parse("1")
+                            }, "safeMint"));
 
                 return delayedEncode;
             }
             catch (Exception)
             {
-
-                throw new Exception("make delayed enode mint failed");
+                throw new Exception("Make delayed encode mint failed");
             }
-            
+
         }
+        DelayedEncode MakeERC1155DelayedEncodeMint(string contractAddress, string toAddress, BigInteger tokenId, BigInteger amount, byte[] data = null)
+        {
+            if (data == null)
+            {
+                data = "Minted using the Sequence Unity SDK".ToByteArray();
+            }
+            try
+            {             
+                var delayedEncode =
+                    new DelayedEncode(contractAddress, "0",
+                        new DelayedEncodeData("mint(address,uint256,uint256,bytes)",
+                            new object[]
+                            {
+                        toAddress,        
+                        tokenId,          
+                        amount,           
+                        data              
+                            }, "mint"));
+
+                return delayedEncode;
+            }
+            catch (Exception)
+            {
+                throw new Exception("Make delayed encode mint failed");
+            }
+        }
+        
         DelayedEncode MakeDelayedEncodeApprove(string contractAddress)
         {
             var delayedEncode =

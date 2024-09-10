@@ -14,15 +14,16 @@ namespace Sequence.EmbeddedWallet
     public class EOAWalletToSequenceWalletAdapter : IWallet
     {
         Sequence.Wallet.IWallet _wallet;
-        SequenceEthClient client;
+        SequenceEthClient _client;
+
         public EOAWalletToSequenceWalletAdapter(Sequence.Wallet.IWallet wallet)
         {
             _wallet = wallet;
         }
 
-        public EOAWalletToSequenceWalletAdapter(Sequence.Wallet.IWallet wallet, SequenceEthClient testClient)
+        public EOAWalletToSequenceWalletAdapter(Sequence.Wallet.IWallet wallet, SequenceEthClient client)
         {
-            client = testClient;
+            _client = client;
             _wallet = wallet;
         }
         public Address GetWalletAddress()
@@ -69,7 +70,8 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<TransactionReturn> SendTransaction(Chain network, Transaction[] transactions, bool waitForReceipt = true, uint timeBeforeExpiry = 30)
         {
-            //var client = new SequenceEthClient(network);
+            if (_client == null) _client = new SequenceEthClient(network);
+
             EthTransaction[] ethTransactions = new EthTransaction[transactions.Length];
             List<FailedTransactionReturn> failedTransactionReturns = new List<FailedTransactionReturn>();
             List<SuccessfulTransactionReturn> successfulTransactionReturns = new List<SuccessfulTransactionReturn>();
@@ -88,7 +90,7 @@ namespace Sequence.EmbeddedWallet
                         value = BigInteger.Parse(tx.value);
                         data = tx.data;
 
-                        transaction = await new GasLimitEstimator(client, _wallet.GetAddress())
+                        transaction = await new GasLimitEstimator(_client, _wallet.GetAddress())
                                                  .BuildTransaction(toAddress, data, value);
                         break;
                         
@@ -98,15 +100,15 @@ namespace Sequence.EmbeddedWallet
 
                         var erc20 = new ERC20(tx.tokenAddress);
                         transaction = await erc20.TransferFrom(_wallet.GetAddress(), toAddress, value)
-                                                    .Create(client, new ContractCall(_wallet.GetAddress()));
+                                                    .Create(_client, new ContractCall(_wallet.GetAddress()));
                         break;
 
                     case SendERC721 tx:
                         toAddress = tx.to;
-
+                                             
                         var erc721 = new ERC721(tx.tokenAddress);
-                        transaction = await erc721.SafeTransferFrom(_wallet.GetAddress(), toAddress, BigInteger.Parse(tx.id), Encoding.UTF8.GetBytes(tx.data))
-                                                    .Create(client, new ContractCall(_wallet.GetAddress()));
+                        transaction = await erc721.SafeTransferFrom(_wallet.GetAddress(), toAddress, BigInteger.Parse(tx.id))
+                                                    .Create(_client, new ContractCall(_wallet.GetAddress()));
                         break;
 
                     case SendERC1155 tx:
@@ -122,8 +124,8 @@ namespace Sequence.EmbeddedWallet
                             tokenValues[j] = BigInteger.Parse(tx.vals[j].amount);
                         }
 
-                        transaction = await erc1155.SafeBatchTransferFrom(_wallet.GetAddress(), toAddress, tokenIds, tokenValues, Encoding.UTF8.GetBytes(tx.data))
-                                                    .Create(client, new ContractCall(_wallet.GetAddress()));
+                        transaction = await erc1155.SafeBatchTransferFrom(_wallet.GetAddress(), toAddress, tokenIds, tokenValues)
+                                                     .Create(_client, new ContractCall(_wallet.GetAddress()));
                         break;
 
                     case DelayedEncode tx:
@@ -132,12 +134,12 @@ namespace Sequence.EmbeddedWallet
                         {
                             var contract = new Contract(tx.to, tx.data.abi);
 
-                            transaction = await contract.CallFunction(tx.data.func, tx.data.args).Create(client, new ContractCall(_wallet.GetAddress()));
+                            transaction = await contract.CallFunction(tx.data.func, tx.data.args).Create(_client, new ContractCall(_wallet.GetAddress()));
                         }
                         catch (Exception e)
                         {
                             var contract = new Contract(tx.to);
-                            transaction = await contract.CallFunction(tx.data.abi, tx.data.args).Create(client, new ContractCall(_wallet.GetAddress()));
+                            transaction = await contract.CallFunction(tx.data.abi, tx.data.args).Create(_client, new ContractCall(_wallet.GetAddress()));
                         }
                                               
 
@@ -150,7 +152,7 @@ namespace Sequence.EmbeddedWallet
                 {
                     try
                     {
-                        var receiptResponse = await _wallet.SendTransactionAndWaitForReceipt(client, transaction);
+                        var receiptResponse = await _wallet.SendTransactionAndWaitForReceipt(_client, transaction);
 
                         if (receiptResponse == null)
                         {
@@ -172,7 +174,7 @@ namespace Sequence.EmbeddedWallet
                 }
                 else
                 {
-                    var txHash = await _wallet.SendTransaction(client, transaction);
+                    var txHash = await _wallet.SendTransaction(_client, transaction);
                     successfulTransactionReturns.Add(new SuccessfulTransactionReturn(txHash, null, null, null));
                 }
             }
@@ -230,11 +232,11 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<ContractDeploymentReturn> DeployContract(Chain network, string bytecode, string value)
         {
-            //var client = new SequenceEthClient(network);
+            if (_client == null) _client = new SequenceEthClient(network);
 
             try
             {
-                ContractDeploymentResult result = await ContractDeployer.Deploy(client, _wallet, bytecode);
+                ContractDeploymentResult result = await ContractDeployer.Deploy(_client, _wallet, bytecode);
                 if (result.DeployedContractAddress != null)
                 {
                     SuccessfulContractDeploymentReturn contractDeploymentReturn = new SuccessfulContractDeploymentReturn(new SuccessfulTransactionReturn(result.Receipt.transactionHash, null, null, null), result.DeployedContractAddress);
