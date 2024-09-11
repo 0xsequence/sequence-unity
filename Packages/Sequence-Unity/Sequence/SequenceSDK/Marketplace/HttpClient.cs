@@ -22,11 +22,20 @@ namespace Sequence.Marketplace
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
         }
+        
+        public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)
+        {
+            return await SendRequest<object, ReturnType>(chain, url, null);
+        }
 
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(Chain chain, string endpoint, ArgType args)
         {
             string url = _baseUrl + ChainDictionaries.PathOf[chain] + _endUrl + endpoint;
-            string requestJson = JsonConvert.SerializeObject(args);
+            string requestJson = "";
+            if (args != null)
+            {
+                requestJson = JsonConvert.SerializeObject(args);
+            }
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);

@@ -23,7 +23,7 @@ namespace Sequence.Demo
         private int _widthInItems;
         private GridLayoutGroup _grid;
         private float _brandingBuffer = 60;
-        private ListCollectibles _collectibles;
+        private MarketplaceReader _collectibles;
         private int _items = 0;
 
         protected override void Awake()
@@ -32,7 +32,7 @@ namespace Sequence.Demo
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
             _widthInItems = _grid.constraintCount;
-            _collectibles = new ListCollectibles(_chain);
+            _collectibles = new MarketplaceReader(_chain);
 
             DestroyGridChildren();
         }
@@ -64,7 +64,7 @@ namespace Sequence.Demo
 
         private async Task FetchCollection(Page page = null)
         {
-            ListCollectiblesWithLowestListingReturn result = await _collectibles.ListCollectiblesWithLowestListing(_collectionAddressInputField.text, null, page);
+            ListCollectiblesReturn result = await _collectibles.ListCollectiblesWithLowestListing(_collectionAddressInputField.text, null, page);
             if (result == null || result.collectibles == null || result.collectibles.Length == 0)
             {
                 _errorText.text = "No orders founds for collection";
