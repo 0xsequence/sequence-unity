@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Sequence.EmbeddedWallet
@@ -15,6 +16,7 @@ namespace Sequence.EmbeddedWallet
 
         public SuccessfulTransactionReturn() { }
 
+        [JsonConstructor]
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {
             this.txHash = txHash;
