@@ -71,7 +71,7 @@ namespace Sequence.EmbeddedWallet
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
-            
+
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
             new Dictionary<string, string>() {{"X-Access-Key", _builderApiKey}}); 
@@ -401,5 +401,44 @@ namespace Sequence.EmbeddedWallet
                 return null;
             }
         }
+        
+        public event Action<IntentResponseAccountList> OnAccountListGenerated;
+        public event Action<string> OnFailedToGenerateAccountList;
+        
+        public async Task<IntentResponseAccountList> GetAccountList()
+        {
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseAccountList, IntentDataListAccounts>(new IntentDataListAccounts(_address), IntentType.ListAccounts);
+                OnAccountListGenerated?.Invoke(result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                OnFailedToGenerateAccountList?.Invoke("Failed to generate account list: " + e.Message);
+                return null;
+            }
+        }
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public async Task<IntentResponseGetIdToken> GetIdToken(string nonce = null)
+        {
+            IntentDataGetIdToken args = new IntentDataGetIdToken(SessionId, _address, nonce);
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseGetIdToken, IntentDataGetIdToken>(args, IntentType.GetIdToken);
+                OnIdTokenRetrieved?.Invoke(result);
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                OnFailedToRetrieveIdToken?.Invoke("Failed to retrieve Id Token : " + e.Message);
+                return null;
+            }
+        }
+
     }
 }

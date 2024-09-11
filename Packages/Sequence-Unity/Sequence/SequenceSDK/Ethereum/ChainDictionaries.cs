@@ -40,8 +40,8 @@ namespace Sequence
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "ETH" },
-            { Chain.Polygon, "MATIC" },
-            { Chain.PolygonZkEvm, "MATIC" },
+            { Chain.Polygon, "POL" },
+            { Chain.PolygonZkEvm, "POL" },
             { Chain.BNBSmartChain, "BNB" },
             { Chain.ArbitrumOne, "AETH" },
             { Chain.ArbitrumNova, "AETH" },
@@ -61,7 +61,7 @@ namespace Sequence
             { Chain.TestnetOasysHomeverse, "OAS"},
             { Chain.TestnetAvalanche, "AVAX"},
             { Chain.TestnetOptimisticSepolia, "OP"},
-            { Chain.TestnetPolygonAmoy, "MATIC" },
+            { Chain.TestnetPolygonAmoy, "POL" },
             { Chain.TestnetAstarZKyoto, "ETH"},
             { Chain.TestnetXrSepolia, "tXR" },
             { Chain.TestnetXaiSepolia, "sXAI" },
@@ -169,6 +169,39 @@ namespace Sequence
             { "1993", Chain.TestnetB3Sepolia },
             { "33111", Chain.TestnetAPEChain },
             { "168587773", Chain.TestnetBlastSepolia }
+        };
+        
+        public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
+        {
+            { Chain.Ethereum, "mainnet" },
+            { Chain.Polygon, "polygon" },
+            { Chain.BNBSmartChain, "bsc" },
+            { Chain.PolygonZkEvm, "polygon-zkevm" },
+            { Chain.ArbitrumOne, "arbitrum" },
+            { Chain.ArbitrumNova, "arbitrum-nova" },
+            { Chain.Optimism, "optimism" },
+            { Chain.Avalanche, "avalanche" },
+            { Chain.Gnosis, "gnosis" },
+            { Chain.Base, "base" },
+            { Chain.OasysHomeverse, "homeverse" },
+            { Chain.AstarZKEvm, "astar-zkevm" },
+            { Chain.Xai, "xai" },
+            { Chain.Blast, "blast" },
+
+            { Chain.TestnetSepolia, "sepolia" },
+            { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
+            { Chain.TestnetBNBSmartChain, "bsc-testnet" },
+            { Chain.TestnetBaseSepolia, "base-sepolia" },
+            { Chain.TestnetOasysHomeverse, "homeverse-testnet" },
+            { Chain.TestnetAvalanche, "avalanche-testnet" },
+            { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
+            { Chain.TestnetPolygonAmoy, "amoy" }, 
+            { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
+            { Chain.TestnetXrSepolia, "xr-sepolia" },
+            { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
+            { Chain.TestnetB3Sepolia, "b3-sepolia" },
+            { Chain.TestnetAPEChain, "apechain-testnet" },
+            { Chain.TestnetBlastSepolia, "blast-sepolia" }
         };
     }
 }
