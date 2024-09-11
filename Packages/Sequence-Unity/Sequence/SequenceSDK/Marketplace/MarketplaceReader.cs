@@ -15,16 +15,20 @@ namespace Sequence.Marketplace
             _client = new HttpClient();
         }
 
+        public Action<Currency[]> OnListCurrenciesReturn;
+        public Action<string> OnListCurrenciesError;
         public async Task<Currency[]> ListCurrencies()
         {
             try
             {
                 Currency[] currencies = await _client.SendRequest<Currency[]>(_chain, "ListCurrencies");
+                OnListCurrenciesReturn?.Invoke(currencies);
                 return currencies;
             }
             catch (Exception e)
             {
                 string errorMessage = $"Error listing currencies: {e.Message}";
+                OnListCurrenciesError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
         }
@@ -100,6 +104,8 @@ namespace Sequence.Marketplace
             return ListAllCollectibles("ListCollectiblesWithHighestOffer", contractAddress, filter);
         }
 
+        public Action<TokenMetadata> OnGetCollectibleReturn;
+        public Action<string> OnGetCollectibleError;
         public async Task<TokenMetadata> GetCollectible(Address contractAddress, string tokenId)
         {
             GetCollectibleRequest request = new GetCollectibleRequest(contractAddress, tokenId);
@@ -107,11 +113,13 @@ namespace Sequence.Marketplace
             try
             {
                 TokenMetadata tokenMetadata = await _client.SendRequest<GetCollectibleRequest, TokenMetadata>(_chain, "GetCollectible", request);
+                OnGetCollectibleReturn?.Invoke(tokenMetadata);
                 return tokenMetadata;
             }
             catch (Exception e)
             {
                 string errorMessage = $"Error getting collectible {tokenId} from {contractAddress}: {e.Message}";
+                OnGetCollectibleError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
         }
@@ -160,17 +168,21 @@ namespace Sequence.Marketplace
             return GetCollectibleOrder(endpoint, contractAddress, tokenId, filter);
         }
         
+        public Action<ListCollectibleListingsReturn> OnListCollectibleListingsReturn;
+        public Action<string> OnListCollectibleListingsError;
         public async Task<ListCollectibleListingsReturn> ListCollectibleListings(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             ListCollectibleListingsArgs args = new ListCollectibleListingsArgs(contractAddress, tokenId, filter, page);
             try
             {
                 ListCollectibleListingsReturn result = await _client.SendRequest<ListCollectibleListingsArgs, ListCollectibleListingsReturn>(_chain, "ListCollectibleListings", args);
+                OnListCollectibleListingsReturn?.Invoke(result);
                 return result;
             }
             catch (Exception e)
             {
                 string errorMessage = $"Error listing collectible listings for {tokenId} from {contractAddress}: {e.Message}";
+                OnListCollectibleListingsError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
         }
@@ -197,17 +209,21 @@ namespace Sequence.Marketplace
             return orders;
         }
         
+        public Action<ListCollectibleOffersReturn> OnListCollectibleOffersReturn;
+        public Action<string> OnListCollectibleOffersError;
         public async Task<ListCollectibleOffersReturn> ListCollectibleOffers(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             ListCollectibleListingsArgs args = new ListCollectibleListingsArgs(contractAddress, tokenId, filter, page);
             try
             {
                 ListCollectibleOffersReturn result = await _client.SendRequest<ListCollectibleListingsArgs, ListCollectibleOffersReturn>(_chain, "ListCollectibleOffers", args);
+                OnListCollectibleOffersReturn?.Invoke(result);
                 return result;
             }
             catch (Exception e)
             {
                 string errorMessage = $"Error listing collectible offers for {tokenId} from {contractAddress}: {e.Message}";
+                OnListCollectibleOffersError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
         }

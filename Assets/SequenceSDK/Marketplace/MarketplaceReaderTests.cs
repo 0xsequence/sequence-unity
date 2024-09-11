@@ -12,6 +12,27 @@ namespace Sequence.Marketplace
     {
         private static List<Chain> chainIdCases = EnumExtensions.GetEnumValuesAsList<Chain>();
         
+        private int successEvents;
+        private int failEvents;
+
+        [SetUp]
+        public void Setup()
+        {
+            successEvents = 0;
+            failEvents = 0;
+        }
+
+        private void OnSuccess<T>(T result)
+        {
+            successEvents++;
+        }
+
+        private void OnError(string error)
+        {
+            failEvents++;
+            Assert.Fail(error);
+        }
+        
         [Test]
         public async Task TestListAllCollectiblesWithLowestListing()
         {
@@ -19,22 +40,15 @@ namespace Sequence.Marketplace
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             CollectiblesFilter filter = new CollectiblesFilter(false);
-            int successEvents = 0;
-            int failEvents = 0;
-            marketplaceReader.OnListCollectiblesReturn += (ListCollectiblesReturn result) =>
-            {
-                successEvents++;
-            };
-            marketplaceReader.OnListCollectiblesError += (string error) =>
-            {
-                Assert.Fail(error);
-            };
+            
+            marketplaceReader.OnListCollectiblesReturn += OnSuccess;
+            marketplaceReader.OnListCollectiblesError += OnError;
             
             CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleWithLowestListing(contractAddress, filter);
             
             Assert.IsNotNull(collectibles);
             Assert.Greater(successEvents, 0);
-            Assert.AreEqual(failEvents, 0);
+            Assert.AreEqual(0, failEvents);
             Assert.Greater(collectibles.Length, 0);
         }
         
@@ -45,22 +59,15 @@ namespace Sequence.Marketplace
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             CollectiblesFilter filter = new CollectiblesFilter(false);
-            int successEvents = 0;
-            int failEvents = 0;
-            marketplaceReader.OnListCollectiblesReturn += (ListCollectiblesReturn result) =>
-            {
-                successEvents++;
-            };
-            marketplaceReader.OnListCollectiblesError += (string error) =>
-            {
-                Assert.Fail(error);
-            };
+            
+            marketplaceReader.OnListCollectiblesReturn += OnSuccess;
+            marketplaceReader.OnListCollectiblesError += OnError;
             
             CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleWithHighestOffer(contractAddress, filter);
             
             Assert.IsNotNull(collectibles);
             Assert.Greater(successEvents, 0);
-            Assert.AreEqual(failEvents, 0);
+            Assert.AreEqual(0, failEvents);
             Assert.Greater(collectibles.Length, 0);
         }
 
@@ -74,9 +81,14 @@ namespace Sequence.Marketplace
             
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             
+            marketplaceReader.OnListCurrenciesReturn += OnSuccess;
+            marketplaceReader.OnListCurrenciesError += OnError;
+            
             Currency[] currencies = await marketplaceReader.ListCurrencies();
             
             Assert.IsNotNull(currencies);
+            Assert.AreEqual(1, successEvents);
+            Assert.AreEqual(0, failEvents);
             Assert.Greater(currencies.Length, 0);
         }
 
@@ -88,9 +100,14 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
+            marketplaceReader.OnGetCollectibleReturn += OnSuccess;
+            marketplaceReader.OnGetCollectibleError += OnError;
+            
             TokenMetadata collectible = await marketplaceReader.GetCollectible(new Address(contractAddress), tokenId);
             
             Assert.IsNotNull(collectible);
+            Assert.AreEqual(1, successEvents);
+            Assert.AreEqual(0, failEvents);
             Assert.AreEqual(tokenId, collectible.tokenId);
         }
 
@@ -102,9 +119,14 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
+            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.GetCollectibleOrderError += OnError;
+            
             Order order = await marketplaceReader.GetCollectibleLowestOffer(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
+            Assert.AreEqual(1, successEvents);
+            Assert.AreEqual(0, failEvents);
             Assert.AreEqual(tokenId, order.tokenId);
         }
 
@@ -116,9 +138,14 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
+            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.GetCollectibleOrderError += OnError;
+            
             Order order = await marketplaceReader.GetCollectibleHighestOffer(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
+            Assert.AreEqual(1, successEvents);
+            Assert.AreEqual(0, failEvents);
             Assert.AreEqual(tokenId, order.tokenId);
         }
 
@@ -130,9 +157,14 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
+            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.GetCollectibleOrderError += OnError;
+            
             Order order = await marketplaceReader.GetCollectibleLowestListing(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
+            Assert.AreEqual(1, successEvents);
+            Assert.AreEqual(0, failEvents);
             Assert.AreEqual(tokenId, order.tokenId);
         }
 
@@ -144,9 +176,14 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
+            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.GetCollectibleOrderError += OnError;
+            
             Order order = await marketplaceReader.GetCollectibleHighestListing(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
+            Assert.AreEqual(1, successEvents);
+            Assert.AreEqual(0, failEvents);
             Assert.AreEqual(tokenId, order.tokenId);
         }
     }
