@@ -80,10 +80,8 @@ namespace Sequence.WaaS.Tests
 
             var erc1155 = await MakeERC1155Transaction(await TestDeployERC1155(_erc1155ByteCode));
 
-            var delayedEncode = MakeDelayedEncodeApprove(contractAddress);
+            var txs = new Transaction[] { erc20, erc721 , erc1155 };
 
-
-            var txs = new Transaction[] { /*erc20,*/ erc721 , erc1155 , delayedEncode };
             var txreturn = await adapter.SendTransaction(chain, txs, true);
 
             if (txreturn is SuccessfulBatchTransactionReturn successfulBatchTransactionReturn)
@@ -107,7 +105,8 @@ namespace Sequence.WaaS.Tests
             {
                 foreach (var item in failedBatchTransactionReturn.FailedTransactionReturns)
                 {
-                    Assert.Fail("Failed transaction return: " + item.error);
+                    Assert.IsNotNull(item);
+                    Assert.IsNotNull(item.error);
                 }
                 foreach (var item in failedBatchTransactionReturn.SuccessfulTransactionReturns)
                 {
@@ -120,17 +119,15 @@ namespace Sequence.WaaS.Tests
 
         void OnTransactionSent(TransactionReturn txReturn)
         {
-            Debug.Log(txReturn.ToString());
+            Assert.IsNotNull(txReturn);
         }
         void OnContractDeployed(SuccessfulContractDeploymentReturn deploymentReturn)
         {
-            Debug.Log("Deployed contract" + deploymentReturn.DeployedContractAddress);
+           Assert.IsNotEmpty(deploymentReturn.DeployedContractAddress);
         }
         void OnContractNotDeployed(FailedContractDeploymentReturn deploymentReturn)
         {
-            Debug.Log(deploymentReturn.Error);
-            Debug.Log(deploymentReturn.TransactionReturn.error);
-
+            Assert.Fail(deploymentReturn.Error);
         }
 
         async Task<ERC20> TestDeployERC20(string byteCode)
@@ -166,7 +163,7 @@ namespace Sequence.WaaS.Tests
                                                 new DelayedEncodeData("mint(address,uint256)",
                                                     new object[]
                                                     {
-                                        wallet.GetAddress(), BigInteger.Parse(DecimalNormalizer.Normalize(1000000000000000000))
+                                        adapter.GetWalletAddress(), BigInteger.Parse("1000")
                                                     }, "mint"));
 
                 return delayedEncode;
@@ -185,19 +182,39 @@ namespace Sequence.WaaS.Tests
             {
                 var receipt =  await adapter.SendTransaction(chain, new Transaction[] { MakeERC20DelayedEncodeMint(erc20.Contract.GetAddress())}, true);
 
-                if (receipt != null )
+                var delayedEncode = MakeDelayedEncodeApprove(erc20.Contract.GetAddress());
+
+                try
                 {
-                    return new SendERC20(erc20.Contract.GetAddress(), _toAddress, "1");
+                    var txs = new Transaction[] { delayedEncode };
+                    var txreturn = await adapter.SendTransaction(chain, txs, true);
+
+                    if (txreturn is SuccessfulTransactionReturn successfulTransactionReturn)
+                    {
+                        if (receipt != null)
+                        {
+
+                            return new SendERC20(erc20.Contract.GetAddress(), _toAddress, "1");
+                        }
+                        else
+                        {
+                            throw new Exception("MintFailed: Couldn't get receipt");
+                        }
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    throw new Exception("MintFailed: Couldn't get receipt");
+                    throw new Exception(e.Message);
                 }
+
+                throw new Exception($"Error occurred while minting ERC20 tokens");
+
+
             }
             catch (Exception ex)
             {
 
-                throw new Exception($"Error occurred while minting ERC20 tokens: {ex.Message}");
+                throw new Exception(ex.Message);
 
             }
 
