@@ -84,7 +84,7 @@ namespace Sequence.EmbeddedWallet.Tests
         [Test]
         public async Task TestSignMessageSuccessEvent()
         {
-            IIntentSender intentSender = new MockIntentSender(new IntentResponseSignedMessage("",""));
+            IIntentSender intentSender = new MockIntentSender(new IntentResponseSignedMessage("","0x"));
             SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
             
             bool successEventHit = false;

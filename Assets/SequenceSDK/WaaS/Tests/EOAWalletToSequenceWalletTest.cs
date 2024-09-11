@@ -97,10 +97,6 @@ namespace Sequence.WaaS.Tests
             {
                 Assert.IsNotEmpty(successfulTransactionReturn.txHash);
             }
-            else if (txreturn is FailedTransactionReturn failedTransactionReturn)
-            {
-                Assert.Fail("Failed transaction return: "+ failedTransactionReturn.error );
-            }
             else if (txreturn is FailedBatchTransactionReturn failedBatchTransactionReturn)
             {
                 foreach (var item in failedBatchTransactionReturn.FailedTransactionReturns)
@@ -114,6 +110,10 @@ namespace Sequence.WaaS.Tests
                     Assert.IsNotNull(item.txHash);
                     Assert.IsNotEmpty(item.txHash);
                 }
+            }
+            else if (txreturn is FailedTransactionReturn failedTransactionReturn)
+            {
+                Assert.Fail("Failed transaction return: "+ failedTransactionReturn.error );
             }
         }
 
