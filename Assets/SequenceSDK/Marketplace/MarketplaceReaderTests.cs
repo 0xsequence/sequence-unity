@@ -44,7 +44,7 @@ namespace Sequence.Marketplace
             marketplaceReader.OnListCollectiblesReturn += OnSuccess;
             marketplaceReader.OnListCollectiblesError += OnError;
             
-            CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleWithLowestListing(contractAddress, filter);
+            CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectiblesWithLowestListing(contractAddress, filter);
             
             Assert.IsNotNull(collectibles);
             Assert.Greater(successEvents, 0);

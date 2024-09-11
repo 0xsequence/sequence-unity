@@ -64,7 +64,7 @@ namespace Sequence.Marketplace
             }
         }
 
-        public Task<CollectibleOrder[]> ListAllCollectibleWithLowestListing(string contractAddress,
+        public Task<CollectibleOrder[]> ListAllCollectiblesWithLowestListing(string contractAddress,
             CollectiblesFilter filter = default)
         {
             return ListAllCollectibles("ListCollectiblesWithLowestListing", contractAddress, filter);

@@ -7,7 +7,8 @@
         "GUID:f7fd4ba36aabd1d499450c174865e70b",
         "SequenceIntegrations",
         "SequenceUtils",
-        "SequenceMarketplace"
+        "SequenceMarketplace",
+        "GUID:403077141e1554429a890cbc129df651"
     ],
     "includePlatforms": [
         "Editor"
