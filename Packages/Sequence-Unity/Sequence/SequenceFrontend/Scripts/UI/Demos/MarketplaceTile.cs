@@ -11,19 +11,21 @@ namespace Sequence.Demo
     public class MarketplaceTile : MonoBehaviour
     {
         private Image _image;
-        private TextMeshProUGUI _priceText;
+        [SerializeField ]private TextMeshProUGUI _nameText, _priceText;
         private CollectibleOrder _collectibleOrder;
-
+        private Button _interactButton;
         private void Awake()
         {
             _image = GetComponent<Image>();
-            _priceText = GetComponentInChildren<TextMeshProUGUI>();
+            _interactButton = GetComponent<Button>();
+            _interactButton.onClick.AddListener(() => SequenceSampleUI.instance.OpenSeeMarketplaceDetailsPanelWithDelay(0, _collectibleOrder));
         }
 
         public void Assemble(CollectibleOrder order)
         {
             _collectibleOrder = order;
             FetchImage().ConfigureAwait(false);
+            _nameText.text = name;
             _priceText.text = order.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
         }
 
