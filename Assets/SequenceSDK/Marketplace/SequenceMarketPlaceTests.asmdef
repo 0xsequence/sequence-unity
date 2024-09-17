@@ -8,7 +8,8 @@
         "SequenceIntegrations",
         "SequenceUtils",
         "SequenceMarketplace",
-        "GUID:403077141e1554429a890cbc129df651"
+        "GUID:403077141e1554429a890cbc129df651",
+        "SequenceEmbeddedWallet"
     ],
     "includePlatforms": [
         "Editor"

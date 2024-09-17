@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
 {
@@ -31,14 +32,14 @@ namespace Sequence.Marketplace
         
         [TestCase(new[] {0})]
         [TestCase(new [] {0, 1, 2})]
-        public async Task GetCheckoutOptions(int[] indices)
+        public async Task TestGetCheckoutOptions(int[] indices)
         {
             Order[] orders = new Order[indices.Length];
             for (int i = 0; i < indices.Length; i++)
             {
                 orders[i] = _collectibleOrders[indices[i]].order;
             }
-            Checkout checkout = new Checkout(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), Chain.Polygon);
+            Checkout checkout = new Checkout(new SequenceWallet(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), "", null), Chain.Polygon);
 
             CheckoutOptions options = await checkout.GetCheckoutOptions(orders);
             
@@ -46,6 +47,19 @@ namespace Sequence.Marketplace
             Assert.IsNotNull(options.swap);
             Assert.IsNotNull(options.nftCheckout);
             Assert.IsNotNull(options.onRamp);
+        }
+
+        [TestCase(new[] { 0 })]
+        [TestCase(new[] { 0, 1, 2 })]
+        public async Task TestGenerateBuyTransaction(int[] indices)
+        {
+            Order[] orders = new Order[indices.Length];
+            for (int i = 0; i < indices.Length; i++)
+            {
+                orders[i] = _collectibleOrders[indices[i]].order;
+            }
+            Checkout checkout = new Checkout(new SequenceWallet(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), "", null), Chain.Polygon);
+            
         }
     }
 }

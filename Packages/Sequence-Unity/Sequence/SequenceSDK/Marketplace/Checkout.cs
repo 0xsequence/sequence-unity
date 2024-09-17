@@ -1,15 +1,16 @@
 using System;
 using System.Threading.Tasks;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
 {
     public class Checkout
     {
         private IHttpClient _client;
-        private Address _wallet;
+        private IWallet _wallet;
         private Chain _chain;
 
-        public Checkout(Address wallet, Chain chain, IHttpClient client = null)
+        public Checkout(IWallet wallet, Chain chain, IHttpClient client = null)
         {
             _wallet = wallet;
             _chain = chain;
@@ -23,7 +24,7 @@ namespace Sequence.Marketplace
         public async Task<CheckoutOptions> GetCheckoutOptions(CheckoutOptionsMarketplaceOrder[] orders,
             int additionalFeeBps = 0)
         {
-            GetCheckoutOptionsRequest request = new GetCheckoutOptionsRequest(_wallet, orders, additionalFeeBps);
+            GetCheckoutOptionsRequest request = new GetCheckoutOptionsRequest(_wallet.GetWalletAddress(), orders, additionalFeeBps);
             try
             {
                 return await _client.SendRequest<GetCheckoutOptionsRequest, CheckoutOptions>(_chain,
@@ -49,6 +50,24 @@ namespace Sequence.Marketplace
             }
 
             return GetCheckoutOptions(options, additionalFeeBps);
+        }
+        
+        public async Task<Step[]> GenerateBuyTransaction(Order order, AdditionalFee additionalFee)
+        {
+            OrderData[] ordersData = new OrderData[]
+                { new OrderData(order.orderId, order.quantityDecimals.ToString()) };  
+            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
+                order.marketplace, ordersData, new AdditionalFee[] { additionalFee }, _wallet.GetWalletKind());
+
+            try
+            {
+                return await _client.SendRequest<GenerateBuyTransaction, Step[]>(_chain, "GenerateBuyTransaction",
+                    generateBuyTransaction);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error generating buy transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}");
+            }
         }
     }
 }
