@@ -25,7 +25,7 @@ namespace Sequence.EmbeddedWallet
             this.receipt = receipt;
             this.nativeReceipt = nativeReceipt;
             this.simulations = simulations;
-        }
+        } 
     }
 
     public class SuccessfulBatchTransactionReturn : SuccessfulTransactionReturn
