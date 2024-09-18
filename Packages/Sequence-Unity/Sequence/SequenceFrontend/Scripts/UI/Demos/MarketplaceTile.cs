@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using Sequence.Marketplace;
@@ -25,7 +26,7 @@ namespace Sequence.Demo
         {
             _collectibleOrder = order;
             FetchImage().ConfigureAwait(false);
-            _nameText.text = name;
+            _nameText.text = new string(order.metadata.name.TakeWhile(char.IsLetter).ToArray());
             _priceText.text = order.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
         }
 

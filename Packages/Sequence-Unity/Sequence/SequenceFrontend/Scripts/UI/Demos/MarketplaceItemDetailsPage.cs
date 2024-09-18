@@ -10,7 +10,7 @@ namespace Sequence.Demo
         [SerializeField] UIPanel _getCheckoutOptionsPanel;
         [SerializeField] Image _image;
         [SerializeField] private TextMeshProUGUI _nameText, _priceText, _descriptionText, _attributesText;
-        public CollectibleOrder CollectibleOrder { get; set; }
+        CollectibleOrder _order;
 
         protected override void Awake()
         {
@@ -24,7 +24,7 @@ namespace Sequence.Demo
 
             foreach (var item in args)
             {
-                if (item is CollectibleOrder order) CollectibleOrder = order;
+                if (item is CollectibleOrder order) _order = order;
                 break;
             }
             FillPage();
@@ -37,21 +37,21 @@ namespace Sequence.Demo
             _priceText.text = string.Empty;
             _descriptionText.text = string.Empty;
             _attributesText.text = string.Empty;
-            CollectibleOrder = null;
+            _order = null;
         }
 
         async void FillPage()
         {
-            var texture = await UnityWebRequestExtensions.DownloadImage(CollectibleOrder.metadata.image);
+            var texture = await UnityWebRequestExtensions.DownloadImage(_order.metadata.image);
             _image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            _nameText.text = CollectibleOrder.metadata.name;
-            _priceText.text = CollectibleOrder.order.priceUSD.ToString();
-            _descriptionText.text = CollectibleOrder.metadata.description;
-            _attributesText.text = CollectibleOrder.metadata.attributes[0].Values.ToString();
+            _nameText.text = _order.metadata.name;
+            _priceText.text = _order.order.priceUSD.ToString();
+            _descriptionText.text = _order.metadata.description;
+            _attributesText.text = _order.metadata.attributes[0].Values.ToString();
         }
         public void Checkout()
         {
-            _getCheckoutOptionsPanel.Open();
+            _getCheckoutOptionsPanel.Open(_order);
         }
     }
 }

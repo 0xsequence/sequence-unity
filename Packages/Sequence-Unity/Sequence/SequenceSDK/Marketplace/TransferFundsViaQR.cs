@@ -8,26 +8,39 @@ using Sequence.Marketplace;
 
 public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
 {
-    [SerializeField] GameObject QrPanel;
-    [SerializeField] Image QrImage;
+    [SerializeField] GameObject _qrPanel;
+    [SerializeField] Image _qrImage;
+
+    CollectibleOrder _order;
+
     string apiEndpoint = "https://api.qrserver.com/v1/create-qr-code/";
    
 
-
-    public async void Checkout(params object [] args)
+    void Awake()
     {
-        CollectibleOrder order = args.OfType<CollectibleOrder>().FirstOrDefault();
-
-        if (order != null)
+        GetComponent<Button>().onClick.AddListener(() => Checkout());
+    }
+    public async void Checkout()
+    {
+        if (_order != null)
         {
-            await SetQrCode((int)order.order.chainId, "0x00000000000000000000000000000000", "1e2"); 
-            QrPanel.SetActive(true);
+            await SetQrCode((int)_order.order.chainId, "0x00000000000000000000000000000000", "1e2"); 
+            _qrPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("Collectible order not set for checkout.");
         }
     }
 
+    public void SetCollectibleOrder(CollectibleOrder checkoutOrder)
+    {
+        _order = checkoutOrder;
+    }
     public async Task SetQrCode(int chainId, string destinationAddress, string amount)
     {
-        QrImage.sprite = Sprite.Create(await GenerateQRCodeAsync( chainId, destinationAddress, "1e2"), new Rect(0, 0, 200, 200), new UnityEngine.Vector2(0.5f, 0.5f));
+        var texture = await GenerateQRCodeAsync(chainId, destinationAddress, "1e2");
+        _qrImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new UnityEngine.Vector2(0.5f, 0.5f));
     }
 
     public async Task<Texture2D> GenerateQRCodeAsync(int chainId, string destinationAddress, string amount)
@@ -38,11 +51,8 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
     
     public void Close()
     {
-        QrPanel.SetActive(false);
+        _qrPanel.SetActive(false);
     }
-
-   
-
 }
 
 public static class UnityWebRequestExtensions

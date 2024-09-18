@@ -1,7 +1,8 @@
 using UnityEngine;
-
+using Sequence.Marketplace;
 public interface ICheckoutOption 
 {
-    public void Checkout(params object [] args);
+    public void Checkout();
 
+    public void SetCollectibleOrder(CollectibleOrder checkoutOrder);
 }
