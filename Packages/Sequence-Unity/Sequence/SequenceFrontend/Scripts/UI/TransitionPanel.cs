@@ -47,7 +47,7 @@ namespace Sequence.Demo
         
         public void LinkEOAWallet()
         {
-            EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://dev-api.sequence.app/rpc/API/GenerateWaaSVerificationURL");
+            EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://dev-api.sequence.app/rpc/API/GenerateWaaSVerificationURL", "https://demo-waas-wallet-link.pages.dev/");
             linker.OpenEOAWalletLink(Chain.ArbitrumNova);
         }
         
