@@ -105,7 +105,7 @@ namespace Sequence
             { Chain.TestnetB3Sepolia, "https://sepolia.explorer.b3.fun/" },
             { Chain.TestnetAPEChain, "https://curtis.explorer.caldera.xyz/" }, 
             { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" },
-            { Chain.TestnetBorne, "" }, // Not found
+            { Chain.TestnetBorne, "https://subnets-test.avax.network/bornegfdn" },
             { Chain.TestnetSkaleNebulaGamingHub, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" }
         };
         
