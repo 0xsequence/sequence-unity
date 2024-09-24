@@ -34,7 +34,9 @@ namespace Sequence
             { Chain.TestnetXaiSepolia, "Xai Sepolia" },
             { Chain.TestnetB3Sepolia, "B3 Sepolia" },
             { Chain.TestnetAPEChain, "APE Chain Testnet" },
-            { Chain.TestnetBlastSepolia, "Blast Sepolia" }
+            { Chain.TestnetBlastSepolia, "Blast Sepolia" },
+            { Chain.TestnetBorne, "Borne Testnet" },
+            { Chain.TestnetSkaleNebulaGamingHub, "Skale Nebula Gaming Hub Testnet" }
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -67,7 +69,9 @@ namespace Sequence
             { Chain.TestnetXaiSepolia, "sXAI" },
             { Chain.TestnetB3Sepolia, "ETH" },
             { Chain.TestnetAPEChain, "APE" },
-            { Chain.TestnetBlastSepolia, "ETH" }
+            { Chain.TestnetBlastSepolia, "ETH" },
+            { Chain.TestnetBorne, "BORNE" },
+            { Chain.TestnetSkaleNebulaGamingHub, "sFUEL" }
         };
 
         public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
@@ -100,7 +104,9 @@ namespace Sequence
             { Chain.TestnetXaiSepolia, "https://testnet-explorer-v2.xai-chain.net/" },
             { Chain.TestnetB3Sepolia, "https://sepolia.explorer.b3.fun/" },
             { Chain.TestnetAPEChain, "https://curtis.explorer.caldera.xyz/" }, 
-            { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" }
+            { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" },
+            { Chain.TestnetBorne, "https://subnets-test.avax.network/bornegfdn" },
+            { Chain.TestnetSkaleNebulaGamingHub, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" }
         };
         
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -135,7 +141,9 @@ namespace Sequence
             { Chain.TestnetXaiSepolia, "37714555429" },
             { Chain.TestnetB3Sepolia, "1993" },
             { Chain.TestnetAPEChain, "33111" },
-            { Chain.TestnetBlastSepolia, "168587773" }
+            { Chain.TestnetBlastSepolia, "168587773" },
+            { Chain.TestnetBorne, "94984" },
+            { Chain.TestnetSkaleNebulaGamingHub, "37084624" }
         };
         
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -168,7 +176,9 @@ namespace Sequence
             { "37714555429", Chain.TestnetXaiSepolia },
             { "1993", Chain.TestnetB3Sepolia },
             { "33111", Chain.TestnetAPEChain },
-            { "168587773", Chain.TestnetBlastSepolia }
+            { "168587773", Chain.TestnetBlastSepolia },
+            { "94984", Chain.TestnetBorne },
+            { "37084624", Chain.TestnetSkaleNebulaGamingHub }
         };
         
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -201,7 +211,9 @@ namespace Sequence
             { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
             { Chain.TestnetB3Sepolia, "b3-sepolia" },
             { Chain.TestnetAPEChain, "apechain-testnet" },
-            { Chain.TestnetBlastSepolia, "blast-sepolia" }
+            { Chain.TestnetBlastSepolia, "blast-sepolia" },
+            { Chain.TestnetBorne, "borne-testnet" },
+            { Chain.TestnetSkaleNebulaGamingHub, "skale-nebula-testnet" }
         };
     }
 }
