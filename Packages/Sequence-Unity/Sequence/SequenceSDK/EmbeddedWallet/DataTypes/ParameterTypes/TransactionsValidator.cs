@@ -20,14 +20,14 @@ namespace Sequence.EmbeddedWallet
                     {
                         if (!ABIRegex.MatchesFunctionABI(delayedEncode.data.abi))
                         {
-                            throw new ArgumentException($"Given {nameof(DelayedEncode)} transaction with function abi {delayedEncode.data.abi} that does not match the required regex {ABIRegex.FunctionABIRegex}");
+                            throw new ArgumentException($"Given {nameof(DelayedEncode)} transaction with function abi {delayedEncode.data.abi} that does not match the required regex {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"");
                         }
                     }
 
                     if (!ABIRegex.MatchesFunctionName(delayedEncode.data.func))
                     {
                         throw new ArgumentException(
-                            $"Given {nameof(DelayedEncode)} transaction with function name {delayedEncode.data.func} that does not match the required regex {ABIRegex.FunctionNameRegex}");
+                            $"Given {nameof(DelayedEncode)} transaction with function name {delayedEncode.data.func} that does not match the required regex {ABIRegex.FunctionNameRegex} - for example: \"mint\"");
                     }
                 }
             }

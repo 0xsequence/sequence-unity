@@ -72,14 +72,14 @@ namespace Sequence.Contracts
             {
                 if (!ABIRegex.MatchesFunctionABI(functionName))
                 {
-                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex}");
+                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"");
                 }
             }
             else
             {
                 if (!ABIRegex.MatchesFunctionName(functionName))
                 {
-                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionNameRegex}");
+                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionNameRegex} - for example: \"mint\"");
                 }
             }
         }
