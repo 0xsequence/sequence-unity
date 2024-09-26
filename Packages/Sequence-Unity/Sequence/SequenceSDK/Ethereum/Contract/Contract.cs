@@ -7,6 +7,7 @@ using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Transactions;
 using System.Text;
+using System.Text.RegularExpressions;
 using Sequence.Wallet;
 using UnityEngine;
 
@@ -17,8 +18,8 @@ namespace Sequence.Contracts
         Address address;
         public delegate Task<T> QueryContractMessageSender<T>(IEthClient client);
 
-        private string abi;
-        private FunctionAbi functionAbi;
+        private string _abi;
+        private FunctionAbi _functionAbi;
 
         /// <summary>
         /// Will throw if given an invalid abi or contractAddress
@@ -31,15 +32,15 @@ namespace Sequence.Contracts
         public Contract(string contractAddress, string abi = null)
         {
             address = new Address(contractAddress);
-            this.abi = abi;
+            this._abi = abi;
             if (abi == null)
             {
                 Debug.LogWarning("Creating a contract with a null ABI is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
-                this.functionAbi = null;
+                this._functionAbi = null;
             }
             else
             {
-                this.functionAbi = ABI.ABI.DecodeAbi(abi);
+                this._functionAbi = ABI.ABI.DecodeAbi(abi);
             }
         }
 
@@ -61,10 +62,28 @@ namespace Sequence.Contracts
         /// <returns></returns>
         public string AssembleCallData(string functionName, params object[] functionArgs)
         {
+            ValidateFunctionNameRegex(functionName);
             return GetData(functionName, functionArgs);
         }
 
-        
+        private void ValidateFunctionNameRegex(string functionName)
+        {
+            if (string.IsNullOrWhiteSpace(_abi))
+            {
+                if (!ABIRegex.MatchesFunctionABI(functionName))
+                {
+                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex}");
+                }
+            }
+            else
+            {
+                if (!ABIRegex.MatchesFunctionName(functionName))
+                {
+                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionNameRegex}");
+                }
+            }
+        }
+
         /// <summary>
         /// Create a CallContractFunction for the given functionName and functionArgs
         /// </summary>
@@ -73,6 +92,7 @@ namespace Sequence.Contracts
         /// <returns></returns>
         public CallContractFunction CallFunction(string functionName, params object[] functionArgs)
         {
+            ValidateFunctionNameRegex(functionName);
             string callData = GetData(functionName, functionArgs);
             return new CallContractFunction(callData, address);
         }
@@ -88,7 +108,8 @@ namespace Sequence.Contracts
         /// <exception cref="ArgumentException"></exception>
         public QueryContractMessageSender<T> QueryContract<T>(string functionName, params object[] args)
         {
-            if (this.functionAbi == null)
+            ValidateFunctionNameRegex(functionName);
+            if (this._functionAbi == null)
             {
                 // Return string, throw exception is anything else is provided as T
                 if (typeof(T) != typeof(string))
@@ -104,7 +125,7 @@ namespace Sequence.Contracts
             {
                 // Instead, get the string response, then use ABI (define a method in FunctionABI) to decode the hex string into the correct datatype
                 string result = await client.CallContract(toSendParams);
-                return this.functionAbi.DecodeReturnValue<T>(result, functionName, args);
+                return this._functionAbi.DecodeReturnValue<T>(result, functionName, args);
             };
         }
         
@@ -133,10 +154,10 @@ namespace Sequence.Contracts
         private string GetData(string functionName, params object[] args)
         {
             string data;
-            if (this.functionAbi != null)
+            if (this._functionAbi != null)
             {
-                int abiIndex = this.functionAbi.GetFunctionAbiIndex(functionName, args);
-                data = ABI.ABI.Pack(this.functionAbi.GetFunctionSignature(functionName, abiIndex), args);
+                int abiIndex = this._functionAbi.GetFunctionAbiIndex(functionName, args);
+                data = ABI.ABI.Pack(this._functionAbi.GetFunctionSignature(functionName, abiIndex), args);
             }
             else
             {
