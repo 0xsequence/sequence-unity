@@ -14,6 +14,13 @@ namespace Sequence.Utils
             asyncOp.completed += obj => { tcs.SetResult(null); };
             return ((Task)tcs.Task).GetAwaiter();
         }
+        
+        public static Task ToTask(this UnityWebRequestAsyncOperation asyncOperation)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            asyncOperation.completed += _ => tcs.SetResult(true);
+            return tcs.Task;
+        }
 
         public static TaskAwaiter GetAwaiter(this UnityWebRequestAsyncOperation webReqOp)
         {

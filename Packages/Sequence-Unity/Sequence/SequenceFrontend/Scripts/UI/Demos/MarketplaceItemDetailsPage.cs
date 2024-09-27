@@ -42,7 +42,7 @@ namespace Sequence.Demo
 
         async void FillPage()
         {
-            var texture = await UnityWebRequestExtensions.DownloadImage(_order.metadata.image);
+            var texture = await AssetHandler.GetTexture2DAsync(_order.metadata.image);
             _image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             _nameText.text = _order.metadata.name;
             _priceText.text = _order.order.priceUSD.ToString();

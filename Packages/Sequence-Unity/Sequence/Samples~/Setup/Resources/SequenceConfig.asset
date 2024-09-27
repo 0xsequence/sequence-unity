@@ -25,7 +25,8 @@ MonoBehaviour:
   DiscordClientIdAndroid: 
   FacebookClientIAndroid: 
   AppleClientIdAndroid: 
-  WaaSVersion: 1.0.0
-  WaaSConfigKey: 
-  BuilderAPIKey: 
+  WaaSConfigKey: eyJwcm9qZWN0SWQiOjM4NjIxLCJycGNTZXJ2ZXIiOiJodHRwczovL3dhYXMuc2VxdWVuY2UuYXBwIn0=
+  EnableMultipleAccountsPerEmail: 0
+  BuilderAPIKey: AQAAAAAAAJbd_5JOcE50AqglZCtvu51YlGI
   StoreSessionPrivateKeyInSecureStorage: 0
+  EditorStoreSessionPrivateKeyInSecureStorage: 1

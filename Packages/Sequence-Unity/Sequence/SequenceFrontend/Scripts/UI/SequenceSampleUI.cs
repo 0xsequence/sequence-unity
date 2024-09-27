@@ -21,6 +21,8 @@ namespace Sequence.Demo
         private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
         private SeeMarketplaceListingsPanel _seeMarketplaceListingsPanel;
         private MarketplaceItemDetailsPanel _marketplaceItemDetailsPanel;
+        private PrimarySalePanel _primarySalePanel;
+        
         private void Awake()
         {
             if (instance == null) instance = this;
@@ -34,6 +36,7 @@ namespace Sequence.Demo
             _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
             _seeMarketplaceListingsPanel = GetComponentInChildren<SeeMarketplaceListingsPanel>();
             _marketplaceItemDetailsPanel = GetComponentInChildren<MarketplaceItemDetailsPanel>();
+            _primarySalePanel = GetComponentInChildren<PrimarySalePanel>();
 
             if (!IsTesting)
             {
@@ -106,6 +109,12 @@ namespace Sequence.Demo
         {
             _marketplaceItemDetailsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
+        
+        public void OpenPrimarySalePanelWithDelay(float delayInSeconds, params object[] openArgs)
+        {
+            _primarySalePanel.OpenWithDelay(delayInSeconds, openArgs);
+        }
+        
         private void ReplaceWithLoginPanel()
         {
             float delayInSeconds = 0;
