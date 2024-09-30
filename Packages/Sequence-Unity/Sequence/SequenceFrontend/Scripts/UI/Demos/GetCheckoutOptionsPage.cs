@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 namespace Sequence.Demo
 {
@@ -9,7 +10,18 @@ namespace Sequence.Demo
     {
         [SerializeField] Button [] checkoutOptionButton;
         CollectibleOrder _order;
+        SequenceWallet _wallet;
+        protected override void Awake()
+        {
+            base.Awake();
+            SequenceWallet.OnWalletCreated += wallet => OnWalletCreated(wallet); 
+        }
 
+        void OnWalletCreated(SequenceWallet wallet)
+        {
+            _wallet = wallet;
+
+        }
         public override void Open(params object[] args)
         {
             base.Open(args);
@@ -27,15 +39,14 @@ namespace Sequence.Demo
 
             foreach (var option in options)
             {
-                // Ensure option is a valid index and within the bounds of the checkoutOptionButton array/list
                 int index = (int)option;
                 if (index >= 0 && index < checkoutOptionButton.Length)
                 {
-                    // Try to get the ICheckoutOption component
                     if (checkoutOptionButton[index].gameObject.TryGetComponent(out ICheckoutOption checkout))
                     {
                         checkoutOptionButton[index].gameObject.SetActive(true);
                         checkout.SetCollectibleOrder(_order);
+                        checkout.SetWallet(_wallet);
                     }
                 }
                 else
@@ -46,6 +57,6 @@ namespace Sequence.Demo
         }
 
     }
-
+    
 }
 

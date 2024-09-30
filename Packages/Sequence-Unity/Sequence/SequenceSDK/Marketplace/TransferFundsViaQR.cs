@@ -1,9 +1,9 @@
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Sequence;
+using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 
 public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
@@ -11,6 +11,7 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
     [SerializeField] GameObject _qrPanel;
     [SerializeField] Image _qrImage;
 
+    SequenceWallet _wallet;
     CollectibleOrder _order;
 
     string apiEndpoint = "https://api.qrserver.com/v1/create-qr-code/";
@@ -24,14 +25,17 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
     {
         if (_order != null)
         {
-            await SetQrCode((int)_order.order.chainId, "0x00000000000000000000000000000000", "1e2"); 
+            await SetQrCode((int)_order.order.chainId, _wallet.GetWalletAddress(), ConvertToScientificNotation(float.Parse(_order.order.priceAmount)));
             _qrPanel.SetActive(true);
         }
-        else
-        {
-            Debug.LogError("Collectible order not set for checkout.");
-        }
+        else Debug.LogError("Collectible order not set for checkout option.");
     }
+
+    public void SetWallet(SequenceWallet wallet)
+    {
+        _wallet = wallet;
+    }
+
 
     public void SetCollectibleOrder(CollectibleOrder checkoutOrder)
     {
@@ -39,19 +43,28 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
     }
     public async Task SetQrCode(int chainId, string destinationAddress, string amount)
     {
-        var texture = await GenerateQRCodeAsync(chainId, destinationAddress, "1e2");
+        var texture = await GenerateQRCodeAsync(chainId, destinationAddress, amount);
         _qrImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new UnityEngine.Vector2(0.5f, 0.5f));
     }
 
     public async Task<Texture2D> GenerateQRCodeAsync(int chainId, string destinationAddress, string amount)
     {
-        var url = apiEndpoint +"?color=000000&bgcolor=FFFFFF&data=https%3A//metamask.app.link/send/" + NativeTokenAddress.GetNativeTokenAddress(chainId) + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"8&qzone=1&margin=0&size=250x250&ecc=L";
+        var url = apiEndpoint +"?color=000000&bgcolor=FFFFFF&data=https%3A//metamask.app.link/send/" + NativeTokenAddress.GetNativeTokenAddress(chainId) + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
         return await UnityWebRequestExtensions.DownloadImage(url);
     }
     
     public void Close()
     {
         _qrPanel.SetActive(false);
+    }
+
+    string ConvertToScientificNotation(float value)
+    {
+        string formattedValue = value.ToString("0.##E+0");
+        formattedValue = formattedValue.Replace("E", "e");
+        formattedValue = formattedValue.Replace("e+", "e");
+
+        return formattedValue;
     }
 }
 
