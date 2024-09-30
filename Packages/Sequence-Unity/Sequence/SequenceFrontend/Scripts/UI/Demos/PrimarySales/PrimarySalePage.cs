@@ -18,6 +18,7 @@ namespace Sequence.Demo
             [field: SerializeField] public Chain Chain { get; private set; }
             [field: SerializeField] public string TokenContractAddress { get; private set; }
             [field: SerializeField] public string SaleContractAddress { get; private set; }
+            [field: SerializeField] public int[] ItemsForSale { get; private set; }
         }
         
         [Header("Configuration")] 
@@ -51,17 +52,6 @@ namespace Sequence.Demo
             
             _wallet = args.GetObjectOfTypeIfExists<SequenceWallet>();
             Assert.IsNotNull(_wallet);
-
-            _config = Array.Find(_configs, c => c.Type == _saleContractType);
-            
-            _saleState = _saleContractType switch
-            {
-                SaleContractType.ERC721 => new PrimarySaleStateERC721(),
-                SaleContractType.ERC1155 => new PrimarySaleStateERC1155(),
-                _ => null
-            };
-            
-            Assert.IsNotNull(_saleState);
             RefreshState();
         }
 
@@ -73,18 +63,31 @@ namespace Sequence.Demo
 
         public async void RefreshState()
         {
+            ClearState();
+            
+            _config = Array.Find(_configs, c => c.Type == _saleContractType);
+            
+            _saleState = _saleContractType switch
+            {
+                SaleContractType.ERC721 => new PrimarySaleStateERC721(),
+                SaleContractType.ERC1155 => new PrimarySaleStateERC1155(),
+                _ => null
+            };
+            
+            Assert.IsNotNull(_saleState);
+            
             await _saleState.Construct(
                 _config.SaleContractAddress, 
                 _config.TokenContractAddress, 
                 _wallet, 
-                _config.Chain);
+                _config.Chain,
+                _config.ItemsForSale);
             
             RenderState();
         }
 
         private void RenderState()
         {
-            _titleText.text = $"Primary Sales Demo ({_saleContractType})";
             _paymentTokenText.text = _saleState.PaymentTokenSymbol;
             _userAddressText.text= _wallet.GetWalletAddress();
             _userBalanceText.text= $"{_saleState.UserPaymentBalance} {_saleState.PaymentTokenSymbol}";
@@ -93,6 +96,24 @@ namespace Sequence.Demo
             _endTimeText.text = ConvertTime(_saleState.EndTime);
             
             LoadTiles();
+        }
+
+        private void ClearState()
+        {
+            _titleText.text = $"Primary Sales Demo ({_saleContractType})";
+            _paymentTokenText.text = string.Empty;
+            _userAddressText.text= string.Empty;
+            _userBalanceText.text= string.Empty;
+            _supplyText.text = string.Empty;
+            _startTimeText.text = string.Empty;
+            _endTimeText.text = string.Empty;
+            
+            _tilePool?.Cleanup();
+            _tilePool = ObjectPool.ActivateObjectPool(
+                _marketplaceTilePrefab, 
+                _objectPoolAmount, 
+                true, 
+                _marketplaceTileParent);
         }
         
         private void LoadTiles()
@@ -107,8 +128,13 @@ namespace Sequence.Demo
             foreach (var (tokenId, supply) in _saleState.TokenSupplies)
             {
                 var tileObject = _tilePool.GetNextAvailable().GetComponent<PrimarySaleTile>();
-                tileObject.Initialize(tokenId, supply.tokenMetadata, _saleState.Cost, _saleState.PaymentTokenSymbol, 
-                    supply.supply, PurchaseToken);
+                tileObject.Initialize(
+                    tokenId, 
+                    supply.tokenMetadata, 
+                    _saleState.Cost,
+                    _saleState.PaymentTokenSymbol, 
+                    supply.supply, 
+                    PurchaseToken);
             }
         }
 

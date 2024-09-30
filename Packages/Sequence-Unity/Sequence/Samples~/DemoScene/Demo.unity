@@ -9234,10 +9234,12 @@ MonoBehaviour:
     <Chain>k__BackingField: 84532
     <TokenContractAddress>k__BackingField: 0x23d796aa7027aa8501931afc50a84535abb357fe
     <SaleContractAddress>k__BackingField: 0xaec9763be323c35ec97863ec0d0415e66f561f17
+    <ItemsForSale>k__BackingField: 0300000004000000
   - <Type>k__BackingField: 1
     <Chain>k__BackingField: 84532
     <TokenContractAddress>k__BackingField: 0xfcc90f2b72ce3bd1f052942db78c348df826a5c6
     <SaleContractAddress>k__BackingField: 0x05b12091c1a321460eb1749c7657c11060da6410
+    <ItemsForSale>k__BackingField: 00000000010000000200000003000000
   _qrCodeView: {fileID: 51428859}
   _titleText: {fileID: 1843144953}
   _paymentTokenText: {fileID: 759189166}
@@ -12948,7 +12950,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: See Store
+  m_text: Primay Sale
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

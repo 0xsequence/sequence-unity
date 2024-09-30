@@ -8,6 +8,7 @@ namespace Sequence.Demo
     public interface IPrimarySaleState
     {
         string PaymentTokenSymbol { get; }
+        BigInteger PaymentTokenDecimals { get; }
         BigInteger UserPaymentBalance { get; }
         BigInteger Cost { get; }
         BigInteger SupplyCap { get; }
@@ -15,7 +16,8 @@ namespace Sequence.Demo
         int EndTime { get; }
         int TotalMinted { get; }
         Dictionary<BigInteger, TokenSupply> TokenSupplies { get; }
-        Task Construct(string saleContractAddress, string tokenContractAddress, IWallet wallet, Chain chain);
+        Task Construct(string saleContractAddress, string tokenContractAddress, 
+            IWallet wallet, Chain chain, int[] itemsForSale);
         Task<bool> Purchase(BigInteger tokenId, int amount);
     }
 }

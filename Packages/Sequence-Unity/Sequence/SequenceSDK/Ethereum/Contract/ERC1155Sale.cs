@@ -3,7 +3,6 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Provider;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.Contracts
 {

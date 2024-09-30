@@ -2,7 +2,6 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Provider;
-using UnityEngine;
 
 namespace Sequence.Contracts
 {

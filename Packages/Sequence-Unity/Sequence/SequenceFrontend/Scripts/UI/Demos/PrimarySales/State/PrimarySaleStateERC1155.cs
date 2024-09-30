@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.Provider;
+using UnityEngine;
 
 namespace Sequence.Demo
 {
@@ -13,6 +14,7 @@ namespace Sequence.Demo
     {
         public string PaymentToken { get; private set; }
         public string PaymentTokenSymbol { get; private set; }
+        public BigInteger PaymentTokenDecimals { get; private set; }
         public BigInteger UserPaymentBalance { get; private set; }
         public BigInteger Cost { get; private set; }
         public BigInteger SupplyCap { get; private set; }
@@ -26,35 +28,47 @@ namespace Sequence.Demo
         private IEthClient _client;
         private IWallet _wallet;
         private Chain _chain;
+        private int[] _itemsForSale;
 
-        public async Task Construct(string saleContractAddress, string tokenContractAddress, IWallet wallet, Chain chain)
+        public async Task Construct(string saleContractAddress, string tokenContractAddress, 
+            IWallet wallet, Chain chain, int[] itemsForSale)
         {
             _tokenContractAddress = tokenContractAddress;
             _saleContract = new ERC1155Sale(saleContractAddress);
             _client = new SequenceEthClient(chain);
             _wallet = wallet;
             _chain = chain;
+            _itemsForSale = itemsForSale;
 
             await Task.WhenAll(
                 UpdateSaleDetailsAsync(),
-                UpdatePaymentTokenAsync());
+                UpdatePaymentTokenAsync(),
+                UpdateTokenSuppliesAsync());
         }
 
         public async Task<bool> Purchase(BigInteger tokenId, int amount)
         {
             if (UserPaymentBalance < Cost * amount)
                 return false;
-            
+
             var to = _wallet.GetWalletAddress();
             var defaultProof = Array.Empty<byte>();
 
-            var fn = _saleContract.Mint(to, new[] {tokenId}, 
+            var fn = _saleContract.Mint(to, new[] {tokenId},
                 new[] {new BigInteger(amount)}, null, PaymentToken, new BigInteger(1), defaultProof);
-            
+
             Assert.IsNotNull(fn);
 
-            var result = await _wallet.SendTransaction(_chain, new Transaction[] {new RawTransaction(fn)});
-            return result is SuccessfulTransactionReturn;
+            var transactions = new Transaction[] { new RawTransaction(fn) };
+            var result = await _wallet.SendTransaction(_chain, transactions);
+            if (result is FailedTransactionReturn failed)
+            {
+                Debug.Log($"Error purchasing item: {failed.error}");
+                return false;
+            }
+
+            AddAmountToTokenId(tokenId, amount);
+            return true;
         }
 
         private async Task UpdateSaleDetailsAsync()
@@ -68,27 +82,48 @@ namespace Sequence.Demo
 
         private async Task UpdatePaymentTokenAsync()
         {
-            var paymentToken = await _saleContract.GetPaymentTokenAsync(_client);
-            PaymentToken = paymentToken;
+            PaymentToken = await _saleContract.GetPaymentTokenAsync(_client);
 
-            TokenSupplies = new Dictionary<BigInteger, TokenSupply>();
-            var supplyArgs = new GetTokenSuppliesArgs(_tokenContractAddress, true);
-            var suppliesReturn = await Indexer.GetTokenSupplies((int)_chain, supplyArgs);
+            var contract = new ERC20(PaymentToken);
+            PaymentTokenSymbol = await contract.Symbol(_client);
+            PaymentTokenDecimals = await contract.Decimals(_client);
+            
+            await UserPaymentTokenBalanceAsync();
+        }
 
-            TotalMinted = 0;
-            foreach (var supply in suppliesReturn.tokenIDs)
-            {
-                TokenSupplies.Add(supply.tokenID, supply);
-                TotalMinted += int.TryParse(supply.supply, out var value) ? value : 0;
-            }
-
-            var balancesArgs = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), paymentToken);
+        private async Task UserPaymentTokenBalanceAsync()
+        {
+            var balancesArgs = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), PaymentToken);
             var result = await Indexer.GetTokenBalances((int) _chain, balancesArgs);
 
             var balances = result.balances;
-            
             UserPaymentBalance = balances.Length > 0 ? balances[0].balance : 0;
-            PaymentTokenSymbol = await new ERC20(paymentToken).Symbol(_client);
+        }
+
+        private async Task UpdateTokenSuppliesAsync()
+        {
+            TokenSupplies = new Dictionary<BigInteger, TokenSupply>();
+            var supplyArgs = new GetTokenSuppliesArgs(_tokenContractAddress, true);
+            var suppliesReturn = await Indexer.GetTokenSupplies((int) _chain, supplyArgs);
+
+            TotalMinted = 0;
+            foreach (var tokenId in _itemsForSale)
+            {
+                var supply = Array.Find(suppliesReturn.tokenIDs, t => t.tokenID == tokenId);
+                if (supply == null)
+                    continue;
+                
+                TokenSupplies.Add(supply.tokenID, supply);
+                TotalMinted += int.TryParse(supply.supply, out var value) ? value : 0;
+            }
+        }
+        
+        private void AddAmountToTokenId(BigInteger tokenId, int amount)
+        {
+            TotalMinted += amount;
+            var curSupplyStr = TokenSupplies[tokenId].supply;
+            var curSupply = int.TryParse(curSupplyStr, out var value) ? value : 0;
+            TokenSupplies[tokenId].supply = (curSupply + amount).ToString();
         }
     }
 }
