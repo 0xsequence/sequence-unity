@@ -25,6 +25,7 @@ namespace Sequence.EmbeddedWallet
             this.metaTxHash = metaTxHash;
             this.request = request;
             this.receipt = receipt;
+            this.nativeReceipt = nativeReceipt;
             this.nativeTransactionReceipt = nativeReceipt?.ToObject<TransactionReceipt>(new JsonSerializer { Converters = { new TransactionReceiptConverter() } });
             this.simulations = simulations;
         }
