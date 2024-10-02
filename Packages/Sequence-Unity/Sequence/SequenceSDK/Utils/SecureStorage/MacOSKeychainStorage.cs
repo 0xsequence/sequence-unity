@@ -8,12 +8,12 @@ namespace Sequence.Utils.SecureStorage
     {
         public MacOSKeychainStorage()
         {
-#if !UNITY_STANDALONE_OSX || UNITY_EDITOR
+#if !UNITY_STANDALONE_OSX && !UNITY_EDITOR_OSX
             throw new System.NotSupportedException("MacOSKeychainStorage is only supported on macOS platform.");
 #endif
         }
 
-#if UNITY_STANDALONE_OSX && !UNITY_EDITOR
+#if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
         [DllImport("KeychainAccess")]
         private static extern void SaveKeychainValue(string key, string value);
 

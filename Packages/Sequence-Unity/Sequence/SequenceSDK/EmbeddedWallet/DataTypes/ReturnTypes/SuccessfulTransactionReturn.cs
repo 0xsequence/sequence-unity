@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ namespace Sequence.EmbeddedWallet
         public TransactionReceipt nativeTransactionReceipt { get; private set; }
         public SimulateResult[] simulations { get; private set; }
 
+        public SuccessfulTransactionReturn() { }
+
+        [JsonConstructor]
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {
             this.txHash = txHash;
@@ -30,6 +34,17 @@ namespace Sequence.EmbeddedWallet
             this.simulations = simulations;
         }
     }
+
+    public class SuccessfulBatchTransactionReturn : SuccessfulTransactionReturn
+    {
+        public SuccessfulTransactionReturn[] SuccessfulTransactionReturns { get; private set; }
+
+        public SuccessfulBatchTransactionReturn(SuccessfulTransactionReturn[] successfulTransactionReturns)
+        {
+            SuccessfulTransactionReturns = successfulTransactionReturns;
+        }
+    }
+
     public class TransactionReceiptConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

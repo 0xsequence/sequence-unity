@@ -15,6 +15,8 @@ namespace Sequence.EmbeddedWallet
         }
 
         public event Action<string> OnSignMessageComplete;
+        public event Action<string> OnSignMessageFailed;
+
 
         public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
@@ -79,6 +81,21 @@ namespace Sequence.EmbeddedWallet
         public event Action<string> OnFailedToGenerateSessionAuthProof;
 
         public Task<IntentResponseSessionAuthProof> GetSessionAuthProof(Chain network, string nonce = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public event Action<IntentResponseAccountList> OnAccountListGenerated;
+        public event Action<string> OnFailedToGenerateAccountList;
+        public Task<IntentResponseAccountList> GetAccountList()
+        {
+            throw new NotImplementedException();
+        }
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public Task<IntentResponseGetIdToken> GetIdToken(string nonce = null)
         {
             throw new NotImplementedException();
         }

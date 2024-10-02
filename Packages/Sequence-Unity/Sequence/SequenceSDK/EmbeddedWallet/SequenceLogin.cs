@@ -36,11 +36,12 @@ namespace Sequence.EmbeddedWallet
         private LoginMethod _failedLoginMethod;
         private string _failedLoginEmail;
         private bool _automaticallyFederateAccountsWhenPossible;
-        private bool _authenticatorSetup = false;
 
         private Address _connectedWalletAddress;
 
         private static SequenceLogin _instance;
+
+        private string _verifierToReject; // Since email auth is two separate requests, an invalid signature error may go unnoticed. So, we cache the verifier used in an initiateAuth attempt that had an invalid signature and reject the corresponding openSession attempt if it uses the same verifier.
 
         public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null,
             IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true,
@@ -86,7 +87,7 @@ namespace Sequence.EmbeddedWallet
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
             SetConnectedWalletAddress(connectedWalletAddress);
             
-            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionPrivateKeyInSecureStorage && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
+            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
@@ -105,20 +106,13 @@ namespace Sequence.EmbeddedWallet
             SetupAuthenticator(validator, authenticator);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="validator"></param>
-        /// <param name="authenticator"></param>
-        /// <param name="federateAuth"></param>
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
-            if (_authenticatorSetup)
-            {
-                return;
-            }
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            _sessionWallet = new EOAWallet();
+            if (_connectedWalletAddress == null || _sessionWallet == null)
+            {
+                _sessionWallet = new EOAWallet();
+            }
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
@@ -139,8 +133,6 @@ namespace Sequence.EmbeddedWallet
             _validator = validator;
 
             _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
-
-            _authenticatorSetup = true;
         }
 
         public void TryToRestoreSession()
@@ -267,7 +259,7 @@ namespace Sequence.EmbeddedWallet
         private (EOAWallet, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string walletInfo = secureStorage.RetrieveString(_walletKey);
+            string walletInfo = secureStorage.RetrieveString(Application.companyName + "-" + Application.productName + "-" + _walletKey);
             if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "");
@@ -356,6 +348,12 @@ namespace Sequence.EmbeddedWallet
         public async Task ConnectToWaaS(IntentDataOpenSession loginIntent, LoginMethod method, string email = "")
         {
             string walletAddress = "";
+            if (_verifierToReject == loginIntent.verifier)
+            {
+                OnLoginFailed?.Invoke("The initiateAuth request associated with this login attempt received a response with an invalid signature. For security reasons, this login request will not be sent to the API as your network traffic may be being monitored. Please try initiating auth again.", method);
+                _isLoggingIn = false;
+                return;
+            }
             try
             {
                 IntentResponseSessionOpened registerSessionResponse = await _intentSender.SendIntent<IntentResponseSessionOpened, IntentDataOpenSession>(loginIntent, IntentType.OpenSession);
@@ -494,9 +492,14 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                OnLoginFailed?.Invoke("Error initiating auth: " + e.Message, method);
-                challenge = "Error initiating auth: " + e.Message;
+                string error = "Error initiating auth: " + e.Message;
+                if (error.Contains("Error validating response"))
+                {
+                    _verifierToReject = initiateAuthIntent.verifier;
+                }
+                OnLoginFailed?.Invoke(error, method);
                 _isLoggingIn = false;
+                throw new Exception(error);
             }
 
             return challenge;
@@ -575,7 +578,7 @@ namespace Sequence.EmbeddedWallet
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(_walletKey, privateKey + "-" + waasWalletAddress);
+            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress);
         }
 
         public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)

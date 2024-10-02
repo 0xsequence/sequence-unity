@@ -6,10 +6,10 @@ namespace Sequence.EmbeddedWallet {
         public IdentityType identityType;
         public string issuer;
         
-        public Account(string id, string identityType, string issuer, string email)
+        public Account(string id, string type, string issuer, string email)
         {
             this.id = id;
-            this.identityType = identityType.GetIdentityType();
+            this.identityType = type.GetIdentityType();
             this.issuer = issuer;
             this.email = email;
         }

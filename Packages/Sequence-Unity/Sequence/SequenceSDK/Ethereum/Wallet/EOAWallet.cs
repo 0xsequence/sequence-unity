@@ -1,7 +1,6 @@
 #define HAS_SPAN
 #define SECP256K1_LIB
 
-
 using NBitcoin.Secp256k1;
 using Sequence.Signer;
 using Sequence.Provider;
@@ -12,7 +11,6 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using Sequence.Transactions;
-using UnityEngine;
 
 namespace Sequence.Wallet
 {
@@ -71,8 +69,9 @@ namespace Sequence.Wallet
             EthTransaction deployTransaction = await new GasLimitEstimator(client, GetAddress()).BuildTransaction(StringExtensions.ZeroAddress, bytecode, value);
             TransactionReceipt receipt = await SendTransactionAndWaitForReceipt(client, deployTransaction);
             return receipt;
-        }
 
+        }
+        
         /// <summary>
         /// Get the balance of native currency (e.g. ETH) held by this wallet
         /// </summary>
