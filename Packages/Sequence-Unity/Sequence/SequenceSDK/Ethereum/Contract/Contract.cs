@@ -62,17 +62,24 @@ namespace Sequence.Contracts
         /// <returns></returns>
         public string AssembleCallData(string functionName, params object[] functionArgs)
         {
-            ValidateFunctionNameRegex(functionName);
+            functionName = ValidateFunctionNameRegex(functionName);
             return GetData(functionName, functionArgs);
         }
 
-        private void ValidateFunctionNameRegex(string functionName)
+        private string ValidateFunctionNameRegex(string functionName)
         {
             if (string.IsNullOrWhiteSpace(_abi))
             {
                 if (!ABIRegex.MatchesFunctionABI(functionName))
                 {
-                    throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"");
+                    string message =
+                        $"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"";
+                    Debug.LogWarning(message + "\nAttempting to recover and parse anyways");
+                    functionName = EventParser.ParseEventDef(functionName).ToString();
+                    if (!ABIRegex.MatchesFunctionABI(functionName))
+                    {
+                        throw new ArgumentException(message);
+                    }
                 }
             }
             else
@@ -82,6 +89,8 @@ namespace Sequence.Contracts
                     throw new ArgumentException($"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionNameRegex} - for example: \"mint\"");
                 }
             }
+
+            return functionName;
         }
 
         /// <summary>
@@ -92,7 +101,7 @@ namespace Sequence.Contracts
         /// <returns></returns>
         public CallContractFunction CallFunction(string functionName, params object[] functionArgs)
         {
-            ValidateFunctionNameRegex(functionName);
+            functionName = ValidateFunctionNameRegex(functionName);
             string callData = GetData(functionName, functionArgs);
             return new CallContractFunction(callData, address);
         }
@@ -108,7 +117,7 @@ namespace Sequence.Contracts
         /// <exception cref="ArgumentException"></exception>
         public QueryContractMessageSender<T> QueryContract<T>(string functionName, params object[] args)
         {
-            ValidateFunctionNameRegex(functionName);
+            functionName = ValidateFunctionNameRegex(functionName);
             if (this._functionAbi == null)
             {
                 // Return string, throw exception is anything else is provided as T

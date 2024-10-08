@@ -58,19 +58,27 @@ namespace Sequence.EmbeddedWallet.Tests
             Assert.IsTrue(failedEventHit);
         }
 
-        private static DelayedEncodeData[] _invalidDelayedEncodeData = new[]
+        private static (DelayedEncodeData, bool)[] _invalidDelayedEncodeData = new[]
         {
-            new DelayedEncodeData("functionName", Array.Empty<object>(), "functionName"),
-            new DelayedEncodeData("functionName()", Array.Empty<object>(), "functionName()"),
-            new DelayedEncodeData("functionName(uint banana)", Array.Empty<object>(), "functionName"),
-            new DelayedEncodeData("functionName(uint, uint)", Array.Empty<object>(), "functionName"),
-            new DelayedEncodeData("functionName(uint,uint)", Array.Empty<object>(), "functionName(uint,uint)")
+            (new DelayedEncodeData("functionName", Array.Empty<object>(), "functionName"), false),
+            (new DelayedEncodeData("functionName()", Array.Empty<object>(), "functionName"), true),
+            (new DelayedEncodeData("functionName()", Array.Empty<object>(), "functionName()"), false),
+            (new DelayedEncodeData("functionName(", Array.Empty<object>(), "functionName"), false),
+            (new DelayedEncodeData("functionName)", Array.Empty<object>(), "functionName"), false),
+            (new DelayedEncodeData("functionName(uint banana)", new object[] {1}, "functionName"), true),
+            (new DelayedEncodeData("functionName(uint, uint)", new object[]{1,2}, "functionName"), true),
+            (new DelayedEncodeData("functionName(uint,uint)", new object[]{1,2}, "functionName(uint,uint)"), false),
+            (new DelayedEncodeData("functionName(uint banana", new object[] {1}, "functionName"), false),
+            (new DelayedEncodeData("functionNameuint, uint)", new object[]{1,2}, "functionName"), false),
+            (new DelayedEncodeData("functionName(uint,uint", new object[]{1,2}, "functionName"), false)
         };
         
         [TestCaseSource(nameof(_invalidDelayedEncodeData))]
-        public async Task TestSendTransactionFailedEvent_invalidDelayedEncode(DelayedEncodeData data)
+        public async Task TestSendTransactionEvent_delayedEncodeValidation((DelayedEncodeData, bool) args)
         {
-            IIntentSender intentSender = new MockIntentSender(new FailedTransactionReturn("",null,null));
+            DelayedEncodeData data = args.Item1;
+            bool success = args.Item2;
+            IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn());
             SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
             
             bool successEventHit = false;
@@ -89,10 +97,18 @@ namespace Sequence.EmbeddedWallet.Tests
                 new RawTransaction("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"),
                 new DelayedEncode("0xc683a014955b75F5ECF991d4502427c8fa1Aa249", "0", data),
                 new RawTransaction("0xc683a014955b75F5ECF991d4502427c8fa1Aa249")
-            });
-            
-            Assert.IsFalse(successEventHit);
-            Assert.IsTrue(failedEventHit);
+            }, waitForReceipt: false);
+
+            if (!success)
+            {
+                Assert.IsFalse(successEventHit);
+                Assert.IsTrue(failedEventHit);
+            }
+            else
+            {
+                Assert.IsTrue(successEventHit);
+                Assert.IsFalse(failedEventHit);
+            }
         }
 
         [Test]

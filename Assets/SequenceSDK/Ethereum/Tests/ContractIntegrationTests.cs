@@ -115,7 +115,7 @@ namespace Sequence.Ethereum.Tests
 
             try
             {
-                complexContract.AssembleCallData("functionName(uint banana)");
+                complexContract.QueryContract<string>("functionName(");
                 Assert.Fail("Expected exception but none was thrown");
             }
             catch (ArgumentException e)
@@ -125,21 +125,39 @@ namespace Sequence.Ethereum.Tests
             catch (Exception e)
             {
                 Assert.Fail("Expected argument exception");
+            }
+
+            try
+            {
+                complexContract.QueryContract<string>("functionName)");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+
+            try
+            {
+                complexContract.AssembleCallData("functionName(uint banana)", 1);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("No exception expected");
             }
             
             
             try
             {
-                complexContract.CallFunction("functionName(uint, uint)");
-                Assert.Fail("Expected exception but none was thrown");
-            }
-            catch (ArgumentException e)
-            {
-
+                complexContract.CallFunction("functionName(uint, uint)", 1, 1);
             }
             catch (Exception e)
             {
-                Assert.Fail("Expected argument exception");
+                Assert.Fail("No exception expected");
             }
         }
 
