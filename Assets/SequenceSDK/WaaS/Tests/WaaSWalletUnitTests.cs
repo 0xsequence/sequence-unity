@@ -29,7 +29,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 failedEventHit = true;
             };
             
-            await wallet.SendTransaction(Chain.None, null);
+            await wallet.SendTransaction(Chain.None, Array.Empty<Transaction>());
             
             Assert.IsTrue(successEventHit);
             Assert.IsFalse(failedEventHit);
@@ -52,10 +52,63 @@ namespace Sequence.EmbeddedWallet.Tests
                 failedEventHit = true;
             };
             
-            await wallet.SendTransaction(Chain.None, null);
+            await wallet.SendTransaction(Chain.None, Array.Empty<Transaction>());
             
             Assert.IsFalse(successEventHit);
             Assert.IsTrue(failedEventHit);
+        }
+
+        private static (DelayedEncodeData, bool)[] _invalidDelayedEncodeData = new[]
+        {
+            (new DelayedEncodeData("functionName", Array.Empty<object>(), "functionName"), false),
+            (new DelayedEncodeData("functionName()", Array.Empty<object>(), "functionName"), true),
+            (new DelayedEncodeData("functionName()", Array.Empty<object>(), "functionName()"), false),
+            (new DelayedEncodeData("functionName(", Array.Empty<object>(), "functionName"), false),
+            (new DelayedEncodeData("functionName)", Array.Empty<object>(), "functionName"), false),
+            (new DelayedEncodeData("functionName(uint banana)", new object[] {1}, "functionName"), true),
+            (new DelayedEncodeData("functionName(uint, uint)", new object[]{1,2}, "functionName"), true),
+            (new DelayedEncodeData("functionName(uint,uint)", new object[]{1,2}, "functionName(uint,uint)"), false),
+            (new DelayedEncodeData("functionName(uint banana", new object[] {1}, "functionName"), false),
+            (new DelayedEncodeData("functionNameuint, uint)", new object[]{1,2}, "functionName"), false),
+            (new DelayedEncodeData("functionName(uint,uint", new object[]{1,2}, "functionName"), false)
+        };
+        
+        [TestCaseSource(nameof(_invalidDelayedEncodeData))]
+        public async Task TestSendTransactionEvent_delayedEncodeValidation((DelayedEncodeData, bool) args)
+        {
+            DelayedEncodeData data = args.Item1;
+            bool success = args.Item2;
+            IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn());
+            SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successEventHit = true;
+            };
+            bool failedEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedEventHit = true;
+            };
+            
+            await wallet.SendTransaction(Chain.None, new Transaction[]
+            {
+                new RawTransaction("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"),
+                new DelayedEncode("0xc683a014955b75F5ECF991d4502427c8fa1Aa249", "0", data),
+                new RawTransaction("0xc683a014955b75F5ECF991d4502427c8fa1Aa249")
+            }, waitForReceipt: false);
+
+            if (!success)
+            {
+                Assert.IsFalse(successEventHit);
+                Assert.IsTrue(failedEventHit);
+            }
+            else
+            {
+                Assert.IsTrue(successEventHit);
+                Assert.IsFalse(failedEventHit);
+            }
         }
 
         [Test]
@@ -75,7 +128,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 failedEventHit = true;
             };
             
-            await wallet.SendTransaction(Chain.None, null);
+            await wallet.SendTransaction(Chain.None, Array.Empty<Transaction>());
             
             Assert.IsFalse(successEventHit);
             Assert.IsTrue(failedEventHit);
@@ -343,7 +396,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 failedEventHit = true;
             };
 
-            var result = await wallet.SendTransaction(Chain.None, null);
+            var result = await wallet.SendTransaction(Chain.None, Array.Empty<Transaction>());
             
             Assert.IsTrue(successEventHit);
             Assert.IsFalse(failedEventHit);
@@ -392,7 +445,7 @@ namespace Sequence.EmbeddedWallet.Tests
             
             LogAssert.Expect(LogType.Error, "Transaction was successful, but we're unable to obtain the transaction hash. Reason: some random error");
             
-            var result = await wallet.SendTransaction(Chain.None, null);
+            var result = await wallet.SendTransaction(Chain.None, Array.Empty<Transaction>());
             
             Assert.IsTrue(successEventHit);
             Assert.IsFalse(failedEventHit);
@@ -438,7 +491,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 failedEventHit = true;
             };
 
-            var result = await wallet.SendTransaction(Chain.None, null, false);
+            var result = await wallet.SendTransaction(Chain.None, Array.Empty<Transaction>(), false);
             
             Assert.IsTrue(successEventHit);
             Assert.IsFalse(failedEventHit);
