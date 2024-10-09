@@ -52,12 +52,17 @@ namespace Sequence.Marketplace
             return GetCheckoutOptions(options, additionalFeeBps);
         }
         
-        public async Task<Step[]> GenerateBuyTransaction(Order order, AdditionalFee additionalFee)
+        public async Task<Step[]> GenerateBuyTransaction(Order order, AdditionalFee additionalFee = null)
         {
             OrderData[] ordersData = new OrderData[]
-                { new OrderData(order.orderId, order.quantityDecimals.ToString()) };  
+                { new OrderData(order.orderId, order.quantityDecimals.ToString()) };
+            AdditionalFee[] additionalFees = new AdditionalFee[] { additionalFee };
+            if (additionalFee == null)
+            {
+                additionalFees = null;
+            }
             GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
-                order.marketplace, ordersData, new AdditionalFee[] { additionalFee }, _wallet.GetWalletKind());
+                order.marketplace, ordersData, additionalFees, _wallet.GetWalletKind());
 
             try
             {
