@@ -112,7 +112,7 @@ namespace Sequence.Marketplace
         }
 
         [Test]
-        public async Task TestGetCollectibleLowestOffer()
+        public async Task TestGetLowestPriceOfferForCollectible()
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
@@ -122,7 +122,7 @@ namespace Sequence.Marketplace
             marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
             marketplaceReader.GetCollectibleOrderError += OnError;
             
-            Order order = await marketplaceReader.GetCollectibleLowestOffer(new Address(contractAddress), tokenId);
+            Order order = await marketplaceReader.GetLowestPriceOfferForCollectible(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
             Assert.AreEqual(1, successEvents);
@@ -131,7 +131,7 @@ namespace Sequence.Marketplace
         }
 
         [Test]
-        public async Task TestGetCollectibleHighestOffer()
+        public async Task TestGetHighestPriceOfferForCollectible()
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
@@ -141,7 +141,7 @@ namespace Sequence.Marketplace
             marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
             marketplaceReader.GetCollectibleOrderError += OnError;
             
-            Order order = await marketplaceReader.GetCollectibleHighestOffer(new Address(contractAddress), tokenId);
+            Order order = await marketplaceReader.GetHighestPriceOfferForCollectible(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
             Assert.AreEqual(1, successEvents);
@@ -150,7 +150,7 @@ namespace Sequence.Marketplace
         }
 
         [Test]
-        public async Task TestGetCollectibleLowestListing()
+        public async Task TestGetLowestPriceListingForCollectible()
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
@@ -160,7 +160,7 @@ namespace Sequence.Marketplace
             marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
             marketplaceReader.GetCollectibleOrderError += OnError;
             
-            Order order = await marketplaceReader.GetCollectibleLowestListing(new Address(contractAddress), tokenId);
+            Order order = await marketplaceReader.GetLowestPriceListingForCollectible(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
             Assert.AreEqual(1, successEvents);
@@ -169,7 +169,7 @@ namespace Sequence.Marketplace
         }
 
         [Test]
-        public async Task TestGetCollectibleHighestListing()
+        public async Task TestGetHighestPriceListingForCollectible()
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
@@ -179,7 +179,7 @@ namespace Sequence.Marketplace
             marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
             marketplaceReader.GetCollectibleOrderError += OnError;
             
-            Order order = await marketplaceReader.GetCollectibleHighestListing(new Address(contractAddress), tokenId);
+            Order order = await marketplaceReader.GetHighestPriceListingForCollectible(new Address(contractAddress), tokenId);
 
             Assert.IsNotNull(order);
             Assert.AreEqual(1, successEvents);

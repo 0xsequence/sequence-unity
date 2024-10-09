@@ -128,9 +128,9 @@ namespace Sequence.Marketplace
 
         public Action<Order> GetCollectibleOrderReturn;
         public Action<string> GetCollectibleOrderError;
-        public Task<Order> GetCollectibleLowestOffer(Address contractAddress, string tokenId, OrderFilter filter = null)
+        public Task<Order> GetLowestPriceOfferForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
-            string endpoint = "GetCollectibleLowestOffer";
+            string endpoint = "GetLowestPriceOfferForCollectible";
             return GetCollectibleOrder(endpoint, contractAddress, tokenId, filter);
         }
 
@@ -140,7 +140,8 @@ namespace Sequence.Marketplace
             GetCollectibleOrderRequest args = new GetCollectibleOrderRequest(contractAddress, tokenId, filter);
             try
             {
-                Order order = await _client.SendRequest<GetCollectibleOrderRequest, Order>(_chain, endpoint, args);
+                OrderResponse orderResponse = await _client.SendRequest<GetCollectibleOrderRequest, OrderResponse>(_chain, endpoint, args);
+                Order order = orderResponse.order;
                 GetCollectibleOrderReturn?.Invoke(order);
                 return order;
             }
@@ -152,21 +153,21 @@ namespace Sequence.Marketplace
             }
         }
         
-        public Task<Order> GetCollectibleHighestOffer(Address contractAddress, string tokenId, OrderFilter filter = null)
+        public Task<Order> GetHighestPriceOfferForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
-            string endpoint = "GetCollectibleHighestOffer";
+            string endpoint = "GetHighestPriceOfferForCollectible";
             return GetCollectibleOrder(endpoint, contractAddress, tokenId, filter);
         }
         
-        public Task<Order> GetCollectibleLowestListing(Address contractAddress, string tokenId, OrderFilter filter = null)
+        public Task<Order> GetLowestPriceListingForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
-            string endpoint = "GetCollectibleLowestListing";
+            string endpoint = "GetLowestPriceListingForCollectible";
             return GetCollectibleOrder(endpoint, contractAddress, tokenId, filter);
         }
         
-        public Task<Order> GetCollectibleHighestListing(Address contractAddress, string tokenId, OrderFilter filter = null)
+        public Task<Order> GetHighestPriceListingForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
-            string endpoint = "GetCollectibleHighestListing";
+            string endpoint = "GetHighestPriceListingForCollectible";
             return GetCollectibleOrder(endpoint, contractAddress, tokenId, filter);
         }
         
