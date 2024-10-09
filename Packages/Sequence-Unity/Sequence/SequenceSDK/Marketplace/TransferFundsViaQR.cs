@@ -49,8 +49,16 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
 
     public async Task<Texture2D> GenerateQRCodeAsync(int chainId, string destinationAddress, string amount)
     {
-        var url = apiEndpoint +"?color=000000&bgcolor=FFFFFF&data=https%3A//metamask.app.link/send/" + NativeTokenAddress.GetNativeTokenAddress(chainId) + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
+        string priceCurrencyAddress;
+        if (_order.order.priceCurrencyAddress != "0x0000000000000000000000000000000000000000")
+            priceCurrencyAddress = _order.order.priceCurrencyAddress;
+        else
+            priceCurrencyAddress = ChainTokenAddress.Get((int)_order.order.chainId);
+
+        var url = apiEndpoint +"?color=000000&bgcolor=FFFFFF&data=https%3A//metamask.app.link/send/"  + priceCurrencyAddress + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
+        Debug.Log(url);
         return await UnityWebRequestExtensions.DownloadImage(url);
+
     }
     
     public void Close()

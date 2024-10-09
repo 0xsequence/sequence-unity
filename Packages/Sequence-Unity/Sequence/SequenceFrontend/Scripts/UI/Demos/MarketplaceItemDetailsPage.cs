@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
+using System.Globalization;
 using TMPro;
 using Sequence.Marketplace;
 
@@ -42,10 +44,9 @@ namespace Sequence.Demo
 
         async void FillPage()
         {
-            var texture = await UnityWebRequestExtensions.DownloadImage(_order.metadata.image);
-            _image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            _nameText.text = _order.metadata.name;
-            _priceText.text = _order.order.priceUSD.ToString();
+            _image.sprite = await SpriteFetcher.Fetch(_order.metadata.image);
+            _nameText.text = new string(_order.metadata.name.TakeWhile(char.IsLetter).ToArray());
+            _priceText.text = _order.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
             _descriptionText.text = _order.metadata.description;
             _attributesText.text = _order.metadata.attributes[0].Values.ToString();
         }

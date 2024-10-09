@@ -15,7 +15,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _marketplaceTilePrefab;
         [SerializeField] private int _numberOfMarketplaceTilesToInstantiate = 10;
         [SerializeField] private Transform _scrollviewContentParent;
-        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
+        [SerializeField] private Chain _chain = Chain.Polygon;
         [SerializeField] private TextMeshProUGUI _errorText;
 
         private ObjectPool _marketplaceTilePool;

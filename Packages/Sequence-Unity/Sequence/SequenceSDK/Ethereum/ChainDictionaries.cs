@@ -70,7 +70,7 @@ namespace Sequence
             { Chain.TestnetBlastSepolia, "ETH" }
         };
 
-        public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
+        public static Dictionary<Chain, string> ChainTokenAddressOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" }, // WETH
             { Chain.Polygon, "0x0000000000000000000000000000000000001010" }, // MATIC on Polygon

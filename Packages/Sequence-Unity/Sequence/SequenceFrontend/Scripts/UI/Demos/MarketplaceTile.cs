@@ -33,8 +33,7 @@ namespace Sequence.Demo
         private async Task FetchImage()
         {
             gameObject.SetActive(false);
-            Sprite sprite = await SpriteFetcher.Fetch(_collectibleOrder.metadata.image);
-            _image.sprite = sprite;
+            _image.sprite = await SpriteFetcher.Fetch(_collectibleOrder.metadata.image);
             gameObject.SetActive(true);
         }
     }
