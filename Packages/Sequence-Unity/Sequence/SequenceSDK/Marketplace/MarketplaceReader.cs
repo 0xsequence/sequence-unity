@@ -21,7 +21,8 @@ namespace Sequence.Marketplace
         {
             try
             {
-                Currency[] currencies = await _client.SendRequest<Currency[]>(_chain, "ListCurrencies");
+                ListCurrenciesResponse currenciesResponse = await _client.SendRequest<ListCurrenciesResponse>(_chain, "ListCurrencies");
+                Currency[] currencies = currenciesResponse.currencies;
                 OnListCurrenciesReturn?.Invoke(currencies);
                 return currencies;
             }

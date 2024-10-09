@@ -14,7 +14,7 @@ namespace Sequence.Marketplace
     public class HttpClient : IHttpClient
     {
         private string _apiKey;
-        private const string _baseUrl = "https://dev-marketplace-api.sequence.app/";
+        private const string _baseUrl = "https://marketplace-api.sequence.app/";
         private const string _endUrl = "/rpc/Marketplace/";
         
         public HttpClient()

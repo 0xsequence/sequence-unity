@@ -1,4 +1,6 @@
 using System;
+using System.Numerics;
+using Newtonsoft.Json;
 
 namespace Sequence.Marketplace
 {
@@ -6,13 +8,21 @@ namespace Sequence.Marketplace
     public class Currency
     {
         public uint id;
-        public uint chainId;
+        public Chain chain;
         public string contractAddress;
 
-        public Currency(uint id, uint chainId, string contractAddress)
+        public Currency(uint id, Chain chain, string contractAddress)
         {
             this.id = id;
-            this.chainId = chainId;
+            this.chain = chain;
+            this.contractAddress = contractAddress;
+        }
+        
+        [JsonConstructor]
+        public Currency(uint id, BigInteger chainId, string contractAddress)
+        {
+            this.id = id;
+            this.chain = ChainDictionaries.ChainById[chainId.ToString()];
             this.contractAddress = contractAddress;
         }
     }
