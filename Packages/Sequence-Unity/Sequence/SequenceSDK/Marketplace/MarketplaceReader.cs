@@ -113,7 +113,8 @@ namespace Sequence.Marketplace
             
             try
             {
-                TokenMetadata tokenMetadata = await _client.SendRequest<GetCollectibleRequest, TokenMetadata>(_chain, "GetCollectible", request);
+                GetCollectibleResponse response = await _client.SendRequest<GetCollectibleRequest, GetCollectibleResponse>(_chain, "GetCollectible", request);
+                TokenMetadata tokenMetadata = response.metadata;
                 OnGetCollectibleReturn?.Invoke(tokenMetadata);
                 return tokenMetadata;
             }
