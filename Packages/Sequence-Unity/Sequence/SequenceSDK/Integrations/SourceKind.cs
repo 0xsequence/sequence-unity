@@ -4,33 +4,33 @@ using Newtonsoft.Json.Linq;
 
 namespace Sequence.Marketplace
 {
-    
-    [JsonConverter(typeof(OrderSideConverter))]
-    public enum OrderSide
+    [JsonConverter(typeof(SourceKindConverter))]
+    public enum SourceKind
     {
         unknown,
-        listing,
-        offer,
+        external,
+        sequence_marketplace_v1,
+        sequence_marketplace_v2,
     }
     
-    public static class OrderSideExtensions
+    public static class SourceKindExtensions
     {
-        public static string AsString(this OrderSide side)
+        public static string AsString(this SourceKind source)
         {
-            return side.ToString();
+            return source.ToString();
         }
     }
     
-    public class OrderSideConverter : JsonConverter
+    public class SourceKindConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(OrderSide) || objectType == typeof(OrderSide[]);
+            return objectType == typeof(SourceKind) || objectType == typeof(SourceKind[]);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is OrderSide[] paymentMethods)
+            if (value is SourceKind[] paymentMethods)
             {
                 writer.WriteStartArray();
                 foreach (var method in paymentMethods)
@@ -39,7 +39,7 @@ namespace Sequence.Marketplace
                 }
                 writer.WriteEndArray();
             }
-            else if (value is OrderSide paymentMethod)
+            else if (value is SourceKind paymentMethod)
             {
                 writer.WriteValue(paymentMethod.AsString());
             }
@@ -47,20 +47,20 @@ namespace Sequence.Marketplace
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (objectType == typeof(OrderSide[]))
+            if (objectType == typeof(SourceKind[]))
             {
                 var array = JArray.Load(reader);
-                var methods = new OrderSide[array.Count];
+                var methods = new SourceKind[array.Count];
                 for (int i = 0; i < array.Count; i++)
                 {
-                    methods[i] = Enum.Parse<OrderSide>(array[i].ToString());
+                    methods[i] = Enum.Parse<SourceKind>(array[i].ToString());
                 }
                 return methods;
             }
             else
             {
                 var method = JToken.Load(reader).ToString();
-                return Enum.Parse<OrderSide>(method);
+                return Enum.Parse<SourceKind>(method);
             }
         }
     }

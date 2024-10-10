@@ -4,35 +4,38 @@ using Newtonsoft.Json.Linq;
 
 namespace Sequence.Marketplace
 {
-    [JsonConverter(typeof(OrderStatusConverter))]
-    public enum OrderStatus
+    
+    [JsonConverter(typeof(OrderbookKindConverter))]
+    public enum OrderbookKind
     {
         unknown,
-        active,
-        inactive,
-        expired,
-        cancelled,
-        filled,
+        sequence_marketplace_v1,
+        sequence_marketplace_v2,
+        blur,
+        opensea,
+        looks_rare,
+        reservoir,
+        x2y2,
     }
     
-    public static class OrderStatusExtensions
+    public static class OrderbookKindExtensions
     {
-        public static string AsString(this OrderStatus status)
+        public static string AsString(this OrderbookKind kind)
         {
-            return status.ToString();
+            return kind.ToString();
         }
     }
     
-    public class OrderStatusConverter : JsonConverter
+    internal class OrderbookKindConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(OrderStatus) || objectType == typeof(OrderStatus[]);
+            return objectType == typeof(OrderbookKind) || objectType == typeof(OrderbookKind[]);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is OrderStatus[] paymentMethods)
+            if (value is OrderbookKind[] paymentMethods)
             {
                 writer.WriteStartArray();
                 foreach (var method in paymentMethods)
@@ -41,7 +44,7 @@ namespace Sequence.Marketplace
                 }
                 writer.WriteEndArray();
             }
-            else if (value is OrderStatus paymentMethod)
+            else if (value is OrderbookKind paymentMethod)
             {
                 writer.WriteValue(paymentMethod.AsString());
             }
@@ -49,20 +52,20 @@ namespace Sequence.Marketplace
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (objectType == typeof(OrderStatus[]))
+            if (objectType == typeof(OrderbookKind[]))
             {
                 var array = JArray.Load(reader);
-                var methods = new OrderStatus[array.Count];
+                var methods = new OrderbookKind[array.Count];
                 for (int i = 0; i < array.Count; i++)
                 {
-                    methods[i] = Enum.Parse<OrderStatus>(array[i].ToString());
+                    methods[i] = Enum.Parse<OrderbookKind>(array[i].ToString());
                 }
                 return methods;
             }
             else
             {
                 var method = JToken.Load(reader).ToString();
-                return Enum.Parse<OrderStatus>(method);
+                return Enum.Parse<OrderbookKind>(method);
             }
         }
     }

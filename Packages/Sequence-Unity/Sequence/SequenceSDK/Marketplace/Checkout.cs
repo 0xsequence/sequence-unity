@@ -100,5 +100,39 @@ namespace Sequence.Marketplace
                 throw new Exception($"Error generating sell transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}");
             }
         }
+
+        public async Task<Step[]> GenerateListingTransaction(Address collectionAddress, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)
+        {
+            long epochTime = ((DateTimeOffset)expiry).ToUnixTimeSeconds();
+            GenerateListingTransactionArgs args = new GenerateListingTransactionArgs(collectionAddress, _wallet.GetWalletAddress(), contractType, orderbookKind, 
+                new CreateReq(tokenId, amount.ToString(), epochTime.ToString(), currencyTokenAddress, pricePerToken.ToString()), _wallet.GetWalletKind());
+
+            try
+            {
+                GenerateTransactionResponse response = await _client.SendRequest<GenerateListingTransactionArgs, GenerateTransactionResponse>(_chain, "GenerateListingTransaction", args);
+                return response.steps;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error generating listing transaction for {_wallet} with args {args}: {e.Message}");
+            }
+        }
+
+        public async Task<Step[]> GenerateOfferTransaction(Address collectionAddress, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)
+        {
+            long epochTime = ((DateTimeOffset)expiry).ToUnixTimeSeconds();
+            GenerateOfferTransactionArgs args = new GenerateOfferTransactionArgs(collectionAddress, _wallet.GetWalletAddress(), contractType, orderbookKind, 
+                new CreateReq(tokenId, amount.ToString(), epochTime.ToString(), currencyTokenAddress, pricePerToken.ToString()), _wallet.GetWalletKind());
+
+            try
+            {
+                GenerateTransactionResponse response = await _client.SendRequest<GenerateOfferTransactionArgs, GenerateTransactionResponse>(_chain, "GenerateOfferTransaction", args);
+                return response.steps;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error generating offer transaction for {_wallet} with args {args}: {e.Message}");
+            }
+        }
     }
 }

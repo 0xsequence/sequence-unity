@@ -1,13 +1,18 @@
 using System;
 using System.Numerics;
+using UnityEngine.Serialization;
 
 namespace Sequence.Marketplace
 {
     [Serializable]
     public class Order
     {
+        public BigInteger id;
+        public BigInteger collectionId;
+        public BigInteger collectibleId;
         public string orderId;
         public MarketplaceKind marketplace;
+        public SourceKind source;
         public OrderSide side;
         public OrderStatus status;
         public BigInteger chainId;
@@ -38,10 +43,14 @@ namespace Sequence.Marketplace
         public string updatedAt;
         public string deletedAt;
 
-        public Order(string orderId, MarketplaceKind marketplace, OrderSide side, OrderStatus status, BigInteger chainId, string collectionContractAddress, string tokenId, string createdBy, string priceAmount, string priceAmountFormatted, string priceAmountNet, string priceAmountNetFormatted, string priceCurrencyAddress, BigInteger priceDecimals, float priceUsd, string quantityInitial, string quantityInitialFormatted, string quantityRemaining, string quantityRemainingFormatted, string quantityAvailable, string quantityAvailableFormatted, BigInteger quantityDecimals, BigInteger feeBps, FeeBreakdown[] feeBreakdown, string validFrom, string validUntil, string createdAt, string updatedAt, string orderCreatedAt = null, string orderUpdatedAt = null, string deletedAt = null)
+        public Order(BigInteger id, BigInteger collectionId, BigInteger collectibleId, string orderId, MarketplaceKind marketplace, SourceKind source, OrderSide side, OrderStatus status, BigInteger chainId, string collectionContractAddress, string tokenId, string createdBy, string priceAmount, string priceAmountFormatted, string priceAmountNet, string priceAmountNetFormatted, string priceCurrencyAddress, BigInteger priceDecimals, float priceUsd, string quantityInitial, string quantityInitialFormatted, string quantityRemaining, string quantityRemainingFormatted, string quantityAvailable, string quantityAvailableFormatted, BigInteger quantityDecimals, BigInteger feeBps, FeeBreakdown[] feeBreakdown, string validFrom, string validUntil, string orderCreatedAt, string orderUpdatedAt, string createdAt, string updatedAt, string deletedAt)
         {
+            this.id = id;
+            this.collectionId = collectionId;
+            this.collectibleId = collectibleId;
             this.orderId = orderId;
             this.marketplace = marketplace;
+            this.source = source;
             this.side = side;
             this.status = status;
             this.chainId = chainId;
@@ -66,8 +75,11 @@ namespace Sequence.Marketplace
             this.feeBreakdown = feeBreakdown;
             this.validFrom = validFrom;
             this.validUntil = validUntil;
+            this.orderCreatedAt = orderCreatedAt;
+            this.orderUpdatedAt = orderUpdatedAt;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
+            this.deletedAt = deletedAt;
         }
     }
 }

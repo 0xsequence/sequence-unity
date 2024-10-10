@@ -28,7 +28,7 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                string errorMessage = $"Error listing currencies: {e.Message}";
+                string errorMessage = $"Error offer currencies: {e.Message}";
                 OnListCurrenciesError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
@@ -182,7 +182,7 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                string errorMessage = $"Error listing collectible listings for {tokenId} from {contractAddress}: {e.Message}";
+                string errorMessage = $"Error offer collectible listings for {tokenId} from {contractAddress}: {e.Message}";
                 OnListCollectibleListingsError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
@@ -223,7 +223,7 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                string errorMessage = $"Error listing collectible offers for {tokenId} from {contractAddress}: {e.Message}";
+                string errorMessage = $"Error offer collectible offers for {tokenId} from {contractAddress}: {e.Message}";
                 OnListCollectibleOffersError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
