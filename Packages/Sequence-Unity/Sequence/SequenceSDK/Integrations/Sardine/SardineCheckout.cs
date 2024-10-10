@@ -90,7 +90,7 @@ namespace Sequence.Integrations.Sardine
                     PaymentMethod.us_debit),
                 order.metadata.image, _chain, recipient, new Address(order.order.collectionContractAddress), order.metadata.tokenId, quantity, order.order.quantityDecimals,
                 order.order.priceAmount,
-                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name, order.order.marketplace.AsString());
+                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name, order.order.marketplace.ToString());
             try {
                 return await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, SardineNFTCheckout>(url, request);
             } catch (Exception e) {

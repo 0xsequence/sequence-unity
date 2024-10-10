@@ -50,7 +50,7 @@ namespace Sequence.Marketplace
             string[] marketplacesString = new string[length];
             for (int i = 0; i < length; i++)
             {
-                marketplacesString[i] = marketplaces[i].AsString();
+                marketplacesString[i] = marketplaces[i].ToString();
             }
 
             return marketplacesString;

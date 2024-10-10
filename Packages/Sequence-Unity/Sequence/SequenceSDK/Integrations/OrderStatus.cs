@@ -1,10 +1,11 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    [JsonConverter(typeof(OrderStatusConverter))]
+    [JsonConverter(typeof(EnumConverter<OrderStatus>))]
     public enum OrderStatus
     {
         unknown,
@@ -13,57 +14,5 @@ namespace Sequence.Marketplace
         expired,
         cancelled,
         filled,
-    }
-    
-    public static class OrderStatusExtensions
-    {
-        public static string AsString(this OrderStatus status)
-        {
-            return status.ToString();
-        }
-    }
-    
-    public class OrderStatusConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(OrderStatus) || objectType == typeof(OrderStatus[]);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            if (value is OrderStatus[] paymentMethods)
-            {
-                writer.WriteStartArray();
-                foreach (var method in paymentMethods)
-                {
-                    writer.WriteValue(method.AsString());
-                }
-                writer.WriteEndArray();
-            }
-            else if (value is OrderStatus paymentMethod)
-            {
-                writer.WriteValue(paymentMethod.AsString());
-            }
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (objectType == typeof(OrderStatus[]))
-            {
-                var array = JArray.Load(reader);
-                var methods = new OrderStatus[array.Count];
-                for (int i = 0; i < array.Count; i++)
-                {
-                    methods[i] = Enum.Parse<OrderStatus>(array[i].ToString());
-                }
-                return methods;
-            }
-            else
-            {
-                var method = JToken.Load(reader).ToString();
-                return Enum.Parse<OrderStatus>(method);
-            }
-        }
     }
 }
