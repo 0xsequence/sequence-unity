@@ -173,12 +173,12 @@ namespace Sequence.Marketplace
         
         public Action<ListCollectibleListingsReturn> OnListCollectibleListingsReturn;
         public Action<string> OnListCollectibleListingsError;
-        public async Task<ListCollectibleListingsReturn> ListCollectibleListings(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
+        public async Task<ListCollectibleListingsReturn> ListListingsForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             ListCollectibleListingsArgs args = new ListCollectibleListingsArgs(contractAddress, tokenId, filter, page);
             try
             {
-                ListCollectibleListingsReturn result = await _client.SendRequest<ListCollectibleListingsArgs, ListCollectibleListingsReturn>(_chain, "ListCollectibleListings", args);
+                ListCollectibleListingsReturn result = await _client.SendRequest<ListCollectibleListingsArgs, ListCollectibleListingsReturn>(_chain, "ListListingsForCollectible", args);
                 OnListCollectibleListingsReturn?.Invoke(result);
                 return result;
             }
@@ -190,9 +190,9 @@ namespace Sequence.Marketplace
             }
         }
         
-        public async Task<Order[]> ListAllCollectibleListings(Address contractAddress, string tokenId, OrderFilter filter = null)
+        public async Task<Order[]> ListAllListingsForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
-            ListCollectibleListingsReturn result = await ListCollectibleListings(contractAddress, tokenId, filter, null);
+            ListCollectibleListingsReturn result = await ListListingsForCollectible(contractAddress, tokenId, filter, null);
             if (result == null)
             {
                 return null;
@@ -201,7 +201,7 @@ namespace Sequence.Marketplace
             Order[] orders = result.listings;
             while (result.page != null && result.page.more)
             {
-                result = await ListCollectibleListings(contractAddress, tokenId, filter, result.page);
+                result = await ListListingsForCollectible(contractAddress, tokenId, filter, result.page);
                 if (result == null)
                 {
                     return orders;
@@ -214,12 +214,12 @@ namespace Sequence.Marketplace
         
         public Action<ListCollectibleOffersReturn> OnListCollectibleOffersReturn;
         public Action<string> OnListCollectibleOffersError;
-        public async Task<ListCollectibleOffersReturn> ListCollectibleOffers(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
+        public async Task<ListCollectibleOffersReturn> ListOffersForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             ListCollectibleListingsArgs args = new ListCollectibleListingsArgs(contractAddress, tokenId, filter, page);
             try
             {
-                ListCollectibleOffersReturn result = await _client.SendRequest<ListCollectibleListingsArgs, ListCollectibleOffersReturn>(_chain, "ListCollectibleOffers", args);
+                ListCollectibleOffersReturn result = await _client.SendRequest<ListCollectibleListingsArgs, ListCollectibleOffersReturn>(_chain, "ListOffersForCollectible", args);
                 OnListCollectibleOffersReturn?.Invoke(result);
                 return result;
             }
@@ -231,9 +231,9 @@ namespace Sequence.Marketplace
             }
         }
         
-        public async Task<Order[]> ListAllCollectibleOffers(Address contractAddress, string tokenId, OrderFilter filter = null)
+        public async Task<Order[]> ListAllOffersForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
-            ListCollectibleOffersReturn result = await ListCollectibleOffers(contractAddress, tokenId, filter, null);
+            ListCollectibleOffersReturn result = await ListOffersForCollectible(contractAddress, tokenId, filter, null);
             if (result == null)
             {
                 return null;
@@ -242,7 +242,7 @@ namespace Sequence.Marketplace
             Order[] orders = result.offers;
             while (result.page != null && result.page.more)
             {
-                result = await ListCollectibleOffers(contractAddress, tokenId, filter, result.page);
+                result = await ListOffersForCollectible(contractAddress, tokenId, filter, result.page);
                 if (result == null)
                 {
                     return orders;

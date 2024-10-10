@@ -186,5 +186,41 @@ namespace Sequence.Marketplace
             Assert.AreEqual(0, failEvents);
             Assert.AreEqual(tokenId, order.tokenId);
         }
+
+        [Test]
+        public async Task TestListAllListingsForCollectible()
+        {
+            Chain chain = Chain.Polygon;
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
+            string tokenId = "130";
+            
+            marketplaceReader.OnListCollectibleListingsReturn += OnSuccess;
+            marketplaceReader.OnListCollectibleListingsError += OnError;
+            
+            Order[] orders = await marketplaceReader.ListAllListingsForCollectible(new Address(contractAddress), tokenId);
+
+            Assert.IsNotNull(orders);
+            Assert.Greater(successEvents, 0);
+            Assert.AreEqual(0, failEvents);
+        }
+
+        [Test]
+        public async Task TestListAllOffersForCollectible()
+        {
+            Chain chain = Chain.Polygon;
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
+            string tokenId = "130";
+            
+            marketplaceReader.OnListCollectibleListingsReturn += OnSuccess;
+            marketplaceReader.OnListCollectibleListingsError += OnError;
+            
+            Order[] orders = await marketplaceReader.ListAllOffersForCollectible(new Address(contractAddress), tokenId);
+
+            Assert.IsNotNull(orders);
+            Assert.Greater(successEvents, 0);
+            Assert.AreEqual(0, failEvents);
+        }
     }
 }
