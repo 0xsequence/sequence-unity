@@ -22,28 +22,5 @@ namespace Sequence.Marketplace
             this.signature = signature;
             this.post = post;
         }
-        
-        [JsonConstructor]
-        public Step(uint id, string data, string to, string value, Signature signature, PostRequest post)
-        {
-            this.id = (StepType)id;
-            this.data = data;
-            this.to = to;
-            this.value = value;
-            this.signature = signature;
-            this.post = post;
-        }
-    }
-
-    public enum StepType
-    {
-        unknown,
-        tokenApproval,
-        buy,
-        sell,
-        createListing,
-        createOffer,
-        signEIP712,
-        signEIP191,
     }
 }

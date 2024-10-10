@@ -54,7 +54,7 @@ namespace Sequence.Marketplace
             this.priceAmountNetFormatted = priceAmountNetFormatted;
             this.priceCurrencyAddress = priceCurrencyAddress;
             this.priceDecimals = priceDecimals;
-            priceUSD = priceUsd;
+            this.priceUSD = priceUsd;
             this.quantityInitial = quantityInitial;
             this.quantityInitialFormatted = quantityInitialFormatted;
             this.quantityRemaining = quantityRemaining;

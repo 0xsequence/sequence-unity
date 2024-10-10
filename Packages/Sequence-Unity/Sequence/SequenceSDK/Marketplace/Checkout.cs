@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
 
@@ -55,7 +56,7 @@ namespace Sequence.Marketplace
         public async Task<Step[]> GenerateBuyTransaction(Order order, AdditionalFee additionalFee = null)
         {
             OrderData[] ordersData = new OrderData[]
-                { new OrderData(order.orderId, order.quantityDecimals.ToString()) };
+                { new OrderData(order.orderId, order.quantityAvailable) };
             AdditionalFee[] additionalFees = new AdditionalFee[] { additionalFee };
             if (additionalFee == null)
             {
@@ -66,8 +67,9 @@ namespace Sequence.Marketplace
 
             try
             {
-                return await _client.SendRequest<GenerateBuyTransaction, Step[]>(_chain, "GenerateBuyTransaction",
+                GenerateTransactionResponse response = await _client.SendRequest<GenerateBuyTransaction, GenerateTransactionResponse>(_chain, "GenerateBuyTransaction",
                     generateBuyTransaction);
+                return response.steps;
             }
             catch (Exception e)
             {
@@ -78,7 +80,7 @@ namespace Sequence.Marketplace
         public async Task<Step[]> GenerateSellTransaction(Order order, AdditionalFee additionalFee = null)
         {
             OrderData[] ordersData = new OrderData[]
-                { new OrderData(order.orderId, order.quantityDecimals.ToString()) };
+                { new OrderData(order.orderId, order.quantityAvailable) };
             AdditionalFee[] additionalFees = new AdditionalFee[] { additionalFee };
             if (additionalFee == null)
             {
@@ -89,8 +91,9 @@ namespace Sequence.Marketplace
 
             try
             {
-                return await _client.SendRequest<GenerateBuyTransaction, Step[]>(_chain, "GenerateSellTransaction",
+                GenerateTransactionResponse response = await _client.SendRequest<GenerateBuyTransaction, GenerateTransactionResponse>(_chain, "GenerateSellTransaction",
                     generateBuyTransaction);
+                return response.steps;
             }
             catch (Exception e)
             {
