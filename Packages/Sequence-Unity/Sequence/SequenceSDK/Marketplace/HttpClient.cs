@@ -16,6 +16,10 @@ namespace Sequence.Marketplace
         private string _apiKey;
         private const string _baseUrl = "https://marketplace-api.sequence.app/";
         private const string _endUrl = "/rpc/Marketplace/";
+        private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
         
         public HttpClient()
         {
@@ -34,7 +38,7 @@ namespace Sequence.Marketplace
             string requestJson = "";
             if (args != null)
             {
-                requestJson = JsonConvert.SerializeObject(args);
+                requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             }
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;

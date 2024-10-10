@@ -7,6 +7,9 @@ namespace Sequence.Marketplace
     public class MarketplaceCheckoutTests
     {
         private CollectibleOrder[] _collectibleOrders;
+
+        private IWallet _testWallet =
+            new SequenceWallet(new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07"), "", null);
         
         [SetUp]
         public async Task Setup()
@@ -39,7 +42,7 @@ namespace Sequence.Marketplace
             {
                 orders[i] = _collectibleOrders[indices[i]].order;
             }
-            Checkout checkout = new Checkout(new SequenceWallet(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), "", null), Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
             CheckoutOptions options = await checkout.GetCheckoutOptions(orders);
             
@@ -58,7 +61,7 @@ namespace Sequence.Marketplace
             {
                 orders[i] = _collectibleOrders[indices[i]].order;
             }
-            Checkout checkout = new Checkout(new SequenceWallet(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), "", null), Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
             for (int i = 0; i < indices.Length; i++)
             {
@@ -77,7 +80,7 @@ namespace Sequence.Marketplace
             {
                 orders[i] = _collectibleOrders[indices[i]].order;
             }
-            Checkout checkout = new Checkout(new SequenceWallet(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), "", null), Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
             for (int i = 0; i < indices.Length; i++)
             {
