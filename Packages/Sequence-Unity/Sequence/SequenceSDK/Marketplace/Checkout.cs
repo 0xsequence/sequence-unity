@@ -74,5 +74,28 @@ namespace Sequence.Marketplace
                 throw new Exception($"Error generating buy transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}");
             }
         }
+        
+        public async Task<Step[]> GenerateSellTransaction(Order order, AdditionalFee additionalFee = null)
+        {
+            OrderData[] ordersData = new OrderData[]
+                { new OrderData(order.orderId, order.quantityDecimals.ToString()) };
+            AdditionalFee[] additionalFees = new AdditionalFee[] { additionalFee };
+            if (additionalFee == null)
+            {
+                additionalFees = null;
+            }
+            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
+                order.marketplace, ordersData, additionalFees, _wallet.GetWalletKind());
+
+            try
+            {
+                return await _client.SendRequest<GenerateBuyTransaction, Step[]>(_chain, "GenerateSellTransaction",
+                    generateBuyTransaction);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error generating sell transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}");
+            }
+        }
     }
 }

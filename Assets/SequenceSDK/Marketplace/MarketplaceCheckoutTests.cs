@@ -67,5 +67,24 @@ namespace Sequence.Marketplace
                 Assert.Greater(steps.Length, 0);
             }
         }
+
+        [TestCase(new[] { 0 })]
+        [TestCase(new[] { 0, 1, 2 })]
+        public async Task TestGenerateSellTransaction(int[] indices)
+        {
+            Order[] orders = new Order[indices.Length];
+            for (int i = 0; i < indices.Length; i++)
+            {
+                orders[i] = _collectibleOrders[indices[i]].order;
+            }
+            Checkout checkout = new Checkout(new SequenceWallet(new Address("0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb"), "", null), Chain.Polygon);
+
+            for (int i = 0; i < indices.Length; i++)
+            {
+                Step[] steps = await checkout.GenerateSellTransaction(orders[i]);
+                Assert.IsNotNull(steps);
+                Assert.Greater(steps.Length, 0);
+            }
+        }
     }
 }
