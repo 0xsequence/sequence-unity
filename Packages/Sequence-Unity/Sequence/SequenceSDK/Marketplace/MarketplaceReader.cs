@@ -36,25 +36,23 @@ namespace Sequence.Marketplace
         
         public Action<ListCollectiblesReturn> OnListCollectiblesReturn;
         public Action<string> OnListCollectiblesError;
-        public Task<ListCollectiblesReturn> ListCollectiblesWithLowestListing(string contractAddress, CollectiblesFilter filter = default, Page page = default)
+        public Task<ListCollectiblesReturn> ListCollectibleListingsWithLowestPricedListingsFirst(string contractAddress, CollectiblesFilter filter = default, Page page = default)
         {
-            string endpoint = "ListCollectiblesWithLowestListing";
-
-            return DoListCollectibles(endpoint, contractAddress, filter, page);
+            return DoListCollectibles(OrderSide.listing, contractAddress, filter, page);
         }
 
-        private async Task<ListCollectiblesReturn> DoListCollectibles(string endpoint, string contractAddress,
+        private async Task<ListCollectiblesReturn> DoListCollectibles(OrderSide side, string contractAddress,
             CollectiblesFilter filter, Page page)
         {
             ListCollectiblesArgs args =
-                new ListCollectiblesArgs(contractAddress, filter, page);
+                new ListCollectiblesArgs(side, contractAddress, filter, page);
 
             try
             {
                 ListCollectiblesReturn result =
                     await _client
                         .SendRequest<ListCollectiblesArgs, ListCollectiblesReturn>(
-                            _chain, endpoint, args);
+                            _chain, "ListCollectibles", args);
                 OnListCollectiblesReturn?.Invoke(result);
                 return result;
             }
@@ -65,15 +63,15 @@ namespace Sequence.Marketplace
             }
         }
 
-        public Task<CollectibleOrder[]> ListAllCollectiblesWithLowestListing(string contractAddress,
+        public Task<CollectibleOrder[]> ListAllCollectibleListingsWithLowestPricedListingsFirst(string contractAddress,
             CollectiblesFilter filter = default)
         {
-            return ListAllCollectibles("ListCollectiblesWithLowestListing", contractAddress, filter);
+            return ListAllCollectibles(OrderSide.listing, contractAddress, filter);
         }
         
-        private async Task<CollectibleOrder[]> ListAllCollectibles(string endpoint, string contractAddress, CollectiblesFilter filter = default)
+        private async Task<CollectibleOrder[]> ListAllCollectibles(OrderSide side, string contractAddress, CollectiblesFilter filter = default)
         {
-            ListCollectiblesReturn result = await DoListCollectibles(endpoint, contractAddress, filter, null);
+            ListCollectiblesReturn result = await DoListCollectibles(side, contractAddress, filter, null);
             if (result == null)
             {
                 return null;
@@ -83,7 +81,7 @@ namespace Sequence.Marketplace
             while (result.page != null && result.page.more)
             {
                 collectibles = ArrayUtils.CombineArrays(collectibles, result.collectibles);
-                result = await DoListCollectibles(endpoint, contractAddress, filter, result.page);
+                result = await DoListCollectibles(side, contractAddress, filter, result.page);
                 if (result == null)
                 {
                     return collectibles;
@@ -93,16 +91,16 @@ namespace Sequence.Marketplace
             return collectibles;
         }
         
-        public Task<ListCollectiblesReturn> ListCollectiblesWithHighestOffer(string contractAddress, CollectiblesFilter filter = default, Page page = default)
+        public Task<ListCollectiblesReturn> ListCollectibleOffersWithHighestPricedOfferFirst(string contractAddress, CollectiblesFilter filter = default, Page page = default)
         {
-            string endpoint = "ListCollectiblesWithHighestOffer";
-            return DoListCollectibles(endpoint, contractAddress, filter, page);
+            string endpoint = "ListCollectibleOffersWithHighestPricedOfferFirst";
+            return DoListCollectibles(OrderSide.offer, contractAddress, filter, page);
         }
 
-        public Task<CollectibleOrder[]> ListAllCollectibleWithHighestOffer(string contractAddress,
+        public Task<CollectibleOrder[]> ListAllCollectibleOffersWithHighestPricedOfferFirst(string contractAddress,
             CollectiblesFilter filter = default)
         {
-            return ListAllCollectibles("ListCollectiblesWithHighestOffer", contractAddress, filter);
+            return ListAllCollectibles(OrderSide.offer, contractAddress, filter);
         }
 
         public Action<TokenMetadata> OnGetCollectibleReturn;

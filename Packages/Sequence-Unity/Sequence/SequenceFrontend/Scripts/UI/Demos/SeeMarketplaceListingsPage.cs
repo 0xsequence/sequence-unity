@@ -64,7 +64,7 @@ namespace Sequence.Demo
 
         private async Task FetchCollection(Page page = null)
         {
-            ListCollectiblesReturn result = await _collectibles.ListCollectiblesWithLowestListing(_collectionAddressInputField.text, null, page);
+            ListCollectiblesReturn result = await _collectibles.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
             if (result == null || result.collectibles == null || result.collectibles.Length == 0)
             {
                 _errorText.text = "No orders founds for collection";

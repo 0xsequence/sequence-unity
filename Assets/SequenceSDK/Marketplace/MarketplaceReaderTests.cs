@@ -34,7 +34,7 @@ namespace Sequence.Marketplace
         }
         
         [Test]
-        public async Task TestListAllCollectiblesWithLowestListing()
+        public async Task TestListAllCollectibleListingsWithLowestPricedListingsFirst()
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
@@ -44,7 +44,7 @@ namespace Sequence.Marketplace
             marketplaceReader.OnListCollectiblesReturn += OnSuccess;
             marketplaceReader.OnListCollectiblesError += OnError;
             
-            CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectiblesWithLowestListing(contractAddress, filter);
+            CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleListingsWithLowestPricedListingsFirst(contractAddress, filter);
             
             Assert.IsNotNull(collectibles);
             Assert.Greater(successEvents, 0);
@@ -53,7 +53,7 @@ namespace Sequence.Marketplace
         }
         
         [Test]
-        public async Task TestListAllCollectiblesWithHighestOffer()
+        public async Task TestListAllCollectibleOffersWithHighestPricedOfferFirst()
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
@@ -63,7 +63,7 @@ namespace Sequence.Marketplace
             marketplaceReader.OnListCollectiblesReturn += OnSuccess;
             marketplaceReader.OnListCollectiblesError += OnError;
             
-            CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleWithHighestOffer(contractAddress, filter);
+            CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleOffersWithHighestPricedOfferFirst(contractAddress, filter);
             
             Assert.IsNotNull(collectibles);
             Assert.Greater(successEvents, 0);
