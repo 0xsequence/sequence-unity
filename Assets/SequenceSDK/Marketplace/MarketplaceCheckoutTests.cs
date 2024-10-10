@@ -49,9 +49,7 @@ namespace Sequence.Marketplace
             CheckoutOptions options = await checkout.GetCheckoutOptions(orders);
             
             Assert.IsNotNull(options);
-            Assert.IsNotNull(options.swap);
-            Assert.IsNotNull(options.nftCheckout);
-            Assert.IsNotNull(options.onRamp);
+            Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
         }
 
         [TestCase(new[] { 0 })]

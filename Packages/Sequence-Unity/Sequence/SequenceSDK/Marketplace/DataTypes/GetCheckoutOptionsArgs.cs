@@ -3,13 +3,13 @@ using System;
 namespace Sequence.Marketplace
 {
     [Serializable]
-    public class GetCheckoutOptionsRequest
+    public class GetCheckoutOptionsArgs
     {
         public Address wallet;
         public CheckoutOptionsMarketplaceOrder[] orders;
         public int feeBPS;
 
-        public GetCheckoutOptionsRequest(Address wallet, CheckoutOptionsMarketplaceOrder[] orders, int feeBps)
+        public GetCheckoutOptionsArgs(Address wallet, CheckoutOptionsMarketplaceOrder[] orders, int feeBps)
         {
             this.wallet = wallet;
             this.orders = orders;

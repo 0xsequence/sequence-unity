@@ -25,11 +25,12 @@ namespace Sequence.Marketplace
         public async Task<CheckoutOptions> GetCheckoutOptions(CheckoutOptionsMarketplaceOrder[] orders,
             int additionalFeeBps = 0)
         {
-            GetCheckoutOptionsRequest request = new GetCheckoutOptionsRequest(_wallet.GetWalletAddress(), orders, additionalFeeBps);
+            GetCheckoutOptionsArgs args = new GetCheckoutOptionsArgs(_wallet.GetWalletAddress(), orders, additionalFeeBps);
             try
             {
-                return await _client.SendRequest<GetCheckoutOptionsRequest, CheckoutOptions>(_chain,
-                    "CheckoutOptionsMarketplace", request);
+                GetCheckoutOptionsResponse response = await _client.SendRequest<GetCheckoutOptionsArgs, GetCheckoutOptionsResponse>(_chain,
+                    "CheckoutOptionsMarketplace", args);
+                return response.options;
             }
             catch (Exception e)
             {
