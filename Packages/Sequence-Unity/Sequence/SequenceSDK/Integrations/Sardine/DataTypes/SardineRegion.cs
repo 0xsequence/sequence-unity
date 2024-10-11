@@ -15,9 +15,9 @@ namespace Sequence.Integrations.Sardine
         public bool isPayrollSupported;
         public string[] supportedDocuments;
         public SardineRegionPaymentMethod[] paymentMethods;
-        public SardineRegionState[] stated;
+        public SardineRegionState[] states;
 
-        public SardineRegion(string countryCode, bool isAllowedOnRamp, bool isAllowedOnNft, string[] isBasicKycRequired, string[] isSsnRequired, string name, string currencyCode, bool isPayrollSupported, string[] supportedDocuments, SardineRegionPaymentMethod[] paymentMethods, SardineRegionState[] stated)
+        public SardineRegion(string countryCode, bool isAllowedOnRamp, bool isAllowedOnNft, string[] isBasicKycRequired, string[] isSsnRequired, string name, string currencyCode, bool isPayrollSupported, string[] supportedDocuments, SardineRegionPaymentMethod[] paymentMethods, SardineRegionState[] states)
         {
             this.countryCode = countryCode;
             this.isAllowedOnRamp = isAllowedOnRamp;
@@ -29,7 +29,7 @@ namespace Sequence.Integrations.Sardine
             this.isPayrollSupported = isPayrollSupported;
             this.supportedDocuments = supportedDocuments;
             this.paymentMethods = paymentMethods;
-            this.stated = stated;
+            this.states = states;
         }
     }
 }

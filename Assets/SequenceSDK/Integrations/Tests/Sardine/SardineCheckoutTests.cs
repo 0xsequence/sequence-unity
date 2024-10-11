@@ -29,11 +29,11 @@ namespace Sequence.Integrations.Tests.Sardine
         }
 
         [Test]
-        public async Task TestGetSardineClientToken()
+        public async Task TestSardineGetClientToken()
         {
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon);
 
-            string token = await sardine.GetSardineClientToken();
+            string token = await sardine.SardineGetClientToken();
             
             Assert.NotNull(token);
             Assert.IsFalse(string.IsNullOrWhiteSpace(token));

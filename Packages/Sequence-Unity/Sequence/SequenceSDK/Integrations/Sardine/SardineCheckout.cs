@@ -70,9 +70,9 @@ namespace Sequence.Integrations.Sardine
             }
         }
 
-        public async Task<string> GetSardineClientToken()
+        public async Task<string> SardineGetClientToken()
         {
-            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "GetSardineClientToken";
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetClientToken";
             try {
                 SardineTokenResponse response = await _client.SendRequest<SardineTokenResponse>(url);
                 return response.token;
