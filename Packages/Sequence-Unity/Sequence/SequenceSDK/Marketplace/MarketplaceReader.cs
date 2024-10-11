@@ -250,5 +250,21 @@ namespace Sequence.Marketplace
 
             return orders;
         }
+
+        public async Task<CollectibleOrder> GetFloorOrder(Address contractAddress, CollectiblesFilter filter = null)
+        {
+            GetFloorOrderArgs args = new GetFloorOrderArgs(contractAddress, filter);
+            
+            try
+            {
+                GetOrderResponse response = await _client.SendRequest<GetFloorOrderArgs, GetOrderResponse>(_chain, "GetFloorOrder", args);
+                CollectibleOrder order = response.collectible;
+                return order;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error getting floor order for {contractAddress}: {e.Message}");
+            }
+        }
     }
 }

@@ -222,5 +222,19 @@ namespace Sequence.Marketplace
             Assert.Greater(successEvents, 0);
             Assert.AreEqual(0, failEvents);
         }
+
+        [Test]
+        public async Task TestGetFloorOrder()
+        {
+            Chain chain = Chain.Polygon;
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
+            string tokenId = "130";
+
+            CollectibleOrder order = await marketplaceReader.GetFloorOrder(new Address(contractAddress));
+
+            Assert.IsNotNull(order);
+            Assert.AreEqual(contractAddress, order.order.collectionContractAddress);
+        }
     }
 }
