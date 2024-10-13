@@ -9,9 +9,9 @@ namespace Sequence.EmbeddedWallet
         public string type { get; private set; } = TypeIdentifier;
         public string value { get; private set; }
         
-        public DelayedEncode(string to, string value, DelayedEncodeData data)
+        public DelayedEncode(string contractAddress, string value, DelayedEncodeData data)
         {
-            this.to = to;
+            this.to = contractAddress;
             this.value = value;
             this.data = data;
         }

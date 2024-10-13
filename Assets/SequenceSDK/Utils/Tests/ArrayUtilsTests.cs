@@ -21,7 +21,7 @@ namespace Sequence.Utils.Tests
             Dictionary<Chain, string> chains = new Dictionary<Chain, string>();
             chains[Chain.Ethereum] = "ETH";
             chains[Chain.Avalanche] = "AVAX";
-            chains[Chain.Polygon] = "MATIC";
+            chains[Chain.Polygon] = "POL";
             yield return new TestCaseData(chains.Keys.GetEnumerator(), new Chain[] { Chain.Ethereum, Chain.Avalanche, Chain.Polygon });
         }
             
