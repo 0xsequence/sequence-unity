@@ -147,7 +147,7 @@ namespace Sequence.Demo
             int count = nftElements.Length;
             for (int i = 0; i < count; i++)
             {
-                if (nftElements[i].TokenIconSprite.texture == SpriteFetcher.DefaultTexture)
+                if (nftElements[i].TokenIconSprite.texture == AssetHandler.DefaultTexture)
                 {
                     Debug.Log($"Nft {nftElements[i]} has the default image. This is likely because its image url is invalid. Skipping NFT...");
                     continue;

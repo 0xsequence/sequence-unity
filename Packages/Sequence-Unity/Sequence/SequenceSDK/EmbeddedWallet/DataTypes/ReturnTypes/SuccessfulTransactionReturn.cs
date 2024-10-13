@@ -32,7 +32,7 @@ namespace Sequence.EmbeddedWallet
             this.nativeReceipt = nativeReceipt;
             this.nativeTransactionReceipt = nativeReceipt?.ToObject<TransactionReceipt>(new JsonSerializer { Converters = { new TransactionReceiptConverter() } });
             this.simulations = simulations;
-        }
+        } 
     }
 
     public class SuccessfulBatchTransactionReturn : SuccessfulTransactionReturn

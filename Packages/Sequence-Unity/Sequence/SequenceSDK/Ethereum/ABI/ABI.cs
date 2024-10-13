@@ -203,14 +203,21 @@ namespace Sequence.ABI
         private static string[] ExtractTypes(JArray array)
         {
             int length = array.Count;
-            string[] result = new string[length];
+            List<string> result = new List<string>();
             for (int i = 0; i < length; i++)
             {
                 JObject item = array[i] as JObject;
-                result[i] = item["type"].ToString();
+                JArray components = item["components"] as JArray;
+                if (components == null)
+                    result.Add(item["type"].ToString());
+                else
+                {
+                    foreach (var component in components)
+                        result.Add(component["type"].ToString());
+                }
             }
 
-            return result;
+            return result.ToArray();
         }
 
         private static Dictionary<string, List<(string[], string)>> AddToDictionary(

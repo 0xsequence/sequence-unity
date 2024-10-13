@@ -274,7 +274,7 @@ namespace Sequence.Demo
                 Debug.LogWarning($"No metadata URL found for given token: {tokenBalance}");
             }
             
-            Sprite iconSprite = await SpriteFetcher.Fetch(metadataUrl);
+            Sprite iconSprite = await AssetHandler.GetSpriteAsync(metadataUrl);
             return iconSprite;
         }
 
@@ -291,7 +291,7 @@ namespace Sequence.Demo
                 Debug.Log($"No metadata URL found for given token: {tokenBalance}");
             }
             
-            Sprite iconSprite = await SpriteFetcher.Fetch(metadataUrl);
+            Sprite iconSprite = await AssetHandler.GetSpriteAsync(metadataUrl);
             return iconSprite;
         }
 

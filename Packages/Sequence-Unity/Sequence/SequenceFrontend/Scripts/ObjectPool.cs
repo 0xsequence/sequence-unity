@@ -24,7 +24,7 @@ namespace Sequence.Demo
 
         public static ObjectPool ActivateObjectPool(GameObject toInstantiate, int count, bool canGrow = true, Transform parent = null)
         {
-            ObjectPool pool = new ObjectPool(toInstantiate, count);
+            ObjectPool pool = new ObjectPool(toInstantiate, count, canGrow, parent);
             for (int i = 0; i < count; i++)
             {
                 pool.InstantiateObject();
