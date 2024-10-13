@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class PrimarySaleStateERC1155 : IPrimarySaleState
+    public class PrimarySaleStateERC1155
     {
         public string PaymentToken { get; private set; }
         public string PaymentTokenSymbol { get; private set; }
@@ -61,6 +61,7 @@ namespace Sequence.Demo
 
             var transactions = new Transaction[] { new RawTransaction(fn) };
             var result = await _wallet.SendTransaction(_chain, transactions);
+            Debug.Log($"Purchase");
             if (result is FailedTransactionReturn failed)
             {
                 Debug.Log($"Error purchasing item: {failed.error}");

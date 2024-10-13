@@ -11,23 +11,17 @@ namespace Sequence.Demo
 {
     public class PrimarySalePage : UIPage
     {
-        [Serializable]
-        private struct SaleContractConfig
-        {
-            [field: SerializeField] public SaleContractType Type { get; private set; }
-            [field: SerializeField] public Chain Chain { get; private set; }
-            [field: SerializeField] public string TokenContractAddress { get; private set; }
-            [field: SerializeField] public string SaleContractAddress { get; private set; }
-            [field: SerializeField] public int[] ItemsForSale { get; private set; }
-        }
-        
-        [Header("Configuration")] 
-        [SerializeField] private SaleContractType _saleContractType;
-        [SerializeField] private SaleContractConfig[] _configs;
+        [Header("Configuration")]
+        [SerializeField] private Chain _chain;
+        [SerializeField] private string _tokenContractAddress;
+        [SerializeField] private string _saleContractAddress;
+        [SerializeField] private int[] _itemsForSale;
         
         [Header("Components")]
+        [SerializeField] private GameObject _loadingView;
+        [SerializeField] private GameObject _resultView;
         [SerializeField] private QrCodeView _qrCodeView;
-        [SerializeField] private TMP_Text _titleText;
+        [SerializeField] private TMP_Text _resultText;
         [SerializeField] private TMP_Text _paymentTokenText;
         [SerializeField] private TMP_Text _userAddressText;
         [SerializeField] private TMP_Text _userBalanceText;
@@ -40,14 +34,15 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _marketplaceTilePrefab;
         [SerializeField] private int _objectPoolAmount = 10;
 
-        private SaleContractConfig _config;
         private SequenceWallet _wallet;
-        private IPrimarySaleState _saleState;
+        private PrimarySaleStateERC1155 _saleState;
         private ObjectPool _tilePool;
 
         public override void Open(params object[] args)
         {
             base.Open(args);
+            _loadingView.SetActive(false);
+            _resultView.SetActive(false);
             _qrCodeView.gameObject.SetActive(false);
             
             _wallet = args.GetObjectOfTypeIfExists<SequenceWallet>();
@@ -58,31 +53,26 @@ namespace Sequence.Demo
         public async void OpenQrCodeView()
         {
             var destinationAddress = _wallet.GetWalletAddress();
-            await _qrCodeView.Show((int)_config.Chain, destinationAddress, "1e2");
+            await _qrCodeView.Show(_saleState.PaymentToken, (int)_chain, destinationAddress, "1e2");
         }
 
         public async void RefreshState()
         {
             ClearState();
-            
-            _config = Array.Find(_configs, c => c.Type == _saleContractType);
-            
-            _saleState = _saleContractType switch
-            {
-                SaleContractType.ERC721 => new PrimarySaleStateERC721(),
-                SaleContractType.ERC1155 => new PrimarySaleStateERC1155(),
-                _ => null
-            };
+
+            _saleState = new PrimarySaleStateERC1155();
             
             Assert.IsNotNull(_saleState);
-            
+
+            SetLoading(true);
             await _saleState.Construct(
-                _config.SaleContractAddress, 
-                _config.TokenContractAddress, 
+                _saleContractAddress, 
+                _tokenContractAddress, 
                 _wallet, 
-                _config.Chain,
-                _config.ItemsForSale);
-            
+                _chain,
+                _itemsForSale);
+
+            SetLoading(false);
             RenderState();
         }
 
@@ -100,7 +90,6 @@ namespace Sequence.Demo
 
         private void ClearState()
         {
-            _titleText.text = $"Primary Sales Demo ({_saleContractType})";
             _paymentTokenText.text = string.Empty;
             _userAddressText.text= string.Empty;
             _userBalanceText.text= string.Empty;
@@ -140,11 +129,26 @@ namespace Sequence.Demo
 
         private async Task PurchaseToken(BigInteger tokenId, int amount)
         {
+            SetLoading(true);
             var success = await _saleState.Purchase(tokenId, amount);
+            SetLoading(false);
+            SetResult(success);
+            
             if (success)
                 RenderState();
             else
                 OpenQrCodeView();
+        }
+
+        private void SetLoading(bool loading)
+        {
+            _loadingView.SetActive(loading);
+        }
+
+        private void SetResult(bool success)
+        {
+            _resultView.SetActive(true);
+            _resultText.text = success ? "Success" : "Failed";
         }
 
         private string ConvertTime(int timestamp)

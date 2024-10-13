@@ -51,6 +51,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 250db09c678b4c708f26b52f55aa527f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _format: https://metamask.app.link/send/{0}@{1}/transfer?address={2}&uint256={3}
+  _size: 512
   _qrImage: {fileID: 2755424297343367048}
 --- !u!1 &2755424297343367054
 GameObject:
