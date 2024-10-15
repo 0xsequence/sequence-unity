@@ -37,6 +37,7 @@ namespace Sequence
         TestnetBorne = 94984,
         TestnetSkaleNebulaGamingHub = 37084624,
         TestnetSoneiumMinato = 1946,
+        TestnetToy = 21000000,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
