@@ -37,7 +37,8 @@ namespace Sequence
             { Chain.TestnetBlastSepolia, "Blast Sepolia" },
             { Chain.TestnetBorne, "Borne Testnet" },
             { Chain.TestnetSkaleNebulaGamingHub, "Skale Nebula Gaming Hub Testnet" },
-            { Chain.TestnetSoneiumMinato, "Soneium Minato Testnet" }
+            { Chain.TestnetSoneiumMinato, "Soneium Minato Testnet" },
+            { Chain.TestnetToy, "TOY Testnet" }
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -73,7 +74,8 @@ namespace Sequence
             { Chain.TestnetBlastSepolia, "ETH" },
             { Chain.TestnetBorne, "BORNE" },
             { Chain.TestnetSkaleNebulaGamingHub, "sFUEL" },
-            { Chain.TestnetSoneiumMinato, "ETH" }
+            { Chain.TestnetSoneiumMinato, "ETH" },
+            { Chain.TestnetToy, "TOY" }
         };
 
         public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
@@ -109,7 +111,8 @@ namespace Sequence
             { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" },
             { Chain.TestnetBorne, "https://subnets-test.avax.network/bornegfdn" },
             { Chain.TestnetSkaleNebulaGamingHub, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
-            { Chain.TestnetSoneiumMinato, "https://explorer-testnet.soneium.org/" }
+            { Chain.TestnetSoneiumMinato, "https://explorer-testnet.soneium.org/" },
+            { Chain.TestnetToy, "" } // Not found
         };
         
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -147,7 +150,8 @@ namespace Sequence
             { Chain.TestnetBlastSepolia, "168587773" },
             { Chain.TestnetBorne, "94984" },
             { Chain.TestnetSkaleNebulaGamingHub, "37084624" },
-            { Chain.TestnetSoneiumMinato, "1946" }
+            { Chain.TestnetSoneiumMinato, "1946" },
+            { Chain.TestnetToy, "21000000" }
         };
         
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -183,7 +187,8 @@ namespace Sequence
             { "168587773", Chain.TestnetBlastSepolia },
             { "94984", Chain.TestnetBorne },
             { "37084624", Chain.TestnetSkaleNebulaGamingHub },
-            { "1946", Chain.TestnetSoneiumMinato }
+            { "1946", Chain.TestnetSoneiumMinato },
+            { "21000000", Chain.TestnetToy }
         };
         
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -219,7 +224,8 @@ namespace Sequence
             { Chain.TestnetBlastSepolia, "blast-sepolia" },
             { Chain.TestnetBorne, "borne-testnet" },
             { Chain.TestnetSkaleNebulaGamingHub, "skale-nebula-testnet" },
-            { Chain.TestnetSoneiumMinato, "soneium-minato" }
+            { Chain.TestnetSoneiumMinato, "soneium-minato" },
+            { Chain.TestnetToy, "toy-testnet" }
         };
     }
 }
