@@ -11,7 +11,7 @@ namespace Sequence.Demo
     {
         [SerializeField] UIPanel _getCheckoutOptionsPanel;
         [SerializeField] Image _image;
-        [SerializeField] private TextMeshProUGUI _nameText, _priceText, _descriptionText, _attributesText;
+        [SerializeField] private TextMeshProUGUI _nameText, _usdPriceText, _priceText, _descriptionText, _attributesText;
         CollectibleOrder _order;
 
         protected override void Awake()
@@ -36,6 +36,7 @@ namespace Sequence.Demo
         {
             _image.sprite = null;
             _nameText.text = string.Empty;
+            _usdPriceText.text = string.Empty;
             _priceText.text = string.Empty;
             _descriptionText.text = string.Empty;
             _attributesText.text = string.Empty;
@@ -45,8 +46,9 @@ namespace Sequence.Demo
         async void FillPage()
         {
             _image.sprite = await SpriteFetcher.Fetch(_order.metadata.image);
-            _nameText.text = new string(_order.metadata.name.TakeWhile(char.IsLetter).ToArray());
-            _priceText.text = _order.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
+            _nameText.text = new string(_order.metadata.name);
+            _usdPriceText.text = "US" + _order.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
+            _priceText.text = _order.order.priceAmountFormatted;
             _descriptionText.text = _order.metadata.description;
             _attributesText.text = _order.metadata.attributes[0].Values.ToString();
         }

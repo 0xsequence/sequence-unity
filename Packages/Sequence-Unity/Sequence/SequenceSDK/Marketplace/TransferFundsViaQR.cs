@@ -25,7 +25,8 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
     {
         if (_order != null)
         {
-            await SetQrCode((int)_order.order.chainId, _wallet.GetWalletAddress(), ConvertToScientificNotation(float.Parse(_order.order.priceAmount)));
+            //Price must be converted into specific ScientificNotation format following eip-681 standard (see below)
+            await SetQrCode((int)_order.order.chainId, _wallet.GetWalletAddress(), PriceValuetoEIP618Standard(float.Parse(_order.order.priceAmount)));
             _qrPanel.SetActive(true);
         }
         else Debug.LogError("Collectible order not set for checkout option.");
@@ -55,7 +56,7 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
         else
             priceCurrencyAddress = ChainTokenAddress.Get((int)_order.order.chainId);
 
-        var url = apiEndpoint +"?color=000000&bgcolor=FFFFFF&data=https%3A//metamask.app.link/send/"  + priceCurrencyAddress + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
+        var url = apiEndpoint + "?color=000000&bgcolor=FFFFFF&data=ethereum:" + priceCurrencyAddress + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
         Debug.Log(url);
         return await UnityWebRequestExtensions.DownloadImage(url);
 
@@ -66,9 +67,11 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
         _qrPanel.SetActive(false);
     }
 
-    string ConvertToScientificNotation(float value)
+    string PriceValuetoEIP618Standard(float value)
     {
-        string formattedValue = value.ToString("0.##E+0");
+
+        float decimalValue = value * Mathf.Pow(1, 18); // Increases decimal places by 18 (ERC20 standard)
+        string formattedValue = decimalValue.ToString("0.##E+0");
         formattedValue = formattedValue.Replace("E", "e");
         formattedValue = formattedValue.Replace("e+", "e");
 

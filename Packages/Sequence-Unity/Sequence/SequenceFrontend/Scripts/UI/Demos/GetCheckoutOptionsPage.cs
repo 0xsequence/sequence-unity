@@ -26,9 +26,7 @@ namespace Sequence.Demo
         {
             base.Open(args);
 
-            CollectibleOrder order = args.OfType<CollectibleOrder>().FirstOrDefault();
-
-            if (order != null) _order = order;
+            _order = args.OfType<CollectibleOrder>().FirstOrDefault();
             
             GetCheckoutOptions(0);
         }

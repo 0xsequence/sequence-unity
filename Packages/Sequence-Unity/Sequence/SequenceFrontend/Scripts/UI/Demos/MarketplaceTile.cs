@@ -26,8 +26,8 @@ namespace Sequence.Demo
         {
             _collectibleOrder = order;
             FetchImage().ConfigureAwait(false);
-            _nameText.text = new string(order.metadata.name.TakeWhile(char.IsLetter).ToArray());
-            _priceText.text = order.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
+            _nameText.text = new string(_collectibleOrder.metadata.name);
+            _priceText.text = "US"+ _collectibleOrder.order.priceUSD.ToString("C6", new CultureInfo("en-US"));
         }
 
         private async Task FetchImage()
