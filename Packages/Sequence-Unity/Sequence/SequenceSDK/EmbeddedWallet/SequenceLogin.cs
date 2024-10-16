@@ -106,6 +106,13 @@ namespace Sequence.EmbeddedWallet
             SetupAuthenticator(validator, authenticator);
         }
 
+        public void ResetSessionId()
+        {
+            _sessionWallet = new EOAWallet();
+            _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+            _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
+        }
+
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();

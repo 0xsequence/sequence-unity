@@ -127,6 +127,12 @@ namespace Sequence.EmbeddedWallet
             IntentResponseSessionClosed result = await SendIntent<IntentResponseSessionClosed, IntentDataCloseSession>(
                 new IntentDataCloseSession(dropSessionId),
                 IntentType.CloseSession);
+
+            if (dropSessionId == SessionId)
+            {
+                SequenceLogin.GetInstance().ResetSessionId();
+            }
+            
             return result != null;
         }
 
