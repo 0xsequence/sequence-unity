@@ -19,12 +19,6 @@ namespace Sequence.Config
         public string DiscordClientIdIOS;
         public string FacebookClientIdIOS;
         public string AppleClientIdIOS;
-        
-        [Header("Social Sign In Configuration - Android")]
-        public string GoogleClientIdAndroid;
-        public string DiscordClientIdAndroid;
-        public string FacebookClientIAndroid;
-        public string AppleClientIdAndroid;
 
         [Header("WaaS Configuration")]
         public string WaaSConfigKey;
