@@ -97,7 +97,8 @@ namespace Sequence
         { Chain.TestnetAPEChain.GetChainId(), "apechain-testnet" },
         { Chain.TestnetBlastSepolia.GetChainId(), "blast-sepolia" },
         { Chain.TestnetBorne.GetChainId(), "borne-testnet" },
-        { Chain.TestnetSkaleNebulaGamingHub.GetChainId(), "skale-nebula-testnet" }
+        { Chain.TestnetSkaleNebulaGamingHub.GetChainId(), "skale-nebula-testnet" },
+        { Chain.TestnetSoneiumMinato.GetChainId(), "soneium-minato" }
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
