@@ -34,7 +34,7 @@ namespace Sequence.EmbeddedWallet
         public event Action<string> OnSignMessageComplete;
         public event Action<string> OnSignMessageFailed;
 
-        public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
+        public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30, Action<string> onSuccess = null, Action<string> onFail = null)
         {
             byte[] byteChain = Encoding.UTF8.GetBytes(network.GetChainId());
             byte[] byteMessage = Encoding.UTF8.GetBytes(message);
@@ -43,12 +43,20 @@ namespace Sequence.EmbeddedWallet
             {
                 var signature = await _wallet.SignMessage(byteMessage, byteChain);
                 OnSignMessageComplete?.Invoke(signature);
+                if (onSuccess != null)
+                {
+                    onSuccess(signature);
+                }
                 return signature;
 
             }
             catch (Exception e)
             {
                 OnSignMessageFailed?.Invoke("Error signing message: "+ e.Message);
+                if (onFail != null)
+                {
+                    onFail(e.Message);
+                }
                 return e.Message;
             }
         }

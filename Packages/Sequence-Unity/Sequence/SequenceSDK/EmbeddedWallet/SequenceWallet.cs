@@ -40,7 +40,7 @@ namespace Sequence.EmbeddedWallet
         public event Action<string> OnSignMessageComplete;
         public event Action<string> OnSignMessageFailed;
 
-        public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
+        public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30, Action<string> onSuccess = null, Action<string> onFail = null)
         {
             try
             {
@@ -55,12 +55,20 @@ namespace Sequence.EmbeddedWallet
                 else
                 {
                     OnSignMessageComplete?.Invoke(signature);
+                    if (onSuccess != null)
+                    {
+                        onSuccess(signature);
+                    }
                     return signature;
                 }
             }
             catch (Exception e)
             {
                 OnSignMessageFailed?.Invoke(e.Message);
+                if (onFail != null)
+                {
+                    onFail(e.Message);
+                }
                 return e.Message;
             }
         }

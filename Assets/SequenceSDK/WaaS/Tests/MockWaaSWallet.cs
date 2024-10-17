@@ -17,8 +17,8 @@ namespace Sequence.EmbeddedWallet
         public event Action<string> OnSignMessageComplete;
         public event Action<string> OnSignMessageFailed;
 
-
-        public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
+        public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30, Action<string> onSuccess = null,
+            Action<string> onFail = null)
         {
             throw new NotImplementedException();
         }

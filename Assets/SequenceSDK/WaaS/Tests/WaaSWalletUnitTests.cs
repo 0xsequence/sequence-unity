@@ -97,6 +97,57 @@ namespace Sequence.EmbeddedWallet.Tests
             
             Assert.IsTrue(successEventHit);
         }
+        
+        [Test]
+        public async Task TestSignMessageFailEvent()
+        {
+            IIntentSender intentSender = new MockIntentSender(new Exception("something bad happened"));
+            SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
+            
+            bool failEventHit = false;
+            wallet.OnSignMessageFailed += (result)=>
+            {
+                failEventHit = true;
+            };
+            
+            await wallet.SignMessage(Chain.None, "");
+            
+            Assert.IsTrue(failEventHit);
+        }
+        
+        [Test]
+        public async Task TestSignMessageCustomSuccessEvent()
+        {
+            IIntentSender intentSender = new MockIntentSender(new IntentResponseSignedMessage("","0x"));
+            SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            Action<string> onSuccess= (result)=>
+            {
+                successEventHit = true;
+            };
+            
+            await wallet.SignMessage(Chain.None, "", onSuccess: onSuccess);
+            
+            Assert.IsTrue(successEventHit);
+        }
+        
+        [Test]
+        public async Task TestSignMessageCustomFailEvent()
+        {
+            IIntentSender intentSender = new MockIntentSender(new Exception("Something bad happened"));
+            SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
+            
+            bool failEventHit = false;
+            Action<string> onFail= (result)=>
+            {
+                failEventHit = true;
+            };
+            
+            await wallet.SignMessage(Chain.None, "", onFail: onFail);
+            
+            Assert.IsTrue(failEventHit);
+        }
 
         [Test]
         public async Task TestDeployContractSuccessEvent()

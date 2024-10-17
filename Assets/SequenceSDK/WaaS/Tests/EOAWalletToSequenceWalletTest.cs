@@ -56,7 +56,7 @@ namespace Sequence.WaaS.Tests
         {
             successfullSignatureCounter = 0;
             failedSignatureCounter = 0;
-            var signature = await adapter.SignMessage(chain, "TestSingature");
+            var signature = await adapter.SignMessage(chain, "TestSignature");
             Assert.AreEqual(1, successfullSignatureCounter);
             Assert.Zero(failedSignatureCounter);
             Assert.IsNotNull(signature);
@@ -71,6 +71,7 @@ namespace Sequence.WaaS.Tests
         {
             failedSignatureCounter++;
         }
+        
         [Test]
         public async Task TestSendTransactionT()
         {

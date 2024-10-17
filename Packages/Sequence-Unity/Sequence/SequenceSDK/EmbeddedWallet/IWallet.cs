@@ -18,8 +18,11 @@ namespace Sequence.EmbeddedWallet
         /// <param name="network"></param>
         /// <param name="message"></param>
         /// <param name="timeBeforeExpiry"></param>
+        /// <param name="onSuccess"></param>
+        /// <param name="onFail"></param>
         /// <returns></returns>
-        public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30);
+        public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30,
+            Action<string> onSuccess = null, Action<string> onFail = null);
 
         /// <summary>
         /// Determine if the specified message and signature are validly signed for the given network by this wallet
