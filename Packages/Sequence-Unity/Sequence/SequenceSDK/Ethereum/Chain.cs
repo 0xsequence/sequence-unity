@@ -34,6 +34,9 @@ namespace Sequence
         TestnetB3Sepolia = 1993,
         TestnetAPEChain = 33111,
         TestnetBlastSepolia = 168587773,
+        TestnetBorne = 94984,
+        TestnetSkaleNebulaGamingHub = 37084624,
+        TestnetSoneiumMinato = 1946,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
