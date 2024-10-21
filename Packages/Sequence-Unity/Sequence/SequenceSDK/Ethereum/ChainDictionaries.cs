@@ -20,6 +20,8 @@ namespace Sequence
             { Chain.Xai, "Xai" },
             { Chain.AstarZKEvm, "Astar zkEVM" },
             { Chain.Blast, "Blast" },
+            { Chain.B3, "B3" },
+            { Chain.APEChain, "APE Chain" },
             
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -57,6 +59,8 @@ namespace Sequence
             { Chain.AstarZKEvm, "ETH" },
             { Chain.Xai, "XAI" },
             { Chain.Blast, "ETH" },
+            { Chain.B3, "ETH" },
+            { Chain.APEChain, "APE" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -94,6 +98,8 @@ namespace Sequence
             { Chain.AstarZKEvm, "https://astar-zkevm.explorer.startale.com/" },
             { Chain.Xai, "https://explorer.xai-chain.net/" }, 
             { Chain.Blast, "https://blastscan.io/" },
+            { Chain.B3, "https://explorer.b3.fun/" },
+            { Chain.APEChain, "https://apescan.io/" },
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -112,7 +118,7 @@ namespace Sequence
             { Chain.TestnetBorne, "https://subnets-test.avax.network/bornegfdn" },
             { Chain.TestnetSkaleNebulaGamingHub, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
             { Chain.TestnetSoneiumMinato, "https://explorer-testnet.soneium.org/" },
-            { Chain.TestnetToy, "" } // Not found
+            { Chain.TestnetToy, "https://toy-chain-testnet.explorer.caldera.xyz/" }
         };
         
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -133,6 +139,8 @@ namespace Sequence
             { Chain.AstarZKEvm, "3776" },
             { Chain.Xai, "660279" },
             { Chain.Blast, "81457" },
+            { Chain.B3, "8333" },
+            { Chain.APEChain, "33139" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -170,6 +178,8 @@ namespace Sequence
             { "3776", Chain.AstarZKEvm },
             { "660279", Chain.Xai },
             { "81457", Chain.Blast },
+            { "8333", Chain.B3 },
+            { "33139", Chain.APEChain },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -207,6 +217,8 @@ namespace Sequence
             { Chain.AstarZKEvm, "astar-zkevm" },
             { Chain.Xai, "xai" },
             { Chain.Blast, "blast" },
+            { Chain.B3, "b3" },
+            { Chain.APEChain, "apechain" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },

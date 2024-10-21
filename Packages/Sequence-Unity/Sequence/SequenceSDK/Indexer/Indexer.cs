@@ -81,6 +81,8 @@ namespace Sequence
         { Chain.AstarZKEvm.GetChainId(), "astar-zkevm" },
         { Chain.Xai.GetChainId(), "xai" },
         { Chain.Blast.GetChainId(), "blast" },
+        { Chain.B3.GetChainId(), "b3" },
+        { Chain.APEChain.GetChainId(), "apechain" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
