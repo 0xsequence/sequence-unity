@@ -89,7 +89,12 @@ namespace Sequence.Integrations.Sardine
         private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, Address recipient, BigInteger quantity, string callData)
         {
             string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetNFTCheckoutToken";
-            string priceSymbol = await new ERC20(order.order.priceCurrencyAddress).Symbol(new SequenceEthClient(_chain));
+            string priceSymbol = ChainDictionaries.GasCurrencyOf[_chain];
+            string currencyAddress = order.order.priceCurrencyAddress;
+            if (!currencyAddress.IsZeroAddress())
+            {
+                priceSymbol = await new ERC20(order.order.priceCurrencyAddress).Symbol(new SequenceEthClient(_chain));
+            }
             GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
                 new PaymentMethodTypeConfig(EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(),
                     PaymentMethod.us_debit),
