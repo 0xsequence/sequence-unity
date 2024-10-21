@@ -17,7 +17,7 @@ namespace Sequence.Ethereum.Tests
     public class SequenceEthClientTests
     {
         static readonly string testnetUrl = "http://localhost:8545/";
-        static readonly string publicPolygonRpc = "https://polygon-bor.publicnode.com";
+        static readonly string publicPolygonRpc = "https://polygon-rpc.com/";
         private static string[] urls = new string[] { testnetUrl, publicPolygonRpc };
         float blockTimeInSeconds = 2f;
         IRpcClient failingClient = new FailingRpcClient();
