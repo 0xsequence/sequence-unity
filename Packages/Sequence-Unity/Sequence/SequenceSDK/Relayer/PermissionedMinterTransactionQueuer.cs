@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Sequence.Relayer
 {
-    public class PermissionedMinterTransactionQueuer : TransactionQueuer<PermissionedMintTransaction, PermissionedMinterQueueSubmissionResult>
+    public class PermissionedMinterTransactionQueuer : TransactionQueuer<(PermissionedMintTransaction, IMinter), PermissionedMinterQueueSubmissionResult>
     {
         private IMinter _minter;
         
@@ -30,13 +30,18 @@ namespace Sequence.Relayer
             _minter.OnMintTokenFailed -= HandleMintTokenFailed;
         }
 
-        public override void Enqueue(PermissionedMintTransaction transaction)
+        public void Enqueue(PermissionedMintTransaction transaction, IMinter minter = null)
         {
             if (AttemptToUpdateTransaction(transaction))
             {
                 return;
             }
-            base.Enqueue(transaction);
+
+            if (minter == null)
+            {
+                minter = _minter;
+            }
+            base.Enqueue((transaction, minter));
         }
         
         private bool AttemptToUpdateTransaction(PermissionedMintTransaction transaction)
@@ -44,9 +49,9 @@ namespace Sequence.Relayer
             int transactions = _queue.Count;
             for (int i = 0; i < transactions; i++)
             {
-                if (_queue[i].TokenId == transaction.TokenId)
+                if (_queue[i].Item1.TokenId == transaction.TokenId)
                 {
-                    _queue[i].Amount += transaction.Amount;
+                    _queue[i].Item1.Amount += transaction.Amount;
                     _lastTransactionAddedTime = Time.time;
                     return true;
                 }
@@ -62,8 +67,9 @@ namespace Sequence.Relayer
             List<string> transactionHashes = new List<string>();
             for (int i = 0; i < transactions; i++)
             {
-                PermissionedMintTransaction transaction = _queue[i];
-                string transactionHash = await _minter.MintToken(transaction.TokenId, transaction.Amount);
+                PermissionedMintTransaction transaction = _queue[i].Item1;
+                IMinter minter = _queue[i].Item2;
+                string transactionHash = await minter.MintToken(transaction.TokenId, transaction.Amount);
                 
                 if (string.IsNullOrEmpty(transactionHash) || transactionHash.Contains('{'))
                 {
