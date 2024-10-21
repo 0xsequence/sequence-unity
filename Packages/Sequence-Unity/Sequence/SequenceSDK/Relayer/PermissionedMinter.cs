@@ -16,9 +16,9 @@ namespace Sequence.Relayer
     {
         private string _mintEndpoint;
         
-        private MintingRequestProver _mintingRequestProver;
+        protected MintingRequestProver _mintingRequestProver;
 
-        private Address _contractAddress;
+        protected Address _contractAddress;
         
         public PermissionedMinter(MintingRequestProver mintingRequestProver, string mintEndpoint, string contractAddress)
         {
@@ -30,7 +30,7 @@ namespace Sequence.Relayer
         public event Action<string> OnMintTokenSuccess;
         public event Action<string> OnMintTokenFailed;
 
-        public async Task<string> BuildMintTokenRequestJson(string tokenId, uint amount = 1)
+        public virtual async Task<string> BuildMintTokenRequestJson(string tokenId, uint amount = 1)
         {
             MintingRequestProof requestProof =
                 await _mintingRequestProver.GenerateProof(_contractAddress, tokenId, amount);

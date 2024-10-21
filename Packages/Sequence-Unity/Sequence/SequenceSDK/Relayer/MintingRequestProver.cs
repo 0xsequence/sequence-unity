@@ -24,7 +24,17 @@ namespace Sequence.Relayer
             _proofSigner = new SequenceWalletProofSigner(wallet, _chain);
         }
 
-        public async Task<MintingRequestProof> GenerateProof(string contractAddress, string tokenId, uint amount)
+        public Task<MintingRequestProof> GenerateProof(string contractAddress, string tokenId, uint amount)
+        {
+            return GenerateProof(new MintRequestPayload()
+            {
+                contractAddress = contractAddress,
+                tokenId = tokenId,
+                amount = amount
+            });
+        }
+
+        public async Task<MintingRequestProof> GenerateProof(MintRequestPayload payload)
         {
             ProofPayload proofPayload = new ProofPayload()
             {
@@ -32,12 +42,7 @@ namespace Sequence.Relayer
                 iat = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 exp = (uint)DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 300,
                 ogn = "Sequence Unity SDK",
-                payload = new MintRequestPayload()
-                {
-                    contractAddress = contractAddress,
-                    tokenId = tokenId,
-                    amount = amount
-                }
+                payload = payload
             };
             string proof = JsonConvert.SerializeObject(proofPayload);
             string signedProof = await _proofSigner.SignProof(proof);
