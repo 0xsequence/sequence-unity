@@ -15,7 +15,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _marketplaceTilePrefab;
         [SerializeField] private int _numberOfMarketplaceTilesToInstantiate = 10;
         [SerializeField] private Transform _scrollviewContentParent;
-        [SerializeField] private Chain _chain = Chain.ArbitrumNova;
+        [SerializeField] private Chain _chain = Chain.Polygon;
         [SerializeField] private TextMeshProUGUI _errorText;
 
         private ObjectPool _marketplaceTilePool;
@@ -67,7 +67,7 @@ namespace Sequence.Demo
             ListCollectiblesReturn result = await _collectibles.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
             if (result == null || result.collectibles == null || result.collectibles.Length == 0)
             {
-                _errorText.text = "No orders founds for collection";
+                _errorText.text = "No orders founds for collection" + result.ToString();
                 return;
             }
             

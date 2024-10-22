@@ -23,5 +23,20 @@ namespace Sequence
         {
             return ChainDictionaries.ChainIdOf[chain];
         }
+
     }
+
+    public static class ChainTokenAddress
+    {
+        public static string Get(Chain chain)
+        {
+            return ChainDictionaries.ChainTokenAddressOf[chain];
+        }
+        public static string Get(int chainId)
+        {
+            return Get((Chain)chainId);
+        }
+    }
+    
+
 }

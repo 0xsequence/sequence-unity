@@ -50,6 +50,9 @@ namespace Sequence.Marketplace
             string headersString = ExtractHeaders(request);
             string method = request.method;
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
+
+            UnityEngine.Debug.Log(curlRequest);
+
             try
             {
                 await request.SendWebRequest();
