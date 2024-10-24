@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -19,7 +20,7 @@ namespace Sequence.EmbeddedWallet
             this.func = func;
         }
     }
-    
+
     public class DelayedEncodeDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
@@ -36,21 +37,52 @@ namespace Sequence.EmbeddedWallet
 
             JArray argsArray = jsonObject["args"].ToObject<JArray>();
             object[] args = argsArray.ToObject<object[]>(serializer);
-            DelayedEncodeData delayedEncodeData = new DelayedEncodeData(abi, args, func);
-
-            return delayedEncodeData;
+            return new DelayedEncodeData(abi, args, func);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             DelayedEncodeData delayedEncodeData = (DelayedEncodeData)value;
 
-            JObject jsonObject = new JObject();
-            jsonObject.Add("abi", JToken.FromObject(delayedEncodeData.abi));
-            jsonObject.Add("args", JArray.FromObject(delayedEncodeData.args, serializer));
-            jsonObject.Add("func", JToken.FromObject(delayedEncodeData.func));
+            JObject jsonObject = new JObject
+            {
+                { "abi", JToken.FromObject(delayedEncodeData.abi) },
+                { "args", SerializeArgsWithSortedFields(delayedEncodeData.args, serializer) },
+                { "func", JToken.FromObject(delayedEncodeData.func) }
+            };
 
             jsonObject.WriteTo(writer);
+        }
+
+        private JArray SerializeArgsWithSortedFields(object[] args, JsonSerializer serializer)
+        {
+            JArray sortedArgsArray = new JArray();
+
+            foreach (var arg in args)
+            {
+                JToken serializedArg = SerializeAlphabetically(arg, serializer);
+                sortedArgsArray.Add(serializedArg);
+            }
+
+            return sortedArgsArray;
+        }
+
+        private JToken SerializeAlphabetically(object arg, JsonSerializer serializer)
+        {
+            try
+            {
+                JObject jsonArg = JObject.FromObject(arg, serializer);
+                
+                JObject sortedJsonArg = new JObject(
+                    jsonArg.Properties().OrderBy(p => p.Name)
+                );
+
+                return sortedJsonArg;
+            }
+            catch (Exception)
+            {
+                return JToken.FromObject(arg, serializer);
+            }
         }
     }
 }
