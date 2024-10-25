@@ -71,21 +71,18 @@ namespace Sequence.EmbeddedWallet
 
         private JToken SerializeAlphabetically(object arg, JsonSerializer serializer)
         {
-            // Convert the input object to a JToken.
             JToken token = JToken.FromObject(arg, serializer);
 
-            // Handle arrays recursively.
             if (token.Type == JTokenType.Array)
             {
                 JArray array = new JArray();
                 foreach (var element in token.Children())
                 {
-                    array.Add(SerializeAlphabetically(element, serializer)); // Recursively process each element.
+                    array.Add(SerializeAlphabetically(element, serializer));
                 }
                 return array;
             }
 
-            // Handle objects recursively and sort properties by name.
             if (token.Type == JTokenType.Object)
             {
                 JObject jsonObject = (JObject)token;
@@ -93,12 +90,11 @@ namespace Sequence.EmbeddedWallet
                     jsonObject.Properties()
                         .OrderBy(p => p.Name)
                         .Select(p => new JProperty(
-                            p.Name, SerializeAlphabetically(p.Value, serializer))) // Recursively process each property value.
+                            p.Name, SerializeAlphabetically(p.Value, serializer))) 
                 );
                 return sortedObject;
             }
 
-            // Return the token as-is for primitive types.
             return token;
         }
 
