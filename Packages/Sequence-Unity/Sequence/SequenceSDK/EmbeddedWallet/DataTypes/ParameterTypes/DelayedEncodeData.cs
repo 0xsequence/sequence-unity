@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -69,20 +71,32 @@ namespace Sequence.EmbeddedWallet
 
         private JToken SerializeAlphabetically(object arg, JsonSerializer serializer)
         {
-            try
-            {
-                JObject jsonArg = JObject.FromObject(arg, serializer);
-                
-                JObject sortedJsonArg = new JObject(
-                    jsonArg.Properties().OrderBy(p => p.Name)
-                );
+            JToken token = JToken.FromObject(arg, serializer);
 
-                return sortedJsonArg;
-            }
-            catch (Exception)
+            if (token.Type == JTokenType.Array)
             {
-                return JToken.FromObject(arg, serializer);
+                JArray array = new JArray();
+                foreach (var element in token.Children())
+                {
+                    array.Add(SerializeAlphabetically(element, serializer));
+                }
+                return array;
             }
+
+            if (token.Type == JTokenType.Object)
+            {
+                JObject jsonObject = (JObject)token;
+                JObject sortedObject = new JObject(
+                    jsonObject.Properties()
+                        .OrderBy(p => p.Name)
+                        .Select(p => new JProperty(
+                            p.Name, SerializeAlphabetically(p.Value, serializer))) 
+                );
+                return sortedObject;
+            }
+
+            return token;
         }
+
     }
 }
