@@ -1,4 +1,6 @@
 using System;
+using NUnit.Framework;
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -75,7 +77,8 @@ namespace Sequence.Config
         public bool StoreSessionKey()
         {
 #if UNITY_EDITOR
-            return EditorStoreSessionPrivateKeyInSecureStorage;
+            return EditorStoreSessionPrivateKeyInSecureStorage &&
+                   TestContext.CurrentTestExecutionContext?.ExecutionStatus != TestExecutionStatus.Running;
 #else
             return StoreSessionPrivateKeyInSecureStorage;
 #endif
