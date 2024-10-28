@@ -10,15 +10,16 @@ namespace Sequence.EmbeddedWallet
     public class SuccessfulTransactionReturn : TransactionReturn
     {
         public const string IdentifyingCode = "transactionReceipt";
-        public string txHash { get; private set; }
-        public string metaTxHash { get; private set; }
-        public IntentPayload request { get; private set; }
-        public MetaTxnReceipt receipt { get; private set; }
+        public string txHash;
+        public string metaTxHash;
+        public IntentPayload request;
+        public MetaTxnReceipt receipt;
 
         [Obsolete("nativeReceipt is deprecated. Please use nativeTransactionReceipt instead.")]
-        public JObject nativeReceipt { get; private set; }
-        public TransactionReceipt nativeTransactionReceipt { get; private set; }
-        public SimulateResult[] simulations { get; private set; }
+        public JObject nativeReceipt;
+
+        public TransactionReceipt nativeTransactionReceipt;
+        public SimulateResult[] simulations;
 
         public SuccessfulTransactionReturn() { }
 

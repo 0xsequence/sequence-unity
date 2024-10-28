@@ -7,9 +7,9 @@ namespace Sequence.EmbeddedWallet
     public class FailedTransactionReturn : TransactionReturn
     {
         public const string IdentifyingCode = "transactionFailed";
-        public string error { get; private set; }
-        public IntentPayload request { get; private set; }
-        public SimulateResult[] simulations { get; private set; }
+        public string error;
+        public IntentPayload request;
+        public SimulateResult[] simulations;
 
         [JsonConstructor]
         public FailedTransactionReturn(string error, IntentPayload request, SimulateResult[] simulations)
@@ -33,9 +33,9 @@ namespace Sequence.EmbeddedWallet
 
     public class FailedBatchTransactionReturn : FailedTransactionReturn
     {
-        public SuccessfulTransactionReturn[] SuccessfulTransactionReturns { get; private set; }
+        public SuccessfulTransactionReturn[] SuccessfulTransactionReturns;
 
-        public FailedTransactionReturn[] FailedTransactionReturns { get; private set; }
+        public FailedTransactionReturn[] FailedTransactionReturns;
 
         public FailedBatchTransactionReturn(SuccessfulTransactionReturn[] successfullTransactionReturns, FailedTransactionReturn[] failedTransactionReturns)
         {

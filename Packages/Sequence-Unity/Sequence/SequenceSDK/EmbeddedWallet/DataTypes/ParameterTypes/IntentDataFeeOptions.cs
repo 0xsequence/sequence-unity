@@ -5,10 +5,10 @@ namespace Sequence.EmbeddedWallet
 {
     public class IntentDataFeeOptions
     {
-        public string identifier { get; private set; }
-        public string network { get; private set; }
-        public Transaction[] transactions { get; private set; }
-        public string wallet { get; private set; }
+        public string identifier;
+        public string network;
+        public Transaction[] transactions;
+        public string wallet;
         
         [JsonConstructor]
         public IntentDataFeeOptions(string identifier, string network, Transaction[] transactions, string wallet)
