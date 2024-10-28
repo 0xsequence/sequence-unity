@@ -5,8 +5,8 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class FeeOptionsResponse
     {
-        public FeeOptionReturn[] FeeOptions { get; private set; }
-        public string FeeQuote { get; private set; }
+        public FeeOptionReturn[] FeeOptions;
+        public string FeeQuote;
 
         public FeeOptionsResponse(FeeOptionReturn[] feeOptions, string feeQuote)
         {

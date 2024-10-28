@@ -5,9 +5,9 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentDataGetIdToken
     {
-        public string sessionId { get; private set; }
-        public string wallet { get; private set; }
-        public string nonce { get; private set; } 
+        public string sessionId;
+        public string wallet;
+        public string nonce;
 
         public IntentDataGetIdToken(string sessionId, string walletAddress, string nonce = null)
         {
