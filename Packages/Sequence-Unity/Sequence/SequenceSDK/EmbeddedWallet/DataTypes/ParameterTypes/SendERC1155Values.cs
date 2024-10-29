@@ -5,8 +5,8 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class SendERC1155Values
     {
-        public string amount { get; private set; }
-        public string id { get; private set; }
+        public string amount;
+        public string id;
 
         public SendERC1155Values(string id, string amount)
         {
