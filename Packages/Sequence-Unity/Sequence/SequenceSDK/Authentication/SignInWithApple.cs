@@ -11,8 +11,8 @@ namespace Sequence.Authentication
     public class SignInWithApple : MonoBehaviour
     {
         IAppleAuthManager m_AppleAuthManager;
-        public string Token { get; private set; }
-        public string Error { get; private set; }
+        public string Token;
+        public string Error;
 
         private void Initialize()
         {

@@ -5,8 +5,8 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentResponseGetIdToken
     {
-        public string IdToken { get; private set; }
-        public int ExpiresIn { get; private set; }
+        public string IdToken;
+        public int ExpiresIn;
 
         public IntentResponseGetIdToken(string idToken, int expiresIn)
         {

@@ -5,14 +5,14 @@ namespace Sequence.EmbeddedWallet
 {
     public class FeeToken
     {
-        public uint chainId { get; private set; }
-        public string contractAddress { get; private set; }
-        public uint decimals { get; private set; }
-        public string logoURL { get; private set; }
-        public string name { get; private set; }
-        public string symbol { get; private set; }
-        public string tokenID { get; private set; }
-        public FeeTokenType type { get; private set; }
+        public uint chainId;
+        public string contractAddress;
+        public uint decimals;
+        public string logoURL;
+        public string name;
+        public string symbol;
+        public string tokenID;
+        public FeeTokenType type;
 
         [JsonConstructor]
         public FeeToken(uint chainId, string contractAddress, uint decimals, string logoURL, string name, string symbol, string tokenID, FeeTokenType type)

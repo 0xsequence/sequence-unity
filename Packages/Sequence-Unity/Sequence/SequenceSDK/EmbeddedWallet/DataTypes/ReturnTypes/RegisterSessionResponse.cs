@@ -2,8 +2,8 @@ namespace Sequence.EmbeddedWallet
 {
     public class RegisterSessionResponse
     {
-        public Session session { get; private set; }
-        public Response<IntentResponseSessionOpened> response { get; private set; }
+        public Session session;
+        public Response<IntentResponseSessionOpened> response;
         
         public RegisterSessionResponse(Session session, Response<IntentResponseSessionOpened> response)
         {
