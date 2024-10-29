@@ -414,8 +414,13 @@ namespace Sequence.ABI
                     {
                         return (T)(object)value.HexStringToInt();
                     }
+                    
+                    if (typeof(T) == typeof(uint))
+                    {
+                        return (T)(object)(uint)value.HexStringToBigInteger();
+                    }
 
-                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString());
+                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString(), typeof(uint).ToString());
                     break;
                 case ABIType.BOOLEAN:
                     if (typeof(T) != typeof(bool))
