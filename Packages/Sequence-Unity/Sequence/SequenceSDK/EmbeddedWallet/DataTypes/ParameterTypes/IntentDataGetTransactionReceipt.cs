@@ -6,9 +6,9 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentDataGetTransactionReceipt
     {
-        public string metaTxHash { get; private set; }
-        public string network { get; private set; }
-        public string wallet { get; private set; }
+        public string metaTxHash;
+        public string network;
+        public string wallet;
 
         public IntentDataGetTransactionReceipt(string metaTxHash, string network, string wallet)
         {

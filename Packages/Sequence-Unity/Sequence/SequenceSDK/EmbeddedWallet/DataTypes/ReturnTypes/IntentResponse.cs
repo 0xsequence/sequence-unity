@@ -6,18 +6,19 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentResponse<T>
     {
-        public Response<T> response { get; private set; }
+        public Response<T> response;
 
         public IntentResponse(Response<T> response)
         {
             this.response = response;
         }
     }
-    
+
+    [Serializable]
     public class Response<T>
     {
-        public string code { get; private set; }
-        public T data { get; private set; }
+        public string code;
+        public T data;
         
         public Response(string code, T data)
         {
