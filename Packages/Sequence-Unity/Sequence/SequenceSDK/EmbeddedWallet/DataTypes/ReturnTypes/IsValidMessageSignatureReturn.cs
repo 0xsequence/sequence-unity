@@ -4,5 +4,12 @@ namespace Sequence.EmbeddedWallet
     public class IsValidMessageSignatureReturn
     {
         public bool isValid;
+        public IsValidMessageSignatureReturn(bool IsValid)
+        {
+             isValid =  IsValid;
+        }
     }
+
+
+
 }

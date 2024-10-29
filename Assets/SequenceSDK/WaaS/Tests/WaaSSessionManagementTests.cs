@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PlayFab;
@@ -13,17 +14,20 @@ namespace Sequence.EmbeddedWallet.Tests
         [Test]
         public async Task SignInAndOutRepeatedly_Guest()
         {
+            List<string> sessionIds = new List<string>();
             try
             {
-                SequenceLogin login = new SequenceLogin();
+                SequenceLogin login = SequenceLogin.GetInstance();
                 await Task.Delay(100);
-                login.OnLoginFailed += (error, method, email, methods) =>
+                ILogin.OnLoginFailedHandler onFailedLogin = (error, method, email, methods) =>
                 {
                     Assert.Fail(error);
                 };
                 int repetitions = 0;
-                SequenceWallet.OnWalletCreated += async wallet =>
+                Action<SequenceWallet> onLogin = async wallet =>
                 {
+                    Assert.IsFalse(sessionIds.Contains(wallet.SessionId));
+                    sessionIds.Add(wallet.SessionId);
                     if (repetitions < 3)
                     {
                         try
@@ -38,12 +42,18 @@ namespace Sequence.EmbeddedWallet.Tests
                         }
                     }
                 };
+                login.OnLoginFailed += onFailedLogin;
+                SequenceWallet.OnWalletCreated += onLogin;
+                
                 await login.ConnectToWaaSAsGuest();
 
                 while (repetitions < 3)
                 {
                     await Task.Yield();
                 }
+                
+                login.OnLoginFailed -= onFailedLogin;
+                SequenceWallet.OnWalletCreated -= onLogin;
             }
             catch (System.Exception e)
             {
@@ -61,7 +71,7 @@ namespace Sequence.EmbeddedWallet.Tests
                 PlayFabSettings.staticSettings.TitleId = titleId;
             }
             
-            SequenceLogin login = new SequenceLogin();
+            SequenceLogin login = SequenceLogin.GetInstance();
             await Task.Delay(100);
             login.OnLoginFailed += (error, method, email, methods) =>
             {
@@ -155,6 +165,50 @@ namespace Sequence.EmbeddedWallet.Tests
                 tcs.TrySetException(new Exception(error));
             });
             
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task GetIdTokenTest()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            
+            var login = SequenceLogin.GetInstance();
+
+            login.OnLoginFailed += (error, method, email, methods) =>
+            {
+                string errorMessage = "Login failed: " + error;
+                tcs.TrySetException(new Exception(errorMessage));
+
+                Assert.Fail(errorMessage);
+            };
+
+            SequenceWallet.OnWalletCreated += async wallet =>
+            {
+                try
+                {
+                    wallet.OnIdTokenRetrieved += (idToken) =>
+                    {
+                        Assert.IsNotNull(idToken);
+                        Assert.IsFalse(string.IsNullOrWhiteSpace(idToken.IdToken));
+                        tcs.TrySetResult(true);
+                    };
+
+                    wallet.OnFailedToRetrieveIdToken += (error) =>
+                    {
+                        tcs.TrySetException(new Exception(error));
+                        Assert.Fail(error);
+                    };
+
+                    await wallet.GetIdToken();
+                }
+                catch (Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            };
+            login.GuestLogin();
             await tcs.Task;
         }
     }

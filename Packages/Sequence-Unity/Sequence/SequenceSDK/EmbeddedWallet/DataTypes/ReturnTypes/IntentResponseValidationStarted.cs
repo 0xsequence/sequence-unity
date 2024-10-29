@@ -5,7 +5,7 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentResponseValidationStarted
     {
-        public string salt { get; private set; }
+        public string salt;
         
         public IntentResponseValidationStarted(string salt)
         {

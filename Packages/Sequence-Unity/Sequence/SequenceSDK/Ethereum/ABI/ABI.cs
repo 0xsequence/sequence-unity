@@ -56,6 +56,11 @@ namespace Sequence.ABI
 
         public static ABIType GetTypeFromEvmName(string typeName)
         {
+            if (typeName.EndsWith("[]"))
+            {
+                return ABIType.DYNAMICARRAY;
+            }
+            
             if (typeName.StartsWith("("))
             {
                 return ABIType.TUPLE;
@@ -66,10 +71,6 @@ namespace Sequence.ABI
                 return ABIType.FIXEDARRAY;
             }
 
-            if (typeName.EndsWith("[]"))
-            {
-                return ABIType.DYNAMICARRAY;
-            }
 
             if (typeName.StartsWith("bytes"))
             {
@@ -208,6 +209,28 @@ namespace Sequence.ABI
             {
                 JObject item = array[i] as JObject;
                 result[i] = item["type"].ToString();
+                if (result[i].Contains("tuple"))
+                {
+                    StringBuilder tupleType = new StringBuilder();
+                    tupleType.Append("(");
+                    JArray components = item["components"] as JArray;
+                    int componentsLength = components.Count;
+                    for (int j = 0; j < componentsLength; j++)
+                    {
+                        JObject component = components[j] as JObject;
+                        tupleType.Append(component["type"].ToString());
+                        if (j < componentsLength - 1)
+                        {
+                            tupleType.Append(",");
+                        }
+                    }
+                    tupleType.Append(")");
+                    if (result[i].EndsWith("[]"))
+                    {
+                        tupleType.Append("[]");
+                    }
+                    result[i] = tupleType.ToString();
+                }
             }
 
             return result;
@@ -391,8 +414,13 @@ namespace Sequence.ABI
                     {
                         return (T)(object)value.HexStringToInt();
                     }
+                    
+                    if (typeof(T) == typeof(uint))
+                    {
+                        return (T)(object)(uint)value.HexStringToBigInteger();
+                    }
 
-                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString());
+                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString(), typeof(uint).ToString());
                     break;
                 case ABIType.BOOLEAN:
                     if (typeof(T) != typeof(bool))
@@ -717,14 +745,39 @@ namespace Sequence.ABI
                 throw new ArgumentException("Invalid method use. Expects a tuple evm type");
             }
 
-            string withoutParenthesis = evmType.Substring(1, evmType.Length - 2);
-            withoutParenthesis = withoutParenthesis.Replace(" ", "");
-            if (withoutParenthesis == "")
+            string withoutParenthesis = evmType.Substring(1, evmType.Length - 2).Replace(" ", "");
+
+            if (string.IsNullOrEmpty(withoutParenthesis))
             {
-                return new string[] { };
+                return Array.Empty<string>();
             }
-            string[] types = withoutParenthesis.Split(",");
-            return types;
+
+            List<string> types = new List<string>();
+            int start = 0;
+            int nestedLevel = 0;
+
+            for (int i = 0; i < withoutParenthesis.Length; i++)
+            {
+                char currentChar = withoutParenthesis[i];
+
+                if (currentChar == '(')
+                {
+                    nestedLevel++;
+                }
+                else if (currentChar == ')')
+                {
+                    nestedLevel--;
+                }
+                else if (currentChar == ',' && nestedLevel == 0)
+                {
+                    types.Add(withoutParenthesis.Substring(start, i - start));
+                    start = i + 1;
+                }
+            }
+
+            types.Add(withoutParenthesis.Substring(start));
+
+            return types.ToArray();
         }
 
         private static object[] ConvertToObjectArray<T>(this T value)

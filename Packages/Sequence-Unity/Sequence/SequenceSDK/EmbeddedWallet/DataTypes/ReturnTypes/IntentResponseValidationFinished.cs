@@ -2,7 +2,7 @@ namespace Sequence.EmbeddedWallet
 {
     public class IntentResponseValidationFinished
     {
-        public bool isValid { get; private set; }
+        public bool isValid;
         
         public IntentResponseValidationFinished(bool isValid)
         {

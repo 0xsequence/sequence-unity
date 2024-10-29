@@ -5,8 +5,8 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class FeeOptionReturn
     {
-        public FeeOption FeeOption { get; private set; }
-        public bool InWallet { get; private set; }
+        public FeeOption FeeOption;
+        public bool InWallet;
 
         public FeeOptionReturn(FeeOption feeOption, bool inWallet)
         {

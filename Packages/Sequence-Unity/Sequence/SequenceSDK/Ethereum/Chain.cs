@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 
 namespace Sequence
 {
@@ -16,10 +17,13 @@ namespace Sequence
         Gnosis = 100,
         Base = 8453,
         OasysHomeverse = 19011,
+        [Obsolete("Chain is no longer active; use TestnetSoneiumMinato instead")]
         AstarZKEvm = 3776,
         Xai = 660279,
         Blast = 81457,
-        
+        B3 = 8333,
+        APEChain = 33139,
+
         // Testnets
         TestnetSepolia = 11155111,
         TestnetPolygonAmoy = 80002,
@@ -29,11 +33,16 @@ namespace Sequence
         TestnetAvalanche = 43113,
         TestnetOasysHomeverse = 40875,
         TestnetOptimisticSepolia = 11155420,
+        [Obsolete("Chain is no longer active; use TestnetSoneiumMinato instead")]
         TestnetAstarZKyoto = 6038361,
         TestnetXrSepolia = 2730,
         TestnetB3Sepolia = 1993,
         TestnetAPEChain = 33111,
         TestnetBlastSepolia = 168587773,
+        TestnetBorne = 94984,
+        TestnetSkaleNebulaGamingHub = 37084624,
+        TestnetSoneiumMinato = 1946,
+        TestnetToy = 21000000,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         

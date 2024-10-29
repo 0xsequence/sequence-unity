@@ -8,12 +8,12 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentPayload
     {
-        public JObject data { get; private set; }
-        public uint expiresAt { get; private set; }
-        public uint issuedAt { get; private set; }
-        public string name { get; private set; }
-        public Signature[] signatures { get; private set; }
-        public string version { get; private set; }
+        public JObject data;
+        public uint expiresAt;
+        public uint issuedAt;
+        public string name;
+        public Signature[] signatures;
+        public string version;
 
         [JsonConstructor]
         public IntentPayload(string version, string name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
@@ -67,6 +67,7 @@ namespace Sequence.EmbeddedWallet
             {IntentType.InitiateAuth, "initiateAuth"},
             {IntentType.FederateAccount, "federateAccount"},
             {IntentType.ListAccounts, "listAccounts"},
+            {IntentType.GetIdToken, "getIdToken"},
         };
     }
 
@@ -86,6 +87,7 @@ namespace Sequence.EmbeddedWallet
         InitiateAuth,
         FederateAccount,
         ListAccounts,
+        GetIdToken,
         None
     }
 }
