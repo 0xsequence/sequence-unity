@@ -1,4 +1,7 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EmbeddedWallet {
+    [Preserve]
     public class Account
     {
         public string email;
