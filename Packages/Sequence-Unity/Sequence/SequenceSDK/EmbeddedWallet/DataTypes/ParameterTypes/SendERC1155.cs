@@ -1,8 +1,10 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class SendERC1155 : Transaction
     {
@@ -21,6 +23,7 @@ namespace Sequence.EmbeddedWallet
             this.data = data;
         }
 
+        [Preserve]
         [JsonConstructor]
         public SendERC1155(string data, string to, string tokenAddress, string type, SendERC1155Values[] vals)
         {

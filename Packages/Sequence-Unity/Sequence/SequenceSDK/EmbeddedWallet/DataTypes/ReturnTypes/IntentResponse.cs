@@ -1,8 +1,10 @@
 using System;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentResponse<T>
     {
@@ -14,6 +16,7 @@ namespace Sequence.EmbeddedWallet
         }
     }
 
+    [Preserve]
     [Serializable]
     public class Response<T>
     {

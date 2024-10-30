@@ -1,9 +1,11 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class IntentDataSendTransaction
     {
@@ -37,6 +39,7 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
+        [Preserve]
         [JsonConstructor]
         public IntentDataSendTransaction(string code, uint expires, uint issued, string network, JObject[] transactions, string transactionsFeeQuote, string wallet)
         {

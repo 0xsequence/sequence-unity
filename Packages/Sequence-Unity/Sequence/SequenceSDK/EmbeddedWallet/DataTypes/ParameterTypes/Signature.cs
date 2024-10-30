@@ -1,5 +1,8 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     public class Signature
     {
         public string sessionId;

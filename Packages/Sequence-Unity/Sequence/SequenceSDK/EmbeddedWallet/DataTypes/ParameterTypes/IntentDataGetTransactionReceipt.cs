@@ -1,8 +1,10 @@
 using System;
 using Sequence;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentDataGetTransactionReceipt
     {

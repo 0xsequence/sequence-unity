@@ -1,5 +1,8 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class IsValidMessageSignatureReturn
     {
@@ -9,7 +12,4 @@ namespace Sequence.EmbeddedWallet
              isValid =  IsValid;
         }
     }
-
-
-
 }

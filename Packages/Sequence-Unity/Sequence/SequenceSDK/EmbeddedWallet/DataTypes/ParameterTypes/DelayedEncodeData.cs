@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     [JsonConverter(typeof(DelayedEncodeDataConverter))]
     public class DelayedEncodeData

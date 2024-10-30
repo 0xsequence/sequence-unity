@@ -1,8 +1,10 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class FailedTransactionReturn : TransactionReturn
     {
@@ -11,6 +13,7 @@ namespace Sequence.EmbeddedWallet
         public IntentPayload request;
         public SimulateResult[] simulations;
 
+        [Preserve]
         [JsonConstructor]
         public FailedTransactionReturn(string error, IntentPayload request, SimulateResult[] simulations)
         {
