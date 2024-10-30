@@ -13,6 +13,7 @@ namespace Sequence.EmbeddedWallet
         public uint gasUsed;
         public uint gasLimit;
 
+        [Preserve]
         public SimulateResult(bool executed, bool succeeded, uint gasUsed, uint gasLimit, string result = null, string reason = null)
         {
             this.executed = executed;

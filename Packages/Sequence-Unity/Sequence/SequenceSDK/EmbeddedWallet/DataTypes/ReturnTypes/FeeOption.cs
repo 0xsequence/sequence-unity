@@ -12,6 +12,7 @@ namespace Sequence.EmbeddedWallet
         public FeeToken token;
         public string value;
 
+        [Preserve]
         public FeeOption(uint gasLimit, string to, FeeToken token, string value)
         {
             this.gasLimit = gasLimit;

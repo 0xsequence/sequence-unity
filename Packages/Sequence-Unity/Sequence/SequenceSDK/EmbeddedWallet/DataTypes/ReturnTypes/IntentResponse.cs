@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
     {
         public Response<T> response;
 
+        [Preserve]
         public IntentResponse(Response<T> response)
         {
             this.response = response;
@@ -23,6 +24,7 @@ namespace Sequence.EmbeddedWallet
         public string code;
         public T data;
         
+        [Preserve]
         public Response(string code, T data)
         {
             this.code = code;

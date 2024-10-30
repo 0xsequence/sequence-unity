@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string sessionId;
         public string wallet;
 
+        [Preserve]
         public IntentDataGetSession(string sessionId, string walletAddress)
         {
             this.sessionId = sessionId;

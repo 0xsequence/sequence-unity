@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
         public FeeOption FeeOption;
         public bool InWallet;
 
+        [Preserve]
         public FeeOptionReturn(FeeOption feeOption, bool inWallet)
         {
             FeeOption = feeOption;

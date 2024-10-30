@@ -17,6 +17,7 @@ namespace Sequence.EmbeddedWallet
         public DateTime refreshedAt;
         public DateTime expiresAt;
 
+        [Preserve]
         public Session(string id, string address, string userId, int projectId, Identity identity, string friendlyName, DateTime createdAt, DateTime refreshedAt, DateTime expiresAt)
         {
             this.id = id;

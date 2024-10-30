@@ -8,6 +8,7 @@ namespace Sequence.EmbeddedWallet
         public IntentPayload intent;
         public string friendlyName;
         
+        [Preserve]
         public RegisterSessionIntent(string friendlyName, IntentPayload intent)
         {
             this.friendlyName = friendlyName;

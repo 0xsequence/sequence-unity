@@ -9,6 +9,7 @@ namespace Sequence.EmbeddedWallet
     {
         public string sessionId;
 
+        [Preserve]
         public IntentDataCloseSession(string sessionId)
         {
             this.sessionId = sessionId;

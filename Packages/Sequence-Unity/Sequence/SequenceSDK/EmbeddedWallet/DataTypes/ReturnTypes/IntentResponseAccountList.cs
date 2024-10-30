@@ -8,6 +8,7 @@ namespace Sequence.EmbeddedWallet
         public Account[] accounts;
         public string currentAccountId;
         
+        [Preserve]
         public IntentResponseAccountList(Account[] accounts, string currentAccountId)
         {
             this.accounts = accounts;

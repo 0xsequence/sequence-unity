@@ -9,6 +9,7 @@ namespace Sequence.EmbeddedWallet
     {
         public string wallet;
         
+        [Preserve]
         public IntentDataListSessions(string walletAddress)
         {
             this.wallet = walletAddress;

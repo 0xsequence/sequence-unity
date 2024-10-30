@@ -9,6 +9,7 @@ namespace Sequence.EmbeddedWallet
     {
         public IntentPayload intent;
         
+        [Preserve]
         public SendIntentPayload(IntentPayload intent)
         {
             this.intent = intent;

@@ -14,6 +14,7 @@ namespace Sequence.EmbeddedWallet
         public MetaTxnReceipt[] receipts;
         public string txnReceipt;
 
+        [Preserve]
         public MetaTxnReceipt(string id, string status, int index, MetaTxnReceiptLog[] logs, MetaTxnReceipt[] receipts, string txnReceipt, string revertReason = null)
         {
             this.id = id;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -21,6 +22,7 @@ namespace Sequence.Marketplace
         public string updatedAt;
         public Asset[] assets;
 
+        [Preserve]
         public TokenMetadata(string tokenId, string name, Dictionary<string, object>[] attributes, string description = null, string image = null, string video = null, string audio = null, string imageData = null, string externalURL = null, string backgroundColor = null, string animationURL = null, uint decimals = default, string updatedAt = null, Asset[] assets = null)
         {
             this.tokenId = tokenId;

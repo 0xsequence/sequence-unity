@@ -11,6 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string message;
         public string signature;
 
+        [Preserve]
         public IsValidMessageSignatureArgs(Chain chain, string walletAddress, string message, string signature)
         {
             this.chainId = chain.GetChainId();

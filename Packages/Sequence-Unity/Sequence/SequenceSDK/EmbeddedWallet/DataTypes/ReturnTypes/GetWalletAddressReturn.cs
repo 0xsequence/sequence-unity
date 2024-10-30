@@ -8,6 +8,7 @@ namespace Sequence.EmbeddedWallet
     {
         public string address;
 
+        [Preserve]
         public GetWalletAddressReturn(string address)
         {
             this.address = address;

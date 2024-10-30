@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string IdToken;
         public int ExpiresIn;
 
+        [Preserve]
         public IntentResponseGetIdToken(string idToken, int expiresIn)
         {
             this.IdToken = idToken;
