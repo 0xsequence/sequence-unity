@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -21,6 +22,7 @@ namespace Sequence.Integrations.Sardine
         public string platform;
         public string approvedSpenderAddress;
 
+        [Preserve]
         public SardineNFTCheckoutParams(string name, string imageUrl, string network, string recipientAddress, string blockchainNftId, string contractAddress, int quantity, int decimals, string tokenAmount, string tokenAddress, string tokenSymbol, int tokenDecimals, string callData, string platform, string approvedSpenderAddress = null)
         {
             this.name = name;

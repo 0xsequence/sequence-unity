@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -7,6 +8,7 @@ namespace Sequence.Marketplace
     {
         public Step[] steps;
 
+        [Preserve]
         public GenerateTransactionResponse(Step[] steps)
         {
             this.steps = steps;

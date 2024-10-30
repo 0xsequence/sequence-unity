@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -10,6 +11,7 @@ namespace Sequence.Marketplace
         public TransactionProvider[] nftCheckout;
         public TransactionProvider[] onRamp;
 
+        [Preserve]
         public CheckoutOptions(TransactionCrypto crypto, TransactionProvider[] swap, TransactionProvider[] nftCheckout, TransactionProvider[] onRamp)
         {
             this.crypto = crypto;

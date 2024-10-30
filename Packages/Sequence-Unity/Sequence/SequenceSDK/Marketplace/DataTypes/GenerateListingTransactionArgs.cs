@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -12,6 +13,7 @@ namespace Sequence.Marketplace
         public CreateReq listing;
         public WalletKind walletType;
 
+        [Preserve]
         public GenerateListingTransactionArgs(string collectionAddress, string owner, ContractType contractType, OrderbookKind orderbookKind, CreateReq listing, WalletKind walletType)
         {
             this.collectionAddress = collectionAddress;

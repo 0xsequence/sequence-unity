@@ -5,7 +5,6 @@ using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    
     [JsonConverter(typeof(EnumConverter<ContractType>))]
     public enum ContractType
     {

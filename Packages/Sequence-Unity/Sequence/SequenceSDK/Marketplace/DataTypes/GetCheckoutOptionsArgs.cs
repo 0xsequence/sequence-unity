@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -9,6 +10,7 @@ namespace Sequence.Marketplace
         public CheckoutOptionsMarketplaceOrder[] orders;
         public int feeBPS;
 
+        [Preserve]
         public GetCheckoutOptionsArgs(Address wallet, CheckoutOptionsMarketplaceOrder[] orders, int feeBps)
         {
             this.wallet = wallet;

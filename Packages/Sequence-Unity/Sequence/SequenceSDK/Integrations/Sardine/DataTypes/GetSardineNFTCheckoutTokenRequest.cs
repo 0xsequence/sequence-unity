@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -47,6 +48,7 @@ namespace Sequence.Integrations.Sardine
             this.expiresIn = expiresIn;
         }
 
+        [Preserve]
         [JsonConstructor]
         public GetSardineNFTCheckoutTokenRequest(string referenceId, uint expiresIn, PaymentMethodTypeConfig paymentMethodTypeConfig, string name, string imageUrl, string network, string recipientAddress, string contractAddress, string platform, string executionType, string blockchainNftId, BigInteger quantity, BigInteger decimals, string tokenAmount, string tokenAddress, string tokenSymbol, BigInteger tokenDecimals, string callData)
         {

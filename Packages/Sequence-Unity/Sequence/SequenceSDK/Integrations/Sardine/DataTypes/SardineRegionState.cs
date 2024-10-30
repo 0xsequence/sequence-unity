@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -10,6 +11,7 @@ namespace Sequence.Integrations.Sardine
         public bool isAllowedOnRamp;
         public bool isAllowedOnNFT;
 
+        [Preserve]
         public SardineRegionState(string code, string name, bool isAllowedOnRamp, bool isAllowedOnNft)
         {
             this.code = code;

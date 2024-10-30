@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -10,6 +11,7 @@ namespace Sequence.Marketplace
         public string primaryType;
         public object value;
 
+        [Preserve]
         public Signature(Domain domain, object types, string primaryType, object value)
         {
             this.domain = domain;

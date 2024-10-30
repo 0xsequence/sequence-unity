@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -7,6 +8,7 @@ namespace Sequence.Integrations.Sardine
     {
         public SardineNFTCheckout resp;
 
+        [Preserve]
         public SardineNFTCheckoutResponse(SardineNFTCheckout resp)
         {
             this.resp = resp;

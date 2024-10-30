@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -11,6 +12,7 @@ namespace Sequence.Marketplace
         public string orderId;
         public MarketplaceKind marketplace;
 
+        [Preserve]
         public CheckoutOptionsMarketplaceOrder(Address contractAddress, string orderId, MarketplaceKind marketplace)
         {
             this.contractAddress = contractAddress;

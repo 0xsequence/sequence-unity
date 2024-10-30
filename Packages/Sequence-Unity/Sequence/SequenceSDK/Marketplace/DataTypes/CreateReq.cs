@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -11,6 +12,7 @@ namespace Sequence.Marketplace
         public string currencyAddress;
         public string pricePerToken;
 
+        [Preserve]
         public CreateReq(string tokenId, string quantity, string expiry, string currencyAddress, string pricePerToken)
         {
             this.tokenId = tokenId;

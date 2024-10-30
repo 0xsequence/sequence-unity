@@ -1,3 +1,5 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.Marketplace
 {
     [System.Serializable]
@@ -7,6 +9,7 @@ namespace Sequence.Marketplace
         public string method;
         public object body;
         
+        [Preserve]
         public PostRequest(string endpoint, string method, object body)
         {
             this.endpoint = endpoint;

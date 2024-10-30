@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -8,6 +9,7 @@ namespace Sequence.Marketplace
         public Order[] offers;
         public Page page;
 
+        [Preserve]
         public ListCollectibleOffersReturn(Order[] offers, Page page)
         {
             this.offers = offers;

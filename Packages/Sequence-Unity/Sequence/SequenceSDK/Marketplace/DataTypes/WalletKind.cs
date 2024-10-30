@@ -6,7 +6,6 @@ using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    
     [JsonConverter(typeof(EnumConverter<WalletKind>))]
     public enum WalletKind
     {

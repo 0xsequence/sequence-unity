@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -12,6 +13,7 @@ namespace Sequence.Integrations.Sardine
         public string type;
         public string subType;
 
+        [Preserve]
         public SardineRegionPaymentMethod(string name, bool isAllowedOnRamp, bool isAllowedOnNft, string[] subTypes, string type, string subType)
         {
             this.name = name;

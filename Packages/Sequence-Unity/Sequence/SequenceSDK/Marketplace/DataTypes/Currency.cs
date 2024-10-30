@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -18,6 +19,7 @@ namespace Sequence.Marketplace
             this.contractAddress = contractAddress;
         }
         
+        [Preserve]
         [JsonConstructor]
         public Currency(uint id, BigInteger chainId, string contractAddress)
         {

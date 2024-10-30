@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -17,6 +18,7 @@ namespace Sequence.Integrations.Sardine
         public SardineRegionPaymentMethod[] paymentMethods;
         public SardineRegionState[] states;
 
+        [Preserve]
         public SardineRegion(string countryCode, bool isAllowedOnRamp, bool isAllowedOnNft, string[] isBasicKycRequired, string[] isSsnRequired, string name, string currencyCode, bool isPayrollSupported, string[] supportedDocuments, SardineRegionPaymentMethod[] paymentMethods, SardineRegionState[] states)
         {
             this.countryCode = countryCode;

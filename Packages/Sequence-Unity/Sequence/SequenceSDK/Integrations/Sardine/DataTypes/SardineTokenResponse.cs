@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -7,6 +8,7 @@ namespace Sequence.Integrations.Sardine
     {
         public string token;
 
+        [Preserve]
         public SardineTokenResponse(string token)
         {
             this.token = token;

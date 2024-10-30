@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -11,6 +12,7 @@ namespace Sequence.Integrations.Sardine
         public SardinePaymentOption[] paymentOptions;
         public string[] supportedCountries;
 
+        [Preserve]
         public SardineFiatCurrency(string currencyCode, string name, string currencySymbol, SardinePaymentOption[] paymentOptions, string[] supportedCountries)
         {
             this.currencyCode = currencyCode;

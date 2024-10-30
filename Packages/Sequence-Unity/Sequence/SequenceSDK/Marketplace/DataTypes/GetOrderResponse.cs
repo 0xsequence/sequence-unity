@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -7,6 +8,7 @@ namespace Sequence.Marketplace
     {
         public CollectibleOrder collectible;
 
+        [Preserve]
         public GetOrderResponse(CollectibleOrder collectible)
         {
             this.collectible = collectible;

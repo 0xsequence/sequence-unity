@@ -1,3 +1,5 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.Marketplace
 {
     [System.Serializable]
@@ -6,6 +8,7 @@ namespace Sequence.Marketplace
         public string orderId;
         public string quantity;
         
+        [Preserve]
         public OrderData(string orderId, string quantity)
         {
             this.orderId = orderId;

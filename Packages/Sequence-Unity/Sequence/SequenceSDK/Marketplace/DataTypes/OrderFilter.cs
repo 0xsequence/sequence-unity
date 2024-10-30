@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -9,6 +10,7 @@ namespace Sequence.Marketplace
         public MarketplaceKind[] marketplace;
         public string[] currencies;
 
+        [Preserve]
         public OrderFilter(string[] createdBy, MarketplaceKind[] marketplace, string[] currencies)
         {
             this.createdBy = createdBy;

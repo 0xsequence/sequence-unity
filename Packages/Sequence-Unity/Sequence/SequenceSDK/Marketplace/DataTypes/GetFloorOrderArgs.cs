@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -8,6 +9,7 @@ namespace Sequence.Marketplace
         public string contractAddress;
         public CollectiblesFilter filter;
 
+        [Preserve]
         public GetFloorOrderArgs(string contractAddress, CollectiblesFilter filter = null)
         {
             this.contractAddress = contractAddress;

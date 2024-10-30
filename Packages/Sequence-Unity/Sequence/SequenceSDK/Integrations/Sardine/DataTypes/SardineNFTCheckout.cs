@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -9,6 +10,7 @@ namespace Sequence.Integrations.Sardine
         public string expiresAt;
         public string orderId;
 
+        [Preserve]
         public SardineNFTCheckout(string token, string expiresAt, string orderId)
         {
             this.token = token;

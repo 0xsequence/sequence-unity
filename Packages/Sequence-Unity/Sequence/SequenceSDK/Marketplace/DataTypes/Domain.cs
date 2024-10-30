@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -12,6 +13,7 @@ namespace Sequence.Marketplace
         public Chain chain;
         public string verifyingContract;
 
+        [Preserve]
         [JsonConstructor]
         public Domain(string name, string version, uint chainId, string verifyingContract)
         {

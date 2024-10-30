@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -13,6 +14,7 @@ namespace Sequence.Integrations.Sardine
         public SardineQuoteType quoteType;
         public Address walletAddress;
 
+        [Preserve]
         public SardineGetQuoteParams(string assetType, string network, ulong total, Address walletAddress, string currency = "USD", SardinePaymentType paymentType = default, SardineQuoteType quoteType = default)
         {
             this.assetType = assetType;

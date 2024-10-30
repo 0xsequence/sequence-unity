@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -14,6 +15,7 @@ namespace Sequence.Integrations.Sardine
         public string token;
         public Address tokenAddress;
 
+        [Preserve]
         [JsonConstructor]
         public SardineSupportedToken(string network, string assetSymbol, string assetName, string chainId, string tokenName, string token, Address tokenAddress)
         {

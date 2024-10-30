@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -9,6 +10,7 @@ namespace Sequence.Marketplace
         public string amount;
         public string receiver;
         
+        [Preserve]
         [JsonConstructor]
         public AdditionalFee(string amount, string receiver)
         {

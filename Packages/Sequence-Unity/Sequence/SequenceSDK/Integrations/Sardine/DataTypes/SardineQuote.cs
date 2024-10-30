@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -21,6 +22,7 @@ namespace Sequence.Integrations.Sardine
         public double maxTransactionValue;
         public string liquidityProvider;
 
+        [Preserve]
         public SardineQuote(double quantity, string network, string assetType, double total, string currency, string expiresAt, string paymentType, double price, double subtotal, double transactionFee, double networkFee, bool highNetworkFee, double minTransactionValue, double maxTransactionValue, string liquidityProvider)
         {
             this.quantity = quantity;

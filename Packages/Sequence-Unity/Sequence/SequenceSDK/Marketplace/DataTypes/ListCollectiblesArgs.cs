@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -11,6 +12,7 @@ namespace Sequence.Marketplace
         public CollectiblesFilter filter;
         public Page page;
 
+        [Preserve]
         public ListCollectiblesArgs(OrderSide side, string contractAddress, CollectiblesFilter filter = null, Page page = null)
         {
             this.side = side;

@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -28,6 +29,7 @@ namespace Sequence.Integrations.Sardine
         public string transactionHash;
         public Address recipientAddress;
 
+        [Preserve]
         public SardineOrder(string id, string createdAt, string referenceId, string status, string fiatCurrency, double fiatExchangeRateUsd, string transactionId, string expiresAt, double total, double subTotal, double transactionFee, double networkFee, string paymentCurrency, string paymentMethodType, string transactionType, string name, int price, string imageUrl, Address contractAddress = null, string transactionHash = null, Address recipientAddress = null)
         {
             this.id = id;

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Sardine
 {
@@ -16,6 +17,7 @@ namespace Sequence.Integrations.Sardine
         public string subType;
         public string processingTime;
 
+        [Preserve]
         public SardinePaymentOption(string name, double dailyLimit, double weeklyLimit, double monthlyLimit, double maxAmount, double minAmount, string[] subTypes, string type, string subType, string processingTime)
         {
             this.name = name;

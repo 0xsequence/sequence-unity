@@ -2,6 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Transak
 {
@@ -16,6 +17,7 @@ namespace Sequence.Integrations.Transak
         public uint quantity;
         public NFTType nftType;
 
+        [Preserve]
         public TransakNftData(string imageURL, string nftName, Address collectionAddress, string[] tokenID, ulong[] price, uint quantity, NFTType nftType = NFTType.ERC721)
         {
             this.imageURL = imageURL;

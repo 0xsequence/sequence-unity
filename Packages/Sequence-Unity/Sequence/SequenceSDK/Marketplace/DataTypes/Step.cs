@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -13,6 +14,7 @@ namespace Sequence.Marketplace
         public Signature signature;
         public PostRequest post;
 
+        [Preserve]
         public Step(StepType id, string data, string to, string value, Signature signature, PostRequest post)
         {
             this.id = id;

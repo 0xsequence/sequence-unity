@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -12,6 +13,7 @@ namespace Sequence.Marketplace
         public AdditionalFee[] additionalFees;
         public WalletKind walletType;
 
+        [Preserve]
         public GenerateBuyTransaction(string collectionAddress, string buyer, MarketplaceKind marketplace, OrderData[] ordersData, AdditionalFee[] additionalFees, WalletKind walletType)
         {
             this.collectionAddress = collectionAddress;

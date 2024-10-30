@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -10,6 +11,7 @@ namespace Sequence.Marketplace
         public OrderFilter filter;
         public Page page;
 
+        [Preserve]
         public ListCollectibleListingsArgs(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             this.contractAddress = contractAddress;
