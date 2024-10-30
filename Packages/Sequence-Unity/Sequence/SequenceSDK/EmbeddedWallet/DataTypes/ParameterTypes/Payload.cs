@@ -11,6 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string payloadCiphertext;
         public string payloadSig;
 
+        [Preserve]
         public Payload(string encryptedPayloadKey, string payloadCiphertext, string payloadSig)
         {
             this.encryptedPayloadKey = encryptedPayloadKey;

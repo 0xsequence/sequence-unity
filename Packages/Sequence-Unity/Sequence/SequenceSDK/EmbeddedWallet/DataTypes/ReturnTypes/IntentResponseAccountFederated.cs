@@ -7,6 +7,7 @@ namespace Sequence.EmbeddedWallet
     {
         public Account account;
 
+        [Preserve]
         public IntentResponseAccountFederated(Account account)
         {
             this.account = account;

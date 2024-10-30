@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string signature;
         public string message;
         
+        [Preserve]
         public IntentResponseSignedMessage(string message, string signature)
         {
             this.message = message;

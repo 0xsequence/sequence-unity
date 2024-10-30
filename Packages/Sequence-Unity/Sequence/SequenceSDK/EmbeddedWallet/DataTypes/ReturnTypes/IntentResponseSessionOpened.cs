@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string sessionId;
         public string wallet;
 
+        [Preserve]
         public IntentResponseSessionOpened(string sessionId, string wallet)
         {
             this.sessionId = sessionId;

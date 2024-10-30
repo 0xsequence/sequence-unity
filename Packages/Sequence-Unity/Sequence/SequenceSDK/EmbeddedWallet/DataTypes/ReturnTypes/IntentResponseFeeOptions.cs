@@ -11,6 +11,7 @@ namespace Sequence.EmbeddedWallet
         public FeeOption[] feeOptions;
         public string feeQuote;
 
+        [Preserve]
         public IntentResponseFeeOptions(FeeOption[] feeOptions, string feeQuote)
         {
             this.feeOptions = feeOptions;

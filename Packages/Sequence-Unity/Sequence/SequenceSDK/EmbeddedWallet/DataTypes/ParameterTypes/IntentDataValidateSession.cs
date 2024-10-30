@@ -3,7 +3,6 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
     [Serializable]
     public class IntentDataValidateSession
     {

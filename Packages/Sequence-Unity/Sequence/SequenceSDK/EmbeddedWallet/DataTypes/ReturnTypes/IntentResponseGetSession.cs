@@ -11,6 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string wallet;
         public bool validated;
         
+        [Preserve]
         public IntentResponseGetSession(string sessionId, string wallet, bool validated)
         {
             this.sessionId = sessionId;

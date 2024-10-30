@@ -10,6 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string amount;
         public string id;
 
+        [Preserve]
         public SendERC1155Values(string id, string amount)
         {
             this.id = id;

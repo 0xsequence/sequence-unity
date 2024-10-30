@@ -7,6 +7,8 @@ namespace Sequence.EmbeddedWallet
     public class IsValidMessageSignatureReturn
     {
         public bool isValid;
+        
+        [Preserve]
         public IsValidMessageSignatureReturn(bool IsValid)
         {
              isValid =  IsValid;

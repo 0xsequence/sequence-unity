@@ -11,6 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string wallet;
         public string nonce;
 
+        [Preserve]
         public IntentDataGetIdToken(string sessionId, string walletAddress, string nonce = null)
         {
             this.sessionId = sessionId;
