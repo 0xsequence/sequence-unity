@@ -10,17 +10,17 @@ namespace Sequence.Marketplace
         public string collectionAddress;
         public string maker;
         public ContractType contractType;
-        public OrderbookKind orderbookKind;
+        public OrderbookKind orderbook;
         public CreateReq offer;
         public WalletKind walletType;
 
         [Preserve]
-        public GenerateOfferTransactionArgs(string collectionAddress, string maker, ContractType contractType, OrderbookKind orderbookKind, CreateReq offer, WalletKind walletType)
+        public GenerateOfferTransactionArgs(string collectionAddress, string maker, ContractType contractType, OrderbookKind orderbook, CreateReq offer, WalletKind walletType)
         {
             this.collectionAddress = collectionAddress;
             this.maker = maker;
             this.contractType = contractType;
-            this.orderbookKind = orderbookKind;
+            this.orderbook = orderbook;
             this.offer = offer;
             this.walletType = walletType;
         }
@@ -28,7 +28,7 @@ namespace Sequence.Marketplace
         public override string ToString()
         {
             return
-                $"GenerateOfferTransactionArgs(collectionAddress: {collectionAddress}, maker: {maker}, contractType: {contractType}, orderbookKind: {orderbookKind}, offer: {offer}, walletType: {walletType})";
+                $"GenerateOfferTransactionArgs(collectionAddress: {collectionAddress}, maker: {maker}, contractType: {contractType}, orderbook: {orderbook}, offer: {offer}, walletType: {walletType})";
         }
     }
 }

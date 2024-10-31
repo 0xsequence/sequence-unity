@@ -1,5 +1,6 @@
 using System;
 using UnityEngine.Scripting;
+using UnityEngine.Serialization;
 
 namespace Sequence.Marketplace
 {
@@ -9,17 +10,17 @@ namespace Sequence.Marketplace
         public string collectionAddress;
         public string owner;
         public ContractType contractType;
-        public OrderbookKind orderbookKind;
+        public OrderbookKind orderbook;
         public CreateReq listing;
         public WalletKind walletType;
 
         [Preserve]
-        public GenerateListingTransactionArgs(string collectionAddress, string owner, ContractType contractType, OrderbookKind orderbookKind, CreateReq listing, WalletKind walletType)
+        public GenerateListingTransactionArgs(string collectionAddress, string owner, ContractType contractType, OrderbookKind orderbook, CreateReq listing, WalletKind walletType)
         {
             this.collectionAddress = collectionAddress;
             this.owner = owner;
             this.contractType = contractType;
-            this.orderbookKind = orderbookKind;
+            this.orderbook = orderbook;
             this.listing = listing;
             this.walletType = walletType;
         }
@@ -27,7 +28,7 @@ namespace Sequence.Marketplace
         public override string ToString()
         {
             return
-                $"GenerateListingTransactionArgs(collectionAddress: {collectionAddress}, owner: {owner}, contractType: {contractType}, orderbookKind: {orderbookKind}, listing: {listing}, walletType: {walletType})";
+                $"GenerateListingTransactionArgs(collectionAddress: {collectionAddress}, owner: {owner}, contractType: {contractType}, orderbook: {orderbook}, listing: {listing}, walletType: {walletType})";
         }
     }
 }
