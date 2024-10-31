@@ -14,7 +14,7 @@ namespace Sequence.Marketplace
     public class HttpClient : IHttpClient
     {
         private string _apiKey;
-        private const string _baseUrl = "https://dev-marketplace-api.sequence.app/";
+        private const string _baseUrl = "https://dev-marketplace-api.sequence.app/"; // Todo switch to prod
         private const string _endUrl = "/rpc/Marketplace/";
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
@@ -25,6 +25,7 @@ namespace Sequence.Marketplace
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
+            _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays"; // todo remove dev env api key
         }
         
         public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)
@@ -65,7 +66,6 @@ namespace Sequence.Marketplace
                 else
                 {
                     byte[] results = request.downloadHandler.data;
-                    request.Dispose();
                     var responseJson = Encoding.UTF8.GetString(results);
                     try
                     {
