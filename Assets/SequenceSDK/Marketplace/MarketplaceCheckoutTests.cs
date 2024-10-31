@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -36,18 +37,25 @@ namespace Sequence.Marketplace
             Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
         }
 
-        [TestCase(new[] { 0 })]
-        [TestCase(new[] { 0, 1, 2 })]
-        public async Task TestGenerateBuyTransaction(int[] indices)
+        [TestCase(0)]
+        [TestCase(3)]
+        public async Task TestGenerateBuyTransaction(int amount)
         {
-            Order[] orders = new Order[indices.Length];
-            for (int i = 0; i < indices.Length; i++)
+            List<Order> orders = new List<Order>();
+            for (int i = 0; i < _collectibleOrders.Length; i++)
             {
-                orders[i] = _collectibleOrders[indices[i]].order;
+                if (_collectibleOrders[i].order.side == OrderSide.listing && _collectibleOrders[i].order.status == OrderStatus.active)
+                {
+                    orders.Add(_collectibleOrders[i].order);
+                    if (orders.Count == amount)
+                    {
+                        break;
+                    }
+                }
             }
             Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
-            for (int i = 0; i < indices.Length; i++)
+            for (int i = 0; i < amount; i++)
             {
                 Step[] steps = await checkout.GenerateBuyTransaction(orders[i]);
                 Assert.IsNotNull(steps);
