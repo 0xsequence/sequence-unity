@@ -65,11 +65,12 @@ namespace Sequence.Integrations.Sardine
             }
         }
 
-        public async Task<SardineRegion[]> GetSardineSupportedRegions()
+        public async Task<SardineRegion[]> SardineGetSupportedRegions()
         {
-            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "GetSardineSupportedRegions";
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetSupportedRegions";
             try {
-                return await _client.SendRequest<SardineRegion[]>(url);
+                SardineSupportedRegionsResponse response = await _client.SendRequest<SardineSupportedRegionsResponse>(url);
+                return response.regions;
             } catch (Exception e) {
                 throw new Exception("Error fetching Sardine supported regions: " + e.Message);
             }

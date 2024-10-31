@@ -35,7 +35,7 @@ namespace Sequence.Integrations.Tests.Sardine
         {
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
             
-            SardineRegion[] regions = await sardine.GetSardineSupportedRegions();
+            SardineRegion[] regions = await sardine.SardineGetSupportedRegions();
             
             Assert.NotNull(regions);
             Assert.Greater(regions.Length, 0);

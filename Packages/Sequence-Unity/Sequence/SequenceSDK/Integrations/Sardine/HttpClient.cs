@@ -56,7 +56,6 @@ namespace Sequence.Integrations.Sardine
                 else
                 {
                     byte[] results = request.downloadHandler.data;
-                    request.Dispose();
                     var responseJson = Encoding.UTF8.GetString(results);
                     try
                     {
