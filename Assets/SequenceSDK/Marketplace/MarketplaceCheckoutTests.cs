@@ -13,25 +13,27 @@ namespace Sequence.Marketplace
 
         private IWallet _testWallet =
             new SequenceWallet(new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07"), "", null);
-
-        [SetUp]
-        public async Task Setup()
-        {
-            _collectibleOrders = await OrderFetcher.FetchOrders();
-        }
         
-        [TestCase(new[] {0})]
-        [TestCase(new [] {0, 1, 2})]
-        public async Task TestGetCheckoutOptions(int[] indices)
+        [TestCase(0)]
+        [TestCase(3)]
+        public async Task TestGetCheckoutOptions(int amount)
         {
-            Order[] orders = new Order[indices.Length];
-            for (int i = 0; i < indices.Length; i++)
+            _collectibleOrders = await OrderFetcher.FetchListings();
+            List<Order> orders = new List<Order>();
+            for (int i = 0; i < _collectibleOrders.Length; i++)
             {
-                orders[i] = _collectibleOrders[indices[i]].order;
+                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                {
+                    orders.Add(_collectibleOrders[i].order);
+                    if (orders.Count == amount)
+                    {
+                        break;
+                    }
+                }
             }
             Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
-            CheckoutOptions options = await checkout.GetCheckoutOptions(orders);
+            CheckoutOptions options = await checkout.GetCheckoutOptions(orders.ToArray());
             
             Assert.IsNotNull(options);
             Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
@@ -41,10 +43,11 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateBuyTransaction(int amount)
         {
+            _collectibleOrders = await OrderFetcher.FetchListings();
             List<Order> orders = new List<Order>();
             for (int i = 0; i < _collectibleOrders.Length; i++)
             {
-                if (_collectibleOrders[i].order.side == OrderSide.listing && _collectibleOrders[i].order.status == OrderStatus.active)
+                if (_collectibleOrders[i].order.status == OrderStatus.active)
                 {
                     orders.Add(_collectibleOrders[i].order);
                     if (orders.Count == amount)
@@ -63,18 +66,26 @@ namespace Sequence.Marketplace
             }
         }
 
-        [TestCase(new[] { 0 })]
-        [TestCase(new[] { 0, 1, 2 })]
-        public async Task TestGenerateSellTransaction(int[] indices)
+        [TestCase(0)]
+        [TestCase(3)]
+        public async Task TestGenerateSellTransaction(int amount)
         {
-            Order[] orders = new Order[indices.Length];
-            for (int i = 0; i < indices.Length; i++)
+            _collectibleOrders = await OrderFetcher.FetchOffers();
+            List<Order> orders = new List<Order>();
+            for (int i = 0; i < _collectibleOrders.Length; i++)
             {
-                orders[i] = _collectibleOrders[indices[i]].order;
+                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                {
+                    orders.Add(_collectibleOrders[i].order);
+                    if (orders.Count == amount)
+                    {
+                        break;
+                    }
+                }
             }
             Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
-            for (int i = 0; i < indices.Length; i++)
+            for (int i = 0; i < amount; i++)
             {
                 Step[] steps = await checkout.GenerateSellTransaction(orders[i]);
                 Assert.IsNotNull(steps);
@@ -82,18 +93,26 @@ namespace Sequence.Marketplace
             }
         }
 
-        [TestCase(new[] { 0 })]
-        [TestCase(new[] { 0, 1, 2 })]
-        public async Task TestGenerateListingTransaction(int[] indices)
+        [TestCase(0)]
+        [TestCase(3)]
+        public async Task TestGenerateListingTransaction(int amount)
         {
-            Order[] orders = new Order[indices.Length];
-            for (int i = 0; i < indices.Length; i++)
+            _collectibleOrders = await OrderFetcher.FetchOffers();
+            List<Order> orders = new List<Order>();
+            for (int i = 0; i < _collectibleOrders.Length; i++)
             {
-                orders[i] = _collectibleOrders[indices[i]].order;
+                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                {
+                    orders.Add(_collectibleOrders[i].order);
+                    if (orders.Count == amount)
+                    {
+                        break;
+                    }
+                }
             }
             Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
-            for (int i = 0; i < indices.Length; i++)
+            for (int i = 0; i < amount; i++)
             {
                 Step[] steps = await checkout.GenerateListingTransaction(new Address(orders[i].collectionContractAddress), orders[i].tokenId, 
                     BigInteger.Parse(orders[i].quantityAvailable), ContractType.ERC1155, new Address(orders[i].priceCurrencyAddress), 
@@ -103,18 +122,26 @@ namespace Sequence.Marketplace
             }
         }
 
-        [TestCase(new[] { 0 })]
-        [TestCase(new[] { 0, 1, 2 })]
-        public async Task TestGenerateOfferTransaction(int[] indices)
+        [TestCase(0)]
+        [TestCase(3)]
+        public async Task TestGenerateOfferTransaction(int amount)
         {
-            Order[] orders = new Order[indices.Length];
-            for (int i = 0; i < indices.Length; i++)
+            _collectibleOrders = await OrderFetcher.FetchListings();
+            List<Order> orders = new List<Order>();
+            for (int i = 0; i < _collectibleOrders.Length; i++)
             {
-                orders[i] = _collectibleOrders[indices[i]].order;
+                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                {
+                    orders.Add(_collectibleOrders[i].order);
+                    if (orders.Count == amount)
+                    {
+                        break;
+                    }
+                }
             }
             Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
 
-            for (int i = 0; i < indices.Length; i++)
+            for (int i = 0; i < amount; i++)
             {
                 Step[] steps = await checkout.GenerateOfferTransaction(new Address(orders[i].collectionContractAddress), orders[i].tokenId, 
                     BigInteger.Parse(orders[i].quantityAvailable), ContractType.ERC1155, new Address(orders[i].priceCurrencyAddress), 

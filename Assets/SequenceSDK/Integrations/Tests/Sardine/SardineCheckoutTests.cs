@@ -16,7 +16,7 @@ namespace Sequence.Integrations.Tests.Sardine
         [SetUp]
         public async Task Setup()
         {
-            _collectibleOrders = await OrderFetcher.FetchOrders();
+            _collectibleOrders = await OrderFetcher.FetchListings();
         }
         
         [Test]
