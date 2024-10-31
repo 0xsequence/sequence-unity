@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -27,6 +28,7 @@ namespace Sequence.Marketplace
             this.ordersNotCreatedBy = ordersNotCreatedBy;
         }
 
+        [Preserve]
         [JsonConstructor]
         public CollectiblesFilter(bool includeEmpty, string searchText, PropertyFilter[] properties, string[] marketplaces, string[] inAccounts, string[] notInAccounts, string[] ordersCreatedBy, string[] ordersNotCreatedBy)
         {
@@ -50,7 +52,7 @@ namespace Sequence.Marketplace
             string[] marketplacesString = new string[length];
             for (int i = 0; i < length; i++)
             {
-                marketplacesString[i] = marketplaces[i].AsString();
+                marketplacesString[i] = marketplaces[i].ToString();
             }
 
             return marketplacesString;
