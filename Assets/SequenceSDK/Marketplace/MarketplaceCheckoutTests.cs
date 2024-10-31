@@ -83,7 +83,7 @@ namespace Sequence.Marketplace
                     }
                 }
             }
-            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.TestnetPolygonAmoy);
 
             for (int i = 0; i < amount; i++)
             {
@@ -94,7 +94,7 @@ namespace Sequence.Marketplace
         }
 
         [TestCase(0)]
-        [TestCase(3)]
+        // [TestCase(3)] todo add back in once we have test data that returns more than 1 offer
         public async Task TestGenerateListingTransaction(int amount)
         {
             _collectibleOrders = await OrderFetcher.FetchOffers();
@@ -110,7 +110,7 @@ namespace Sequence.Marketplace
                     }
                 }
             }
-            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.TestnetPolygonAmoy);
 
             for (int i = 0; i < amount; i++)
             {
