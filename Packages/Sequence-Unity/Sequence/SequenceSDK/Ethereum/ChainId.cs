@@ -23,5 +23,10 @@ namespace Sequence
         {
             return ChainDictionaries.ChainIdOf[chain];
         }
+
+        public static bool IsActive(this Chain chain)
+        {
+            return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto);
+        }
     }
 }

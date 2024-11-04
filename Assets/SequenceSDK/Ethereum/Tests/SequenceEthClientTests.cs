@@ -135,7 +135,7 @@ namespace Sequence.Ethereum.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestChainId(Chain chain)
         {
-            if (chain == Chain.None) return;
+            if (!chain.IsActive()) return;
             try
             {
                 var client = new SequenceEthClient(chain);
