@@ -225,9 +225,9 @@ namespace Sequence.ABI
                         }
                     }
                     tupleType.Append(")");
-                    if (result[i].EndsWith("[]"))
+                    if (result[i].Contains("["))
                     {
-                        tupleType.Append("[]");
+                        tupleType.Append(result[i].Substring(result[i].IndexOf('['), result[i].Length - result[i].IndexOf('[')));
                     }
                     result[i] = tupleType.ToString();
                 }
