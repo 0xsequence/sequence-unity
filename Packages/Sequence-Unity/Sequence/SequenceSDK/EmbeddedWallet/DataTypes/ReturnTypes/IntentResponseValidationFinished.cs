@@ -1,3 +1,5 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EmbeddedWallet
 {
     public class IntentResponseValidationFinished

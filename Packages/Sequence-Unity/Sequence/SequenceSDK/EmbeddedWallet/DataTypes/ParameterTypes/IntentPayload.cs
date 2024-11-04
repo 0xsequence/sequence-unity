@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentPayload
     {
@@ -15,6 +17,7 @@ namespace Sequence.EmbeddedWallet
         public Signature[] signatures;
         public string version;
 
+        [Preserve]
         [JsonConstructor]
         public IntentPayload(string version, string name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
         {

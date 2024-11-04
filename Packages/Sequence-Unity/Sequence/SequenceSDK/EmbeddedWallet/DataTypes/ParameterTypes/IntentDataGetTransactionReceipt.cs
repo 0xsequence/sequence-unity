@@ -1,8 +1,11 @@
 using System;
+using Newtonsoft.Json;
 using Sequence;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentDataGetTransactionReceipt
     {
@@ -10,6 +13,8 @@ namespace Sequence.EmbeddedWallet
         public string network;
         public string wallet;
 
+        [Preserve]
+        [JsonConstructor]
         public IntentDataGetTransactionReceipt(string metaTxHash, string network, string wallet)
         {
             this.metaTxHash = metaTxHash;

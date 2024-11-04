@@ -1,9 +1,11 @@
 using System;
 using System.Text;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentDataSignMessage
     {
