@@ -23,6 +23,9 @@ namespace Sequence
         Blast = 81457,
         B3 = 8333,
         APEChain = 33139,
+        ImmutableZkEvm = 13371,
+        SkaleNebula = 1482601649,
+        Root = 7668,
 
         // Testnets
         TestnetSepolia = 11155111,
@@ -43,6 +46,8 @@ namespace Sequence
         TestnetSkaleNebulaGamingHub = 37084624,
         TestnetSoneiumMinato = 1946,
         TestnetToy = 21000000,
+        TestnetImmutableZkEvm = 13473,
+        TestnetRootPorcini = 7672,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
