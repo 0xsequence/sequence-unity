@@ -29,7 +29,7 @@ namespace Sequence.Ethereum.Tests
         EOAWallet wallet3 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000003");
         SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
 
-        [Test]
+        [SetUp]
         public async Task _TestDeployComplexContract()
         {
             try
