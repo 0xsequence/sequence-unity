@@ -1,4 +1,4 @@
 namespace Sequence.Demo
 {
-    public class PrimarySalePanel : UIPanel { }
+    public class PrimarySalePanel : DemoPanel { }
 }

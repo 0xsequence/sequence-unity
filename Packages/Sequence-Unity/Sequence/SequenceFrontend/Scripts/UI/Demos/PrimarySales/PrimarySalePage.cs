@@ -46,7 +46,8 @@ namespace Sequence.Demo
             _qrCodeView.gameObject.SetActive(false);
             
             _wallet = args.GetObjectOfTypeIfExists<SequenceWallet>();
-            Assert.IsNotNull(_wallet);
+            Assert.IsNotNull(_wallet, "Could not get a SequenceWallet reference from the UIPage.Open() arguments.");
+            
             RefreshState();
         }
 
@@ -61,13 +62,11 @@ namespace Sequence.Demo
             ClearState();
 
             _saleState = new PrimarySaleStateERC1155();
-            
-            Assert.IsNotNull(_saleState);
 
             SetLoading(true);
             await _saleState.Construct(
-                _saleContractAddress, 
-                _tokenContractAddress, 
+                new Address(_saleContractAddress), 
+                new Address(_tokenContractAddress), 
                 _wallet, 
                 _chain,
                 _itemsForSale);
@@ -130,7 +129,7 @@ namespace Sequence.Demo
         private async Task PurchaseToken(BigInteger tokenId, int amount)
         {
             SetLoading(true);
-            var success = await _saleState.Purchase(tokenId, amount);
+            var success = await _saleState.PurchaseAsync(tokenId, amount);
             SetLoading(false);
             SetResult(success);
             

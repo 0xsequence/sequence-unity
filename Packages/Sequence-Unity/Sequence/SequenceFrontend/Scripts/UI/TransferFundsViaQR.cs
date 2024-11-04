@@ -4,6 +4,7 @@ using Sequence.Marketplace;
 
 namespace Sequence.Demo
 {
+    [RequireComponent(typeof(Button))]
     public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
     {
         [SerializeField] private GameObject _qrPanel;

@@ -21,12 +21,8 @@ MonoBehaviour:
   DiscordClientIdIOS: 
   FacebookClientIdIOS: 
   AppleClientIdIOS: 
-  GoogleClientIdAndroid: 
-  DiscordClientIdAndroid: 
-  FacebookClientIAndroid: 
-  AppleClientIdAndroid: 
-  WaaSConfigKey: eyJwcm9qZWN0SWQiOjM4NjIxLCJycGNTZXJ2ZXIiOiJodHRwczovL3dhYXMuc2VxdWVuY2UuYXBwIn0=
+  WaaSConfigKey: 
   EnableMultipleAccountsPerEmail: 0
-  BuilderAPIKey: AQAAAAAAAJbd_5JOcE50AqglZCtvu51YlGI
+  BuilderAPIKey: 
   StoreSessionPrivateKeyInSecureStorage: 0
-  EditorStoreSessionPrivateKeyInSecureStorage: 1
+  EditorStoreSessionPrivateKeyInSecureStorage: 0

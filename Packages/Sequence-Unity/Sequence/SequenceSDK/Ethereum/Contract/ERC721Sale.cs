@@ -9,7 +9,7 @@ namespace Sequence.Contracts
     {
         public struct SaleDetails
         {
-            public string PaymentToken;
+            public Address PaymentToken;
             public BigInteger Cost;
             public BigInteger SupplyCap;
             public int StartTime;
@@ -41,12 +41,12 @@ namespace Sequence.Contracts
             return _contract.CallFunction("mint", to, amount, paymentToken, maxTotal, proof);
         }
 
-        public async Task<BigInteger> CheckMerkleProof(IEthClient client, byte root, byte[] proof, string address, byte salt)
+        public async Task<BigInteger> CheckMerkleProofAsync(IEthClient client, byte root, byte[] proof, string address, byte salt)
         {
             return await _contract.SendQuery<BigInteger>(client, "checkMerkleProof", root, proof, address, salt);
         }
 
-        public async Task<string> ItemsContract(IEthClient client)
+        public async Task<string> ItemsContractAsync(IEthClient client)
         {
             return await _contract.SendQuery<string>(client, "itemsContract");
         }
@@ -63,7 +63,7 @@ namespace Sequence.Contracts
             {
                 Cost = new BigInteger(Convert.ToInt64(results[0].ToString())),
                 SupplyCap = new BigInteger(Convert.ToInt64(results[1].ToString())),
-                PaymentToken = results[2].ToString(),
+                PaymentToken = new Address(results[2].ToString()),
                 StartTime = Convert.ToInt32(results[3].ToString()),
                 EndTime = Convert.ToInt32(results[4].ToString())
             };

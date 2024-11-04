@@ -12,7 +12,7 @@ namespace Sequence.Demo
 {
     public class PrimarySaleStateERC1155
     {
-        public string PaymentToken { get; private set; }
+        public Address PaymentToken { get; private set; }
         public string PaymentTokenSymbol { get; private set; }
         public BigInteger PaymentTokenDecimals { get; private set; }
         public BigInteger UserPaymentBalance { get; private set; }
@@ -23,14 +23,14 @@ namespace Sequence.Demo
         public int TotalMinted { get; private set; }
         public Dictionary<BigInteger, TokenSupply> TokenSupplies { get; private set; }
 
-        private string _tokenContractAddress;
+        private Address _tokenContractAddress;
         private ERC1155Sale _saleContract;
         private IEthClient _client;
         private IWallet _wallet;
         private Chain _chain;
         private int[] _itemsForSale;
 
-        public async Task Construct(string saleContractAddress, string tokenContractAddress, 
+        public async Task Construct(Address saleContractAddress, Address tokenContractAddress, 
             IWallet wallet, Chain chain, int[] itemsForSale)
         {
             _tokenContractAddress = tokenContractAddress;
@@ -46,10 +46,14 @@ namespace Sequence.Demo
                 UpdateTokenSuppliesAsync());
         }
 
-        public async Task<bool> Purchase(BigInteger tokenId, int amount)
+        public async Task<bool> PurchaseAsync(BigInteger tokenId, int amount)
         {
             if (UserPaymentBalance < Cost * amount)
+            {
+                Debug.Log($"User is missing {Cost * amount - UserPaymentBalance} {PaymentTokenSymbol} " +
+                          $"to purchase tokenId {tokenId}");
                 return false;
+            }
 
             var to = _wallet.GetWalletAddress();
             var defaultProof = Array.Empty<byte>();
@@ -57,11 +61,11 @@ namespace Sequence.Demo
             var fn = _saleContract.Mint(to, new[] {tokenId},
                 new[] {new BigInteger(amount)}, null, PaymentToken, new BigInteger(1), defaultProof);
 
-            Assert.IsNotNull(fn);
+            Assert.IsNotNull(fn, "Failed to create mint function in ERC1155Sale.cs");
 
             var transactions = new Transaction[] { new RawTransaction(fn) };
             var result = await _wallet.SendTransaction(_chain, transactions);
-            Debug.Log($"Purchase");
+            
             if (result is FailedTransactionReturn failed)
             {
                 Debug.Log($"Error purchasing item: {failed.error}");
@@ -95,7 +99,7 @@ namespace Sequence.Demo
         private async Task UserPaymentTokenBalanceAsync()
         {
             var balancesArgs = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), PaymentToken);
-            var result = await Indexer.GetTokenBalances((int) _chain, balancesArgs);
+            var result = await Indexer.GetTokenBalances(_chain.GetChainId(), balancesArgs);
 
             var balances = result.balances;
             UserPaymentBalance = balances.Length > 0 ? balances[0].balance : 0;
@@ -105,7 +109,7 @@ namespace Sequence.Demo
         {
             TokenSupplies = new Dictionary<BigInteger, TokenSupply>();
             var supplyArgs = new GetTokenSuppliesArgs(_tokenContractAddress, true);
-            var suppliesReturn = await Indexer.GetTokenSupplies((int) _chain, supplyArgs);
+            var suppliesReturn = await Indexer.GetTokenSupplies(_chain.GetChainId(), supplyArgs);
 
             TotalMinted = 0;
             foreach (var tokenId in _itemsForSale)

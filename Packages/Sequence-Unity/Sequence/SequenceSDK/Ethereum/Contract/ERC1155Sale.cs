@@ -38,11 +38,13 @@ namespace Sequence.Contracts
 
         public CallContractFunction Mint(string to, BigInteger[] tokenIds, BigInteger[] amounts, byte[] data, string expectedPaymentToken, BigInteger maxTotal, byte[] proof)
         {
-            data ??= "Minted using the Sequence Unity SDK".ToByteArray(); // Contract expects some data that is non empty
+            if (data == null)
+                data = "Minted using the Sequence Unity SDK".ToByteArray(); // Contract expects some data that is non empty
+            
             return _contract.CallFunction("mint", to, tokenIds, amounts, data, expectedPaymentToken, maxTotal, proof);
         }
 
-        public async Task<BigInteger> CheckMerkleProof(IEthClient client, byte root, byte[] proof, string address, byte salt)
+        public async Task<BigInteger> CheckMerkleProofAsync(IEthClient client, byte root, byte[] proof, string address, byte salt)
         {
             return await _contract.SendQuery<BigInteger>(client, "checkMerkleProof", root, proof, address, salt);
         }
@@ -53,15 +55,15 @@ namespace Sequence.Contracts
             return ConvertSaleDetails(results);
         }
         
-        public async Task<SaleDetails> TokenSaleDetails(IEthClient client, BigInteger tokenId)
+        public async Task<SaleDetails> TokenSaleDetailsAsync(IEthClient client, BigInteger tokenId)
         {
             var results = await _contract.SendQuery<object[]>(client, "tokenSaleDetails", tokenId);
             return ConvertSaleDetails(results);
         }
 
-        public async Task<string> GetPaymentTokenAsync(IEthClient client)
+        public async Task<Address> GetPaymentTokenAsync(IEthClient client)
         {
-            return await _contract.SendQuery<string>(client, "paymentToken");
+            return await _contract.SendQuery<Address>(client, "paymentToken");
         }
 
         private SaleDetails ConvertSaleDetails(object[] results)
