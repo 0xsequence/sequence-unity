@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -38,6 +39,7 @@ namespace Sequence.Marketplace
         public string updatedAt;
         public string deletedAt;
 
+        [Preserve]
         public Order(string orderId, MarketplaceKind marketplace, OrderSide side, OrderStatus status, BigInteger chainId, string collectionContractAddress, string tokenId, string createdBy, string priceAmount, string priceAmountFormatted, string priceAmountNet, string priceAmountNetFormatted, string priceCurrencyAddress, BigInteger priceDecimals, float priceUsd, string quantityInitial, string quantityInitialFormatted, string quantityRemaining, string quantityRemainingFormatted, string quantityAvailable, string quantityAvailableFormatted, BigInteger quantityDecimals, BigInteger feeBps, FeeBreakdown[] feeBreakdown, string validFrom, string validUntil, string createdAt, string updatedAt, string orderCreatedAt = null, string orderUpdatedAt = null, string deletedAt = null)
         {
             this.orderId = orderId;

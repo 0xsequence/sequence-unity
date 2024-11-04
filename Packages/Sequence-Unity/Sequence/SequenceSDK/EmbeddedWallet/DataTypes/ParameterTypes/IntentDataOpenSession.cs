@@ -1,9 +1,11 @@
 using System;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentDataOpenSession
     {
@@ -13,6 +15,7 @@ namespace Sequence.EmbeddedWallet
         public string sessionId;
         public string verifier;
 
+        [Preserve]
         [JsonConstructor]
         public IntentDataOpenSession(string answer, bool forceCreateAccount, string identityType, string sessionId, string verifier)
         {
