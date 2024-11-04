@@ -11,12 +11,13 @@ namespace Sequence.EmbeddedWallet
         
         private IWallet _wallet;
 
-        private const string _verificationUrl = "https://demo-waas-wallet-link.pages.dev/";
+        private string _verificationUrl;// = "https://demo-waas-wallet-link.pages.dev/";
 
-        public EOAWalletLinker(IWallet wallet, string nonceGenerationLink)
+        public EOAWalletLinker(IWallet wallet, string nonceGenerationLink, string verificationUrl)
         {
             _wallet = wallet;
             _nonceGenerationLink = nonceGenerationLink;
+            _verificationUrl = verificationUrl;
         }
 
         public async Task<string> GenerateEOAWalletLink(Chain chain)
