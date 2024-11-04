@@ -30,7 +30,7 @@ namespace Sequence.Ethereum.Tests
         SequenceEthClient client = new SequenceEthClient("http://localhost:8545/");
 
         [SetUp]
-        public async Task _TestDeployComplexContract()
+        public async Task DeployComplexContract()
         {
             try
             {
