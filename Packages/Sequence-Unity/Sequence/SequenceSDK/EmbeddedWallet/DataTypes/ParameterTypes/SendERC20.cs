@@ -1,15 +1,17 @@
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class SendERC20 : Transaction
     {
         public const string TypeIdentifier = "erc20send";
-        public string to { get; private set; }
-        public string tokenAddress { get; private set; }
-        public string type { get; private set; } = TypeIdentifier;
-        public string value { get; private set; }
+        public string to;
+        public string tokenAddress;
+        public string type = TypeIdentifier;
+        public string value;
         
         public SendERC20(string tokenAddress, string to, string value)
         {
@@ -18,7 +20,7 @@ namespace Sequence.EmbeddedWallet
             this.value = value;
         }
 
-        
+        [Preserve]
         [JsonConstructor]
         public SendERC20(string to, string tokenAddress, string type, string value)
         {

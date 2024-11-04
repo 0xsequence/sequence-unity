@@ -1,9 +1,11 @@
 using System;
 using System.Numerics;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
+    [Preserve]
     [Serializable]
     public class PropertyFilter
     {
@@ -22,6 +24,7 @@ namespace Sequence.Marketplace
             this.values = values;
         }
 
+        [Preserve]
         [JsonConstructor]
         public PropertyFilter(string name, string type, BigInteger min, BigInteger max, object[] values)
         {

@@ -1,14 +1,17 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentResponseGetSession
     {
-        public string sessionId { get; private set; }
-        public string wallet { get; private set; }
-        public bool validated { get; private set; }
+        public string sessionId;
+        public string wallet;
+        public bool validated;
         
+        [Preserve]
         public IntentResponseGetSession(string sessionId, string wallet, bool validated)
         {
             this.sessionId = sessionId;

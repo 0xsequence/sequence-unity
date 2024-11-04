@@ -1,10 +1,14 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     public class RegisterSessionResponse
     {
-        public Session session { get; private set; }
-        public Response<IntentResponseSessionOpened> response { get; private set; }
+        public Session session;
+        public Response<IntentResponseSessionOpened> response;
         
+        [Preserve]
         public RegisterSessionResponse(Session session, Response<IntentResponseSessionOpened> response)
         {
             this.session = session;

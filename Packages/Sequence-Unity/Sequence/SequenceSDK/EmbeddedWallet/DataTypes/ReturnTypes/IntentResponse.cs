@@ -1,24 +1,30 @@
 using System;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentResponse<T>
     {
-        public Response<T> response { get; private set; }
+        public Response<T> response;
 
+        [Preserve]
         public IntentResponse(Response<T> response)
         {
             this.response = response;
         }
     }
-    
+
+    [Preserve]
+    [Serializable]
     public class Response<T>
     {
-        public string code { get; private set; }
-        public T data { get; private set; }
+        public string code;
+        public T data;
         
+        [Preserve]
         public Response(string code, T data)
         {
             this.code = code;

@@ -1,8 +1,10 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
+    [Preserve]
     [Serializable]
     public class CollectiblesFilter
     {
@@ -27,6 +29,7 @@ namespace Sequence.Marketplace
             this.ordersNotCreatedBy = ordersNotCreatedBy;
         }
 
+        [Preserve]
         [JsonConstructor]
         public CollectiblesFilter(bool includeEmpty, string searchText, PropertyFilter[] properties, string[] marketplaces, string[] inAccounts, string[] notInAccounts, string[] ordersCreatedBy, string[] ordersNotCreatedBy)
         {

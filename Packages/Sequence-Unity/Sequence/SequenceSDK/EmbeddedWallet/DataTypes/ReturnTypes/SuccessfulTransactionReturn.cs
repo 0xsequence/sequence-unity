@@ -3,25 +3,29 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class SuccessfulTransactionReturn : TransactionReturn
     {
         public const string IdentifyingCode = "transactionReceipt";
-        public string txHash { get; private set; }
-        public string metaTxHash { get; private set; }
-        public IntentPayload request { get; private set; }
-        public MetaTxnReceipt receipt { get; private set; }
+        public string txHash;
+        public string metaTxHash;
+        public IntentPayload request;
+        public MetaTxnReceipt receipt;
 
         [Obsolete("nativeReceipt is deprecated. Please use nativeTransactionReceipt instead.")]
-        public JObject nativeReceipt { get; private set; }
-        public TransactionReceipt nativeTransactionReceipt { get; private set; }
-        public SimulateResult[] simulations { get; private set; }
+        public JObject nativeReceipt;
+
+        public TransactionReceipt nativeTransactionReceipt;
+        public SimulateResult[] simulations;
 
         public SuccessfulTransactionReturn() { }
 
+        [Preserve]
         [JsonConstructor]
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {
