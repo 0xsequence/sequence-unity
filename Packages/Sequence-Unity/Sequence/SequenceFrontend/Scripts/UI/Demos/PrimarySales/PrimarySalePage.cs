@@ -30,13 +30,10 @@ namespace Sequence.Demo
         [SerializeField] private TMP_Text _endTimeText;
         
         [Header("Tile Object Pool")]
-        [SerializeField] private Transform _marketplaceTileParent;
-        [SerializeField] private GameObject _marketplaceTilePrefab;
-        [SerializeField] private int _objectPoolAmount = 10;
+        [SerializeField] private GenericObjectPool<PrimarySaleTile> _tilePool;
 
         private SequenceWallet _wallet;
         private PrimarySaleStateERC1155 _saleState;
-        private ObjectPool _tilePool;
 
         public override void Open(params object[] args)
         {
@@ -95,27 +92,15 @@ namespace Sequence.Demo
             _supplyText.text = string.Empty;
             _startTimeText.text = string.Empty;
             _endTimeText.text = string.Empty;
-            
-            _tilePool?.Cleanup();
-            _tilePool = ObjectPool.ActivateObjectPool(
-                _marketplaceTilePrefab, 
-                _objectPoolAmount, 
-                true, 
-                _marketplaceTileParent);
+            _tilePool.Cleanup();
         }
         
         private void LoadTiles()
         {
-            _tilePool?.Cleanup();
-            _tilePool = ObjectPool.ActivateObjectPool(
-                _marketplaceTilePrefab, 
-                _objectPoolAmount, 
-                true, 
-                _marketplaceTileParent);
-            
+            _tilePool.Cleanup();
             foreach (var (tokenId, supply) in _saleState.TokenSupplies)
             {
-                var tileObject = _tilePool.GetNextAvailable().GetComponent<PrimarySaleTile>();
+                var tileObject = _tilePool.GetObject();
                 tileObject.Initialize(
                     tokenId, 
                     supply.tokenMetadata, 
