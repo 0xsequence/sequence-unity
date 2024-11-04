@@ -1,19 +1,19 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
     [Serializable]
-    public class ListCollectiblesWithLowestListingArgs
+    internal class GetFloorOrderArgs
     {
         public string contractAddress;
         public CollectiblesFilter filter;
-        public Page page;
 
-        public ListCollectiblesWithLowestListingArgs(string contractAddress, CollectiblesFilter filter = null, Page page = null)
+        [Preserve]
+        public GetFloorOrderArgs(string contractAddress, CollectiblesFilter filter = null)
         {
             this.contractAddress = contractAddress;
             this.filter = filter;
-            this.page = page;
         }
     }
 }

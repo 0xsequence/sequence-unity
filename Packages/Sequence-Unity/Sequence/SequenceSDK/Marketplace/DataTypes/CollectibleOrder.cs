@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -8,6 +9,7 @@ namespace Sequence.Marketplace
         public TokenMetadata metadata;
         public Order order;
 
+        [Preserve]
         public CollectibleOrder(TokenMetadata metadata, Order order = null)
         {
             this.metadata = metadata;

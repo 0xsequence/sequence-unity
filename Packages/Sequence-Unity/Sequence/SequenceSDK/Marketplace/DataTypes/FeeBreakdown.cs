@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -10,6 +11,7 @@ namespace Sequence.Marketplace
         public string recipientAddress;
         public BigInteger bps;
 
+        [Preserve]
         public FeeBreakdown(string kind, string recipientAddress, BigInteger bps)
         {
             this.kind = kind;

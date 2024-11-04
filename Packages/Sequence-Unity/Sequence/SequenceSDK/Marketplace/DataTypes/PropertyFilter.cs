@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -16,12 +17,13 @@ namespace Sequence.Marketplace
         public PropertyFilter(string name, PropertyType type, BigInteger min = default, BigInteger max = default, object[] values = null)
         {
             this.name = name;
-            this.type = type.AsString();
+            this.type = type.ToString();
             this.min = min;
             this.max = max;
             this.values = values;
         }
 
+        [Preserve]
         [JsonConstructor]
         public PropertyFilter(string name, string type, BigInteger min, BigInteger max, object[] values)
         {

@@ -1,7 +1,10 @@
 using System;
+using Newtonsoft.Json;
 using Sequence.Utils;
 
-namespace Sequence {
+namespace Sequence 
+{
+    [JsonConverter(typeof(AddressJsonConverter))]
     public class Address {
         public readonly string Value;
 
@@ -38,6 +41,60 @@ namespace Sequence {
 
             Address address = (Address)obj;
             return this.Value == address.Value;
+        }
+    }
+
+    public class AddressJsonConverter : JsonConverter
+    {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (value is Address address)
+            {
+                writer.WriteValue(address.Value);
+            }
+            else
+            {
+                throw new JsonSerializationException("Expected Address object.");
+            }
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.String)
+            {
+                string addressString = (string)reader.Value;
+            
+                try
+                {
+                    return new Address(addressString);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    throw new JsonSerializationException("Invalid address format.");
+                }
+            }
+
+            throw new JsonSerializationException("Expected a string value.");
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return true;
+        }
+    }
+
+    public static class AddressExtensions
+    {
+        public static bool IsZeroAddress(this Address address)
+        {
+            return IsZeroAddress(address.Value);
+        }
+
+        public static bool IsZeroAddress(this string address)
+        {
+            string toCheck = address.WithoutHexPrefix();
+            toCheck = toCheck.Replace("0", "");
+            return toCheck.Length == 0;
         }
     }
 }
