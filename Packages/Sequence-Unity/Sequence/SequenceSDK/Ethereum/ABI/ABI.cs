@@ -56,6 +56,11 @@ namespace Sequence.ABI
 
         public static ABIType GetTypeFromEvmName(string typeName)
         {
+            if (IsFixedArray(typeName))
+            {
+                return ABIType.FIXEDARRAY;
+            }
+            
             if (typeName.EndsWith("[]"))
             {
                 return ABIType.DYNAMICARRAY;
@@ -65,12 +70,6 @@ namespace Sequence.ABI
             {
                 return ABIType.TUPLE;
             }
-
-            if (IsFixedArray(typeName))
-            {
-                return ABIType.FIXEDARRAY;
-            }
-
 
             if (typeName.StartsWith("bytes"))
             {
@@ -112,6 +111,11 @@ namespace Sequence.ABI
         /// <returns></returns>
         private static bool IsFixedArray(string value)
         {
+            if (value.StartsWith('('))
+            {
+                return false; // this is a tuple
+            }
+            
             int start = value.IndexOf('[');
             if (start <= 0)
             {
