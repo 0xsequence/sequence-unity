@@ -2,8 +2,8 @@ namespace Sequence.EmbeddedWallet
 {
     public class RegisterSessionIntent
     {
-        public IntentPayload intent { get; private set; }
-        public string friendlyName { get; private set; }
+        public IntentPayload intent;
+        public string friendlyName;
         
         public RegisterSessionIntent(string friendlyName, IntentPayload intent)
         {

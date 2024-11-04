@@ -5,7 +5,7 @@ namespace Sequence.EmbeddedWallet
     [Serializable]
     public class IntentDataListSessions
     {
-        public string wallet { get; private set; }
+        public string wallet;
         
         public IntentDataListSessions(string walletAddress)
         {

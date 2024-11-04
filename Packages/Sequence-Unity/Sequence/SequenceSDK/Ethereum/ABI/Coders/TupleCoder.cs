@@ -49,6 +49,11 @@ namespace Sequence.ABI
                 throw new ArgumentException($"{nameof(evmTypes)} must not be null");
             }
 
+            if (value.IsTuple())
+            {
+                value = value.ToObjectList();
+            }
+
             IList valueTuple = (IList)value;
             if (evmTypes.Length == 1 && (ABI.GetTypeFromEvmName(evmTypes[0]) == ABIType.FIXEDARRAY ||
                                          ABI.GetTypeFromEvmName(evmTypes[0]) == ABIType.DYNAMICARRAY) &&

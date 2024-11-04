@@ -10,10 +10,10 @@ namespace Sequence.EmbeddedWallet
     public class RawTransaction : Transaction
     {
         public const string TypeIdentifier = "transaction";
-        public string data { get; private set; }
-        public string to { get; private set; }
-        public string type { get; private set; } = TypeIdentifier;
-        public string value { get; private set; }
+        public string data;
+        public string to;
+        public string type = TypeIdentifier;
+        public string value;
 
         public RawTransaction(string to, string value = null, string calldata = null)
         {

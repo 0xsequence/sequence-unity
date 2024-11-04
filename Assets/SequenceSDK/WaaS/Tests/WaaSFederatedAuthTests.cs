@@ -18,7 +18,7 @@ namespace Sequence.EmbeddedWallet.Tests
         [Test]
         public async Task TestAccountAssociation()
         {
-            _login = new SequenceLogin();
+            _login = SequenceLogin.GetInstance();
             SequenceWallet.OnAccountFederated += OnAccountFederated;
             _tcs = new TaskCompletionSource<bool>();
             EndToEndTestHarness testHarness = new EndToEndTestHarness(_login);
