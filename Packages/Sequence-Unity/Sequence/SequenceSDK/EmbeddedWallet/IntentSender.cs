@@ -65,8 +65,19 @@ namespace Sequence.EmbeddedWallet
                     throw;
                 }
 
-                IntentPayload intent = intentPayload as IntentPayload;
-                long currentTimeAccordingToIntent = intent.issuedAt;
+                long currentTimeAccordingToIntent = 0;
+                if (intentPayload is IntentPayload intent)
+                {
+                    currentTimeAccordingToIntent = intent.issuedAt;
+                }
+                else if (intentPayload is RegisterSessionIntent registerSessionIntent)
+                {
+                    currentTimeAccordingToIntent = registerSessionIntent.intent.issuedAt;
+                }
+                else
+                {
+                    Debug.LogError("Unexpected intent payload type: " + intentPayload.GetType());
+                }
                 if (currentTimeAccordingToServer > currentTimeAccordingToIntent + 1 ||
                     currentTimeAccordingToServer < currentTimeAccordingToIntent - 1)
                 {

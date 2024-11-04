@@ -2,10 +2,12 @@ using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.Contracts;
 using Sequence.Transactions;
+using UnityEngine.Scripting;
 using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class RawTransaction : Transaction
     {
@@ -63,6 +65,7 @@ namespace Sequence.EmbeddedWallet
             this.data = callContractFunction.CallData;
         }
         
+        [Preserve]
         [JsonConstructor]
         public RawTransaction(string data, string to, string type, string value)
         {

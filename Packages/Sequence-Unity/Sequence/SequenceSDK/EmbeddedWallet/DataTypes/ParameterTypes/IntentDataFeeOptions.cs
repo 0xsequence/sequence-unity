@@ -1,8 +1,10 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     public class IntentDataFeeOptions
     {
         public string identifier;
@@ -10,6 +12,7 @@ namespace Sequence.EmbeddedWallet
         public Transaction[] transactions;
         public string wallet;
         
+        [Preserve]
         [JsonConstructor]
         public IntentDataFeeOptions(string identifier, string network, Transaction[] transactions, string wallet)
         {
