@@ -92,6 +92,39 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "XRP" }
         };
 
+        public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
+{
+    { Chain.Ethereum, "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" }, // WETH
+    { Chain.Polygon, "0x0000000000000000000000000000000000001010" }, // MATIC on Polygon
+    { Chain.PolygonZkEvm, "0xa2036f0538221a77A3937F1379699f44945018d0" }, // MATIC on zkEvm
+    { Chain.BNBSmartChain, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" }, // WBNB on BNB SmartChain
+    { Chain.ArbitrumOne, "0x912CE59144191C1204E64559FE8253a0e49E6548" }, // ARB on Arbitrum
+    { Chain.ArbitrumNova, "0xf823c3cd3cebe0a1fa952ba88dc9eef8e0bf46ad" }, // ARB on Arbitrum Nova
+    { Chain.Optimism, "0x4200000000000000000000000000000000000042" }, // OP
+    { Chain.Avalanche, "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7" }, // AVAX
+    { Chain.Gnosis, "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb" }, // xDai 
+    { Chain.Base, "0x4200000000000000000000000000000000000006" }, // WETH9 on Base
+    { Chain.OasysHomeverse, "0xd07df0da6e67b31db33cde4a6893e06bd87f8a08" }, // Placeholder for OAS token (0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000 explorers OAS token page)
+    { Chain.AstarZKEvm, "0x0000000000000000000000000000000000000000" }, // Placeholder for Astar token
+    { Chain.Xai, "0x0000000000000000000000000000000000000000" }, // Placeholder for XAI token
+    { Chain.Blast, "0x0000000000000000000000000000000000000000" }, // Placeholder for Blast token
+    
+    { Chain.TestnetSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Sepolia ETH
+    { Chain.TestnetArbitrumSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Arbitrum Sepolia ETH
+    { Chain.TestnetBNBSmartChain, "0x0000000000000000000000000000000000000000" }, // Placeholder for BNB Testnet
+    { Chain.TestnetBaseSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Base Sepolia ETH
+    { Chain.TestnetOasysHomeverse, "0x0000000000000000000000000000000000000000" }, // Placeholder for Oasys Testnet token
+    { Chain.TestnetAvalanche, "0x0000000000000000000000000000000000000000" }, // Placeholder for Avalanche Testnet token
+    { Chain.TestnetOptimisticSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Optimism Sepolia ETH
+    { Chain.TestnetPolygonAmoy, "0x0000000000000000000000000000000000000000" }, // Placeholder for Polygon Amoy Testnet token
+    { Chain.TestnetAstarZKyoto, "0x0000000000000000000000000000000000000000" }, // Placeholder for Astar zKyoto token
+    { Chain.TestnetXrSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for XR Sepolia token
+    { Chain.TestnetXaiSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Xai Sepolia token
+    { Chain.TestnetB3Sepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for B3 Sepolia token
+    { Chain.TestnetAPEChain, "0x0000000000000000000000000000000000000000" }, // Placeholder for APE Chain Testnet token
+    { Chain.TestnetBlastSepolia, "0x0000000000000000000000000000000000000000" }  // Placeholder for Blast Sepolia token
+};
+
         public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "https://etherscan.io/" },
@@ -106,7 +139,7 @@ namespace Sequence
             { Chain.Base, "https://basescan.org/" },
             { Chain.OasysHomeverse, "https://explorer.oasys.homeverse.games/" },
             { Chain.AstarZKEvm, "https://astar-zkevm.explorer.startale.com/" },
-            { Chain.Xai, "https://explorer.xai-chain.net/" }, 
+            { Chain.Xai, "https://explorer.xai-chain.net/" },
             { Chain.Blast, "https://blastscan.io/" },
             { Chain.B3, "https://explorer.b3.fun/" },
             { Chain.APEChain, "https://apescan.io/" },
@@ -122,7 +155,7 @@ namespace Sequence
             { Chain.TestnetAvalanche, "https://testnet.snowtrace.io/" },
             { Chain.TestnetOptimisticSepolia, "https://sepolia-optimism.etherscan.io/" },
             { Chain.TestnetPolygonAmoy, "https://amoy.polygonscan.com/" },
-            { Chain.TestnetAstarZKyoto, "https://astar-zkyoto.blockscout.com/" }, 
+            { Chain.TestnetAstarZKyoto, "https://astar-zkyoto.blockscout.com/" },
             { Chain.TestnetXrSepolia, "https://xr-sepolia-testnet.explorer.caldera.xyz/" },
             { Chain.TestnetXaiSepolia, "https://testnet-explorer-v2.xai-chain.net/" },
             { Chain.TestnetB3Sepolia, "https://sepolia.explorer.b3.fun/" },
@@ -135,11 +168,11 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "https://explorer.testnet.immutable.com/" },
             { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" }
         };
-        
+
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
         {
             { Chain.None, ""},
-            
+
             { Chain.Ethereum, "1" },
             { Chain.Polygon, "137" },
             { Chain.PolygonZkEvm, "1101" },
@@ -181,7 +214,7 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "13473" },
             { Chain.TestnetRootPorcini, "7672" }
         };
-        
+
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
         {
             { "1", Chain.Ethereum },
@@ -225,7 +258,7 @@ namespace Sequence
             { "13473", Chain.TestnetImmutableZkEvm },
             { "7672", Chain.TestnetRootPorcini }
         };
-        
+
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "mainnet" },
@@ -255,10 +288,10 @@ namespace Sequence
             { Chain.TestnetOasysHomeverse, "homeverse-testnet" },
             { Chain.TestnetAvalanche, "avalanche-testnet" },
             { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
-            { Chain.TestnetPolygonAmoy, "amoy" }, 
-            { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
+            { Chain.TestnetPolygonAmoy, "amoy" },
+            { Chain.TestnetAstarZKyoto, "astar-zkyoto" },
             { Chain.TestnetXrSepolia, "xr-sepolia" },
-            { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
+            { Chain.TestnetXaiSepolia, "xai-sepolia" },
             { Chain.TestnetB3Sepolia, "b3-sepolia" },
             { Chain.TestnetAPEChain, "apechain-testnet" },
             { Chain.TestnetBlastSepolia, "blast-sepolia" },
