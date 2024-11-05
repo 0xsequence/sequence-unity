@@ -159,11 +159,6 @@ namespace Sequence.EmbeddedWallet
 
         public void GuestLogin()
         {
-            if (_connectedWalletAddress != null)
-            {
-                FederateAccountGuest(_connectedWalletAddress);
-                return;
-            }
             ConnectToWaaSAsGuest();
         }
 
@@ -285,6 +280,7 @@ namespace Sequence.EmbeddedWallet
 
         public async Task Login(string email)
         {
+            ResetSessionId();
             try
             {
                 _isLoggingIn = true;
@@ -337,6 +333,7 @@ namespace Sequence.EmbeddedWallet
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
+            ResetSessionId();
             if (_connectedWalletAddress != null)
             {
                 FederateAccountSocial(result.IdToken, result.Method, _connectedWalletAddress);
@@ -530,6 +527,7 @@ namespace Sequence.EmbeddedWallet
 
         public void PlayFabLogin(string titleId, string sessionTicket, string email)
         {
+            ResetSessionId();
             if (_connectedWalletAddress != null)
             {
                 FederateAccountPlayFab(titleId, sessionTicket, email, _connectedWalletAddress);
@@ -574,6 +572,7 @@ namespace Sequence.EmbeddedWallet
 
         public async Task ConnectToWaaSAsGuest()
         {
+            ResetSessionId();
             _isLoggingIn = true;
             GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
             await connector.ConnectToWaaSViaGuest();
@@ -618,12 +617,6 @@ namespace Sequence.EmbeddedWallet
         {
             PlayFabConnector playFabConnector = new PlayFabConnector(titleId, sessionTicket, _sessionId, _sessionWallet, _connector);
             await playFabConnector.FederateAccount(email, walletAddress);
-        }
-        
-        public async Task FederateAccountGuest(string walletAddress)
-        {
-            GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
-            await connector.FederateAccount(walletAddress);
         }
         
         public async Task FederateAccountSocial(string idToken, LoginMethod method, string walletAddress)
