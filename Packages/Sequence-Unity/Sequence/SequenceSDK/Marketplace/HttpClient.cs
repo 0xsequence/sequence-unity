@@ -11,7 +11,7 @@ using UnityEngine.Networking;
 
 namespace Sequence.Marketplace
 {
-    public class HttpClient : IHttpClient
+    internal class HttpClient : IHttpClient
     {
         private string _apiKey;
         private const string _baseUrl = "https://dev-marketplace-api.sequence.app/"; // Todo switch to prod
@@ -36,6 +36,17 @@ namespace Sequence.Marketplace
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(Chain chain, string endpoint, ArgType args)
         {
             string url = _baseUrl + ChainDictionaries.PathOf[chain] + _endUrl + endpoint;
+            return await SendRequest<ArgType, ReturnType>(url, args);
+        }
+
+        public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
+        {
+            // todo remove when we remove above hardcoded dev key
+            if (url.StartsWith("https://api.sequence"))
+            {
+                _apiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+            }
+            
             string requestJson = "";
             if (args != null)
             {
