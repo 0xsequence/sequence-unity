@@ -338,6 +338,7 @@ and in that case, my mission will be complete.";
             {
                 Assert.AreEqual(
                     $"Unable to decode to type \'{typeof(T)}\' when ABI expects to decode to type \'uint256\'. Supported types: {typeof(BigInteger)}, {typeof(int)}, {typeof(long)}, {typeof(uint)}, {typeof(ulong)}",
+
                     ex.Message);
             }
             catch (Exception ex)

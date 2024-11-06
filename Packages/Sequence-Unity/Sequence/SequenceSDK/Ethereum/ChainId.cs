@@ -29,4 +29,18 @@ namespace Sequence
             return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto);
         }
     }
+
+    public static class NativeTokenAddress
+    {
+        public static string GetNativeTokenAddress(Chain chain)
+        {
+            return ChainDictionaries.NativeTokenAddressOf.TryGetValue(chain, out var address) ? address : null;
+        }
+        public static string GetNativeTokenAddress(int chainId)
+        {
+            return GetNativeTokenAddress((Chain)chainId);
+        }
+    }
+    
+
 }

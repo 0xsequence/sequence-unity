@@ -208,11 +208,11 @@ namespace Sequence.ABI
         private static string[] ExtractTypes(JArray array)
         {
             int length = array.Count;
-            string[] result = new string[length];
+            List<string> result = new List<string>(length);
             for (int i = 0; i < length; i++)
             {
                 JObject item = array[i] as JObject;
-                result[i] = item["type"].ToString();
+                result.Add(item["type"].ToString());
                 if (result[i].Contains("tuple"))
                 {
                     StringBuilder tupleType = new StringBuilder();
@@ -237,7 +237,7 @@ namespace Sequence.ABI
                 }
             }
 
-            return result;
+            return result.ToArray();
         }
 
         private static Dictionary<string, List<(string[], string)>> AddToDictionary(
