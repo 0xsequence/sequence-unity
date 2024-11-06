@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Sequence.Editor
         [MenuItem("Sequence Dev/Platform Compile Test")]
         public static void RunBuildTest()
         {
+            BigInteger startEpochTime = new BigInteger(DateTimeOffset.Now.ToUnixTimeSeconds());
             ClearPreviousErrors();
             
             string[] scenes = GetEnabledScenes();
@@ -38,6 +40,9 @@ namespace Sequence.Editor
             {
                 Debug.LogError(failedBuild);
             }
+            
+            BigInteger endEpochTime = new BigInteger(DateTimeOffset.Now.ToUnixTimeSeconds());
+            Debug.Log($"Total Test Time: {endEpochTime - startEpochTime} seconds");
         }
 
         private static void ClearPreviousErrors()
