@@ -6,9 +6,9 @@ namespace Sequence.Marketplace
 {
     public class CurrencySwapTests
     {
-        private const Chain _chain = Chain.ArbitrumNova;
-        private const string USDC = "0x750ba8b76187092B0D1E87E28daaf484d1b5273b";
-        private const string WETH = "0x722E8BdD2ce80A4422E880164f2079488e115365";
+        private const Chain _chain = Chain.Polygon;
+        private const string USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+        private const string WPOL = "0x0000000000000000000000000000000000001010";
         
         [Test]
         public async Task GetSwapPriceTest()
@@ -16,7 +16,7 @@ namespace Sequence.Marketplace
             CurrencySwap currencySwap = new CurrencySwap(_chain);
             string amount = "1000000000000000000";
             
-            SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address(USDC), new Address(WETH), amount);
+            SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address(USDC), new Address(WPOL), amount);
             
             Assert.IsNotNull(swapPrice);
             Assert.AreEqual(USDC, swapPrice.currencyAddress);
@@ -57,15 +57,15 @@ namespace Sequence.Marketplace
             ChainIndexer indexer = new ChainIndexer(_chain);
             Address userWallet = new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07");
             
-            SwapQuote swapQuote = await currencySwap.GetSwapQuote(userWallet, new Address(USDC), new Address(WETH), amount, true);
+            SwapQuote swapQuote = await currencySwap.GetSwapQuote(userWallet, new Address(USDC), new Address(WPOL), amount, true);
             GetTokenBalancesReturn balancesReturn =
-                await indexer.GetTokenBalances(new GetTokenBalancesArgs(userWallet, WETH));
+                await indexer.GetTokenBalances(new GetTokenBalancesArgs(userWallet, WPOL));
             TokenBalance[] balances = balancesReturn.balances;
             Assert.Greater(balances.Length, 0);
             TokenBalance wethBalance = null;
             foreach (var balance in balances)
             {
-                if (balance.contractAddress == WETH)
+                if (balance.contractAddress == WPOL)
                 {
                     wethBalance = balance;
                     break;
@@ -75,7 +75,7 @@ namespace Sequence.Marketplace
             BigInteger wethBalanceAmount = wethBalance.balance;
             
             Assert.IsNotNull(swapQuote);
-            Assert.AreEqual(WETH, swapQuote.currencyAddress);
+            Assert.AreEqual(WPOL, swapQuote.currencyAddress);
             Assert.AreEqual(wethBalanceAmount, BigInteger.Parse(swapQuote.currencyBalance));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.price));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.maxPrice));
