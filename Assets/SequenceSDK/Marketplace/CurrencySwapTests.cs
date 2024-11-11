@@ -6,17 +6,17 @@ namespace Sequence.Marketplace
 {
     public class CurrencySwapTests
     {
-        private const Chain _chain = Chain.Polygon;
-        private const string USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-        private const string WPOL = "0x0000000000000000000000000000000000001010";
+        private const Chain _chain = Chain.ArbitrumOne;
+        private const string USDC = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831";
+        private const string USDCe = "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
         
         [Test]
         public async Task GetSwapPriceTest()
         {
             CurrencySwap currencySwap = new CurrencySwap(_chain);
-            string amount = "1000000000000000000";
+            string amount = "1000";
             
-            SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address(USDC), new Address(WPOL), amount);
+            SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address(USDC), new Address(USDCe), amount);
             
             Assert.IsNotNull(swapPrice);
             Assert.AreEqual(USDC, swapPrice.currencyAddress);
@@ -31,9 +31,9 @@ namespace Sequence.Marketplace
         public async Task GetSwapQuotesTest()
         {
             CurrencySwap currencySwap = new CurrencySwap(_chain);
-            string amount = "1000000000000000000";
+            string amount = "1000";
             
-            SwapPrice[] swapPrices = await currencySwap.GetSwapPrices(new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07"), new Address(USDC), amount);
+            SwapPrice[] swapPrices = await currencySwap.GetSwapPrices(new Address("0xe8db071f698aBA1d60babaE8e08F5cBc28782108"), new Address(USDC), amount);
             
             Assert.IsNotNull(swapPrices);
             Assert.Greater(swapPrices.Length, 0);
@@ -53,19 +53,19 @@ namespace Sequence.Marketplace
         public async Task GetSwapQuoteTest()
         {
             CurrencySwap currencySwap = new CurrencySwap(_chain);
-            string amount = "1000000000000000000";
+            string amount = "1000";
             ChainIndexer indexer = new ChainIndexer(_chain);
-            Address userWallet = new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07");
+            Address userWallet = new Address("0xe8db071f698aBA1d60babaE8e08F5cBc28782108");
             
-            SwapQuote swapQuote = await currencySwap.GetSwapQuote(userWallet, new Address(USDC), new Address(WPOL), amount, true);
+            SwapQuote swapQuote = await currencySwap.GetSwapQuote(userWallet, new Address(USDC), new Address(USDCe), amount, true);
             GetTokenBalancesReturn balancesReturn =
-                await indexer.GetTokenBalances(new GetTokenBalancesArgs(userWallet, WPOL));
+                await indexer.GetTokenBalances(new GetTokenBalancesArgs(userWallet, USDCe));
             TokenBalance[] balances = balancesReturn.balances;
             Assert.Greater(balances.Length, 0);
             TokenBalance wethBalance = null;
             foreach (var balance in balances)
             {
-                if (balance.contractAddress == WPOL)
+                if (balance.contractAddress == USDCe)
                 {
                     wethBalance = balance;
                     break;
@@ -75,7 +75,7 @@ namespace Sequence.Marketplace
             BigInteger wethBalanceAmount = wethBalance.balance;
             
             Assert.IsNotNull(swapQuote);
-            Assert.AreEqual(WPOL, swapQuote.currencyAddress);
+            Assert.AreEqual(USDCe, swapQuote.currencyAddress);
             Assert.AreEqual(wethBalanceAmount, BigInteger.Parse(swapQuote.currencyBalance));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.price));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.maxPrice));
