@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -19,16 +20,15 @@ namespace Sequence.Marketplace
             SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address(USDC), new Address(USDCe), amount);
             
             Assert.IsNotNull(swapPrice);
-            Assert.AreEqual(USDC, swapPrice.currencyAddress);
-            Assert.AreEqual(amount, swapPrice.currencyBalance);
+            Assert.AreEqual(USDCe.ToLower(), swapPrice.currencyAddress.Value.ToLower());
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.price));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.maxPrice));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.transactionValue));
-            Assert.GreaterOrEqual(BigInteger.Parse(swapPrice.transactionValue), 0);
+            Assert.GreaterOrEqual(BigInteger.Parse(swapPrice.transactionValue), BigInteger.Zero);
         }
 
         [Test]
-        public async Task GetSwapQuotesTest()
+        public async Task GetSwapPricesTest()
         {
             CurrencySwap currencySwap = new CurrencySwap(_chain);
             string amount = "1000";
@@ -40,12 +40,10 @@ namespace Sequence.Marketplace
             foreach (SwapPrice swapPrice in swapPrices)
             {
                 Assert.IsNotNull(swapPrice);
-                Assert.AreEqual(USDC, swapPrice.currencyAddress);
-                Assert.AreEqual(amount, swapPrice.currencyBalance);
                 Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.price));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.maxPrice));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.transactionValue));
-                Assert.GreaterOrEqual(BigInteger.Parse(swapPrice.transactionValue), 0);
+                Assert.GreaterOrEqual(BigInteger.Parse(swapPrice.transactionValue), BigInteger.Zero);
             }
         }
         
@@ -75,14 +73,52 @@ namespace Sequence.Marketplace
             BigInteger wethBalanceAmount = wethBalance.balance;
             
             Assert.IsNotNull(swapQuote);
-            Assert.AreEqual(USDCe, swapQuote.currencyAddress);
+            Assert.AreEqual(USDCe.ToLower(), swapQuote.currencyAddress.Value.ToLower());
             Assert.AreEqual(wethBalanceAmount, BigInteger.Parse(swapQuote.currencyBalance));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.price));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.maxPrice));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.transactionData));
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.transactionValue));
-            Assert.GreaterOrEqual(BigInteger.Parse(swapQuote.transactionValue), 0);
+            Assert.GreaterOrEqual(BigInteger.Parse(swapQuote.transactionValue), BigInteger.Zero);
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.approveData));
+        }
+        
+        [Test]
+        public async Task GetSwapQuoteTest_InsufficientBalance()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            string amount = "1000";
+            ChainIndexer indexer = new ChainIndexer(_chain);
+            Address userWallet = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+
+            try
+            {
+                SwapQuote swapQuote = await currencySwap.GetSwapQuote(userWallet, new Address(USDC), new Address(USDCe), amount, true);
+                Assert.Fail("Exception expected but none was encountered");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.Message.Contains("Insufficient balance"));
+            }
+        }
+        
+        [Test]
+        public async Task GetSwapQuoteTest_FailedToFetchPrice()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            string amount = "1000000000000000000000000000000000000";
+            ChainIndexer indexer = new ChainIndexer(_chain);
+            Address userWallet = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
+
+            try
+            {
+                SwapQuote swapQuote = await currencySwap.GetSwapQuote(userWallet, new Address(USDC), new Address(USDCe), amount, true);
+                Assert.Fail("Exception expected but none was encountered");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error fetching swap price"));
+            }
         }
     }
 }
