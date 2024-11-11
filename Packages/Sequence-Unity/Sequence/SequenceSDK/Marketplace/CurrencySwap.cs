@@ -81,6 +81,10 @@ namespace Sequence.Marketplace
             {
                 GetSwapQuoteResponse response =
                     await _client.SendRequest<GetSwapQuoteRequest, GetSwapQuoteResponse>(url, args);
+                if (response.swapQuote == null)
+                {
+                    throw new Exception("Unknown error - swap API has returned a null response");
+                }
                 return response.swapQuote;
             }
             catch (Exception e)
