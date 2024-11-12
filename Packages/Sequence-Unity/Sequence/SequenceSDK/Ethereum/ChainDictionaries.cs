@@ -22,7 +22,10 @@ namespace Sequence
             { Chain.Blast, "Blast" },
             { Chain.B3, "B3" },
             { Chain.APEChain, "APE Chain" },
-            
+            { Chain.ImmutableZkEvm, "Immutable zkEVM"},
+            { Chain.SkaleNebula, "Skale Nebula" },
+            { Chain.Root, "Root" },
+
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
             { Chain.TestnetBNBSmartChain, "BNB Smart Chain Testnet" },
@@ -40,7 +43,9 @@ namespace Sequence
             { Chain.TestnetBorne, "Borne Testnet" },
             { Chain.TestnetSkaleNebulaGamingHub, "Skale Nebula Gaming Hub Testnet" },
             { Chain.TestnetSoneiumMinato, "Soneium Minato Testnet" },
-            { Chain.TestnetToy, "TOY Testnet" }
+            { Chain.TestnetToy, "TOY Testnet" },
+            { Chain.TestnetImmutableZkEvm, "Immutable zkEVM Testnet" },
+            { Chain.TestnetRootPorcini, "Root Porcini Testnet" }
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -61,6 +66,9 @@ namespace Sequence
             { Chain.Blast, "ETH" },
             { Chain.B3, "ETH" },
             { Chain.APEChain, "APE" },
+            { Chain.ImmutableZkEvm, "IMX" },
+            { Chain.SkaleNebula, "sFUEL" },
+            { Chain.Root, "XRP" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -79,7 +87,9 @@ namespace Sequence
             { Chain.TestnetBorne, "BORNE" },
             { Chain.TestnetSkaleNebulaGamingHub, "sFUEL" },
             { Chain.TestnetSoneiumMinato, "ETH" },
-            { Chain.TestnetToy, "TOY" }
+            { Chain.TestnetToy, "TOY" },
+            { Chain.TestnetImmutableZkEvm, "IMX" },
+            { Chain.TestnetRootPorcini, "XRP" }
         };
 
         public static Dictionary<Chain, string> ChainTokenAddressOf = new Dictionary<Chain, string>()
@@ -133,6 +143,9 @@ namespace Sequence
             { Chain.Blast, "https://blastscan.io/" },
             { Chain.B3, "https://explorer.b3.fun/" },
             { Chain.APEChain, "https://apescan.io/" },
+            { Chain.ImmutableZkEvm, "https://explorer.immutable.com/" },
+            { Chain.SkaleNebula, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
+            { Chain.Root, "https://rootscan.io/" },
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -151,7 +164,9 @@ namespace Sequence
             { Chain.TestnetBorne, "https://subnets-test.avax.network/bornegfdn" },
             { Chain.TestnetSkaleNebulaGamingHub, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
             { Chain.TestnetSoneiumMinato, "https://explorer-testnet.soneium.org/" },
-            { Chain.TestnetToy, "https://toy-chain-testnet.explorer.caldera.xyz/" }
+            { Chain.TestnetToy, "https://toy-chain-testnet.explorer.caldera.xyz/" },
+            { Chain.TestnetImmutableZkEvm, "https://explorer.testnet.immutable.com/" },
+            { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" }
         };
         
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -174,6 +189,9 @@ namespace Sequence
             { Chain.Blast, "81457" },
             { Chain.B3, "8333" },
             { Chain.APEChain, "33139" },
+            { Chain.ImmutableZkEvm, "13371" },
+            { Chain.SkaleNebula, "1482601649" },
+            { Chain.Root, "7668" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -192,7 +210,9 @@ namespace Sequence
             { Chain.TestnetBorne, "94984" },
             { Chain.TestnetSkaleNebulaGamingHub, "37084624" },
             { Chain.TestnetSoneiumMinato, "1946" },
-            { Chain.TestnetToy, "21000000" }
+            { Chain.TestnetToy, "21000000" },
+            { Chain.TestnetImmutableZkEvm, "13473" },
+            { Chain.TestnetRootPorcini, "7672" }
         };
         
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -213,6 +233,9 @@ namespace Sequence
             { "81457", Chain.Blast },
             { "8333", Chain.B3 },
             { "33139", Chain.APEChain },
+            { "13371", Chain.ImmutableZkEvm },
+            { "1482601649", Chain.SkaleNebula },
+            { "7668", Chain.Root },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -231,7 +254,9 @@ namespace Sequence
             { "94984", Chain.TestnetBorne },
             { "37084624", Chain.TestnetSkaleNebulaGamingHub },
             { "1946", Chain.TestnetSoneiumMinato },
-            { "21000000", Chain.TestnetToy }
+            { "21000000", Chain.TestnetToy },
+            { "13473", Chain.TestnetImmutableZkEvm },
+            { "7672", Chain.TestnetRootPorcini }
         };
         
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -252,6 +277,9 @@ namespace Sequence
             { Chain.Blast, "blast" },
             { Chain.B3, "b3" },
             { Chain.APEChain, "apechain" },
+            { Chain.ImmutableZkEvm, "immutable-zkevm" },
+            { Chain.SkaleNebula, "skale-nebula" },
+            { Chain.Root, "root" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
@@ -270,7 +298,9 @@ namespace Sequence
             { Chain.TestnetBorne, "borne-testnet" },
             { Chain.TestnetSkaleNebulaGamingHub, "skale-nebula-testnet" },
             { Chain.TestnetSoneiumMinato, "soneium-minato" },
-            { Chain.TestnetToy, "toy-testnet" }
+            { Chain.TestnetToy, "toy-testnet" },
+            { Chain.TestnetImmutableZkEvm, "immutable-zkevm-testnet" },
+            { Chain.TestnetRootPorcini, "root-porcini" }
         };
     }
 }
