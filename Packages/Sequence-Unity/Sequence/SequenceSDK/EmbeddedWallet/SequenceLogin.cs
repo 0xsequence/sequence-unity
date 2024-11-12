@@ -368,10 +368,6 @@ namespace Sequence.EmbeddedWallet
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
-                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
-                {
-                    StoreWalletSecurely(walletAddress);
-                }
                 _isLoggingIn = false;
                 wallet.OnDropSessionComplete += session =>
                 {
@@ -403,6 +399,18 @@ namespace Sequence.EmbeddedWallet
             if (_automaticallyFederateAccountsWhenPossible && _failedLoginEmail == email && !loginIntent.forceCreateAccount) // forceCreateAccount should only be true if we are creating another account for the same email address, meaning we don't have a failed login method that needs federating
             {
                 await FederateAccount(new IntentDataFederateAccount(_failedLoginIntent, walletAddress), _failedLoginMethod, email);
+            }
+
+            try
+            {
+                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
+                {
+                    StoreWalletSecurely(walletAddress);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error storing session wallet securely: " + e.Message);
             }
         }
 
