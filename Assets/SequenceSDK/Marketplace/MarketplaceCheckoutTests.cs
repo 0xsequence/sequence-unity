@@ -224,6 +224,18 @@ namespace Sequence.Marketplace
             {
                 Assert.AreNotEqual(initialWallet, wallet.GetWalletAddress());
                 await Task.Delay(10000);
+                
+                ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
+                GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
+                    new GetTokenBalancesArgs(wallet.GetWalletAddress(), collection));
+                Assert.IsNotNull(balancesReturn);
+                TokenBalance[] balances = balancesReturn.balances;
+                BigInteger balance = BigInteger.Zero;
+                if (balances.Length != 0)
+                {
+                    balance = balances[0].balance;
+                }
+                
                 Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
                 MarketplaceReader reader = new MarketplaceReader(Chain.ArbitrumNova);
                 
@@ -253,6 +265,17 @@ namespace Sequence.Marketplace
                 result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result is SuccessfulTransactionReturn);
+                
+                balancesReturn = await indexer.GetTokenBalances(
+                    new GetTokenBalancesArgs(wallet.GetWalletAddress(), collection));
+                Assert.IsNotNull(balancesReturn);
+                TokenBalance[] newBalances = balancesReturn.balances;
+                BigInteger newBalance = BigInteger.Zero;
+                if (newBalances.Length != 0)
+                {
+                    newBalance = newBalances[0].balance;
+                }
+                Assert.Greater(newBalance, balance);
                 
                 bought = true;
             }, (error, method, email, methods) =>
