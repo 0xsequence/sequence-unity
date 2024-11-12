@@ -9,7 +9,9 @@
         "SequenceUtils",
         "SequenceMarketplace",
         "GUID:403077141e1554429a890cbc129df651",
-        "SequenceEmbeddedWallet"
+        "SequenceEmbeddedWallet",
+        "GUID:040286810a82b46ed9acd6d70bfbbfd4",
+        "GUID:f78a27d6a73d94c4baf04337e0add4dc"
     ],
     "includePlatforms": [
         "Editor"
