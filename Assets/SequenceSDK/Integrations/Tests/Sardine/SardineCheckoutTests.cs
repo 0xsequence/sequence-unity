@@ -48,7 +48,7 @@ namespace Sequence.Integrations.Tests.Sardine
         public async Task TestSardineGetNFTCheckoutToken()
         {
             CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
-            SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
+            SardineCheckout sardine = new SardineCheckout(Chain.ArbitrumNova, _testWallet);
 
             SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders[0], 1);
             

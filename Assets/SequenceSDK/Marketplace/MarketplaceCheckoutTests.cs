@@ -35,7 +35,7 @@ namespace Sequence.Marketplace
                     }
                 }
             }
-            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             CheckoutOptions options = await checkout.GetCheckoutOptions(orders.ToArray());
             
@@ -60,7 +60,7 @@ namespace Sequence.Marketplace
                     }
                 }
             }
-            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
             {
@@ -87,7 +87,7 @@ namespace Sequence.Marketplace
                     }
                 }
             }
-            Checkout checkout = new Checkout(_testWallet, Chain.TestnetPolygonAmoy);
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
             {
@@ -126,25 +126,14 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateOfferTransaction(int amount)
         {
-            _collectibleOrders = await OrderFetcher.FetchListings();
-            List<Order> orders = new List<Order>();
-            for (int i = 0; i < _collectibleOrders.Length; i++)
-            {
-                if (_collectibleOrders[i].order.status == OrderStatus.active)
-                {
-                    orders.Add(_collectibleOrders[i].order);
-                    if (orders.Count == amount)
-                    {
-                        break;
-                    }
-                }
-            }
-            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            Address USDC = new Address("0x750ba8b76187092B0D1E87E28daaf484d1b5273b");
+            Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
             {
-                Step[] steps = await checkout.GenerateOfferTransaction(new Address(orders[i].collectionContractAddress), orders[i].tokenId, 
-                    BigInteger.Parse(orders[i].quantityAvailable), ContractType.ERC1155, new Address(orders[i].priceCurrencyAddress), 
+                Step[] steps = await checkout.GenerateOfferTransaction(collection, "1", 
+                    1, ContractType.ERC1155, USDC, 
                     1, DateTime.Now + TimeSpan.FromMinutes(30));
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
@@ -450,8 +439,6 @@ namespace Sequence.Marketplace
                 await Task.Yield();
             }
         }
-        
-        
 
         private async Task<Step[]> FetchOfferAndSell(Address collection, SequenceWallet wallet, int retries = 0)
         {
