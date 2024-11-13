@@ -19,7 +19,7 @@ namespace Sequence.Demo
         {
             _image = GetComponent<Image>();
             _interactButton = GetComponent<Button>();
-            _interactButton.onClick.AddListener(() => SequenceSampleUI.instance.OpenSeeMarketplaceDetailsPanelWithDelay(0, _collectibleOrder));
+            _interactButton.onClick.AddListener(() => SequenceSampleUI.instance.OpenViewMarketplaceDetailsPanelWithDelay(0, _collectibleOrder));
         }
 
         public void Assemble(CollectibleOrder order)

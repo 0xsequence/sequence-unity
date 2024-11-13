@@ -19,7 +19,7 @@ namespace Sequence.Demo
         private SignMessagePanel _signMessagePanel;
         private SendTransactionPanel _sendTransactionPanel;
         private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
-        private SeeMarketplaceListingsPanel _seeMarketplaceListingsPanel;
+        private ViewMarketplaceListingsPanel _viewMarketplaceListingsPanel;
         private MarketplaceItemDetailsPanel _marketplaceItemDetailsPanel;
         private void Awake()
         {
@@ -32,7 +32,7 @@ namespace Sequence.Demo
             _signMessagePanel = GetComponentInChildren<SignMessagePanel>();
             _sendTransactionPanel = GetComponentInChildren<SendTransactionPanel>();
             _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
-            _seeMarketplaceListingsPanel = GetComponentInChildren<SeeMarketplaceListingsPanel>();
+            _viewMarketplaceListingsPanel = GetComponentInChildren<ViewMarketplaceListingsPanel>();
             _marketplaceItemDetailsPanel = GetComponentInChildren<MarketplaceItemDetailsPanel>();
 
             if (!IsTesting)
@@ -97,12 +97,12 @@ namespace Sequence.Demo
             _sendTransactionWithFeeOptionsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
         
-        public void OpenSeeMarketplaceListingsPanelWithDelay(float delayInSeconds, params object[] openArgs)
+        public void OpenViewMarketplaceListingsPanelWithDelay(float delayInSeconds, params object[] openArgs)
         {
-            _seeMarketplaceListingsPanel.OpenWithDelay(delayInSeconds, openArgs);
+            _viewMarketplaceListingsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
 
-        public void OpenSeeMarketplaceDetailsPanelWithDelay(float delayInSeconds, params object[] openArgs)
+        public void OpenViewMarketplaceDetailsPanelWithDelay(float delayInSeconds, params object[] openArgs)
         {
             _marketplaceItemDetailsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
