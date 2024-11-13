@@ -55,9 +55,9 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestListAllCollectibleOffersWithHighestPricedOfferFirst()
         {
-            Chain chain = Chain.TestnetPolygonAmoy;
+            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x5e4bfd71236a21299d43f508dbb76cb7d0fd4e50";
+            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
             marketplaceReader.OnListCollectiblesReturn += OnSuccess;
@@ -114,9 +114,9 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestGetLowestPriceOfferForCollectible()
         {
-            Chain chain = Chain.TestnetPolygonAmoy;
+            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x5e4bfd71236a21299d43f508dbb76cb7d0fd4e50";
+            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
             marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
@@ -133,9 +133,9 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestGetHighestPriceOfferForCollectible()
         {
-            Chain chain = Chain.TestnetPolygonAmoy;
+            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x5e4bfd71236a21299d43f508dbb76cb7d0fd4e50";
+            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
             marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
@@ -208,9 +208,9 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestListAllOffersForCollectible()
         {
-            Chain chain = Chain.TestnetPolygonAmoy;
+            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x5e4bfd71236a21299d43f508dbb76cb7d0fd4e50";
+            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
             marketplaceReader.OnListCollectibleOffersReturn += OnSuccess;

@@ -8,17 +8,9 @@ namespace Sequence.Integrations.Tests.Sardine
 {
     public class SardineCheckoutTests
     {
-        private CollectibleOrder[] _collectibleOrders;
-        
         private IWallet _testWallet =
             new SequenceWallet(new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07"), "", null);
-        
-        [SetUp]
-        public async Task Setup()
-        {
-            _collectibleOrders = await OrderFetcher.FetchListings();
-        }
-        
+
         [Test]
         public async Task TestCheckSardineWhitelistStatus()
         {
@@ -55,9 +47,10 @@ namespace Sequence.Integrations.Tests.Sardine
         [Test]
         public async Task TestSardineGetNFTCheckoutToken()
         {
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
 
-            SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(_collectibleOrders[0], 1);
+            SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders[0], 1);
             
             Assert.NotNull(token);
             Assert.IsFalse(string.IsNullOrWhiteSpace(token.token));
