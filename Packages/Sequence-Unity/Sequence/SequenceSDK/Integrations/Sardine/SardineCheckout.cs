@@ -116,7 +116,7 @@ namespace Sequence.Integrations.Sardine
                 recipient = _wallet.GetWalletAddress();
             }
             
-            Step[] steps = await _checkout.GenerateBuyTransaction(order.order, additionalFee);
+            Step[] steps = await _checkout.GenerateBuyTransaction(order.order, quantity, additionalFee);
             string callData = steps[0].data;
             
             return await SardineGetNFTCheckoutToken(order, recipient, quantity, callData);

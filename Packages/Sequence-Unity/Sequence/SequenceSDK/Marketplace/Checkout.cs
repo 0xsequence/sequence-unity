@@ -54,10 +54,10 @@ namespace Sequence.Marketplace
             return GetCheckoutOptions(options, additionalFeeBps);
         }
         
-        public async Task<Step[]> GenerateBuyTransaction(Order order, AdditionalFee additionalFee = null)
+        public async Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null)
         {
             OrderData[] ordersData = new OrderData[]
-                { new OrderData(order.orderId, order.quantityAvailable) };
+                { new OrderData(order.orderId, amount.ToString()) };
             AdditionalFee[] additionalFees = new AdditionalFee[] { additionalFee };
             if (additionalFee == null)
             {
@@ -78,10 +78,10 @@ namespace Sequence.Marketplace
             }
         }
         
-        public async Task<Step[]> GenerateSellTransaction(Order order, AdditionalFee additionalFee = null)
+        public async Task<Step[]> GenerateSellTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null)
         {
             OrderData[] ordersData = new OrderData[]
-                { new OrderData(order.orderId, order.quantityAvailable) };
+                { new OrderData(order.orderId, amount.ToString()) };
             AdditionalFee[] additionalFees = new AdditionalFee[] { additionalFee };
             if (additionalFee == null)
             {

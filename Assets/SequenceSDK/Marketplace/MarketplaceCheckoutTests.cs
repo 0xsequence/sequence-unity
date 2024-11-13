@@ -64,7 +64,7 @@ namespace Sequence.Marketplace
 
             for (int i = 0; i < amount; i++)
             {
-                Step[] steps = await checkout.GenerateBuyTransaction(orders[i]);
+                Step[] steps = await checkout.GenerateBuyTransaction(orders[i], 1);
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
             }
@@ -91,7 +91,7 @@ namespace Sequence.Marketplace
 
             for (int i = 0; i < amount; i++)
             {
-                Step[] steps = await checkout.GenerateSellTransaction(orders[i]);
+                Step[] steps = await checkout.GenerateSellTransaction(orders[i], 1);
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
             }
@@ -307,7 +307,7 @@ namespace Sequence.Marketplace
             Step[] steps = null;
             try
             {
-                steps = await checkout.GenerateBuyTransaction(_collectibleOrders[0].order);
+                steps = await checkout.GenerateBuyTransaction(_collectibleOrders[0].order, 1);
             }
             catch (Exception e)
             {
@@ -478,7 +478,7 @@ namespace Sequence.Marketplace
             Step[] steps = null;
             try
             {
-                steps = await checkout.GenerateSellTransaction(_collectibleOrders[0].order);
+                steps = await checkout.GenerateSellTransaction(_collectibleOrders[0].order, 1);
             }
             catch (Exception e)
             {

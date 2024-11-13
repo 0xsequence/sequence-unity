@@ -108,7 +108,7 @@ namespace Sequence.Integrations.Transak
 
         public async Task<string> GetNFTCheckoutLink(Order order, TokenMetadata metadata, uint quantity, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
         {
-            Step[] steps = await _checkout.GenerateBuyTransaction(order, additionalFee);
+            Step[] steps = await _checkout.GenerateBuyTransaction(order, quantity, additionalFee);
             string callData = steps[0].data;
 
             TransakNftData nftData = new TransakNftData(metadata.image, metadata.name,
