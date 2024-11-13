@@ -7,9 +7,9 @@ namespace Sequence.Marketplace
     {
         public static async Task<CollectibleOrder[]> FetchListings()
         {
-            Chain chain = Chain.Polygon;
+            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
+            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
             ListCollectiblesReturn collectiblesResponse = await marketplaceReader.ListCollectibleListingsWithLowestPricedListingsFirst(contractAddress, filter);
@@ -20,9 +20,9 @@ namespace Sequence.Marketplace
         
         public static async Task<CollectibleOrder[]> FetchOffers()
         {
-            Chain chain = Chain.TestnetPolygonAmoy;
+            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x5e4bfd71236a21299d43f508dbb76cb7d0fd4e50";
+            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
             ListCollectiblesReturn collectiblesResponse = await marketplaceReader.ListCollectibleOffersWithHighestPricedOfferFirst(contractAddress, filter);

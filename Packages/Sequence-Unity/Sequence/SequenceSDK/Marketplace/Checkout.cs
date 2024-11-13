@@ -87,12 +87,12 @@ namespace Sequence.Marketplace
             {
                 additionalFees = null;
             }
-            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
+            GenerateSellTransaction generateBuyTransaction = new GenerateSellTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
                 order.marketplace, ordersData, additionalFees, _wallet.GetWalletKind());
 
             try
             {
-                GenerateTransactionResponse response = await _client.SendRequest<GenerateBuyTransaction, GenerateTransactionResponse>(_chain, "GenerateSellTransaction",
+                GenerateTransactionResponse response = await _client.SendRequest<GenerateSellTransaction, GenerateTransactionResponse>(_chain, "GenerateSellTransaction",
                     generateBuyTransaction);
                 return response.steps;
             }
