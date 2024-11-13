@@ -10,7 +10,7 @@ namespace Sequence.Marketplace
         private Chain _chain;
         private const uint DefaultSlippagePercentage = 5;
         private IHttpClient _client;
-        private const string BaseUrl = "https://dev-api.sequence.app/rpc/API";
+        private const string BaseUrl = "https://api.sequence.app/rpc/API";
         private IIndexer _indexer;
         
         public CurrencySwap(Chain chain, IHttpClient client = null)
