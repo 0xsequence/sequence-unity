@@ -7214,7 +7214,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1580427527}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.0077908733
+  m_Size: 0.0077908724
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -11849,8 +11849,9 @@ MonoBehaviour:
   _marketplaceTilePrefab: {fileID: 1206971350662929228, guid: 1a72b45acb0dc4af3968588e57193b87, type: 3}
   _numberOfMarketplaceTilesToInstantiate: 10
   _scrollviewContentParent: {fileID: 1932036475}
-  _chain: 137
+  _chain: 42170
   _errorText: {fileID: 173122838}
+  _defaultCollectionAddress: 0x0ee3af1874789245467e7482f042ced9c5171073
 --- !u!1 &2121210750
 GameObject:
   m_ObjectHideFlags: 0

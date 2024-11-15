@@ -17,6 +17,7 @@ namespace Sequence.Demo
         [SerializeField] private Transform _scrollviewContentParent;
         [SerializeField] private Chain _chain = Chain.Polygon;
         [SerializeField] private TextMeshProUGUI _errorText;
+        [SerializeField] private string _defaultCollectionAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
 
         private ObjectPool _marketplaceTilePool;
         private RectTransform _scrollRectContent;
@@ -46,6 +47,8 @@ namespace Sequence.Demo
             _marketplaceTilePool =
                 ObjectPool.ActivateObjectPool(_marketplaceTilePrefab, _numberOfMarketplaceTilesToInstantiate);
             _collectionAddressInputField.onValueChanged.AddListener(OnInputValueChanged);
+
+            _collectionAddressInputField.text = _defaultCollectionAddress;
         }
         
         private void OnInputValueChanged(string value)
