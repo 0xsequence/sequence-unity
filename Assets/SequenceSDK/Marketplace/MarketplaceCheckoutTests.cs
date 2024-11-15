@@ -13,32 +13,31 @@ namespace Sequence.Marketplace
 {
     public class MarketplaceCheckoutTests
     {
-        private CollectibleOrder[] _collectibleOrders;
-
         private IWallet _testWallet =
             new SequenceWallet(new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07"), "", null);
-        
+
         [TestCase(1)]
         [TestCase(3)]
         public async Task TestGetCheckoutOptions(int amount)
         {
-            _collectibleOrders = await OrderFetcher.FetchListings();
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < _collectibleOrders.Length; i++)
+            for (int i = 0; i < collectibleOrders.Length; i++)
             {
-                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                if (collectibleOrders[i].order.status == OrderStatus.active)
                 {
-                    orders.Add(_collectibleOrders[i].order);
+                    orders.Add(collectibleOrders[i].order);
                     if (orders.Count == amount)
                     {
                         break;
                     }
                 }
             }
+
             Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             CheckoutOptions options = await checkout.GetCheckoutOptions(orders.ToArray());
-            
+
             Assert.IsNotNull(options);
             Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
         }
@@ -47,19 +46,20 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateBuyTransaction(int amount)
         {
-            _collectibleOrders = await OrderFetcher.FetchListings();
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < _collectibleOrders.Length; i++)
+            for (int i = 0; i < collectibleOrders.Length; i++)
             {
-                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                if (collectibleOrders[i].order.status == OrderStatus.active)
                 {
-                    orders.Add(_collectibleOrders[i].order);
+                    orders.Add(collectibleOrders[i].order);
                     if (orders.Count == amount)
                     {
                         break;
                     }
                 }
             }
+
             Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
@@ -74,19 +74,20 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateSellTransaction(int amount)
         {
-            _collectibleOrders = await OrderFetcher.FetchOffers();
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchOffers();
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < _collectibleOrders.Length; i++)
+            for (int i = 0; i < collectibleOrders.Length; i++)
             {
-                if (_collectibleOrders[i].order.status == OrderStatus.active)
+                if (collectibleOrders[i].order.status == OrderStatus.active)
                 {
-                    orders.Add(_collectibleOrders[i].order);
+                    orders.Add(collectibleOrders[i].order);
                     if (orders.Count == amount)
                     {
                         break;
                     }
                 }
             }
+
             Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
@@ -104,7 +105,7 @@ namespace Sequence.Marketplace
             Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
             ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
             Address USDC = new Address("0x750ba8b76187092B0D1E87E28daaf484d1b5273b");
-            
+
             GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
                 new GetTokenBalancesArgs(_testWallet.GetWalletAddress(), "0x0ee3af1874789245467e7482f042ced9c5171073"));
             Assert.IsNotNull(balancesReturn);
@@ -114,8 +115,9 @@ namespace Sequence.Marketplace
 
             for (int i = 0; i < amount; i++)
             {
-                Step[] steps = await checkout.GenerateListingTransaction(new Address(balances[i].contractAddress), balances[i].tokenID.ToString(), 
-                    balances[i].balance, balances[i].contractType.AsMarketplaceContractType(), USDC, 
+                Step[] steps = await checkout.GenerateListingTransaction(new Address(balances[i].contractAddress),
+                    balances[i].tokenID.ToString(),
+                    balances[i].balance, balances[i].contractType.AsMarketplaceContractType(), USDC,
                     1, DateTime.Now + TimeSpan.FromMinutes(30));
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
@@ -132,8 +134,8 @@ namespace Sequence.Marketplace
 
             for (int i = 0; i < amount; i++)
             {
-                Step[] steps = await checkout.GenerateOfferTransaction(collection, "1", 
-                    1, ContractType.ERC1155, USDC, 
+                Step[] steps = await checkout.GenerateOfferTransaction(collection, "1",
+                    1, ContractType.ERC1155, USDC,
                     1, DateTime.Now + TimeSpan.FromMinutes(30));
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
@@ -149,48 +151,13 @@ namespace Sequence.Marketplace
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
             Address initialWallet = null;
             bool bought = false;
-            
+
             testHarness.Login(async wallet =>
             {
                 try
                 {
                     initialWallet = wallet.GetWalletAddress();
-                    Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
-                    ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
-                    
-                    ERC1155 universallyMintable = new ERC1155(collection);
-                    TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
-                    {
-                        new RawTransaction(collection, "0",
-                            universallyMintable.Mint(wallet.GetWalletAddress(), 1, 10000).CallData)
-                    });
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result is SuccessfulTransactionReturn);
-                    await Task.Delay(3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
-            
-                    GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
-                        new GetTokenBalancesArgs(wallet.GetWalletAddress(), collection));
-                    Assert.IsNotNull(balancesReturn);
-                    TokenBalance[] balances = balancesReturn.balances;
-                    Assert.IsNotNull(balances);
-                    Assert.Greater(balances.Length, 0);
-
-                    
-                    Step[] steps = await checkout.GenerateListingTransaction(new Address(balances[0].contractAddress), balances[0].tokenID.ToString(), 
-                        balances[0].balance, balances[0].contractType.AsMarketplaceContractType(), erc20UniversallyMintable, 
-                        1, DateTime.Now + TimeSpan.FromMinutes(30));
-                    Assert.IsNotNull(steps);
-                    Assert.Greater(steps.Length, 0);
-                    
-                    Transaction[] transactions = new Transaction[steps.Length];
-                    for (int i = 0; i < steps.Length; i++)
-                    {
-                        transactions[i] = new RawTransaction(steps[i].to, steps[i].value, steps[i].data);
-                    }
-
-                    result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result is SuccessfulTransactionReturn);
+                    await SeedWalletAndCreateListing(wallet, collection, erc20UniversallyMintable);
 
                     await wallet.DropThisSession();
 
@@ -210,11 +177,11 @@ namespace Sequence.Marketplace
             {
                 await Task.Yield();
             }
-            
+
             testHarness.Login(async wallet =>
             {
                 Assert.AreNotEqual(initialWallet, wallet.GetWalletAddress());
-                
+
                 ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
                 GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
                     new GetTokenBalancesArgs(wallet.GetWalletAddress(), collection));
@@ -225,7 +192,7 @@ namespace Sequence.Marketplace
                 {
                     balance = balances[0].balance;
                 }
-                
+
                 ERC20 universallyMintable = new ERC20(erc20UniversallyMintable);
                 TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
                 {
@@ -236,18 +203,8 @@ namespace Sequence.Marketplace
                 Assert.IsTrue(result is SuccessfulTransactionReturn);
 
                 Step[] steps = await FetchListingAndBuy(collection, wallet);
-                Assert.Greater(steps.Length, 0);
-                
-                Transaction[] transactions = new Transaction[steps.Length];
-                for (int i = 0; i < steps.Length; i++)
-                {
-                    transactions[i] = new RawTransaction(steps[i].to, steps[i].value, steps[i].data);
-                }
-                
-                result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
-                Assert.IsNotNull(result);
-                Assert.IsTrue(result is SuccessfulTransactionReturn);
-                
+                await SubmitStepsAsTransaction(steps, wallet);
+
                 balancesReturn = await indexer.GetTokenBalances(
                     new GetTokenBalancesArgs(wallet.GetWalletAddress(), collection));
                 Assert.IsNotNull(balancesReturn);
@@ -257,18 +214,63 @@ namespace Sequence.Marketplace
                 {
                     newBalance = newBalances[0].balance;
                 }
+
                 Assert.Greater(newBalance, balance);
-                
+
                 bought = true;
-            }, (error, method, email, methods) =>
-            {
-                Assert.Fail(error);
-            });
-            
+            }, (error, method, email, methods) => { Assert.Fail(error); });
+
             while (!bought)
             {
                 await Task.Yield();
             }
+        }
+
+        private async Task SubmitStepsAsTransaction(Step[] steps, IWallet wallet)
+        {
+            Assert.IsNotNull(steps);
+            Assert.Greater(steps.Length, 0);
+
+            Transaction[] transactions = new Transaction[steps.Length];
+            for (int i = 0; i < steps.Length; i++)
+            {
+                transactions[i] = new RawTransaction(steps[i].to, steps[i].value, steps[i].data);
+            }
+
+            TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is SuccessfulTransactionReturn);
+        }
+
+        private async Task SeedWalletAndCreateListing(IWallet wallet, Address erc1155UniversallyMintable,
+            Address erc20UniversallyMintable)
+        {
+            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+            ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
+
+            ERC1155 universallyMintable = new ERC1155(erc1155UniversallyMintable);
+            TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
+            {
+                new RawTransaction(erc1155UniversallyMintable, "0",
+                    universallyMintable.Mint(wallet.GetWalletAddress(), 1, 10000).CallData)
+            });
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result is SuccessfulTransactionReturn);
+            await Task.Delay(3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
+
+            GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
+                new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc1155UniversallyMintable));
+            Assert.IsNotNull(balancesReturn);
+            TokenBalance[] balances = balancesReturn.balances;
+            Assert.IsNotNull(balances);
+            Assert.Greater(balances.Length, 0);
+
+
+            Step[] steps = await checkout.GenerateListingTransaction(new Address(balances[0].contractAddress),
+                balances[0].tokenID.ToString(),
+                balances[0].balance, balances[0].contractType.AsMarketplaceContractType(), erc20UniversallyMintable,
+                1, DateTime.Now + TimeSpan.FromMinutes(30));
+            await SubmitStepsAsTransaction(steps, wallet);
         }
 
         private async Task<Step[]> FetchListingAndBuy(Address collection, SequenceWallet wallet, int retries = 0)
@@ -277,30 +279,20 @@ namespace Sequence.Marketplace
             {
                 Assert.Fail("Failed to fetch and buy listing after 5 retries");
             }
-            
-            MarketplaceReader reader = new MarketplaceReader(Chain.ArbitrumNova);
-            for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
-            {
-                _collectibleOrders = await reader.ListAllCollectibleListingsWithLowestPricedListingsFirst(collection);
-                Assert.IsNotNull(_collectibleOrders);
-                if (_collectibleOrders.Length > 0)
-                {
-                    Debug.Log($"No collectibles found. Retrying {retries + 1}...");
-                    break;
-                }
-                await Task.Delay(5000);
-            }
-            Assert.Greater(_collectibleOrders.Length, 0);
-                
+
+            CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova);
+            Assert.Greater(collectibleOrders.Length, 0);
+
             Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
             Step[] steps = null;
             try
             {
-                steps = await checkout.GenerateBuyTransaction(_collectibleOrders[0].order, 1);
+                steps = await checkout.GenerateBuyTransaction(collectibleOrders[0].order, 1);
             }
             catch (Exception e)
             {
-                if (e.Message.Contains("orders not valid orderIDs")) // Sometimes when the API has not fully been refreshed, we are given orders that have already been filled
+                if (e.Message.Contains(
+                        "orders not valid orderIDs")) // Sometimes when the API has not fully been refreshed, we are given orders that have already been filled
                 {
                     Debug.Log($"Encountered error: {e.Message}\nRetrying {retries + 1}...");
                     await Task.Delay(10000);
@@ -311,11 +303,35 @@ namespace Sequence.Marketplace
                     Assert.Fail(e.Message);
                 }
             }
+
             Assert.IsNotNull(steps);
             Assert.Greater(steps.Length, 0);
             return steps;
         }
-        
+
+        private async Task<CollectibleOrder[]> FetchListings(string collection, Chain chain)
+        {
+            MarketplaceReader reader = new MarketplaceReader(chain);
+            CollectibleOrder[] collectibleOrders = null;
+            for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
+            {
+                collectibleOrders = await reader.ListAllCollectibleListingsWithLowestPricedListingsFirst(collection);
+                Assert.IsNotNull(collectibleOrders);
+                if (collectibleOrders.Length > 0)
+                {
+                    Debug.Log($"No collectibles found. Retrying {i + 1}...");
+                    break;
+                }
+
+                await Task.Delay(5000);
+            }
+
+            Assert.IsNotNull(collectibleOrders);
+            Assert.Greater(collectibleOrders.Length, 0);
+            
+            return collectibleOrders;
+        }
+
         [Test]
         public async Task TestCreateOfferAndSellIt()
         {
@@ -325,13 +341,13 @@ namespace Sequence.Marketplace
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
             Address initialWallet = null;
             bool sold = false;
-            
+
             testHarness.Login(async wallet =>
             {
                 try
                 {
                     initialWallet = wallet.GetWalletAddress();
-                
+
                     ERC20 universallyMintable = new ERC20(erc20UniversallyMintable);
                     TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
                     {
@@ -340,24 +356,13 @@ namespace Sequence.Marketplace
                     });
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result is SuccessfulTransactionReturn);
-                    
+
                     Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
 
-                    Step[] steps = await checkout.GenerateOfferTransaction(collection, "1", 
-                        1, ContractType.ERC1155, erc20UniversallyMintable, 
+                    Step[] steps = await checkout.GenerateOfferTransaction(collection, "1",
+                        1, ContractType.ERC1155, erc20UniversallyMintable,
                         1, DateTime.Now + TimeSpan.FromMinutes(30));
-                    Assert.IsNotNull(steps);
-                    Assert.Greater(steps.Length, 0);
-                    
-                    Transaction[] transactions = new Transaction[steps.Length];
-                    for (int i = 0; i < steps.Length; i++)
-                    {
-                        transactions[i] = new RawTransaction(steps[i].to, steps[i].value, steps[i].data);
-                    }
-
-                    result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result is SuccessfulTransactionReturn);
+                    await SubmitStepsAsTransaction(steps, wallet);
 
                     await wallet.DropThisSession();
 
@@ -377,13 +382,13 @@ namespace Sequence.Marketplace
             {
                 await Task.Yield();
             }
-            
+
             testHarness.Login(async wallet =>
             {
                 Assert.AreNotEqual(initialWallet, wallet.GetWalletAddress());
-                    
+
                 ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
-                
+
                 GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
                     new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20UniversallyMintable));
                 Assert.IsNotNull(balancesReturn);
@@ -393,7 +398,7 @@ namespace Sequence.Marketplace
                 {
                     balance = balances[0].balance;
                 }
-                
+
                 ERC1155 universallyMintable = new ERC1155(collection);
                 TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
                 {
@@ -402,21 +407,12 @@ namespace Sequence.Marketplace
                 });
                 Assert.IsNotNull(result);
                 Assert.IsTrue(result is SuccessfulTransactionReturn);
-                await Task.Delay(3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
+                await Task.Delay(
+                    3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
 
                 Step[] steps = await FetchOfferAndSell(collection, wallet);
-                Assert.Greater(steps.Length, 0);
-                
-                Transaction[] transactions = new Transaction[steps.Length];
-                for (int i = 0; i < steps.Length; i++)
-                {
-                    transactions[i] = new RawTransaction(steps[i].to, steps[i].value, steps[i].data);
-                }
-                
-                result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
-                Assert.IsNotNull(result);
-                Assert.IsTrue(result is SuccessfulTransactionReturn);
-                
+                await SubmitStepsAsTransaction(steps, wallet);
+
                 balancesReturn = await indexer.GetTokenBalances(
                     new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20UniversallyMintable));
                 Assert.IsNotNull(balancesReturn);
@@ -426,14 +422,12 @@ namespace Sequence.Marketplace
                 {
                     newBalance = newBalances[0].balance;
                 }
+
                 Assert.Greater(newBalance, balance);
-                
+
                 sold = true;
-            }, (error, method, email, methods) =>
-            {
-                Assert.Fail(error);
-            });
-            
+            }, (error, method, email, methods) => { Assert.Fail(error); });
+
             while (!sold)
             {
                 await Task.Yield();
@@ -446,30 +440,21 @@ namespace Sequence.Marketplace
             {
                 Assert.Fail("Failed to fetch and buy listing after 5 retries");
             }
-            
-            MarketplaceReader reader = new MarketplaceReader(Chain.ArbitrumNova);
-            for (int i = 0; i < 5; i++) // Retry up to 5 times as the offer might not have been picked up yet
-            {
-                _collectibleOrders = await reader.ListAllCollectibleOffersWithHighestPricedOfferFirst(collection);
-                Assert.IsNotNull(_collectibleOrders);
-                if (_collectibleOrders.Length > 0)
-                {
-                    Debug.Log($"No collectibles found. Retrying {retries + 1}...");
-                    break;
-                }
-                await Task.Delay(5000);
-            }
-            Assert.Greater(_collectibleOrders.Length, 0);
-                
+
+            CollectibleOrder[] collectibleOrders = await FetchOffers(collection, Chain.ArbitrumNova);
+
+            Assert.Greater(collectibleOrders.Length, 0);
+
             Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
             Step[] steps = null;
             try
             {
-                steps = await checkout.GenerateSellTransaction(_collectibleOrders[0].order, 1);
+                steps = await checkout.GenerateSellTransaction(collectibleOrders[0].order, 1);
             }
             catch (Exception e)
             {
-                if (e.Message.Contains("orders not valid orderIDs")) // Sometimes when the API has not fully been refreshed, we are given orders that have already been filled
+                if (e.Message.Contains(
+                        "orders not valid orderIDs")) // Sometimes when the API has not fully been refreshed, we are given orders that have already been filled
                 {
                     Debug.Log($"Encountered error: {e.Message}\nRetrying {retries + 1}...");
                     await Task.Delay(10000);
@@ -480,9 +465,116 @@ namespace Sequence.Marketplace
                     Assert.Fail(e.Message);
                 }
             }
+
             Assert.IsNotNull(steps);
             Assert.Greater(steps.Length, 0);
             return steps;
+        }
+
+        private async Task<CollectibleOrder[]> FetchOffers(string collection, Chain chain)
+        {
+            MarketplaceReader reader = new MarketplaceReader(chain);
+            CollectibleOrder[] collectibleOrders = null;
+            for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
+            {
+                collectibleOrders = await reader.ListAllCollectibleOffersWithHighestPricedOfferFirst(collection);
+                Assert.IsNotNull(collectibleOrders);
+                if (collectibleOrders.Length > 0)
+                {
+                    Debug.Log($"No collectibles found. Retrying {i + 1}...");
+                    break;
+                }
+
+                await Task.Delay(5000);
+            }
+
+            Assert.IsNotNull(collectibleOrders);
+            Assert.Greater(collectibleOrders.Length, 0);
+            
+            return collectibleOrders;
+        }
+
+        [Test]
+        public async Task TestCancelOrder()
+        {
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            Address erc20UniversallyMintable = new Address("0x9d0d8dcba30c8b7241da84f922942c100eb1bddc");
+            Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
+            bool cancelled = false;
+
+            testHarness.Login(async wallet =>
+            {
+                await SeedWalletAndCreateListing(wallet, collection, erc20UniversallyMintable);
+
+                Order myOrder = null;
+                int retries = 5;
+                for (int i = 0; i < retries; i++)
+                {
+                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova);
+                    Assert.Greater(collectibleOrders.Length, 0);
+
+                    myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
+                    if (myOrder != null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Debug.Log($"No order created by {wallet.GetWalletAddress()} found. Retrying {i + 1}...");
+                    }
+                }
+                    
+                if (myOrder == null)
+                {
+                    Assert.Fail($"Failed to find order created by wallet after {retries} retries");
+                }
+
+                Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+                Step[] steps = await checkout.GenerateCancelTransaction(collection, myOrder);
+                await SubmitStepsAsTransaction(steps, wallet);
+                    
+                for (int i = 0; i < retries; i++)
+                {
+                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova);
+                    Assert.Greater(collectibleOrders.Length, 0);
+
+                    myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
+                    if (myOrder == null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Debug.Log($"My order {myOrder.orderId} is still found. Retrying {i + 1}...");
+                    }
+                }
+                    
+                if (myOrder != null)
+                {
+                    Assert.Fail($"Failed to see that order {myOrder.orderId} was cancelled after {retries} retries");
+                }
+
+                cancelled = true;
+            }, (error, method, email, methods) => { Assert.Fail(error); });
+            
+            while (!cancelled)
+            {
+                await Task.Yield();
+            }
+        }
+
+        private Order FindOrderCreatedByWallet(Address walletAddress, CollectibleOrder[] collectibleOrders)
+        {
+            foreach (var collectibleOrder in collectibleOrders)
+            {
+                Order order = collectibleOrder.order;
+                if (order.createdBy == walletAddress)
+                {
+                    return order;
+                }
+            }
+
+            return null;
         }
     }
 }

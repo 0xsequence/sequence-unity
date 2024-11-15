@@ -4,12 +4,12 @@ using UnityEngine.Scripting;
 namespace Sequence.Marketplace
 {
     [Serializable]
-    internal class GenerateTransactionResponse
+    internal class GenerateCancelTransactionResponse
     {
         public Step[] steps;
-
+        
         [Preserve]
-        public GenerateTransactionResponse(Step[] steps)
+        public GenerateCancelTransactionResponse(Step[] steps)
         {
             this.steps = steps;
         }

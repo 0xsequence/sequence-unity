@@ -102,10 +102,10 @@ namespace Sequence.Marketplace
             }
         }
 
-        public async Task<Step[]> GenerateListingTransaction(Address collectionAddress, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)
+        public async Task<Step[]> GenerateListingTransaction(Address collection, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)
         {
             long epochTime = ((DateTimeOffset)expiry).ToUnixTimeSeconds();
-            GenerateListingTransactionArgs args = new GenerateListingTransactionArgs(collectionAddress, _wallet.GetWalletAddress(), contractType, orderbookKind, 
+            GenerateListingTransactionArgs args = new GenerateListingTransactionArgs(collection, _wallet.GetWalletAddress(), contractType, orderbookKind, 
                 new CreateReq(tokenId, amount.ToString(), epochTime.ToString(), currencyTokenAddress, pricePerToken.ToString()), _wallet.GetWalletKind());
 
             try
@@ -119,10 +119,10 @@ namespace Sequence.Marketplace
             }
         }
 
-        public async Task<Step[]> GenerateOfferTransaction(Address collectionAddress, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)
+        public async Task<Step[]> GenerateOfferTransaction(Address collection, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)
         {
             long epochTime = ((DateTimeOffset)expiry).ToUnixTimeSeconds();
-            GenerateOfferTransactionArgs args = new GenerateOfferTransactionArgs(collectionAddress, _wallet.GetWalletAddress(), contractType, orderbookKind, 
+            GenerateOfferTransactionArgs args = new GenerateOfferTransactionArgs(collection, _wallet.GetWalletAddress(), contractType, orderbookKind, 
                 new CreateReq(tokenId, amount.ToString(), epochTime.ToString(), currencyTokenAddress, pricePerToken.ToString()), _wallet.GetWalletKind());
 
             try
@@ -134,6 +134,29 @@ namespace Sequence.Marketplace
             {
                 throw new Exception($"Error generating offer transaction for {_wallet} with args {args}: {e.Message}");
             }
+        }
+
+        public async Task<Step[]> GenerateCancelTransaction(Address collection, string orderId,
+            MarketplaceKind marketplaceKind = MarketplaceKind.sequence_marketplace_v2)
+        {
+            GenerateCancelTransactionRequest args =
+                new GenerateCancelTransactionRequest(collection, _wallet.GetWalletAddress(), marketplaceKind, orderId);
+            
+            try
+            {
+                GenerateTransactionResponse response = await _client.SendRequest<GenerateCancelTransactionRequest, GenerateTransactionResponse>(_chain, "GenerateCancelTransaction", args);
+                return response.steps;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error generating cancel transaction for {_wallet} with args {args}: {e.Message}");
+            }
+        }
+        
+        public Task<Step[]> GenerateCancelTransaction(Address collection, Order order,
+            MarketplaceKind marketplaceKind = MarketplaceKind.sequence_marketplace_v2)
+        {
+            return GenerateCancelTransaction(collection, order.orderId, marketplaceKind);
         }
     }
 }
