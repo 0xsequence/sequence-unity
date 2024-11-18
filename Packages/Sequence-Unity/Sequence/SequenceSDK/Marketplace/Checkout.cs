@@ -5,7 +5,7 @@ using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
 {
-    public class Checkout
+    public class Checkout : ICheckout
     {
         private IHttpClient _client;
         private IWallet _wallet;
@@ -22,6 +22,9 @@ namespace Sequence.Marketplace
             _client = client;
         }
 
+        public event Action<CheckoutOptions> OnCheckoutOptionsReturn;
+        public event Action<string> OnCheckoutOptionsError;
+        
         public async Task<CheckoutOptions> GetCheckoutOptions(CheckoutOptionsMarketplaceOrder[] orders,
             int additionalFeeBps = 0)
         {
@@ -30,11 +33,15 @@ namespace Sequence.Marketplace
             {
                 GetCheckoutOptionsResponse response = await _client.SendRequest<GetCheckoutOptionsArgs, GetCheckoutOptionsResponse>(_chain,
                     "CheckoutOptionsMarketplace", args);
+                OnCheckoutOptionsReturn?.Invoke(response.options);
                 return response.options;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error fetching checkout options for {_wallet} with orders {orders.AsString()} and {nameof(additionalFeeBps)} {additionalFeeBps}: {e.Message}");
+                string error =
+                    $"Error fetching checkout options for {_wallet} with orders {orders.AsString()} and {nameof(additionalFeeBps)} {additionalFeeBps}: {e.Message}";
+                OnCheckoutOptionsError?.Invoke(error);
+                throw new Exception(error);
             }
         }
 
@@ -42,7 +49,9 @@ namespace Sequence.Marketplace
         {
             if (orders == null)
             {
-                throw new ArgumentException($"{nameof(orders)} cannot be null");
+                string error = $"{nameof(orders)} cannot be null";
+                OnCheckoutOptionsError?.Invoke(error);
+                throw new ArgumentException(error);
             }
             int length = orders.Length;
             CheckoutOptionsMarketplaceOrder[] options = new CheckoutOptionsMarketplaceOrder[length];
@@ -53,6 +62,9 @@ namespace Sequence.Marketplace
 
             return GetCheckoutOptions(options, additionalFeeBps);
         }
+        
+        public event Action<Step[]> OnTransactionStepsReturn;
+        public event Action<string> OnTransactionStepsError;
         
         public async Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null)
         {
@@ -70,11 +82,15 @@ namespace Sequence.Marketplace
             {
                 GenerateTransactionResponse response = await _client.SendRequest<GenerateBuyTransaction, GenerateTransactionResponse>(_chain, "GenerateBuyTransaction",
                     generateBuyTransaction);
+                OnTransactionStepsReturn?.Invoke(response.steps);
                 return response.steps;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error generating buy transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}");
+                string error =
+                    $"Error generating buy transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}";
+                OnTransactionStepsError?.Invoke(error);
+                throw new Exception(error);
             }
         }
         
@@ -94,11 +110,15 @@ namespace Sequence.Marketplace
             {
                 GenerateTransactionResponse response = await _client.SendRequest<GenerateSellTransaction, GenerateTransactionResponse>(_chain, "GenerateSellTransaction",
                     generateBuyTransaction);
+                OnTransactionStepsReturn?.Invoke(response.steps);
                 return response.steps;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error generating sell transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}");
+                string error =
+                    $"Error generating sell transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}";
+                OnTransactionStepsError?.Invoke(error);
+                throw new Exception(error);
             }
         }
 
@@ -111,11 +131,14 @@ namespace Sequence.Marketplace
             try
             {
                 GenerateTransactionResponse response = await _client.SendRequest<GenerateListingTransactionArgs, GenerateTransactionResponse>(_chain, "GenerateListingTransaction", args);
+                OnTransactionStepsReturn?.Invoke(response.steps);
                 return response.steps;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error generating listing transaction for {_wallet} with args {args}: {e.Message}");
+                string error = $"Error generating listing transaction for {_wallet} with args {args}: {e.Message}";
+                OnTransactionStepsError?.Invoke(error);
+                throw new Exception(error);
             }
         }
 
@@ -128,11 +151,14 @@ namespace Sequence.Marketplace
             try
             {
                 GenerateTransactionResponse response = await _client.SendRequest<GenerateOfferTransactionArgs, GenerateTransactionResponse>(_chain, "GenerateOfferTransaction", args);
+                OnTransactionStepsReturn?.Invoke(response.steps);
                 return response.steps;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error generating offer transaction for {_wallet} with args {args}: {e.Message}");
+                string error = $"Error generating offer transaction for {_wallet} with args {args}: {e.Message}";
+                OnTransactionStepsError?.Invoke(error);
+                throw new Exception(error);
             }
         }
 
@@ -145,11 +171,14 @@ namespace Sequence.Marketplace
             try
             {
                 GenerateTransactionResponse response = await _client.SendRequest<GenerateCancelTransactionRequest, GenerateTransactionResponse>(_chain, "GenerateCancelTransaction", args);
+                OnTransactionStepsReturn?.Invoke(response.steps);
                 return response.steps;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error generating cancel transaction for {_wallet} with args {args}: {e.Message}");
+                string error = $"Error generating cancel transaction for {_wallet} with args {args}: {e.Message}";
+                OnTransactionStepsError?.Invoke(error);
+                throw new Exception(error);
             }
         }
         

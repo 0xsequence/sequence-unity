@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Sequence.Marketplace
 {
+    /// <summary>
+    /// This class is used to filter out orders that the user cannot afford to buy
+    /// </summary>
     public class FilterAffordableOrders
     {
         private Address _buyer;
@@ -18,6 +21,10 @@ namespace Sequence.Marketplace
             _orders = orders;
         }
         
+        /// <summary>
+        /// Return a CollectibleOrder[] of orders that the user can afford to buy, using the _indexer to fetch the _buyer's balances
+        /// </summary>
+        /// <returns></returns>
         public async Task<CollectibleOrder[]> RemoveListingsThatUserCannotAfford()
         {
             if (_orders == null || _orders.Length == 0)
