@@ -148,5 +148,10 @@ namespace Sequence
         {
             return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler, this);
         }
+
+        public bool ChainMatched(Chain chain)
+        {
+            return chain == GetChain();
+        }
     }
 }

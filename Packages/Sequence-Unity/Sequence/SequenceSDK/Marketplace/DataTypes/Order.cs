@@ -83,5 +83,16 @@ namespace Sequence.Marketplace
             this.updatedAt = updatedAt;
             this.deletedAt = deletedAt;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Order other = (Order) obj;
+            return id == other.id && collectionId == other.collectionId && collectibleId == other.collectibleId && orderId == other.orderId && marketplace == other.marketplace && source == other.source && side == other.side && status == other.status && chainId == other.chainId && collectionContractAddress == other.collectionContractAddress && tokenId == other.tokenId && createdBy == other.createdBy && priceAmount == other.priceAmount && priceAmountFormatted == other.priceAmountFormatted && priceAmountNet == other.priceAmountNet && priceAmountNetFormatted == other.priceAmountNetFormatted && priceCurrencyAddress == other.priceCurrencyAddress && priceDecimals == other.priceDecimals && priceUSD == other.priceUSD && quantityInitial == other.quantityInitial && quantityInitialFormatted == other.quantityInitialFormatted && quantityRemaining == other.quantityRemaining && quantityRemainingFormatted == other.quantityRemainingFormatted && quantityAvailable == other.quantityAvailable && quantityAvailableFormatted == other.quantityAvailableFormatted && quantityDecimals == other.quantityDecimals && feeBps == other.feeBps && Equals(feeBreakdown, other.feeBreakdown) && validFrom == other.validFrom && validUntil == other.validUntil && orderCreatedAt == other.orderCreatedAt && orderUpdatedAt == other.orderUpdatedAt && createdAt == other.createdAt && updatedAt == other.updatedAt && deletedAt == other.deletedAt;
+        }
     }
 }

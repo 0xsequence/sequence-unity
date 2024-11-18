@@ -11,10 +11,10 @@ namespace Sequence.Marketplace
         public string searchText = "";
         public PropertyFilter[] properties = null;
         public string[] marketplaces = null;
-        public string[] inAccounts = null;
-        public string[] notInAccounts = null;
-        public string[] ordersCreatedBy = null;
-        public string[] ordersNotCreatedBy = null;
+        public string[] inAccounts = null; // Filter for collectibles owned by the specified addresses
+        public string[] notInAccounts = null; // Filter out any collectibles owned by the specified addresses
+        public string[] ordersCreatedBy = null; // Filter for orders created by the specified addresses
+        public string[] ordersNotCreatedBy = null; // Filter out any orders created by the specified addresses
         
         public CollectiblesFilter(bool includeEmpty, string searchText = "", PropertyFilter[] properties = null, MarketplaceKind[] marketplaces = null, string[] inAccounts = null, string[] notInAccounts = null, string[] ordersCreatedBy = null, string[] ordersNotCreatedBy = null)
         {

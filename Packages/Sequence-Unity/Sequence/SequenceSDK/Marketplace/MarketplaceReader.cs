@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Utils;
 
@@ -9,10 +11,14 @@ namespace Sequence.Marketplace
         private Chain _chain;
         private IHttpClient _client;
         
-        public MarketplaceReader(Chain chain)
+        public MarketplaceReader(Chain chain, IHttpClient client = null)
         {
             _chain = chain;
-            _client = new HttpClient();
+            if (client == null)
+            {
+                client = new HttpClient();
+            }
+            _client = client;
         }
 
         public Action<Currency[]> OnListCurrenciesReturn;
@@ -265,6 +271,67 @@ namespace Sequence.Marketplace
             {
                 throw new Exception($"Error getting floor order for {contractAddress}: {e.Message}");
             }
+        }
+
+        public Task<CollectibleOrder[]> ListAllSellableOffers(Address sellableBy, Address collection,
+            CollectiblesFilter filter = default)
+        {
+            if (filter == null)
+            {
+                filter = new CollectiblesFilter(true, "", null, (MarketplaceKind[])null, new string[] { sellableBy }, null, null, new string[] { sellableBy });
+            }
+            if (filter.inAccounts == null)
+            {
+                filter.inAccounts = new string[] { sellableBy };
+            }
+            else
+            {
+                filter.inAccounts = ArrayUtils.CombineArrays(filter.inAccounts, new string[] { sellableBy });
+            }
+            
+            if (filter.ordersNotCreatedBy == null)
+            {
+                filter.ordersNotCreatedBy = new string[] { sellableBy };
+            }
+            else
+            {
+                filter.ordersNotCreatedBy = ArrayUtils.CombineArrays(filter.ordersNotCreatedBy, new string[] { sellableBy });
+            }
+            
+            return ListAllCollectibleOffersWithHighestPricedOfferFirst(collection, filter);
+        }
+
+        public async Task<CollectibleOrder[]> ListAllPurchasableListings(Address purchasableBy, Address collection,
+            IIndexer indexer = null, CollectiblesFilter filter = null)
+        {
+            if (indexer == null)
+            {
+                indexer = new ChainIndexer(_chain);
+            }
+
+            if (!indexer.ChainMatched(_chain))
+            {
+                throw new ArgumentException($"Given an indexer configured to fetch from the wrong chain. Given {indexer.GetChain()}, expected {_chain}");
+            }
+
+            if (filter == null)
+            {
+                filter = new CollectiblesFilter(true, "", null, (MarketplaceKind[])null, null, null, null, new string[] { purchasableBy });
+            }
+            if (filter.ordersNotCreatedBy == null)
+            {
+                filter.ordersNotCreatedBy = new string[] { purchasableBy };
+            }
+            else
+            {
+                filter.ordersNotCreatedBy = ArrayUtils.CombineArrays(filter.ordersNotCreatedBy, new string[] { purchasableBy });
+            }
+            
+            CollectibleOrder[] orders = await ListAllCollectibleListingsWithLowestPricedListingsFirst(collection, filter);
+            
+            FilterAffordableOrders filterAffordableOrders = new FilterAffordableOrders(purchasableBy, indexer, orders);
+
+            return await filterAffordableOrders.RemoveListingsThatUserCannotAfford();
         }
     }
 }

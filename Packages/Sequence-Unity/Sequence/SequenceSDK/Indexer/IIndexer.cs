@@ -93,5 +93,12 @@ namespace Sequence
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args);
+
+        /// <summary>
+        /// Returns true if the provided Chain matches the Chain of this Indexer, false otherwise
+        /// </summary>
+        /// <param name="chain"></param>
+        /// <returns></returns>
+        public bool ChainMatched(Chain chain);
     }
 }

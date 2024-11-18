@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 namespace Sequence.Marketplace
 {
     [Serializable]
-    internal class ListCollectiblesArgs
+    public class ListCollectiblesArgs
     {
         public OrderSide side;
         public string contractAddress;
@@ -13,7 +13,7 @@ namespace Sequence.Marketplace
         public Page page;
 
         [Preserve]
-        public ListCollectiblesArgs(OrderSide side, string contractAddress, CollectiblesFilter filter = null, Page page = null)
+        internal ListCollectiblesArgs(OrderSide side, string contractAddress, CollectiblesFilter filter = null, Page page = null)
         {
             this.side = side;
             this.contractAddress = contractAddress;
