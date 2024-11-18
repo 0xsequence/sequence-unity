@@ -178,5 +178,43 @@ namespace Sequence.Marketplace
                 }
             };
         }
+        
+        [Test]
+        public async Task TestListAllPurchasableListings_NoListings()
+        {
+            MockClientReturnsGiven mockClient = new MockClientReturnsGiven(new ListCollectiblesReturn(new CollectibleOrder[0]));
+            MarketplaceReader reader = new MarketplaceReader(_chain, mockClient);
+            
+            CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), null);
+            
+            CollectionAssert.IsEmpty(result);
+        }
+        
+        [Test]
+        public async Task TestListAllPurchasableListings_NullListings()
+        {
+            MockClientReturnsGiven mockClient = new MockClientReturnsGiven(new ListCollectiblesReturn(null));
+            MarketplaceReader reader = new MarketplaceReader(_chain, mockClient);
+            
+            CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), null);
+            
+            Assert.IsNull(result);
+        }
+        
+        [Test]
+        public async Task TestListAllPurchasableListings_InvalidIndexer()
+        {
+            MarketplaceReader reader = new MarketplaceReader(_chain);
+
+            try
+            {
+                CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerWrongChain());
+                Assert.Fail("Expected exception");
+            }
+            catch (Exception e)
+            {
+                Assert.True(e.Message.Contains("Given an indexer configured to fetch from the wrong chain"));
+            }
+        }
     }
 }

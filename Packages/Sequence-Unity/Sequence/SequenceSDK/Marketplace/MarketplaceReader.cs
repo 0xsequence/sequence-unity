@@ -6,7 +6,7 @@ using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    public class MarketplaceReader
+    public class MarketplaceReader : IReader
     {
         private Chain _chain;
         private IHttpClient _client;
@@ -21,8 +21,8 @@ namespace Sequence.Marketplace
             _client = client;
         }
 
-        public Action<Currency[]> OnListCurrenciesReturn;
-        public Action<string> OnListCurrenciesError;
+        public event Action<Currency[]> OnListCurrenciesReturn;
+        public event Action<string> OnListCurrenciesError;
         public async Task<Currency[]> ListCurrencies()
         {
             try
@@ -40,8 +40,8 @@ namespace Sequence.Marketplace
             }
         }
         
-        public Action<ListCollectiblesReturn> OnListCollectiblesReturn;
-        public Action<string> OnListCollectiblesError;
+        public event Action<ListCollectiblesReturn> OnListCollectibleOrdersReturn;
+        public event Action<string> OnListCollectibleOrdersError;
         public Task<ListCollectiblesReturn> ListCollectibleListingsWithLowestPricedListingsFirst(string contractAddress, CollectiblesFilter filter = default, Page page = default)
         {
             return DoListCollectibles(OrderSide.listing, contractAddress, filter, page);
@@ -59,12 +59,12 @@ namespace Sequence.Marketplace
                     await _client
                         .SendRequest<ListCollectiblesArgs, ListCollectiblesReturn>(
                             _chain, "ListCollectibles", args);
-                OnListCollectiblesReturn?.Invoke(result);
+                OnListCollectibleOrdersReturn?.Invoke(result);
                 return result;
             }
             catch (Exception e)
             {
-                OnListCollectiblesError?.Invoke(e.Message);
+                OnListCollectibleOrdersError?.Invoke(e.Message);
                 return null;
             }
         }
@@ -109,8 +109,8 @@ namespace Sequence.Marketplace
             return ListAllCollectibles(OrderSide.offer, contractAddress, filter);
         }
 
-        public Action<TokenMetadata> OnGetCollectibleReturn;
-        public Action<string> OnGetCollectibleError;
+        public event Action<TokenMetadata> OnGetCollectibleReturn;
+        public event Action<string> OnGetCollectibleError;
         public async Task<TokenMetadata> GetCollectible(Address contractAddress, string tokenId)
         {
             GetCollectibleRequest request = new GetCollectibleRequest(contractAddress, tokenId);
@@ -130,8 +130,8 @@ namespace Sequence.Marketplace
             }
         }
 
-        public Action<Order> GetCollectibleOrderReturn;
-        public Action<string> GetCollectibleOrderError;
+        public event Action<Order> OnGetCollectibleOrderReturn;
+        public event Action<string> OnGetCollectibleOrderError;
         public Task<Order> GetLowestPriceOfferForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null)
         {
             string endpoint = "GetLowestPriceOfferForCollectible";
@@ -146,13 +146,13 @@ namespace Sequence.Marketplace
             {
                 OrderResponse orderResponse = await _client.SendRequest<GetCollectibleOrderRequest, OrderResponse>(_chain, endpoint, args);
                 Order order = orderResponse.order;
-                GetCollectibleOrderReturn?.Invoke(order);
+                OnGetCollectibleOrderReturn?.Invoke(order);
                 return order;
             }
             catch (Exception e)
             {
                 string errorMessage = $"Error getting order for {tokenId} from {contractAddress}: {e.Message}";
-                GetCollectibleOrderError?.Invoke(errorMessage);
+                OnGetCollectibleOrderError?.Invoke(errorMessage);
                 throw new Exception(errorMessage);
             }
         }
@@ -175,8 +175,8 @@ namespace Sequence.Marketplace
             return GetCollectibleOrder(endpoint, contractAddress, tokenId, filter);
         }
         
-        public Action<ListCollectibleListingsReturn> OnListCollectibleListingsReturn;
-        public Action<string> OnListCollectibleListingsError;
+        public event Action<ListCollectibleListingsReturn> OnListCollectibleListingsReturn;
+        public event Action<string> OnListCollectibleListingsError;
         public async Task<ListCollectibleListingsReturn> ListListingsForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             ListCollectibleListingsArgs args = new ListCollectibleListingsArgs(contractAddress, tokenId, filter, page);
@@ -216,8 +216,8 @@ namespace Sequence.Marketplace
             return orders;
         }
         
-        public Action<ListCollectibleOffersReturn> OnListCollectibleOffersReturn;
-        public Action<string> OnListCollectibleOffersError;
+        public event Action<ListCollectibleOffersReturn> OnListCollectibleOffersReturn;
+        public event Action<string> OnListCollectibleOffersError;
         public async Task<ListCollectibleOffersReturn> ListOffersForCollectible(Address contractAddress, string tokenId, OrderFilter filter = null, Page page = null)
         {
             ListCollectibleListingsArgs args = new ListCollectibleListingsArgs(contractAddress, tokenId, filter, page);

@@ -41,8 +41,8 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
-            marketplaceReader.OnListCollectiblesReturn += OnSuccess;
-            marketplaceReader.OnListCollectiblesError += OnError;
+            marketplaceReader.OnListCollectibleOrdersReturn += OnSuccess;
+            marketplaceReader.OnListCollectibleOrdersError += OnError;
             
             CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleListingsWithLowestPricedListingsFirst(contractAddress, filter);
             
@@ -60,8 +60,8 @@ namespace Sequence.Marketplace
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
-            marketplaceReader.OnListCollectiblesReturn += OnSuccess;
-            marketplaceReader.OnListCollectiblesError += OnError;
+            marketplaceReader.OnListCollectibleOrdersReturn += OnSuccess;
+            marketplaceReader.OnListCollectibleOrdersError += OnError;
             
             CollectibleOrder[] collectibles = await marketplaceReader.ListAllCollectibleOffersWithHighestPricedOfferFirst(contractAddress, filter);
             
@@ -119,8 +119,8 @@ namespace Sequence.Marketplace
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
-            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
-            marketplaceReader.GetCollectibleOrderError += OnError;
+            marketplaceReader.OnGetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.OnGetCollectibleOrderError += OnError;
             
             Order order = await marketplaceReader.GetLowestPriceOfferForCollectible(new Address(contractAddress), tokenId);
 
@@ -138,8 +138,8 @@ namespace Sequence.Marketplace
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
-            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
-            marketplaceReader.GetCollectibleOrderError += OnError;
+            marketplaceReader.OnGetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.OnGetCollectibleOrderError += OnError;
             
             Order order = await marketplaceReader.GetHighestPriceOfferForCollectible(new Address(contractAddress), tokenId);
 
@@ -157,8 +157,8 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
-            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
-            marketplaceReader.GetCollectibleOrderError += OnError;
+            marketplaceReader.OnGetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.OnGetCollectibleOrderError += OnError;
             
             Order order = await marketplaceReader.GetLowestPriceListingForCollectible(new Address(contractAddress), tokenId);
 
@@ -176,8 +176,8 @@ namespace Sequence.Marketplace
             string contractAddress = "0x44b3f42e2BF34F62868Ff9e9dAb7C2F807ba97Cb";
             string tokenId = "130";
             
-            marketplaceReader.GetCollectibleOrderReturn += OnSuccess;
-            marketplaceReader.GetCollectibleOrderError += OnError;
+            marketplaceReader.OnGetCollectibleOrderReturn += OnSuccess;
+            marketplaceReader.OnGetCollectibleOrderError += OnError;
             
             Order order = await marketplaceReader.GetHighestPriceListingForCollectible(new Address(contractAddress), tokenId);
 
