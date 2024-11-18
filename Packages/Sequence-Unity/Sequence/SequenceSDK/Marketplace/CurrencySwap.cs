@@ -5,7 +5,7 @@ using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    public class CurrencySwap
+    public class CurrencySwap : ISwap
     {
         private Chain _chain;
         private const uint DefaultSlippagePercentage = 5;
@@ -24,6 +24,9 @@ namespace Sequence.Marketplace
             _indexer = new ChainIndexer(_chain);
         }
 
+        public event Action<SwapPrice> OnSwapPriceReturn;
+        public event Action<string> OnSwapPriceError;
+        
         public async Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, 
             uint slippagePercent = DefaultSlippagePercentage)
         {
@@ -34,13 +37,20 @@ namespace Sequence.Marketplace
             {
                 GetSwapPriceResponse response =
                     await _client.SendRequest<GetSwapPriceRequest, GetSwapPriceResponse>(url, args);
+                OnSwapPriceReturn?.Invoke(response.swapPrice);
                 return response.swapPrice;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error fetching swap price for {buyCurrency} and {sellCurrency} with {nameof(buyAmount)} {buyAmount}: {e.Message}");
+                string error =
+                    $"Error fetching swap price for {buyCurrency} and {sellCurrency} with {nameof(buyAmount)} {buyAmount}: {e.Message}";
+                OnSwapPriceError?.Invoke(error);
+                throw new Exception(error);
             }
         }
+
+        public event Action<SwapPrice[]> OnSwapPricesReturn;
+        public event Action<string> OnSwapPricesError;
         
         public async Task<SwapPrice[]> GetSwapPrices(Address userWallet, Address buyCurrency, string buyAmount,
             uint slippagePercentage = DefaultSlippagePercentage)
@@ -52,13 +62,20 @@ namespace Sequence.Marketplace
             {
                 GetSwapPricesResponse response =
                     await _client.SendRequest<GetSwapPricesRequest, GetSwapPricesResponse>(url, args);
+                OnSwapPricesReturn?.Invoke(response.swapPrices);
                 return response.swapPrices;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error fetching swap prices for {buyCurrency} with {nameof(buyAmount)} {buyAmount}: {e.Message}");
+                string error =
+                    $"Error fetching swap prices for {buyCurrency} with {nameof(buyAmount)} {buyAmount}: {e.Message}";
+                OnSwapPricesError?.Invoke(error);
+                throw new Exception(error);
             }
         }
+        
+        public event Action<SwapQuote> OnSwapQuoteReturn;
+        public event Action<string> OnSwapQuoteError;
 
         public async Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency,
             string buyAmount, bool includeApprove,
@@ -71,7 +88,9 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                throw new Exception($"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}");
+                string error = $"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}";
+                OnSwapQuoteError?.Invoke(error);
+                throw new Exception(error);
             }
             
             GetSwapQuoteRequest args = new GetSwapQuoteRequest(userWallet, buyCurrency, sellCurrency, buyAmount, _chain,
@@ -83,13 +102,19 @@ namespace Sequence.Marketplace
                     await _client.SendRequest<GetSwapQuoteRequest, GetSwapQuoteResponse>(url, args);
                 if (response.swapQuote == null)
                 {
-                    throw new Exception("Unknown error - swap API has returned a null response");
+                    string error = $"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: Unknown error - swap API has returned a null response";
+                    OnSwapQuoteError?.Invoke(error);
+                    throw new Exception(error);
                 }
+                OnSwapQuoteReturn?.Invoke(response.swapQuote);
                 return response.swapQuote;
             }
             catch (Exception e)
             {
-                throw new Exception($"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}");
+                string error =
+                    $"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}";
+                OnSwapQuoteError?.Invoke(error);
+                throw new Exception(error);
             }
         }
 
