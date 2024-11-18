@@ -309,13 +309,13 @@ namespace Sequence.Marketplace
             return steps;
         }
 
-        private async Task<CollectibleOrder[]> FetchListings(string collection, Chain chain)
+        private async Task<CollectibleOrder[]> FetchListings(string collection, Chain chain, CollectiblesFilter filter = null)
         {
             MarketplaceReader reader = new MarketplaceReader(chain);
             CollectibleOrder[] collectibleOrders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
-                collectibleOrders = await reader.ListAllCollectibleListingsWithLowestPricedListingsFirst(collection);
+                collectibleOrders = await reader.ListAllCollectibleListingsWithLowestPricedListingsFirst(collection, filter);
                 Assert.IsNotNull(collectibleOrders);
                 if (collectibleOrders.Length > 0)
                 {
@@ -510,7 +510,8 @@ namespace Sequence.Marketplace
                 int retries = 5;
                 for (int i = 0; i < retries; i++)
                 {
-                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova);
+                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova, 
+                        new CollectiblesFilter(true, "", null, null, new string[] {wallet.GetWalletAddress()}));
                     Assert.Greater(collectibleOrders.Length, 0);
 
                     myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
@@ -535,7 +536,8 @@ namespace Sequence.Marketplace
                     
                 for (int i = 0; i < retries; i++)
                 {
-                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova);
+                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova, 
+                        new CollectiblesFilter(true, "", null, null, new string[] {wallet.GetWalletAddress()}));
                     Assert.Greater(collectibleOrders.Length, 0);
 
                     myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
