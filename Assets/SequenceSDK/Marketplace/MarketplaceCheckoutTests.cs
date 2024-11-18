@@ -231,13 +231,7 @@ namespace Sequence.Marketplace
             Assert.IsNotNull(steps);
             Assert.Greater(steps.Length, 0);
 
-            Transaction[] transactions = new Transaction[steps.Length];
-            for (int i = 0; i < steps.Length; i++)
-            {
-                transactions[i] = new RawTransaction(steps[i].to, steps[i].value, steps[i].data);
-            }
-
-            TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
+            TransactionReturn result = await steps.SubmitAsTransactions(wallet, Chain.ArbitrumNova);
             Assert.IsNotNull(result);
             Assert.IsTrue(result is SuccessfulTransactionReturn);
         }
