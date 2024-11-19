@@ -16,12 +16,13 @@ namespace Sequence.EmbeddedWallet.Tests
         {
             if (login == null)
             {
-                _login = new SequenceLogin();
+                _login = SequenceLogin.GetInstance();
             }
             else
             {
                 _login = login;
             }
+            _login.ResetAuthenticator();
         }
         
         public async Task Login(Action<SequenceWallet> OnLogin, ILogin.OnLoginFailedHandler OnFailedLogin)
