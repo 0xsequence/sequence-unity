@@ -113,6 +113,14 @@ namespace Sequence.EmbeddedWallet
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
         }
 
+        /// <summary>
+        /// Use this to reset the authenticator and validator to new instances. Useful for when you're testing and using mock implementations
+        /// </summary>
+        public void ResetAuthenticator()
+        {
+            SetupAuthenticator();
+        }
+
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
