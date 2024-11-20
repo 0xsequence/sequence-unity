@@ -11,7 +11,7 @@ namespace Sequence.EmbeddedWallet.Tests
         [TearDown]
         public void Cleanup()
         {
-            SequenceLogin.GetInstance().ResetAuthenticator();
+            SequenceLogin.GetInstance().ResetLoginAfterTest();
         }
         
         [Test]

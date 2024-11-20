@@ -114,10 +114,11 @@ namespace Sequence.EmbeddedWallet
         }
 
         /// <summary>
-        /// Use this to reset the authenticator and validator to new instances. Useful for when you're testing and using mock implementations
+        /// Use this to reset the authenticator, validator, and other dependancies to new instances. Useful for when you're testing and using mock implementations
         /// </summary>
-        public void ResetAuthenticator()
+        public void ResetLoginAfterTest()
         {
+            _connector = this;
             SetupAuthenticator();
         }
 

@@ -22,7 +22,7 @@ namespace Sequence.EmbeddedWallet.Tests
             {
                 _login = login;
             }
-            _login.ResetAuthenticator();
+            _login.ResetLoginAfterTest();
         }
         
         public async Task Login(Action<SequenceWallet> OnLogin, ILogin.OnLoginFailedHandler OnFailedLogin)
