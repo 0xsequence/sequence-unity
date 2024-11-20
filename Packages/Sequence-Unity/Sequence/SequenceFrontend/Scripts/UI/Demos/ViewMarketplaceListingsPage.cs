@@ -15,7 +15,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _marketplaceTilePrefab;
         [SerializeField] private int _numberOfMarketplaceTilesToInstantiate = 10;
         [SerializeField] private Transform _scrollviewContentParent;
-        [SerializeField] private Chain _chain = Chain.Polygon;
+        [SerializeField] private Chain _chain = Chain.ArbitrumNova;
         [SerializeField] private TextMeshProUGUI _errorText;
         [SerializeField] private string _defaultCollectionAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
 
@@ -26,6 +26,8 @@ namespace Sequence.Demo
         private float _brandingBuffer = 60;
         private MarketplaceReader _collectibles;
         private int _items = 0;
+        private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
+        bool _currenciesFetched = false;
 
         protected override void Awake()
         {
@@ -49,6 +51,8 @@ namespace Sequence.Demo
             _collectionAddressInputField.onValueChanged.AddListener(OnInputValueChanged);
 
             _collectionAddressInputField.text = _defaultCollectionAddress;
+            
+            FetchCurrencyIcons().ConfigureAwait(false);
         }
         
         private void OnInputValueChanged(string value)
@@ -67,6 +71,11 @@ namespace Sequence.Demo
 
         private async Task FetchCollection(Page page = null)
         {
+            while (!_currenciesFetched)
+            {
+                await Task.Yield();
+            }
+            
             ListCollectiblesReturn result = await _collectibles.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
             if (result == null || result.collectibles == null || result.collectibles.Length == 0)
             {
@@ -79,7 +88,17 @@ namespace Sequence.Demo
             {
                 Transform marketplaceTile = _marketplaceTilePool.GetNextAvailable();
                 marketplaceTile.SetParent(_scrollviewContentParent);
-                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i]);
+                Sprite currencyIcon = null;
+                if (_currencyIcons.TryGetValue(result.collectibles[i].order.priceCurrencyAddress, out var icon))
+                {
+                    currencyIcon = icon;
+                }
+                else
+                {
+                    Debug.LogError($"Currency icon not found for {result.collectibles[i].order.priceCurrencyAddress} which is listed as the price currency address for {result.collectibles[i].order.orderId}. Skipping as this order is invalid.");
+                    continue;
+                }
+                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon);
                 _items++;
                 UpdateScrollViewSize();
             }
@@ -124,6 +143,17 @@ namespace Sequence.Demo
             {
                 Destroy(_scrollviewContentParent.GetChild(i).gameObject);
             }
+        }
+        
+        private async Task FetchCurrencyIcons()
+        {
+            Marketplace.Currency[] currencies = await _collectibles.ListCurrencies();
+            foreach (Marketplace.Currency currency in currencies)
+            {
+                Sprite icon = await SpriteFetcher.Fetch(currency.imageUrl);
+                _currencyIcons.Add(currency.contractAddress, icon);
+            }
+            _currenciesFetched = true;
         }
     }
 }
