@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Demo.Mocks;
+using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Utils;
 using TMPro;
@@ -18,16 +21,18 @@ namespace Sequence.Demo
         [SerializeField] private Chain _chain = Chain.ArbitrumNova;
         [SerializeField] private TextMeshProUGUI _errorText;
         [SerializeField] private string _defaultCollectionAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+        [SerializeField] private bool _useMockReader = false;
 
         private ObjectPool _marketplaceTilePool;
         private RectTransform _scrollRectContent;
         private int _widthInItems;
         private GridLayoutGroup _grid;
         private float _brandingBuffer = 60;
-        private MarketplaceReader _collectibles;
+        private IReader _reader;
         private int _items = 0;
         private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
-        bool _currenciesFetched = false;
+        private bool _currenciesFetched = false;
+        private IWallet _wallet;
 
         protected override void Awake()
         {
@@ -35,7 +40,7 @@ namespace Sequence.Demo
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
             _widthInItems = _grid.constraintCount;
-            _collectibles = new MarketplaceReader(_chain);
+            _reader = new MarketplaceReader(_chain);
 
             DestroyGridChildren();
         }
@@ -43,6 +48,27 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
+            
+            _wallet = args.GetObjectOfTypeIfExists<IWallet>();
+            if (_wallet == default)
+            {
+                throw new SystemException(
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(IWallet)} as an argument");
+            }
+
+            Chain chain = args.GetObjectOfTypeIfExists<Chain>();
+            if (chain != default)
+            {
+                _chain = chain;
+                _reader = new MarketplaceReader(_chain);
+            }
+            
+#if UNITY_EDITOR
+            if (_useMockReader)
+            {
+                _reader = new MockMarketplaceReaderReturnsRandomFakeListings(_chain);
+            }
+#endif
 
             _items = 0;
 
@@ -76,7 +102,7 @@ namespace Sequence.Demo
                 await Task.Yield();
             }
             
-            ListCollectiblesReturn result = await _collectibles.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
+            ListCollectiblesReturn result = await _reader.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
             if (result == null || result.collectibles == null || result.collectibles.Length == 0)
             {
                 _errorText.text = "No orders founds for collection" + result.ToString();
@@ -98,7 +124,8 @@ namespace Sequence.Demo
                     Debug.LogError($"Currency icon not found for {result.collectibles[i].order.priceCurrencyAddress} which is listed as the price currency address for {result.collectibles[i].order.orderId}. Skipping as this order is invalid.");
                     continue;
                 }
-                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon);
+                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet);
+                marketplaceTile.localScale = Vector3.one;
                 _items++;
                 UpdateScrollViewSize();
             }
@@ -147,7 +174,7 @@ namespace Sequence.Demo
         
         private async Task FetchCurrencyIcons()
         {
-            Marketplace.Currency[] currencies = await _collectibles.ListCurrencies();
+            Marketplace.Currency[] currencies = await _reader.ListCurrencies();
             foreach (Marketplace.Currency currency in currencies)
             {
                 Sprite icon = await SpriteFetcher.Fetch(currency.imageUrl);
