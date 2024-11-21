@@ -27,7 +27,7 @@ namespace Sequence.Config
                 return packagesPath;
             }
 
-            string[] directories = Directory.GetDirectories("Library/PackageCache/", "xyz.0xsequence.waas-unity@*", SearchOption.TopDirectoryOnly);
+            string[] directories = Directory.GetDirectories("Library/PackageCache/", "xyz.0xsequence.waas-unity*", SearchOption.TopDirectoryOnly);
 
             if (directories.Length > 0)
             {
