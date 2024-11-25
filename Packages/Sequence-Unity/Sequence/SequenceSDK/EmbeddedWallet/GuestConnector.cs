@@ -47,13 +47,6 @@ namespace Sequence.EmbeddedWallet
                 new IntentDataOpenSession(_sessionWallet.GetAddress(), IdentityType.Guest, _sessionId, answer);
             return intent;
         }
-
-        public async Task FederateAccount(string walletAddress)
-        {
-            string challenge = await InitiateAuth();
-            IntentDataFederateAccount intent = AssembleGuestFederateAccountIntent(challenge, walletAddress);
-            await _connector.FederateAccount(intent, LoginMethod.Guest, walletAddress);
-        }
         
         private IntentDataFederateAccount AssembleGuestFederateAccountIntent(string challenge, string walletAddress)
         {
