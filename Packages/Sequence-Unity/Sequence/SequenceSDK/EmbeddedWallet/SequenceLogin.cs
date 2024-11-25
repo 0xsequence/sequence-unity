@@ -111,6 +111,7 @@ namespace Sequence.EmbeddedWallet
             _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
+            _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
         }
 
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
