@@ -10,7 +10,9 @@ namespace Sequence.Demo
         public static UIPanel InitialPanel;
         public static object[] InitialPanelOpenArgs;
         #endregion
-        
+
+        public static SequenceSampleUI instance;
+
         private LoginPanel _loginPanel;
         private TransitionPanel _transitionPanel;
         private WalletPanel _walletPanel;
@@ -18,9 +20,14 @@ namespace Sequence.Demo
         private SendTransactionPanel _sendTransactionPanel;
         private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
         private SeeMarketplaceListingsPanel _seeMarketplaceListingsPanel;
-
+        private MarketplaceItemDetailsPanel _marketplaceItemDetailsPanel;
+        private PrimarySalePanel _primarySalePanel;
+        
         private void Awake()
         {
+            if (instance == null) instance = this;
+                else Destroy(gameObject);
+
             _loginPanel = GetComponentInChildren<LoginPanel>();
             _transitionPanel = GetComponentInChildren<TransitionPanel>();
             _walletPanel = GetComponentInChildren<WalletPanel>();
@@ -28,6 +35,8 @@ namespace Sequence.Demo
             _sendTransactionPanel = GetComponentInChildren<SendTransactionPanel>();
             _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
             _seeMarketplaceListingsPanel = GetComponentInChildren<SeeMarketplaceListingsPanel>();
+            _marketplaceItemDetailsPanel = GetComponentInChildren<MarketplaceItemDetailsPanel>();
+            _primarySalePanel = GetComponentInChildren<PrimarySalePanel>();
 
             if (!IsTesting)
             {
@@ -96,6 +105,16 @@ namespace Sequence.Demo
             _seeMarketplaceListingsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
 
+        public void OpenSeeMarketplaceDetailsPanelWithDelay(float delayInSeconds, params object[] openArgs)
+        {
+            _marketplaceItemDetailsPanel.OpenWithDelay(delayInSeconds, openArgs);
+        }
+        
+        public void OpenPrimarySalePanelWithDelay(float delayInSeconds, params object[] openArgs)
+        {
+            _primarySalePanel.OpenWithDelay(delayInSeconds, openArgs);
+        }
+        
         private void ReplaceWithLoginPanel()
         {
             float delayInSeconds = 0;
