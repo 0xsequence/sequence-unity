@@ -54,7 +54,7 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
         if (_order.order.priceCurrencyAddress != "0x0000000000000000000000000000000000000000")
             priceCurrencyAddress = _order.order.priceCurrencyAddress;
         else
-            priceCurrencyAddress = ChainTokenAddress.Get((int)_order.order.chainId);
+            priceCurrencyAddress = NativeTokenAddress.Get((int)_order.order.chainId);
 
         var url = apiEndpoint + "?color=000000&bgcolor=FFFFFF&data=ethereum:" + priceCurrencyAddress + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
         Debug.Log(url);

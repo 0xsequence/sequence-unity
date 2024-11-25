@@ -26,12 +26,13 @@ namespace Sequence
 
     }
 
-    public static class ChainTokenAddress
+    public static class NativeTokenAddress
     {
         public static string Get(Chain chain)
         {
-            return ChainDictionaries.ChainTokenAddressOf[chain];
+            return ChainDictionaries.NativeTokenAddressOf.TryGetValue(chain, out var address) ? address : null;
         }
+        
         public static string Get(int chainId)
         {
             return Get((Chain)chainId);

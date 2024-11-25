@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Packages/xyz.0xsequence.waas-unity/Sequence/Samples/DemoScene/Demo.unity
     guid: d87896574aa4f42aab6b98685b555474
   - enabled: 0

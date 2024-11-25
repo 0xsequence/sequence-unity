@@ -5,6 +5,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
+    [Preserve]
     [Serializable]
     public class PropertyFilter
     {

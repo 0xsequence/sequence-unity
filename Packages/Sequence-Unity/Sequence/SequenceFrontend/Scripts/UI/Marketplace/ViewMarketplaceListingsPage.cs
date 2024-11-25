@@ -18,7 +18,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _marketplaceTilePrefab;
         [SerializeField] private int _numberOfMarketplaceTilesToInstantiate = 10;
         [SerializeField] private Transform _scrollviewContentParent;
-        [SerializeField] private Chain _chain = Chain.ArbitrumNova;
+        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
         [SerializeField] private TextMeshProUGUI _errorText;
         [SerializeField] private string _defaultCollectionAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
         [SerializeField] private bool _useMockReader = false;
@@ -179,7 +179,7 @@ namespace Sequence.Demo
             Marketplace.Currency[] currencies = await _reader.ListCurrencies();
             foreach (Marketplace.Currency currency in currencies)
             {
-                Sprite icon = await SpriteFetcher.Fetch(currency.imageUrl);
+                Sprite icon = await AssetHandler.GetSpriteAsync(currency.imageUrl);
                 _currencyIcons.Add(currency.contractAddress, icon);
             }
             _currenciesFetched = true;

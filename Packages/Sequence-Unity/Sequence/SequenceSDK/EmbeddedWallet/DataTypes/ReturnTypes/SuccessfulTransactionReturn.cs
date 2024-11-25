@@ -3,9 +3,11 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class SuccessfulTransactionReturn : TransactionReturn
     {
@@ -23,6 +25,7 @@ namespace Sequence.EmbeddedWallet
 
         public SuccessfulTransactionReturn() { }
 
+        [Preserve]
         [JsonConstructor]
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {

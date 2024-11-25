@@ -92,7 +92,7 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "XRP" }
         };
 
-        public static Dictionary<Chain, string> ChainTokenAddressOf = new Dictionary<Chain, string>()
+        public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" }, // WETH
             { Chain.Polygon, "0x0000000000000000000000000000000000001010" }, // MATIC on Polygon
@@ -108,7 +108,7 @@ namespace Sequence
             { Chain.AstarZKEvm, "0x0000000000000000000000000000000000000000" }, // Placeholder for Astar token
             { Chain.Xai, "0x0000000000000000000000000000000000000000" }, // Placeholder for XAI token
             { Chain.Blast, "0x0000000000000000000000000000000000000000" }, // Placeholder for Blast token
-    
+            
             { Chain.TestnetSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Sepolia ETH
             { Chain.TestnetArbitrumSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Arbitrum Sepolia ETH
             { Chain.TestnetBNBSmartChain, "0x0000000000000000000000000000000000000000" }, // Placeholder for BNB Testnet
@@ -168,11 +168,11 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "https://explorer.testnet.immutable.com/" },
             { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" }
         };
-        
+
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
         {
             { Chain.None, ""},
-            
+
             { Chain.Ethereum, "1" },
             { Chain.Polygon, "137" },
             { Chain.PolygonZkEvm, "1101" },
@@ -214,7 +214,7 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "13473" },
             { Chain.TestnetRootPorcini, "7672" }
         };
-        
+
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
         {
             { "1", Chain.Ethereum },
@@ -258,7 +258,7 @@ namespace Sequence
             { "13473", Chain.TestnetImmutableZkEvm },
             { "7672", Chain.TestnetRootPorcini }
         };
-        
+
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
         {
             { Chain.Ethereum, "mainnet" },
@@ -288,10 +288,10 @@ namespace Sequence
             { Chain.TestnetOasysHomeverse, "homeverse-testnet" },
             { Chain.TestnetAvalanche, "avalanche-testnet" },
             { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
-            { Chain.TestnetPolygonAmoy, "amoy" }, 
-            { Chain.TestnetAstarZKyoto, "astar-zkyoto" }, 
+            { Chain.TestnetPolygonAmoy, "amoy" },
+            { Chain.TestnetAstarZKyoto, "astar-zkyoto" },
             { Chain.TestnetXrSepolia, "xr-sepolia" },
-            { Chain.TestnetXaiSepolia, "xai-sepolia" }, 
+            { Chain.TestnetXaiSepolia, "xai-sepolia" },
             { Chain.TestnetB3Sepolia, "b3-sepolia" },
             { Chain.TestnetAPEChain, "apechain-testnet" },
             { Chain.TestnetBlastSepolia, "blast-sepolia" },
