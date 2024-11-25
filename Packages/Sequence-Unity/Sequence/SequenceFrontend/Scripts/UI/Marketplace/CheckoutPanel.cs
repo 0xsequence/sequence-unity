@@ -7,16 +7,14 @@ namespace Sequence.Demo
 {
     public class CheckoutPanel : UIPanel
     {
-        private Order[] _listings;
-
         public override void Open(params object[] args)
         {
             base.Open(args);
-            _listings = args.GetObjectOfTypeIfExists<Order[]>();
-            if (_listings == null || _listings.Length == 0)
+            Cart cart = args.GetObjectOfTypeIfExists<Cart>();
+            if (cart == null)
             {
                 throw new ArgumentException(
-                    $"Invalid use. {GetType().Name} must be opened with a non-empty {typeof(Order[])} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(Cart)} as an argument");
             }
         }
     }

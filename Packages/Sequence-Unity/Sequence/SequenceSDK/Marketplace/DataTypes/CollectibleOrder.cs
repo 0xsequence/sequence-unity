@@ -27,4 +27,18 @@ namespace Sequence.Marketplace
             return Equals(metadata, other.metadata) && Equals(order, other.order);
         }
     }
+    
+    public static class CollectibleOrderExtensions
+    {
+        public static Order[] ToOrderArray(this CollectibleOrder[] collectibleOrders)
+        {
+            Order[] orders = new Order[collectibleOrders.Length];
+            for (int i = 0; i < collectibleOrders.Length; i++)
+            {
+                orders[i] = collectibleOrders[i].order;
+            }
+
+            return orders;
+        }
+    }
 }

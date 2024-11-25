@@ -33,6 +33,7 @@ namespace Sequence.Demo
         private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
         private bool _currenciesFetched = false;
         private IWallet _wallet;
+        private CheckoutPanel _checkoutPanel;
 
         protected override void Awake()
         {
@@ -41,6 +42,7 @@ namespace Sequence.Demo
             _grid = GetComponentInChildren<GridLayoutGroup>();
             _widthInItems = _grid.constraintCount;
             _reader = new MarketplaceReader(_chain);
+            _checkoutPanel = FindObjectOfType<CheckoutPanel>();
 
             DestroyGridChildren();
         }
@@ -124,7 +126,7 @@ namespace Sequence.Demo
                     Debug.LogError($"Currency icon not found for {result.collectibles[i].order.priceCurrencyAddress} which is listed as the price currency address for {result.collectibles[i].order.orderId}. Skipping as this order is invalid.");
                     continue;
                 }
-                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet);
+                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet, _checkoutPanel);
                 marketplaceTile.localScale = Vector3.one;
                 _items++;
                 UpdateScrollViewSize();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace Sequence.Demo
         private MarketplaceItemDetailsPage _marketplaceItemDetailsPage;
         private IWallet _wallet;
         private CheckoutPanel _checkoutPanel;
+        private Sprite _collectibleSprite;
         
         private void Awake()
         {
@@ -42,7 +44,7 @@ namespace Sequence.Demo
             OnCollectibleSelected -= HandleCollectibleSelected;
         }
 
-        public void Assemble(CollectibleOrder order, Sprite currencyIcon, IWallet wallet)
+        public void Assemble(CollectibleOrder order, Sprite currencyIcon, IWallet wallet, CheckoutPanel checkoutPanel)
         {
             _collectibleOrder = order;
             FetchImage().ConfigureAwait(false);
@@ -51,12 +53,14 @@ namespace Sequence.Demo
             _priceText.text = _collectibleOrder.order.priceAmountFormatted;
             _amountAvailableText.text = "Available: " + _collectibleOrder.order.quantityAvailable;
             _wallet = wallet;
+            _checkoutPanel = checkoutPanel;
         }
 
         private async Task FetchImage()
         {
             gameObject.SetActive(false);
-            _collectibleImage.sprite = await SpriteFetcher.Fetch(_collectibleOrder.metadata.image);
+            _collectibleSprite = await SpriteFetcher.Fetch(_collectibleOrder.metadata.image);
+            _collectibleImage.sprite = _collectibleSprite;
             gameObject.SetActive(true);
         }
 
@@ -117,12 +121,15 @@ namespace Sequence.Demo
 
         public void OpenBuyPage()
         {
-            if (_checkoutPanel == null)
-            {
-                _checkoutPanel = FindObjectOfType<CheckoutPanel>();
-            }
-            
-            _checkoutPanel.Open(new Order[] { _collectibleOrder.order }, _wallet);
+            _checkoutPanel.Open(new Cart(new CollectibleOrder[] { _collectibleOrder },
+                new Dictionary<string, Sprite>()
+                {
+                    { _collectibleOrder.order.orderId , _collectibleSprite }
+                },
+                new Dictionary<string, uint>()
+                {
+                    { _collectibleOrder.order.orderId , 1 }
+                }), _wallet);
         }
     }
 }
