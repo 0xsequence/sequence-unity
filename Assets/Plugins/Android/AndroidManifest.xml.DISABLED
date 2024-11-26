@@ -5,20 +5,22 @@
 >
     <application>
         <activity
-                android:name="com.unity3d.player.UnityPlayerActivity"
+                android:name="xzy.sequence.app.MainActivity" 
                 android:theme="@style/UnityThemeSelector"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+            <meta-data android:name="xzy.sequence.app.MainActivity" android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="sdk-powered-by-sequence"/>
+                <data android:scheme="cropoutunity"/>
             </intent-filter>
         </activity>
     </application>
 </manifest>
+
+
