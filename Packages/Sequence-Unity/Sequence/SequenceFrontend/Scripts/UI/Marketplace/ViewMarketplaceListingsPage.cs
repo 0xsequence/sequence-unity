@@ -114,8 +114,6 @@ namespace Sequence.Demo
             int length = result.collectibles.Length;
             for (int i = 0; i < length; i++)
             {
-                Transform marketplaceTile = _marketplaceTilePool.GetNextAvailable();
-                marketplaceTile.SetParent(_scrollviewContentParent);
                 Sprite currencyIcon = null;
                 if (_currencyIcons.TryGetValue(result.collectibles[i].order.priceCurrencyAddress, out var icon))
                 {
@@ -126,6 +124,8 @@ namespace Sequence.Demo
                     Debug.LogError($"Currency icon not found for {result.collectibles[i].order.priceCurrencyAddress} which is listed as the price currency address for {result.collectibles[i].order.orderId}. Skipping as this order is invalid.");
                     continue;
                 }
+                Transform marketplaceTile = _marketplaceTilePool.GetNextAvailable();
+                marketplaceTile.SetParent(_scrollviewContentParent);
                 marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet, _checkoutPanel);
                 marketplaceTile.localScale = Vector3.one;
                 _items++;
