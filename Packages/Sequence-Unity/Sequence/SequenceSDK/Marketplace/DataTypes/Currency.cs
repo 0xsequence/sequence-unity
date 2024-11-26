@@ -21,7 +21,7 @@ namespace Sequence.Marketplace
         public string updatedAt;
         public string deletedAt;
 
-        private const string NativeCurrencyAddress = "native";
+        public const string NativeCurrencyAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
         public Currency(ulong id, Chain chain, string contractAddress, string name, string symbol, ulong decimals, string imageUrl, double exchangeRate, bool defaultChainCurrency, string createdAt, string updatedAt, string deletedAt = "")
         {

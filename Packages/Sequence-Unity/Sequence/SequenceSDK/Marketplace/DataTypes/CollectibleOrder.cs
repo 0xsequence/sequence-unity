@@ -10,7 +10,7 @@ namespace Sequence.Marketplace
         public Order order;
 
         [Preserve]
-        public CollectibleOrder(TokenMetadata metadata, Order order = null)
+        public CollectibleOrder(TokenMetadata metadata, Order order)
         {
             this.metadata = metadata;
             this.order = order;

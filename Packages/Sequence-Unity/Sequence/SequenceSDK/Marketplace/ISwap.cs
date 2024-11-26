@@ -5,7 +5,7 @@ namespace Sequence.Marketplace
 {
     public interface ISwap
     {
-        private const uint DefaultSlippagePercentage = 5;
+        public const uint DefaultSlippagePercentage = 5;
 
         public event Action<SwapPrice> OnSwapPriceReturn;
         public event Action<string> OnSwapPriceError;
@@ -18,7 +18,7 @@ namespace Sequence.Marketplace
         /// <param name="buyAmount"></param>
         /// <param name="slippagePercent">the maximum slippage percentage allowed</param>
         /// <returns></returns>
-        public Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, uint slippagePercent);
+        public Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, uint slippagePercent = DefaultSlippagePercentage);
 
         public event Action<SwapPrice[]> OnSwapPricesReturn;
         public event Action<string> OnSwapPricesError;
@@ -31,7 +31,7 @@ namespace Sequence.Marketplace
         /// <param name="buyAmount"></param>
         /// <param name="slippagePercentage">the maximum slippage percentage allowed</param>
         /// <returns></returns>
-        public Task<SwapPrice[]> GetSwapPrices(Address userWallet, Address buyCurrency, string buyAmount, uint slippagePercentage);
+        public Task<SwapPrice[]> GetSwapPrices(Address userWallet, Address buyCurrency, string buyAmount, uint slippagePercentage = DefaultSlippagePercentage);
         
         public event Action<SwapQuote> OnSwapQuoteReturn;
         public event Action<string> OnSwapQuoteError;
@@ -47,6 +47,6 @@ namespace Sequence.Marketplace
         /// <param name="slippagePercentage">the maximum slippage percentage allowed</param>
         /// <returns></returns>
         public Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency,
-            string buyAmount, bool includeApprove, uint slippagePercentage);
+            string buyAmount, bool includeApprove, uint slippagePercentage = DefaultSlippagePercentage);
     }
 }

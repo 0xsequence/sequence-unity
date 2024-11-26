@@ -8,7 +8,6 @@ namespace Sequence.Marketplace
     public class CurrencySwap : ISwap
     {
         private Chain _chain;
-        private const uint DefaultSlippagePercentage = 5;
         private IHttpClient _client;
         private const string BaseUrl = "https://api.sequence.app/rpc/API";
         private IIndexer _indexer;
@@ -28,7 +27,7 @@ namespace Sequence.Marketplace
         public event Action<string> OnSwapPriceError;
         
         public async Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, 
-            uint slippagePercent = DefaultSlippagePercentage)
+            uint slippagePercent = ISwap.DefaultSlippagePercentage)
         {
             GetSwapPriceRequest args = new GetSwapPriceRequest(buyCurrency, sellCurrency, buyAmount, _chain,
                 slippagePercent);
@@ -53,7 +52,7 @@ namespace Sequence.Marketplace
         public event Action<string> OnSwapPricesError;
         
         public async Task<SwapPrice[]> GetSwapPrices(Address userWallet, Address buyCurrency, string buyAmount,
-            uint slippagePercentage = DefaultSlippagePercentage)
+            uint slippagePercentage = ISwap.DefaultSlippagePercentage)
         {
             GetSwapPricesRequest args = new GetSwapPricesRequest(userWallet, buyCurrency, buyAmount, _chain,
                 slippagePercentage);
@@ -79,7 +78,7 @@ namespace Sequence.Marketplace
 
         public async Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency,
             string buyAmount, bool includeApprove,
-            uint slippagePercentage = DefaultSlippagePercentage)
+            uint slippagePercentage = ISwap.DefaultSlippagePercentage)
         {
             try
             {
@@ -119,7 +118,7 @@ namespace Sequence.Marketplace
         }
 
         private async Task AssertWeHaveSufficientBalance(Address userWallet, Address buyCurrency, Address sellCurrency,
-            string buyAmount, uint slippagePercentage = DefaultSlippagePercentage)
+            string buyAmount, uint slippagePercentage = ISwap.DefaultSlippagePercentage)
         {
             BigInteger required, have;
             try

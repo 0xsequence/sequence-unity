@@ -52,7 +52,7 @@ namespace Sequence.Demo.Mocks
             string[] possibleCurrencyAddresses = new[]
             {
                 "0x750ba8b76187092b0d1e87e28daaf484d1b5273b", "0x722e8bdd2ce80a4422e880164f2079488e115365", // The Currencies on Arb Nova as of Nov 21, 2024
-                "0x9d0d8dcba30c8b7241da84f922942c100eb1bddc", "native"
+                "0x9d0d8dcba30c8b7241da84f922942c100eb1bddc", Marketplace.Currency.NativeCurrencyAddress
             };
             CollectibleOrder order = new CollectibleOrder(
                 new Marketplace.TokenMetadata(Random.Range(1, 10000).ToString(),possibleNames.GetRandomObjectFromArray()),
