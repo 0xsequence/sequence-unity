@@ -62,6 +62,13 @@ namespace Sequence.Marketplace
                 _swap = new CurrencySwap(ChainDictionaries.ChainById[listings[0].order.chainId.ToString()]);
             }
         }
+
+        public Cart(CollectibleOrder listing, Sprite collectibleIcon, uint amount)
+        {
+            Listings = new CollectibleOrder[] {listing};
+            CollectibleImagesByOrderId = new Dictionary<string, Sprite> {{listing.order.orderId, collectibleIcon}};
+            AmountsRequestedByOrderId = new Dictionary<string, uint> {{listing.order.orderId, amount}};
+        }
         
         public CollectibleOrder GetOrderByOrderId(string orderId)
         {
@@ -114,8 +121,18 @@ namespace Sequence.Marketplace
                 }
                 else
                 {
-                    SwapPrice price = await _swap.GetSwapPrice(currencyAddress, new Address(order.priceCurrencyAddress), order.priceAmount);
-                    total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(price.maxPrice), (int)order.priceDecimals) * amountRequested;
+                    try
+                    {
+                        SwapPrice price = await _swap.GetSwapPrice(currencyAddress, new Address(order.priceCurrencyAddress), order.priceAmount);
+                        total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(price.maxPrice), (int)order.priceDecimals) * amountRequested;
+                    }
+                    catch (Exception e)
+                    {
+                        string error =
+                            $"Error fetching swap price for buying {order.priceAmount} of {order.priceCurrencyAddress} with {currencyAddress}: {e.Message}";
+                        Debug.LogError(error);
+                        return error;
+                    }
                 }
             }
             
