@@ -11,7 +11,8 @@
         "GUID:403077141e1554429a890cbc129df651",
         "SequenceEmbeddedWallet",
         "GUID:040286810a82b46ed9acd6d70bfbbfd4",
-        "GUID:f78a27d6a73d94c4baf04337e0add4dc"
+        "GUID:f78a27d6a73d94c4baf04337e0add4dc",
+        "GUID:68e161619428e430bba22d7d0a9548ab"
     ],
     "includePlatforms": [
         "Editor"

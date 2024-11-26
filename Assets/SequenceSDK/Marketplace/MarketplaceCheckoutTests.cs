@@ -60,6 +60,8 @@ namespace Sequence.Marketplace
                 }
             }
 
+            Assert.GreaterOrEqual(orders.Count, amount);
+
             Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
@@ -204,6 +206,8 @@ namespace Sequence.Marketplace
 
                 Step[] steps = await FetchListingAndBuy(collection, wallet);
                 await SubmitStepsAsTransaction(steps, wallet);
+                await Task.Delay(
+                    3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
 
                 balancesReturn = await indexer.GetTokenBalances(
                     new GetTokenBalancesArgs(wallet.GetWalletAddress(), collection));
@@ -406,6 +410,8 @@ namespace Sequence.Marketplace
 
                 Step[] steps = await FetchOfferAndSell(collection, wallet);
                 await SubmitStepsAsTransaction(steps, wallet);
+                await Task.Delay(
+                    3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
 
                 balancesReturn = await indexer.GetTokenBalances(
                     new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20UniversallyMintable));
