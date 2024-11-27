@@ -35,7 +35,7 @@ namespace Temp
                 collectibleImagesByOrderId.Add(collectibleOrders[i].order.orderId, null);
                 amountsRequestedByOrderId.Add(collectibleOrders[i].order.orderId, (uint)Random.Range(0, 1000));
             }
-            Cart cart = new Cart(collectibleOrders, collectibleImagesByOrderId, amountsRequestedByOrderId, new MockSwapGivesRandomExchangeRate());
+            Cart cart = new Cart(collectibleOrders, collectibleImagesByOrderId, amountsRequestedByOrderId, new MockSwapGivesRandomExchangeRate(), new MockMarketplaceReaderReturnsFakeCurrencies());
             
             _checkoutPanel.Open(cart, new EOAWalletToSequenceWalletAdapter(new EOAWallet()));
         }
@@ -56,7 +56,7 @@ namespace Temp
                     OrderStatus.active, BigInteger.Parse(ChainDictionaries.ChainIdOf[_chain]), possibleAddresses.GetRandomObjectFromArray(), 
                     Random.Range(1, 10000).ToString(), possibleAddresses.GetRandomObjectFromArray(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), possibleCurrencyAddresses.GetRandomObjectFromArray(),
-                    Random.Range(1, 10000), Random.Range(1f, 10000f), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
+                    Random.Range(1, 19), Random.Range(1f, 10000f), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 19), Random.Range(1, 100), null, DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.Add(TimeSpan.FromDays(300)).ToString(CultureInfo.InvariantCulture),
                     DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), ""));

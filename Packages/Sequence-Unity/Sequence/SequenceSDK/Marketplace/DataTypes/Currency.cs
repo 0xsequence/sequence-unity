@@ -65,4 +65,20 @@ namespace Sequence.Marketplace
             }
         }
     }
+
+    public static class CurrencyExtensions
+    {
+        public static Currency GetCurrencyByContractAddress(this Currency[] currencies, string contractAddress)
+        {
+            foreach (Currency currency in currencies)
+            {
+                if (currency.contractAddress == contractAddress)
+                {
+                    return currency;
+                }
+            }
+
+            return null;
+        }
+    }
 }

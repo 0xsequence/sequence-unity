@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Spacing: 5
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 1
+  m_ChildControlWidth: 0
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
@@ -949,6 +949,9 @@ MonoBehaviour:
   _numberOfUniqueItemsText: {fileID: 1725893151149645637}
   _scrollViewLayoutGroup: {fileID: 1725893150128125170}
   _scrollView: {fileID: 1725893151211506208}
+  _networkBannerPrefab: {fileID: 573983388965529282, guid: afc78646e50d64018841ee08eba6908f, type: 3}
+  _estimatedTotalPrefab: {fileID: 8039049874399770031, guid: 9eb74a505556a47c7a164424bffe5720, type: 3}
+  _dividerPrefab: {fileID: 8411021290343302275, guid: 209992ef35a8d4946afdd15953c1943a, type: 3}
 --- !u!224 &1725893150786301951
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1163,7 +1166,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 270, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1725893151149645639
 GameObject:

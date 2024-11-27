@@ -17,6 +17,9 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _numberOfUniqueItemsText;
         [SerializeField] private VerticalLayoutGroup _scrollViewLayoutGroup;
         [SerializeField] private ScrollRect _scrollView;
+        [SerializeField] private GameObject _networkBannerPrefab;
+        [SerializeField] private GameObject _estimatedTotalPrefab;
+        [SerializeField] private GameObject _dividerPrefab;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
@@ -76,6 +79,19 @@ namespace Sequence.Demo
                 GameObject cartItem = Instantiate(_cartItemPrefab, _cartItemsParent);
                 cartItem.GetComponent<CartItem>().Assemble(_cart, listing.order.orderId);
             }
+            
+            GameObject estimatedTotalGameObject = Instantiate(_estimatedTotalPrefab, _cartItemsParent);
+            EstimatedTotal estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
+            Marketplace.Currency bestCurrency = _cart.GetBestCurrency();
+            string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(bestCurrency.contractAddress));
+            Sprite currencyIcon = await AssetHandler.GetSpriteAsync(bestCurrency.imageUrl);
+            estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, bestCurrency.symbol, currencyIcon);
+            
+            GameObject networkBannerGameObject = Instantiate(_networkBannerPrefab, _cartItemsParent);
+            NetworkBanner networkBanner = networkBannerGameObject.GetComponent<NetworkBanner>();
+            networkBanner.Assemble(_chain);
+
+            Instantiate(_dividerPrefab, _cartItemsParent);
 
             await AsyncExtensions.DelayTask(.1f);
             UpdateScrollViewSize();

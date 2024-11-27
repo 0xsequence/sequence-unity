@@ -16,8 +16,10 @@ namespace Sequence.Marketplace
         public Dictionary<string, uint> AmountsRequestedByOrderId;
 
         private ISwap _swap;
+        private IReader _reader;
+        private Currency[] _currencies;
         
-        public Cart(CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null)
+        public Cart(CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null, IReader reader = null)
         {
             Listings = listings;
             CollectibleImagesByOrderId = collectibleImagesByOrderId;
@@ -56,18 +58,43 @@ namespace Sequence.Marketplace
                 }
             }
             
+            SetSwap(swap);
+            SetReader(reader);
+        }
+        
+        private void SetSwap(ISwap swap)
+        {
             _swap = swap;
             if (_swap == null)
             {
-                _swap = new CurrencySwap(ChainDictionaries.ChainById[listings[0].order.chainId.ToString()]);
+                _swap = new CurrencySwap(ChainDictionaries.ChainById[Listings[0].order.chainId.ToString()]);
             }
         }
 
-        public Cart(CollectibleOrder listing, Sprite collectibleIcon, uint amount)
+        private void SetReader(IReader reader)
+        {
+            _reader = reader;
+            if (_reader == null)
+            {
+                _reader = new MarketplaceReader(ChainDictionaries.ChainById[Listings[0].order.chainId.ToString()]);
+            }
+            
+            FetchCurrencies().ConfigureAwait(false);
+        }
+        
+        private async Task FetchCurrencies()
+        {
+            _currencies = await _reader.ListCurrencies();
+        }
+
+        public Cart(CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IReader reader = null)
         {
             Listings = new CollectibleOrder[] {listing};
             CollectibleImagesByOrderId = new Dictionary<string, Sprite> {{listing.order.orderId, collectibleIcon}};
             AmountsRequestedByOrderId = new Dictionary<string, uint> {{listing.order.orderId, amount}};
+            
+            SetSwap(swap);
+            SetReader(reader);
         }
         
         public CollectibleOrder GetOrderByOrderId(string orderId)
@@ -137,6 +164,31 @@ namespace Sequence.Marketplace
             }
             
             return total.ToString("0.####");
+        }
+
+        public Currency GetBestCurrency()
+        {
+            int listings = Listings.Length;
+            Dictionary<string, int> currencyCounts = new Dictionary<string, int>();
+            for (int i = 0; i < listings; i++)
+            {
+                if (Listings[i].order.priceCurrencyAddress == Currency.NativeCurrencyAddress)
+                {
+                    return _currencies.GetCurrencyByContractAddress(Currency.NativeCurrencyAddress);
+                }
+                string currencyAddress = Listings[i].order.priceCurrencyAddress;
+                if (currencyCounts.ContainsKey(currencyAddress))
+                {
+                    currencyCounts[currencyAddress]++;
+                }
+                else
+                {
+                    currencyCounts[currencyAddress] = 1;
+                }
+            }
+            
+            string bestCurrencyAddress = currencyCounts.OrderByDescending(pair => pair.Value).First().Key;
+            return _currencies.GetCurrencyByContractAddress(bestCurrencyAddress);
         }
     }
 }
