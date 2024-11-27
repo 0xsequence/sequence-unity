@@ -19,6 +19,7 @@ namespace Sequence.Marketplace
         
         /// <summary>
         /// List collectible listings for a given contract address with the listings in the array sorted in terms of increasing prices.
+        /// Only the lowest priced listing for each collectible/token id will be returned.
         /// </summary>
         /// <param name="contractAddress">the collection contract address</param>
         /// <param name="filter">apply filters on the queried orders</param>
@@ -29,7 +30,8 @@ namespace Sequence.Marketplace
 
         /// <summary>
         /// List collectible listings for a given contract address with the listings in the array sorted in terms of increasing prices.
-        ///
+        /// Only the lowest priced listing for each collectible/token id will be returned.
+        /// 
         /// Same as ListCollectibleListingsWithLowestPricedListingsFirst except we will continue to make the requests until we have all listings.
         /// Useful helper method to avoid having to deal with pagination.
         /// Be careful to use this method only when you are sure that the number of listings is not too large or it will lead to a long wait time and high memory usage.
@@ -42,6 +44,7 @@ namespace Sequence.Marketplace
         
         /// <summary>
         /// List collectible offers for a given contract address with the offers in the array sorted in terms of decreasing prices.
+        /// Only the highest priced offer for each collectible/token id will be returned.
         /// </summary>
         /// <param name="contractAddress">the collection contract address</param>
         /// <param name="filter">apply filters on the queried orders</param>
@@ -52,7 +55,8 @@ namespace Sequence.Marketplace
 
         /// <summary>
         /// List collectible offers for a given contract address with the offers in the array sorted in terms of decreasing prices.
-        ///
+        /// Only the highest priced offer for each collectible/token id will be returned.
+        /// 
         /// Same as ListCollectibleOffersWithHighestPricedOfferFirst except we will continue to make the requests until we have all offers.
         /// Useful helper method to avoid having to deal with pagination.
         /// Be careful to use this method only when you are sure that the number of offers is not too large or it will lead to a long wait time and high memory usage.

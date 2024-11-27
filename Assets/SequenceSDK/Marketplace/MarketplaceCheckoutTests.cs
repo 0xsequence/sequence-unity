@@ -46,13 +46,13 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateBuyTransaction(int amount)
         {
-            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
+            Order[] ordersResponse = await OrderFetcher.FetchListingsForCollectible("1");
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < collectibleOrders.Length; i++)
+            for (int i = 0; i < ordersResponse.Length; i++)
             {
-                if (collectibleOrders[i].order.status == OrderStatus.active)
+                if (ordersResponse[i].status == OrderStatus.active)
                 {
-                    orders.Add(collectibleOrders[i].order);
+                    orders.Add(ordersResponse[i]);
                     if (orders.Count == amount)
                     {
                         break;
@@ -76,13 +76,13 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateSellTransaction(int amount)
         {
-            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchOffers();
+            Order[] orderResponse = await OrderFetcher.FetchOffersForCollectible("1");
             List<Order> orders = new List<Order>();
-            for (int i = 0; i < collectibleOrders.Length; i++)
+            for (int i = 0; i < orderResponse.Length; i++)
             {
-                if (collectibleOrders[i].order.status == OrderStatus.active)
+                if (orderResponse[i].status == OrderStatus.active)
                 {
-                    orders.Add(collectibleOrders[i].order);
+                    orders.Add(orderResponse[i]);
                     if (orders.Count == amount)
                     {
                         break;

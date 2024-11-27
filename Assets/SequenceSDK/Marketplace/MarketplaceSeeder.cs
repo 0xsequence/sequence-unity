@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Contracts;
@@ -26,7 +27,7 @@ namespace Sequence.Marketplace
                 TransactionReturn mintResult = await wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
                 {
                     new RawTransaction(collection, "0",
-                        universallyMintableNft.Mint(wallet.GetWalletAddress(), 1, 1000000000000).CallData),
+                        universallyMintableNft.MintBatch(wallet.GetWalletAddress(), new BigInteger[] {1, 2, 3, 4, 5}, new BigInteger[] {100000, 100000, 100000, 100000, 100000}).CallData),
                     new RawTransaction(erc20UniversallyMintable, "0",
                         universallyMintableToken.Mint(wallet.GetWalletAddress(), 1000000000000).CallData)
                 });
@@ -37,7 +38,7 @@ namespace Sequence.Marketplace
                 Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
                 for (int i = 0; i < 100; i++)
                 {
-                    Step[] steps = await checkout.GenerateListingTransaction(collection, "1", i + 1,
+                    Step[] steps = await checkout.GenerateListingTransaction(collection, (i % 5 + 1).ToString(), i + 1,
                         ContractType.ERC1155, erc20UniversallyMintable, 1,
                         DateTime.Now + TimeSpan.FromDays(365));
                     foreach (var step in steps)
@@ -48,7 +49,7 @@ namespace Sequence.Marketplace
 
                 for (int i = 0; i < 100; i++)
                 {
-                    Step[] steps = await checkout.GenerateOfferTransaction(collection, "1", i + 1,
+                    Step[] steps = await checkout.GenerateOfferTransaction(collection, (i % 5 + 1).ToString(), i + 1,
                         ContractType.ERC1155, erc20UniversallyMintable, 1,
                         DateTime.Now + TimeSpan.FromDays(365));
                     foreach (var step in steps)
