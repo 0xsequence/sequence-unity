@@ -6,6 +6,7 @@ using Sequence.Marketplace;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
@@ -14,6 +15,8 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _cartItemPrefab;
         [SerializeField] private Transform _cartItemsParent;
         [SerializeField] private TextMeshProUGUI _numberOfUniqueItemsText;
+        [SerializeField] private VerticalLayoutGroup _scrollViewLayoutGroup;
+        [SerializeField] private ScrollRect _scrollView;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
@@ -22,6 +25,13 @@ namespace Sequence.Demo
         private Dictionary<string, Sprite> _collectibleImagesByOrderId;
         private Dictionary<string, uint> _amountsRequestedByOrderId;
         private Cart _cart;
+        private RectTransform _scrollViewLayoutGroupRectTransform;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _scrollViewLayoutGroupRectTransform = _scrollViewLayoutGroup.GetComponent<RectTransform>();
+        }
 
         public override void Open(params object[] args)
         {
@@ -48,7 +58,7 @@ namespace Sequence.Demo
             _amountsRequestedByOrderId = _cart.AmountsRequestedByOrderId;
             
             _checkout = new Checkout(_wallet, _chain);
-            
+
             Assemble().ConfigureAwait(false);
         }
 
@@ -66,7 +76,18 @@ namespace Sequence.Demo
                 GameObject cartItem = Instantiate(_cartItemPrefab, _cartItemsParent);
                 cartItem.GetComponent<CartItem>().Assemble(_cart, listing.order.orderId);
             }
+
+            await AsyncExtensions.DelayTask(.1f);
+            UpdateScrollViewSize();
         }
 
+        private void UpdateScrollViewSize()
+        {
+            float contentHeight = _scrollViewLayoutGroup.preferredHeight;
+            _scrollViewLayoutGroupRectTransform.sizeDelta =
+                new Vector2(_scrollViewLayoutGroupRectTransform.sizeDelta.x, contentHeight);
+            
+            _scrollView.verticalNormalizedPosition = 1f;
+        }
     }
 }
