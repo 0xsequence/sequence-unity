@@ -58,7 +58,7 @@ namespace Sequence.Demo
         
         public void OpenSeeMarketplaceListingsPanel()
         {
-            _ui.OpenSeeMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+            _ui.OpenViewMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
     }
 }

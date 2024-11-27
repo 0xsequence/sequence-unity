@@ -1,3 +1,4 @@
+using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.UI;
 using Sequence.Marketplace;
@@ -11,6 +12,7 @@ namespace Sequence.Demo
         [SerializeField] private QrCodeView _qrCodeView;
 
         private CollectibleOrder _order;
+        private IWallet _wallet;
         
         private void Awake()
         {
@@ -29,6 +31,11 @@ namespace Sequence.Demo
             {
                 Debug.LogError("Collectible order not set for checkout.");
             }
+        }
+
+        public void SetWallet(SequenceWallet wallet)
+        {
+            _wallet = wallet;
         }
 
         public void SetCollectibleOrder(CollectibleOrder checkoutOrder)

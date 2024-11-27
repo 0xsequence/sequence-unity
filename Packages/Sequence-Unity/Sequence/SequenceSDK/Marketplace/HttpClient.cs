@@ -11,22 +11,47 @@ using UnityEngine.Networking;
 
 namespace Sequence.Marketplace
 {
-    public class HttpClient
+    internal class HttpClient : IHttpClient
     {
         private string _apiKey;
-        private const string _baseUrl = "https://marketplace-api.sequence.app/";
+        private const string _baseUrl = "https://dev-marketplace-api.sequence.app/"; // Todo switch to prod
         private const string _endUrl = "/rpc/Marketplace/";
+        private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
         
         public HttpClient()
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
+            _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays"; // todo remove dev env api key
+        }
+        
+        public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)
+        {
+            return await SendRequest<object, ReturnType>(chain, url, null);
         }
 
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(Chain chain, string endpoint, ArgType args)
         {
             string url = _baseUrl + ChainDictionaries.PathOf[chain] + _endUrl + endpoint;
-            string requestJson = JsonConvert.SerializeObject(args);
+            return await SendRequest<ArgType, ReturnType>(url, args);
+        }
+
+        public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
+        {
+            // todo remove when we remove above hardcoded dev key
+            if (url.StartsWith("https://api.sequence"))
+            {
+                _apiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+            }
+            
+            string requestJson = "";
+            if (args != null)
+            {
+                requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            }
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
