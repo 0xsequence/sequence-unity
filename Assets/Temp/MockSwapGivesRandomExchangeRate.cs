@@ -14,7 +14,7 @@ namespace Temp
         public async Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount,
             uint slippagePercent = ISwap.DefaultSlippagePercentage)
         {
-            return new SwapPrice(sellCurrency, "", "", Random.Range(1, 1000000).ToString(), "");
+            return new SwapPrice(sellCurrency, "", "", Random.Range(1, 100).ToString(), "");
         }
 
         public event Action<SwapPrice[]> OnSwapPricesReturn;

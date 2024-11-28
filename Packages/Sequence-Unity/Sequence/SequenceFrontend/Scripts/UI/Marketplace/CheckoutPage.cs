@@ -20,6 +20,9 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _networkBannerPrefab;
         [SerializeField] private GameObject _estimatedTotalPrefab;
         [SerializeField] private GameObject _dividerPrefab;
+        [SerializeField] private GameObject _payWithCryptoTextPrefab;
+        [SerializeField] private GameObject _tokenPaymentOptionPrefab;
+        [SerializeField] private Button _completePurchaseButton;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
@@ -49,12 +52,7 @@ namespace Sequence.Demo
             
             _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
             
-            _wallet = args.GetObjectOfTypeIfExists<IWallet>();
-            if (_wallet == default)
-            {
-                throw new SystemException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(IWallet)} as an argument");
-            }
+            _wallet = _cart.Wallet;
 
             _collectibleImagesByOrderId = _cart.CollectibleImagesByOrderId;
 
@@ -84,7 +82,11 @@ namespace Sequence.Demo
             EstimatedTotal estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
             Marketplace.Currency bestCurrency = _cart.GetBestCurrency();
             string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(bestCurrency.contractAddress));
-            Sprite currencyIcon = await AssetHandler.GetSpriteAsync(bestCurrency.imageUrl);
+            if (estimatedCurrencyRequired.StartsWith("Error"))
+            {
+                Debug.LogError(estimatedCurrencyRequired);
+            }
+            Sprite currencyIcon = await _cart.GetCurrencyIcon(bestCurrency);
             estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, bestCurrency.symbol, currencyIcon);
             
             GameObject networkBannerGameObject = Instantiate(_networkBannerPrefab, _cartItemsParent);
@@ -92,6 +94,44 @@ namespace Sequence.Demo
             networkBanner.Assemble(_chain);
 
             Instantiate(_dividerPrefab, _cartItemsParent);
+            Instantiate(_payWithCryptoTextPrefab, _cartItemsParent);
+            
+            Marketplace.Currency[] currencies = await _cart.GetCurrencies();
+            int currenciesLength = currencies.Length;
+            bool hasAtLeastOneCryptoPaymentOption = false;
+            for (int i = 0; i < currenciesLength; i++)
+            {
+                Marketplace.Currency currency = currencies[i];
+                string quotedPrice = await _cart.GetApproximateTotalInCurrencyIfAffordable(new Address(currency.contractAddress));
+                if (string.IsNullOrWhiteSpace(quotedPrice) || quotedPrice == "")
+                {
+                    Debug.Log($"User {_wallet.GetWalletAddress()} has insufficient balance to pay with {currency.contractAddress}. Skipping...");
+                    continue;
+                }
+
+                if (quotedPrice.StartsWith("Error"))
+                {
+                    Debug.LogError(quotedPrice + "\nSkipping...");
+                    continue;
+                }
+                
+                GameObject tokenPaymentOptionGameObject = Instantiate(_tokenPaymentOptionPrefab, _cartItemsParent);
+                TokenPaymentOption tokenPaymentOption = tokenPaymentOptionGameObject.GetComponent<TokenPaymentOption>();
+                Sprite tokenIcon = await _cart.GetCurrencyIcon(currency);
+                tokenPaymentOption.Assemble(currency, quotedPrice, tokenIcon);
+                hasAtLeastOneCryptoPaymentOption = true;
+            }
+            
+            Instantiate(_dividerPrefab, _cartItemsParent);
+
+            if (hasAtLeastOneCryptoPaymentOption)
+            {
+                _completePurchaseButton.interactable = true;
+            }
+            else
+            {
+                _completePurchaseButton.interactable = false;
+            }
 
             await AsyncExtensions.DelayTask(.1f);
             UpdateScrollViewSize();

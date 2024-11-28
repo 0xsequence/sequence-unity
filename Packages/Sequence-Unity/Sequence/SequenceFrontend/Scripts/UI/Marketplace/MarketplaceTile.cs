@@ -121,7 +121,7 @@ namespace Sequence.Demo
 
         public void OpenBuyPage()
         {
-            _checkoutPanel.Open(new Cart(new CollectibleOrder[] { _collectibleOrder },
+            _checkoutPanel.Open(new Cart(_wallet, new CollectibleOrder[] { _collectibleOrder },
                 new Dictionary<string, Sprite>()
                 {
                     { _collectibleOrder.order.orderId , _collectibleSprite }
@@ -129,7 +129,7 @@ namespace Sequence.Demo
                 new Dictionary<string, uint>()
                 {
                     { _collectibleOrder.order.orderId , 1 }
-                }), _wallet);
+                }));
         }
     }
 }

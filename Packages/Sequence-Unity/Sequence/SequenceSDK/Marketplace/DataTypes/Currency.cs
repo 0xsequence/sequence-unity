@@ -80,5 +80,18 @@ namespace Sequence.Marketplace
 
             return null;
         }
+        
+        public static Currency FindDefaultChainCurrency(this Currency[] currencies)
+        {
+            foreach (Currency currency in currencies)
+            {
+                if (currency.defaultChainCurrency)
+                {
+                    return currency;
+                }
+            }
+
+            return null;
+        }
     }
 }

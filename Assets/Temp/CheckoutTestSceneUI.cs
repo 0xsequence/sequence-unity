@@ -33,11 +33,11 @@ namespace Temp
             for (int i = 0; i < listings; i++)
             {
                 collectibleImagesByOrderId.Add(collectibleOrders[i].order.orderId, null);
-                amountsRequestedByOrderId.Add(collectibleOrders[i].order.orderId, (uint)Random.Range(0, 1000));
+                amountsRequestedByOrderId.Add(collectibleOrders[i].order.orderId, (uint)Random.Range(0, 100));
             }
-            Cart cart = new Cart(collectibleOrders, collectibleImagesByOrderId, amountsRequestedByOrderId, new MockSwapGivesRandomExchangeRate(), new MockMarketplaceReaderReturnsFakeCurrencies());
+            Cart cart = new Cart(new EOAWalletToSequenceWalletAdapter(new EOAWallet()), collectibleOrders, collectibleImagesByOrderId, amountsRequestedByOrderId, new MockSwapGivesRandomExchangeRate(), new MockMarketplaceReaderReturnsFakeCurrencies(), new MockIndexerReturnsHighBalances());
             
-            _checkoutPanel.Open(cart, new EOAWalletToSequenceWalletAdapter(new EOAWallet()));
+            _checkoutPanel.Open(cart);
         }
 
         private CollectibleOrder CreateMockCollectibleOrder()
@@ -57,7 +57,7 @@ namespace Temp
                     Random.Range(1, 10000).ToString(), possibleAddresses.GetRandomObjectFromArray(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), possibleCurrencyAddresses.GetRandomObjectFromArray(),
                     Random.Range(1, 19), Random.Range(1f, 10000f), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
-                    Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
+                    Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 100).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 19), Random.Range(1, 100), null, DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.Add(TimeSpan.FromDays(300)).ToString(CultureInfo.InvariantCulture),
                     DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), ""));
             return order;
