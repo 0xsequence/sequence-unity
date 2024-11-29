@@ -10,8 +10,6 @@ namespace Sequence.Demo
     [RequireComponent(typeof(Button))]
     public class TokenPaymentOption : MonoBehaviour
     {
-        public static event Action<Marketplace.Currency> OnSelectedCurrency;
-        
         [SerializeField] private Image _checkbox;
         [SerializeField] private Sprite _uncheckedSprite;
         [SerializeField] private Sprite _checkedSprite;
@@ -20,16 +18,15 @@ namespace Sequence.Demo
         [SerializeField] private Image _tokenIcon;
 
         private Marketplace.Currency _currency;
-        private Cart _cart;
 
         private void Awake()
         {
-            OnSelectedCurrency += HandleCurrencySelected;
+            Cart.OnSelectedCurrency += HandleCurrencySelected;
         }
         
         private void OnDestroy()
         {
-            OnSelectedCurrency -= HandleCurrencySelected;
+            Cart.OnSelectedCurrency -= HandleCurrencySelected;
         }
 
         public void Assemble(Marketplace.Currency currency, string amount, Sprite tokenIcon = null)
@@ -57,7 +54,12 @@ namespace Sequence.Demo
 
         private void OnClick()
         {
-            OnSelectedCurrency?.Invoke(_currency);
+            SelectCurrency();
+        }
+
+        public void SelectCurrency()
+        {
+            Cart.SelectCurrency(_currency);
         }
 
         private void HandleCurrencySelected(Marketplace.Currency selectedCurrency)

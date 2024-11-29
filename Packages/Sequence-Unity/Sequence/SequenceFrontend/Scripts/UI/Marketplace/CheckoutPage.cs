@@ -23,6 +23,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _payWithCryptoTextPrefab;
         [SerializeField] private GameObject _tokenPaymentOptionPrefab;
         [SerializeField] private Button _completePurchaseButton;
+        [SerializeField] private GameObject _loadingScreen;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
@@ -80,7 +81,7 @@ namespace Sequence.Demo
             
             GameObject estimatedTotalGameObject = Instantiate(_estimatedTotalPrefab, _cartItemsParent);
             EstimatedTotal estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
-            Marketplace.Currency bestCurrency = _cart.GetBestCurrency();
+            Marketplace.Currency bestCurrency = await _cart.GetBestCurrency();
             string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(bestCurrency.contractAddress));
             if (estimatedCurrencyRequired.StartsWith("Error"))
             {
@@ -119,6 +120,10 @@ namespace Sequence.Demo
                 TokenPaymentOption tokenPaymentOption = tokenPaymentOptionGameObject.GetComponent<TokenPaymentOption>();
                 Sprite tokenIcon = await _cart.GetCurrencyIcon(currency);
                 tokenPaymentOption.Assemble(currency, quotedPrice, tokenIcon);
+                if (!hasAtLeastOneCryptoPaymentOption)
+                {
+                    tokenPaymentOption.SelectCurrency();
+                }
                 hasAtLeastOneCryptoPaymentOption = true;
             }
             
@@ -144,6 +149,49 @@ namespace Sequence.Demo
                 new Vector2(_scrollViewLayoutGroupRectTransform.sizeDelta.x, contentHeight);
             
             _scrollView.verticalNormalizedPosition = 1f;
+        }
+
+        public void Checkout()
+        {
+            DoCheckout().ConfigureAwait(false);
+        }
+
+        private async Task DoCheckout()
+        {
+            _loadingScreen.SetActive(true);
+            bool success = await CheckoutWithCart();
+            _loadingScreen.SetActive(false);
+            if (success)
+            {
+                _panel.Close();
+            }
+            else
+            {
+                // todo do something here
+            }
+        }
+        
+        private async Task<bool> CheckoutWithCart()
+        {
+            try
+            {
+                TransactionReturn transactionReturn = await _cart.Checkout();
+                if (transactionReturn is FailedTransactionReturn failedTransactionReturn)
+                {
+                    Debug.LogError(failedTransactionReturn.error);
+                    return false;
+                }
+                else
+                {
+                    Debug.Log("Checkout successful");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+                return false;
+            }
         }
     }
 }

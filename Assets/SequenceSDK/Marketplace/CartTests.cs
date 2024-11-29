@@ -5,8 +5,10 @@ using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Demo.Mocks;
+using Sequence.EmbeddedWallet;
 using Sequence.Marketplace.Mocks;
 using Sequence.Utils;
+using Sequence.Wallet;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -39,7 +41,7 @@ namespace Sequence.Marketplace
                 sprites[order.order.orderId] = null;
                 quantities[order.order.orderId] = amounts[i];
             }
-            Cart cart = new Cart(orders, sprites, quantities);
+            Cart cart = new Cart(null, orders, sprites, quantities);
             string totalInUSD = cart.GetApproximateTotalInUSD();
             
             Assert.AreEqual(expected, totalInUSD);
@@ -75,7 +77,7 @@ namespace Sequence.Marketplace
             CollectibleOrder[] orders = new CollectibleOrder[0];
             Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
             Dictionary<string, uint> quantities = new Dictionary<string, uint>();
-            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(orders, sprites, quantities));
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(null, orders, sprites, quantities));
             Assert.True(exception.Message.Contains("Invalid use."));
         }
 
@@ -85,7 +87,7 @@ namespace Sequence.Marketplace
             CollectibleOrder[] orders = null;
             Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
             Dictionary<string, uint> quantities = new Dictionary<string, uint>();
-            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(orders, sprites, quantities));
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(null, orders, sprites, quantities));
             Assert.True(exception.Message.Contains("Invalid use."));
         }
         
@@ -96,7 +98,7 @@ namespace Sequence.Marketplace
             orders[0] = CreateFakeOrder(5f);
             Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
             Dictionary<string, uint> quantities = new Dictionary<string, uint>();
-            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(orders, sprites, quantities));
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(null, orders, sprites, quantities));
             Assert.True(exception.Message.Contains("Invalid use."));
         }
         
@@ -108,7 +110,7 @@ namespace Sequence.Marketplace
             Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
             sprites[orders[0].order.orderId] = null;
             Dictionary<string, uint> quantities = new Dictionary<string, uint>();
-            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(orders, sprites, quantities));
+            ArgumentException exception = Assert.Throws<ArgumentException>(() => new Cart(null, orders, sprites, quantities));
             Assert.True(exception.Message.Contains("Invalid use."));
         }
 
@@ -132,7 +134,7 @@ namespace Sequence.Marketplace
                 quantities[orders[i].order.orderId] = (uint)i;
             }
             
-            Cart cart = new Cart(orders, sprites, quantities);
+            Cart cart = new Cart(null, orders, sprites, quantities);
             
             string totalInUSD = cart.GetApproximateTotalInUSD();
             Assert.AreEqual("7.72", totalInUSD);
@@ -213,7 +215,7 @@ namespace Sequence.Marketplace
                 quantities[orders[i].order.orderId] = amounts[i];
             }
             
-            Cart cart = new Cart(orders, sprites, quantities, new MockSwapThatGivesPricesInOrder(maxSwapPrices));
+            Cart cart = new Cart(null, orders, sprites, quantities, new MockSwapThatGivesPricesInOrder(maxSwapPrices));
             
             string totalInCurrency = await cart.GetApproximateTotalInCurrency(new Address(_possibleCurrencyAddresses[currencyIndex]));
             Assert.AreEqual(expected, totalInCurrency);
@@ -235,6 +237,206 @@ namespace Sequence.Marketplace
                     Random.Range(1, 19), Random.Range(1, 100), null, DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.Add(TimeSpan.FromDays(300)).ToString(CultureInfo.InvariantCulture),
                     DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), ""));
             return order;
+        }
+
+        [TestCase(new int[] {1}, 1)]
+        [TestCase(new int[] {0,1,2,3}, 0)] // 0 is the default currency for the chain
+        [TestCase(new int[] {0,1,2,3,2,2,2,2}, 0)]
+        [TestCase(new int[] {3,1,2,1,1,1,1,2,3}, 1)]
+        [TestCase(new int[] {3,2,2,2,2,2,2,2,3}, 2)]
+        public async Task TestGetBestCurrency(int[] priceCurrencyIndices, int expectedCurrencyIndex)
+        {
+            int amount = priceCurrencyIndices.Length;
+            CollectibleOrder[] orders = new CollectibleOrder[amount];
+            for (int i = 0; i < amount; i++)
+            {
+                orders[i] = CreateFakeOrder((uint)priceCurrencyIndices[i], 1000, 3);
+            }
+            
+            Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+            Dictionary<string, uint> quantities = new Dictionary<string, uint>();
+            for (int i = 0; i < orders.Length; i++)
+            {
+                sprites[orders[i].order.orderId] = null;
+                quantities[orders[i].order.orderId] = 1;
+            }
+            
+            Cart cart = new Cart(null, orders, sprites, quantities);
+
+            Currency bestCurrency = await cart.GetBestCurrency();
+            Assert.AreEqual(_possibleCurrencyAddresses[expectedCurrencyIndex], bestCurrency.contractAddress);
+        }
+
+        [Test]
+        public async Task TestGetCurrencyIcon()
+        {
+            CollectibleOrder listing = CreateFakeOrder(1f);
+            Cart cart = new Cart(null, listing, null, 1);
+            Currency[] currencies = await cart.GetCurrencies();
+            Currency currency = currencies.GetCurrencyByContractAddress(listing.order.priceCurrencyAddress);
+            Assert.NotNull(currency);
+            
+            Sprite sprite = await cart.GetCurrencyIcon(currency);
+            
+            Assert.NotNull(sprite);
+        }
+
+        [Test]
+        public void TestGetOrderByOrderId()
+        {
+            CollectibleOrder listing = CreateFakeOrder(1f);
+            Cart cart = new Cart(null, listing, null, 1);
+            
+            CollectibleOrder order = cart.GetOrderByOrderId(listing.order.orderId);
+            
+            Assert.NotNull(order);
+            Assert.AreEqual(listing, order);
+        }
+
+        [TestCase(0, 
+            new uint[]{1}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{0},
+            new ulong[]{1000}, 
+            true,
+            "1")]
+        [TestCase(0, 
+            new uint[]{1, 3}, 
+            new ulong[]{1000, 9000500}, 
+            new ulong[]{3, 5}, 
+            new uint[]{0, 0},
+            new ulong[]{1000, 1000}, 
+            true,
+            "271.015")]
+        [TestCase(0, 
+            new uint[]{0}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{0},
+            new ulong[]{1000}, 
+            true,
+            "")]
+        [TestCase(0, 
+            new uint[]{0}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{1},
+            new ulong[]{1000}, 
+            true,
+            "")]
+        [TestCase(0, 
+            new uint[]{1}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{1},
+            new ulong[]{10000}, 
+            true,
+            "10")]
+        [TestCase(3, 
+            new uint[]{1, 3}, 
+            new ulong[]{1000, 9000500}, 
+            new ulong[]{3, 5}, 
+            new uint[]{3, 1},
+            new ulong[]{10000, 10000}, 
+            true,
+            "1.3")]
+        [TestCase(0, 
+            new uint[]{1}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{0},
+            new ulong[]{1000}, 
+            false,
+            "")]
+        [TestCase(0, 
+            new uint[]{1, 3}, 
+            new ulong[]{1000, 9000500}, 
+            new ulong[]{3, 5}, 
+            new uint[]{0, 0},
+            new ulong[]{1000, 1000}, 
+            false,
+            "")]
+        [TestCase(0, 
+            new uint[]{0}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{0},
+            new ulong[]{1000}, 
+            false,
+            "")]
+        [TestCase(0, 
+            new uint[]{1}, 
+            new ulong[]{1000}, 
+            new ulong[]{3}, 
+            new uint[]{1},
+            new ulong[]{10000}, 
+            false,
+            "")]
+        [TestCase(3, 
+            new uint[]{1, 3}, 
+            new ulong[]{1000, 9000500}, 
+            new ulong[]{3, 5}, 
+            new uint[]{3, 1},
+            new ulong[]{10000, 10000}, 
+            false,
+            "")]
+        public async Task TestGetApproximateTotalInCurrencyIfAffordable(int currencyIndex, uint[] amounts, ulong[] priceAmount,
+            ulong[] priceDecimals, uint[] priceCurrencyIndex, ulong[] maxSwapPrices, bool canAfford, string expected)
+        {
+            int amountsCount = amounts.Length;
+            int priceAmountCount = priceAmount.Length;
+            int priceDecimalsCount = priceDecimals.Length;
+            int priceCurrencyIndexCount = priceCurrencyIndex.Length;
+            int maxSwapPricesCount = maxSwapPrices.Length;
+            Assert.AreEqual(amountsCount, priceAmountCount, "Invalid test. Must have same amount of amounts and priceAmount");
+            Assert.AreEqual(amountsCount, priceDecimalsCount, "Invalid test. Must have same amount of amounts and priceDecimals");
+            Assert.AreEqual(amountsCount, priceCurrencyIndexCount, "Invalid test. Must have same amount of amounts and priceCurrencyIndex");
+            Assert.AreEqual(amountsCount, maxSwapPricesCount, "Invalid test. Must have same amount of amounts and maxSwapPrices");
+            CollectibleOrder[] orders = new CollectibleOrder[amountsCount];
+            for (int i = 0; i < amountsCount; i++)
+            {
+                orders[i] = CreateFakeOrder(priceCurrencyIndex[i], priceAmount[i], priceDecimals[i]);
+            }
+            
+            Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+            Dictionary<string, uint> quantities = new Dictionary<string, uint>();
+            for (int i = 0; i < orders.Length; i++)
+            {
+                sprites[orders[i].order.orderId] = null;
+                quantities[orders[i].order.orderId] = amounts[i];
+            }
+            
+            Cart cart = new Cart(null, orders, sprites, quantities, new MockSwapThatGivesPricesInOrder(maxSwapPrices));
+            
+            string totalInCurrency = await cart.GetApproximateTotalInCurrency(new Address(_possibleCurrencyAddresses[currencyIndex]));
+
+            float total = float.Parse(totalInCurrency);
+
+            if (canAfford)
+            {
+                total += 10000;
+            }
+            else
+            {
+                total -= 10000;
+                if (total < 0)
+                {
+                    total = 0;
+                }
+            }
+
+            int totalRounded = Mathf.RoundToInt(total);
+            IIndexer indexer = new MockIndexerReturnsProvidedValue(totalRounded.ToString(), 1);
+            
+            cart = new Cart(new EOAWalletToSequenceWalletAdapter(new EOAWallet()), orders, sprites, quantities, new MockSwapThatGivesPricesInOrder(maxSwapPrices), null, indexer);
+            
+            string totalInCurrencyIfAffordable = await cart.GetApproximateTotalInCurrencyIfAffordable(new Address(_possibleCurrencyAddresses[currencyIndex]));
+            if (totalInCurrencyIfAffordable.StartsWith("Error"))
+            {
+                throw new Exception(totalInCurrencyIfAffordable);
+            }
+            Assert.AreEqual(expected, totalInCurrencyIfAffordable);
         }
     }
 }

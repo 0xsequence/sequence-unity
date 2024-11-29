@@ -13,6 +13,8 @@ namespace Sequence.Marketplace
 {
     public class Cart
     {
+        public static event Action<Marketplace.Currency> OnSelectedCurrency;
+        
         public IWallet Wallet;
         public CollectibleOrder[] Listings;
         public Dictionary<string, Sprite> CollectibleImagesByOrderId;
@@ -21,11 +23,13 @@ namespace Sequence.Marketplace
         private ISwap _swap;
         private IReader _reader;
         private IIndexer _indexer;
+        private ICheckout _checkout;
         private Currency[] _currencies;
         private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
         private Chain _chain;
+        private Currency _chosenCurrency;
 
-        public Cart(IWallet wallet, CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null, IReader reader = null, IIndexer indexer = null)
+        public Cart(IWallet wallet, CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
             Wallet = wallet;
             Listings = listings;
@@ -64,12 +68,31 @@ namespace Sequence.Marketplace
                         $"Invalid use. {GetType().Name} must be created with a {typeof(Dictionary<string, uint>)} that contains all orderIds as keys in the {typeof(CollectibleOrder[])}");
                 }
             }
-
-            _chain = ChainDictionaries.ChainById[Listings[0].order.chainId.ToString()];
             
+            Setup(swap, reader, indexer, checkout);
+        }
+
+        private void Setup(ISwap swap, IReader reader, IIndexer indexer, ICheckout checkout)
+        {
+            _chain = ChainDictionaries.ChainById[Listings[0].order.chainId.ToString()];
             SetSwap(swap);
             SetReader(reader);
             SetIndexer(indexer);
+            SetCheckout(checkout);
+
+            OnSelectedCurrency += currency =>
+            {
+                if (_currencies.GetCurrencyByContractAddress(currency.contractAddress) == null)
+                {
+                    return;
+                }
+                _chosenCurrency = currency;
+            };
+        }
+
+        public static void SelectCurrency(Currency currency)
+        {
+            OnSelectedCurrency?.Invoke(currency);
         }
         
         private void SetSwap(ISwap swap)
@@ -100,22 +123,30 @@ namespace Sequence.Marketplace
                 _indexer = new ChainIndexer(_chain);
             }
         }
+
+        private void SetCheckout(ICheckout checkout)
+        {
+            _checkout = checkout;
+            if (_checkout == null)
+            {
+                _checkout = new Checkout(Wallet, _chain);
+            }
+        }
         
         private async Task FetchCurrencies()
         {
             _currencies = await _reader.ListCurrencies();
+            _chosenCurrency = _currencies.FindDefaultChainCurrency();
         }
 
-        public Cart(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IReader reader = null, IIndexer indexer = null)
+        public Cart(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
             Wallet = wallet;
             Listings = new CollectibleOrder[] {listing};
             CollectibleImagesByOrderId = new Dictionary<string, Sprite> {{listing.order.orderId, collectibleIcon}};
             AmountsRequestedByOrderId = new Dictionary<string, uint> {{listing.order.orderId, amount}};
             
-            SetSwap(swap);
-            SetReader(reader);
-            SetIndexer(indexer);
+            Setup(swap, reader, indexer, checkout);
         }
         
         public CollectibleOrder GetOrderByOrderId(string orderId)
@@ -186,8 +217,13 @@ namespace Sequence.Marketplace
             return total.ToString("0.####");
         }
 
-        public Currency GetBestCurrency()
+        public async Task<Currency> GetBestCurrency()
         {
+            if (_currencies == null)
+            {
+                _currencies = await _reader.ListCurrencies();
+            }
+            
             Currency defaultChainCurrency = _currencies.FindDefaultChainCurrency();
             string chosenAddress = Currency.NativeCurrencyAddress;
             if (defaultChainCurrency != null)
@@ -295,7 +331,7 @@ namespace Sequence.Marketplace
                         throw new Exception("Received unexpected null response from indexer");
                     }
                     BigInteger balance = balancesReturn.balanceWei;
-                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance);
+                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance,1);
                     if (balanceAmount >= price)
                     {
                         return total;
@@ -311,6 +347,54 @@ namespace Sequence.Marketplace
                     return error;
                 }
             }
+        }
+
+        public async Task<TransactionReturn> Checkout()
+        {
+            Transaction[] transactions;
+            try
+            {
+                transactions =  await BuildCheckoutTransactionArray();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error building checkout transaction array: {e.Message}");
+            }
+
+            try
+            {
+                TransactionReturn transactionReturn = await Wallet.SendTransaction(_chain, transactions);
+                return transactionReturn;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error sending checkout transactions: {e.Message}");
+            }
+        }
+
+        private async Task<Transaction[]> BuildCheckoutTransactionArray()
+        {
+            int listings = Listings.Length;
+            List<Transaction> transactions = new List<Transaction>();
+            for (int i = 0; i < listings; i++)
+            {
+                CollectibleOrder listing = Listings[i];
+                if (listing.order.priceCurrencyAddress == _chosenCurrency.contractAddress)
+                {
+                    Step[] steps = await _checkout.GenerateBuyTransaction(listing.order, AmountsRequestedByOrderId[listing.order.orderId]);
+                    transactions.AddRange(steps.AsTransactionArray());
+                }
+                else
+                {
+                    SwapQuote quote = await _swap.GetSwapQuote(Wallet.GetWalletAddress(),
+                        new Address(listing.order.priceCurrencyAddress),
+                        new Address(_chosenCurrency.contractAddress),
+                        listing.order.priceAmount, true);
+                    transactions.AddRange(quote.AsTransactionArray());
+                }
+            }
+            
+            return transactions.ToArray();
         }
     }
 }

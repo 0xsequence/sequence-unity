@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Sequence.EmbeddedWallet;
 using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
@@ -26,6 +28,21 @@ namespace Sequence.Marketplace
             this.transactionData = transactionData;
             this.transactionValue = transactionValue;
             this.approveData = approveData;
+        }
+    }
+    
+    public static class SwapQuoteExtensions
+    {
+        public static Transaction[] AsTransactionArray(this SwapQuote swapQuote)
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            if (!string.IsNullOrWhiteSpace(swapQuote.approveData))
+            {
+                transactions.Add(new RawTransaction(swapQuote.to, null, swapQuote.approveData));
+            }
+            transactions.Add(new RawTransaction(swapQuote.to, swapQuote.transactionValue, swapQuote.transactionData));
+            
+            return transactions.ToArray();
         }
     }
 }

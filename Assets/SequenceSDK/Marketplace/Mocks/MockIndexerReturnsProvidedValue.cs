@@ -1,16 +1,17 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Sequence.Marketplace.Mocks
 {
-    public class MockIndexerReturnsCached : IIndexer
+    public class MockIndexerReturnsProvidedValue : IIndexer
     {
-        private Dictionary<string, GetTokenBalancesReturn> _cachedTokenBalances;
-        public MockIndexerReturnsCached(Dictionary<string, GetTokenBalancesReturn> cachedTokenBalances)
+        private string _given;
+        private int _decimals;
+        
+        public MockIndexerReturnsProvidedValue(string given, int decimals)
         {
-            _cachedTokenBalances = cachedTokenBalances;
+            _given = given;
         }
         
         public void OnQueryFailed(string error)
@@ -48,20 +49,33 @@ namespace Sequence.Marketplace.Mocks
             throw new System.NotImplementedException();
         }
 
-        public Task<EtherBalance> GetEtherBalance(string accountAddress)
+        public async Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
-            throw new System.NotImplementedException();
+            return new EtherBalance()
+            {
+                accountAddress = accountAddress,
+                balanceWei = BigInteger.Parse(_given)
+            };
         }
 
         public async Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)
         {
-            await Task.Yield();
-            if (_cachedTokenBalances.TryGetValue(args.contractAddress, out var balances))
+            return new GetTokenBalancesReturn()
             {
-                return balances;
-            }
-
-            return null;
+                balances = new TokenBalance[]
+                {
+                    new TokenBalance()
+                    {
+                        accountAddress = args.accountAddress,
+                        contractAddress = args.contractAddress,
+                        balance = BigInteger.Parse(_given),
+                        contractInfo = new ContractInfo()
+                        {
+                            decimals = _decimals,
+                        }
+                    }
+                }
+            };
         }
 
         public Task<Dictionary<BigInteger, TokenBalance>> GetTokenBalancesOrganizedInDictionary(string accountAddress, string contractAddress, bool includeMetadata = false)
@@ -91,7 +105,7 @@ namespace Sequence.Marketplace.Mocks
 
         public bool ChainMatched(Chain chain)
         {
-            return true;
+            throw new System.NotImplementedException();
         }
     }
 }
