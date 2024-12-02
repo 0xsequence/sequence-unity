@@ -43,6 +43,7 @@ namespace Sequence
         TestnetB3Sepolia = 1993,
         TestnetAPEChain = 33111,
         TestnetBlastSepolia = 168587773,
+        [Obsolete("Chain is not currently supported")]
         TestnetBorne = 94984,
         TestnetSkaleNebulaGamingHub = 37084624,
         TestnetSoneiumMinato = 1946,
