@@ -25,6 +25,7 @@ namespace Sequence.Provider
             _httpRpcClient = new HttpRpcClient(url);
         }
 
+        [Obsolete("Use SequenceEthClient(Chain chain) instead. Public nodes often misbehave and can be unreliable; it is highly recommended to use Sequence's node gateway.")]
         public SequenceEthClient(string _url)
         {
             _httpRpcClient = new HttpRpcClient(_url);
