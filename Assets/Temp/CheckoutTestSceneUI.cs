@@ -35,7 +35,7 @@ namespace Temp
                 collectibleImagesByOrderId.Add(collectibleOrders[i].order.orderId, null);
                 amountsRequestedByOrderId.Add(collectibleOrders[i].order.orderId, (uint)Random.Range(0, 100));
             }
-            Cart cart = new Cart(new EOAWalletToSequenceWalletAdapter(new EOAWallet()), collectibleOrders, collectibleImagesByOrderId, amountsRequestedByOrderId, new MockSwapGivesRandomExchangeRate(), new MockMarketplaceReaderReturnsFakeCurrencies(), new MockIndexerReturnsHighBalances());
+            Cart cart = new Cart(new MockWalletWithSuccessfulTransactions(), collectibleOrders, collectibleImagesByOrderId, amountsRequestedByOrderId, new MockSwapGivesRandomExchangeRate(), new MockMarketplaceReaderReturnsFakeCurrencies(), new MockIndexerReturnsHighBalances(), new MockCheckoutThatAlwaysGeneratesTransactions());
             
             _checkoutPanel.Open(cart);
         }

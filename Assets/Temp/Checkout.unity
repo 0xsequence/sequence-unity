@@ -312,22 +312,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 545713117}
     m_Modifications:
-    - target: {fileID: 1690211464671671473, guid: b675a1455406a4749a6659422d0a8b22, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1690211464671671473, guid: b675a1455406a4749a6659422d0a8b22, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1690211464671671473, guid: b675a1455406a4749a6659422d0a8b22, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1690211464671671473, guid: b675a1455406a4749a6659422d0a8b22, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1690211465220774611, guid: b675a1455406a4749a6659422d0a8b22, type: 3}
       propertyPath: m_Name
       value: CheckoutPanel

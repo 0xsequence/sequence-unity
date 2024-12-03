@@ -29,10 +29,11 @@ namespace Temp
         public event Action<SwapQuote> OnSwapQuoteReturn;
         public event Action<string> OnSwapQuoteError;
 
-        public Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount, bool includeApprove,
+        public async Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount, bool includeApprove,
             uint slippagePercentage = ISwap.DefaultSlippagePercentage)
         {
-            throw new NotImplementedException();
+            return new SwapQuote(buyCurrency, buyAmount, "some price", "max price",
+                new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"), "data", "value", "approveData");
         }
     }
 }
