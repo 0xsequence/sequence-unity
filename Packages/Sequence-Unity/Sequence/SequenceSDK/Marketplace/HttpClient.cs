@@ -14,7 +14,7 @@ namespace Sequence.Marketplace
     internal class HttpClient : IHttpClient
     {
         private string _apiKey;
-        private const string _baseUrl = "https://dev-marketplace-api.sequence.app/"; // Todo switch to prod
+        private const string _baseUrl = "https://dev-marketplace-api.sequence-dev.app/"; // Todo switch to prod
         private const string _endUrl = "/rpc/Marketplace/";
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {

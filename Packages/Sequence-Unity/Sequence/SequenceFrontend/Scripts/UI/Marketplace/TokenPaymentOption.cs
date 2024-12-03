@@ -21,12 +21,12 @@ namespace Sequence.Demo
 
         private void Awake()
         {
-            Cart.OnSelectedCurrency += HandleCurrencySelected;
+            ICheckoutHelper.OnSelectedCurrency += HandleCurrencySelected;
         }
         
         private void OnDestroy()
         {
-            Cart.OnSelectedCurrency -= HandleCurrencySelected;
+            ICheckoutHelper.OnSelectedCurrency -= HandleCurrencySelected;
         }
 
         public void Assemble(Marketplace.Currency currency, string amount, Sprite tokenIcon = null)
@@ -59,7 +59,7 @@ namespace Sequence.Demo
 
         public void SelectCurrency()
         {
-            Cart.SelectCurrency(_currency);
+            ICheckoutHelper.SelectCurrency(_currency);
         }
 
         private void HandleCurrencySelected(Marketplace.Currency selectedCurrency)

@@ -22,14 +22,14 @@ namespace Sequence.Demo
         private Sprite _collectibleSprite;
         private string _collectionName;
         private string _collectibleName;
-        private Cart _cart;
+        private ICheckoutHelper _cart;
 
-        public void Assemble(Cart cart, string orderId, string collectionName = "")
+        public void Assemble(ICheckoutHelper cart, string orderId, string collectionName = "")
         {
             _cart = cart;
-            _order = _cart.GetOrderByOrderId(orderId);
-            _collectibleSprite = _cart.CollectibleImagesByOrderId[orderId];
-            _amountRequested = _cart.AmountsRequestedByOrderId[orderId];
+            _order = _cart.GetListings().GetCollectibleOrder(orderId);
+            _collectibleSprite = _cart.GetCollectibleImagesByOrderId()[orderId];
+            _amountRequested = _cart.GetAmountsRequestedByOrderId()[orderId];
             _collectionName = collectionName;
             _collectibleName = _order.metadata.name;
 
@@ -80,7 +80,7 @@ namespace Sequence.Demo
                 {
                     _amountRequested++;
                     _amountField.text = _amountRequested.ToString();
-                    _cart.AmountsRequestedByOrderId[_order.order.orderId] = _amountRequested;
+                    _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
                 }
             }
             else
@@ -95,7 +95,7 @@ namespace Sequence.Demo
             {
                 _amountRequested--;
                 _amountField.text = _amountRequested.ToString();
-                _cart.AmountsRequestedByOrderId[_order.order.orderId] = _amountRequested;
+                _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
             }
         }
         
@@ -115,7 +115,7 @@ namespace Sequence.Demo
                 {
                     _amountRequested = uint.Parse(_order.order.quantityAvailable);
                 }
-                _cart.AmountsRequestedByOrderId[_order.order.orderId] = _amountRequested;
+                _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
                 _amountField.text = _amountRequested.ToString();
             }
             else

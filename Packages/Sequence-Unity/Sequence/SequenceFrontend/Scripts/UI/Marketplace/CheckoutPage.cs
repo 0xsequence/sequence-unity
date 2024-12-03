@@ -31,7 +31,7 @@ namespace Sequence.Demo
         private ICheckout _checkout;
         private Dictionary<string, Sprite> _collectibleImagesByOrderId;
         private Dictionary<string, uint> _amountsRequestedByOrderId;
-        private Cart _cart;
+        private ICheckoutHelper _cart;
         private RectTransform _scrollViewLayoutGroupRectTransform;
 
         protected override void Awake()
@@ -43,21 +43,21 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
-            _cart = args.GetObjectOfTypeIfExists<Cart>();
+            _cart = args.GetObjectOfTypeIfExists<ICheckoutHelper>();
             if (_cart == null)
             {
                 throw new ArgumentException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(Cart)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(ICheckoutHelper)} as an argument");
             }
-            _listings = _cart.Listings;
+            _listings = _cart.GetListings();
             
             _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
             
-            _wallet = _cart.Wallet;
+            _wallet = _cart.GetWallet();
 
-            _collectibleImagesByOrderId = _cart.CollectibleImagesByOrderId;
+            _collectibleImagesByOrderId = _cart.GetCollectibleImagesByOrderId();
 
-            _amountsRequestedByOrderId = _cart.AmountsRequestedByOrderId;
+            _amountsRequestedByOrderId = _cart.GetAmountsRequestedByOrderId();
             
             _checkout = new Checkout(_wallet, _chain);
 
@@ -137,6 +137,10 @@ namespace Sequence.Demo
             {
                 _completePurchaseButton.interactable = false;
             }
+            
+            // Todo instantiate QR code and Transak based wallet funding buttons
+            
+            // Todo instantiate credit card based checkout stuff (only if we have one cart item)
 
             await AsyncExtensions.DelayTask(.1f);
             UpdateScrollViewSize();

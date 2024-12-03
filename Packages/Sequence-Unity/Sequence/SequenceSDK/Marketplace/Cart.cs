@@ -11,15 +11,12 @@ using UnityEngine;
 
 namespace Sequence.Marketplace
 {
-    public class Cart
+    public class Cart : ICheckoutHelper // Todo - refactor to re-use some of the code in NftCheckout
     {
-        public static event Action<Marketplace.Currency> OnSelectedCurrency;
-        
-        public IWallet Wallet;
-        public CollectibleOrder[] Listings;
-        public Dictionary<string, Sprite> CollectibleImagesByOrderId;
-        public Dictionary<string, uint> AmountsRequestedByOrderId;
-
+        private IWallet _wallet;
+        private CollectibleOrder[] _listings;
+        private Dictionary<string, Sprite> _collectibleImagesByOrderId;
+        private Dictionary<string, uint> _amountsRequestedByOrderId;
         private ISwap _swap;
         private IReader _reader;
         private IIndexer _indexer;
@@ -31,10 +28,10 @@ namespace Sequence.Marketplace
 
         public Cart(IWallet wallet, CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
-            Wallet = wallet;
-            Listings = listings;
-            CollectibleImagesByOrderId = collectibleImagesByOrderId;
-            AmountsRequestedByOrderId = amountsRequestedByOrderId;
+            _wallet = wallet;
+            _listings = listings;
+            _collectibleImagesByOrderId = collectibleImagesByOrderId;
+            _amountsRequestedByOrderId = amountsRequestedByOrderId;
             
             if (listings == null)
             {
@@ -74,13 +71,13 @@ namespace Sequence.Marketplace
 
         private void Setup(ISwap swap, IReader reader, IIndexer indexer, ICheckout checkout)
         {
-            _chain = ChainDictionaries.ChainById[Listings[0].order.chainId.ToString()];
+            _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
             SetSwap(swap);
             SetReader(reader);
             SetIndexer(indexer);
             SetCheckout(checkout);
 
-            OnSelectedCurrency += currency =>
+            ICheckoutHelper.OnSelectedCurrency += currency =>
             {
                 if (_currencies.GetCurrencyByContractAddress(currency.contractAddress) == null)
                 {
@@ -88,11 +85,6 @@ namespace Sequence.Marketplace
                 }
                 _chosenCurrency = currency;
             };
-        }
-
-        public static void SelectCurrency(Currency currency)
-        {
-            OnSelectedCurrency?.Invoke(currency);
         }
         
         private void SetSwap(ISwap swap)
@@ -129,7 +121,7 @@ namespace Sequence.Marketplace
             _checkout = checkout;
             if (_checkout == null)
             {
-                _checkout = new Checkout(Wallet, _chain);
+                _checkout = new Checkout(_wallet, _chain);
             }
         }
         
@@ -141,17 +133,17 @@ namespace Sequence.Marketplace
 
         public Cart(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
-            Wallet = wallet;
-            Listings = new CollectibleOrder[] {listing};
-            CollectibleImagesByOrderId = new Dictionary<string, Sprite> {{listing.order.orderId, collectibleIcon}};
-            AmountsRequestedByOrderId = new Dictionary<string, uint> {{listing.order.orderId, amount}};
+            _wallet = wallet;
+            _listings = new CollectibleOrder[] {listing};
+            _collectibleImagesByOrderId = new Dictionary<string, Sprite> {{listing.order.orderId, collectibleIcon}};
+            _amountsRequestedByOrderId = new Dictionary<string, uint> {{listing.order.orderId, amount}};
             
             Setup(swap, reader, indexer, checkout);
         }
         
         public CollectibleOrder GetOrderByOrderId(string orderId)
         {
-            foreach (CollectibleOrder listing in Listings)
+            foreach (CollectibleOrder listing in _listings)
             {
                 if (listing.order.orderId == orderId)
                 {
@@ -166,20 +158,20 @@ namespace Sequence.Marketplace
         {
             if (GetOrderByOrderId(order.order.orderId) == null)
             {
-                Listings = Listings.AppendObject(order);
+                _listings = _listings.AppendObject(order);
             }
-            CollectibleImagesByOrderId[order.order.orderId] = collectibleImage;
-            AmountsRequestedByOrderId[order.order.orderId] = amountRequested;
+            _collectibleImagesByOrderId[order.order.orderId] = collectibleImage;
+            _amountsRequestedByOrderId[order.order.orderId] = amountRequested;
         }
 
         public string GetApproximateTotalInUSD()
         {
-            int listings = Listings.Length;
+            int listings = _listings.Length;
             double total = 0;
             for (int i = 0; i < listings; i++)
             {
-                Order order = Listings[i].order;
-                uint amountRequested = AmountsRequestedByOrderId[order.orderId];
+                Order order = _listings[i].order;
+                uint amountRequested = _amountsRequestedByOrderId[order.orderId];
                 total += order.priceUSD * amountRequested;
             }
             
@@ -188,12 +180,12 @@ namespace Sequence.Marketplace
 
         public async Task<string> GetApproximateTotalInCurrency(Address currencyAddress)
         {
-            int listings = Listings.Length;
+            int listings = _listings.Length;
             double total = 0;
             for (int i = 0; i < listings; i++)
             {
-                Order order = Listings[i].order;
-                uint amountRequested = AmountsRequestedByOrderId[order.orderId];
+                Order order = _listings[i].order;
+                uint amountRequested = _amountsRequestedByOrderId[order.orderId];
                 if (order.priceCurrencyAddress == currencyAddress)
                 {
                     total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(order.priceAmount), (int)order.priceDecimals) * amountRequested;
@@ -230,15 +222,15 @@ namespace Sequence.Marketplace
             {
                 chosenAddress = defaultChainCurrency.contractAddress;
             }
-            int listings = Listings.Length;
+            int listings = _listings.Length;
             Dictionary<string, int> currencyCounts = new Dictionary<string, int>();
             for (int i = 0; i < listings; i++)
             {
-                if (Listings[i].order.priceCurrencyAddress == chosenAddress)
+                if (_listings[i].order.priceCurrencyAddress == chosenAddress)
                 {
                     return _currencies.GetCurrencyByContractAddress(chosenAddress);
                 }
-                string currencyAddress = Listings[i].order.priceCurrencyAddress;
+                string currencyAddress = _listings[i].order.priceCurrencyAddress;
                 if (currencyCounts.ContainsKey(currencyAddress))
                 {
                     currencyCounts[currencyAddress]++;
@@ -251,6 +243,36 @@ namespace Sequence.Marketplace
             
             string bestCurrencyAddress = currencyCounts.OrderByDescending(pair => pair.Value).First().Key;
             return _currencies.GetCurrencyByContractAddress(bestCurrencyAddress);
+        }
+
+        public CollectibleOrder[] GetListings()
+        {
+            return _listings;
+        }
+
+        public IWallet GetWallet()
+        {
+            return _wallet;
+        }
+
+        public Dictionary<string, Sprite> GetCollectibleImagesByOrderId()
+        {
+            return _collectibleImagesByOrderId;
+        }
+
+        public Dictionary<string, uint> GetAmountsRequestedByOrderId()
+        {
+            return _amountsRequestedByOrderId;
+        }
+
+        public void SetAmountRequested(string orderId, uint amount)
+        {
+            if (!_amountsRequestedByOrderId.ContainsKey(orderId))
+            {
+                throw new ArgumentException(
+                    "Invalid use. Cannot set amount requested for an order that is not in the cart.");
+            }
+            _amountsRequestedByOrderId[orderId] = amount;
         }
 
         public async Task<Currency[]> GetCurrencies()
@@ -294,7 +316,7 @@ namespace Sequence.Marketplace
             {
                 try
                 {
-                    GetTokenBalancesReturn balancesReturn = await _indexer.GetTokenBalances(new GetTokenBalancesArgs(Wallet.GetWalletAddress(), currencyContractAddress));
+                    GetTokenBalancesReturn balancesReturn = await _indexer.GetTokenBalances(new GetTokenBalancesArgs(_wallet.GetWalletAddress(), currencyContractAddress));
                     if (balancesReturn == null || balancesReturn.balances == null)
                     {
                         throw new Exception("Received unexpected null response from indexer");
@@ -325,7 +347,7 @@ namespace Sequence.Marketplace
             {
                 try
                 {
-                    EtherBalance balancesReturn = await _indexer.GetEtherBalance(Wallet.GetWalletAddress());
+                    EtherBalance balancesReturn = await _indexer.GetEtherBalance(_wallet.GetWalletAddress());
                     if (balancesReturn == null)
                     {
                         throw new Exception("Received unexpected null response from indexer");
@@ -363,7 +385,7 @@ namespace Sequence.Marketplace
 
             try
             {
-                TransactionReturn transactionReturn = await Wallet.SendTransaction(_chain, transactions);
+                TransactionReturn transactionReturn = await _wallet.SendTransaction(_chain, transactions);
                 return transactionReturn;
             }
             catch (Exception e)
@@ -374,19 +396,19 @@ namespace Sequence.Marketplace
 
         private async Task<Transaction[]> BuildCheckoutTransactionArray()
         {
-            int listings = Listings.Length;
+            int listings = _listings.Length;
             List<Transaction> transactions = new List<Transaction>();
             for (int i = 0; i < listings; i++)
             {
-                CollectibleOrder listing = Listings[i];
+                CollectibleOrder listing = _listings[i];
                 if (listing.order.priceCurrencyAddress == _chosenCurrency.contractAddress)
                 {
-                    Step[] steps = await _checkout.GenerateBuyTransaction(listing.order, AmountsRequestedByOrderId[listing.order.orderId]);
+                    Step[] steps = await _checkout.GenerateBuyTransaction(listing.order, _amountsRequestedByOrderId[listing.order.orderId]);
                     transactions.AddRange(steps.AsTransactionArray());
                 }
                 else
                 {
-                    SwapQuote quote = await _swap.GetSwapQuote(Wallet.GetWalletAddress(),
+                    SwapQuote quote = await _swap.GetSwapQuote(_wallet.GetWalletAddress(),
                         new Address(listing.order.priceCurrencyAddress),
                         new Address(_chosenCurrency.contractAddress),
                         listing.order.priceAmount, true);

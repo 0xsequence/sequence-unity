@@ -40,5 +40,18 @@ namespace Sequence.Marketplace
 
             return orders;
         }
+        
+        public static CollectibleOrder GetCollectibleOrder(this CollectibleOrder[] collectibleOrders, string orderId)
+        {
+            foreach (CollectibleOrder collectibleOrder in collectibleOrders)
+            {
+                if (collectibleOrder.order.orderId == orderId)
+                {
+                    return collectibleOrder;
+                }
+            }
+
+            return null;
+        }
     }
 }

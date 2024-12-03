@@ -10,11 +10,11 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
-            Cart cart = args.GetObjectOfTypeIfExists<Cart>();
+            ICheckoutHelper cart = args.GetObjectOfTypeIfExists<ICheckoutHelper>();
             if (cart == null)
             {
                 throw new ArgumentException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(Cart)} as an argument");
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(ICheckoutHelper)} as an argument");
             }
         }
     }

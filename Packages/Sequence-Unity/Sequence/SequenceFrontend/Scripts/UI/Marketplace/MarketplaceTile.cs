@@ -121,15 +121,7 @@ namespace Sequence.Demo
 
         public void OpenBuyPage()
         {
-            _checkoutPanel.Open(new Cart(_wallet, new CollectibleOrder[] { _collectibleOrder },
-                new Dictionary<string, Sprite>()
-                {
-                    { _collectibleOrder.order.orderId , _collectibleSprite }
-                },
-                new Dictionary<string, uint>()
-                {
-                    { _collectibleOrder.order.orderId , 1 }
-                }));
+            _checkoutPanel.Open(new NftCheckout(_wallet, _collectibleOrder, _collectibleSprite, 1));
         }
     }
 }
