@@ -29,5 +29,8 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.2"
+  },
+  "resolutions": {
+    "elliptic": "^6.6.0"
   }
 }

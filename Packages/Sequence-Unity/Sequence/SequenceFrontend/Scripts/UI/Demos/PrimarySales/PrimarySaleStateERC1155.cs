@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.Provider;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Sequence.Demo
 {

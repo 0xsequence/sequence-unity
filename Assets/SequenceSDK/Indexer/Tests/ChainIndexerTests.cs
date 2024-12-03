@@ -69,6 +69,12 @@ namespace Sequence.Indexer.Tests
             }
         }
 
+
+        private bool ChainIsInactive(Chain chain)
+        {
+            return chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto || chain == Chain.TestnetBorne;
+        }
+        
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestRuntimeStatus(Chain chain)
         {

@@ -111,6 +111,7 @@ namespace Sequence.EmbeddedWallet
             _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
+            _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
         }
 
         /// <summary>
@@ -377,10 +378,6 @@ namespace Sequence.EmbeddedWallet
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
-                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
-                {
-                    StoreWalletSecurely(walletAddress);
-                }
                 _isLoggingIn = false;
                 wallet.OnDropSessionComplete += session =>
                 {
@@ -412,6 +409,18 @@ namespace Sequence.EmbeddedWallet
             if (_automaticallyFederateAccountsWhenPossible && _failedLoginEmail == email && !loginIntent.forceCreateAccount) // forceCreateAccount should only be true if we are creating another account for the same email address, meaning we don't have a failed login method that needs federating
             {
                 await FederateAccount(new IntentDataFederateAccount(_failedLoginIntent, walletAddress), _failedLoginMethod, email);
+            }
+
+            try
+            {
+                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
+                {
+                    StoreWalletSecurely(walletAddress);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error storing session wallet securely: " + e.Message);
             }
         }
 
