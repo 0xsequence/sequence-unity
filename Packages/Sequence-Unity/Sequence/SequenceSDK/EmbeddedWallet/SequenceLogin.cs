@@ -114,6 +114,15 @@ namespace Sequence.EmbeddedWallet
             _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
         }
 
+        /// <summary>
+        /// Use this to reset the authenticator, validator, and other dependancies to new instances. Useful for when you're testing and using mock implementations
+        /// </summary>
+        public void ResetLoginAfterTest()
+        {
+            _connector = this;
+            SetupAuthenticator();
+        }
+
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();

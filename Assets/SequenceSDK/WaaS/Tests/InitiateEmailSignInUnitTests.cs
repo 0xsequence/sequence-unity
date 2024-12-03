@@ -8,6 +8,12 @@ namespace Sequence.EmbeddedWallet.Tests
     {
         private string _email = "email@domain.com";
 
+        [TearDown]
+        public void Cleanup()
+        {
+            SequenceLogin.GetInstance().ResetLoginAfterTest();
+        }
+        
         [Test]
         public void TestLogin_Success()
         {

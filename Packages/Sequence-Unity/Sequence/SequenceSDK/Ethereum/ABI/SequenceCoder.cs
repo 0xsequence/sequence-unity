@@ -212,6 +212,9 @@ namespace Sequence.ABI
             byte[] bytes = HexStringToByteArray(hexString);
             string result = Encoding.UTF8.GetString(bytes);
             string cleaned = RemoveControlCharactersExceptNewline(result); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+             cleaned = cleaned.Replace("\n", "\r\n");
+#endif
             return cleaned;
         }
 
