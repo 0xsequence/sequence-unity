@@ -1,13 +1,14 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
     [Serializable]
     public class IntentDataValidateSession
     {
-        public string deviceMetadata { get; private set; }
-        public string sessionId { get; private set; }
-        public string wallet { get; private set; }
+        public string deviceMetadata;
+        public string sessionId;
+        public string wallet;
 
         public IntentDataValidateSession(string sessionId, string wallet, string deviceMetadata)
         {

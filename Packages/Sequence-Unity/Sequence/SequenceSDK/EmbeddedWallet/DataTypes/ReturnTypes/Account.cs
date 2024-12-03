@@ -1,4 +1,8 @@
-namespace Sequence.EmbeddedWallet {
+using UnityEngine.Scripting;
+
+namespace Sequence.EmbeddedWallet 
+{
+    [Preserve]
     public class Account
     {
         public string email;
@@ -6,6 +10,7 @@ namespace Sequence.EmbeddedWallet {
         public IdentityType identityType;
         public string issuer;
         
+        [Preserve]
         public Account(string id, string type, string issuer, string email)
         {
             this.id = id;

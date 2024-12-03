@@ -171,7 +171,6 @@ namespace Sequence.EmbeddedWallet
                         byte[] results = request.downloadHandler.data;
                         responseJson = Encoding.UTF8.GetString(results);
                     }
-                    request.Dispose();
                     try
                     {
                         T2 result = JsonConvert.DeserializeObject<T2>(responseJson);

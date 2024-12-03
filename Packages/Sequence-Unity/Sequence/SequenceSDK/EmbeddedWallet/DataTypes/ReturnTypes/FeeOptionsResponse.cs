@@ -1,13 +1,16 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class FeeOptionsResponse
     {
-        public FeeOptionReturn[] FeeOptions { get; private set; }
-        public string FeeQuote { get; private set; }
+        public FeeOptionReturn[] FeeOptions;
+        public string FeeQuote;
 
+        [Preserve]
         public FeeOptionsResponse(FeeOptionReturn[] feeOptions, string feeQuote)
         {
             this.FeeOptions = feeOptions;

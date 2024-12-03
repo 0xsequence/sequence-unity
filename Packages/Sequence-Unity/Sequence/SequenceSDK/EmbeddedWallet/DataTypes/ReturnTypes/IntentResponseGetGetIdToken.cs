@@ -1,13 +1,16 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentResponseGetIdToken
     {
-        public string IdToken { get; private set; }
-        public int ExpiresIn { get; private set; }
+        public string IdToken;
+        public int ExpiresIn;
 
+        [Preserve]
         public IntentResponseGetIdToken(string idToken, int expiresIn)
         {
             this.IdToken = idToken;

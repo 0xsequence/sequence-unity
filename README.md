@@ -4,7 +4,7 @@
 https://docs.sequence.xyz/sdk/unity/overview
 
 ## Building a game guide
-https://docs.sequence.xyz/guides/unity-guide/
+https://docs.sequence.xyz/guides/jelly-forest-unity-guide/
 
 ## Requirements
 Unity 2021.3.6f1 or later

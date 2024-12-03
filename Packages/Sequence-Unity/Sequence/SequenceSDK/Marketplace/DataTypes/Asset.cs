@@ -1,4 +1,5 @@
 using System.Numerics;
+using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -16,6 +17,7 @@ namespace Sequence.Marketplace
         public BigInteger height;
         public string updatedAt;
 
+        [Preserve]
         public Asset(BigInteger id, BigInteger collectionId, string tokenId, string metadataField, string url = null, string name = null, BigInteger filesize = default, string mimeType = null, BigInteger width = default, BigInteger height = default, string updatedAt = null)
         {
             this.id = id;

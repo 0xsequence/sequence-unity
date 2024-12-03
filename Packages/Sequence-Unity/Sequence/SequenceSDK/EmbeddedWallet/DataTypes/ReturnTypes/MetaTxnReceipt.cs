@@ -1,16 +1,20 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [System.Serializable]
     public class MetaTxnReceipt
     {
-        public string id { get; private set; }
-        public string status { get; private set; }
-        public string revertReason { get; private set; }
-        public int index { get; private set; }
-        public MetaTxnReceiptLog[] logs { get; private set; }
-        public MetaTxnReceipt[] receipts { get; private set; }
-        public string txnReceipt { get; private set; }
+        public string id;
+        public string status;
+        public string revertReason;
+        public int index;
+        public MetaTxnReceiptLog[] logs;
+        public MetaTxnReceipt[] receipts;
+        public string txnReceipt;
 
+        [Preserve]
         public MetaTxnReceipt(string id, string status, int index, MetaTxnReceiptLog[] logs, MetaTxnReceipt[] receipts, string txnReceipt, string revertReason = null)
         {
             this.id = id;

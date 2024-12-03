@@ -1,8 +1,10 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentDataSessionAuthProof
     {
@@ -10,6 +12,7 @@ namespace Sequence.EmbeddedWallet
         public string nonce = null;
         public string wallet;
 
+        [Preserve]
         [JsonConstructor]
         public IntentDataSessionAuthProof(string network, string wallet, string nonce)
         {
