@@ -1,4 +1,5 @@
 using System;
+using Sequence.Contracts;
 using Sequence.Utils;
 using Sequence.EmbeddedWallet;
 
@@ -13,6 +14,8 @@ namespace Sequence.Demo
         private static IContentFetcher contentFetcher =
             new ContentFetcher(new Address("0x8e3e38fe7367dd3b52d1e281e4e8400447c8d8b9"),
                 EnumExtensions.GetEnumValuesAsList<Chain>().ToArray());
+
+        private string _easyMintFungibleTokenContract = "0x9d0d8dcba30c8b7241da84f922942c100eb1bddc";
         
         protected override void Awake()
         {
@@ -58,6 +61,11 @@ namespace Sequence.Demo
         
         public void OpenSeeMarketplaceListingsPanel()
         {
+            // ERC20 emf = new ERC20(_easyMintFungibleTokenContract);
+            // Wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
+            // {
+            //     new RawTransaction(emf.GetAddress(), "0", emf.Mint(Wallet.GetWalletAddress(), DecimalNormalizer.NormalizeAsBigInteger(10000)).CallData),
+            // });
             _ui.OpenViewMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
 

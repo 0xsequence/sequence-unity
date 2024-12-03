@@ -127,7 +127,7 @@ namespace Sequence.Marketplace
                 }
             }
             
-            return total.ToString("0.####");
+            return total.ToString("F99").TrimEnd('0').TrimEnd('.');
         }
 
         public async Task<Currency[]> GetCurrencies()
@@ -182,7 +182,17 @@ namespace Sequence.Marketplace
                         return "";
                     }
                     TokenBalance balance = balances[0];
-                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance.balance, balance.contractInfo.decimals);
+                    int decimals = 18;
+                    if (balance.contractInfo == null)
+                    {
+                        Debug.LogWarning($"No contract info found for {balance.contractAddress}, using default decimals of 18");
+                    }
+                    else
+                    {
+                        decimals = balance.contractInfo.decimals;
+                    }
+
+                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance.balance, decimals);
                     if (balanceAmount >= price)
                     {
                         return total;

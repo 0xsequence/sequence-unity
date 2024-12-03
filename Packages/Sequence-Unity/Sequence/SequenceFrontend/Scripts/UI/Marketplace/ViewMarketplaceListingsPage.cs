@@ -68,6 +68,7 @@ namespace Sequence.Demo
 #if UNITY_EDITOR
             if (_useMockReader)
             {
+                Debug.LogWarning("Using mock marketplace reader. If you want to use a real reader, make sure to uncheck the _useMockReader field in the inspector.");
                 _reader = new MockMarketplaceReaderReturnsRandomFakeListings(_chain);
             }
 #endif
