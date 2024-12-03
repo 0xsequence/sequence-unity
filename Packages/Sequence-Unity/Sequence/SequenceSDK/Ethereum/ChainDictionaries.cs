@@ -25,6 +25,7 @@ namespace Sequence
             { Chain.ImmutableZkEvm, "Immutable zkEVM"},
             { Chain.SkaleNebula, "Skale Nebula" },
             { Chain.Root, "Root" },
+            { Chain.LAOS, "LAOS" },
 
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -45,7 +46,8 @@ namespace Sequence
             { Chain.TestnetSoneiumMinato, "Soneium Minato Testnet" },
             { Chain.TestnetToy, "TOY Testnet" },
             { Chain.TestnetImmutableZkEvm, "Immutable zkEVM Testnet" },
-            { Chain.TestnetRootPorcini, "Root Porcini Testnet" }
+            { Chain.TestnetRootPorcini, "Root Porcini Testnet" },
+            { Chain.TestnetLAOSSigma, "LAOS Sigma Testnet" },
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -69,6 +71,7 @@ namespace Sequence
             { Chain.ImmutableZkEvm, "IMX" },
             { Chain.SkaleNebula, "sFUEL" },
             { Chain.Root, "XRP" },
+            { Chain.LAOS, "LAOS" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -89,7 +92,8 @@ namespace Sequence
             { Chain.TestnetSoneiumMinato, "ETH" },
             { Chain.TestnetToy, "TOY" },
             { Chain.TestnetImmutableZkEvm, "IMX" },
-            { Chain.TestnetRootPorcini, "XRP" }
+            { Chain.TestnetRootPorcini, "XRP" },
+            { Chain.TestnetLAOSSigma, "SIGMA" },
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -146,6 +150,7 @@ namespace Sequence
             { Chain.ImmutableZkEvm, "https://explorer.immutable.com/" },
             { Chain.SkaleNebula, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
             { Chain.Root, "https://rootscan.io/" },
+            { Chain.LAOS, "https://blockscout.laos.laosfoundation.io/" },
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -166,7 +171,8 @@ namespace Sequence
             { Chain.TestnetSoneiumMinato, "https://explorer-testnet.soneium.org/" },
             { Chain.TestnetToy, "https://toy-chain-testnet.explorer.caldera.xyz/" },
             { Chain.TestnetImmutableZkEvm, "https://explorer.testnet.immutable.com/" },
-            { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" }
+            { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" },
+            { Chain.TestnetLAOSSigma, "https://sigma.explorer.laosnetwork.io/" }
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -192,6 +198,7 @@ namespace Sequence
             { Chain.ImmutableZkEvm, "13371" },
             { Chain.SkaleNebula, "1482601649" },
             { Chain.Root, "7668" },
+            { Chain.LAOS, "6283" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -212,7 +219,8 @@ namespace Sequence
             { Chain.TestnetSoneiumMinato, "1946" },
             { Chain.TestnetToy, "21000000" },
             { Chain.TestnetImmutableZkEvm, "13473" },
-            { Chain.TestnetRootPorcini, "7672" }
+            { Chain.TestnetRootPorcini, "7672" },
+            { Chain.TestnetLAOSSigma, "62850" }
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -236,6 +244,7 @@ namespace Sequence
             { "13371", Chain.ImmutableZkEvm },
             { "1482601649", Chain.SkaleNebula },
             { "7668", Chain.Root },
+            { "6283", Chain.LAOS },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -256,7 +265,8 @@ namespace Sequence
             { "1946", Chain.TestnetSoneiumMinato },
             { "21000000", Chain.TestnetToy },
             { "13473", Chain.TestnetImmutableZkEvm },
-            { "7672", Chain.TestnetRootPorcini }
+            { "7672", Chain.TestnetRootPorcini },
+            { "62850", Chain.TestnetLAOSSigma }
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -280,6 +290,7 @@ namespace Sequence
             { Chain.ImmutableZkEvm, "immutable-zkevm" },
             { Chain.SkaleNebula, "skale-nebula" },
             { Chain.Root, "root" },
+            { Chain.LAOS, "laos" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
@@ -300,7 +311,8 @@ namespace Sequence
             { Chain.TestnetSoneiumMinato, "soneium-minato" },
             { Chain.TestnetToy, "toy-testnet" },
             { Chain.TestnetImmutableZkEvm, "immutable-zkevm-testnet" },
-            { Chain.TestnetRootPorcini, "root-porcini" }
+            { Chain.TestnetRootPorcini, "root-porcini" },
+            { Chain.TestnetLAOSSigma, "laos-sigma-testnet" }
         };
     }
 }

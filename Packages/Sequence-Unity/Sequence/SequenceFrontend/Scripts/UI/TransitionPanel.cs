@@ -60,5 +60,10 @@ namespace Sequence.Demo
         {
             _ui.OpenViewMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
+
+        public void SignOut()
+        {
+            Wallet.DropThisSession();
+        }
     }
 }
