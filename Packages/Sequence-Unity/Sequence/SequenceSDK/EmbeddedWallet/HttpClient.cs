@@ -219,6 +219,12 @@ namespace Sequence.EmbeddedWallet
                         throw new Exception(exceptionMessage);
                     }
                 }
+                else if (errorReason.Contains("JWT validation: aud not satisfied"))
+                {
+                    exceptionMessage = "File load exception: " + e.Message + " response: " + errorReason +
+                                       " Please make sure you've whitelisted the associated login method and associated configuration values in your Embedded Wallet configuration in the Sequence Builder!" 
+                                       + "\nCurl-equivalent request: " + curlRequest;
+                }
                 throw new Exception(exceptionMessage);
             }
             catch (Exception e)
@@ -236,7 +242,7 @@ namespace Sequence.EmbeddedWallet
         {
             if (request.downloadHandler != null && request.downloadHandler.data != null)
             {
-                return " response: " + Encoding.UTF8.GetString(request.downloadHandler.data);
+                return " " + Encoding.UTF8.GetString(request.downloadHandler.data);
             }
 
             return "";
