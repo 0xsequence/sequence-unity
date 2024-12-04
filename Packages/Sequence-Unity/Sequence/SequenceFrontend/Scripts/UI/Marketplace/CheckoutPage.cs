@@ -33,6 +33,8 @@ namespace Sequence.Demo
         private Dictionary<string, uint> _amountsRequestedByOrderId;
         private ICheckoutHelper _cart;
         private RectTransform _scrollViewLayoutGroupRectTransform;
+        private EstimatedTotal _estimatedTotal;
+        private List<TokenPaymentOption> _tokenPaymentOptions;
 
         protected override void Awake()
         {
@@ -58,10 +60,20 @@ namespace Sequence.Demo
             _collectibleImagesByOrderId = _cart.GetCollectibleImagesByOrderId();
 
             _amountsRequestedByOrderId = _cart.GetAmountsRequestedByOrderId();
+
+            _tokenPaymentOptions = new List<TokenPaymentOption>();
             
             _checkout = new Checkout(_wallet, _chain);
+            
+            CartItem.OnAmountChanged += OnCartAmountChanged;
 
             Assemble().ConfigureAwait(false);
+        }
+
+        public override void Close()
+        {
+            base.Close();
+            CartItem.OnAmountChanged -= OnCartAmountChanged;
         }
 
         private async Task Assemble()
@@ -80,15 +92,8 @@ namespace Sequence.Demo
             }
             
             GameObject estimatedTotalGameObject = Instantiate(_estimatedTotalPrefab, _cartItemsParent);
-            EstimatedTotal estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
-            Marketplace.Currency bestCurrency = await _cart.GetBestCurrency();
-            string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(bestCurrency.contractAddress));
-            if (estimatedCurrencyRequired.StartsWith("Error"))
-            {
-                Debug.LogError(estimatedCurrencyRequired);
-            }
-            Sprite currencyIcon = await _cart.GetCurrencyIcon(bestCurrency);
-            estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, bestCurrency.symbol, currencyIcon);
+            _estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
+            await RefreshEstimatedTotal();
             
             GameObject networkBannerGameObject = Instantiate(_networkBannerPrefab, _cartItemsParent);
             NetworkBanner networkBanner = networkBannerGameObject.GetComponent<NetworkBanner>();
@@ -99,37 +104,29 @@ namespace Sequence.Demo
             
             Marketplace.Currency[] currencies = await _cart.GetCurrencies();
             int currenciesLength = currencies.Length;
-            bool hasAtLeastOneCryptoPaymentOption = false;
             for (int i = 0; i < currenciesLength; i++)
             {
                 Marketplace.Currency currency = currencies[i];
-                string quotedPrice = await _cart.GetApproximateTotalInCurrencyIfAffordable(new Address(currency.contractAddress));
-                if (string.IsNullOrWhiteSpace(quotedPrice) || quotedPrice == "")
+                GameObject tokenPaymentOptionGameObject = Instantiate(_tokenPaymentOptionPrefab, _cartItemsParent);
+                TokenPaymentOption tokenPaymentOption = tokenPaymentOptionGameObject.GetComponent<TokenPaymentOption>();
+                bool success = await RefreshTokenPaymentOption(tokenPaymentOption, currency);
+                
+                if (!success)
                 {
-                    Debug.Log($"User {_wallet.GetWalletAddress()} has insufficient balance to pay with {currency.contractAddress}. Skipping...");
-                    continue;
-                }
-
-                if (quotedPrice.StartsWith("Error"))
-                {
-                    Debug.LogError(quotedPrice + "\nSkipping...");
+                    Destroy(tokenPaymentOptionGameObject);
                     continue;
                 }
                 
-                GameObject tokenPaymentOptionGameObject = Instantiate(_tokenPaymentOptionPrefab, _cartItemsParent);
-                TokenPaymentOption tokenPaymentOption = tokenPaymentOptionGameObject.GetComponent<TokenPaymentOption>();
-                Sprite tokenIcon = await _cart.GetCurrencyIcon(currency);
-                tokenPaymentOption.Assemble(currency, quotedPrice, tokenIcon);
-                if (!hasAtLeastOneCryptoPaymentOption)
+                if (!HasAtLeastOneCryptoPaymentOption())
                 {
                     tokenPaymentOption.SelectCurrency();
                 }
-                hasAtLeastOneCryptoPaymentOption = true;
+                _tokenPaymentOptions.Add(tokenPaymentOption);
             }
             
             Instantiate(_dividerPrefab, _cartItemsParent);
 
-            if (hasAtLeastOneCryptoPaymentOption)
+            if (HasAtLeastOneCryptoPaymentOption())
             {
                 _completePurchaseButton.interactable = true;
             }
@@ -144,6 +141,77 @@ namespace Sequence.Demo
 
             await AsyncExtensions.DelayTask(.1f);
             UpdateScrollViewSize();
+        }
+
+        private bool HasAtLeastOneCryptoPaymentOption()
+        {
+            return _tokenPaymentOptions.Count > 0;
+        }
+
+        private async Task RefreshEstimatedTotal()
+        {
+            if (_estimatedTotal == null)
+            {
+                return;
+            }
+            Marketplace.Currency bestCurrency = await _cart.GetBestCurrency();
+            string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(bestCurrency.contractAddress));
+            if (estimatedCurrencyRequired.StartsWith("Error"))
+            {
+                Debug.LogError(estimatedCurrencyRequired);
+            }
+            Sprite currencyIcon = await _cart.GetCurrencyIcon(bestCurrency);
+            _estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, bestCurrency.symbol, currencyIcon);
+        }
+
+        private async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency)
+        {
+            string quotedPrice = await _cart.GetApproximateTotalInCurrencyIfAffordable(new Address(currency.contractAddress));
+            if (string.IsNullOrWhiteSpace(quotedPrice) || quotedPrice == "")
+            {
+                Debug.Log($"User {_wallet.GetWalletAddress()} has insufficient balance to pay with {currency.contractAddress}. Skipping...");
+                return false;
+            }
+
+            if (quotedPrice.StartsWith("Error"))
+            {
+                Debug.LogError(quotedPrice + "\nSkipping...");
+                return false;
+            }
+                
+            Sprite tokenIcon = await _cart.GetCurrencyIcon(currency);
+            tokenPaymentOption.Assemble(currency, quotedPrice, tokenIcon);
+            return true;
+        }
+
+        private void OnCartAmountChanged()
+        {
+            RefreshEstimatedTotal().ConfigureAwait(false);
+            RefreshTokenPaymentOptions().ConfigureAwait(false);
+        }
+
+        // Todo switch to using object pool for token payment options
+        private async Task RefreshTokenPaymentOptions()
+        {
+            Marketplace.Currency[] currencies = await _cart.GetCurrencies();
+            int tokenPaymentOptionsCount = _tokenPaymentOptions.Count;
+            for (int i = 0; i < tokenPaymentOptionsCount; i++)
+            {
+                TokenPaymentOption tokenPaymentOption = _tokenPaymentOptions[i];
+                bool refreshed = false;
+                foreach (var currency in currencies)
+                {
+                    if (tokenPaymentOption.UsesCurrency(currency))
+                    {
+                        refreshed = await RefreshTokenPaymentOption(tokenPaymentOption, currency);
+                    }
+                }
+
+                if (!refreshed)
+                {
+                    Destroy(tokenPaymentOption.gameObject);
+                }
+            }
         }
 
         private void UpdateScrollViewSize()

@@ -47,6 +47,20 @@ namespace Sequence.Demo
             GetComponent<Button>().onClick.AddListener(OnClick);
         }
 
+        /// <summary>
+        /// Returns true if no _currency is set or if the given currency is the same as the set _currency
+        /// </summary>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        public bool UsesCurrency(Marketplace.Currency currency)
+        {
+            if (_currency == null)
+            {
+                return true;
+            }
+            return _currency.contractAddress == currency.contractAddress;
+        }
+
         private async Task FetchAndApplyTokenIconSprite()
         {
             _tokenIcon.sprite = await AssetHandler.GetSpriteAsync(_currency.imageUrl);

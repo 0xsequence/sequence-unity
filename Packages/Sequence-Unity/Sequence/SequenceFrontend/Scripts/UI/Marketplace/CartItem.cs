@@ -12,6 +12,8 @@ namespace Sequence.Demo
 {
     public class CartItem : MonoBehaviour
     {
+        public static event Action OnAmountChanged;
+        
         [SerializeField] private TMP_InputField _amountField;
         [SerializeField] private Image _collectibleImage;
         [SerializeField] private TextMeshProUGUI _collectionNameText;
@@ -81,6 +83,7 @@ namespace Sequence.Demo
                     _amountRequested++;
                     _amountField.text = _amountRequested.ToString();
                     _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
+                    OnAmountChanged?.Invoke();
                 }
             }
             else
@@ -96,6 +99,7 @@ namespace Sequence.Demo
                 _amountRequested--;
                 _amountField.text = _amountRequested.ToString();
                 _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
+                OnAmountChanged?.Invoke();
             }
         }
         
