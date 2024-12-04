@@ -414,7 +414,7 @@ namespace Sequence.Marketplace
                     3000); // Allow some time for the transaction to finalize and for the indexer to pick it up
 
                 balancesReturn = await indexer.GetTokenBalances(
-                    new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20UniversallyMintable));
+                    new GetTokenBalancesArgs(initialWallet, erc20UniversallyMintable));
                 Assert.IsNotNull(balancesReturn);
                 TokenBalance[] newBalances = balancesReturn.balances;
                 BigInteger newBalance = BigInteger.Zero;
