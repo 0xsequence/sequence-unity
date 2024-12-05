@@ -178,7 +178,7 @@ namespace Sequence.Ethereum.Tests
                 EOAWallet wallet2 = new EOAWallet("0xabc0000000000000000000000000000000000000000000000000000000000002");
                 Contract mockERC20 = new Contract(receipt.contractAddress);
                 string result = await mockERC20.SendTransactionMethod(wallet2, client, 0,
-                    "mockMint(address , uint256)",
+                    "mockMint(address, uint256)",
                     wallet2.GetAddress(), 1);
                 Assert.IsNotNull(result);
             }

@@ -15,13 +15,11 @@ namespace Sequence.EmbeddedWallet
     {
         public string abi;
         public object[] args;
-        public string func;
 
-        public AbiData(string abi, object[] args, string func = "")
+        public AbiData(string abi, object[] args)
         {
             this.abi = abi;
             this.args = args;
-            this.func = func;
         }
     }
 
@@ -37,11 +35,10 @@ namespace Sequence.EmbeddedWallet
             JObject jsonObject = JObject.Load(reader);
 
             string abi = jsonObject["abi"].ToObject<string>();
-            string func = jsonObject["func"].ToObject<string>();
 
             JArray argsArray = jsonObject["args"].ToObject<JArray>();
             object[] args = argsArray.ToObject<object[]>(serializer);
-            return new AbiData(abi, args, func);
+            return new AbiData(abi, args);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -52,7 +49,6 @@ namespace Sequence.EmbeddedWallet
             {
                 { "abi", JToken.FromObject(abiData.abi) },
                 { "args", SerializeArgsWithSortedFields(abiData.args, serializer) },
-                { "func", JToken.FromObject(abiData.func) }
             };
 
             jsonObject.WriteTo(writer);

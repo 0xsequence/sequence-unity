@@ -63,7 +63,7 @@ namespace Sequence.EmbeddedWallet.Tests
                     new object[] { 1, new object[] { 2, new ComplexObjectInNonAlphabeticalOrder("last", "first", "halfway"), 3, 
                         new ExtraComplexObjectWithComplexObjectArray("last", new ComplexObjectInNonAlphabeticalOrder[] { null, 
                             new ("last", "first", "halfway")}, "halfway")}, "word"}
-                }, "testFunc");
+                });
             
             string json = JsonConvert.SerializeObject(testData);
             Debug.Log(json);
