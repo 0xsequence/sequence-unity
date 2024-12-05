@@ -68,7 +68,7 @@ namespace Sequence.EmbeddedWallet.Tests
             string json = JsonConvert.SerializeObject(testData);
             Debug.Log(json);
             
-            Assert.AreEqual("{\"abi\":\"testAbi(string,ComplexObjectInNonAlphabeticalOrder,int)\",\"args\":[\"some string\",{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},1,5,[1,{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},null,\"banana\"],[{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},null],[1,[2,{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},3,{\"ComplexObjectArray\":[null,{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"}],\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"}],\"word\"]],\"func\":\"testFunc\"}", json);
+            Assert.AreEqual("{\"abi\":\"testAbi(string,ComplexObjectInNonAlphabeticalOrder,int)\",\"args\":[\"some string\",{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},1,5,[1,{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},null,\"banana\"],[{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},null],[1,[2,{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"},3,{\"ComplexObjectArray\":[null,{\"FirstValue\":\"first\",\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"}],\"HalfwayValue\":\"halfway\",\"LastValue\":\"last\"}],\"word\"]]}", json);
         }
     }
 }
