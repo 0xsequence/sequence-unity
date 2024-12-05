@@ -144,6 +144,11 @@ namespace Sequence.EmbeddedWallet
                                               
 
                         break;
+
+                    case SequenceContractCall tx:
+                        Contract contractToCall = new Contract(tx.to);
+                        transaction = await contractToCall.CallFunction(tx.data.abi, tx.data.args).Create(_client, new ContractCall(_wallet.GetAddress()));
+                        break;
                     default:
                         return new FailedTransactionReturn("Error adapting to EthTransaction type. Unable to determine transaction type for:" + transactions[i].ToString(), null);
                 }
