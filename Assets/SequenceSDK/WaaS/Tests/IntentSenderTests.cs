@@ -164,6 +164,11 @@ namespace Sequence.EmbeddedWallet.Tests
                 string responseJson = JsonConvert.SerializeObject(response);
                 return JsonConvert.DeserializeObject<T2>(responseJson);
             }
+
+            public async Task<TimeSpan> GetTimeShift()
+            {
+                return TimeSpan.Zero;
+            }
         }
 
         private class MockHttpClientReturnsUnknownCode : IHttpClient
@@ -177,6 +182,11 @@ namespace Sequence.EmbeddedWallet.Tests
                 string responseJson = JsonConvert.SerializeObject(response);
                 return JsonConvert.DeserializeObject<T2>(responseJson);
             }
+
+            public async Task<TimeSpan> GetTimeShift()
+            {
+                return TimeSpan.Zero;
+            }
         }
 
         private class MockHttpClientReturnsSuccessfulTransaction : IHttpClient
@@ -189,6 +199,11 @@ namespace Sequence.EmbeddedWallet.Tests
                     new SuccessfulTransactionReturn(txHash, "", null, null)));
                 string responseJson = JsonConvert.SerializeObject(response);
                 return JsonConvert.DeserializeObject<T2>(responseJson);
+            }
+
+            public async Task<TimeSpan> GetTimeShift()
+            {
+                return TimeSpan.Zero;
             }
         }
 
