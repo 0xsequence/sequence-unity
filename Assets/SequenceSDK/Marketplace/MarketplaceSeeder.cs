@@ -6,6 +6,8 @@ using NUnit.Framework;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.EmbeddedWallet.Tests;
+using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Marketplace
 {
@@ -38,9 +40,15 @@ namespace Sequence.Marketplace
                 Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
                 for (int i = 0; i < 100; i++)
                 {
+                    Address[] possibleCurrencyAddresses = new Address[]
+                        { erc20UniversallyMintable, new Address(Currency.NativeCurrencyAddress) };
                     Step[] steps = await checkout.GenerateListingTransaction(collection, (i % 5 + 1).ToString(), i + 1,
-                        ContractType.ERC1155, erc20UniversallyMintable, 1,
+                        ContractType.ERC1155, possibleCurrencyAddresses.GetRandomObjectFromArray(), 1,
                         DateTime.Now + TimeSpan.FromDays(365));
+                    if (i % 5 == 3)
+                    {
+                        await Task.Delay(1000);
+                    }
                     foreach (var step in steps)
                     {
                         finalSteps.Add(step);
@@ -52,6 +60,10 @@ namespace Sequence.Marketplace
                     Step[] steps = await checkout.GenerateOfferTransaction(collection, (i % 5 + 1).ToString(), i + 1,
                         ContractType.ERC1155, erc20UniversallyMintable, 1,
                         DateTime.Now + TimeSpan.FromDays(365));
+                    if (i % 5 == 3)
+                    {
+                        await Task.Delay(1000);
+                    }
                     foreach (var step in steps)
                     {
                         finalSteps.Add(step);
@@ -68,6 +80,10 @@ namespace Sequence.Marketplace
                     TransactionReturn result = await wallet.SendTransaction(Chain.ArbitrumNova, transactions);
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result is SuccessfulTransactionReturn);
+                    if (result is SuccessfulTransactionReturn success)
+                    {
+                       Application.OpenURL(ChainDictionaries.BlockExplorerOf[Chain.ArbitrumNova].AppendTrailingSlashIfNeeded() + "tx/" + success.txHash);
+                    }
                 }
 
                 done = true;
