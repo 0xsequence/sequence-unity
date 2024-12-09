@@ -160,6 +160,17 @@ namespace Sequence.EmbeddedWallet
         public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
         public event Action<string> OnFailedToRetrieveIdToken;
 
+        /// <summary>
+        /// Get an idToken JWT issued from the Sequence API
+        /// </summary>
+        /// <param name="nonce"></param>
+        /// <returns></returns>
         public Task<IntentResponseGetIdToken> GetIdToken(string nonce = null);
+
+        /// <summary>
+        /// Get the email associated with this session
+        /// </summary>
+        /// <returns></returns>
+        public string GetEmail();
     }
 }

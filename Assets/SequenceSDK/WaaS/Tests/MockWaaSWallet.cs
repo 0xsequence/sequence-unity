@@ -99,5 +99,10 @@ namespace Sequence.EmbeddedWallet
         {
             throw new NotImplementedException();
         }
+
+        public string GetEmail()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

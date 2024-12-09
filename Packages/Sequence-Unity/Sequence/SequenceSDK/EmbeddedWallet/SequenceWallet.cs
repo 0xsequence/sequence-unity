@@ -22,14 +22,16 @@ namespace Sequence.EmbeddedWallet
         private IIntentSender _intentSender;
         private const string _sequenceCreatedContractEvent = "CreatedContract(address)";
         private string _builderApiKey;
+        private string _email;
 
-        public SequenceWallet(Address address, string sessionId, IIntentSender intentSender)
+        public SequenceWallet(Address address, string sessionId, IIntentSender intentSender, string email = "")
         {
             _address = address;
             _httpClient = new HttpClient("https://api.sequence.app/rpc");
             _intentSender = intentSender;
             SessionId = sessionId;
             _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+            _email = email;
         }
 
         public Address GetWalletAddress()
@@ -440,5 +442,9 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
+        public string GetEmail()
+        {
+            return _email;
+        }
     }
 }
