@@ -37,6 +37,7 @@ namespace Sequence.Demo
         private EstimatedTotal _estimatedTotal;
         private List<TokenPaymentOption> _tokenPaymentOptions;
         private Marketplace.Currency _bestCurrency;
+        private List<GameObject> _spawnedGameObjects;
 
         protected override void Awake()
         {
@@ -76,12 +77,19 @@ namespace Sequence.Demo
         {
             base.Close();
             CartItem.OnAmountChanged -= OnCartAmountChanged;
+            
+            foreach (var spawnedGameObject in _spawnedGameObjects)
+            {
+                Destroy(spawnedGameObject);
+            }
         }
 
         private async Task Assemble()
         {
             int listings = _listings.Length;
             _numberOfUniqueItemsText.text = $"{listings} items";
+            
+            _spawnedGameObjects = new List<GameObject>();
             
             // Todo add back in; use a mock for now
             // Marketplace.CheckoutOptions options = await _checkout.GetCheckoutOptions(_listings.ToOrderArray());
@@ -91,18 +99,21 @@ namespace Sequence.Demo
                 CollectibleOrder listing = _listings[i];
                 GameObject cartItem = Instantiate(_cartItemPrefab, _cartItemsParent);
                 cartItem.GetComponent<CartItem>().Assemble(_cart, listing.order.orderId);
+                _spawnedGameObjects.Add(cartItem);
             }
             
             GameObject estimatedTotalGameObject = Instantiate(_estimatedTotalPrefab, _cartItemsParent);
             _estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
             await RefreshEstimatedTotal();
+            _spawnedGameObjects.Add(estimatedTotalGameObject);
             
             GameObject networkBannerGameObject = Instantiate(_networkBannerPrefab, _cartItemsParent);
             NetworkBanner networkBanner = networkBannerGameObject.GetComponent<NetworkBanner>();
             networkBanner.Assemble(_chain);
+            _spawnedGameObjects.Add(networkBannerGameObject);
 
-            Instantiate(_dividerPrefab, _cartItemsParent);
-            Instantiate(_payWithCryptoTextPrefab, _cartItemsParent);
+            _spawnedGameObjects.Add(Instantiate(_dividerPrefab, _cartItemsParent));
+            _spawnedGameObjects.Add(Instantiate(_payWithCryptoTextPrefab, _cartItemsParent));
             
             Marketplace.Currency[] currencies = await _cart.GetCurrencies();
             int currenciesLength = currencies.Length;
@@ -124,13 +135,15 @@ namespace Sequence.Demo
                     tokenPaymentOption.SelectCurrency();
                 }
                 _tokenPaymentOptions.Add(tokenPaymentOption);
+                _spawnedGameObjects.Add(tokenPaymentOptionGameObject);
             }
             
-            Instantiate(_dividerPrefab, _cartItemsParent);
+            _spawnedGameObjects.Add(Instantiate(_dividerPrefab, _cartItemsParent));
             
             GameObject qrCodeButtonGameObject = Instantiate(_qrCodeButtonPrefab, _cartItemsParent);
             Button qrCodeButton = qrCodeButtonGameObject.GetComponent<Button>();
             qrCodeButton.onClick.AddListener(OpenQrCodePage);
+            _spawnedGameObjects.Add(qrCodeButtonGameObject);
 
             if (HasAtLeastOneCryptoPaymentOption())
             {
