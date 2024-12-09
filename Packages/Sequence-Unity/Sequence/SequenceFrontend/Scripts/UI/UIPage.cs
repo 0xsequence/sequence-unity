@@ -44,7 +44,7 @@ namespace Sequence.Demo
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(UIPanel)} as an argument");
             }
             _gameObject.SetActive(true);
-            _animator.AnimateIn( _openAnimationDurationInSeconds);
+            _animator.AnimateIn(_openAnimationDurationInSeconds);
         }
 
         public virtual void Close()

@@ -51,7 +51,7 @@ namespace Sequence.Demo
         public async void OpenQrCodeView()
         {
             var destinationAddress = _wallet.GetWalletAddress();
-            await _qrCodeView.Show(_saleState.PaymentToken, (int)_chain, destinationAddress, "1e2");
+            await _qrCodeView.Show(_saleState.PaymentToken, _chain, destinationAddress, "1e2");
         }
 
         public async void RefreshState()

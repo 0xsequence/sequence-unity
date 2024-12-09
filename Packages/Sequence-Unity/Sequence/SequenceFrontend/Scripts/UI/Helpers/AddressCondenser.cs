@@ -4,7 +4,7 @@ namespace Sequence.Demo
     {
         public static string CondenseForUI(this Address address)
         {
-            return address.ToString().Substring(0, 6) + "..." + address.ToString().Substring(38, 4);
+            return address.ToString().Substring(0, 5) + "..." + address.ToString().Substring(39, 3);
         }
     }
 }

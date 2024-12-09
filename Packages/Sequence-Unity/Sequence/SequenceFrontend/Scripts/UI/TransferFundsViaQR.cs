@@ -23,7 +23,7 @@ namespace Sequence.Demo
         {
             if (_order != null)
             {
-                await _qrCodeView.Show("0x00000000000000000000000000000000", (int)_order.order.chainId, 
+                await _qrCodeView.Show("0x00000000000000000000000000000000", _order.order.chainId, 
                     "0x00000000000000000000000000000000", "1e2"); 
                 _qrPanel.SetActive(true);
             }

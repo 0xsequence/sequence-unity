@@ -24,6 +24,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _tokenPaymentOptionPrefab;
         [SerializeField] private Button _completePurchaseButton;
         [SerializeField] private GameObject _loadingScreen;
+        [SerializeField] private GameObject _qrCodeButtonPrefab;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
@@ -35,6 +36,7 @@ namespace Sequence.Demo
         private RectTransform _scrollViewLayoutGroupRectTransform;
         private EstimatedTotal _estimatedTotal;
         private List<TokenPaymentOption> _tokenPaymentOptions;
+        private Marketplace.Currency _bestCurrency;
 
         protected override void Awake()
         {
@@ -125,6 +127,10 @@ namespace Sequence.Demo
             }
             
             Instantiate(_dividerPrefab, _cartItemsParent);
+            
+            GameObject qrCodeButtonGameObject = Instantiate(_qrCodeButtonPrefab, _cartItemsParent);
+            Button qrCodeButton = qrCodeButtonGameObject.GetComponent<Button>();
+            qrCodeButton.onClick.AddListener(OpenQrCodePage);
 
             if (HasAtLeastOneCryptoPaymentOption())
             {
@@ -154,14 +160,14 @@ namespace Sequence.Demo
             {
                 return;
             }
-            Marketplace.Currency bestCurrency = await _cart.GetBestCurrency();
-            string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(bestCurrency.contractAddress));
+            _bestCurrency = await _cart.GetBestCurrency();
+            string estimatedCurrencyRequired = await _cart.GetApproximateTotalInCurrency(new Address(_bestCurrency.contractAddress));
             if (estimatedCurrencyRequired.StartsWith("Error"))
             {
                 Debug.LogError(estimatedCurrencyRequired);
             }
-            Sprite currencyIcon = await _cart.GetCurrencyIcon(bestCurrency);
-            _estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, bestCurrency.symbol, currencyIcon);
+            Sprite currencyIcon = await _cart.GetCurrencyIcon(_bestCurrency);
+            _estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, _bestCurrency.symbol, currencyIcon);
         }
 
         private async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency)
@@ -263,6 +269,14 @@ namespace Sequence.Demo
             {
                 Debug.LogError(e.Message);
                 return false;
+            }
+        }
+
+        private void OpenQrCodePage()
+        {
+            if (_panel is CheckoutPanel checkoutPanel)
+            {
+                checkoutPanel.OpenQrCodePage(new QrCodeParams(new Address(_bestCurrency.contractAddress), _chain, _wallet.GetWalletAddress()));
             }
         }
     }
