@@ -6454,7 +6454,7 @@ MonoBehaviour:
   - {fileID: 3911810626580786188}
   _enterCodeText: {fileID: 3911810626720903612}
   _errorText: {fileID: 3911810627950373898}
-  _loadingScreenPrefab: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
+  _loadingScreen: {fileID: 181291193031515344}
 --- !u!1 &3911810628491489749
 GameObject:
   m_ObjectHideFlags: 0
