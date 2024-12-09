@@ -275,6 +275,11 @@ namespace Sequence.Marketplace
             _amountsRequestedByOrderId[orderId] = amount;
         }
 
+        public ICheckout GetICheckout()
+        {
+            return _checkout;
+        }
+
         public async Task<Currency[]> GetCurrencies()
         {
             while (_currencies == null)

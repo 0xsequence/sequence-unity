@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence;
 using Sequence.Marketplace;
+using CheckoutOptions = Sequence.Marketplace.CheckoutOptions;
 using ContractType = Sequence.Marketplace.ContractType;
 
 namespace Temp
@@ -16,9 +17,12 @@ namespace Temp
             throw new NotImplementedException();
         }
 
-        public Task<Sequence.Marketplace.CheckoutOptions> GetCheckoutOptions(Order[] orders, int additionalFeeBps = 0)
+        public async Task<Sequence.Marketplace.CheckoutOptions> GetCheckoutOptions(Order[] orders, int additionalFeeBps = 0)
         {
-            throw new NotImplementedException();
+            return new Sequence.Marketplace.CheckoutOptions(TransactionCrypto.all, Array.Empty<TransactionSwapProvider>(), Array.Empty<TransactionNFTCheckoutProvider>(), new TransactionOnRampProvider[]
+                {
+                    TransactionOnRampProvider.transak
+                });
         }
 
         public event Action<Step[]> OnTransactionStepsReturn;

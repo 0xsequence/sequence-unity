@@ -5,12 +5,11 @@ using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    [JsonConverter(typeof(EnumConverter<TransactionProvider>))]
-    public enum TransactionProvider
+    [JsonConverter(typeof(EnumConverter<TransactionOnRampProvider>))]
+    public enum TransactionOnRampProvider
     {
         unknown,
         sardine,
         transak,
-        zerox
     }
 }

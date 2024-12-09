@@ -27,5 +27,6 @@ namespace Sequence.Marketplace
         public Dictionary<string, Sprite> GetCollectibleImagesByOrderId();
         public Dictionary<string, uint> GetAmountsRequestedByOrderId();
         public void SetAmountRequested(string orderId, uint amount);
+        public ICheckout GetICheckout();
     }
 }

@@ -7,12 +7,12 @@ namespace Sequence.Marketplace
     public class CheckoutOptions
     {
         public TransactionCrypto crypto;
-        public TransactionProvider[] swap;
-        public TransactionProvider[] nftCheckout;
-        public TransactionProvider[] onRamp;
+        public TransactionSwapProvider[] swap;
+        public TransactionNFTCheckoutProvider[] nftCheckout;
+        public TransactionOnRampProvider[] onRamp;
 
         [Preserve]
-        public CheckoutOptions(TransactionCrypto crypto, TransactionProvider[] swap, TransactionProvider[] nftCheckout, TransactionProvider[] onRamp)
+        public CheckoutOptions(TransactionCrypto crypto, TransactionSwapProvider[] swap, TransactionNFTCheckoutProvider[] nftCheckout, TransactionOnRampProvider[] onRamp)
         {
             this.crypto = crypto;
             this.swap = swap;

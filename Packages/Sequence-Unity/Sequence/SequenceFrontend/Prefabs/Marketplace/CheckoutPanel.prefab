@@ -779,6 +779,7 @@ MonoBehaviour:
   _completePurchaseButton: {fileID: 38083725506949587}
   _loadingScreen: {fileID: 3059380303685510642}
   _qrCodeButtonPrefab: {fileID: 3311939297369479765, guid: ff57df149f1524de7967727a22a2f0e8, type: 3}
+  _fundWithCreditCardPrefab: {fileID: 3483406631426310963, guid: fbccf8e8c585a492b98d26b0fb27e202, type: 3}
 --- !u!1 &1690211465220774611
 GameObject:
   m_ObjectHideFlags: 0
@@ -1734,7 +1735,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5517699062687508381, guid: 7cf47fcef03d043179b4447c9980330f, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 45.6525
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5517699062687508381, guid: 7cf47fcef03d043179b4447c9980330f, type: 3}
       propertyPath: m_AnchoredPosition.y

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine.Scripting;
+using UnityEngine.Serialization;
 
 namespace Sequence.Marketplace
 {
@@ -8,14 +9,14 @@ namespace Sequence.Marketplace
     {
         public Address wallet;
         public CheckoutOptionsMarketplaceOrder[] orders;
-        public int feeBPS;
+        public int additionalFee;
 
         [Preserve]
-        public GetCheckoutOptionsArgs(Address wallet, CheckoutOptionsMarketplaceOrder[] orders, int feeBps)
+        public GetCheckoutOptionsArgs(Address wallet, CheckoutOptionsMarketplaceOrder[] orders, int additionalFee)
         {
             this.wallet = wallet;
             this.orders = orders;
-            feeBPS = feeBps;
+            additionalFee = additionalFee;
         }
     }
 }

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Sequence.Marketplace
 {
-    public class NftCheckout : ICheckoutHelper // Todo add an additional interface that handles the credit card based checkout?
+    public class NftCheckout : ICheckoutHelper // Todo add an additional interface that handles the credit card based checkout
     {
         private IWallet _wallet;
         private CollectibleOrder _listing;
@@ -306,6 +306,11 @@ namespace Sequence.Marketplace
             }
             
             _amountRequested = amount;
+        }
+
+        public ICheckout GetICheckout()
+        {
+            return _checkout;
         }
 
         private async Task<Transaction[]> BuildCheckoutTransactionArray()

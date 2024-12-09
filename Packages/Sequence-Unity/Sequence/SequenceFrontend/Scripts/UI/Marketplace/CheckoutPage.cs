@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
+using Sequence.Integrations.Transak;
 using Sequence.Marketplace;
 using Sequence.Utils;
 using TMPro;
@@ -25,6 +27,7 @@ namespace Sequence.Demo
         [SerializeField] private Button _completePurchaseButton;
         [SerializeField] private GameObject _loadingScreen;
         [SerializeField] private GameObject _qrCodeButtonPrefab;
+        [SerializeField] private GameObject _fundWithCreditCardPrefab;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
@@ -66,7 +69,7 @@ namespace Sequence.Demo
 
             _tokenPaymentOptions = new List<TokenPaymentOption>();
             
-            _checkout = new Checkout(_wallet, _chain);
+            _checkout = _cart.GetICheckout();
             
             CartItem.OnAmountChanged += OnCartAmountChanged;
 
@@ -90,9 +93,6 @@ namespace Sequence.Demo
             _numberOfUniqueItemsText.text = $"{listings} items";
             
             _spawnedGameObjects = new List<GameObject>();
-            
-            // Todo add back in; use a mock for now
-            // Marketplace.CheckoutOptions options = await _checkout.GetCheckoutOptions(_listings.ToOrderArray());
             
             for (int i = 0; i < listings; i++)
             {
@@ -153,8 +153,36 @@ namespace Sequence.Demo
             {
                 _completePurchaseButton.interactable = false;
             }
+
+            Marketplace.CheckoutOptions options = null;
+            try
+            {
+                options = await _checkout.GetCheckoutOptions(_listings.ToOrderArray());
+            }
+            catch (Exception e)
+            {
+                string message =  $"Error fetching checkout options: {e.Message}";
+                Debug.LogError(message);
+            }
             
-            // Todo instantiate QR code and Transak based wallet funding buttons
+            if (options != null && options.onRamp != null && options.onRamp.Length > 0)
+            {
+                GameObject fundWithCreditCardGameObject = Instantiate(_fundWithCreditCardPrefab, _cartItemsParent);
+                Button fundWithCreditCardButton = fundWithCreditCardGameObject.GetComponent<Button>();
+                fundWithCreditCardButton.onClick.AddListener(() =>
+                {
+                    if (options.onRamp.Contains(TransactionOnRampProvider.transak))
+                    {
+                        TransakOnRamp transakOnRamp = new TransakOnRamp(_wallet.GetWalletAddress());
+                        transakOnRamp.OpenTransakLink();
+                    }
+                });
+                _spawnedGameObjects.Add(fundWithCreditCardGameObject);
+            }
+            else
+            {
+                Debug.LogWarning($"No {nameof(Marketplace.CheckoutOptions)} found. Assuming crypto only checkout.");
+            }
             
             // Todo instantiate credit card based checkout stuff (only if we have one cart item)
 
