@@ -31,7 +31,15 @@ namespace Sequence.Integrations.Sardine
         {
             this.paymentMethodTypeConfig = paymentMethodTypeConfig;
             this.name = name;
+            if (string.IsNullOrWhiteSpace(this.name))
+            {
+                this.name = "Placeholder";
+            }
             this.imageUrl = imageUrl;
+            if (string.IsNullOrWhiteSpace(this.imageUrl))
+            {
+                this.imageUrl = "https://dev-metadata.sequence.app/projects/1010/collections/394/tokens/1/image.webp"; // Placeholder image
+            }
             this.network = ChainDictionaries.PathOf[network];
             this.recipientAddress = recipientAddress;
             this.contractAddress = contractAddress;
