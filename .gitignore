@@ -101,6 +101,8 @@ crashlytics-build.properties
 chaintest.out
 TestResults_Edit.xml
 TestResults_Play.xml
+Builds/
+PlatformCompileTestErrors/
 
 # Temporary test files
 Assets/InitTestScene*.unity*
