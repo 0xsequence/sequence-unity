@@ -289,7 +289,7 @@ namespace Sequence
             { Chain.APEChain, "apechain" },
             { Chain.ImmutableZkEvm, "immutable-zkevm" },
             { Chain.SkaleNebula, "skale-nebula" },
-            { Chain.Root, "root" },
+            { Chain.Root, "rootnet" },
             { Chain.LAOS, "laos" },
 
             { Chain.TestnetSepolia, "sepolia" },
@@ -311,7 +311,7 @@ namespace Sequence
             { Chain.TestnetSoneiumMinato, "soneium-minato" },
             { Chain.TestnetToy, "toy-testnet" },
             { Chain.TestnetImmutableZkEvm, "immutable-zkevm-testnet" },
-            { Chain.TestnetRootPorcini, "root-porcini" },
+            { Chain.TestnetRootPorcini, "rootnet-porcini" },
             { Chain.TestnetLAOSSigma, "laos-sigma-testnet" }
         };
     }

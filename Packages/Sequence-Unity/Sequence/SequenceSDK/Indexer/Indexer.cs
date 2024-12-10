@@ -85,7 +85,7 @@ namespace Sequence
         { Chain.APEChain.GetChainId(), "apechain" },
         { Chain.ImmutableZkEvm.GetChainId(), "immutable-zkevm" },
         { Chain.SkaleNebula.GetChainId(), "skale-nebula" },
-        { Chain.Root.GetChainId(), "root" },
+        { Chain.Root.GetChainId(), "rootnet" },
         { Chain.LAOS.GetChainId(), "laos" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
@@ -107,7 +107,7 @@ namespace Sequence
         { Chain.TestnetSoneiumMinato.GetChainId(), "soneium-minato" },
         { Chain.TestnetToy.GetChainId(), "toy-testnet" },
         { Chain.TestnetImmutableZkEvm.GetChainId(), "immutable-zkevm-testnet" },
-        { Chain.TestnetRootPorcini.GetChainId(), "root-porcini" },
+        { Chain.TestnetRootPorcini.GetChainId(), "rootnet-porcini" },
         { Chain.TestnetLAOSSigma.GetChainId(), "laos-sigma-testnet" }
     };
 
