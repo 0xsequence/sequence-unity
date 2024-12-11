@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence;
+using Sequence.EmbeddedWallet.Tests;
 using Sequence.Marketplace;
 using Sequence.Utils;
 using UnityEngine;
@@ -56,7 +57,8 @@ namespace Sequence.Marketplace
         public async Task TestListAllCollectibleOffersWithHighestPricedOfferFirst()
         {
             Chain chain = Chain.ArbitrumNova;
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
@@ -74,7 +76,7 @@ namespace Sequence.Marketplace
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestListCurrencies(Chain chain)
         {
-            if (chain == Chain.None)
+            if (!chain.IsActive())
             {
                 return;
             }
@@ -115,7 +117,8 @@ namespace Sequence.Marketplace
         public async Task TestGetLowestPriceOfferForCollectible()
         {
             Chain chain = Chain.ArbitrumNova;
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
@@ -134,7 +137,8 @@ namespace Sequence.Marketplace
         public async Task TestGetHighestPriceOfferForCollectible()
         {
             Chain chain = Chain.ArbitrumNova;
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
@@ -209,7 +213,8 @@ namespace Sequence.Marketplace
         public async Task TestListAllOffersForCollectible()
         {
             Chain chain = Chain.ArbitrumNova;
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             

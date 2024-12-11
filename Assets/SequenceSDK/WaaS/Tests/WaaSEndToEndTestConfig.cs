@@ -9,6 +9,7 @@ namespace Sequence.EmbeddedWallet.Tests
         public string PlayFabTitleId;
         public string PlayFabEmail;
         public string PlayFabPassword;
+        public string DevAPIKey;
         
         private static WaaSEndToEndTestConfig _config;
 

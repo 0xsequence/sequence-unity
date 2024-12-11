@@ -29,5 +29,8 @@ namespace Sequence.Marketplace
         element,
         aqua_xyz,
         auranft_co,
+        zerox,
+        alienswap,
+        payment_processor,
     }
 }

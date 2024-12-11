@@ -18,13 +18,14 @@ namespace Sequence.Integrations.Sardine
         private IWallet _wallet;
         private Checkout _checkout;
         
-        private const string _baseUrl = "https://api.sequence.app/rpc/API";
+        private const string _baseUrl = "https://dev-api.sequence.app/rpc/API";
 
         public SardineCheckout(Chain chain, IWallet wallet)
         {
             _chain = chain;
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
+            _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays";
             _client = new HttpClient(_apiKey);
             _wallet = wallet;
             _checkout = new Checkout(_wallet, _chain);

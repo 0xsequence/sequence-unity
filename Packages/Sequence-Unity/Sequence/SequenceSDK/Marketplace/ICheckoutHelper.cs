@@ -74,7 +74,7 @@ namespace Sequence.Marketplace
         public CollectibleOrder[] GetListings();
         
         /// <summary>
-        /// Get the wallet that will be making the murchases
+        /// Get the wallet that will be making the purchases
         /// </summary>
         /// <returns></returns>
         public IWallet GetWallet();

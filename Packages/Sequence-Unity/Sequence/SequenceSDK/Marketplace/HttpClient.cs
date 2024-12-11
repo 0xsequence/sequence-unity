@@ -11,10 +11,11 @@ using UnityEngine.Networking;
 
 namespace Sequence.Marketplace
 {
-    internal class HttpClient : IHttpClient
+    public class HttpClient : IHttpClient
     {
         private string _apiKey;
-        private const string _baseUrl = "https://dev-marketplace-api.sequence-dev.app/"; // Todo switch to prod
+        private const string _prodUrl = "https://marketplace-api.sequence.app/";
+        private static string _baseUrl = "https://marketplace-api.sequence.app/";
         private const string _endUrl = "/rpc/Marketplace/";
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
@@ -25,7 +26,18 @@ namespace Sequence.Marketplace
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
-            _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays"; // todo remove dev env api key
+            _baseUrl = _prodUrl;
+        }
+
+        public static HttpClient UseHttpClientWithDevEnvironment(string devApiKey)
+        {
+            _baseUrl = "https://dev-marketplace-api.sequence-dev.app/";
+            return new HttpClient(devApiKey);
+        }
+        
+        private HttpClient(string apiKey)
+        {
+            _apiKey = apiKey;
         }
         
         public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)
@@ -41,12 +53,6 @@ namespace Sequence.Marketplace
 
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
         {
-            // todo remove when we remove above hardcoded dev key
-            if (url.StartsWith("https://api.sequence"))
-            {
-                _apiKey = SequenceConfig.GetConfig().BuilderAPIKey;
-            }
-            
             string requestJson = "";
             if (args != null)
             {

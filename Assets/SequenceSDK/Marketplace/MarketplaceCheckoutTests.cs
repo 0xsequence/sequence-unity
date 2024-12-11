@@ -22,6 +22,7 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGetCheckoutOptions(int amount)
         {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
             CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
             List<Order> orders = new List<Order>();
             for (int i = 0; i < collectibleOrders.Length; i++)
@@ -36,7 +37,7 @@ namespace Sequence.Marketplace
                 }
             }
 
-            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
 
             CheckoutOptions options = await checkout.GetCheckoutOptions(orders.ToArray());
 
@@ -48,6 +49,7 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateBuyTransaction(int amount)
         {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
             Order[] ordersResponse = await OrderFetcher.FetchListingsForCollectible("1");
             List<Order> orders = new List<Order>();
             for (int i = 0; i < ordersResponse.Length; i++)
@@ -64,7 +66,7 @@ namespace Sequence.Marketplace
 
             Assert.GreaterOrEqual(orders.Count, amount);
 
-            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
 
             for (int i = 0; i < amount; i++)
             {
@@ -78,6 +80,7 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateSellTransaction(int amount)
         {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
             Order[] orderResponse = await OrderFetcher.FetchOffersForCollectible("1");
             List<Order> orders = new List<Order>();
             for (int i = 0; i < orderResponse.Length; i++)
@@ -92,7 +95,7 @@ namespace Sequence.Marketplace
                 }
             }
 
-            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
 
             for (int i = 0; i < amount; i++)
             {
@@ -106,7 +109,8 @@ namespace Sequence.Marketplace
         [TestCase(2)]
         public async Task TestGenerateListingTransaction(int amount)
         {
-            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
             Address USDC = new Address("0x750ba8b76187092B0D1E87E28daaf484d1b5273b");
 
@@ -132,9 +136,10 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateOfferTransaction(int amount)
         {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             Address USDC = new Address("0x750ba8b76187092B0D1E87E28daaf484d1b5273b");
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
-            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
 
             for (int i = 0; i < amount; i++)
             {
@@ -245,7 +250,8 @@ namespace Sequence.Marketplace
         private async Task SeedWalletAndCreateListing(IWallet wallet, Address erc1155UniversallyMintable,
             Address currencyToken)
         {
-            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
 
             ERC1155 universallyMintable = new ERC1155(erc1155UniversallyMintable);
@@ -283,7 +289,8 @@ namespace Sequence.Marketplace
             CollectibleOrder[] collectibleOrders = await FetchListings(collection, Chain.ArbitrumNova);
             Assert.Greater(collectibleOrders.Length, 0);
 
-            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             Step[] steps = null;
             try
             {
@@ -311,7 +318,8 @@ namespace Sequence.Marketplace
 
         private async Task<CollectibleOrder[]> FetchListings(string collection, Chain chain, CollectiblesFilter filter = null)
         {
-            MarketplaceReader reader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader reader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             CollectibleOrder[] collectibleOrders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
@@ -357,7 +365,8 @@ namespace Sequence.Marketplace
                     Assert.IsNotNull(result);
                     Assert.IsTrue(result is SuccessfulTransactionReturn);
 
-                    Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+                    WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+                    Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
 
                     Step[] steps = await checkout.GenerateOfferTransaction(collection, "1",
                         1, ContractType.ERC1155, erc20UniversallyMintable,
@@ -447,7 +456,8 @@ namespace Sequence.Marketplace
 
             Assert.Greater(collectibleOrders.Length, 0);
 
-            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             Step[] steps = null;
             try
             {
@@ -475,7 +485,8 @@ namespace Sequence.Marketplace
 
         private async Task<CollectibleOrder[]> FetchOffers(string collection, Chain chain)
         {
-            MarketplaceReader reader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader reader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             CollectibleOrder[] collectibleOrders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
@@ -532,7 +543,8 @@ namespace Sequence.Marketplace
                     Assert.Fail($"Failed to find order created by wallet after {retries} retries");
                 }
 
-                Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+                WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+                Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
                 Step[] steps = await checkout.GenerateCancelTransaction(collection, myOrder);
                 await SubmitStepsAsTransaction(steps, wallet);
                     
@@ -628,7 +640,7 @@ namespace Sequence.Marketplace
                             Assert.Greater(orders.Length, 0);
 
                             Order order = orders[0];
-                            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova);
+                            Checkout checkout = new Checkout(wallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
                             Step[] steps = await checkout.GenerateBuyTransaction(order, 1);
                             await SubmitStepsAsTransaction(steps, wallet);
                             await Task.Delay(
@@ -660,7 +672,8 @@ namespace Sequence.Marketplace
         
         private async Task<Order[]> FetchListingsForCollectible(string collection, string tokenId, Chain chain, OrderFilter filter = null)
         {
-            MarketplaceReader reader = new MarketplaceReader(chain);
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            MarketplaceReader reader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             Order[] orders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
