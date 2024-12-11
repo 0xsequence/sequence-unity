@@ -56,6 +56,11 @@ namespace Sequence.ABI
 
         public static ABIType GetTypeFromEvmName(string typeName)
         {
+            if (IsFixedArray(typeName))
+            {
+                return ABIType.FIXEDARRAY;
+            }
+            
             if (typeName.EndsWith("[]"))
             {
                 return ABIType.DYNAMICARRAY;
@@ -65,12 +70,6 @@ namespace Sequence.ABI
             {
                 return ABIType.TUPLE;
             }
-
-            if (IsFixedArray(typeName))
-            {
-                return ABIType.FIXEDARRAY;
-            }
-
 
             if (typeName.StartsWith("bytes"))
             {
@@ -112,6 +111,11 @@ namespace Sequence.ABI
         /// <returns></returns>
         private static bool IsFixedArray(string value)
         {
+            if (value.StartsWith('('))
+            {
+                return false; // this is a tuple
+            }
+            
             int start = value.IndexOf('[');
             if (start <= 0)
             {
@@ -225,9 +229,9 @@ namespace Sequence.ABI
                         }
                     }
                     tupleType.Append(")");
-                    if (result[i].EndsWith("[]"))
+                    if (result[i].Contains("["))
                     {
-                        tupleType.Append("[]");
+                        tupleType.Append(result[i].Substring(result[i].IndexOf('['), result[i].Length - result[i].IndexOf('[')));
                     }
                     result[i] = tupleType.ToString();
                 }
@@ -414,13 +418,23 @@ namespace Sequence.ABI
                     {
                         return (T)(object)value.HexStringToInt();
                     }
+
+                    if (typeof(T) == typeof(long))
+                    {
+                        return (T)(object)(long)value.HexStringToBigInteger();
+                    }
                     
                     if (typeof(T) == typeof(uint))
                     {
                         return (T)(object)(uint)value.HexStringToBigInteger();
                     }
+                    
+                    if (typeof(T) == typeof(ulong))
+                    {
+                        return (T)(object)(ulong)value.HexStringToBigInteger();
+                    }
 
-                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString(), typeof(uint).ToString());
+                    ThrowDecodeException<T>(evmType, typeof(BigInteger).ToString(), typeof(int).ToString(), typeof(long).ToString(), typeof(uint).ToString(), typeof(ulong).ToString());
                     break;
                 case ABIType.BOOLEAN:
                     if (typeof(T) != typeof(bool))
