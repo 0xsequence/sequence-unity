@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Sequence.Marketplace
 {
-    public interface IReader // Todo rename to IMarketplaceReader
+    public interface IMarketplaceReader
     {
         public event Action<Currency[]> OnListCurrenciesReturn;
         public event Action<string> OnListCurrenciesError;

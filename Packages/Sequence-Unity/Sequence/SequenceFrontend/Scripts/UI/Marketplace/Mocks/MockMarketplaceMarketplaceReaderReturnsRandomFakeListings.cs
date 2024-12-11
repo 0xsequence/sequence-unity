@@ -9,11 +9,11 @@ using Random = UnityEngine.Random;
 
 namespace Sequence.Demo.Mocks
 {
-    public class MockMarketplaceReaderReturnsRandomFakeListings : IReader
+    public class MockMarketplaceMarketplaceReaderReturnsRandomFakeListings : IMarketplaceReader
     {
         private Chain _chain;
         
-        public MockMarketplaceReaderReturnsRandomFakeListings(Chain chain)
+        public MockMarketplaceMarketplaceReaderReturnsRandomFakeListings(Chain chain)
         {
             _chain = chain;
         }
@@ -22,8 +22,8 @@ namespace Sequence.Demo.Mocks
         public event Action<string> OnListCurrenciesError;
         public Task<Marketplace.Currency[]> ListCurrencies()
         {
-            MarketplaceReader reader = new MarketplaceReader(_chain);
-            return reader.ListCurrencies();
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain);
+            return marketplaceReader.ListCurrencies();
         }
 
         public event Action<ListCollectiblesReturn> OnListCollectibleOrdersReturn;

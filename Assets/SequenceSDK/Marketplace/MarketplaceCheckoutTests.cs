@@ -319,11 +319,11 @@ namespace Sequence.Marketplace
         private async Task<CollectibleOrder[]> FetchListings(string collection, Chain chain, CollectiblesFilter filter = null)
         {
             WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader reader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             CollectibleOrder[] collectibleOrders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
-                collectibleOrders = await reader.ListAllCollectibleListingsWithLowestPricedListingsFirst(collection, filter);
+                collectibleOrders = await marketplaceReader.ListAllCollectibleListingsWithLowestPricedListingsFirst(collection, filter);
                 Assert.IsNotNull(collectibleOrders);
                 if (collectibleOrders.Length > 0)
                 {
@@ -486,11 +486,11 @@ namespace Sequence.Marketplace
         private async Task<CollectibleOrder[]> FetchOffers(string collection, Chain chain)
         {
             WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader reader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             CollectibleOrder[] collectibleOrders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
-                collectibleOrders = await reader.ListAllCollectibleOffersWithHighestPricedOfferFirst(collection);
+                collectibleOrders = await marketplaceReader.ListAllCollectibleOffersWithHighestPricedOfferFirst(collection);
                 Assert.IsNotNull(collectibleOrders);
                 if (collectibleOrders.Length > 0)
                 {
@@ -673,11 +673,11 @@ namespace Sequence.Marketplace
         private async Task<Order[]> FetchListingsForCollectible(string collection, string tokenId, Chain chain, OrderFilter filter = null)
         {
             WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader reader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
             Order[] orders = null;
             for (int i = 0; i < 5; i++) // Retry up to 5 times as the listing might not have been picked up yet
             {
-                orders = await reader.ListAllListingsForCollectible(new Address(collection), tokenId, filter);
+                orders = await marketplaceReader.ListAllListingsForCollectible(new Address(collection), tokenId, filter);
                 Assert.IsNotNull(orders);
                 if (orders.Length > 0)
                 {

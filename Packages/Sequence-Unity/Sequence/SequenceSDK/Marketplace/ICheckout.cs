@@ -54,7 +54,7 @@ namespace Sequence.Marketplace
         /// <param name="tokenId">the collectible token id</param>
         /// <param name="amount"></param>
         /// <param name="contractType">the collectible contract type</param>
-        /// <param name="currencyTokenAddress">the Currency/ERC20 token address; note: must be whitelisted! If whitelisted, the Currency should be returned when using IReader.ListCurrencies()</param>
+        /// <param name="currencyTokenAddress">the Currency/ERC20 token address; note: must be whitelisted! If whitelisted, the Currency should be returned when using IMarketplaceReader.ListCurrencies()</param>
         /// <param name="pricePerToken">the price, in currencyTokenAddress, for each collectible in the order</param>
         /// <param name="expiry">order will be cancelled automatically past expiry DateTime</param>
         /// <param name="orderbookKind">the orderbook type for the order, defaults to OrderbookKind.sequence_marketplace_v2</param>
@@ -70,7 +70,7 @@ namespace Sequence.Marketplace
         /// <param name="tokenId">the collectible token id</param>
         /// <param name="amount"></param>
         /// <param name="contractType">the collectible contract type</param>
-        /// <param name="currencyTokenAddress">the Currency/ERC20 token address; note: must be whitelisted! If whitelisted, the Currency should be returned when using IReader.ListCurrencies()</param>
+        /// <param name="currencyTokenAddress">the Currency/ERC20 token address; note: must be whitelisted! If whitelisted, the Currency should be returned when using IMarketplaceReader.ListCurrencies()</param>
         /// <param name="pricePerToken">the price, in currencyTokenAddress, for each collectible in the order</param>
         /// <param name="expiry">order will be cancelled automatically past expiry DateTime</param>
         /// <param name="orderbookKind">the orderbook type for the order, defaults to OrderbookKind.sequence_marketplace_v2</param>

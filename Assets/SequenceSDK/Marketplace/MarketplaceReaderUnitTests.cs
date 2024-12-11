@@ -23,11 +23,11 @@ namespace Sequence.Marketplace
 
         private async Task TestListAllSellableOffers_ConstructsAppropriateFilter(CollectiblesFilter expectedFilter, CollectiblesFilter filterGiven)
         {
-            MarketplaceReader reader = new MarketplaceReader(_chain, new MockClientAssertsExpectedFilter(expectedFilter));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain, new MockClientAssertsExpectedFilter(expectedFilter));
 
             try
             {
-                await reader.ListAllSellableOffers(_testAddress, _collection, filterGiven);
+                await marketplaceReader.ListAllSellableOffers(_testAddress, _collection, filterGiven);
             }
             catch (Exception e)
             {
@@ -73,11 +73,11 @@ namespace Sequence.Marketplace
 
         private async Task TestListAllPurchasableListings_ConstructsAppropriateFilter(CollectiblesFilter expectedFilter, CollectiblesFilter filterGiven)
         {
-            MarketplaceReader reader = new MarketplaceReader(_chain, new MockClientAssertsExpectedFilter(expectedFilter));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain, new MockClientAssertsExpectedFilter(expectedFilter));
 
             try
             {
-                await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), filterGiven);
+                await marketplaceReader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), filterGiven);
             }
             catch (Exception e)
             {
@@ -147,9 +147,9 @@ namespace Sequence.Marketplace
             MockIndexerReturnsCached mockIndexer = new MockIndexerReturnsCached(cachedBalances);
             MockClientReturnsGiven mockClient = new MockClientReturnsGiven(new ListCollectiblesReturn(initialList));
             
-            MarketplaceReader reader = new MarketplaceReader(_chain, mockClient);
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain, mockClient);
             
-            CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, mockIndexer, null);
+            CollectibleOrder[] result = await marketplaceReader.ListAllPurchasableListings(_testAddress, _collection, mockIndexer, null);
             
             CollectionAssert.AreEqual(expectedList, result);
         }
@@ -183,9 +183,9 @@ namespace Sequence.Marketplace
         public async Task TestListAllPurchasableListings_NoListings()
         {
             MockClientReturnsGiven mockClient = new MockClientReturnsGiven(new ListCollectiblesReturn(new CollectibleOrder[0]));
-            MarketplaceReader reader = new MarketplaceReader(_chain, mockClient);
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain, mockClient);
             
-            CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), null);
+            CollectibleOrder[] result = await marketplaceReader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), null);
             
             CollectionAssert.IsEmpty(result);
         }
@@ -194,9 +194,9 @@ namespace Sequence.Marketplace
         public async Task TestListAllPurchasableListings_NullListings()
         {
             MockClientReturnsGiven mockClient = new MockClientReturnsGiven(new ListCollectiblesReturn(null));
-            MarketplaceReader reader = new MarketplaceReader(_chain, mockClient);
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain, mockClient);
             
-            CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), null);
+            CollectibleOrder[] result = await marketplaceReader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerReturnsNull(), null);
             
             Assert.IsNull(result);
         }
@@ -204,11 +204,11 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestListAllPurchasableListings_InvalidIndexer()
         {
-            MarketplaceReader reader = new MarketplaceReader(_chain);
+            MarketplaceReader marketplaceReader = new MarketplaceReader(_chain);
 
             try
             {
-                CollectibleOrder[] result = await reader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerWrongChain());
+                CollectibleOrder[] result = await marketplaceReader.ListAllPurchasableListings(_testAddress, _collection, new MockIndexerWrongChain());
                 Assert.Fail("Expected exception");
             }
             catch (Exception e)

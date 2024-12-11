@@ -16,7 +16,7 @@ namespace Sequence.Marketplace
         private Sprite _collectibleImage;
         private uint _amountRequested;
         private ISwap _swap;
-        private IReader _reader;
+        private IMarketplaceReader _marketplaceReader;
         private IIndexer _indexer;
         private ICheckout _checkout;
         private Currency[] _currencies;
@@ -24,21 +24,21 @@ namespace Sequence.Marketplace
         private Chain _chain;
         private Currency _chosenCurrency;
 
-        public NftCheckout(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
+        public NftCheckout(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
             _wallet = wallet;
             _listing = listing;
             _collectibleImage = collectibleIcon;
             _amountRequested = amount;
             
-            Setup(swap, reader, indexer, checkout);
+            Setup(swap, marketplaceReader, indexer, checkout);
         }
         
-        private void Setup(ISwap swap, IReader reader, IIndexer indexer, ICheckout checkout)
+        private void Setup(ISwap swap, IMarketplaceReader marketplaceReader, IIndexer indexer, ICheckout checkout)
         {
             _chain = ChainDictionaries.ChainById[_listing.order.chainId.ToString()];
             SetSwap(swap);
-            SetReader(reader);
+            SetReader(marketplaceReader);
             SetIndexer(indexer);
             SetCheckout(checkout);
 
@@ -61,12 +61,12 @@ namespace Sequence.Marketplace
             }
         }
 
-        private void SetReader(IReader reader)
+        private void SetReader(IMarketplaceReader marketplaceReader)
         {
-            _reader = reader;
-            if (_reader == null)
+            _marketplaceReader = marketplaceReader;
+            if (_marketplaceReader == null)
             {
-                _reader = new MarketplaceReader(_chain);
+                _marketplaceReader = new MarketplaceReader(_chain);
             }
             
             FetchCurrencies().ConfigureAwait(false);
@@ -92,7 +92,7 @@ namespace Sequence.Marketplace
         
         private async Task FetchCurrencies()
         {
-            _currencies = await _reader.ListCurrencies();
+            _currencies = await _marketplaceReader.ListCurrencies();
             _chosenCurrency = _currencies.FindDefaultChainCurrency();
         }
 
@@ -263,7 +263,7 @@ namespace Sequence.Marketplace
         {
             if (_currencies == null)
             {
-                _currencies = await _reader.ListCurrencies();
+                _currencies = await _marketplaceReader.ListCurrencies();
             }
 
             return _currencies.GetCurrencyByContractAddress(_listing.order.priceCurrencyAddress);

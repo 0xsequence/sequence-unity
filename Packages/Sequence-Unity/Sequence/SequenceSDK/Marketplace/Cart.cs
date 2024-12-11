@@ -18,7 +18,7 @@ namespace Sequence.Marketplace
         private Dictionary<string, Sprite> _collectibleImagesByOrderId;
         private Dictionary<string, uint> _amountsRequestedByOrderId;
         private ISwap _swap;
-        private IReader _reader;
+        private IMarketplaceReader _marketplaceReader;
         private IIndexer _indexer;
         private ICheckout _checkout;
         private Currency[] _currencies;
@@ -26,7 +26,7 @@ namespace Sequence.Marketplace
         private Chain _chain;
         private Currency _chosenCurrency;
 
-        public Cart(IWallet wallet, CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
+        public Cart(IWallet wallet, CollectibleOrder[] listings, Dictionary<string, Sprite> collectibleImagesByOrderId, Dictionary<string, uint> amountsRequestedByOrderId, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
             _wallet = wallet;
             _listings = listings;
@@ -66,14 +66,14 @@ namespace Sequence.Marketplace
                 }
             }
             
-            Setup(swap, reader, indexer, checkout);
+            Setup(swap, marketplaceReader, indexer, checkout);
         }
 
-        private void Setup(ISwap swap, IReader reader, IIndexer indexer, ICheckout checkout)
+        private void Setup(ISwap swap, IMarketplaceReader marketplaceReader, IIndexer indexer, ICheckout checkout)
         {
             _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
             SetSwap(swap);
-            SetReader(reader);
+            SetReader(marketplaceReader);
             SetIndexer(indexer);
             SetCheckout(checkout);
 
@@ -96,12 +96,12 @@ namespace Sequence.Marketplace
             }
         }
 
-        private void SetReader(IReader reader)
+        private void SetReader(IMarketplaceReader marketplaceReader)
         {
-            _reader = reader;
-            if (_reader == null)
+            _marketplaceReader = marketplaceReader;
+            if (_marketplaceReader == null)
             {
-                _reader = new MarketplaceReader(_chain);
+                _marketplaceReader = new MarketplaceReader(_chain);
             }
             
             FetchCurrencies().ConfigureAwait(false);
@@ -127,18 +127,18 @@ namespace Sequence.Marketplace
         
         private async Task FetchCurrencies()
         {
-            _currencies = await _reader.ListCurrencies();
+            _currencies = await _marketplaceReader.ListCurrencies();
             _chosenCurrency = _currencies.FindDefaultChainCurrency();
         }
 
-        public Cart(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IReader reader = null, IIndexer indexer = null, ICheckout checkout = null)
+        public Cart(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null)
         {
             _wallet = wallet;
             _listings = new CollectibleOrder[] {listing};
             _collectibleImagesByOrderId = new Dictionary<string, Sprite> {{listing.order.orderId, collectibleIcon}};
             _amountsRequestedByOrderId = new Dictionary<string, uint> {{listing.order.orderId, amount}};
             
-            Setup(swap, reader, indexer, checkout);
+            Setup(swap, marketplaceReader, indexer, checkout);
         }
         
         public CollectibleOrder GetOrderByOrderId(string orderId)
@@ -213,7 +213,7 @@ namespace Sequence.Marketplace
         {
             if (_currencies == null)
             {
-                _currencies = await _reader.ListCurrencies();
+                _currencies = await _marketplaceReader.ListCurrencies();
             }
             
             Currency defaultChainCurrency = _currencies.FindDefaultChainCurrency();

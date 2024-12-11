@@ -6,7 +6,7 @@ using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {
-    public class MarketplaceReader : IReader
+    public class MarketplaceReader : IMarketplaceReader
     {
         private Chain _chain;
         private IHttpClient _client;

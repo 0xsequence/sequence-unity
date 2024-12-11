@@ -6,7 +6,7 @@ using TokenMetadata = Sequence.Marketplace.TokenMetadata;
 
 namespace Temp
 {
-    public class MockMarketplaceReaderReturnsFakeCurrencies : IReader
+    public class MockMarketplaceReaderReturnsFakeCurrencies : IMarketplaceReader
     {
         public event Action<Currency[]> OnListCurrenciesReturn;
         public event Action<string> OnListCurrenciesError;

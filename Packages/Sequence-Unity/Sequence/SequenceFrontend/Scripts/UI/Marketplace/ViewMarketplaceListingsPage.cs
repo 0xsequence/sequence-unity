@@ -28,7 +28,7 @@ namespace Sequence.Demo
         private int _widthInItems;
         private GridLayoutGroup _grid;
         private float _brandingBuffer = 60;
-        private IReader _reader;
+        private IMarketplaceReader _marketplaceReader;
         private int _items = 0;
         private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
         private bool _currenciesFetched = false;
@@ -41,7 +41,7 @@ namespace Sequence.Demo
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
             _widthInItems = _grid.constraintCount;
-            _reader = new MarketplaceReader(_chain);
+            _marketplaceReader = new MarketplaceReader(_chain);
             _checkoutPanel = FindObjectOfType<CheckoutPanel>();
 
             DestroyGridChildren();
@@ -62,14 +62,14 @@ namespace Sequence.Demo
             if (chain != default)
             {
                 _chain = chain;
-                _reader = new MarketplaceReader(_chain);
+                _marketplaceReader = new MarketplaceReader(_chain);
             }
             
 #if UNITY_EDITOR
             if (_useMockReader)
             {
-                Debug.LogWarning("Using mock marketplace reader. If you want to use a real reader, make sure to uncheck the _useMockReader field in the inspector.");
-                _reader = new MockMarketplaceReaderReturnsRandomFakeListings(_chain);
+                Debug.LogWarning("Using mock marketplace reader. If you want to use a real marketplaceReader, make sure to uncheck the _useMockReader field in the inspector.");
+                _marketplaceReader = new MockMarketplaceMarketplaceReaderReturnsRandomFakeListings(_chain);
             }
 #endif
 
@@ -105,7 +105,7 @@ namespace Sequence.Demo
                 await Task.Yield();
             }
             
-            ListCollectiblesReturn result = await _reader.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
+            ListCollectiblesReturn result = await _marketplaceReader.ListCollectibleListingsWithLowestPricedListingsFirst(_collectionAddressInputField.text, null, page);
             if (result == null || result.collectibles == null || result.collectibles.Length == 0)
             {
                 _errorText.text = "No orders founds for collection" + result.ToString();
@@ -177,7 +177,7 @@ namespace Sequence.Demo
         
         private async Task FetchCurrencyIcons()
         {
-            Marketplace.Currency[] currencies = await _reader.ListCurrencies();
+            Marketplace.Currency[] currencies = await _marketplaceReader.ListCurrencies();
             foreach (Marketplace.Currency currency in currencies)
             {
                 Sprite icon = await AssetHandler.GetSpriteAsync(currency.imageUrl);
