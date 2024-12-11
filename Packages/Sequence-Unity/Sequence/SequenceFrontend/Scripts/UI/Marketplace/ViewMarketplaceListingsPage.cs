@@ -69,7 +69,7 @@ namespace Sequence.Demo
             if (_useMockReader)
             {
                 Debug.LogWarning("Using mock marketplace reader. If you want to use a real marketplaceReader, make sure to uncheck the _useMockReader field in the inspector.");
-                _marketplaceReader = new MockMarketplaceMarketplaceReaderReturnsRandomFakeListings(_chain);
+                _marketplaceReader = new MockMarketplaceReaderReturnsRandomFakeListings(_chain);
             }
 #endif
 

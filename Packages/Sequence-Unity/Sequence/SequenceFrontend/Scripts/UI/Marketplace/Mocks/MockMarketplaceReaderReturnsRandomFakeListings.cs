@@ -9,11 +9,11 @@ using Random = UnityEngine.Random;
 
 namespace Sequence.Demo.Mocks
 {
-    public class MockMarketplaceMarketplaceReaderReturnsRandomFakeListings : IMarketplaceReader
+    public class MockMarketplaceReaderReturnsRandomFakeListings : IMarketplaceReader
     {
         private Chain _chain;
         
-        public MockMarketplaceMarketplaceReaderReturnsRandomFakeListings(Chain chain)
+        public MockMarketplaceReaderReturnsRandomFakeListings(Chain chain)
         {
             _chain = chain;
         }
