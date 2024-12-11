@@ -57,4 +57,12 @@ namespace Sequence
         // Null
         None = 0
     }
+
+    public static class ChainExtensions
+    {
+        public static bool IsActive(this Chain chain)
+        {
+            return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto || chain == Chain.TestnetBorne);
+        }
+    }
 }

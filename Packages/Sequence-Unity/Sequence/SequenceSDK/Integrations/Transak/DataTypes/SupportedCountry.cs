@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Transak
 {
@@ -14,6 +15,7 @@ namespace Sequence.Integrations.Transak
         public string currencyCode;
         public Partner[] partners;
 
+        [Preserve]
         public SupportedCountry(string alpha2, string alpha3, bool isAllowed, bool isLightKycAllowed, string name, string[] supportedDocuments, string currencyCode, Partner[] partners)
         {
             this.alpha2 = alpha2;

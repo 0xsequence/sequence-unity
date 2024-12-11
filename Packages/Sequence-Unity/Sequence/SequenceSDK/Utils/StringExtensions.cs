@@ -162,5 +162,12 @@ namespace Sequence.Utils
 
             return result;
         }
+
+        public static string StringToBase64(this string value)
+        {
+            byte[] asBytes = value.ToByteArray();
+            string base64 = Convert.ToBase64String(asBytes);
+            return base64;
+        }
     }
 }
