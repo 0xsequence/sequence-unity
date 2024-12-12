@@ -94,5 +94,10 @@ namespace Temp
         {
             throw new NotImplementedException();
         }
+
+        public string GetEmail()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

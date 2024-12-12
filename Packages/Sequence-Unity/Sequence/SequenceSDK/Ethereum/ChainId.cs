@@ -26,7 +26,7 @@ namespace Sequence
 
         public static bool IsActive(this Chain chain)
         {
-            return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto);
+            return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto || chain == Chain.TestnetBorne);
         }
     }
 
