@@ -43,19 +43,5 @@ namespace Sequence.Integrations.Tests.Sardine
             Assert.NotNull(token);
             Assert.IsFalse(string.IsNullOrWhiteSpace(token));
         }
-
-        [Test]
-        public async Task TestSardineGetNFTCheckoutToken()
-        {
-            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
-            SardineCheckout sardine = new SardineCheckout(Chain.ArbitrumNova, _testWallet);
-
-            SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders[0], 1);
-            
-            Assert.NotNull(token);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(token.token));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(token.expiresAt));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(token.orderId));
-        }
     }
 }

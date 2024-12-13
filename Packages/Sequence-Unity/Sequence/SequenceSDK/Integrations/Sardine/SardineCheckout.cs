@@ -87,40 +87,5 @@ namespace Sequence.Integrations.Sardine
                 throw new Exception("Error fetching Sardine client token: " + e.Message);
             }
         }
-
-        private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, Address recipient, BigInteger quantity, string callData)
-        {
-            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetNFTCheckoutToken";
-            string priceSymbol = ChainDictionaries.GasCurrencyOf[_chain];
-            string currencyAddress = order.order.priceCurrencyAddress;
-            if (!currencyAddress.IsZeroAddress())
-            {
-                priceSymbol = await new ERC20(order.order.priceCurrencyAddress).Symbol(new SequenceEthClient(_chain));
-            }
-            GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
-                new PaymentMethodTypeConfig(EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(),
-                    PaymentMethod.us_debit),
-                order.metadata.image, _chain, recipient, new Address(order.order.collectionContractAddress), order.order.tokenId, quantity, order.order.quantityDecimals,
-                order.order.priceAmount,
-                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name, order.order.marketplace.ToString());
-            try {
-                return await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, SardineNFTCheckout>(url, request);
-            } catch (Exception e) {
-                throw new Exception("Error fetching Sardine NFT checkout token: " + e.Message);
-            }
-        }
-
-        public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, BigInteger quantity, Address recipient = null, AdditionalFee additionalFee = null)
-        {
-            if (recipient == null)
-            {
-                recipient = _wallet.GetWalletAddress();
-            }
-            
-            Step[] steps = await _checkout.GenerateBuyTransaction(order.order, quantity, additionalFee);
-            string callData = steps[0].data;
-            
-            return await SardineGetNFTCheckoutToken(order, recipient, quantity, callData);
-        }
     }
 }
