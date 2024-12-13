@@ -4,7 +4,7 @@ namespace Sequence.Contracts
     {
         
         public const string FunctionNameRegex = @"^[A-Z|a-z|_,-|0-9]+$";
-        public const string FunctionABIRegex = @"^[A-Z|a-z|_,-|0-9]+\(([A-Z|a-z|0-9]+(, *[A-Z|a-z|0-9]+)*)?\)$";
+        public const string FunctionABIRegex = @"^[A-Z|a-z|_,-|0-9]+\(([A-Za-z0-9\[\]]+(, *[A-Za-z0-9\[\]]+)*)?\)$";
         
         public static bool MatchesFunctionName(string input)
         {
