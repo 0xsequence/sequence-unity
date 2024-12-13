@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
+using Sequence.EmbeddedWallet.Tests;
 using Sequence.Integrations.Tests.Mocks;
 using Sequence.Integrations.Transak;
 using Sequence.Marketplace;
 using Sequence.Provider;
 using UnityEngine;
+using HttpClient = Sequence.Marketplace.HttpClient;
 
 namespace Sequence.Integrations.Tests.Transak
 {
@@ -44,8 +46,10 @@ namespace Sequence.Integrations.Tests.Transak
         [Test]
         public async Task TestGetNFTCheckoutLink()
         {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
             TransakNFTCheckout transakCheckout =
-                new TransakNFTCheckout(_testWallet, Chain.Polygon, new MockEthClientForGasEstimation());
+                new TransakNFTCheckout(_testWallet, Chain.ArbitrumNova, new MockEthClientForGasEstimation(), 
+                    new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey)));
             
             string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(_collectibleOrders[0].order, _collectibleOrders[0].metadata, 1, NFTType.ERC1155);
 

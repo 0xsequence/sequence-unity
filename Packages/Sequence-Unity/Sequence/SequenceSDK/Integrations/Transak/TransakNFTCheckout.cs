@@ -17,10 +17,10 @@ namespace Sequence.Integrations.Transak
         private IWallet _wallet;
         private Chain _chain;
         private IEthClient _client;
-        private Checkout _checkout;
+        private ICheckout _checkout;
         private Address _walletAddress;
 
-        public TransakNFTCheckout(IWallet wallet, Chain chain, IEthClient client = null)
+        public TransakNFTCheckout(IWallet wallet, Chain chain, IEthClient client = null, ICheckout checkout = null)
         {
             _wallet = wallet;
             _chain = chain;
@@ -33,7 +33,11 @@ namespace Sequence.Integrations.Transak
 
             _walletAddress = _wallet.GetWalletAddress();
 
-            _checkout = new Checkout(_wallet, chain);
+            _checkout = checkout;
+            if (_checkout == null)
+            {
+                _checkout = new Checkout(_wallet, chain);
+            }
         }
 
         public static Task<SupportedCountry[]> GetSupportedCountries()
