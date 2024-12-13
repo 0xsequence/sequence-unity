@@ -57,23 +57,22 @@ namespace Sequence.Demo
                 throw new ArgumentException(
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(ICheckoutHelper)} as an argument");
             }
-            _listings = _cart.GetListings();
-            
-            _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
-            
-            _wallet = _cart.GetWallet();
-
-            _collectibleImagesByOrderId = _cart.GetCollectibleImagesByOrderId();
-
-            _amountsRequestedByOrderId = _cart.GetAmountsRequestedByOrderId();
-
-            _tokenPaymentOptions = new List<TokenPaymentOption>();
-            
-            _checkout = _cart.GetICheckout();
+            Configure();
             
             CartItem.OnAmountChanged += OnCartAmountChanged;
 
             Assemble().ConfigureAwait(false);
+        }
+
+        protected void Configure()
+        {
+            _listings = _cart.GetListings();
+            _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
+            _wallet = _cart.GetWallet();
+            _collectibleImagesByOrderId = _cart.GetCollectibleImagesByOrderId();
+            _amountsRequestedByOrderId = _cart.GetAmountsRequestedByOrderId();
+            _tokenPaymentOptions = new List<TokenPaymentOption>();
+            _checkout = _cart.GetICheckout();
         }
 
         public override void Close()
@@ -87,13 +86,58 @@ namespace Sequence.Demo
             }
         }
 
-        private async Task Assemble()
+        protected async Task Assemble()
         {
             int listings = _listings.Length;
             _numberOfUniqueItemsText.text = $"{listings} items";
             
             _spawnedGameObjects = new List<GameObject>();
             
+            AssembleCartItems(listings);
+            
+            await SetEstimatedTotal();
+            
+            AssembleNetworkBanner();
+
+            _spawnedGameObjects.Add(Instantiate(_dividerPrefab, _cartItemsParent));
+            _spawnedGameObjects.Add(Instantiate(_payWithCryptoTextPrefab, _cartItemsParent));
+
+            await AssembleTokenPaymentOptions();
+            
+            _spawnedGameObjects.Add(Instantiate(_dividerPrefab, _cartItemsParent));
+            
+            SetupQrCode();
+
+            if (HasAtLeastOneCryptoPaymentOption())
+            {
+                _completePurchaseButton.interactable = true;
+            }
+            else
+            {
+                _completePurchaseButton.interactable = false;
+            }
+
+            Marketplace.CheckoutOptions options = null;
+            try
+            {
+                options = await _checkout.GetCheckoutOptions(_listings.ToOrderArray());
+            }
+            catch (Exception e)
+            {
+                string message =  $"Error fetching checkout options: {e.Message}";
+                Debug.LogError(message);
+            }
+            
+            AddOnRamp(options);
+            
+            // Todo instantiate credit card based checkout stuff (only if we have one cart item)
+
+            await AsyncExtensions.DelayTask(.1f);
+            UpdateScrollViewSize();
+        }
+
+        protected void AssembleCartItems(int listings)
+        {
             for (int i = 0; i < listings; i++)
             {
                 CollectibleOrder listing = _listings[i];
@@ -101,20 +145,26 @@ namespace Sequence.Demo
                 cartItem.GetComponent<CartItem>().Assemble(_cart, listing.order.orderId);
                 _spawnedGameObjects.Add(cartItem);
             }
-            
+        }
+
+        protected async Task SetEstimatedTotal()
+        {
             GameObject estimatedTotalGameObject = Instantiate(_estimatedTotalPrefab, _cartItemsParent);
             _estimatedTotal = estimatedTotalGameObject.GetComponent<EstimatedTotal>();
             await RefreshEstimatedTotal();
             _spawnedGameObjects.Add(estimatedTotalGameObject);
-            
+        }
+
+        protected void AssembleNetworkBanner()
+        {
             GameObject networkBannerGameObject = Instantiate(_networkBannerPrefab, _cartItemsParent);
             NetworkBanner networkBanner = networkBannerGameObject.GetComponent<NetworkBanner>();
             networkBanner.Assemble(_chain);
             _spawnedGameObjects.Add(networkBannerGameObject);
+        }
 
-            _spawnedGameObjects.Add(Instantiate(_dividerPrefab, _cartItemsParent));
-            _spawnedGameObjects.Add(Instantiate(_payWithCryptoTextPrefab, _cartItemsParent));
-            
+        protected async Task AssembleTokenPaymentOptions()
+        {
             Marketplace.Currency[] currencies = await _cart.GetCurrencies();
             int currenciesLength = currencies.Length;
             for (int i = 0; i < currenciesLength; i++)
@@ -137,34 +187,18 @@ namespace Sequence.Demo
                 _tokenPaymentOptions.Add(tokenPaymentOption);
                 _spawnedGameObjects.Add(tokenPaymentOptionGameObject);
             }
-            
-            _spawnedGameObjects.Add(Instantiate(_dividerPrefab, _cartItemsParent));
-            
+        }
+
+        protected void SetupQrCode()
+        {
             GameObject qrCodeButtonGameObject = Instantiate(_qrCodeButtonPrefab, _cartItemsParent);
             Button qrCodeButton = qrCodeButtonGameObject.GetComponent<Button>();
             qrCodeButton.onClick.AddListener(OpenQrCodePage);
             _spawnedGameObjects.Add(qrCodeButtonGameObject);
+        }
 
-            if (HasAtLeastOneCryptoPaymentOption())
-            {
-                _completePurchaseButton.interactable = true;
-            }
-            else
-            {
-                _completePurchaseButton.interactable = false;
-            }
-
-            Marketplace.CheckoutOptions options = null;
-            try
-            {
-                options = await _checkout.GetCheckoutOptions(_listings.ToOrderArray());
-            }
-            catch (Exception e)
-            {
-                string message =  $"Error fetching checkout options: {e.Message}";
-                Debug.LogError(message);
-            }
-            
+        protected void AddOnRamp(Marketplace.CheckoutOptions options)
+        {
             if (options != null && options.onRamp != null && options.onRamp.Length > 0)
             {
                 GameObject fundWithCreditCardGameObject = Instantiate(_fundWithCreditCardPrefab, _cartItemsParent);
@@ -183,11 +217,6 @@ namespace Sequence.Demo
             {
                 Debug.LogWarning($"No {nameof(Marketplace.CheckoutOptions)} found. Assuming crypto only checkout.");
             }
-            
-            // Todo instantiate credit card based checkout stuff (only if we have one cart item)
-
-            await AsyncExtensions.DelayTask(.1f);
-            UpdateScrollViewSize();
         }
 
         private bool HasAtLeastOneCryptoPaymentOption()
@@ -195,7 +224,7 @@ namespace Sequence.Demo
             return _tokenPaymentOptions.Count > 0;
         }
 
-        private async Task RefreshEstimatedTotal()
+        protected async Task RefreshEstimatedTotal()
         {
             if (_estimatedTotal == null)
             {
@@ -211,7 +240,7 @@ namespace Sequence.Demo
             _estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, _bestCurrency.symbol, currencyIcon);
         }
 
-        private async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency)
+        protected async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency)
         {
             string quotedPrice = await _cart.GetApproximateTotalInCurrencyIfAffordable(new Address(currency.contractAddress));
             if (string.IsNullOrWhiteSpace(quotedPrice) || quotedPrice == "")
@@ -238,7 +267,7 @@ namespace Sequence.Demo
         }
 
         // Todo switch to using object pool for token payment options
-        private async Task RefreshTokenPaymentOptions()
+        protected async Task RefreshTokenPaymentOptions()
         {
             Marketplace.Currency[] currencies = await _cart.GetCurrencies();
             int tokenPaymentOptionsCount = _tokenPaymentOptions.Count;
@@ -275,7 +304,7 @@ namespace Sequence.Demo
             DoCheckout().ConfigureAwait(false);
         }
 
-        private async Task DoCheckout()
+        protected async Task DoCheckout()
         {
             _loadingScreen.SetActive(true);
             bool success = await CheckoutWithCart();
@@ -290,7 +319,7 @@ namespace Sequence.Demo
             }
         }
         
-        private async Task<bool> CheckoutWithCart()
+        protected async Task<bool> CheckoutWithCart()
         {
             try
             {
@@ -313,7 +342,7 @@ namespace Sequence.Demo
             }
         }
 
-        private void OpenQrCodePage()
+        protected void OpenQrCodePage()
         {
             if (_panel is CheckoutPanel checkoutPanel)
             {
