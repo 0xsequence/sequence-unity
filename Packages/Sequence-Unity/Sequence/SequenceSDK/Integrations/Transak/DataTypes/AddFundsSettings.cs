@@ -1,8 +1,10 @@
 using System;
 using Newtonsoft.Json;
+using UnityEngine.Scripting;
 
 namespace Sequence.Integrations.Transak
 {
+    [Serializable]
     public class AddFundsSettings
     {
         public string walletAddress;
@@ -15,6 +17,7 @@ namespace Sequence.Integrations.Transak
             "ethereum,mainnet,arbitrum,optimism,polygon,polygonzkevm,zksync,base,bnb,oasys,astar,avaxcchain";
         public const string DefaultCryptoCurrency = "USDC";
 
+        [Preserve]
         public AddFundsSettings(string walletAddress, string fiatCurrency = "USD", string defaultFiatAmount = "50", string defaultCryptoCurrency = DefaultCryptoCurrency, string networks = DefaultNetworks)
         {
             this.walletAddress = walletAddress;

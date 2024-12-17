@@ -79,5 +79,26 @@ namespace Sequence.Transactions {
         {
             return await BuildTransactionCreator(to, data, value, gasPrice, gasLimit, nonce)();
         }
+        
+        public async Task<BigInteger> EstimateGasLimit(string to, string data = null, BigInteger? value = null) {
+            if (value == null)
+            {
+                value = BigInteger.Zero;
+            }
+            TransactionCall call = new TransactionCall
+            {
+                from = wallet,
+                value = (BigInteger)value,
+                data = data,
+            };
+            if (to != StringExtensions.ZeroAddress)
+            {
+                call.to = to;
+            }
+            BigInteger gasPrice = await client.EstimateGas(call);
+            call.gasPrice = gasPrice;
+            
+            return await client.EstimateGas(call);
+        }
     }
 }

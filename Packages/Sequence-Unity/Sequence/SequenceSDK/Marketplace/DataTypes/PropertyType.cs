@@ -1,18 +1,14 @@
+using Newtonsoft.Json;
+using Sequence.Utils;
+
 namespace Sequence.Marketplace
 {
+    [JsonConverter(typeof(EnumConverter<PropertyType>))]
     public enum PropertyType
     {
         INT,
         STRING,
         ARRAY,
         GENERIC,
-    }
-    
-    public static class PropertyTypeExtensions
-    {
-        public static string AsString(this PropertyType propertyType)
-        {
-            return propertyType.ToString();
-        }
     }
 }
