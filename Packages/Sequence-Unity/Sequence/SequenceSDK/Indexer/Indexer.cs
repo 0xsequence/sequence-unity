@@ -87,6 +87,7 @@ namespace Sequence
         { Chain.SkaleNebula.GetChainId(), "skale-nebula" },
         { Chain.Root.GetChainId(), "rootnet" },
         { Chain.LAOS.GetChainId(), "laos" },
+        { Chain.Soneium.GetChainId(), "soneium" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },

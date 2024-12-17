@@ -26,6 +26,7 @@ namespace Sequence
             { Chain.SkaleNebula, "Skale Nebula" },
             { Chain.Root, "Root" },
             { Chain.LAOS, "LAOS" },
+            { Chain.Soneium, "Soneium" },
 
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -72,6 +73,7 @@ namespace Sequence
             { Chain.SkaleNebula, "sFUEL" },
             { Chain.Root, "XRP" },
             { Chain.LAOS, "LAOS" },
+            { Chain.Soneium, "ETH" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -151,6 +153,7 @@ namespace Sequence
             { Chain.SkaleNebula, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
             { Chain.Root, "https://rootscan.io/" },
             { Chain.LAOS, "https://blockscout.laos.laosfoundation.io/" },
+            { Chain.Soneium, "https://vk9a3tgpne6qmub8.blockscout.com/" },
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -199,6 +202,7 @@ namespace Sequence
             { Chain.SkaleNebula, "1482601649" },
             { Chain.Root, "7668" },
             { Chain.LAOS, "6283" },
+            { Chain.Soneium, "1868" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -245,6 +249,7 @@ namespace Sequence
             { "1482601649", Chain.SkaleNebula },
             { "7668", Chain.Root },
             { "6283", Chain.LAOS },
+            { "1868", Chain.Soneium },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -291,6 +296,7 @@ namespace Sequence
             { Chain.SkaleNebula, "skale-nebula" },
             { Chain.Root, "rootnet" },
             { Chain.LAOS, "laos" },
+            { Chain.Soneium, "soneium" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
