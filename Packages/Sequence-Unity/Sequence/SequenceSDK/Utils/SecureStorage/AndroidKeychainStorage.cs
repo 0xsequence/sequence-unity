@@ -22,11 +22,15 @@ namespace Sequence.Utils.SecureStorage
         {
             if (!_isInitialized)
             {
-                using (AndroidJavaClass bridgeClass = new AndroidJavaClass("xyz.sequence.AndroidKeyBridge"))
+                using (AndroidJavaClass javaClass = new AndroidJavaClass("xyz.sequence.AndroidKeyBridge"))
                 {
-                    AndroidJavaObject unityContext = GetUnityActivity();
-                    bridgeClass.Call("init", unityContext);
-                    _isInitialized = true;
+                    AndroidJavaObject bridgeObject = javaClass.CallStatic<AndroidJavaObject>("getInstance");
+                    {
+                        AndroidJavaObject unityContext = GetUnityActivity();
+                        bridgeObject.Call("init", unityContext);
+                        _isInitialized = true;
+
+                    }
                 }
             }
         }
