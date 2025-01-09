@@ -27,6 +27,7 @@ namespace Sequence
         SkaleNebula = 1482601649,
         Root = 7668,
         LAOS = 6283,
+        Soneium = 1868,
 
         // Testnets
         TestnetSepolia = 11155111,
