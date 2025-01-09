@@ -1,11 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Sequence.Authentication;
-using Sequence.EmbeddedWallet;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = System.Random;
 
 namespace Sequence.Demo
 {
@@ -15,72 +11,12 @@ namespace Sequence.Demo
         [SerializeField] [Range(0, 255)] private int _maxAlpha = 255;
         [SerializeField] [Range(0, 255)] private int _minAlpha = 0;
         [SerializeField] private float _animationSpeed = .1f;
-        private LoginPanel _loginPanel;
         
         private const int DefaultFullAlphaValue = 255;
         
         private void OnEnable()
         {
-            _loginPanel = FindObjectOfType<LoginPanel>();
-            if (_loginPanel != null)
-            {
-                _loginPanel.LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
-                _loginPanel.LoginHandler.OnMFAEmailSent += OnMFAEmailSentHandler;
-                _loginPanel.LoginHandler.OnLoginFailed += OnLoginFailedHandler;
-                _loginPanel.LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
-                SequenceWallet.OnAccountFederationFailed += OnAccountFederationFailedHandler;
-                SequenceWallet.OnAccountFederated += OnAccountFederatedHandler;
-            }
-            else
-            {
-                Debug.LogError("No LoginPanel found!");
-                Destroy(gameObject);
-            }
-
             StartCoroutine(LoadingAnimation());
-        }
-
-        private void OnDestroy()
-        {
-            if (_loginPanel != null)
-            {
-                _loginPanel.LoginHandler.OnLoginSuccess -= OnLoginSuccessHandler;
-                _loginPanel.LoginHandler.OnMFAEmailSent -= OnMFAEmailSentHandler;
-                _loginPanel.LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
-                _loginPanel.LoginHandler.OnMFAEmailFailedToSend -= OnMFAEmailFailedToSendHandler;
-                SequenceWallet.OnAccountFederationFailed -= OnAccountFederationFailedHandler;
-                SequenceWallet.OnAccountFederated -= OnAccountFederatedHandler;
-            }
-        }
-
-        private void OnLoginSuccessHandler(string sessionId, string walletAddress)
-        {
-            Destroy(gameObject);
-        }
-        
-        private void OnMFAEmailSentHandler(string email)
-        {
-            Destroy(gameObject);
-        }
-        
-        private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
-        {
-            Destroy(gameObject);
-        }
-        
-        private void OnMFAEmailFailedToSendHandler(string email, string error)
-        {
-            Destroy(gameObject);
-        }
-        
-        private void OnAccountFederationFailedHandler(string error)
-        {
-            Destroy(gameObject);
-        }
-        
-        private void OnAccountFederatedHandler(Account account)
-        {
-            Destroy(gameObject);
         }
 
         private IEnumerator LoadingAnimation()
@@ -152,25 +88,6 @@ namespace Sequence.Demo
             }
 
             return shifted;
-        }
-
-        private void OnApplicationFocus(bool hasFocus)
-        {
-#if !UNITY_IOS
-            if (hasFocus)
-            {
-                StartCoroutine(DestroyIfNotLoggingIn());
-            }
-#endif
-        }
-
-        private IEnumerator DestroyIfNotLoggingIn()
-        {
-            yield return new WaitForSecondsRealtime(0.1f);
-            if (!_loginPanel.LoginHandler.IsLoggingIn())
-            {
-                Destroy(gameObject);
-            }
         }
     }
 }
