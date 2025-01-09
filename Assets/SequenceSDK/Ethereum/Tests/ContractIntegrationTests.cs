@@ -93,5 +93,121 @@ namespace Sequence.Ethereum.Tests
             CollectionAssert.AreEqual(expectedMoreBytes.Data, (byte[])resultPart2[3]);
             CollectionAssert.AreEqual(expectedAddresses, resultPart2[4].ConvertToTArray<Address, object>());
         }
+
+        [Test]
+        public void TestInvalidRegex_noABI()
+        {
+            Contract complexContract = new Contract(complexContractAddress);
+
+            try
+            {
+                complexContract.QueryContract<string>("functionName");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+
+            try
+            {
+                complexContract.QueryContract<string>("functionName(");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+
+            try
+            {
+                complexContract.QueryContract<string>("functionName)");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+
+            try
+            {
+                complexContract.AssembleCallData("functionName(uint banana)", 1);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("No exception expected");
+            }
+            
+            
+            try
+            {
+                complexContract.CallFunction("functionName(uint, uint)", 1, 1);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("No exception expected");
+            }
+        }
+
+        [Test]
+        public void TestInvalidRegex_withABI()
+        {
+            Contract complexContract = new Contract(complexContractAddress, complexContractAbi);
+
+            try
+            {
+                complexContract.QueryContract<string>("functionName()");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+
+            try
+            {
+                complexContract.AssembleCallData("functionName(uint banana)");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+            
+            
+            try
+            {
+                complexContract.CallFunction("functionName*");
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (ArgumentException e)
+            {
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Expected argument exception");
+            }
+        }
     }
 }
