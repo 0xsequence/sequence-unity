@@ -70,6 +70,9 @@ namespace Sequence.EmbeddedWallet
                         case DelayedEncode.TypeIdentifier:
                             this.transactions[i] = transactions[i].ToObject<DelayedEncode>();
                             break;
+                        case SequenceContractCall.TypeIdentifier:
+                            this.transactions[i] = transactions[i].ToObject<SequenceContractCall>();
+                            break;
                         default:
                             throw new JsonSerializationException($"Unknown transaction type {typeName} in transaction {i}: {transactions[i]}");
                     }
