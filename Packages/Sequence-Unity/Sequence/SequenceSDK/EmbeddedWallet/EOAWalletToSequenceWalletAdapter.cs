@@ -314,6 +314,11 @@ namespace Sequence.EmbeddedWallet
         {
             throw new NotSupportedException();
         }
+
+        public string GetEmail()
+        {
+            throw new NotSupportedException();
+        }
     }
     #endregion
 

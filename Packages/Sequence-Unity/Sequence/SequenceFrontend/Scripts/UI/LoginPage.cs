@@ -1,12 +1,8 @@
-using System;
 using System.Collections.Generic;
 using Sequence.Authentication;
-using Sequence.Demo.Tweening;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
@@ -14,12 +10,13 @@ namespace Sequence.Demo
     {
         [SerializeField] private TextMeshProUGUI _errorText;
         [SerializeField] private GameObject _infoPopupPanelPrefab;
-        [SerializeField] private GameObject _loadingScreenPrefab;
-        
+        [SerializeField] private GameObject _loadingScreen;
+
         private TMP_InputField _inputField;
         private LoginMethod _loginMethod;
         private string _loginEmail;
         private LoginButtonHighlighter _loginButtonHighlighter;
+
         internal ILogin LoginHandler { get; private set; }
 
         protected override void Awake()
@@ -32,14 +29,14 @@ namespace Sequence.Demo
         private void Start()
         {
             _loginMethod = GetLoginMethod();
-            
+
             if (_loginButtonHighlighter != null)
             {
                 _loginButtonHighlighter.HighlightAppropriateButton(_loginMethod);
             }
 
             _loginEmail = GetLoginEmail();
-            
+
             SetEmailInputInitialText();
         }
 
@@ -53,6 +50,7 @@ namespace Sequence.Demo
                     return;
                 }
             }
+
             _inputField.text = _loginEmail;
         }
 
@@ -60,6 +58,8 @@ namespace Sequence.Demo
         {
             base.Close();
             _errorText.text = "";
+            EnableLoadingScreen(false);
+
             LoginHandler.OnMFAEmailFailedToSend -= OnMFAEmailFailedToSendHandler;
             LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
             SequenceWallet.OnAccountFederationFailed -= OnAccountFederationFailedHandler;
@@ -71,6 +71,7 @@ namespace Sequence.Demo
             LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
             LoginHandler.OnLoginFailed += OnLoginFailedHandler;
             SequenceWallet.OnAccountFederationFailed += OnAccountFederationFailedHandler;
+            EnableLoadingScreen(false);
         }
 
         public void Login()
@@ -78,56 +79,57 @@ namespace Sequence.Demo
             string email = _inputField.text;
             Debug.Log($"Signing in with email: {email}");
             _errorText.text = "";
+            EnableLoadingScreen(true);
             LoginHandler.Login(email);
-            InstantiateLoadingScreen();
         }
 
         public void GoogleLogin()
         {
             Debug.Log("Google Login");
+            EnableLoadingScreen(true);
             LoginHandler.GoogleLogin();
-            InstantiateLoadingScreen();
         }
 
         public void DiscordLogin()
         {
             Debug.Log("Discord Login");
+            EnableLoadingScreen(true);
             LoginHandler.DiscordLogin();
-            InstantiateLoadingScreen();
         }
 
         public void FacebookLogin()
         {
             Debug.Log("Facebook Login");
+            EnableLoadingScreen(true);
             LoginHandler.FacebookLogin();
-            InstantiateLoadingScreen();
         }
 
         public void AppleLogin()
         {
             Debug.Log("Apple Login");
+            EnableLoadingScreen(true);
             LoginHandler.AppleLogin();
-            InstantiateLoadingScreen();
         }
-        
+
         private void OnMFAEmailFailedToSendHandler(string email, string error)
         {
             Debug.LogError($"Failed to send MFA email to {email} with error: {error}");
-            _errorText.text = error;
+            SetError(error);
         }
-        
-        private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
+
+        private void OnLoginFailedHandler(string error, LoginMethod method, string email,
+            List<LoginMethod> loginMethods)
         {
             Debug.LogError($"Failed to sign in to WaaS API with error: {error}");
-            _errorText.text = error;
+            SetError(error);
         }
-        
+
         private void OnAccountFederationFailedHandler(string error)
         {
             Debug.LogError($"Failed to federate account with Sequence API: {error}");
-            _errorText.text = error;
+            SetError(error);
         }
-        
+
         private LoginMethod GetLoginMethod()
         {
             if (PlayerPrefs.HasKey(SequenceLogin.WaaSLoginMethod))
@@ -148,9 +150,15 @@ namespace Sequence.Demo
             return "";
         }
 
-        private void InstantiateLoadingScreen()
+        private void SetError(string error)
         {
-            Instantiate(_loadingScreenPrefab, transform.parent);
+            _errorText.text = error;
+            EnableLoadingScreen(false);
+        }
+
+        private void EnableLoadingScreen(bool enable)
+        {
+            _loadingScreen.SetActive(enable);
         }
     }
 }

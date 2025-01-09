@@ -1,7 +1,0 @@
-<!--Required for IL2CPP builds. See https://docs.aws.amazon.com/sdk-for-net/v3/developer-guide/unity-special.html for more info-->
-<linker>
-    <assembly fullname="AWSSDK.CognitoIdentity" preserve="all"/>
-    <assembly fullname="AWSSDK.Core" preserve="all"/>
-    <assembly fullname="AWSSDK.KeyManagementService" preserve="all"/>
-    <assembly fullname="AWSSDK.SecurityToken" preserve="all"/>
-</linker>

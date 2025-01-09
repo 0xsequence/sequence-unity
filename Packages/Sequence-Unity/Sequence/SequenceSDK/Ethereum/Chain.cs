@@ -26,6 +26,8 @@ namespace Sequence
         ImmutableZkEvm = 13371,
         SkaleNebula = 1482601649,
         Root = 7668,
+        LAOS = 6283,
+        Soneium = 1868,
 
         // Testnets
         TestnetSepolia = 11155111,
@@ -42,12 +44,14 @@ namespace Sequence
         TestnetB3Sepolia = 1993,
         TestnetAPEChain = 33111,
         TestnetBlastSepolia = 168587773,
+        [Obsolete("Chain is not currently supported")]
         TestnetBorne = 94984,
         TestnetSkaleNebulaGamingHub = 37084624,
         TestnetSoneiumMinato = 1946,
         TestnetToy = 21000000,
         TestnetImmutableZkEvm = 13473,
         TestnetRootPorcini = 7672,
+        TestnetLAOSSigma = 62850,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         

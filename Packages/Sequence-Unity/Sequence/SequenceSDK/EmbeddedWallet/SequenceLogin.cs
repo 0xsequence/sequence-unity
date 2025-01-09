@@ -111,6 +111,16 @@ namespace Sequence.EmbeddedWallet
             _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
+            _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
+        }
+
+        /// <summary>
+        /// Use this to reset the authenticator, validator, and other dependancies to new instances. Useful for when you're testing and using mock implementations
+        /// </summary>
+        public void ResetLoginAfterTest()
+        {
+            _connector = this;
+            SetupAuthenticator();
         }
 
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
@@ -159,11 +169,6 @@ namespace Sequence.EmbeddedWallet
 
         public void GuestLogin()
         {
-            if (_connectedWalletAddress != null)
-            {
-                FederateAccountGuest(_connectedWalletAddress);
-                return;
-            }
             ConnectToWaaSAsGuest();
         }
 
@@ -209,7 +214,7 @@ namespace Sequence.EmbeddedWallet
 
         private void TryToLoginWithStoredSessionWallet()
         {
-            (EOAWallet, string) walletInfo = (null, "");
+            (EOAWallet, string, string) walletInfo = (null, "", "");
             try
             {
                 walletInfo = AttemptToCreateWalletFromSecureStorage();
@@ -229,7 +234,7 @@ namespace Sequence.EmbeddedWallet
             
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
-            SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion));
+            SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
 
             EnsureSessionIsValid(wallet);
         }
@@ -263,19 +268,24 @@ namespace Sequence.EmbeddedWallet
             FailedLoginWithStoredSessionWallet("Stored session wallet is not active");
         }
 
-        private (EOAWallet, string) AttemptToCreateWalletFromSecureStorage()
+        private (EOAWallet, string, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             string walletInfo = secureStorage.RetrieveString(Application.companyName + "-" + Application.productName + "-" + _walletKey);
             if (string.IsNullOrEmpty(walletInfo))
             {
-                return (null, "");
+                return (null, "", "");
             }
             string[] walletInfoSplit = walletInfo.Split('-');
             string privateKey = walletInfoSplit[0];
             string walletAddress = walletInfoSplit[1];
+            string email = "";
+            if (walletInfoSplit.Length == 3)
+            {
+                email = walletInfoSplit[2];
+            }
             EOAWallet wallet = new EOAWallet(privateKey);
-            return (wallet, walletAddress);
+            return (wallet, walletAddress, email);
         }
         
         public event ILogin.OnLoginSuccessHandler OnLoginSuccess;
@@ -285,6 +295,7 @@ namespace Sequence.EmbeddedWallet
 
         public async Task Login(string email)
         {
+            ResetSessionId();
             try
             {
                 _isLoggingIn = true;
@@ -337,6 +348,7 @@ namespace Sequence.EmbeddedWallet
 
         private void OnSocialLogin(OpenIdAuthenticationResult result)
         {
+            ResetSessionId();
             if (_connectedWalletAddress != null)
             {
                 FederateAccountSocial(result.IdToken, result.Method, _connectedWalletAddress);
@@ -367,14 +379,10 @@ namespace Sequence.EmbeddedWallet
                 string sessionId = registerSessionResponse.sessionId;
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion));
+                SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion), email);
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
                 PlayerPrefs.Save();
-                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
-                {
-                    StoreWalletSecurely(walletAddress);
-                }
                 _isLoggingIn = false;
                 wallet.OnDropSessionComplete += session =>
                 {
@@ -406,6 +414,18 @@ namespace Sequence.EmbeddedWallet
             if (_automaticallyFederateAccountsWhenPossible && _failedLoginEmail == email && !loginIntent.forceCreateAccount) // forceCreateAccount should only be true if we are creating another account for the same email address, meaning we don't have a failed login method that needs federating
             {
                 await FederateAccount(new IntentDataFederateAccount(_failedLoginIntent, walletAddress), _failedLoginMethod, email);
+            }
+
+            try
+            {
+                if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
+                {
+                    StoreWalletSecurely(walletAddress, email);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error storing session wallet securely: " + e.Message);
             }
         }
 
@@ -530,6 +550,7 @@ namespace Sequence.EmbeddedWallet
 
         public void PlayFabLogin(string titleId, string sessionTicket, string email)
         {
+            ResetSessionId();
             if (_connectedWalletAddress != null)
             {
                 FederateAccountPlayFab(titleId, sessionTicket, email, _connectedWalletAddress);
@@ -574,18 +595,19 @@ namespace Sequence.EmbeddedWallet
 
         public async Task ConnectToWaaSAsGuest()
         {
+            ResetSessionId();
             _isLoggingIn = true;
             GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
             await connector.ConnectToWaaSViaGuest();
         }
 
-        private void StoreWalletSecurely(string waasWalletAddress)
+        private void StoreWalletSecurely(string waasWalletAddress, string email)
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress);
+            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress + "-" + email);
         }
 
         public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)
@@ -618,12 +640,6 @@ namespace Sequence.EmbeddedWallet
         {
             PlayFabConnector playFabConnector = new PlayFabConnector(titleId, sessionTicket, _sessionId, _sessionWallet, _connector);
             await playFabConnector.FederateAccount(email, walletAddress);
-        }
-        
-        public async Task FederateAccountGuest(string walletAddress)
-        {
-            GuestConnector connector = new GuestConnector(_sessionId, _sessionWallet, _connector);
-            await connector.FederateAccount(walletAddress);
         }
         
         public async Task FederateAccountSocial(string idToken, LoginMethod method, string walletAddress)

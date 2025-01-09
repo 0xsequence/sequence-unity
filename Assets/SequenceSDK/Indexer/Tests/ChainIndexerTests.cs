@@ -20,7 +20,7 @@ namespace Sequence.Indexer.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public void TestCreateChainIndexerForChain(Chain chain)
         {
-            if (ChainIsInactive(chain)) return;
+            if (!chain.IsActive()) return;
             try
             {
                 ChainIndexer chainIndexer = new ChainIndexer(chain);
@@ -36,7 +36,7 @@ namespace Sequence.Indexer.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestPingChain(Chain chain)
         {
-            if (ChainIsInactive(chain)) return;
+            if (!chain.IsActive()) return;
             try
             {
                 IIndexer chainIndexer = new ChainIndexer(chain);
@@ -52,7 +52,7 @@ namespace Sequence.Indexer.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestVersion(Chain chain)
         {
-            if (ChainIsInactive(chain)) return;
+            if (!chain.IsActive()) return;
             try
             {
                 IIndexer indexer = new ChainIndexer(chain);
@@ -69,15 +69,16 @@ namespace Sequence.Indexer.Tests
             }
         }
 
+
         private bool ChainIsInactive(Chain chain)
         {
-            return chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto;
+            return chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto || chain == Chain.TestnetBorne;
         }
         
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestRuntimeStatus(Chain chain)
         {
-            if (ChainIsInactive(chain)) return;
+            if (!chain.IsActive()) return;
             RuntimeStatus result = null;
             try
             {

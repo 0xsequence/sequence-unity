@@ -26,19 +26,7 @@ namespace Sequence.Provider
 
         public async Task<RpcResponse> SendRequest(RpcRequest rpcRequest)
         {
-
-            var request = new
-            {
-                jsonrpc = "2.0",
-                id = rpcRequest.id,
-                method = rpcRequest.method,
-                @params = rpcRequest.rawParameters
-
-            };
-
-
-            var rpcRequestJson = JsonConvert.SerializeObject(request);
-
+            var rpcRequestJson = JsonConvert.SerializeObject(rpcRequest);
             return await SendRequest(rpcRequestJson);
         }
 
