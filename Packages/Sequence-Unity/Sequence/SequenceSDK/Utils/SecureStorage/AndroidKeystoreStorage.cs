@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace Sequence.Utils.SecureStorage
 {
-    public class AndroidKeychainStorage : ISecureStorage
+    public class AndroidKeystoreStorage : ISecureStorage
     {
         private bool _isInitialized = false;
         
-        public AndroidKeychainStorage()
+        public AndroidKeystoreStorage()
         {
 #if !UNITY_ANDROID || UNITY_EDITOR
-            throw new System.NotSupportedException("AndroidKeychainStorage is only supported on Android platform.");
+            throw new System.NotSupportedException("AndroidKeystoreStorage is only supported on Android platform.");
 #else
             InitializeAndroidKeyBridge(); 
 #endif
