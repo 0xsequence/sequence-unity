@@ -13,7 +13,7 @@ namespace Sequence.Utils.SecureStorage
 #if !UNITY_ANDROID || UNITY_EDITOR
             throw new System.NotSupportedException("AndroidKeychainStorage is only supported on Android platform.");
 #else
-            InitializeAndroidKeyBridge(); // This method (and any methods it calls) is something I've added to Zemind's work - it may or may not be useful
+            InitializeAndroidKeyBridge(); 
 #endif
         }
 
@@ -29,7 +29,6 @@ namespace Sequence.Utils.SecureStorage
                         AndroidJavaObject unityContext = GetUnityActivity();
                         bridgeObject.Call("init", unityContext);
                         _isInitialized = true;
-
                     }
                 }
             }
