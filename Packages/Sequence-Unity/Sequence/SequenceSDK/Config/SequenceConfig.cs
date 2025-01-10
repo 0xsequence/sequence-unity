@@ -48,6 +48,10 @@ namespace Sequence.Config
                 {
                     _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
                 }
+                
+#if UNITY_EDITOR
+                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
+#endif
             }
 
             if (_config == null)
