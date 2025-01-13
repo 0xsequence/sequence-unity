@@ -14,8 +14,6 @@ namespace Sequence.Utils.SecureStorage
             throw new System.NotSupportedException("AndroidKeystoreStorage is only supported on Android platform.");
 #elif UNITY_ANDROID && ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE
             InitializeAndroidKeyBridge();
-#else
-            throw new System.NotSupportedException("Invalid use. Secure storage is not enabled. Please enable in SequenceConfig and/or set the script define above");
 #endif
         }
 
