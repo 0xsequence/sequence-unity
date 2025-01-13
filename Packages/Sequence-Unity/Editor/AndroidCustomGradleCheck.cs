@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sequence.Config;
 using UnityEditor.Build;
@@ -18,38 +19,64 @@ namespace Sequence.Editor
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            _cachedWarnings = new List<string>();
             if (report.summary.platform == BuildTarget.Android)
             {
-                SequenceConfig config = SequenceConfig.GetConfig();
-                if (config.StoreSessionPrivateKeyInSecureStorage)
+                List<string> warnings = new List<string>();
+
+                if (!IsCustomGradlePropertiesTemplateEnabled())
                 {
-                    bool isCustomGradlePropertiesEnabled =
-                        EditorPrefs.GetBool("CustomPropertiesGradleTemplateEnabled", false);
-                    if (!isCustomGradlePropertiesEnabled)
-                    {
-                        _cachedWarnings.Add(
-                            "Sequence - Custom Gradle Properties Template is not enabled. This may cause issues with secure storage on Android. Refer to: " + _docsUrl);
-                    }
+                    warnings.Add(
+                        "Sequence - Custom Gradle Properties Template is not enabled. This may cause issues with secure storage on Android. Refer to: " + _docsUrl);
+                }
 
-                    bool isCustomMainGradleEnabled = EditorPrefs.GetBool("CustomMainGradleTemplateEnabled", false);
-                    if (!isCustomMainGradleEnabled)
-                    {
-                        _cachedWarnings.Add(
-                            "Sequence - Custom Main Gradle Template is not enabled. This may cause issues with secure storage on Android. Refer to: " + _docsUrl);
-                    }
-                    
-                    foreach (string warning in _cachedWarnings)
-                    {
-                        Debug.LogWarning(warning);
-                    }
+                if (!IsCustomMainGradleTemplateEnabled())
+                {
+                    warnings.Add(
+                        "Sequence - Custom Main Gradle Template is not enabled. This may cause issues with secure storage on Android. Refer to: " + _docsUrl);
+                }
 
-                    if (_cachedWarnings.Count > 0)
-                    {
-                        WarningPopup.ShowWindow(_cachedWarnings);
-                    }
+                foreach (var warning in warnings)
+                {
+                    Debug.LogWarning(warning);
+                }
+
+                if (warnings.Count > 0)
+                {
+                    WarningPopup.ShowWindow(warnings);
                 }
             }
+        }
+
+        private bool IsCustomGradlePropertiesTemplateEnabled()
+        {
+            return GetProjectSettingsFlag("useCustomGradlePropertiesTemplate");
+        }
+
+        private bool IsCustomMainGradleTemplateEnabled()
+        {
+            return GetProjectSettingsFlag("useCustomMainGradleTemplate");
+        }
+
+        private bool GetProjectSettingsFlag(string key)
+        {
+            string projectSettingsPath = Path.Combine(Application.dataPath, "../ProjectSettings/ProjectSettings.asset");
+
+            if (!File.Exists(projectSettingsPath))
+            {
+                Debug.LogError("ProjectSettings.asset file not found.");
+                return false;
+            }
+
+            var lines = File.ReadAllLines(projectSettingsPath);
+            foreach (var line in lines)
+            {
+                if (line.Trim().StartsWith(key + ":"))
+                {
+                    return line.Trim().EndsWith("1");
+                }
+            }
+
+            return false;
         }
 
         private class WarningPopup : EditorWindow
@@ -58,6 +85,10 @@ namespace Sequence.Editor
 
             public static void ShowWindow(List<string> warningsToShow)
             {
+                if (warningsToShow == null || warningsToShow.Count == 0)
+                {
+                    return;
+                }
                 warnings = warningsToShow;
                 var window = GetWindow<WarningPopup>("Sequence Build Warnings");
                 window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 200);
