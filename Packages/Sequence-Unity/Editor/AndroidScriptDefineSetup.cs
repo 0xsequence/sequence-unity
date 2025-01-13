@@ -14,7 +14,7 @@ namespace Sequence.Editor
     /// </summary>
     public class AndroidScriptDefineSetup : IPreprocessBuildWithReport
     {
-        private const string EnableAndroidSecureStorage = "ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE";
+        public const string EnableAndroidSecureStorage = "ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE";
 
         public int callbackOrder => 0;
 

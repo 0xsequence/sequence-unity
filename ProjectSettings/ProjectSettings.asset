@@ -813,7 +813,7 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
-    Android: 
+    Android: ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE
     Server: 
     Standalone: UNITY_ASTOOLS_EXPERIMENTAL
     WebGL: VUPLEX_CCU;VUPLEX_STANDALONE

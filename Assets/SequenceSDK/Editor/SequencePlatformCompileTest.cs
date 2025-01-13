@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using NUnit.Framework;
+using Sequence.Config;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
@@ -33,7 +36,7 @@ namespace Sequence.Editor
             BuildPlatform(BuildTarget.iOS, $"{BuildDirectory}/iOSBuild", scenes);
 #endif
             BuildPlatform(BuildTarget.WebGL, $"{BuildDirectory}/WebGLBuild", scenes);
-            BuildPlatform(BuildTarget.Android, $"{BuildDirectory}/AndroidBuild", scenes);
+            AndroidBuildTest($"{BuildDirectory}/AndroidBuild", scenes);
             
             Debug.Log("Platform Compile Test Completed. Check the console for errors.");
             foreach (var failedBuild in _failedBuilds)
@@ -76,20 +79,30 @@ namespace Sequence.Editor
         {
             try
             {
-                BuildReport report = BuildPipeline.BuildPlayer(scenes, path, target, BuildOptions.None);
-
-                if (report.summary.result != BuildResult.Succeeded)
-                {
-                    _failedBuilds.Add($"{target} build failed with {report.summary.totalErrors} errors. Please see {BuildDirectory}/{target}.txt for details.");
-                    LogErrorsToFile(report, target);
-                }
+                BuildToPlatformAndCheckForSuccess(target, path, scenes);
             }
             finally
             {
-                if (Directory.Exists(BuildDirectory))
-                {
-                    Directory.Delete(BuildDirectory, true);
-                }
+                CleanupBuildDirectory();
+            }
+        }
+
+        private static void BuildToPlatformAndCheckForSuccess(BuildTarget target, string path, string[] scenes)
+        {
+            BuildReport report = BuildPipeline.BuildPlayer(scenes, path, target, BuildOptions.None);
+
+            if (report.summary.result != BuildResult.Succeeded)
+            {
+                _failedBuilds.Add($"{target} build failed with {report.summary.totalErrors} errors. Please see {BuildDirectory}/{target}.txt for details.");
+                LogErrorsToFile(report, target);
+            }
+        }
+
+        private static void CleanupBuildDirectory()
+        {
+            if (Directory.Exists(BuildDirectory))
+            {
+                Directory.Delete(BuildDirectory, true);
             }
         }
 
@@ -123,6 +136,47 @@ namespace Sequence.Editor
                     }
                 }
             }
+        }
+
+        private static void AndroidBuildTest(string path, string[] scenes)
+        {
+            SequenceConfig config = SequenceConfig.GetConfig();
+            bool isSecureStorageEnabled = config.StoreSessionPrivateKeyInSecureStorage;
+            BuildTarget target = BuildTarget.Android;
+
+            try
+            {
+                BuildToPlatformAndCheckForSuccess(target, path, scenes);
+                
+                AssertPluginCompatibility(config, target);
+                AssertAppropriateScriptingDefines(config, target);
+                
+                config.StoreSessionPrivateKeyInSecureStorage = !config.StoreSessionPrivateKeyInSecureStorage;
+                
+                BuildToPlatformAndCheckForSuccess(target, path, scenes);
+                
+                AssertPluginCompatibility(config, target);
+                AssertAppropriateScriptingDefines(config, target);
+            }
+            finally
+            {
+                config.StoreSessionPrivateKeyInSecureStorage = isSecureStorageEnabled;
+                
+                CleanupBuildDirectory();
+            }
+        }
+
+        private static void AssertPluginCompatibility(SequenceConfig config, BuildTarget target)
+        {
+            PluginImporter pluginImporter = AssetImporter.GetAtPath(AndroidDependencyManager.SecureStoragePluginPath) as PluginImporter;
+            Assert.IsNotNull(pluginImporter, "Plugin not found at path: " + AndroidDependencyManager.SecureStoragePluginPath);
+            Assert.AreEqual(config.StoreSessionPrivateKeyInSecureStorage, pluginImporter.GetCompatibleWithPlatform(target));
+        }
+
+        private static void AssertAppropriateScriptingDefines(SequenceConfig config, BuildTarget target)
+        {
+            string defines = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(BuildPipeline.GetBuildTargetGroup(target)));
+            Assert.AreEqual(config.StoreSessionPrivateKeyInSecureStorage, defines.Contains(AndroidScriptDefineSetup.EnableAndroidSecureStorage));
         }
     }
 }

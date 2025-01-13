@@ -14,7 +14,7 @@ namespace Sequence.Editor
     /// </summary>
     public class AndroidDependencyManager : IPreprocessBuildWithReport
     {
-        private const string _secureStoragePluginPath = "Packages/xyz.0xsequence.waas-unity/Plugins/Android/AndroidKeyBridge.java";
+        public const string SecureStoragePluginPath = "Packages/xyz.0xsequence.waas-unity/Plugins/Android/AndroidKeyBridge.java";
         
         public int callbackOrder => 0;
         
@@ -24,11 +24,11 @@ namespace Sequence.Editor
             BuildTarget target = report.summary.platform;
             SequenceConfig config = SequenceConfig.GetConfig();
             
-            PluginImporter pluginImporter = AssetImporter.GetAtPath(_secureStoragePluginPath) as PluginImporter;
+            PluginImporter pluginImporter = AssetImporter.GetAtPath(SecureStoragePluginPath) as PluginImporter;
 
             if (pluginImporter == null)
             {
-                Debug.LogWarning($"Plugin not found at path: {_secureStoragePluginPath}");
+                Debug.LogWarning($"Plugin not found at path: {SecureStoragePluginPath}");
                 return;
             }
             
