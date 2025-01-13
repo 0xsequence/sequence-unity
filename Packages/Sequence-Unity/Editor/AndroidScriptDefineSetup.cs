@@ -5,7 +5,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
-namespace Sequence.Utils.SecureStorage.Editor
+namespace Sequence.Editor
 {
     /// <summary>
     /// This class will set the script define ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE based on the configuration in SequenceConfig.
