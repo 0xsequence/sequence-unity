@@ -21,6 +21,12 @@ namespace Sequence.Editor
         {
             if (report.summary.platform == BuildTarget.Android)
             {
+                SequenceConfig config = SequenceConfig.GetConfig();
+                if (!config.StoreSessionPrivateKeyInSecureStorage)
+                {
+                    return;
+                }
+                
                 List<string> warnings = new List<string>();
 
                 if (!IsCustomGradlePropertiesTemplateEnabled())
