@@ -88,6 +88,7 @@ namespace Sequence
         { Chain.Root.GetChainId(), "rootnet" },
         { Chain.LAOS.GetChainId(), "laos" },
         { Chain.Soneium.GetChainId(), "soneium" },
+        { Chain.Telos.GetChainId(), "telos" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
@@ -109,7 +110,8 @@ namespace Sequence
         { Chain.TestnetToy.GetChainId(), "toy-testnet" },
         { Chain.TestnetImmutableZkEvm.GetChainId(), "immutable-zkevm-testnet" },
         { Chain.TestnetRootPorcini.GetChainId(), "rootnet-porcini" },
-        { Chain.TestnetLAOSSigma.GetChainId(), "laos-sigma-testnet" }
+        { Chain.TestnetLAOSSigma.GetChainId(), "laos-sigma-testnet" },
+        { Chain.TestnetTelos.GetChainId(), "telos-testnet" }
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
