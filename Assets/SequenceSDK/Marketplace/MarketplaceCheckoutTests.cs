@@ -156,7 +156,7 @@ namespace Sequence.Marketplace
         {
             EndToEndTestHarness testHarness = new EndToEndTestHarness();
             bool listingCreated = false;
-            Address erc20UniversallyMintable = new Address("0x9d0d8dcba30c8b7241da84f922942c100eb1bddc");
+            Address erc20UniversallyMintable = new Address("0xc721b6d2bcc4d04b92df8f383beef85aa72c2198");
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
             Address initialWallet = null;
             bool bought = false;
@@ -345,7 +345,7 @@ namespace Sequence.Marketplace
         {
             EndToEndTestHarness testHarness = new EndToEndTestHarness();
             bool offerCreated = false;
-            Address erc20UniversallyMintable = new Address("0x9d0d8dcba30c8b7241da84f922942c100eb1bddc");
+            Address erc20UniversallyMintable = new Address("0xc721b6d2bcc4d04b92df8f383beef85aa72c2198");
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
             Address initialWallet = null;
             bool sold = false;
@@ -511,7 +511,7 @@ namespace Sequence.Marketplace
         public async Task TestCancelOrder()
         {
             EndToEndTestHarness testHarness = new EndToEndTestHarness();
-            Address erc20UniversallyMintable = new Address("0x9d0d8dcba30c8b7241da84f922942c100eb1bddc");
+            Address erc20UniversallyMintable = new Address("0xc721b6d2bcc4d04b92df8f383beef85aa72c2198");
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
             bool cancelled = false;
 
@@ -598,7 +598,7 @@ namespace Sequence.Marketplace
         {
             WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
             EndToEndTestHarness testHarness = new EndToEndTestHarness();
-            Address erc20UniversallyMintable = new Address("0x9d0d8dcba30c8b7241da84f922942c100eb1bddc");
+            Address erc20UniversallyMintable = new Address("0xc721b6d2bcc4d04b92df8f383beef85aa72c2198");
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
             bool listingCreated = false;
             bool bought = false;

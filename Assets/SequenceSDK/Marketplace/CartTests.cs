@@ -49,8 +49,8 @@ namespace Sequence.Marketplace
         
         string[] _possibleCurrencyAddresses = new[]
         {
-            "0x750ba8b76187092b0d1e87e28daaf484d1b5273b", "0x722e8bdd2ce80a4422e880164f2079488e115365", // The Currencies on Arb Nova as of Nov 21, 2024
-            "0x9d0d8dcba30c8b7241da84f922942c100eb1bddc", Currency.NativeCurrencyAddress
+            "0x750ba8b76187092b0d1e87e28daaf484d1b5273b", "0x722e8bdd2ce80a4422e880164f2079488e115365", // The Currencies on Arb Nova as of Jan 16, 2025
+            "0xc721b6d2bcc4d04b92df8f383beef85aa72c2198", Currency.NativeCurrencyAddress
         };
 
         private CollectibleOrder CreateFakeOrder(float priceUSD)
