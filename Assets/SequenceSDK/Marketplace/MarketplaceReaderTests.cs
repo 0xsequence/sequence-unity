@@ -57,8 +57,7 @@ namespace Sequence.Marketplace
         public async Task TestListAllCollectibleOffersWithHighestPricedOfferFirst()
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
@@ -117,8 +116,7 @@ namespace Sequence.Marketplace
         public async Task TestGetLowestPriceOfferForCollectible()
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
@@ -137,8 +135,7 @@ namespace Sequence.Marketplace
         public async Task TestGetHighestPriceOfferForCollectible()
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             
@@ -213,8 +210,7 @@ namespace Sequence.Marketplace
         public async Task TestListAllOffersForCollectible()
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
             

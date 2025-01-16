@@ -10,8 +10,7 @@ namespace Sequence.Marketplace
         public static async Task<CollectibleOrder[]> FetchListings()
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
@@ -24,8 +23,7 @@ namespace Sequence.Marketplace
         public static async Task<Order[]> FetchListingsForCollectible(string tokenId)
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             
             ListCollectibleListingsReturn collectiblesResponse = await marketplaceReader.ListListingsForCollectible(new Address(contractAddress), tokenId);
@@ -37,8 +35,7 @@ namespace Sequence.Marketplace
         public static async Task<CollectibleOrder[]> FetchOffers()
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
@@ -51,8 +48,7 @@ namespace Sequence.Marketplace
         public static async Task<Order[]> FetchOffersForCollectible(string tokenId)
         {
             Chain chain = Chain.ArbitrumNova;
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
-            MarketplaceReader marketplaceReader = new MarketplaceReader(chain, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey));
+            MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             
             ListCollectibleOffersReturn collectiblesResponse = await marketplaceReader.ListOffersForCollectible(new Address(contractAddress), tokenId);
