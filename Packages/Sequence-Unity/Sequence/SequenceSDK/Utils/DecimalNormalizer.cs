@@ -22,23 +22,26 @@ namespace Sequence.Utils
 
         public static string ReturnToNormalString(BigInteger x, int decimals = 18)
         {
-            float result = ReturnToNormal(x, decimals);
-            return result.ToString();
+            string numberStr = BigInteger.Abs(x).ToString();
+
+            while (numberStr.Length <= decimals)
+            {
+                numberStr = "0" + numberStr;
+            }
+
+            int decimalPointIndex = numberStr.Length - decimals;
+            string resultStr = numberStr.Insert(decimalPointIndex, ".");
+            return resultStr;
         }
 
         public static float ReturnToNormal(BigInteger x, int decimals = 18)
         {
-            x = BigInteger.Abs(x);
-            BigInteger divisor = BigInteger.Pow(10, decimals);
-
-            // Separate the integer and fractional parts to avoid overflowing the range of double
-            BigInteger integerPart = x / divisor;
-            BigInteger fractionalPart = x % divisor;
-
-            double result = (double)integerPart + (double)fractionalPart / (double)divisor;
-
-            return (float)result;
+            return float.Parse(ReturnToNormalString(x, decimals));
         }
-
+        
+        public static decimal ReturnToNormalPrecise(BigInteger x, int decimals = 18)
+        {
+            return decimal.Parse(ReturnToNormalString(x, decimals));
+        }
     }
 }

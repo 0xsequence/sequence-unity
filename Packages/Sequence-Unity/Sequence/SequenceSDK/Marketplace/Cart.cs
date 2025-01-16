@@ -181,21 +181,25 @@ namespace Sequence.Marketplace
         public async Task<string> GetApproximateTotalInCurrency(Address currencyAddress)
         {
             int listings = _listings.Length;
-            double total = 0;
+            decimal total = 0;
             for (int i = 0; i < listings; i++)
             {
                 Order order = _listings[i].order;
                 uint amountRequested = _amountsRequestedByOrderId[order.orderId];
                 if (order.priceCurrencyAddress == currencyAddress)
                 {
-                    total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(order.priceAmount), (int)order.priceDecimals) * amountRequested;
+                    decimal pricePerItem = DecimalNormalizer.ReturnToNormalPrecise(BigInteger.Parse(order.priceAmount),
+                        (int)order.priceDecimals);
+                    total += pricePerItem * amountRequested;
                 }
                 else
                 {
                     try
                     {
                         SwapPrice price = await _swap.GetSwapPrice(currencyAddress, new Address(order.priceCurrencyAddress), order.priceAmount);
-                        total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(price.maxPrice), (int)order.priceDecimals) * amountRequested;
+                        decimal pricePerItem = DecimalNormalizer.ReturnToNormalPrecise(BigInteger.Parse(price.maxPrice),
+                            (int)order.priceDecimals);
+                        total += pricePerItem * amountRequested;
                     }
                     catch (Exception e)
                     {
