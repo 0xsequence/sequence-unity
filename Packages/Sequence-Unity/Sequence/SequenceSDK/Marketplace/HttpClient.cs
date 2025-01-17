@@ -11,22 +11,53 @@ using UnityEngine.Networking;
 
 namespace Sequence.Marketplace
 {
-    public class HttpClient
+    public class HttpClient : IHttpClient
     {
         private string _apiKey;
-        private const string _baseUrl = "https://marketplace-api.sequence.app/";
+        private const string _prodUrl = "https://marketplace-api.sequence.app/";
+        private static string _baseUrl = "https://marketplace-api.sequence.app/";
         private const string _endUrl = "/rpc/Marketplace/";
+        private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
         
         public HttpClient()
         {
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
+            _baseUrl = _prodUrl;
+        }
+
+        public static HttpClient UseHttpClientWithDevEnvironment(string devApiKey)
+        {
+            _baseUrl = "https://dev-marketplace-api.sequence-dev.app/";
+            return new HttpClient(devApiKey);
+        }
+        
+        private HttpClient(string apiKey)
+        {
+            _apiKey = apiKey;
+        }
+        
+        public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)
+        {
+            return await SendRequest<object, ReturnType>(chain, url, null);
         }
 
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(Chain chain, string endpoint, ArgType args)
         {
             string url = _baseUrl + ChainDictionaries.PathOf[chain] + _endUrl + endpoint;
-            string requestJson = JsonConvert.SerializeObject(args);
+            return await SendRequest<ArgType, ReturnType>(url, args);
+        }
+
+        public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
+        {
+            string requestJson = "";
+            if (args != null)
+            {
+                requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            }
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
