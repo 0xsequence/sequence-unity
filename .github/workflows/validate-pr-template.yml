@@ -1,0 +1,27 @@
+name: Validate Docs PR Template
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate-template:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR Template Completion
+        run: |
+          # Fetch the pull request body
+          PR_BODY=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} \
+            | jq -r '.body')
+
+          # Check if one of the required checkboxes in the 'Docs Checklist' is marked
+          if ! echo "$PR_BODY" | grep -Eq '\[x\] I have created a separate PR on the sequence docs repository for documentation updates|\[x\] No documentation update is needed for this change'; then
+            echo "Error: The 'Docs Checklist' section in the PR template has not been completed properly."
+            echo "Please ensure you have checked one of the options in the 'Docs Checklist' section."
+            exit 1
+          fi
+
+          echo "Docs Checklist is complete."

@@ -171,7 +171,6 @@ namespace Sequence.EmbeddedWallet
                         byte[] results = request.downloadHandler.data;
                         responseJson = Encoding.UTF8.GetString(results);
                     }
-                    request.Dispose();
                     try
                     {
                         T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
@@ -220,6 +219,12 @@ namespace Sequence.EmbeddedWallet
                         throw new Exception(exceptionMessage);
                     }
                 }
+                else if (errorReason.Contains("JWT validation: aud not satisfied"))
+                {
+                    exceptionMessage = "File load exception: " + e.Message + " response: " + errorReason +
+                                       " Please make sure you've whitelisted the associated login method and associated configuration values in your Embedded Wallet configuration in the Sequence Builder!" 
+                                       + "\nCurl-equivalent request: " + curlRequest;
+                }
                 throw new Exception(exceptionMessage);
             }
             catch (Exception e)
@@ -233,11 +238,35 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
+        public async Task<TimeSpan> GetTimeShift()
+        {
+            UnityWebRequest request = UnityWebRequest.Get(_waasUrl.AppendTrailingSlashIfNeeded() + "status");
+            request.method = UnityWebRequest.kHttpVerbGET;
+
+            try
+            {
+                await request.SendWebRequest();
+                DateTime serverTime = DateTime.Parse(request.GetResponseHeader("date")).ToUniversalTime();
+                DateTime localTime = DateTime.UtcNow;
+                TimeSpan timeShift = serverTime - localTime;
+                return timeShift;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error getting time shift: " + e.Message);
+                return TimeSpan.Zero;
+            }
+            finally
+            {
+                request.Dispose();
+            }
+        }
+
         private string GetRequestErrorIfAvailable(UnityWebRequest request)
         {
             if (request.downloadHandler != null && request.downloadHandler.data != null)
             {
-                return " response: " + Encoding.UTF8.GetString(request.downloadHandler.data);
+                return " " + Encoding.UTF8.GetString(request.downloadHandler.data);
             }
 
             return "";

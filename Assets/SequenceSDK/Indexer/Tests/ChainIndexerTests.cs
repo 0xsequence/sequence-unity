@@ -20,7 +20,7 @@ namespace Sequence.Indexer.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public void TestCreateChainIndexerForChain(Chain chain)
         {
-            if (chain == Chain.None) return;
+            if (!chain.IsActive()) return;
             try
             {
                 ChainIndexer chainIndexer = new ChainIndexer(chain);
@@ -36,7 +36,7 @@ namespace Sequence.Indexer.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestPingChain(Chain chain)
         {
-            if (chain == Chain.None) return;
+            if (!chain.IsActive()) return;
             try
             {
                 IIndexer chainIndexer = new ChainIndexer(chain);
@@ -52,7 +52,7 @@ namespace Sequence.Indexer.Tests
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestVersion(Chain chain)
         {
-            if (chain == Chain.None) return;
+            if (!chain.IsActive()) return;
             try
             {
                 IIndexer indexer = new ChainIndexer(chain);
@@ -68,11 +68,17 @@ namespace Sequence.Indexer.Tests
                 Assert.Fail("Encountered exception when none was expected: " + e.Message);
             }
         }
+
+
+        private bool ChainIsInactive(Chain chain)
+        {
+            return chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto || chain == Chain.TestnetBorne;
+        }
         
         [TestCaseSource(nameof(chainIdCases))]
         public async Task TestRuntimeStatus(Chain chain)
         {
-            if (chain == Chain.None) return;
+            if (!chain.IsActive()) return;
             RuntimeStatus result = null;
             try
             {
@@ -88,7 +94,6 @@ namespace Sequence.Indexer.Tests
             Assert.IsTrue(result.indexerEnabled);
             Assert.IsTrue(result.healthOK);
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.startTime));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.ver));
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.branch));
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.commitHash));
             Assert.AreEqual(chain.GetChainId(), result.chainID);

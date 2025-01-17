@@ -15,13 +15,13 @@ namespace Sequence.Relayer
     {
         public static async Task<bool> IsValidMintingRequestProof(Chain chain, MintingRequestProof proof)
         {
-            SequenceWallet wallet = new SequenceWallet(proof.SigningAddress, null, null);
+            SequenceWallet wallet = new SequenceWallet(proof.SigningAddress, null, null, "");
 
             try
             {
-                IsValidMessageSignatureReturn isValid =
+                IsValidMessageSignatureReturn result =
                     await wallet.IsValidMessageSignature(chain, proof.Proof, proof.SignedProof);
-                return isValid.isValid;
+                return result.isValid;
             }
             catch (Exception e)
             {

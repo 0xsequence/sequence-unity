@@ -22,14 +22,16 @@ namespace Sequence.EmbeddedWallet
         private IIntentSender _intentSender;
         private const string _sequenceCreatedContractEvent = "CreatedContract(address)";
         private string _builderApiKey;
+        private string _email;
 
-        public SequenceWallet(Address address, string sessionId, IIntentSender intentSender)
+        public SequenceWallet(Address address, string sessionId, IIntentSender intentSender, string email = "")
         {
             _address = address;
             _httpClient = new HttpClient("https://api.sequence.app/rpc");
             _intentSender = intentSender;
             SessionId = sessionId;
             _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+            _email = email;
         }
 
         public Address GetWalletAddress()
@@ -38,6 +40,7 @@ namespace Sequence.EmbeddedWallet
         }
 
         public event Action<string> OnSignMessageComplete;
+        public event Action<string> OnSignMessageFailed;
 
         public async Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
@@ -46,13 +49,21 @@ namespace Sequence.EmbeddedWallet
                 IntentDataSignMessage args = new IntentDataSignMessage(_address, network, message);
                 var result = await _intentSender.SendIntent<IntentResponseSignedMessage, IntentDataSignMessage>(args, IntentType.SignMessage, timeBeforeExpiry);
                 string signature = result.signature;
-                OnSignMessageComplete?.Invoke(signature);
-                return signature;
+
+                if (signature == "")
+                {
+                    throw new Exception("Message could not be signed.");
+                }
+                else
+                {
+                    OnSignMessageComplete?.Invoke(signature);
+                    return signature;
+                }
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
-                return null;
+                OnSignMessageFailed?.Invoke(e.Message);
+                return e.Message;
             }
         }
 
@@ -62,7 +73,7 @@ namespace Sequence.EmbeddedWallet
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
-            
+
             return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
             new Dictionary<string, string>() {{"X-Access-Key", _builderApiKey}}); 
@@ -409,6 +420,31 @@ namespace Sequence.EmbeddedWallet
                 OnFailedToGenerateAccountList?.Invoke("Failed to generate account list: " + e.Message);
                 return null;
             }
+        }
+
+        public event Action<IntentResponseGetIdToken> OnIdTokenRetrieved;
+        public event Action<string> OnFailedToRetrieveIdToken;
+
+        public async Task<IntentResponseGetIdToken> GetIdToken(string nonce = null)
+        {
+            IntentDataGetIdToken args = new IntentDataGetIdToken(SessionId, _address, nonce);
+            try
+            {
+                var result = await _intentSender.SendIntent<IntentResponseGetIdToken, IntentDataGetIdToken>(args, IntentType.GetIdToken);
+                OnIdTokenRetrieved?.Invoke(result);
+                return result;
+            }
+
+            catch (Exception e)
+            {
+                OnFailedToRetrieveIdToken?.Invoke("Failed to retrieve Id Token : " + e.Message);
+                return null;
+            }
+        }
+
+        public string GetEmail()
+        {
+            return _email;
         }
     }
 }

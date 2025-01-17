@@ -45,15 +45,27 @@ namespace Sequence.Demo
             _ui.OpenSendTransactionWithFeeOptionsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
         
+        public void OpenPrimarySalePanel()
+        {
+            _ui.OpenPrimarySalePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
+        
         public void LinkEOAWallet()
         {
+
             EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://dev-api.sequence.app/rpc/API/GenerateWaaSVerificationURL", "https://demo-waas-wallet-link.pages.dev/");
+
             linker.OpenEOAWalletLink(Chain.ArbitrumNova);
         }
         
         public void OpenSeeMarketplaceListingsPanel()
         {
             _ui.OpenSeeMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+        }
+
+        public void SignOut()
+        {
+            Wallet.DropThisSession();
         }
     }
 }

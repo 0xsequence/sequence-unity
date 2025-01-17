@@ -81,6 +81,13 @@ namespace Sequence
         { Chain.AstarZKEvm.GetChainId(), "astar-zkevm" },
         { Chain.Xai.GetChainId(), "xai" },
         { Chain.Blast.GetChainId(), "blast" },
+        { Chain.B3.GetChainId(), "b3" },
+        { Chain.APEChain.GetChainId(), "apechain" },
+        { Chain.ImmutableZkEvm.GetChainId(), "immutable-zkevm" },
+        { Chain.SkaleNebula.GetChainId(), "skale-nebula" },
+        { Chain.Root.GetChainId(), "rootnet" },
+        { Chain.LAOS.GetChainId(), "laos" },
+        { Chain.Soneium.GetChainId(), "soneium" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
@@ -95,7 +102,14 @@ namespace Sequence
         { Chain.TestnetXaiSepolia.GetChainId(), "xai-sepolia" }, 
         { Chain.TestnetB3Sepolia.GetChainId(), "b3-sepolia" },
         { Chain.TestnetAPEChain.GetChainId(), "apechain-testnet" },
-        { Chain.TestnetBlastSepolia.GetChainId(), "blast-sepolia" }
+        { Chain.TestnetBlastSepolia.GetChainId(), "blast-sepolia" },
+        { Chain.TestnetBorne.GetChainId(), "borne-testnet" },
+        { Chain.TestnetSkaleNebulaGamingHub.GetChainId(), "skale-nebula-testnet" },
+        { Chain.TestnetSoneiumMinato.GetChainId(), "soneium-minato" },
+        { Chain.TestnetToy.GetChainId(), "toy-testnet" },
+        { Chain.TestnetImmutableZkEvm.GetChainId(), "immutable-zkevm-testnet" },
+        { Chain.TestnetRootPorcini.GetChainId(), "rootnet-porcini" },
+        { Chain.TestnetLAOSSigma.GetChainId(), "laos-sigma-testnet" }
     };
 
         private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;

@@ -15,8 +15,7 @@ namespace Sequence.Utils.SecureStorage
 
         public WindowsProtectedDataStorage()
         {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-#else
+#if !UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
             throw new System.NotSupportedException("WindowsProtectedDataStorage is only supported on windows platform.");
 #endif
         }

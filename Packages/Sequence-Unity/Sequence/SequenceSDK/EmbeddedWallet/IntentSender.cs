@@ -19,6 +19,8 @@ namespace Sequence.EmbeddedWallet
         private int _waasProjectId;
         private string _waasVersion;
         private string _sessionId;
+        private TimeSpan _timeshift;
+        private bool _ready = false;
         
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
@@ -33,6 +35,13 @@ namespace Sequence.EmbeddedWallet
             _waasProjectId = waasProjectId;
             _waasVersion = waasVersion;
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+            GetTimeShift().ConfigureAwait(false);
+        }
+        
+        private async Task GetTimeShift()
+        {
+            _timeshift = await _httpClient.GetTimeShift();
+            _ready = true;
         }
 
         public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
@@ -65,8 +74,19 @@ namespace Sequence.EmbeddedWallet
                     throw;
                 }
 
-                IntentPayload intent = intentPayload as IntentPayload;
-                long currentTimeAccordingToIntent = intent.issuedAt;
+                long currentTimeAccordingToIntent = 0;
+                if (intentPayload is IntentPayload intent)
+                {
+                    currentTimeAccordingToIntent = (long)intent.issuedAt;
+                }
+                else if (intentPayload is RegisterSessionIntent registerSessionIntent)
+                {
+                    currentTimeAccordingToIntent = (long)registerSessionIntent.intent.issuedAt;
+                }
+                else
+                {
+                    Debug.LogError("Unexpected intent payload type: " + intentPayload.GetType());
+                }
                 if (currentTimeAccordingToServer > currentTimeAccordingToIntent + 1 ||
                     currentTimeAccordingToServer < currentTimeAccordingToIntent - 1)
                 {
@@ -105,8 +125,17 @@ namespace Sequence.EmbeddedWallet
             return JsonConvert.SerializeObject(args, serializerSettings);
         }
 
-        private async Task<object> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds, uint currentTime)
+        private async Task<object> AssembleIntentPayload(string payload, IntentType type, uint timeToLiveInSeconds, ulong currentTime)
         {
+            while (!_ready)
+            {
+                await Task.Yield();
+            }
+
+            if (currentTime == 0)
+            {
+                currentTime = (ulong)DateTimeOffset.UtcNow.Add(_timeshift).ToUnixTimeSeconds();
+            }
             JObject packet = JsonConvert.DeserializeObject<JObject>(payload);
             IntentPayload toSign = new IntentPayload(_waasVersion, type, packet, null, timeToLiveInSeconds, currentTime);
             string toSignJson = JsonConvert.SerializeObject(toSign, serializerSettings);
@@ -127,6 +156,7 @@ namespace Sequence.EmbeddedWallet
             IntentResponseSessionClosed result = await SendIntent<IntentResponseSessionClosed, IntentDataCloseSession>(
                 new IntentDataCloseSession(dropSessionId),
                 IntentType.CloseSession);
+            
             return result != null;
         }
 

@@ -2,21 +2,24 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentPayload
     {
-        public JObject data { get; private set; }
-        public uint expiresAt { get; private set; }
-        public uint issuedAt { get; private set; }
-        public string name { get; private set; }
-        public Signature[] signatures { get; private set; }
-        public string version { get; private set; }
+        public JObject data;
+        public ulong expiresAt;
+        public ulong issuedAt;
+        public string name;
+        public Signature[] signatures;
+        public string version;
 
+        [Preserve]
         [JsonConstructor]
-        public IntentPayload(string version, string name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
+        public IntentPayload(string version, string name, ulong expiresAt, ulong issuedAt, JObject data, Signature[] signatures)
         {
             this.version = version;
             this.name = name;
@@ -26,7 +29,7 @@ namespace Sequence.EmbeddedWallet
             this.signatures = signatures;
         }
         
-        public IntentPayload(string version, IntentType name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
+        public IntentPayload(string version, IntentType name, ulong expiresAt, ulong issuedAt, JObject data, Signature[] signatures)
         {
             this.version = version;
             this.name = IntentNames[name];
@@ -36,7 +39,7 @@ namespace Sequence.EmbeddedWallet
             this.signatures = signatures;
         }
 
-        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
+        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30, ulong currentTime = 0)
         {
             this.version = version;
             this.name = IntentNames[type];
@@ -67,6 +70,7 @@ namespace Sequence.EmbeddedWallet
             {IntentType.InitiateAuth, "initiateAuth"},
             {IntentType.FederateAccount, "federateAccount"},
             {IntentType.ListAccounts, "listAccounts"},
+            {IntentType.GetIdToken, "getIdToken"},
         };
     }
 
@@ -86,6 +90,7 @@ namespace Sequence.EmbeddedWallet
         InitiateAuth,
         FederateAccount,
         ListAccounts,
+        GetIdToken,
         None
     }
 }

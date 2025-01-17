@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
@@ -13,12 +14,19 @@ namespace Sequence.Demo
 
         void Awake()
         {
-            SequenceWallet.OnWalletCreated += wallet =>
-            {
-                TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
-                text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
-                _wallet = wallet;
-            };
+            SequenceWallet.OnWalletCreated += OnWalletCreated;
+        }
+
+        private void OnDestroy()
+        {
+            SequenceWallet.OnWalletCreated -= OnWalletCreated;
+        }
+
+        private void OnWalletCreated(SequenceWallet wallet)
+        {
+            TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
+            text.text = "Logged in as: " + PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
+            _wallet = wallet;
         }
 
         public void SignOut()

@@ -1,4 +1,6 @@
 using System;
+using NUnit.Framework;
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -19,12 +21,6 @@ namespace Sequence.Config
         public string DiscordClientIdIOS;
         public string FacebookClientIdIOS;
         public string AppleClientIdIOS;
-        
-        [Header("Social Sign In Configuration - Android")]
-        public string GoogleClientIdAndroid;
-        public string DiscordClientIdAndroid;
-        public string FacebookClientIAndroid;
-        public string AppleClientIdAndroid;
 
         [Header("WaaS Configuration")]
         public string WaaSConfigKey;
@@ -52,6 +48,10 @@ namespace Sequence.Config
                 {
                     _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
                 }
+                
+#if UNITY_EDITOR
+                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
+#endif
             }
 
             if (_config == null)
@@ -81,7 +81,8 @@ namespace Sequence.Config
         public bool StoreSessionKey()
         {
 #if UNITY_EDITOR
-            return EditorStoreSessionPrivateKeyInSecureStorage;
+            return EditorStoreSessionPrivateKeyInSecureStorage &&
+                   TestContext.CurrentTestExecutionContext?.ExecutionStatus != TestExecutionStatus.Running;
 #else
             return StoreSessionPrivateKeyInSecureStorage;
 #endif

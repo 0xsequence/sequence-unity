@@ -1,15 +1,17 @@
 using System;
 using System.Text;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class IntentDataSignMessage
     {
-        public string message { get; private set; }
-        public string network { get; private set; }
-        public string wallet { get; private set; }
+        public string message;
+        public string network;
+        public string wallet;
 
         public IntentDataSignMessage(string walletAddress, Chain network, string message)
         {

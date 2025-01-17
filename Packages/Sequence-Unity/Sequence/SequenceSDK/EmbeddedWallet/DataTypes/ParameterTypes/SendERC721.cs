@@ -1,19 +1,21 @@
 using System;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
+    [Preserve]
     [Serializable]
     public class SendERC721 : Transaction
     {
         public const string TypeIdentifier = "erc721send";
-        public string data { get; private set; }
-        public string id { get; private set; }
-        public bool safe { get; private set; }
-        public string to { get; private set; }
-        public string tokenAddress { get; private set; }
-        public string type { get; private set; } = TypeIdentifier;
+        public string data;
+        public string id;
+        public bool safe;
+        public string to;
+        public string tokenAddress;
+        public string type = TypeIdentifier;
         
         public SendERC721(string tokenAddress, string to, string tokenId, bool safe = true, string data = null)
         {
@@ -29,6 +31,7 @@ namespace Sequence.EmbeddedWallet
             this.data = data;
         }
 
+        [Preserve]
         [JsonConstructor]
         public SendERC721(string data, string id, bool safe, string to, string tokenAddress, string type)
         {
