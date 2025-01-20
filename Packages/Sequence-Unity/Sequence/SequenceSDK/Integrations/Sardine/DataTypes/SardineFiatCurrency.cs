@@ -4,7 +4,7 @@ using UnityEngine.Scripting;
 namespace Sequence.Integrations.Sardine
 {
     [Serializable]
-    internal class SardineFiatCurrency
+    public class SardineFiatCurrency
     {
         public string currencyCode;
         public string name;

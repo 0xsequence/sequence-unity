@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 namespace Sequence.Integrations.Sardine
 {
     [Serializable]
-    internal class SardineSupportedToken
+    public class SardineSupportedToken
     {
         public string network;
         public string assetSymbol;

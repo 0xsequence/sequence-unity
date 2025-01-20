@@ -4,7 +4,7 @@ using UnityEngine.Scripting;
 namespace Sequence.Integrations.Sardine
 {
     [Serializable]
-    internal class SardinePaymentOption
+    public class SardinePaymentOption
     {
         public string name;
         public double dailyLimit;

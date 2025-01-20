@@ -18,14 +18,15 @@ namespace Sequence.Integrations.Sardine
         private IWallet _wallet;
         private Checkout _checkout;
         
-        private const string _baseUrl = "https://dev-api.sequence.app/rpc/API";
+        private const string _baseUrl = "https://api.sequence.app/rpc/API";
+
+        private const string _sequenceMarketplaceV2Contract = "0xfdb42A198a932C8D3B506Ffa5e855bC4b348a712";
 
         public SardineCheckout(Chain chain, IWallet wallet)
         {
             _chain = chain;
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
-            _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays";
             _client = new HttpClient(_apiKey);
             _wallet = wallet;
             _checkout = new Checkout(_wallet, _chain);
@@ -37,7 +38,7 @@ namespace Sequence.Integrations.Sardine
             string referenceId = "sequence-unity-sardine-whitelist-check";
             string name = "whitelist-check";
             string imageUrl = "https://www.sequence.market/images/placeholder.png";
-            string platfrom = "calldata_execution";
+            string platform = "calldata_execution";
             string executionType = "smart_contract";
             string blockchainNftId = "42";
             uint quantity = 1;
@@ -52,7 +53,7 @@ namespace Sequence.Integrations.Sardine
                     PaymentMethod.us_debit),
                 imageUrl, _chain, Address.ZeroAddress, marketplaceAddress, blockchainNftId, quantity, decimals,
                 tokenAmount,
-                tokenAddress, tokenSymbol, tokenDecimals, callData, name, platfrom, executionType);
+                tokenAddress, tokenSymbol, tokenDecimals, callData, name, platform, executionType);
             
             try {
                 await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, SardineNFTCheckout>(url, request);
@@ -63,17 +64,6 @@ namespace Sequence.Integrations.Sardine
                     return false;
                 }
                 throw new Exception("Error fetching Sardine whitelist status: " + e.Message);
-            }
-        }
-
-        public async Task<SardineRegion[]> SardineGetSupportedRegions()
-        {
-            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetSupportedRegions";
-            try {
-                SardineSupportedRegionsResponse response = await _client.SendRequest<SardineSupportedRegionsResponse>(url);
-                return response.regions;
-            } catch (Exception e) {
-                throw new Exception("Error fetching Sardine supported regions: " + e.Message);
             }
         }
 
@@ -88,7 +78,7 @@ namespace Sequence.Integrations.Sardine
             }
         }
 
-        private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, Address recipient, BigInteger quantity, string callData)
+        private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, Address recipient, BigInteger quantity, string callData, Address marketplaceContractAddress)
         {
             string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetNFTCheckoutToken";
             string priceSymbol = ChainDictionaries.GasCurrencyOf[_chain];
@@ -100,9 +90,9 @@ namespace Sequence.Integrations.Sardine
             GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
                 new PaymentMethodTypeConfig(EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(),
                     PaymentMethod.us_debit),
-                order.metadata.image, _chain, recipient, new Address(order.order.collectionContractAddress), order.order.tokenId, quantity, order.order.quantityDecimals,
+                order.metadata.image, _chain, recipient, marketplaceContractAddress, order.order.tokenId, quantity, order.order.quantityDecimals,
                 order.order.priceAmount,
-                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name, order.order.marketplace.ToString());
+                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name);
             try {
                 return await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, SardineNFTCheckout>(url, request);
             } catch (Exception e) {
@@ -110,7 +100,7 @@ namespace Sequence.Integrations.Sardine
             }
         }
 
-        public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, BigInteger quantity, Address recipient = null, AdditionalFee additionalFee = null)
+        public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, BigInteger quantity, Address recipient = null, AdditionalFee additionalFee = null, string marketplaceContractAddress = _sequenceMarketplaceV2Contract)
         {
             if (recipient == null)
             {
@@ -120,7 +110,66 @@ namespace Sequence.Integrations.Sardine
             Step[] steps = await _checkout.GenerateBuyTransaction(order.order, quantity, additionalFee);
             string callData = steps[0].data;
             
-            return await SardineGetNFTCheckoutToken(order, recipient, quantity, callData);
+            return await SardineGetNFTCheckoutToken(order, recipient, quantity, callData, new Address(marketplaceContractAddress));
+        }
+
+        public async Task<SardineOrder> SardineGetNFTCheckoutOrderStatus(string orderId)
+        {
+            GetOrderStatusRequest request = new GetOrderStatusRequest(orderId);
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetNFTCheckoutOrderStatus";
+            try {
+                SardineOrderResponse response = await _client.SendRequest<GetOrderStatusRequest, SardineOrderResponse>(url, request);
+                return response.resp;
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine NFT checkout order status: " + e.Message);
+            }
+        }
+
+        public async Task<SardineRegion[]> SardineGetSupportedRegions()
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetSupportedRegions";
+            try {
+                SardineSupportedRegionsResponse response = await _client.SendRequest<SardineSupportedRegionsResponse>(url);
+                return response.regions;
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine supported regions: " + e.Message);
+            }
+        }
+
+        public async Task<SardineFiatCurrency[]> SardineGetSupportedFiatCurrencies()
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetSupportedFiatCurrencies";
+            try
+            {
+                SupportedFiatCurrenciesResponse response = await _client.SendRequest<SupportedFiatCurrenciesResponse>(url);
+                return response.tokens;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error fetching Sardine supported fiat currencies: " + e.Message);
+            }
+        }
+
+        public async Task<SardineSupportedToken[]> SardineGetSupportedTokens()
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetSupportedTokens";
+            try {
+                SupportedTokenResponse response = await _client.SendRequest<SupportedTokenResponse>(url);
+                return response.tokens;
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine supported tokens: " + e.Message);
+            }
+        }
+
+        public async Task<SardineEnabledToken[]> SardineGetEnabledTokens()
+        {
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetEnabledTokens";
+            try {
+                EnabledTokenResponse response = await _client.SendRequest<EnabledTokenResponse>(url);
+                return response.tokens;
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine enabled tokens: " + e.Message);
+            }
         }
     }
 }
