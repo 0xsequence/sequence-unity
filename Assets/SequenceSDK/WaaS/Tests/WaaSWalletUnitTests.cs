@@ -110,6 +110,58 @@ namespace Sequence.EmbeddedWallet.Tests
                 Assert.IsFalse(failedEventHit);
             }
         }
+        
+        private static (AbiData, bool)[] _invalidContractCallData = new[]
+        {
+            (new AbiData("functionName", Array.Empty<object>()), false),
+            (new AbiData("functionName()", Array.Empty<object>()), true),
+            (new AbiData("functionName(", Array.Empty<object>()), false),
+            (new AbiData("functionName)", Array.Empty<object>()), false),
+            (new AbiData("functionName(uint banana)", new object[] {1}), true),
+            (new AbiData("functionName(uint, uint)", new object[]{1,2}), true),
+            (new AbiData("functionName(uint,uint)", new object[]{1,2}), true),
+            (new AbiData("functionName(uint banana", new object[] {1}), false),
+            (new AbiData("functionNameuint, uint)", new object[]{1,2}), false),
+            (new AbiData("functionName(uint,uint", new object[]{1,2}), false)
+        };
+        
+        [TestCaseSource(nameof(_invalidContractCallData))]
+        public async Task TestSendTransactionEvent_contractCallValidation((AbiData, bool) args)
+        {
+            AbiData data = args.Item1;
+            bool success = args.Item2;
+            IIntentSender intentSender = new MockIntentSender(new SuccessfulTransactionReturn());
+            SequenceWallet wallet = new SequenceWallet(address, "", intentSender);
+            
+            bool successEventHit = false;
+            wallet.OnSendTransactionComplete += (result)=>
+            {
+                successEventHit = true;
+            };
+            bool failedEventHit = false;
+            wallet.OnSendTransactionFailed += (result)=>
+            {
+                failedEventHit = true;
+            };
+            
+            await wallet.SendTransaction(Chain.None, new Transaction[]
+            {
+                new RawTransaction("0xc683a014955b75F5ECF991d4502427c8fa1Aa249"),
+                new SequenceContractCall("0xc683a014955b75F5ECF991d4502427c8fa1Aa249", data),
+                new RawTransaction("0xc683a014955b75F5ECF991d4502427c8fa1Aa249")
+            }, waitForReceipt: false);
+
+            if (!success)
+            {
+                Assert.IsFalse(successEventHit);
+                Assert.IsTrue(failedEventHit);
+            }
+            else
+            {
+                Assert.IsTrue(successEventHit);
+                Assert.IsFalse(failedEventHit);
+            }
+        }
 
         [Test]
         public async Task TestSendTransactionException()

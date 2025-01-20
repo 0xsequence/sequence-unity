@@ -38,6 +38,19 @@ namespace Sequence.EmbeddedWallet
                             $"Given {nameof(DelayedEncode)} transaction with function name {delayedEncode.data.func} that does not match the required regex {ABIRegex.FunctionNameRegex} - for example: \"mint\"");
                     }
                 }
+                else if (transactions[i] is SequenceContractCall contractCall)
+                {
+                    if (!ABIRegex.MatchesFunctionABI(contractCall.data.abi))
+                    {
+                        string message = $"Given {nameof(SequenceContractCall)} transaction with function abi {contractCall.data.abi} that does not match the required regex {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"";
+                        Debug.LogWarning(message + "\nAttempting to recover and parse anyways");
+                        contractCall.data.abi = EventParser.ParseEventDef(contractCall.data.abi).ToString();
+                        if (!ABIRegex.MatchesFunctionABI(contractCall.data.abi))
+                        {
+                            throw new ArgumentException(message);
+                        }
+                    }
+                }
             }
         }
     }
