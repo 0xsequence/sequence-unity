@@ -483,5 +483,75 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
 
             await tcs.Task;
         }
+
+        [Test]
+        public async Task TestInteractingWithContractFunctionsInSnakeCase_LocalABIEncoding()
+        {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            Contract testUnderscores = new Contract("0x8f408550720b268b0ea0969c527ac997d969a638");
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(_chain,
+                        new Transaction[]
+                        {
+                            new RawTransaction(testUnderscores.GetAddress(), "0", 
+                                testUnderscores.CallFunction("test_function_name_with_underscores(uint256)", BigInteger.One).CallData)
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestInteractingWithContractFunctionsInSnakeCase_DelayedServerSideABIEncoding()
+        {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            Contract testUnderscores = new Contract("0x8f408550720b268b0ea0969c527ac997d969a638");
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(_chain,
+                        new Transaction[]
+                        {
+                            new DelayedEncode(testUnderscores.GetAddress(), "0",
+                                new DelayedEncodeData("test_function_name_with_underscores(uint256)", new object[] { "1" }, "test_function_name_with_underscores"))
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+
+            await tcs.Task;
+        }
     }
 }

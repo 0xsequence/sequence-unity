@@ -67,19 +67,17 @@ namespace Sequence.Demo
                 _alreadyAttemptedToRestoreSession = args.GetObjectOfTypeIfExists<bool>();
             }
 
-            if (SecureStorageFactory.IsSupportedPlatform())
+            if (SecureStorageFactory.IsSupportedPlatform() && _storeSessionInfoAndSkipLoginWhenPossible)
             {
-                if (_storeSessionInfoAndSkipLoginWhenPossible && !_alreadyAttemptedToRestoreSession)
+                if (!_alreadyAttemptedToRestoreSession)
                 {
                     _alreadyAttemptedToRestoreSession = true;
                     LoginHandler.TryToRestoreSession();
                     return;
                 }
 
-                if (_storeSessionInfoAndSkipLoginWhenPossible)
-                {
-                    LoginHandler.SetupAuthenticator();
-                }
+                
+                LoginHandler.SetupAuthenticator();
             }
 
             base.Open(args);
