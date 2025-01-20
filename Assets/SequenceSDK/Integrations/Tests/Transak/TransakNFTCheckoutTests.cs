@@ -46,10 +46,9 @@ namespace Sequence.Integrations.Tests.Transak
         [Test]
         public async Task TestGetNFTCheckoutLink()
         {
-            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
             TransakNFTCheckout transakCheckout =
                 new TransakNFTCheckout(_testWallet, Chain.ArbitrumNova, new MockEthClientForGasEstimation(), 
-                    new Checkout(_testWallet, Chain.ArbitrumNova, HttpClient.UseHttpClientWithDevEnvironment(config.DevAPIKey)));
+                    new Checkout(_testWallet, Chain.ArbitrumNova));
             
             string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(_collectibleOrders[0].order, _collectibleOrders[0].metadata, 1, NFTType.ERC1155);
 
