@@ -87,6 +87,7 @@ namespace Sequence.EmbeddedWallet
             IntentDataSendTransaction args = new IntentDataSendTransaction(_address, network, transactions);
             try
             {
+                TransactionsValidator.Validate(transactions);
                 return await SendTransactionIntent(args, waitForReceipt, timeBeforeExpiry);
             }
             catch (Exception e)
@@ -265,6 +266,7 @@ namespace Sequence.EmbeddedWallet
             IntentDataFeeOptions feeOptions = new IntentDataFeeOptions(network, _address, transactions);
             try
             {
+                TransactionsValidator.Validate(transactions);
                 IntentResponseFeeOptions options = await
                     _intentSender.SendIntent<IntentResponseFeeOptions, IntentDataFeeOptions>(feeOptions, IntentType.FeeOptions,
                         timeBeforeExpiry);
@@ -361,6 +363,7 @@ namespace Sequence.EmbeddedWallet
 
             try
             {
+                TransactionsValidator.Validate(transactions);
                 int transactionCount = transactions.Length;
                 Transaction[] transactionsWithFeeOption = new Transaction[transactionCount + 1];
                 transactionsWithFeeOption[0] = feeOption.CreateTransaction();

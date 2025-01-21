@@ -1,4 +1,5 @@
 # Sequence Unity SDK
+The Sequence Unity Embedded Wallet SDK provides full Sequence Embedded Wallet and Indexer integration for your Unity Games, integrated with our own purpose-built for Unity SequenceEthereum library.
 
 ## Documentation
 https://docs.sequence.xyz/sdk/unity/overview
