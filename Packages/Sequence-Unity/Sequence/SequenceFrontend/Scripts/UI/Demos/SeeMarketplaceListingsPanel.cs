@@ -1,6 +1,6 @@
 namespace Sequence.Demo
 {
-    public class SeeMarketplaceListingsPanel : UIPanel
+    public class SeeMarketplaceListingsPanel : DemoPanel
     {
         
     }
