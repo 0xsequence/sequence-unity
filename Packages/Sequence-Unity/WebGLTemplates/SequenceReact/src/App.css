@@ -8,9 +8,6 @@
 
 .container {
   position: relative;
-  /* The container determains the size. */
-  width: 800px;
-  height: 600px;
 }
 
 .container > .loading-overlay {
