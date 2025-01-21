@@ -1,3 +1,4 @@
+import {ReactUnityEventParameter} from "react-unity-webgl/distribution/types/react-unity-event-parameters";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -25,10 +26,13 @@ import "./App.css";
 
   const loadingPercentage = Math.round(loadingProgression * 100);
 
-  const handleGoogleSignIn = useCallback((googleClientId: string, nonce: string) => {
+  const handleGoogleSignIn = useCallback((...parameters: ReactUnityEventParameter[]): ReactUnityEventParameter => {
+    const googleClientId = parameters[0] as string;
+    const nonce = parameters[1] as string;
     setGoogleClientId(googleClientId);
     setNonce(nonce);
     setShowLogin(true);
+    return '';
   }, []);
 
   const [googleClientIdState, setGoogleClientId] = useState("");
