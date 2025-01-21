@@ -52,8 +52,11 @@ import "./App.css";
 
   useEffect(() => {
     addEventListener("GoogleSignIn", handleGoogleSignIn);
+    window.addEventListener("resize", handleResize);
+    handleResize()
     return () => {
       removeEventListener("GoogleSignIn", handleGoogleSignIn);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -67,6 +70,23 @@ import "./App.css";
 
     setShowLogin(false);
   };
+
+    const handleResize = () => {
+      const container = document.querySelector('.container') as any;
+
+      let w = window.innerWidth * 0.98;
+      let h = window.innerHeight * 0.98;
+
+      const r = 600 / 960;
+      if (w * r > window.innerHeight) {
+        w = Math.min(w, Math.ceil(h / r));
+      }
+
+      h = Math.floor(w * r);
+
+      container.style.width = w + "px";
+      container.style.height = h + "px";
+    }
 
   return (
     <div className="outer-container">
