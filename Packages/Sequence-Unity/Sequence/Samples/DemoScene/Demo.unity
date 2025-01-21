@@ -5275,7 +5275,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -5847,7 +5847,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
-      value: Buy collectibles from a Primary Sale.
+      value: Buy ERC1155 tokens from a Primary Sale.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181249, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_AnchorMax.y
@@ -9241,10 +9241,6 @@ PrefabInstance:
       value: Send a transaction with your wallet without paying any fees.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
       value: 8
       objectReference: {fileID: 0}
@@ -9275,10 +9271,6 @@ PrefabInstance:
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
       value: Send Sponsored Transaction
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -10652,10 +10644,6 @@ PrefabInstance:
       value: Send an unsponsored transaction with your wallet.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
       value: 8
       objectReference: {fileID: 0}
@@ -10686,10 +10674,6 @@ PrefabInstance:
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
       value: Send Unsponsored Transaction
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -12124,10 +12108,6 @@ PrefabInstance:
       value: View all listed items on a Marketplace collection.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
       value: 8
       objectReference: {fileID: 0}
@@ -12158,10 +12138,6 @@ PrefabInstance:
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
       value: Marketplace Listings
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -12935,10 +12911,6 @@ PrefabInstance:
       value: Link an EOA wallet from an external browser.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
       value: 8
       objectReference: {fileID: 0}
@@ -12969,10 +12941,6 @@ PrefabInstance:
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
       value: Link External Wallet
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -15871,11 +15839,7 @@ PrefabInstance:
       objectReference: {fileID: 1094787529}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
-      value: Sign a messages with your wallet.
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 8
+      value: Sign messages with your wallet.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -15908,10 +15872,6 @@ PrefabInstance:
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
       value: Sign Message
-      objectReference: {fileID: 0}
-    - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
-      propertyPath: m_fontSize
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8673935662005756174, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase

@@ -20,7 +20,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: grey;
+  background: #1a1a1a;
   /* We'll set the following Flex properties in order to center the text. */
   display: flex;
   justify-content: center;
