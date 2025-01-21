@@ -109,9 +109,10 @@ namespace Sequence.Marketplace
             Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
             ChainIndexer indexer = new ChainIndexer(Chain.ArbitrumNova);
             Address USDC = new Address("0x750ba8b76187092B0D1E87E28daaf484d1b5273b");
+            Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
 
             GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
-                new GetTokenBalancesArgs(_testWallet.GetWalletAddress(), "0x0ee3af1874789245467e7482f042ced9c5171073"));
+                new GetTokenBalancesArgs(_testWallet.GetWalletAddress(), collection));
             Assert.IsNotNull(balancesReturn);
             TokenBalance[] balances = balancesReturn.balances;
             Assert.IsNotNull(balances);
@@ -132,14 +133,24 @@ namespace Sequence.Marketplace
         [TestCase(3)]
         public async Task TestGenerateOfferTransaction(int amount)
         {
-            Checkout checkout = new Checkout(_testWallet, Chain.ArbitrumNova);
-            Address USDC = new Address("0x750ba8b76187092B0D1E87E28daaf484d1b5273b");
+            Chain chain = Chain.ArbitrumNova;
+            Checkout checkout = new Checkout(_testWallet, chain);
+            ChainIndexer indexer = new ChainIndexer(chain);
+            Address erc20UniversallyMintable = new Address("0xc721b6d2bcc4d04b92df8f383beef85aa72c2198");
             Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
+            
+            GetTokenBalancesReturn balancesReturn = await indexer.GetTokenBalances(
+                new GetTokenBalancesArgs(_testWallet.GetWalletAddress(), erc20UniversallyMintable));
+            Assert.IsNotNull(balancesReturn);
+            TokenBalance[] balances = balancesReturn.balances;
+            Assert.IsNotNull(balances);
+            Assert.GreaterOrEqual(balances.Length, 1);
+            Assert.GreaterOrEqual(balances[0].balance, (BigInteger)amount);
 
             for (int i = 0; i < amount; i++)
             {
                 Step[] steps = await checkout.GenerateOfferTransaction(collection, "1",
-                    1, ContractType.ERC1155, USDC,
+                    1, ContractType.ERC1155, erc20UniversallyMintable,
                     1, DateTime.Now + TimeSpan.FromMinutes(30));
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
