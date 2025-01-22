@@ -116,6 +116,7 @@ testchain/artifacts/build-info
 testchain/cache/
 
 package-lock.json
+!Demo/package-lock.json
 
 # Test config
 Assets/SequenceSDK/WaaS/Tests/Resources/
