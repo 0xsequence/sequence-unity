@@ -1,4 +1,5 @@
 # Sequence Unity SDK
+The Sequence Unity Embedded Wallet SDK provides full Sequence Embedded Wallet and Indexer integration for your Unity Games, integrated with our own purpose-built for Unity SequenceEthereum library.
 
 ## Documentation
 https://docs.sequence.xyz/sdk/unity/overview
@@ -30,6 +31,9 @@ Unity by navigating to `Window > General > Test Runner`.
 Many of the tests, specifically those for our custom Ethereum client, make use of a Hardhat-based testchain. This testchain can be found in the root folder of the project - in case you are experiencing issues with it.
 
 Before running tests, boot up the test chain with `make start-testchain`. You may find that you need to stop (control + c) the testchain and restart it when running the test suite again.
+
+### Platform Compile Test
+When making large amounts of changes or any changes that may impact builds (assemblies, dependencies, etc.), it is useful to confirm that the SDK still compiles on the [targeted platforms](#supported-platforms). To do this navigate to the top menu and click `Sequence Dev > Platform Compile Test`. This will build the project, and the currently selected scenes in the build settings, on all targeted platforms. All build errors encountered will be recorded in `PlatformCompileTestErrors/<build platform>.txt`. The builds will be cleaned up once completed. This test doesn't run any tests against the individual builds; it only confirms that the project builds on a given platform.
 
 ### Testing via command line
 It can sometimes be useful to quickly test the project via command line. This can be done without opening Unity or starting the testchain.

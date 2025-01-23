@@ -27,6 +27,8 @@ namespace Sequence
         SkaleNebula = 1482601649,
         Root = 7668,
         LAOS = 6283,
+        Soneium = 1868,
+        Telos = 40,
 
         // Testnets
         TestnetSepolia = 11155111,
@@ -51,6 +53,7 @@ namespace Sequence
         TestnetImmutableZkEvm = 13473,
         TestnetRootPorcini = 7672,
         TestnetLAOSSigma = 62850,
+        TestnetTelos = 41,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         

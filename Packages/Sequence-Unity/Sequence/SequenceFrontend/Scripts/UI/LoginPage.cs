@@ -58,7 +58,7 @@ namespace Sequence.Demo
         {
             base.Close();
             _errorText.text = "";
-            EnableLoginScreen(false);
+            EnableLoadingScreen(false);
 
             LoginHandler.OnMFAEmailFailedToSend -= OnMFAEmailFailedToSendHandler;
             LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
@@ -71,7 +71,7 @@ namespace Sequence.Demo
             LoginHandler.OnMFAEmailFailedToSend += OnMFAEmailFailedToSendHandler;
             LoginHandler.OnLoginFailed += OnLoginFailedHandler;
             SequenceWallet.OnAccountFederationFailed += OnAccountFederationFailedHandler;
-            EnableLoginScreen(false);
+            EnableLoadingScreen(false);
         }
 
         public void Login()
@@ -79,35 +79,35 @@ namespace Sequence.Demo
             string email = _inputField.text;
             Debug.Log($"Signing in with email: {email}");
             _errorText.text = "";
-            EnableLoginScreen(true);
+            EnableLoadingScreen(true);
             LoginHandler.Login(email);
         }
 
         public void GoogleLogin()
         {
             Debug.Log("Google Login");
-            EnableLoginScreen(true);
+            EnableLoadingScreen(true);
             LoginHandler.GoogleLogin();
         }
 
         public void DiscordLogin()
         {
             Debug.Log("Discord Login");
-            EnableLoginScreen(true);
+            EnableLoadingScreen(true);
             LoginHandler.DiscordLogin();
         }
 
         public void FacebookLogin()
         {
             Debug.Log("Facebook Login");
-            EnableLoginScreen(true);
+            EnableLoadingScreen(true);
             LoginHandler.FacebookLogin();
         }
 
         public void AppleLogin()
         {
             Debug.Log("Apple Login");
-            EnableLoginScreen(true);
+            EnableLoadingScreen(true);
             LoginHandler.AppleLogin();
         }
 
@@ -153,10 +153,10 @@ namespace Sequence.Demo
         private void SetError(string error)
         {
             _errorText.text = error;
-            EnableLoginScreen(false);
+            EnableLoadingScreen(false);
         }
 
-        private void EnableLoginScreen(bool enable)
+        private void EnableLoadingScreen(bool enable)
         {
             _loadingScreen.SetActive(enable);
         }

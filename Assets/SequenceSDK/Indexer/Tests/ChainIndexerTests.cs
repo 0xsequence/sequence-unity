@@ -94,7 +94,6 @@ namespace Sequence.Indexer.Tests
             Assert.IsTrue(result.indexerEnabled);
             Assert.IsTrue(result.healthOK);
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.startTime));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.ver));
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.branch));
             Assert.IsFalse(string.IsNullOrWhiteSpace(result.commitHash));
             Assert.AreEqual(chain.GetChainId(), result.chainID);

@@ -1,7 +1,9 @@
 using System;
+using Sequence.Authentication;
 using Sequence.Contracts;
 using Sequence.Utils;
 using Sequence.EmbeddedWallet;
+using UnityEngine;
 
 namespace Sequence.Demo
 {
