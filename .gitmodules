@@ -1,5 +1,5 @@
-[submodule "testchain/contracts-library"]
-	path = testchain/contracts-library
+[submodule "testchain/lib/contracts-library"]
+	path = testchain/lib/contracts-library
 	url = https://github.com/0xsequence/contracts-library.git
 [submodule "testchain/lib/forge-std"]
 	path = testchain/lib/forge-std
