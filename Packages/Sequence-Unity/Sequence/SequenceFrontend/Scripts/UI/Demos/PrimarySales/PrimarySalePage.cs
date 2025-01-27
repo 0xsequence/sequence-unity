@@ -135,7 +135,7 @@ namespace Sequence.Demo
             _resultText.text = success ? "Success" : "Failed";
         }
 
-        private string ConvertTime(int timestamp)
+        private string ConvertTime(long timestamp)
         {
             var localDateTime = DateTimeOffset.FromUnixTimeSeconds(timestamp).LocalDateTime;
             return localDateTime.ToString("dd.MM.yyyy HH:mm:ss");

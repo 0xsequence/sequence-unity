@@ -49,6 +49,11 @@ namespace Sequence.ABI
                 throw new ArgumentException($"{nameof(evmTypes)} must not be null");
             }
 
+            if (value == null)
+            {
+                return new string('0', 32);
+            }
+
             if (value.IsTuple())
             {
                 value = value.ToObjectList();
@@ -74,7 +79,11 @@ namespace Sequence.ABI
             {
                 string head_i = "", tail_i = "";
                 ABIType type = ABI.GetTypeFromEvmName(evmTypes[i]);
-                ABIType temp = ABI.GetParameterType(valueTuple[i]);
+                ABIType temp = type;
+                if (valueTuple[i] != null)
+                {
+                    temp = ABI.GetParameterType(valueTuple[i]);
+                }
                 if (temp != type && type != ABIType.FIXEDARRAY && type != ABIType.DYNAMICARRAY) // If it is a non-array data type, a mismatch will cause encoding issues - with arrays, a mismatch may cause encoding issues but it is difficult to predict
                 {
                     throw new ArgumentException($"Argument type is not as expected. Expected: {type} Received: {temp}");
@@ -116,7 +125,11 @@ namespace Sequence.ABI
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         UnityEngine.Debug.Log("dynamic array head: " + head_i);
                         //intList.Cast<object>().ToList();
-                        int numberCount = ((IList)valueTuple[i]).Count;
+                        int numberCount = 0;
+                        if (valueTuple[i] != null)
+                        {
+                            numberCount = ((IList)valueTuple[i]).Count;
+                        }
                         UnityEngine.Debug.Log("number count:" + numberCount);
 
                         string numberCountEncoded = _numberCoder.EncodeToString(numberCount);
