@@ -1,0 +1,24 @@
+[profile.default]
+src = "src"
+out = "artifacts"
+libs = [
+    "lib",
+    "node_modules",
+]
+remappings = [
+    "@0xsequence/contracts-library/=lib/contracts-library/src/",
+    "@0xsequence/erc-1155/=lib/contracts-library/lib/0xsequence/erc-1155/src/",
+    "@0xsequence/erc20-meta-token/=lib/contracts-library/lib/0xsequence/erc20-meta-token/src/",
+    "@openzeppelin-upgradeable/=lib/contracts-library/lib/openzeppelin-contracts-upgradeable/",
+    "@openzeppelin/=node_modules/@openzeppelin/",
+    "contracts-library/=lib/contracts-library/src/",
+    "ds-test/=lib/contracts-library/lib/forge-std/lib/ds-test/src/",
+    "erc721a-upgradeable/=lib/contracts-library/lib/chiru-labs/erc721a-upgradeable/",
+    "erc721a/=lib/contracts-library/lib/chiru-labs/erc721a/",
+    "forge-std/=lib/contracts-library/lib/forge-std/src/",
+    "hardhat/=node_modules/hardhat/",
+    "murky/=lib/contracts-library/lib/murky/src/",
+    "solady/=lib/contracts-library/lib/solady/src/",
+]
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
