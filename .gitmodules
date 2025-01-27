@@ -1,0 +1,3 @@
+[submodule "testchain/contracts-library"]
+	path = testchain/contracts-library
+	url = https://github.com/0xsequence/contracts-library.git
