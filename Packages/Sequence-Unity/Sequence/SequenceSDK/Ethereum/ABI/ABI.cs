@@ -191,7 +191,15 @@ namespace Sequence.ABI
                     if (outputsArray != null && outputsArray.Count > 0)
                     {
                         string[] outputTypes = ExtractTypes(outputsArray);
-                        returnType = $"({string.Join(", ", outputTypes)})";
+                        if (outputTypes.Length == 1 && outputTypes[0].StartsWith('(') &&
+                              outputTypes[0].EndsWith(')'))
+                        {
+                            returnType = outputTypes[0];
+                        }
+                        else
+                        {
+                            returnType = $"({string.Join(", ", outputTypes)})";
+                        }
                     }
 
                     decodedAbi = AddToDictionary(decodedAbi, functionName, argumentTypes, returnType);
