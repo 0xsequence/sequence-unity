@@ -125,5 +125,4 @@ Assets/SequenceSDK/WaaS/Tests/Resources/
 
 /testchain/lib
 /testchain/artifacts/*
-!/testchain/artifacts/contracts/
-!/testchain/artifacts/contracts/**
+

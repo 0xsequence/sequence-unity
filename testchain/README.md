@@ -1,3 +1,8 @@
+# Testchain
+This project contains a hardhat testchain which can be run with `yarn start:hardhat`.
+
+In addition, we've included some smart contracts. These are compiled with Foundry/Forge.
+
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
@@ -13,54 +18,38 @@ Foundry consists of:
 
 https://book.getfoundry.sh/
 
+## Installation
+https://book.getfoundry.sh/getting-started/installation
+
 ## Usage
 
 ### Build
 
+From /testchain
 ```shell
 $ forge build
 ```
 
-### Test
+This will dump compiled contracts into `/artifacts` 
+
+### Installing/upgrading dependencies
+
+This project has an unusual setup as it is nested in a much larger monorepo. In order to install or update Sequence dependancies please perform the following:
 
 ```shell
-$ forge test
+cd ..
+forge install https://github.com/0xsequence/contracts-library.git --no-commit
 ```
+Replace the url with another git url if using dependencies from elsewhere.
 
-### Format
+This will install at `../lib/`. We want to move here.
 
 ```shell
-$ forge fmt
+cd .. 
+ls lib/ (find out the name of the folder to move, in this case contracts-library)
+mv lib/contracts-library testchain/lib/
 ```
 
-### Gas Snapshots
+Update entry in .gitmodules
 
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Update foundry.toml such that remappings are correct
