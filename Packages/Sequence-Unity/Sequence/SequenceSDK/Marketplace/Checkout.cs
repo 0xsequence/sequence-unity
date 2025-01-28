@@ -150,6 +150,11 @@ namespace Sequence.Marketplace
 
             try
             {
+                if (currencyTokenAddress.IsZeroAddress())
+                {
+                    throw new ArgumentException("Creating an offer with native currencies is not supported. Please use an ERC20 token address.");
+                }
+                
                 GenerateTransactionResponse response = await _client.SendRequest<GenerateOfferTransactionArgs, GenerateTransactionResponse>(_chain, "GenerateOfferTransaction", args);
                 OnTransactionStepsReturn?.Invoke(response.steps);
                 return response.steps;

@@ -17,7 +17,7 @@ namespace Sequence.Integrations.Sardine
 
         [Preserve]
         [JsonConstructor]
-        public SardineEnabledToken(string network, string assetSymbol, string assetName, string chainId, string tokenName, string token, Address tokenAddress)
+        public SardineEnabledToken(string network, string assetSymbol, string assetName, string chainId, string tokenName, string token, string tokenAddress)
         {
             this.network = network;
             this.assetSymbol = assetSymbol;
@@ -25,7 +25,14 @@ namespace Sequence.Integrations.Sardine
             this.chainId = chainId;
             this.tokenName = tokenName;
             this.token = token;
-            this.tokenAddress = tokenAddress;
+            if (network != "stellar" && !string.IsNullOrWhiteSpace(tokenAddress))
+            {
+                this.tokenAddress = new Address(tokenAddress);
+            }
+            else
+            {
+                this.tokenAddress = null;
+            }
         }
 
         public SardineEnabledToken(Chain chain, string assetSymbol, string assetName, string tokenName, string token, Address tokenAddress)

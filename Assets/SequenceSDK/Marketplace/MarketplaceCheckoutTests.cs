@@ -10,6 +10,7 @@ using Sequence.EmbeddedWallet;
 using Sequence.EmbeddedWallet.Tests;
 using Sequence.Utils;
 using UnityEngine;
+using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.Marketplace
 {
@@ -154,6 +155,29 @@ namespace Sequence.Marketplace
                     1, DateTime.Now + TimeSpan.FromMinutes(30));
                 Assert.IsNotNull(steps);
                 Assert.Greater(steps.Length, 0);
+            }
+        }
+        
+        [Test]
+        public async Task TestGenerateOfferTransaction_NativeCurrency()
+        {
+            Chain chain = Chain.ArbitrumNova;
+            Checkout checkout = new Checkout(_testWallet, chain);
+            ChainIndexer indexer = new ChainIndexer(chain);
+            Address currency = new Address(StringExtensions.ZeroAddress);
+            Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
+
+            try
+            {
+                Step[] steps = await checkout.GenerateOfferTransaction(collection, "1",
+                    1, ContractType.ERC1155, currency,
+                    1, DateTime.Now + TimeSpan.FromMinutes(30));
+
+                Assert.Fail("Expected exception but none was encountered");
+            }
+            catch (Exception e)
+            {
+                Assert.True(e.Message.Contains("Creating an offer with native currencies is not supported. Please use an ERC20 token address"));
             }
         }
 
