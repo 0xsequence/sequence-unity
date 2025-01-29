@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 
 namespace Sequence.Demo
 {
-    public class PrimarySaleStateERC1155
+    public class SequenceInGameShopState
     {
         public Address PaymentToken { get; private set; }
         public string PaymentTokenSymbol { get; private set; }

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
-    public class PrimarySaleTile : MonoBehaviour
+    public class SequenceInGameShopTile : MonoBehaviour
     {
         [SerializeField] private Image _image;
         [SerializeField] private TMP_Text _nameText;

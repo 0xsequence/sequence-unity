@@ -1,4 +1,5 @@
 using Sequence.EmbeddedWallet;
+using SequenceSDK.Samples;
 using UnityEngine;
 
 namespace Sequence.Demo
@@ -21,7 +22,9 @@ namespace Sequence.Demo
         private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
         private SeeMarketplaceListingsPanel _seeMarketplaceListingsPanel;
         private MarketplaceItemDetailsPanel _marketplaceItemDetailsPanel;
-        private PrimarySalePanel _primarySalePanel;
+        private SequencePlayerProfile _playerProfile;
+        private SequenceInventory _inventory;
+        private SequenceInGameShop _inGameShop;
         
         private void Awake()
         {
@@ -36,7 +39,9 @@ namespace Sequence.Demo
             _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
             _seeMarketplaceListingsPanel = GetComponentInChildren<SeeMarketplaceListingsPanel>();
             _marketplaceItemDetailsPanel = GetComponentInChildren<MarketplaceItemDetailsPanel>();
-            _primarySalePanel = GetComponentInChildren<PrimarySalePanel>();
+            _playerProfile = GetComponentInChildren<SequencePlayerProfile>();
+            _inventory = GetComponentInChildren<SequenceInventory>();
+            _inGameShop = GetComponentInChildren<SequenceInGameShop>();
 
             if (!IsTesting)
             {
@@ -73,11 +78,30 @@ namespace Sequence.Demo
             {
                 pages[i].gameObject.SetActive(false);
             }
+            
+            _playerProfile.Hide();
+            _inventory.Hide();
+            _inGameShop.Hide();
         }
 
         private void OpenUIPanel(UIPanel panel, params object[] openArgs)
         {
             panel.Open(openArgs);
+        }
+
+        public void OpenPlayerProfile(IWallet wallet)
+        {
+            _playerProfile.Show(wallet);
+        }
+
+        public void OpenInventory(IWallet wallet)
+        {
+            _inventory.Show(wallet);
+        }
+
+        public void OpenInGameShop(IWallet wallet)
+        {
+            _inGameShop.Show(wallet);
         }
 
         public void OpenWalletPanelWithDelay(float delayInSeconds, params object[] openArgs)
@@ -108,11 +132,6 @@ namespace Sequence.Demo
         public void OpenSeeMarketplaceDetailsPanelWithDelay(float delayInSeconds, params object[] openArgs)
         {
             _marketplaceItemDetailsPanel.OpenWithDelay(delayInSeconds, openArgs);
-        }
-        
-        public void OpenPrimarySalePanelWithDelay(float delayInSeconds, params object[] openArgs)
-        {
-            _primarySalePanel.OpenWithDelay(delayInSeconds, openArgs);
         }
         
         private void ReplaceWithLoginPanel()

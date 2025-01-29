@@ -2,17 +2,16 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
-using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Sequence.Demo
 {
-    public class PrimarySalePage : UIPage
+    public class SequenceInGameShop : MonoBehaviour
     {
         [Header("Configuration")]
-        [SerializeField] private Chain _chain;
+        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
         [SerializeField] private string _tokenContractAddress;
         [SerializeField] private string _saleContractAddress;
         [SerializeField] private int[] _itemsForSale;
@@ -30,19 +29,25 @@ namespace Sequence.Demo
         [SerializeField] private TMP_Text _endTimeText;
         
         [Header("Tile Object Pool")]
-        [SerializeField] private GenericObjectPool<PrimarySaleTile> _tilePool;
+        [SerializeField] private GenericObjectPool<SequenceInGameShopTile> _tilePool;
 
-        private SequenceWallet _wallet;
-        private PrimarySaleStateERC1155 _saleState;
+        private IWallet _wallet;
+        private SequenceInGameShopState _saleState;
 
-        public override void Open(params object[] args)
+        public void Hide()
         {
-            base.Open(args);
+            gameObject.SetActive(false);
+        }
+
+        public void Show(IWallet wallet)
+        {
+            _wallet = wallet;
+            
+            gameObject.SetActive(true);
             _loadingView.SetActive(false);
             _resultView.SetActive(false);
             _qrCodeView.gameObject.SetActive(false);
             
-            _wallet = args.GetObjectOfTypeIfExists<SequenceWallet>();
             Assert.IsNotNull(_wallet, "Could not get a SequenceWallet reference from the UIPage.Open() arguments.");
             
             RefreshState();
@@ -58,7 +63,7 @@ namespace Sequence.Demo
         {
             ClearState();
 
-            _saleState = new PrimarySaleStateERC1155();
+            _saleState = new SequenceInGameShopState();
 
             SetLoading(true);
             await _saleState.Construct(

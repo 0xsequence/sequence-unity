@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7100157266534401807}
   - component: {fileID: 1454491925130979779}
   m_Layer: 5
-  m_Name: PrimarySaleTile
+  m_Name: SequenceInGameShopTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

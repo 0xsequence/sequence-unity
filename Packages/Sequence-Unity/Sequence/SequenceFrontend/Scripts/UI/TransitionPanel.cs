@@ -47,9 +47,19 @@ namespace Sequence.Demo
             _ui.OpenSendTransactionWithFeeOptionsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
         
-        public void OpenPrimarySalePanel()
+        public void OpenPlayerProfilePanel()
         {
-            _ui.OpenPrimarySalePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+            _ui.OpenPlayerProfile(Wallet);
+        }
+        
+        public void OpenInventoryPanel()
+        {
+            _ui.OpenInventory(Wallet);
+        }
+        
+        public void OpenInGameShopPanel()
+        {
+            _ui.OpenInGameShop(Wallet);
         }
         
         public void LinkEOAWallet()
