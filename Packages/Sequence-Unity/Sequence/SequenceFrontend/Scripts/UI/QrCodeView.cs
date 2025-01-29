@@ -16,15 +16,20 @@ namespace Sequence.Demo
         
         public async Task Show(string paymentToken, int chainId, string destinationAddress, string amount)
         {
-            gameObject.SetActive(false);
-            var texture = await GenerateQrCodeAsync(paymentToken, chainId, destinationAddress, amount);
-            _qrImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            gameObject.SetActive(true);
+            var deeplink = string.Format(_format, paymentToken, chainId, destinationAddress, amount);
+            await Show(deeplink);
         }
 
-        private async Task<Texture2D> GenerateQrCodeAsync(string paymentToken, int chainId, string destinationAddress, string amount)
+        public async Task Show(string deeplink)
         {
-            var deeplink = string.Format(_format, paymentToken, chainId, destinationAddress, amount);
+            var texture = await GenerateQrCodeAsync(deeplink);
+            
+            _qrImage.sprite = null;
+            _qrImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
+
+        private async Task<Texture2D> GenerateQrCodeAsync(string deeplink)
+        {
             var encodedLink = Convert.ToBase64String(Encoding.UTF8.GetBytes(deeplink));
             var qrLink = ApiEndpoint + encodedLink + $"/{_size}";
             return await AssetHandler.GetTexture2DAsync(qrLink);
