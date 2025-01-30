@@ -26,7 +26,17 @@ namespace Sequence.Demo
             _inputField.onValueChanged.AddListener(OnInputValueChanged);
             _numberOfMFADigits = _inputBoxes.Length;
         }
-        
+
+        private void Update()
+        {
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftCommand))
+                && Input.GetKeyDown(KeyCode.V))
+            {
+                _inputField.text = GUIUtility.systemCopyBuffer;
+                Login();
+            }
+        }
+
         public override void Close()
         {
             base.Close();

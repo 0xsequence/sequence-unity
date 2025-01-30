@@ -12,7 +12,6 @@ namespace Sequence.Demo
         [SerializeField] private Image _image;
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _priceText;
-        [SerializeField] private TMP_Text _supplyText;
         [SerializeField] private TMP_Text _amountText;
         [SerializeField] private Button _purchaseButton;
 
@@ -25,11 +24,11 @@ namespace Sequence.Demo
         {
             _tokenId = tokenId;
             _purchase = purchase;
-            _image.sprite = await AssetHandler.GetSpriteAsync(metadata?.image);
-            _nameText.text = $"{metadata?.name} (#{tokenId})";
-            _priceText.text = $"Price: {cost} {symbol}";
-            _supplyText.text = $"Total Minted: {supply}";
+            _nameText.text = $"{metadata?.name}";
+            _priceText.text = $"{cost} {symbol}";
             SetAmount(0);
+            
+            _image.sprite = await AssetHandler.GetSpriteAsync(metadata?.image);
         }
 
         public async void OnPurchaseClicked()

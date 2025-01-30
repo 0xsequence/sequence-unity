@@ -8,7 +8,7 @@ namespace SequenceSDK.Samples
 {
     public class SequencePlayerProfile : MonoBehaviour
     {
-        [Header("Components")] 
+        [Header("Config")] 
         [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
         
         [Header("Components")]
@@ -16,8 +16,7 @@ namespace SequenceSDK.Samples
         [SerializeField] private TMP_InputField _recipientInput;
         [SerializeField] private TMP_InputField _tokenAmountInput;
         [SerializeField] private QrCodeView _qrImage;
-        [SerializeField] private MessagePopup _successPopup;
-        [SerializeField] private MessagePopup _failurePopup;
+        [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private LoadingScreen _loadingScreen;
         [SerializeField] private GameObject _backButton;
         [SerializeField] private GameObject _overviewState;
@@ -45,6 +44,7 @@ namespace SequenceSDK.Samples
             
             _etherBalanceText.text = $"{balance.balanceWei} ETH";
             EnableLoading(false);
+            _messagePopup.gameObject.SetActive(false);
 
             var filter = new TransactionHistoryFilter {accountAddress = walletAddress};
             var response = await indexer.GetTransactionHistory(new GetTransactionHistoryArgs(filter));
@@ -60,7 +60,7 @@ namespace SequenceSDK.Samples
         public void CopyWalletAddress()
         {
             GUIUtility.systemCopyBuffer = _wallet.GetWalletAddress();
-            _successPopup.Show("Copied");
+            _messagePopup.Show("Copied");
         }
 
         public async void SignOut()
@@ -77,7 +77,7 @@ namespace SequenceSDK.Samples
             var input = _tokenAmountInput.text;
             if (!uint.TryParse(input, out uint t))
             {
-                _failurePopup.Show("Invalid amount.");
+                _messagePopup.Show("Invalid amount.", true);
                 return;
             }
 
@@ -89,9 +89,9 @@ namespace SequenceSDK.Samples
             EnableLoading(false);
 
             if (response is FailedTransactionReturn failed)
-                _failurePopup.Show(failed.error);
+                _messagePopup.Show(failed.error, true);
             else if (response is SuccessfulTransactionReturn success)
-                _successPopup.Show("Sent successfully.");
+                _messagePopup.Show("Sent successfully.");
         }
 
         public void SetOverviewState()
@@ -102,19 +102,8 @@ namespace SequenceSDK.Samples
             _receiveState.SetActive(false);
         }
 
-        public void SetSendState()
-        {
-            _backButton.SetActive(true);
-            _overviewState.SetActive(false);
-            _sendTokenState.SetActive(true);
-            _receiveState.SetActive(false);
-        }
-
         public async void SetReceiveState()
         {
-            _backButton.SetActive(true);
-            _overviewState.SetActive(false);
-            _sendTokenState.SetActive(false);
             _receiveState.SetActive(true);
             await _qrImage.Show(_wallet.GetWalletAddress());
         }

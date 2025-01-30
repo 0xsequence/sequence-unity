@@ -1,4 +1,5 @@
 using Sequence;
+using Sequence.Demo.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -12,8 +13,8 @@ namespace SequenceSDK.Samples
         public void Show(TransactionHistory transaction)
         {
             _titleText.text = transaction.txnHash;
-            Debug.Log($"{transaction.timestamp}");
-            //_dateText.text = new Datte(transaction.timestamp).ToString();
+            _dateText.text = TimeUtils.FormatRemainingTime(
+                TimeUtils.GetTimestampSecondsNow() - TimeUtils.ConvertDateTimeToSeconds(transaction.timestamp));
         }
 
         public void ShowEmpty()

@@ -49,16 +49,19 @@ namespace Sequence.Demo
         
         public void OpenPlayerProfilePanel()
         {
+            gameObject.SetActive(false);
             _ui.OpenPlayerProfile(Wallet);
         }
         
         public void OpenInventoryPanel()
         {
+            gameObject.SetActive(false);
             _ui.OpenInventory(Wallet);
         }
         
         public void OpenInGameShopPanel()
         {
+            gameObject.SetActive(false);
             _ui.OpenInGameShop(Wallet);
         }
         
