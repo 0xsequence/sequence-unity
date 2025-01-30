@@ -56,7 +56,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9893608c30f46418c1a2d78b609df9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _waitDuration: 4
+  _waitDuration: 3
   _messageText: {fileID: 7859111590571459659}
   _successStatus: {fileID: 8692899969951201349}
   _errorStatus: {fileID: 4870453466748982460}
@@ -120,7 +120,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _rectTransform: {fileID: 7657044420813839511}
 --- !u!1 &1007291495348575539
 GameObject:
   m_ObjectHideFlags: 0

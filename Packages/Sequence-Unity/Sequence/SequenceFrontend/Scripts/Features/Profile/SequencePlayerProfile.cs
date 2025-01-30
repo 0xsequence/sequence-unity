@@ -90,7 +90,7 @@ namespace SequenceSDK.Samples
 
             if (response is FailedTransactionReturn failed)
                 _messagePopup.Show(failed.error, true);
-            else if (response is SuccessfulTransactionReturn success)
+            else if (response is SuccessfulTransactionReturn)
                 _messagePopup.Show("Sent successfully.");
         }
 

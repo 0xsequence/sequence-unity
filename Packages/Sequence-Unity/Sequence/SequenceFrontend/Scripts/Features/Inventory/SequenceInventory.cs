@@ -56,10 +56,38 @@ namespace SequenceSDK.Samples
             _sendState.SetActive(false);
         }
 
-        public void SendToken()
+        public async void SendToken()
         {
+            var recipient = _sendRecipientInput.text;
+            var amountInput = _sendAmountInput.text;
+            if (!uint.TryParse(amountInput, out uint amount))
+            {
+                _messagePopup.Show("Invalid amount.", true);
+                return;
+            }
+            
+            if (amount > _selectedBalance.balance)
+            {
+                _messagePopup.Show("This is too much.", true);
+                return;
+            }
+            
             _loadingScreen.SetActive(true);
+
+            var metadata = _selectedBalance.tokenMetadata;
+            var response = await _wallet.SendTransaction(_chain, new Transaction[] {
+                new SendERC1155(metadata.contractAddress, recipient, new []
+                {
+                    new SendERC1155Values(metadata.tokenId.ToString(), amountInput)
+                })
+            });
+            
             _loadingScreen.SetActive(false);
+            
+            if (response is FailedTransactionReturn failed)
+                _messagePopup.Show(failed.error, true);
+            else if (response is SuccessfulTransactionReturn)
+                _messagePopup.Show("Sent successfully.");
         }
 
         private async void LoadBalances()
@@ -93,7 +121,7 @@ namespace SequenceSDK.Samples
             _detailsState.SetActive(true);
             _sendState.SetActive(false);
 
-            _tokenDetailsNameText.text = $"{balance.balance}x {balance.tokenMetadata.name}";
+            _tokenDetailsNameText.text = $"{balance.tokenMetadata.name}";
             _tokenDetailsDescriptionText.text = balance.tokenMetadata.description;
             _tokenDetailsImage.texture = await AssetHandler.GetTexture2DAsync(balance.tokenMetadata.image);
         }

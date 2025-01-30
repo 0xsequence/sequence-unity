@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Demo.Utils;
@@ -53,8 +51,8 @@ namespace Sequence.Demo
 
         public async void OpenQrCodeView()
         {
-            var destinationAddress = _wallet.GetWalletAddress();
             _qrCodeView.gameObject.SetActive(true);
+            var destinationAddress = _wallet.GetWalletAddress();
             await _qrCodeView.Show(_saleState.PaymentToken, (int)_chain, destinationAddress, "1e2");
         }
 

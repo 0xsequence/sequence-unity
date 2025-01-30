@@ -11,6 +11,7 @@ namespace SequenceSDK.Samples
     public class SequenceInventoryTile : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private TMP_Text _nameText;
+        [SerializeField] private TMP_Text _amountText;
         [SerializeField] private RawImage _tokenImage;
 
         private UnityAction _onClick;
@@ -18,7 +19,8 @@ namespace SequenceSDK.Samples
         public async void Load(TokenBalance token, UnityAction onClick)
         {
             _onClick = onClick;
-            _nameText.text = $"{token.balance}x {token.tokenMetadata.name}";
+            _nameText.text = $"{token.tokenMetadata.name}";
+            _amountText.text = $"{token.balance}x";
             _tokenImage.texture = await AssetHandler.GetTexture2DAsync(token.tokenMetadata.image);
         }
 
