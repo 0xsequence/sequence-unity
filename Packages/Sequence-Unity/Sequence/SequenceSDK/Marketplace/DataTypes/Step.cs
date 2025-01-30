@@ -52,5 +52,19 @@ namespace Sequence.Marketplace
 
             return transactions;
         }
+
+        public static Step ExtractBuyStep(this Step[] steps)
+        {
+            int length = steps.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (steps[i].id == StepType.buy)
+                {
+                    return steps[i];
+                }
+            }
+
+            return null;
+        }
     }
 }

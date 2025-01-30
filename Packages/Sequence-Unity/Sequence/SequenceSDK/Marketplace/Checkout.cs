@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
@@ -63,6 +65,44 @@ namespace Sequence.Marketplace
             return GetCheckoutOptions(options, additionalFeeBps);
         }
         
+        public async Task<CheckoutOptions> GetCheckoutOptions(ERC1155Sale saleContract, Address collection, Dictionary<string, BigInteger> amountsByTokenId)
+        {
+            try
+            {
+                GetPrimarySaleCheckoutOptionsArgs args = new GetPrimarySaleCheckoutOptionsArgs(_wallet.GetWalletAddress(), saleContract, collection, amountsByTokenId);
+                GetCheckoutOptionsResponse response = await _client.SendRequest<GetPrimarySaleCheckoutOptionsArgs, GetCheckoutOptionsResponse>(_chain,
+                    "CheckoutOptionsSalesContract", args);
+                OnCheckoutOptionsReturn?.Invoke(response.options);
+                return response.options;
+            }
+            catch (Exception e)
+            {
+                string error =
+                    $"Error fetching checkout options for {_wallet} with sale contract {saleContract.Contract.GetAddress()} and {nameof(collection)} {collection}: {e.Message}";
+                OnCheckoutOptionsError?.Invoke(error);
+                throw new Exception(error);
+            }
+        }
+        
+        public async Task<CheckoutOptions> GetCheckoutOptions(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount)
+        {
+            try
+            {
+                GetPrimarySaleCheckoutOptionsArgs args = new GetPrimarySaleCheckoutOptionsArgs(_wallet.GetWalletAddress(), saleContract, collection, tokenId, amount);
+                GetCheckoutOptionsResponse response = await _client.SendRequest<GetPrimarySaleCheckoutOptionsArgs, GetCheckoutOptionsResponse>(_chain,
+                    "CheckoutOptionsSalesContract", args);
+                OnCheckoutOptionsReturn?.Invoke(response.options);
+                return response.options;
+            }
+            catch (Exception e)
+            {
+                string error =
+                    $"Error fetching checkout options for {_wallet} with sale contract {saleContract.Contract.GetAddress()} and {nameof(collection)} {collection}: {e.Message}";
+                OnCheckoutOptionsError?.Invoke(error);
+                throw new Exception(error);
+            }
+        }
+
         public event Action<Step[]> OnTransactionStepsReturn;
         public event Action<string> OnTransactionStepsError;
         

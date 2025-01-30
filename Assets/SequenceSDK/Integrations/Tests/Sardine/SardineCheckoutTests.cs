@@ -6,6 +6,7 @@ using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.Integrations.Sardine;
 using Sequence.Marketplace;
+using UnityEngine;
 
 namespace Sequence.Integrations.Tests.Sardine
 {
@@ -57,13 +58,14 @@ namespace Sequence.Integrations.Tests.Sardine
             
             Assert.NotNull(token);
             Assert.IsFalse(string.IsNullOrWhiteSpace(token));
+            Debug.Log(token);
         }
 
         [Test]
         public async Task TestSardineGetNFTCheckoutToken_SecondarySale_ERC1155()
         {
-            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
-            SardineCheckout sardine = new SardineCheckout(Chain.ArbitrumNova, _testWallet);
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.Polygon, "0x079294e6ffec16234578c672fa3fbfd4b6c48640");
+            SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
 
             SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders[0], 1);
             
@@ -129,7 +131,7 @@ namespace Sequence.Integrations.Tests.Sardine
         {
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
 
-            SardineSupportedToken[] tokens = await sardine.SardineGetSupportedTokens();
+            SardineSupportedToken[] tokens = await sardine.SardineGetSupportedTokens(true);
             
             Assert.NotNull(tokens);
             Assert.Greater(tokens.Length, 0);
@@ -138,6 +140,21 @@ namespace Sequence.Integrations.Tests.Sardine
                 Assert.NotNull(token);
                 Assert.IsFalse(string.IsNullOrWhiteSpace(token.network));
             }
+
+            int fullLength = tokens.Length;
+            
+            tokens = await sardine.SardineGetSupportedTokens();
+            
+            Assert.NotNull(tokens);
+            Assert.Greater(tokens.Length, 0);
+            foreach (var token in tokens)
+            {
+                Assert.NotNull(token);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(token.network));
+                Assert.IsTrue(token.MatchesChain(Chain.Polygon));
+            }
+
+            Assert.Less(tokens.Length, fullLength);
         }
 
         [Test]
@@ -145,7 +162,7 @@ namespace Sequence.Integrations.Tests.Sardine
         {
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
 
-            SardineEnabledToken[] tokens = await sardine.SardineGetEnabledTokens();
+            SardineEnabledToken[] tokens = await sardine.SardineGetEnabledTokens(true);
             
             Assert.NotNull(tokens);
             Assert.Greater(tokens.Length, 0);
@@ -154,6 +171,21 @@ namespace Sequence.Integrations.Tests.Sardine
                 Assert.NotNull(token);
                 Assert.IsFalse(string.IsNullOrWhiteSpace(token.network));
             }
+
+            int fullLength = tokens.Length;
+            
+            tokens = await sardine.SardineGetEnabledTokens();
+            
+            Assert.NotNull(tokens);
+            Assert.Greater(tokens.Length, 0);
+            foreach (var token in tokens)
+            {
+                Assert.NotNull(token);
+                Assert.IsFalse(string.IsNullOrWhiteSpace(token.network));
+                Assert.IsTrue(token.MatchesChain(Chain.Polygon));
+            }
+
+            Assert.Less(tokens.Length, fullLength);
         }
     }
 }

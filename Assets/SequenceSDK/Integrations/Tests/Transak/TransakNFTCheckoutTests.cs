@@ -25,7 +25,7 @@ namespace Sequence.Integrations.Tests.Transak
         [SetUp]
         public async Task Setup()
         {
-            _collectibleOrders = await OrderFetcher.FetchListings();
+            _collectibleOrders = await OrderFetcher.FetchListings(Chain.ArbitrumNova, "0x0ee3af1874789245467e7482f042ced9c5171073");
         }
         
         [Test]
@@ -44,14 +44,27 @@ namespace Sequence.Integrations.Tests.Transak
         }
         
         [Test]
-        public async Task TestGetNFTCheckoutLink()
+        public async Task TestGetNFTCheckoutLink_Marketplace()
         {
             TransakNFTCheckout transakCheckout =
-                new TransakNFTCheckout(_testWallet, Chain.ArbitrumNova, new MockEthClientForGasEstimation(), 
-                    new Checkout(_testWallet, Chain.ArbitrumNova));
+                new TransakNFTCheckout(_testWallet, Chain.ArbitrumNova, new MockEthClientForGasEstimation());
             
             string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(_collectibleOrders[0].order, _collectibleOrders[0].metadata, 1, NFTType.ERC1155);
 
+            Debug.Log(transakNFTCheckoutLink);
+            Assert.IsNotNull(transakNFTCheckoutLink);
+        }
+
+        [Test]
+        public async Task TestGetNFTCheckoutLink_PrimarySale_ERC1155()
+        {
+            TransakNFTCheckout transakCheckout =
+                new TransakNFTCheckout(_testWallet, Chain.Polygon);
+
+            string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(
+                new ERC1155Sale("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b"),
+                new Address("0xdeb398f41ccd290ee5114df7e498cf04fac916cb"), 1, 1);
+            
             Debug.Log(transakNFTCheckoutLink);
             Assert.IsNotNull(transakNFTCheckoutLink);
         }

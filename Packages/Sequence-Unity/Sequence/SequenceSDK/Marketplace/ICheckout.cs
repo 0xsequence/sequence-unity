@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Contracts;
 
 namespace Sequence.Marketplace
 {
@@ -25,6 +27,26 @@ namespace Sequence.Marketplace
         /// <param name="additionalFeeBps"></param>
         /// <returns></returns>
         public Task<CheckoutOptions> GetCheckoutOptions(Order[] orders, int additionalFeeBps = 0);
+
+        /// <summary>
+        /// Get all the checkout options for a given ERC1155 sale contract, collection, and amounts
+        /// </summary>
+        /// <param name="saleContract"></param>
+        /// <param name="collection"></param>
+        /// <param name="amountsByTokenId"></param>
+        /// <returns></returns>
+        public Task<CheckoutOptions> GetCheckoutOptions(ERC1155Sale saleContract, Address collection,
+            Dictionary<string, BigInteger> amountsByTokenId);
+
+        /// <summary>
+        /// Get all the checkout options for a given ERC721 sale contract, collection, tokenId, and amount
+        /// </summary>
+        /// <param name="saleContract"></param>
+        /// <param name="collection"></param>
+        /// <param name="tokenId"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public Task<CheckoutOptions> GetCheckoutOptions(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount);
         
         public event Action<Step[]> OnTransactionStepsReturn;
         public event Action<string> OnTransactionStepsError;

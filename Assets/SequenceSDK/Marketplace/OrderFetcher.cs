@@ -7,11 +7,9 @@ namespace Sequence.Marketplace
 {
     public static class OrderFetcher
     {
-        public static async Task<CollectibleOrder[]> FetchListings()
+        public static async Task<CollectibleOrder[]> FetchListings(Chain chain, string contractAddress)
         {
-            Chain chain = Chain.ArbitrumNova;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
             ListCollectiblesReturn collectiblesResponse = await marketplaceReader.ListCollectibleListingsWithLowestPricedListingsFirst(contractAddress, filter);

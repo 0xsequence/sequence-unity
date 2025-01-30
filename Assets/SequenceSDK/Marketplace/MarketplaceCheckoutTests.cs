@@ -21,9 +21,9 @@ namespace Sequence.Marketplace
 
         [TestCase(1)]
         [TestCase(3)]
-        public async Task TestGetCheckoutOptions(int amount)
+        public async Task TestGetCheckoutOptions_Marketplace(int amount)
         {
-            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings();
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.ArbitrumNova, "0x0ee3af1874789245467e7482f042ced9c5171073");
             List<Order> orders = new List<Order>();
             for (int i = 0; i < collectibleOrders.Length; i++)
             {
@@ -43,6 +43,79 @@ namespace Sequence.Marketplace
 
             Assert.IsNotNull(options);
             Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
+        }
+
+        [TestCase(new [] { "1" }, new long[] { 1 }, null)]
+        [TestCase(new [] { "1", "2", "3" }, new long[] { 1, 2, 3 }, null)]
+        [TestCase(new string[]{}, new long[]{}, "Must provide at least one tokenId and amount")]
+        [TestCase(new string[] {"1"}, new long[] {-1}, "Amount must be larger than 0")]
+        [TestCase(new string[] {"1", "2"}, new long[] {1, 0}, "Amount must be larger than 0")]
+        [TestCase(new string[] {""}, new long[] {1}, "TokenId is invalid")]
+        [TestCase(new string[] {"something random that isn't a token id"}, new long[] {1}, "TokenId is invalid")]
+        public async Task TestGetCheckoutOptions_PrimarySale_ERC1155(string[] tokenIds, long[] amounts, string expectedException)
+        {
+            Dictionary<string, BigInteger> amountsByTokenId = new Dictionary<string, BigInteger>();
+            int length = tokenIds.Length;
+            Assert.AreEqual(length, amounts.Length, $"Invalid test setup. {nameof(tokenIds)} and {nameof(amounts)} must have the same length");
+            for (int i = 0; i < length; i++)
+            {
+                amountsByTokenId[tokenIds[i]] = amounts[i];
+            }
+
+            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            ERC1155Sale sale = new ERC1155Sale("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b");
+            ERC1155 collection = new ERC1155("0xdeb398f41ccd290ee5114df7e498cf04fac916cb");
+
+            if (!string.IsNullOrWhiteSpace(expectedException))
+            {
+                try
+                {
+                    CheckoutOptions options = await checkout.GetCheckoutOptions(sale, collection, amountsByTokenId);
+                    Assert.Fail("Expected exception but none was encountered");
+                }
+                catch (Exception e)
+                {
+                    Assert.IsTrue(e.Message.Contains(expectedException));
+                }
+            }
+            else
+            {
+                CheckoutOptions options = await checkout.GetCheckoutOptions(sale, collection, amountsByTokenId);
+                Assert.IsNotNull(options);
+                Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
+            }
+        }
+
+        [TestCase("1", 1, null)]
+        [TestCase("1", -1, "Amount must be larger than 0")]
+        [TestCase("", 1, "TokenId is invalid")]
+        [TestCase("something random that isn't a token id", 1, "TokenId is invalid")]
+        [TestCase("1", 0, "Amount must be larger than 0")]
+        public async Task TestGetCheckoutOptions_PrimarySale_ERC721(string tokenId, long amount,
+            string expectedException)
+        {
+            Checkout checkout = new Checkout(_testWallet, Chain.Polygon);
+            ERC721Sale sale = new ERC721Sale("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b");
+            ERC721 collection = new ERC721("0xdeb398f41ccd290ee5114df7e498cf04fac916cb");
+
+            if (!string.IsNullOrWhiteSpace(expectedException))
+            {
+                try
+                {
+                    CheckoutOptions options = await checkout.GetCheckoutOptions(sale, collection, tokenId, amount);
+                    Assert.Fail("Expected exception but none was encountered");
+                }
+                catch (Exception e)
+                {
+                    Assert.IsTrue(e.Message.Contains(expectedException));
+                }
+            }
+            else
+            {
+                CheckoutOptions options = await checkout.GetCheckoutOptions(sale, collection, tokenId, amount);
+                Assert.IsNotNull(options);
+                Assert.AreNotEqual(TransactionCrypto.unknown, options.crypto);
+            }
         }
 
         [TestCase(1)]
