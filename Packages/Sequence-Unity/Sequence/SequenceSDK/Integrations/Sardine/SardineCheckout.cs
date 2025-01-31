@@ -161,6 +161,11 @@ namespace Sequence.Integrations.Sardine
             {
                 recipient = _wallet.GetWalletAddress();
             }
+
+            if (order.order.priceCurrencyAddress.IsZeroAddress())
+            {
+                throw new ArgumentException("Sardine checkout does not support native currency checkout; please choose an order with a different payment token");
+            }
             
             Step[] steps = await _checkout.GenerateBuyTransaction(order.order, quantity, additionalFee);
             string callData = steps.ExtractBuyStep().data;
@@ -168,54 +173,61 @@ namespace Sequence.Integrations.Sardine
             return await SardineGetNFTCheckoutToken(order, recipient, quantity, callData, new Address(marketplaceContractAddress));
         }
 
-        // Todo add back in once we figure out what I should be doing with the tokenId (this isn't required for the primary sales contract and I don't have a way of knowing what the purchased token id would be)
-        // public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC721Sale saleContract, Address collection,
-        //     BigInteger amount, Address recipient = null, byte[] proof = null)
-        // {
-        //     if (recipient == null)
-        //     {
-        //         recipient = _wallet.GetWalletAddress();
-        //     }
-        //     
-        //     if (amount <= 0)
-        //     {
-        //         throw new ArgumentException($"{nameof(amount)} must be greater than 0");
-        //     }
-        //     
-        //     TokenMetadata metadata = await _reader.GetCollectible(collection, tokenId.ToString());
-        //     ERC721Sale.SaleDetails saleDetails = await saleContract.GetSaleDetailsAsync(_ethClient);
-        //     Address paymentToken = saleDetails.PaymentToken;
-        //     ERC20 paymentTokenContract = new ERC20(paymentToken);
-        //     string paymentTokenSymbol = await paymentTokenContract.Symbol(_ethClient);
-        //     BigInteger paymentTokenDecimals = await paymentTokenContract.Decimals(_ethClient);
-        //     
-        //     if (amount > saleDetails.SupplyCap)
-        //     {
-        //         Debug.LogWarning($"Requested amount exceeds the supply cap; requested: {amount}, supply cap: {saleDetails.SupplyCap}. Requesting the supply cap instead");
-        //         amount = saleDetails.SupplyCap;
-        //     }
-        //     
-        //     if (saleDetails.StartTimeLong > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
-        //     {
-        //         throw new Exception($"This collection {collection} is not yet available for sale");
-        //     }
-        //     if (saleDetails.EndTimeLong < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
-        //     {
-        //         throw new Exception($"This collection {collection} is no longer available for sale");
-        //     }
-        //     
-        //     string callData = saleContract.Mint(recipient, amount, paymentToken,
-        //         saleDetails.Cost * amount, proof).CallData;
-        //     
-        //     GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
-        //         new PaymentMethodTypeConfig(
-        //             EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(), PaymentMethod.us_debit),
-        //         metadata.image, _chain, recipient, saleContract.Contract.GetAddress(),
-        //         tokenId.ToString(), amount, metadata.decimals, saleDetails.Cost.ToString(), paymentToken,
-        //         paymentTokenSymbol, paymentTokenDecimals, callData, metadata.name);
-        //
-        //     return await SardineGetNFTCheckoutToken(request);
-        // }
+        // Todo add test
+        public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC721Sale saleContract, Address collection,
+            BigInteger amount, BigInteger tokenId, Address recipient = null, byte[] proof = null)
+        {
+            if (recipient == null)
+            {
+                recipient = _wallet.GetWalletAddress();
+            }
+            
+            if (amount <= 0)
+            {
+                throw new ArgumentException($"{nameof(amount)} must be greater than 0");
+            }
+            
+            TokenMetadata metadata = await _reader.GetCollectible(collection, tokenId.ToString());
+            ERC721Sale.SaleDetails saleDetails = await saleContract.GetSaleDetailsAsync(_ethClient);
+            Address paymentToken = saleDetails.PaymentToken;
+
+            if (paymentToken.IsZeroAddress())
+            {
+                throw new ArgumentException(
+                    "Sardine checkout does not support native currency checkout; please choose an sales contract with a different payment token");
+            }
+            
+            ERC20 paymentTokenContract = new ERC20(paymentToken);
+            string paymentTokenSymbol = await paymentTokenContract.Symbol(_ethClient);
+            BigInteger paymentTokenDecimals = await paymentTokenContract.Decimals(_ethClient);
+            
+            if (amount > saleDetails.SupplyCap)
+            {
+                Debug.LogWarning($"Requested amount exceeds the supply cap; requested: {amount}, supply cap: {saleDetails.SupplyCap}. Requesting the supply cap instead");
+                amount = saleDetails.SupplyCap;
+            }
+            
+            if (saleDetails.StartTimeLong > DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                throw new Exception($"This collection {collection} is not yet available for sale");
+            }
+            if (saleDetails.EndTimeLong < DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                throw new Exception($"This collection {collection} is no longer available for sale");
+            }
+            
+            string callData = saleContract.Mint(recipient, amount, paymentToken,
+                saleDetails.Cost * amount, proof).CallData;
+            
+            GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
+                new PaymentMethodTypeConfig(
+                    EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(), PaymentMethod.us_debit),
+                metadata.image, _chain, recipient, saleContract.Contract.GetAddress(),
+                tokenId.ToString(), amount, metadata.decimals, saleDetails.Cost.ToString(), paymentToken,
+                paymentTokenSymbol, paymentTokenDecimals, callData, metadata.name);
+        
+            return await SardineGetNFTCheckoutToken(request);
+        }
 
         public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC1155Sale saleContract, Address collection,
             BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] data = null, byte[] proof = null)
@@ -231,6 +243,13 @@ namespace Sequence.Integrations.Sardine
             }
 
             Address paymentToken = await saleContract.GetPaymentTokenAsync(_ethClient);
+
+            if (paymentToken.IsZeroAddress())
+            {
+                throw new ArgumentException(
+                    "Sardine checkout does not support native currency checkout; please choose an sales contract with a different payment token");
+            }
+            
             (string, BigInteger) paymentTokenDetails = await GetPaymentTokenDetails(paymentToken);
             string paymentTokenSymbol = paymentTokenDetails.Item1;
             BigInteger paymentTokenDecimals = paymentTokenDetails.Item2;
