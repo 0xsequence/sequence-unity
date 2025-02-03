@@ -22,9 +22,12 @@ namespace SequenceSDK.Samples
         [SerializeField] private GameObject _overviewState;
         [SerializeField] private GameObject _sendTokenState;
         [SerializeField] private GameObject _receiveState;
+        [SerializeField] private GameObject _walletsState;
         [SerializeField] private GenericObjectPool<TransactionHistoryTile> _transactionPool;
+        [SerializeField] private GenericObjectPool<LinkedWalletTile> _walletsPool;
         
         private IWallet _wallet;
+        private EOAWalletLinker _walletLinker;
 
         public void Hide()
         {
@@ -34,7 +37,6 @@ namespace SequenceSDK.Samples
         public async void Show(IWallet wallet)
         {
             _wallet = wallet;
-            
             gameObject.SetActive(true);
             SetOverviewState();
             
@@ -43,18 +45,11 @@ namespace SequenceSDK.Samples
             var balance = await indexer.GetEtherBalance(walletAddress);
             
             _etherBalanceText.text = $"{balance.balanceWei} ETH";
-            EnableLoading(false);
             _messagePopup.gameObject.SetActive(false);
+            EnableLoading(false);
 
-            var filter = new TransactionHistoryFilter {accountAddress = walletAddress};
-            var response = await indexer.GetTransactionHistory(new GetTransactionHistoryArgs(filter));
-            
-            _transactionPool.Cleanup();
-            if (response.transactions.Length == 0)
-                _transactionPool.GetObject().ShowEmpty();
-            
-            foreach (var transaction in response.transactions)
-                _transactionPool.GetObject().Show(transaction);
+            LoadTransactionHistory();
+            LoadLinkedWallets();
         }
 
         public void CopyWalletAddress()
@@ -94,12 +89,18 @@ namespace SequenceSDK.Samples
                 _messagePopup.Show("Sent successfully.");
         }
 
+        public async void LinkExternalWallet()
+        {
+            await new EOAWalletLinker(_wallet, _chain).OpenEoaWalletLink();
+        }
+
         public void SetOverviewState()
         {
             _backButton.SetActive(false);
             _overviewState.SetActive(true);
             _sendTokenState.SetActive(false);
             _receiveState.SetActive(false);
+            _walletsState.SetActive(false);
         }
 
         public async void SetReceiveState()
@@ -111,6 +112,34 @@ namespace SequenceSDK.Samples
         private void EnableLoading(bool enable)
         {
             _loadingScreen.gameObject.SetActive(enable);
+        }
+
+        private async void LoadTransactionHistory()
+        {
+            var walletAddress = _wallet.GetWalletAddress();
+            var indexer = new ChainIndexer(_chain);
+            var filter = new TransactionHistoryFilter {accountAddress = walletAddress};
+            var response = await indexer.GetTransactionHistory(new GetTransactionHistoryArgs(filter));
+            
+            _transactionPool.Cleanup();
+            if (response.transactions.Length == 0)
+                _transactionPool.GetObject().ShowEmpty();
+            
+            foreach (var transaction in response.transactions)
+                _transactionPool.GetObject().Show(transaction);
+        }
+
+        private async void LoadLinkedWallets()
+        {
+            _walletLinker = new EOAWalletLinker(_wallet, _chain);
+            var linkedWallets = await _walletLinker.GetLinkedWallets();
+            
+            _walletsPool.Cleanup();
+            if (linkedWallets.Length == 0)
+                _walletsPool.GetObject().ShowEmpty();
+            
+            foreach (var wallet in linkedWallets)
+                _walletsPool.GetObject().Show(wallet);
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Sequence.Demo
         private SeeMarketplaceListingsPanel _seeMarketplaceListingsPanel;
         private MarketplaceItemDetailsPanel _marketplaceItemDetailsPanel;
         private SequencePlayerProfile _playerProfile;
+        private SequenceDailyRewards _dailyRewards;
         private SequenceInventory _inventory;
         private SequenceInGameShop _inGameShop;
         
@@ -40,6 +41,7 @@ namespace Sequence.Demo
             _seeMarketplaceListingsPanel = GetComponentInChildren<SeeMarketplaceListingsPanel>();
             _marketplaceItemDetailsPanel = GetComponentInChildren<MarketplaceItemDetailsPanel>();
             _playerProfile = GetComponentInChildren<SequencePlayerProfile>();
+            _dailyRewards = GetComponentInChildren<SequenceDailyRewards>();
             _inventory = GetComponentInChildren<SequenceInventory>();
             _inGameShop = GetComponentInChildren<SequenceInGameShop>();
 
@@ -82,6 +84,7 @@ namespace Sequence.Demo
             _playerProfile.Hide();
             _inventory.Hide();
             _inGameShop.Hide();
+            _dailyRewards.Hide();
         }
 
         private void OpenUIPanel(UIPanel panel, params object[] openArgs)
@@ -92,6 +95,11 @@ namespace Sequence.Demo
         public void OpenPlayerProfile(IWallet wallet)
         {
             _playerProfile.Show(wallet);
+        }
+        
+        public void OpenDailyRewards(IWallet wallet)
+        {
+            _dailyRewards.Show(wallet);
         }
 
         public void OpenInventory(IWallet wallet)

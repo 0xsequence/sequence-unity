@@ -12,7 +12,7 @@ namespace Sequence.Demo
         
         [SerializeField] private string _format;
         [SerializeField] private int _size;
-        [SerializeField] private Image _qrImage;
+        [SerializeField] private RawImage _qrImage;
         
         public async Task Show(string paymentToken, int chainId, string destinationAddress, string amount)
         {
@@ -22,10 +22,8 @@ namespace Sequence.Demo
 
         public async Task Show(string deeplink)
         {
-            var texture = await GenerateQrCodeAsync(deeplink);
-            
-            _qrImage.sprite = null;
-            _qrImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            _qrImage.texture = null;
+            _qrImage.texture = await GenerateQrCodeAsync(deeplink);
         }
 
         private async Task<Texture2D> GenerateQrCodeAsync(string deeplink)

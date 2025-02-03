@@ -39,7 +39,7 @@ namespace Sequence.Demo
             _wallet = wallet;
             _chain = chain;
             _itemsForSale = itemsForSale;
-
+            
             await Task.WhenAll(
                 UpdateSaleDetailsAsync(),
                 UpdatePaymentTokenAsync(),

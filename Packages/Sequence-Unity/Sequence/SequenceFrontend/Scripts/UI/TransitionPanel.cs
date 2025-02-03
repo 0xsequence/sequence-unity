@@ -53,6 +53,12 @@ namespace Sequence.Demo
             _ui.OpenPlayerProfile(Wallet);
         }
         
+        public void OpenDailyRewardsPanel()
+        {
+            gameObject.SetActive(false);
+            _ui.OpenDailyRewards(Wallet);
+        }
+        
         public void OpenInventoryPanel()
         {
             gameObject.SetActive(false);
@@ -65,10 +71,10 @@ namespace Sequence.Demo
             _ui.OpenInGameShop(Wallet);
         }
         
-        public void LinkEOAWallet()
+        public async void LinkEOAWallet()
         {
-            EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://api.sequence.app/rpc/API/GenerateWaaSVerificationURL");
-            linker.OpenEOAWalletLink(Chain.ArbitrumNova);
+            var linker = new EOAWalletLinker(Wallet, Chain.ArbitrumNova);
+            await linker.OpenEoaWalletLink();
         }
         
         public void OpenSeeMarketplaceListingsPanel()
