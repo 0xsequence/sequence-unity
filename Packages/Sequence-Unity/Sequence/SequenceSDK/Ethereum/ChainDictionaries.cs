@@ -28,6 +28,7 @@ namespace Sequence
             { Chain.LAOS, "LAOS" },
             { Chain.Soneium, "Soneium" },
             { Chain.Telos, "Telos" },
+            { Chain.Moonbeam, "Moonbeam"},
 
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -51,6 +52,7 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "Root Porcini Testnet" },
             { Chain.TestnetLAOSSigma, "LAOS Sigma Testnet" },
             { Chain.TestnetTelos, "Telos Testnet" },
+            { Chain.TestnetMoonbaseAlpha, "Moonbase Alpha" },
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -77,6 +79,7 @@ namespace Sequence
             { Chain.LAOS, "LAOS" },
             { Chain.Soneium, "ETH" },
             { Chain.Telos, "TLOS" },
+            { Chain.Moonbeam, "GLMR" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -99,7 +102,8 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "IMX" },
             { Chain.TestnetRootPorcini, "XRP" },
             { Chain.TestnetLAOSSigma, "SIGMA" },
-            { Chain.TestnetTelos, "TLOS" }
+            { Chain.TestnetTelos, "TLOS" },
+            { Chain.TestnetMoonbaseAlpha, "DEV" },
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -159,6 +163,7 @@ namespace Sequence
             { Chain.LAOS, "https://blockscout.laos.laosfoundation.io/" },
             { Chain.Soneium, "https://vk9a3tgpne6qmub8.blockscout.com/" },
             { Chain.Telos, "https://www.teloscan.io/" },
+            { Chain.Moonbeam, "https://moonscan.io/"},
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -182,6 +187,7 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" },
             { Chain.TestnetLAOSSigma, "https://sigma.explorer.laosnetwork.io/" },
             { Chain.TestnetTelos, "https://testnet.teloscan.io/" },
+            { Chain.TestnetMoonbaseAlpha, "https://moonbase.moonscan.io/"},
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -210,6 +216,7 @@ namespace Sequence
             { Chain.LAOS, "6283" },
             { Chain.Soneium, "1868" },
             { Chain.Telos, "40" },
+            { Chain.Moonbeam, "1284" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -232,7 +239,8 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "13473" },
             { Chain.TestnetRootPorcini, "7672" },
             { Chain.TestnetLAOSSigma, "62850" },
-            { Chain.TestnetTelos, "41" }
+            { Chain.TestnetTelos, "41" },
+            { Chain.TestnetMoonbaseAlpha, "1287" }
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -259,6 +267,7 @@ namespace Sequence
             { "6283", Chain.LAOS },
             { "1868", Chain.Soneium },
             { "40", Chain.Telos },
+            { "1284", Chain.Moonbeam },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -281,7 +290,8 @@ namespace Sequence
             { "13473", Chain.TestnetImmutableZkEvm },
             { "7672", Chain.TestnetRootPorcini },
             { "62850", Chain.TestnetLAOSSigma },
-            { "41", Chain.TestnetTelos }
+            { "41", Chain.TestnetTelos },
+            { "1287", Chain.TestnetMoonbaseAlpha }
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -308,6 +318,7 @@ namespace Sequence
             { Chain.LAOS, "laos" },
             { Chain.Soneium, "soneium" },
             { Chain.Telos, "telos" },
+            { Chain.Moonbeam, "moonbeam" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
@@ -330,7 +341,8 @@ namespace Sequence
             { Chain.TestnetImmutableZkEvm, "immutable-zkevm-testnet" },
             { Chain.TestnetRootPorcini, "rootnet-porcini" },
             { Chain.TestnetLAOSSigma, "laos-sigma-testnet" },
-            { Chain.TestnetTelos, "telos-testnet" }
+            { Chain.TestnetTelos, "telos-testnet" },
+            { Chain.TestnetMoonbaseAlpha, "moonbase-alpha" }
         };
     }
 }
