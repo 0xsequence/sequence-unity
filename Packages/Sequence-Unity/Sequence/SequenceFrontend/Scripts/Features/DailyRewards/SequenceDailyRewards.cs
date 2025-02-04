@@ -25,6 +25,8 @@ namespace SequenceSDK.Samples
         [SerializeField] private GenericObjectPool<SequenceDailyRewardTile> _tilePool;
         
         private IWallet _wallet;
+        private DailyRewardsStatusData _rewardsData;
+        private Dictionary<string, TokenSupply[]> _supplies;
         
         public void Hide()
         {
@@ -60,17 +62,26 @@ namespace SequenceSDK.Samples
                 _messagePopup.Show("Failed.", true);
         }
 
-        private void LoadRewards(DailyRewardsStatusData rewardsData, Dictionary<string, TokenSupply[]> supplies)
+        private void LoadRewards()
         {
             _tilePool.Cleanup();
-            for (var index = 0; index < rewardsData.rewards.Count; index++)
+            for (var index = 0; index < _rewardsData.rewards.Count; index++)
             {
-                var rewards = rewardsData.rewards[index];
+                var rewards = _rewardsData.rewards[index];
                 var reward = rewards[0];
                 
-                var metadata = supplies[reward.contractAddress].First(s => s.tokenID == reward.tokenId).tokenMetadata;
-                _tilePool.GetObject().Show(index, rewardsData.userStatus.progress, rewardsData.nextClaimTime, reward, metadata, ClaimReward);
+                var metadata = _supplies[reward.contractAddress]
+                    .First(s => s.tokenID == reward.tokenId).tokenMetadata;
+                
+                _tilePool.GetObject()
+                    .Show(index, _rewardsData, reward, metadata, ClaimReward, ResetRewards);
             }
+        }
+
+        private void ResetRewards()
+        {
+            _rewardsData.userStatus.progress = 0;
+            LoadRewards();
         }
 
         private async Task<bool> CallRewardsAsync(string method)
@@ -112,9 +123,12 @@ namespace SequenceSDK.Samples
             
             var metadata = await indexer.GetTokenSuppliesMap(args);
             var supplies = metadata.supplies;
+
+            _rewardsData = rewardsData;
+            _supplies = supplies;
             
             EnableContent(true);
-            LoadRewards(rewardsData, supplies);
+            LoadRewards();
             return true;
         }
     }

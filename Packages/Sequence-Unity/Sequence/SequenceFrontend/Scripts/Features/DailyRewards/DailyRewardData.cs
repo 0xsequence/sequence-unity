@@ -4,7 +4,7 @@ namespace SequenceSDK.Samples
 {
     public struct DailyRewardsStatusData
     {
-        public int nextClaimTime;
+        public int timeSpan;
         public UserRewardStatusData userStatus;
         public List<List<RewardData>> rewards;
     }
