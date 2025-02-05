@@ -112,17 +112,15 @@ namespace Sequence.Integrations.Transak
             {
                 throw new ArgumentException($"The provided {nameof(contractId)} is not for the same chain as the current instance of {nameof(TransakNFTCheckout)}, given: {contractId.Chain}, expected: {_chain}");
             }
-            
-            string transakCallData = Uri.EscapeDataString(CompressionUtility.DeflateAndEncodeToBase64(callData));
+
+            string transakCallData = CallDataCompressor.Compress(callData);
             
             string baseUrl = "https://global.transak.com";
             string transakContractId = contractId.Id;
             
             string transakCryptocurrencyCode = contractId.PriceTokenSymbol;
             
-            string itemJson = JsonConvert.SerializeObject(new [] { item });
-            string itemJsonBase64 = itemJson.StringToBase64();
-            string transakNftDataEncoded = Uri.EscapeDataString(itemJsonBase64);
+            string transakNftDataEncoded = NftDataEncoder.Encode(item);
             
             // Todo use real gas estimates - issue right now is that the call to the Eth client is giving an 'execution reverted' error
             // Most likely reverting since they (probably) don't have any gas in the contract and are likely using a relayer of some sort
