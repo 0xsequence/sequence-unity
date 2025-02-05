@@ -15,19 +15,9 @@ namespace Sequence.Integrations.Tests.Transak
 {
     public class TransakNFTCheckoutTests
     {
-        private CollectibleOrder[] _collectibleOrders;
-
         private IWallet _testWallet =
             new SequenceWallet(new Address("0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07"), "", null);
-        
-        
-        
-        [SetUp]
-        public async Task Setup()
-        {
-            _collectibleOrders = await OrderFetcher.FetchListings(Chain.ArbitrumNova, "0x0ee3af1874789245467e7482f042ced9c5171073");
-        }
-        
+
         [Test]
         public async Task TestGetSupportedCountries()
         {
@@ -46,10 +36,11 @@ namespace Sequence.Integrations.Tests.Transak
         [Test]
         public async Task TestGetNFTCheckoutLink_Marketplace()
         {
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.Polygon, "0x079294e6ffec16234578c672fa3fbfd4b6c48640");
             TransakNFTCheckout transakCheckout =
-                new TransakNFTCheckout(_testWallet, Chain.ArbitrumNova, new MockEthClientForGasEstimation());
+                new TransakNFTCheckout(_testWallet, Chain.Polygon, new MockEthClientForGasEstimation());
             
-            string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(_collectibleOrders[0].order, _collectibleOrders[0].metadata, 1, NFTType.ERC1155);
+            string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(collectibleOrders[0].order, collectibleOrders[0].metadata, 1, NFTType.ERC1155);
 
             Debug.Log(transakNFTCheckoutLink);
             Assert.IsNotNull(transakNFTCheckoutLink);
@@ -67,6 +58,37 @@ namespace Sequence.Integrations.Tests.Transak
             
             Debug.Log(transakNFTCheckoutLink);
             Assert.IsNotNull(transakNFTCheckoutLink);
+        }
+
+        [Test]
+        public async Task TestGetNFTCheckoutLink_PrimarySale_ERC721()
+        {
+            TransakNFTCheckout transakCheckout =
+                new TransakNFTCheckout(_testWallet, Chain.Polygon);
+
+            string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(
+                new ERC721Sale("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b"),
+                new Address("0xdeb398f41ccd290ee5114df7e498cf04fac916cb"), 1, 1); // Todo replace with actual 721 contracts
+            
+            Debug.Log(transakNFTCheckoutLink);
+            Assert.IsNotNull(transakNFTCheckoutLink);
+        }
+
+        [Test]
+        public void TestConstructionWithUnsupportedChain()
+        {
+            try
+            {
+                TransakNFTCheckout checkout = new TransakNFTCheckout(_testWallet, Chain.None);
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.True(e.Message.Contains("provided chain is not supported"));
+                Assert.True(e.Message.Contains("Ethereum"));
+                Assert.True(e.Message.Contains("Polygon"));
+                Debug.Log(e.Message);
+            }
         }
     }
 }

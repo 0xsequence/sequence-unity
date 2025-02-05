@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.Contracts;
 using System.Numerics;
@@ -18,10 +19,36 @@ namespace Sequence.Integrations.Transak
         private Chain _chain;
         private IEthClient _client;
         private ICheckout _checkout;
+        private IMarketplaceReader _reader;
         private Address _walletAddress;
 
-        public TransakNFTCheckout(IWallet wallet, Chain chain, IEthClient client = null, ICheckout checkout = null)
+        // Referenced from here: https://docs.transak.com/docs/nft-marketplace
+        // We are to provide the Chain-associated contract address as the "to" address during NFT checkout
+        private static readonly Dictionary<Chain, Address> TransakContractAddresses = new Dictionary<Chain, Address>()
         {
+            {Chain.Ethereum, new Address("0xab88cd272863b197b48762ea283f24a13f6586dd")},
+            {Chain.TestnetSepolia, new Address("0xD84aC4716A082B1F7eCDe9301aA91A7c4B62ECd7")},
+            {Chain.Polygon, new Address("0x4A598B7eC77b1562AD0dF7dc64a162695cE4c78A")},
+            {Chain.TestnetPolygonAmoy, new Address("0xCB9bD5aCD627e8FcCf9EB8d4ba72AEb1Cd8Ff5EF")},
+            {Chain.BNBSmartChain, new Address("0x4A598B7eC77b1562AD0dF7dc64a162695cE4c78A")},
+            {Chain.TestnetBNBSmartChain, new Address("0x0E9539455944BE8a307bc43B0a046613a1aD6732")},
+            {Chain.ArbitrumOne, new Address("0x4A598B7eC77b1562AD0dF7dc64a162695cE4c78A")},
+            {Chain.TestnetArbitrumSepolia, new Address("0x489F56e3144FF03A887305839bBCD20FF767d3d1")},
+            {Chain.Optimism, new Address("0x4A598B7eC77b1562AD0dF7dc64a162695cE4c78A")},
+            {Chain.TestnetOptimisticSepolia, new Address("0xCB9bD5aCD627e8FcCf9EB8d4ba72AEb1Cd8Ff5EF")},
+            {Chain.ImmutableZkEvm, new Address("0x8b83dE7B20059864C479640CC33426935DC5F85b")},
+            {Chain.TestnetImmutableZkEvm, new Address("0x489F56e3144FF03A887305839bBCD20FF767d3d1")},
+            {Chain.Base, new Address("0x8b83dE7B20059864C479640CC33426935DC5F85b")},
+            {Chain.TestnetBaseSepolia, new Address("0xCB9bD5aCD627e8FcCf9EB8d4ba72AEb1Cd8Ff5EF")},
+        };
+
+        public TransakNFTCheckout(IWallet wallet, Chain chain, IEthClient client = null, ICheckout checkout = null, IMarketplaceReader reader = null)
+        {
+            if (!TransakContractAddresses.ContainsKey(chain))
+            {
+                throw new NotSupportedException($"The provided chain is not supported for Transak NFT checkout, given: {chain}. Supported chains include: {string.Join(", ",TransakContractAddresses.Keys)}");
+            }
+            
             _wallet = wallet;
             _chain = chain;
             if (client == null)
@@ -38,6 +65,13 @@ namespace Sequence.Integrations.Transak
             {
                 _checkout = new Checkout(_wallet, chain);
             }
+
+            if (reader == null)
+            {
+                reader = new MarketplaceReader(_chain);
+            }
+
+            _reader = reader;
         }
 
         public static Task<SupportedCountry[]> GetSupportedCountries()
@@ -71,23 +105,26 @@ namespace Sequence.Integrations.Transak
             Application.OpenURL(link);
         }
         
-        internal async Task<string> GetNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress)
+        private async Task<string> GetNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress)
         {
             string transakCallData = Uri.EscapeDataString(CompressionUtility.DeflateAndEncodeToBase64(callData));
             
             string baseUrl = "https://global.transak.com";
-            string transakContractId = "6675a6d0f597abb8f3e2e9c2";
+            string transakContractId = "674eb5613d739107bbd18ed2"; // Provided to Sequence team by Transak - this is paired with our API key
             
             string transakCryptocurrencyCode = ChainDictionaries.GasCurrencyOf[_chain];
-            transakCryptocurrencyCode = "POL"; // Todo remove this line. Currently POL seems to be the only currency code Transak will accept
             
             string itemJson = JsonConvert.SerializeObject(new [] { item });
             string itemJsonBase64 = itemJson.StringToBase64();
             string transakNftDataEncoded = Uri.EscapeDataString(itemJsonBase64);
             
-            GasLimitEstimator gasLimitEstimator = new GasLimitEstimator(_client, _walletAddress);
-            BigInteger estimatedGasLimit =
-                await gasLimitEstimator.EstimateGasLimit(contractAddress, callData, BigInteger.Zero);
+            // Todo use real gas estimates - issue right now is that the call to the Eth client is giving an 'execution reverted' error
+            // Most likely reverting since they (probably) don't have any gas in the contract and are likely using a relayer of some sort
+            
+            // GasLimitEstimator gasLimitEstimator = new GasLimitEstimator(_client, TransakContractAddresses[_chain]);
+            // BigInteger estimatedGasLimit =
+            //     await gasLimitEstimator.EstimateGasLimit(contractAddress, callData, BigInteger.Zero);
+            BigInteger estimatedGasLimit = 500000;
             string partnerOrderId = $"{_walletAddress}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
             string transakLink = $"{baseUrl}?apiKey={OnOffRampQueryParameters.apiKey}" +
@@ -103,29 +140,82 @@ namespace Sequence.Integrations.Transak
 
             return transakLink;
         }
-        
-        internal async Task OpenNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress)
-        {
-            string link = await GetNFTCheckoutLink(item, callData, contractAddress);
-            Application.OpenURL(link);
-        }
 
-        public async Task<string> GetNFTCheckoutLink(Order order, TokenMetadata metadata, uint quantity, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
+        public async Task<string> GetNFTCheckoutLink(Order order, TokenMetadata metadata, ulong quantity, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
         {
-            Step[] steps = await _checkout.GenerateBuyTransaction(order, quantity, additionalFee);
-            string callData = steps[0].data;
+            if (quantity <= 0)
+            {
+                throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
+            }
+            
+            Step[] steps = await _checkout.GenerateBuyTransaction(order, quantity, additionalFee, TransakContractAddresses[_chain]);
+            string callData = steps.ExtractBuyStep().data;
 
             TransakNftData nftData = new TransakNftData(metadata.image, metadata.name,
-                new Address(order.collectionContractAddress),
-                new string[] { order.tokenId }, new ulong[] { ulong.Parse(order.priceAmount) }, quantity, nftType);
+                new Address(order.collectionContractAddress), new string[] { order.tokenId }, 
+                new decimal[] { DecimalNormalizer.ReturnToNormalPrecise(ulong.Parse(order.priceAmount), (int)order.priceDecimals) }, 
+                quantity, nftType);
             
             return await GetNFTCheckoutLink(nftData, callData, new Address(order.collectionContractAddress));
         }
         
-        public async Task OpenNFTCheckoutLink(Order order, TokenMetadata metadata, uint quantity, NFTType nftType = NFTType.ERC721)
+        public async Task OpenNFTCheckoutLink(Order order, TokenMetadata metadata, ulong quantity, NFTType nftType = NFTType.ERC721)
         {
             string link = await GetNFTCheckoutLink(order, metadata, quantity, nftType);
             Application.OpenURL(link);
+        }
+
+        public async Task<string> GetNFTCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId,
+            ulong quantity, byte[] data = null, byte[] proof = null)
+        {
+            if (quantity <= 0)
+            {
+                throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
+            }
+
+            Address paymentToken = await saleContract.GetPaymentTokenAsync(_client);
+            ERC1155Sale.SaleDetails saleDetails = await saleContract.TokenSaleDetailsAsync(_client, tokenId);
+            TokenMetadata metadata = await _reader.GetCollectible(collection, tokenId.ToString());
+            ERC20 paymentTokenContract = new ERC20(paymentToken);
+            BigInteger decimals = await paymentTokenContract.Decimals(_client);
+
+            string callData = saleContract.Mint(TransakContractAddresses[_chain], new[] { tokenId }, new[] { (BigInteger)quantity }, data, paymentToken,
+                saleDetails.Cost * quantity, proof).CallData;
+            
+            TransakNftData nftData = new TransakNftData(metadata.image, metadata.name, collection, new []{tokenId.ToString()}, 
+                new [] { DecimalNormalizer.ReturnToNormalPrecise(saleDetails.Cost, (int)decimals) }, quantity, NFTType.ERC1155);
+
+            return await GetNFTCheckoutLink(nftData, callData, collection);
+        }
+
+        public async Task OpenNFTCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId,
+            ulong quantity, byte[] data = null, byte[] proof = null)
+        {
+            string link = await GetNFTCheckoutLink(saleContract, collection, tokenId, quantity, data, proof);
+            Application.OpenURL(link);
+        }
+
+        public async Task<string> GetNFTCheckoutLink(ERC721Sale saleContract, Address collection, BigInteger tokenId,
+            ulong quantity, byte[] proof = null)
+        {
+            if (quantity <= 0)
+            {
+                throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
+            }
+
+            ERC721Sale.SaleDetails saleDetails = await saleContract.GetSaleDetailsAsync(_client);
+            Address paymentToken = saleDetails.PaymentToken;
+            TokenMetadata metadata = await _reader.GetCollectible(collection, tokenId.ToString());
+            ERC20 paymentTokenContract = new ERC20(paymentToken);
+            BigInteger decimals = await paymentTokenContract.Decimals(_client);
+
+            string callData = saleContract.Mint(TransakContractAddresses[_chain], quantity, paymentToken,
+                saleDetails.Cost * quantity, proof).CallData;
+            
+            TransakNftData nftData = new TransakNftData(metadata.image, metadata.name, collection, new []{tokenId.ToString()}, 
+                new [] { DecimalNormalizer.ReturnToNormalPrecise(saleDetails.Cost, (int)decimals) }, quantity, NFTType.ERC1155);
+
+            return await GetNFTCheckoutLink(nftData, callData, collection);
         }
     }
 }

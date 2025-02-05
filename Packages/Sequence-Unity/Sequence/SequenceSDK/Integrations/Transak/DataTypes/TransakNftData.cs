@@ -13,12 +13,12 @@ namespace Sequence.Integrations.Transak
         public string nftName;
         public Address collectionAddress;
         public string[] tokenID;
-        public ulong[] price;
-        public uint quantity;
+        public decimal[] price;
+        public ulong quantity;
         public NFTType nftType;
 
         [Preserve]
-        public TransakNftData(string imageURL, string nftName, Address collectionAddress, string[] tokenID, ulong[] price, uint quantity, NFTType nftType = NFTType.ERC721)
+        public TransakNftData(string imageURL, string nftName, Address collectionAddress, string[] tokenID, decimal[] price, ulong quantity, NFTType nftType = NFTType.ERC721)
         {
             this.imageURL = imageURL;
             this.nftName = nftName;
