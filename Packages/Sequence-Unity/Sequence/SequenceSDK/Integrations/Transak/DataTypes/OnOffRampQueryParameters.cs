@@ -7,7 +7,6 @@ namespace Sequence.Integrations.Transak
 {
     public class OnOffRampQueryParameters
     {
-        public const string apiKey = "5911d9ec-46b5-48fa-a755-d59a715ff0cf"; // This can be hardcoded as it is a public API key
         public string referrerDomain;
         public string walletAddress;
         public string fiatCurrency;
@@ -30,7 +29,7 @@ namespace Sequence.Integrations.Transak
 
         public string AsQueryParameters()
         {
-            string url = $"apiKey={apiKey}&referrerDomain={referrerDomain}&walletAddress={walletAddress}&fiatCurrency={fiatCurrency}&disableWalletAddressForm={disableWalletAddressForm}&defaultFiatAmount={defaultFiatAmount}&defaultCryptoCurrency={defaultCryptoCurrency}&networks={networks}";
+            string url = $"apiKey={SequenceTransakContractIdRepository.ApiKey}&referrerDomain={referrerDomain}&walletAddress={walletAddress}&fiatCurrency={fiatCurrency}&disableWalletAddressForm={disableWalletAddressForm}&defaultFiatAmount={defaultFiatAmount}&defaultCryptoCurrency={defaultCryptoCurrency}&networks={networks}";
             url = url.Replace(" ", "");
             return url;
         }

@@ -87,32 +87,38 @@ namespace Sequence.Integrations.Transak
         /// https://docs.transak.com/docs/query-params-for-marketplaces
         /// </summary>
         /// <param name="item" the token the user wants to purchase></param>
+        /// <param name="contract" the contract id for Transak obtained by Sequence team></param>
         /// <param name="contract" the token contract></param>
         /// <param name="buyFunctionName" the name of buy function that needs to be executed on the token contract></param>
         /// <param name="buyFunctionArgs" the arguments needed for the buy function that needs to be executed on the token contract></param>
         /// <returns></returns>
-        public async Task<string> GetNFTCheckoutLink(TransakNftData item, Contract contract, string buyFunctionName, params object[] buyFunctionArgs)
+        public async Task<string> GetNFTCheckoutLink(TransakNftData item, TransakContractId contractId, Contract contract, string buyFunctionName, params object[] buyFunctionArgs)
         {
             string callData = contract.AssembleCallData(buyFunctionName, buyFunctionArgs);
 
-            return await GetNFTCheckoutLink(item, callData, contract.GetAddress());
+            return await GetNFTCheckoutLink(item, callData, contract.GetAddress(), contractId);
         }
 
-        public async Task OpenNFTCheckoutLink(TransakNftData item, Contract contract, string buyFunctionName,
+        public async Task OpenNFTCheckoutLink(TransakNftData item, TransakContractId contractId, Contract contract, string buyFunctionName,
             params object[] buyFunctionArgs)
         {
-            string link = await GetNFTCheckoutLink(item, contract, buyFunctionName, buyFunctionArgs);
+            string link = await GetNFTCheckoutLink(item, contractId, contract, buyFunctionName, buyFunctionArgs);
             Application.OpenURL(link);
         }
         
-        private async Task<string> GetNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress)
+        private async Task<string> GetNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress, TransakContractId contractId)
         {
+            if (contractId.Chain != _chain)
+            {
+                throw new ArgumentException($"The provided {nameof(contractId)} is not for the same chain as the current instance of {nameof(TransakNFTCheckout)}, given: {contractId.Chain}, expected: {_chain}");
+            }
+            
             string transakCallData = Uri.EscapeDataString(CompressionUtility.DeflateAndEncodeToBase64(callData));
             
             string baseUrl = "https://global.transak.com";
-            string transakContractId = "674eb5613d739107bbd18ed2"; // Provided to Sequence team by Transak - this is paired with our API key
+            string transakContractId = contractId.Id;
             
-            string transakCryptocurrencyCode = ChainDictionaries.GasCurrencyOf[_chain];
+            string transakCryptocurrencyCode = contractId.PriceTokenSymbol;
             
             string itemJson = JsonConvert.SerializeObject(new [] { item });
             string itemJsonBase64 = itemJson.StringToBase64();
@@ -127,7 +133,7 @@ namespace Sequence.Integrations.Transak
             BigInteger estimatedGasLimit = 500000;
             string partnerOrderId = $"{_walletAddress}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
-            string transakLink = $"{baseUrl}?apiKey={OnOffRampQueryParameters.apiKey}" +
+            string transakLink = $"{baseUrl.AppendTrailingSlashIfNeeded()}?apiKey={SequenceTransakContractIdRepository.ApiKey}" +
                                  $"&isNFT=true" +
                                  $"&calldata={transakCallData}" +
                                  $"&contractId={transakContractId}" +
@@ -141,12 +147,15 @@ namespace Sequence.Integrations.Transak
             return transakLink;
         }
 
-        public async Task<string> GetNFTCheckoutLink(Order order, TokenMetadata metadata, ulong quantity, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
+        public async Task<string> GetNFTCheckoutLink(CollectibleOrder collectibleOrder, ulong quantity, TransakContractId contractId, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
         {
             if (quantity <= 0)
             {
                 throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
             }
+
+            Order order = collectibleOrder.order;
+            TokenMetadata metadata = collectibleOrder.metadata;
             
             Step[] steps = await _checkout.GenerateBuyTransaction(order, quantity, additionalFee, TransakContractAddresses[_chain]);
             string callData = steps.ExtractBuyStep().data;
@@ -156,17 +165,17 @@ namespace Sequence.Integrations.Transak
                 new decimal[] { DecimalNormalizer.ReturnToNormalPrecise(ulong.Parse(order.priceAmount), (int)order.priceDecimals) }, 
                 quantity, nftType);
             
-            return await GetNFTCheckoutLink(nftData, callData, new Address(order.collectionContractAddress));
+            return await GetNFTCheckoutLink(nftData, callData, new Address(order.collectionContractAddress), contractId);
         }
         
-        public async Task OpenNFTCheckoutLink(Order order, TokenMetadata metadata, ulong quantity, NFTType nftType = NFTType.ERC721)
+        public async Task OpenNFTCheckoutLink(CollectibleOrder order, ulong quantity, TransakContractId contractId, NFTType nftType = NFTType.ERC721)
         {
-            string link = await GetNFTCheckoutLink(order, metadata, quantity, nftType);
+            string link = await GetNFTCheckoutLink(order, quantity, contractId, nftType);
             Application.OpenURL(link);
         }
 
         public async Task<string> GetNFTCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId,
-            ulong quantity, byte[] data = null, byte[] proof = null)
+            ulong quantity, TransakContractId contractId, byte[] data = null, byte[] proof = null)
         {
             if (quantity <= 0)
             {
@@ -185,18 +194,18 @@ namespace Sequence.Integrations.Transak
             TransakNftData nftData = new TransakNftData(metadata.image, metadata.name, collection, new []{tokenId.ToString()}, 
                 new [] { DecimalNormalizer.ReturnToNormalPrecise(saleDetails.Cost, (int)decimals) }, quantity, NFTType.ERC1155);
 
-            return await GetNFTCheckoutLink(nftData, callData, collection);
+            return await GetNFTCheckoutLink(nftData, callData, collection, contractId);
         }
 
         public async Task OpenNFTCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId,
-            ulong quantity, byte[] data = null, byte[] proof = null)
+            ulong quantity, TransakContractId contractId, byte[] data = null, byte[] proof = null)
         {
-            string link = await GetNFTCheckoutLink(saleContract, collection, tokenId, quantity, data, proof);
+            string link = await GetNFTCheckoutLink(saleContract, collection, tokenId, quantity, contractId, data, proof);
             Application.OpenURL(link);
         }
 
         public async Task<string> GetNFTCheckoutLink(ERC721Sale saleContract, Address collection, BigInteger tokenId,
-            ulong quantity, byte[] proof = null)
+            ulong quantity, TransakContractId contractId, byte[] proof = null)
         {
             if (quantity <= 0)
             {
@@ -215,7 +224,7 @@ namespace Sequence.Integrations.Transak
             TransakNftData nftData = new TransakNftData(metadata.image, metadata.name, collection, new []{tokenId.ToString()}, 
                 new [] { DecimalNormalizer.ReturnToNormalPrecise(saleDetails.Cost, (int)decimals) }, quantity, NFTType.ERC1155);
 
-            return await GetNFTCheckoutLink(nftData, callData, collection);
+            return await GetNFTCheckoutLink(nftData, callData, collection, contractId);
         }
     }
 }
