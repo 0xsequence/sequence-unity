@@ -1,6 +1,6 @@
 {
     "name": "SequenceExamples",
-    "rootNamespace": "",
+    "rootNamespace": "Sequence.Demo",
     "references": [
         "GUID:f7fd4ba36aabd1d499450c174865e70b",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
