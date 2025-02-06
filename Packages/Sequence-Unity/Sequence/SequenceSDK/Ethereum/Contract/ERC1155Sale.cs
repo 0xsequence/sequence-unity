@@ -44,11 +44,13 @@ namespace Sequence.Contracts
             _contract = new Contract(contractAddress, abi ?? Abi);
         }
 
-        public CallContractFunction Mint(string to, BigInteger[] tokenIds, BigInteger[] amounts, byte[] data, string expectedPaymentToken, BigInteger maxTotal, byte[] proof)
+        public CallContractFunction Mint(string to, BigInteger[] tokenIds, BigInteger[] amounts, byte[] data, string expectedPaymentToken, BigInteger maxTotal, FixedByte[] proof = null)
         {
             if (data == null)
+            {
                 data = "Minted using the Sequence Unity SDK".ToByteArray(); // Contract expects some data that is non empty
-            
+            }
+
             return _contract.CallFunction("mint", to, tokenIds, amounts, data, expectedPaymentToken, maxTotal, proof);
         }
 

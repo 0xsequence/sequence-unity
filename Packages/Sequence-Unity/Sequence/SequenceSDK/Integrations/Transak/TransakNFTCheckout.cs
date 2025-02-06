@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Sequence.Contracts;
 using System.Numerics;
 using Newtonsoft.Json;
+using Sequence.ABI;
 using Sequence.Marketplace;
 using Sequence.Provider;
 using Sequence.Transactions;
@@ -173,7 +174,7 @@ namespace Sequence.Integrations.Transak
         }
 
         public async Task<string> GetNFTCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId,
-            ulong quantity, TransakContractId contractId, byte[] data = null, byte[] proof = null)
+            ulong quantity, TransakContractId contractId, byte[] data = null, FixedByte[] proof = null)
         {
             if (quantity <= 0)
             {
@@ -196,7 +197,7 @@ namespace Sequence.Integrations.Transak
         }
 
         public async Task OpenNFTCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId,
-            ulong quantity, TransakContractId contractId, byte[] data = null, byte[] proof = null)
+            ulong quantity, TransakContractId contractId, byte[] data = null, FixedByte[] proof = null)
         {
             string link = await GetNFTCheckoutLink(saleContract, collection, tokenId, quantity, contractId, data, proof);
             Application.OpenURL(link);

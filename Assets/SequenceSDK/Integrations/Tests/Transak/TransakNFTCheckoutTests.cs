@@ -56,13 +56,15 @@ namespace Sequence.Integrations.Tests.Transak
             string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(
                 new ERC1155Sale("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b"),
                 new Address("0xdeb398f41ccd290ee5114df7e498cf04fac916cb"), 1, 1, 
-                new TransakContractId("674eb5613d739107bbd18ed2", new Address("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b"), Chain.Polygon, "POL"));
+                new TransakContractId("674eb5613d739107bbd18ed2", new Address("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b"), Chain.Polygon, "USDC"));
             
             Debug.Log(transakNFTCheckoutLink);
             Assert.IsNotNull(transakNFTCheckoutLink);
-            string expectedLinkFromKit =
-                "https://global.transak.com/?apiKey=5911d9ec-46b5-48fa-a755-d59a715ff0cf&isNFT=true&calldata=eJztkMsNxDAIBVsC8zPlOIBrSPmbBiytxCGXzI3DvAfArVAKuhUO8BKfl1WYXSg6VkJuy1BeqENdojhsrpP%2FH9XTcTT94%2FlAwe4hPKK2FE3EQvRnMsgZAZQSROKdeq7u%2Fs33Pwmf%2Fyrt%2Fh9Zdb5R&contractId=674eb5613d739107bbd18ed2&cryptoCurrencyCode=POL&estimatedGasLimit=500000&nftData=W3siaW1hZ2VVUkwiOiJodHRwczovL2Rldi1tZXRhZGF0YS5zZXF1ZW5jZS5hcHAvcHJvamVjdHMvMTAxMC9jb2xsZWN0aW9ucy8zOTQvdG9rZW5zLzEvaW1hZ2Uud2VicCIsIm5mdE5hbWUiOiJLZWF0b24gVC0zMjIiLCJjb2xsZWN0aW9uQWRkcmVzcyI6IjB4ZGViMzk4ZjQxY2NkMjkwZWU1MTE0ZGY3ZTQ5OGNmMDRmYWM5MTZjYiIsInRva2VuSUQiOlsiMSJdLCJwcmljZSI6WzAuMDJdLCJxdWFudGl0eSI6MSwibmZ0VHlwZSI6IkVSQzExNTUifV0%3D&walletAddress=0x5cFE1189E36dacf78A434f42F1d1104C0bf4cafB&disableWalletAddressForm=true&partnerOrderId=0x5cFE1189E36dacf78A434f42F1d1104C0bf4cafB-1738782811397";
-            Assert.AreEqual(expectedLinkFromKit, transakNFTCheckoutLink);
+            // Expected link validated on February 6, 2025
+            // This assertion will confirm that we are still generating the same link from the same data. If primary sale erc1155 with Transak checkout stops working, but this test is still passing, then Transak has made a change on their end that we need to account for 
+            string expectedLink =
+                "https://global.transak.com/?apiKey=5911d9ec-46b5-48fa-a755-d59a715ff0cf&isNFT=true&calldata=eJzlT0kSwzAI%2BxKrMM9xMHlDn9%2Bk90w742N1kgABoheoQThBD7DpOY7oijjYIXPROmMVbDIE6dVWMeaT%2Fzf0np1l0%2F8Yn7Qss9yk%2BvTWwdzMeamgNapIl5eq5855693%2Fp%2B4tIP5vv6gtJDoMDhMKD7014uKGARdyhQeHXxMN%2FVRulmGRd9fMjs0UX%2FEGjwG76g%3D%3D&contractId=674eb5613d739107bbd18ed2&cryptoCurrencyCode=USDC&estimatedGasLimit=500000&nftData=W3siaW1hZ2VVUkwiOiJodHRwczovL2Rldi1tZXRhZGF0YS5zZXF1ZW5jZS5hcHAvcHJvamVjdHMvMTAxMC9jb2xsZWN0aW9ucy8zOTQvdG9rZW5zLzEvaW1hZ2Uud2VicCIsIm5mdE5hbWUiOiJLZWF0b24gVC0zMjIiLCJjb2xsZWN0aW9uQWRkcmVzcyI6IjB4ZGViMzk4ZjQxY2NkMjkwZWU1MTE0ZGY3ZTQ5OGNmMDRmYWM5MTZjYiIsInRva2VuSUQiOlsiMSJdLCJwcmljZSI6WzAuMDIwMDAwXSwicXVhbnRpdHkiOjEsIm5mdFR5cGUiOiJFUkMxMTU1In1d&walletAddress=0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07&disableWalletAddressForm=true&partnerOrderId=0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07-1738867731";
+            Assert.AreEqual(expectedLink, transakNFTCheckoutLink);
         }
 
         [Test]

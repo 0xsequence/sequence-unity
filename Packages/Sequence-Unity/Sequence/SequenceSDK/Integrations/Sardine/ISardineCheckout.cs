@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.ABI;
 using Sequence.Contracts;
 using Sequence.Marketplace;
 
@@ -67,7 +68,7 @@ namespace Sequence.Integrations.Sardine
         /// <param name="proof"></param>
         /// <returns></returns>
         public Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC1155Sale saleContract, Address collection,
-            BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] data = null, byte[] proof = null);
+            BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] data = null, FixedByte[] proof = null);
 
         /// <summary>
         /// Check on the status of an NFT checkout order

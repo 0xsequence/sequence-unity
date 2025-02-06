@@ -56,10 +56,9 @@ namespace Sequence.Demo
             }
 
             var to = _wallet.GetWalletAddress();
-            var defaultProof = Array.Empty<byte>();
 
             var fn = _saleContract.Mint(to, new[] {tokenId},
-                new[] {new BigInteger(amount)}, null, PaymentToken, new BigInteger(1), defaultProof);
+                new[] {new BigInteger(amount)}, null, PaymentToken, new BigInteger(1));
 
             Assert.IsNotNull(fn, "Failed to create mint function in ERC1155Sale.cs");
 

@@ -230,7 +230,7 @@ namespace Sequence.Integrations.Sardine
         }
 
         public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC1155Sale saleContract, Address collection,
-            BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] data = null, byte[] proof = null)
+            BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] data = null, FixedByte[] proof = null)
         {
             if (recipient == null)
             {
