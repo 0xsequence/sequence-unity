@@ -108,6 +108,9 @@ namespace Sequence.EmbeddedWallet
 
         public void ResetSessionId()
         {
+            if (_connectedWalletAddress != null) {
+                return;
+            }
             _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
