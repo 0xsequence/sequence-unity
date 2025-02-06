@@ -3,6 +3,7 @@ using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
+using System.Collections;
 
 namespace Sequence.Demo
 {
@@ -159,6 +160,25 @@ namespace Sequence.Demo
         private void EnableLoadingScreen(bool enable)
         {
             _loadingScreen.SetActive(enable);
+        }
+        
+        private void OnApplicationFocus(bool hasFocus)
+        {
+#if !UNITY_IOS
+            if (hasFocus)
+            {
+                StartCoroutine(DisableLoadingScreenIfNotLoggingIn());
+            }
+#endif
+        }
+
+        private IEnumerator DisableLoadingScreenIfNotLoggingIn()
+        {
+            yield return new WaitForSecondsRealtime(0.1f);
+            if (!LoginHandler.IsLoggingIn())
+            {
+                EnableLoadingScreen(false);
+            }
         }
     }
 }
