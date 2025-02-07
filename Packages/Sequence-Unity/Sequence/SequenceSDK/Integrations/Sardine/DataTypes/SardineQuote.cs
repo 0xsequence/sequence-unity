@@ -4,7 +4,7 @@ using UnityEngine.Scripting;
 namespace Sequence.Integrations.Sardine
 {
     [Serializable]
-    internal class SardineQuote
+    public class SardineQuote
     {
         public double quantity;
         public string network;

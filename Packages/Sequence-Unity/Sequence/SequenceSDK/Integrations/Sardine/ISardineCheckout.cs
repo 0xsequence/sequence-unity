@@ -17,6 +17,19 @@ namespace Sequence.Integrations.Sardine
         /// <param name="marketplaceAddress"></param>
         /// <returns></returns>
         public Task<bool> CheckSardineWhitelistStatus(Address marketplaceAddress);
+
+        /// <summary>
+        /// Retrieve a quote for amount of token that can be bought (or sold) and associated fees
+        /// </summary>
+        /// <param name="token">the token the user wishes to buy or sell</param>
+        /// <param name="amount">the amount (in the quotedCurrency) the user wishes to buy or sell</param>
+        /// <param name="paymentType"></param>
+        /// <param name="quotedCurrency"></param>
+        /// <param name="quoteType"></param>
+        /// <returns></returns>
+        public Task<SardineQuote> SardineGetQuote(SardineToken token, ulong amount,
+            SardinePaymentType paymentType = SardinePaymentType.credit, SardineFiatCurrency quotedCurrency = null,
+            SardineQuoteType quoteType = SardineQuoteType.buy);
         
         /// <summary>
         /// Use this method to request a token from Sardine for on-ramping funds into cryptocurrency via credit/debit card

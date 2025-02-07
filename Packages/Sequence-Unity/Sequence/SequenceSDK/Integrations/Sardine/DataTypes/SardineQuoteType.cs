@@ -4,7 +4,7 @@ using Sequence.Utils;
 namespace Sequence.Integrations.Sardine
 {
     [JsonConverter(typeof(EnumConverter<SardineQuoteType>))]
-    internal enum SardineQuoteType
+    public enum SardineQuoteType
     {
         buy,
         sell

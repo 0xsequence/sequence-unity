@@ -4,7 +4,7 @@ using Sequence.Utils;
 namespace Sequence.Integrations.Sardine
 {
     [JsonConverter(typeof(EnumConverter<SardinePaymentType>))]
-    internal enum SardinePaymentType
+    public enum SardinePaymentType
     {
         ach,
         debit,

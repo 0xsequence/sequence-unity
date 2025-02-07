@@ -5,16 +5,8 @@ using UnityEngine.Scripting;
 namespace Sequence.Integrations.Sardine
 {
     [Serializable]
-    public class SardineEnabledToken : IChainMatcher
+    public class SardineEnabledToken : SardineToken
     {
-        public string network;
-        public string assetSymbol;
-        public string assetName;
-        public string chainId;
-        public string tokenName;
-        public string token;
-        public Address tokenAddress;
-
         [Preserve]
         [JsonConstructor]
         public SardineEnabledToken(string network, string assetSymbol, string assetName, string chainId, string tokenName, string token, string tokenAddress)
@@ -44,15 +36,6 @@ namespace Sequence.Integrations.Sardine
             this.tokenName = tokenName;
             this.token = token;
             this.tokenAddress = tokenAddress;
-        }
-
-        public bool MatchesChain(Chain chain)
-        {
-            if (string.IsNullOrWhiteSpace(chainId))
-            {
-                return false;
-            }
-            return ChainDictionaries.ChainById.ContainsKey(chainId) && ChainDictionaries.ChainById[chainId] == chain;
         }
     }
 }

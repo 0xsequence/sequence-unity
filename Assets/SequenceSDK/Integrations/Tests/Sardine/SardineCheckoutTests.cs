@@ -50,6 +50,22 @@ namespace Sequence.Integrations.Tests.Sardine
         }
 
         [Test]
+        public async Task TestSardineGetQuote()
+        {
+            SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
+            
+            SardineEnabledToken[] tokens = await sardine.SardineGetEnabledTokens();
+            Assert.NotNull(tokens);
+            Assert.Greater(tokens.Length, 0);
+            SardineEnabledToken token = tokens[0];
+
+            SardineQuote quote = await sardine.SardineGetQuote(token, 30);
+            
+            Assert.NotNull(quote);
+            Assert.AreEqual("USD", quote.currency);
+        }
+
+        [Test]
         public async Task TestSardineGetClientToken()
         {
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);

@@ -99,6 +99,21 @@ namespace Sequence.Integrations.Sardine
             }
         }
 
+        public async Task<SardineQuote> SardineGetQuote(SardineToken token, ulong amount,
+            SardinePaymentType paymentType = SardinePaymentType.credit, SardineFiatCurrency quotedCurrency = null,
+            SardineQuoteType quoteType = SardineQuoteType.buy)
+        {
+            SardineGetQuoteParams request = new SardineGetQuoteParams(token.assetSymbol, token.network, amount,
+                _wallet.GetWalletAddress(), quotedCurrency?.currencySymbol, paymentType, quoteType);
+            string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetQuote";
+            try {
+                SardineQuoteResponse response = await _client.SendRequest<SardineGetQuoteParams, SardineQuoteResponse>(url, request);
+                return response.quote;
+            } catch (Exception e) {
+                throw new Exception("Error fetching Sardine quote: " + e.Message);
+            }
+        }
+
         public async Task<string> SardineGetClientToken()
         {
             string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetClientToken";
@@ -378,7 +393,7 @@ namespace Sequence.Integrations.Sardine
             }
         }
 
-        private T[] FilterByChain<T>(T[] tokens) where T : IChainMatcher
+        private T[] FilterByChain<T>(T[] tokens) where T : SardineToken
         {
             List<T> filteredTokens = new List<T>();
             foreach (T token in tokens)
