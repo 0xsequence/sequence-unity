@@ -106,7 +106,7 @@ namespace Sequence.Marketplace
         public event Action<Step[]> OnTransactionStepsReturn;
         public event Action<string> OnTransactionStepsError;
         
-        public async Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null)
+        public async Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null)
         {
             OrderData[] ordersData = new OrderData[]
                 { new OrderData(order.orderId, amount.ToString()) };
@@ -115,7 +115,11 @@ namespace Sequence.Marketplace
             {
                 additionalFees = null;
             }
-            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
+            if (buyer == null)
+            {
+                buyer = _wallet.GetWalletAddress();
+            }
+            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, buyer,
                 order.marketplace, ordersData, additionalFees, _wallet.GetWalletKind());
 
             try

@@ -57,8 +57,9 @@ namespace Sequence.Marketplace
         /// <param name="order"></param>
         /// <param name="amount"></param>
         /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
+        /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
         /// <returns></returns>
-        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null);
+        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null);
 
         /// <summary>
         /// Get the Step[] that, when executed, will create a sell transaction for the given order and amount, fulfilling the order
