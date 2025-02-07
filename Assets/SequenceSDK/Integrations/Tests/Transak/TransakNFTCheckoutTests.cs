@@ -40,8 +40,7 @@ namespace Sequence.Integrations.Tests.Transak
             TransakNFTCheckout transakCheckout =
                 new TransakNFTCheckout(_testWallet, Chain.Polygon, new MockEthClientForGasEstimation());
 
-            string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(collectibleOrders[0], 1, 
-                SequenceTransakContractIdRepository.SequenceContractIds[Chain.Polygon][OrderbookKind.sequence_marketplace_v2], NFTType.ERC1155);
+            string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(collectibleOrders[0], 1, NFTType.ERC1155);
 
             Debug.Log(transakNFTCheckoutLink);
             Assert.IsNotNull(transakNFTCheckoutLink);

@@ -35,5 +35,18 @@ namespace Sequence.Integrations.Transak
                     }
                 }
             };
+        
+        public static TransakContractId GetContractId(Chain chain, MarketplaceKind marketplaceKind)
+        {
+            switch (marketplaceKind)
+            {
+                case MarketplaceKind.sequence_marketplace_v1:
+                    return SequenceContractIds[chain][OrderbookKind.sequence_marketplace_v1];
+                case MarketplaceKind.sequence_marketplace_v2:
+                    return SequenceContractIds[chain][OrderbookKind.sequence_marketplace_v2];
+                default:
+                    return SequenceContractIds[chain][OrderbookKind.reservoir];
+            }
+        }
     }
 }

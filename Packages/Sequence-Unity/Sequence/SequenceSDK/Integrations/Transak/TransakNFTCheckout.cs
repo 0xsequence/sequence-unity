@@ -146,7 +146,7 @@ namespace Sequence.Integrations.Transak
             return transakLink;
         }
 
-        public async Task<string> GetNFTCheckoutLink(CollectibleOrder collectibleOrder, ulong quantity, TransakContractId contractId, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
+        public async Task<string> GetNFTCheckoutLink(CollectibleOrder collectibleOrder, ulong quantity, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
         {
             if (quantity <= 0)
             {
@@ -163,13 +163,15 @@ namespace Sequence.Integrations.Transak
                 new Address(order.collectionContractAddress), new string[] { order.tokenId }, 
                 new decimal[] { DecimalNormalizer.ReturnToNormalPrecise(ulong.Parse(order.priceAmount), (int)order.priceDecimals) }, 
                 quantity, nftType);
+
+            TransakContractId contractId = SequenceTransakContractIdRepository.GetContractId(_chain, order.marketplace);
             
             return await GetNFTCheckoutLink(nftData, callData, new Address(order.collectionContractAddress), contractId);
         }
         
-        public async Task OpenNFTCheckoutLink(CollectibleOrder order, ulong quantity, TransakContractId contractId, NFTType nftType = NFTType.ERC721)
+        public async Task OpenNFTCheckoutLink(CollectibleOrder order, ulong quantity, NFTType nftType = NFTType.ERC721)
         {
-            string link = await GetNFTCheckoutLink(order, quantity, contractId, nftType);
+            string link = await GetNFTCheckoutLink(order, quantity, nftType);
             Application.OpenURL(link);
         }
 
