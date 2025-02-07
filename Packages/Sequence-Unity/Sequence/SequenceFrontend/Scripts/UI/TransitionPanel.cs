@@ -63,11 +63,6 @@ namespace Sequence.Demo
         
         public void OpenSeeMarketplaceListingsPanel()
         {
-            // ERC20 emf = new ERC20(_easyMintFungibleTokenContract);
-            // Wallet.SendTransaction(Chain.ArbitrumNova, new Transaction[]
-            // {
-            //     new RawTransaction(emf.GetAddress(), "0", emf.Mint(Wallet.GetWalletAddress(), DecimalNormalizer.NormalizeAsBigInteger(10000)).CallData),
-            // });
             _ui.OpenViewMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
 
