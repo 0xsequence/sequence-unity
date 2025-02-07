@@ -26,7 +26,7 @@ namespace Sequence.Marketplace
         public string priceAmountNetFormatted;
         public string priceCurrencyAddress;
         public BigInteger priceDecimals;
-        public float priceUSD;
+        public decimal priceUSD;
         public string quantityInitial;
         public string quantityInitialFormatted;
         public string quantityRemaining;
@@ -45,7 +45,7 @@ namespace Sequence.Marketplace
         public string deletedAt;
 
         [Preserve]
-        public Order(BigInteger id, BigInteger collectionId, BigInteger collectibleId, string orderId, MarketplaceKind marketplace, SourceKind source, OrderSide side, OrderStatus status, BigInteger chainId, string collectionContractAddress, string tokenId, string createdBy, string priceAmount, string priceAmountFormatted, string priceAmountNet, string priceAmountNetFormatted, string priceCurrencyAddress, BigInteger priceDecimals, float priceUsd, string quantityInitial, string quantityInitialFormatted, string quantityRemaining, string quantityRemainingFormatted, string quantityAvailable, string quantityAvailableFormatted, BigInteger quantityDecimals, BigInteger feeBps, FeeBreakdown[] feeBreakdown, string validFrom, string validUntil, string orderCreatedAt, string orderUpdatedAt, string createdAt, string updatedAt, string deletedAt)
+        public Order(BigInteger id, BigInteger collectionId, BigInteger collectibleId, string orderId, MarketplaceKind marketplace, SourceKind source, OrderSide side, OrderStatus status, BigInteger chainId, string collectionContractAddress, string tokenId, string createdBy, string priceAmount, string priceAmountFormatted, string priceAmountNet, string priceAmountNetFormatted, string priceCurrencyAddress, BigInteger priceDecimals, decimal priceUsd, string quantityInitial, string quantityInitialFormatted, string quantityRemaining, string quantityRemainingFormatted, string quantityAvailable, string quantityAvailableFormatted, BigInteger quantityDecimals, BigInteger feeBps, FeeBreakdown[] feeBreakdown, string validFrom, string validUntil, string orderCreatedAt, string orderUpdatedAt, string createdAt, string updatedAt, string deletedAt)
         {
             this.id = id;
             this.collectionId = collectionId;

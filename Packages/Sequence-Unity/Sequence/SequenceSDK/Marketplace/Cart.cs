@@ -167,7 +167,7 @@ namespace Sequence.Marketplace
         public string GetApproximateTotalInUSD()
         {
             int listings = _listings.Length;
-            double total = 0;
+            decimal total = 0;
             for (int i = 0; i < listings; i++)
             {
                 Order order = _listings[i].order;

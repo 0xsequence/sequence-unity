@@ -61,7 +61,7 @@ namespace Sequence.Demo.Mocks
                     OrderStatus.active, BigInteger.Parse(ChainDictionaries.ChainIdOf[_chain]), possibleAddresses.GetRandomObjectFromArray(), 
                     Random.Range(1, 10000).ToString(), possibleAddresses.GetRandomObjectFromArray(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), possibleCurrencyAddresses.GetRandomObjectFromArray(),
-                    Random.Range(1, 10000), Random.Range(1f, 10000f), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
+                    Random.Range(1, 10000), (decimal)Random.Range(1f, 10000f), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(), Random.Range(1, 10000).ToString(),
                     Random.Range(1, 19), Random.Range(1, 100), null, DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.Add(TimeSpan.FromDays(300)).ToString(CultureInfo.InvariantCulture),
                     DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), DateTime.Now.ToString(CultureInfo.InvariantCulture), ""));

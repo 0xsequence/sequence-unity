@@ -98,7 +98,7 @@ namespace Sequence.Marketplace
 
         public string GetApproximateTotalInUSD()
         {
-            double total = _listing.order.priceUSD * _amountRequested;
+            decimal total = _listing.order.priceUSD * _amountRequested;
             
             return total.ToString("F2");
         }
