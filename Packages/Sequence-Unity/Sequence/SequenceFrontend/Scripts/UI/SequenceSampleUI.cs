@@ -1,4 +1,7 @@
+using Sequence.Authentication;
+using Sequence.Config;
 using Sequence.EmbeddedWallet;
+using Sequence.Utils.SecureStorage;
 using SequenceSDK.Samples;
 using UnityEngine;
 
@@ -14,8 +17,9 @@ namespace Sequence.Demo
 
         public static SequenceSampleUI instance;
 
-        private LoginPanel _loginPanel;
-        private TransitionPanel _transitionPanel;
+        private ILogin _loginHandler;
+        private SequenceLoginWindow _loginWindow;
+        private TransitionPanel _featureSelection;
         private WalletPanel _walletPanel;
         private SignMessagePanel _signMessagePanel;
         private SendTransactionPanel _sendTransactionPanel;
@@ -32,8 +36,8 @@ namespace Sequence.Demo
             if (instance == null) instance = this;
                 else Destroy(gameObject);
 
-            _loginPanel = GetComponentInChildren<LoginPanel>();
-            _transitionPanel = GetComponentInChildren<TransitionPanel>();
+            _loginWindow = GetComponentInChildren<SequenceLoginWindow>();
+            _featureSelection = GetComponentInChildren<TransitionPanel>();
             _walletPanel = GetComponentInChildren<WalletPanel>();
             _signMessagePanel = GetComponentInChildren<SignMessagePanel>();
             _sendTransactionPanel = GetComponentInChildren<SendTransactionPanel>();
@@ -47,11 +51,14 @@ namespace Sequence.Demo
 
             if (!IsTesting)
             {
-                InitialPanel = _loginPanel;
+                //InitialPanel = _loginPanel;
             }
 
             SequenceWallet.OnWalletCreated += wallet =>
             {
+                DisableAllUIPages();
+                _featureSelection.gameObject.SetActive(true);
+                
                 wallet.OnDropSessionComplete += s =>
                 {
                     if (s == wallet.SessionId)
@@ -65,11 +72,10 @@ namespace Sequence.Demo
         public void Start()
         {
             if (IsTesting)
-            {
                 return;
-            }
+            
             DisableAllUIPages();
-            OpenUIPanel(InitialPanel, InitialPanelOpenArgs);
+            ReplaceWithLoginPanel();
         }
 
         private void DisableAllUIPages()
@@ -81,15 +87,11 @@ namespace Sequence.Demo
                 pages[i].gameObject.SetActive(false);
             }
             
+            _loginWindow.Hide();
             _playerProfile.Hide();
             _inventory.Hide();
             _inGameShop.Hide();
             _dailyRewards.Hide();
-        }
-
-        private void OpenUIPanel(UIPanel panel, params object[] openArgs)
-        {
-            panel.Open(openArgs);
         }
 
         public void OpenPlayerProfile(IWallet wallet)
@@ -144,29 +146,30 @@ namespace Sequence.Demo
         
         private void ReplaceWithLoginPanel()
         {
-            float delayInSeconds = 0;
-            if (_transitionPanel != null && _transitionPanel.IsOpen())
-            {
-                _transitionPanel.Close();
-                delayInSeconds = _transitionPanel.GetCloseAnimationDuration();
-            }
-            if (_signMessagePanel != null && _signMessagePanel.IsOpen())
-            {
-                _signMessagePanel.Close();
-                delayInSeconds = _signMessagePanel.GetCloseAnimationDuration();
-            }
-            if (_sendTransactionPanel != null && _sendTransactionPanel.IsOpen())
-            {
-                _sendTransactionPanel.Close();
-                delayInSeconds = _sendTransactionPanel.GetCloseAnimationDuration();
-            }
-            if (_walletPanel != null && _walletPanel.IsOpen())
-            {
-                _walletPanel.Close();
-                delayInSeconds = _walletPanel.GetCloseAnimationDuration();
-            }
+            SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
+
+            var config = SequenceConfig.GetConfig();
+            var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
+            _loginHandler = SequenceLogin.GetInstance();
             
-            _loginPanel.OpenWithDelay(delayInSeconds, true);
+            if (SecureStorageFactory.IsSupportedPlatform() && storeSessionInfoAndSkipLoginWhenPossible)
+            {
+                _loginHandler.TryToRestoreSession();
+                _loginHandler.SetupAuthenticator();
+            }
+            else
+            {
+                OnFailedToRecoverSession("Secure Storage disabled");
+            }
+        }
+
+        private void OnFailedToRecoverSession(string error)
+        {
+            SequenceWallet.OnFailedToRecoverSession -= OnFailedToRecoverSession;
+            Debug.LogError($"Error attempting to recover Sequence session: {error}");
+            
+            DisableAllUIPages();
+            _loginWindow.Show(_loginHandler);
         }
     }
 }

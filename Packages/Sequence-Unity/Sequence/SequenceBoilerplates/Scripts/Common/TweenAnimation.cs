@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -7,16 +6,8 @@ namespace SequenceSDK.Samples
     [RequireComponent(typeof(CanvasGroup))]
     public class TweenAnimation : MonoBehaviour
     {
-        [Serializable]
-        public enum Type
-        {
-            LocalScale,
-            AnchoredPositionY
-        }
-        
-        [SerializeField] private Type _type;
-        [SerializeField] private float _start = 0.6f;
-        [SerializeField] private float _duration = 0.25f;
+        [SerializeField] private float _start = 0.7f;
+        [SerializeField] private float _duration = 0.3f;
         [SerializeField] private AnimationCurve _animationCurve;
         
         private RectTransform _rectTransform;
@@ -63,17 +54,7 @@ namespace SequenceSDK.Samples
                 var curveValue = _animationCurve.Evaluate(v);
                 _canvasGroup.alpha = curveValue;
 
-                switch (_type)
-                {
-                    case Type.LocalScale:
-                        transform.localScale = Vector3.LerpUnclamped(Vector3.one * _start, Vector3.one, curveValue);
-                        break;
-                    case Type.AnchoredPositionY:
-                        _rectTransform ??= GetComponent<RectTransform>();
-                        _rectTransform.anchoredPosition = Vector2.LerpUnclamped(Vector2.up * _start, Vector2.one, curveValue);
-                        break;
-                }
-                
+                transform.localScale = Vector3.LerpUnclamped(Vector3.one * _start, Vector3.one, curveValue);
                 yield return null;
             }
             

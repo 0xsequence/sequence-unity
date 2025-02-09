@@ -1,14 +1,14 @@
 using UnityEngine;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.SignMessage
 {
-    public class SequenceLoginWindow : MonoBehaviour
+    public class SequenceSignMessage : MonoBehaviour
     {
         public void Hide()
         {
             gameObject.SetActive(false);
         }
-        
+
         public void Show()
         {
             gameObject.SetActive(true);

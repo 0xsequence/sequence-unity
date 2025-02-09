@@ -1,4 +1,3 @@
-using Sequence.Authentication;
 using Sequence.Config;
 using Sequence.EmbeddedWallet;
 using TMPro;
@@ -6,7 +5,7 @@ using UnityEngine;
 
 namespace Sequence.Demo
 {
-    public class EmailSignedInText : MonoBehaviour
+    public class VersionText : MonoBehaviour
     {
         private TextMeshProUGUI _text;
         private SequenceWallet _wallet;
@@ -30,13 +29,8 @@ namespace Sequence.Demo
         private void OnWalletCreated(SequenceWallet wallet)
         {
             _wallet = wallet;
-            var sdkVersion = SequenceConfig.GetConfig().WaaSVersion;
-            var email = PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
-            
-            if (_wallet == null || string.IsNullOrEmpty(email))
-                _text.text = sdkVersion;
-            else
-                _text.text = $"Logged in as: {email}, {sdkVersion}";
+            var sdkVersion = PackageVersionReader.GetVersion();
+            _text.text = $"Sequence Unity SDK {sdkVersion}";
         }
     }
 }

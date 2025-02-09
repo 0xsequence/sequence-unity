@@ -168,8 +168,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 0
-  _start: 0.6
-  _duration: 0.25
+  _start: 0.7
+  _duration: 0.3
   _animationCurve:
     serializedVersion: 2
     m_Curve:

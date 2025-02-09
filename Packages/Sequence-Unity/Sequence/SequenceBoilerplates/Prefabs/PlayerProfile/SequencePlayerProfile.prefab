@@ -2131,7 +2131,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 9164903397726425483}
   m_HandleRect: {fileID: 2746984353184469409}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3206,7 +3206,7 @@ MonoBehaviour:
   _tokenAmountInput: {fileID: 8254898056543049490}
   _qrImage: {fileID: 4200167382304887189}
   _messagePopup: {fileID: 2634582482796634257}
-  _loadingScreen: {fileID: 3930228958649259029}
+  _loadingScreen: {fileID: 2207242179709257925}
   _backButton: {fileID: 4191391662817666007}
   _overviewState: {fileID: 4200167382559960304}
   _sendTokenState: {fileID: 4200167383926226142}
@@ -3247,8 +3247,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 0
-  _start: 0.6
-  _duration: 0.25
+  _start: 0.7
+  _duration: 0.3
   _animationCurve:
     serializedVersion: 2
     m_Curve:
@@ -5145,7 +5145,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1939063635244642745}
   m_HandleRect: {fileID: 7189308080171830635}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -8073,17 +8073,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
---- !u!114 &3930228958649259029 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 205230047614842568, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
+--- !u!1 &2207242179709257925 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
   m_PrefabInstance: {fileID: 3770609986828215005}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b35f72d09a07486a930890a69a896fce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &8614817862703231120 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4890380321044959821, guid: 21aa1af318f304faca1367525db9bc28, type: 3}

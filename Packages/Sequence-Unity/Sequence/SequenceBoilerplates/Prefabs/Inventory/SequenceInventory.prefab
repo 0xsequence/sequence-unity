@@ -1081,7 +1081,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5402869012231404503}
   m_HandleRect: {fileID: 8489736760885032137}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1535,8 +1535,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 0
-  _start: 0.6
-  _duration: 0.25
+  _start: 0.7
+  _duration: 0.3
   _animationCurve:
     serializedVersion: 2
     m_Curve:
@@ -3493,7 +3493,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5402869012231404503}
   m_HandleRect: {fileID: 8489736760885032137}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

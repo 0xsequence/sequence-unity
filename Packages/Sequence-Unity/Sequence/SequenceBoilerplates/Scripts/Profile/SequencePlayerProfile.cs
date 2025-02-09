@@ -17,7 +17,7 @@ namespace SequenceSDK.Samples
         [SerializeField] private TMP_InputField _tokenAmountInput;
         [SerializeField] private QrCodeView _qrImage;
         [SerializeField] private MessagePopup _messagePopup;
-        [SerializeField] private LoadingScreen _loadingScreen;
+        [SerializeField] private GameObject _loadingScreen;
         [SerializeField] private GameObject _backButton;
         [SerializeField] private GameObject _overviewState;
         [SerializeField] private GameObject _sendTokenState;
@@ -111,7 +111,7 @@ namespace SequenceSDK.Samples
 
         private void EnableLoading(bool enable)
         {
-            _loadingScreen.gameObject.SetActive(enable);
+            _loadingScreen.SetActive(enable);
         }
 
         private async void LoadTransactionHistory()
