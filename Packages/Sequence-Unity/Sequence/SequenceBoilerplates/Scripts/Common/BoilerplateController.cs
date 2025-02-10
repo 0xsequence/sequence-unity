@@ -73,12 +73,12 @@ namespace Sequence.Demo
         public void OpenSignMessage()
         {
             _featureSelection.SetActive(false);
-            _signMessage.Show();
-            
+            _signMessage.Show(_wallet);
         }
 
         private void HideAll()
         {
+            _featureSelection.SetActive(false);
             _loginWindow.Hide();
             _playerProfile.Hide();
             _dailyRewards.Hide();

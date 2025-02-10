@@ -26,17 +26,26 @@ namespace Sequence.EmbeddedWallet
 
             var messageToSign = $"parent wallet with address {walletAddress}";
             var signature = await _wallet.SignMessage(_chain, messageToSign);
-            
-            var client = new HttpClient(url);
-            var response = await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>("GetLinkedWallets", new LinkedWalletsRequestData
-            {
-                signatureChainId = _chain.GetChainId(),
-                parentWalletAddress = walletAddress,
-                parentWalletMessage = messageToSign,
-                parentWalletSignature = signature
-            });
 
-            return response.linkedWallets;
+            try
+            {
+                var client = new HttpClient(url);
+                var response = await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
+                    "GetLinkedWallets", new LinkedWalletsRequestData
+                    {
+                        signatureChainId = _chain.GetChainId(),
+                        parentWalletAddress = walletAddress,
+                        parentWalletMessage = messageToSign,
+                        parentWalletSignature = signature
+                    });
+                
+                return response.linkedWallets;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return Array.Empty<LinkedWalletData>();
+            }
         }
 
         public async Task<bool> UnlinkWallet(string walletAddress)

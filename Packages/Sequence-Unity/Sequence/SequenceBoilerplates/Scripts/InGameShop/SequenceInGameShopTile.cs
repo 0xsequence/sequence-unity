@@ -15,6 +15,8 @@ namespace Sequence.Demo
         [SerializeField] private TMP_Text _amountText;
         [SerializeField] private Button _purchaseButton;
 
+        private BigInteger _cost;
+        private string _symbol;
         private BigInteger _tokenId;
         private int _amount;
         private Func<BigInteger, int, Task> _purchase;
@@ -23,9 +25,10 @@ namespace Sequence.Demo
             string supply, Func<BigInteger, int, Task> purchase)
         {
             _tokenId = tokenId;
+            _cost = cost;
+            _symbol = symbol;
             _purchase = purchase;
             _nameText.text = $"{metadata?.name}";
-            _priceText.text = $"{cost} {symbol}";
             SetAmount(0);
             
             _image.sprite = await AssetHandler.GetSpriteAsync(metadata?.image);
@@ -48,7 +51,8 @@ namespace Sequence.Demo
         private void SetAmount(int amount)
         {
             _amount = Mathf.Max(0, amount);
-            _amountText.text = $"{_amount}x";
+            _amountText.text = $"{_amount}";
+            _priceText.text = $"Purchase for {_cost} {_symbol}";
             _purchaseButton.interactable = _amount > 0;
         }
     }

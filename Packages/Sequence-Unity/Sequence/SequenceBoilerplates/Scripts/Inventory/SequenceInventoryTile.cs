@@ -20,7 +20,7 @@ namespace SequenceSDK.Samples
         {
             _onClick = onClick;
             _nameText.text = $"{token.tokenMetadata.name}";
-            _amountText.text = $"{token.balance}x";
+            _amountText.text = $"{token.balance}";
             _tokenImage.texture = await AssetHandler.GetTexture2DAsync(token.tokenMetadata.image);
         }
 

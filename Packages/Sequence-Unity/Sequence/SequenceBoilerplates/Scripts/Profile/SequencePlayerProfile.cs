@@ -18,7 +18,6 @@ namespace SequenceSDK.Samples
         [SerializeField] private QrCodeView _qrImage;
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject _loadingScreen;
-        [SerializeField] private GameObject _backButton;
         [SerializeField] private GameObject _overviewState;
         [SerializeField] private GameObject _sendTokenState;
         [SerializeField] private GameObject _receiveState;
@@ -96,7 +95,6 @@ namespace SequenceSDK.Samples
 
         public void SetOverviewState()
         {
-            _backButton.SetActive(false);
             _overviewState.SetActive(true);
             _sendTokenState.SetActive(false);
             _receiveState.SetActive(false);

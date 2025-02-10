@@ -167,7 +167,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb6fa7d82312143d9b451ac5e7465a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _type: 0
   _start: 0.7
   _duration: 0.3
   _animationCurve:
@@ -403,7 +402,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 70528f3440ea84f968e5a4ecf4b389a9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e0aca7c4ac2ed4cc589962721c508d77, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

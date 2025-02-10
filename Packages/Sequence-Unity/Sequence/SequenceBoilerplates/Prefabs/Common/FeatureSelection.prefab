@@ -149,7 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb6fa7d82312143d9b451ac5e7465a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _type: 0
   _start: 0.7
   _duration: 0.3
   _animationCurve:
@@ -298,7 +297,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
-      value: Daily Rewards
+      value: Get rewarded for consecutive days and claim one token every day!
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -480,7 +479,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
-      value: Inventory
+      value: View all items your own for a specified contract address.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
@@ -844,7 +843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_text
-      value: Player Profile
+      value: Send & Receive ETH. Manage linked wallets & Sign Out.
       objectReference: {fileID: 0}
     - target: {fileID: 8673935661939181248, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
       propertyPath: m_fontSizeBase
