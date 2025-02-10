@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Sequence.EmbeddedWallet.Tests;
-using Sequence.Integrations.Sardine;
 
 namespace Sequence.Marketplace
 {

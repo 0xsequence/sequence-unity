@@ -1,0 +1,28 @@
+{
+    "name": "SequencePayTests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a67bc3d548bec4971b914c7b64c9e959",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:f7fd4ba36aabd1d499450c174865e70b",
+        "GUID:4e0a798abbda240658187632ae443a67",
+        "GUID:19b9eb7db56cc47349571a4fbb0dd677",
+        "GUID:403077141e1554429a890cbc129df651",
+        "GUID:5789406399e24424f9e03a479a30eecb",
+        "GUID:040286810a82b46ed9acd6d70bfbbfd4"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
-using Sequence.Integrations.Transak;
+using Sequence.Pay.Transak;
 using Sequence.Marketplace;
 using Sequence.Utils;
 using TMPro;
