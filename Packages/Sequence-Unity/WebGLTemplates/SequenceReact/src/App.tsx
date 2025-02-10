@@ -26,14 +26,14 @@ import "./App.css";
 
   const loadingPercentage = Math.round(loadingProgression * 100);
 
-  const handleGoogleSignIn = useCallback((...parameters: ReactUnityEventParameter[]): ReactUnityEventParameter => {
-    const googleClientId = parameters[0] as string;
-    const nonce = parameters[1] as string;
-    setGoogleClientId(googleClientId);
-    setNonce(nonce);
-    setShowLogin(true);
-    return '';
-  }, []);
+    const handleGoogleSignIn = useCallback((...parameters: ReactUnityEventParameter[]): ReactUnityEventParameter => {
+      const googleClientId = parameters[0] as string;
+      const nonce = parameters[1] as string;
+      setGoogleClientId(googleClientId);
+      setNonce(nonce);
+      setShowLogin(true);
+      return '';
+    }, []);
 
   const [googleClientIdState, setGoogleClientId] = useState("");
   const [nonce, setNonce] = useState("");
@@ -54,15 +54,15 @@ import "./App.css";
     }
   }, [messageToSend]);
 
-    useEffect(() => {
-      addEventListener("GoogleSignIn", handleGoogleSignIn);
-      window.addEventListener("resize", handleResize);
-      handleResize()
-      return () => {
-        removeEventListener("GoogleSignIn", handleGoogleSignIn);
-        window.removeEventListener("resize", handleResize);
-      };
-    }, []);
+  useEffect(() => {
+    addEventListener("GoogleSignIn", handleGoogleSignIn);
+    window.addEventListener("resize", handleResize);
+    handleResize()
+    return () => {
+      removeEventListener("GoogleSignIn", handleGoogleSignIn);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const [showLogin, setShowLogin] = useState(false);
 

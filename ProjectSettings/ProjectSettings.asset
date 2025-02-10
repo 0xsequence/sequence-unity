@@ -807,11 +807,11 @@ PlayerSettings:
   webGLTemplate: PROJECT:SequenceReact
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
-  webGLCompressionFormat: 2
+  webGLCompressionFormat: 1
   webGLWasmArithmeticExceptions: 0
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
-  webGLDecompressionFallback: 0
+  webGLDecompressionFallback: 1
   scriptingDefineSymbols:
     Android: ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE
     Server: 
