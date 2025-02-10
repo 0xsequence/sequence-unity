@@ -439,7 +439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 250db09c678b4c708f26b52f55aa527f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _format: https://metamask.app.link/send/{0}@{1}/transfer?address={2}&uint256={3}
+  _format: https://metamask.app.link/send/{0}/transfer?address={1}&uint256={2}
   _size: 512
   _qrImage: {fileID: 5124856579309961258}
 --- !u!1 &1475529392507061954

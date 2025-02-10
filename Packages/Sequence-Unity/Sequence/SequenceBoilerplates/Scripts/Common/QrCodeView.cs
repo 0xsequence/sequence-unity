@@ -16,7 +16,7 @@ namespace Sequence.Demo
         
         public async Task Show(string paymentToken, int chainId, string destinationAddress, string amount)
         {
-            var deeplink = string.Format(_format, paymentToken, chainId, destinationAddress, amount);
+            var deeplink = string.Format(_format, paymentToken, destinationAddress, amount);
             await Show(deeplink);
         }
 
