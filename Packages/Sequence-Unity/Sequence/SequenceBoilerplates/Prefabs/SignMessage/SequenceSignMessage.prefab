@@ -701,6 +701,7 @@ MonoBehaviour:
   _signatureText: {fileID: 7272795130108342568}
   _messageInput: {fileID: 4338304252978539449}
   _messagePopup: {fileID: 2482853704875185635}
+  _initSignatureText: Sign a message to see the signature...
 --- !u!225 &831167691682184734
 CanvasGroup:
   m_ObjectHideFlags: 0

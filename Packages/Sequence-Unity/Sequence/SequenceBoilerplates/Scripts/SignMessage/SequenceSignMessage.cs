@@ -17,18 +17,17 @@ namespace Sequence.Boilerplates.SignMessage
         [SerializeField] private TMP_Text _signatureText;
         [SerializeField] private TMP_InputField _messageInput;
         [SerializeField] private MessagePopup _messagePopup;
+        [SerializeField] private string _initSignatureText;
         
         private IWallet _wallet;
         private string _curInput;
         private string _curSignature;
-        private string _initSignatureText;
 
         private void Start()
         {
             _signButton.onClick.AddListener(SignMessage);
             _copyButton.onClick.AddListener(CopySignature);
             _messageInput.onValueChanged.AddListener(VerifyInput);
-            _initSignatureText = _signatureText.text;
         }
 
         public void Hide()
@@ -60,14 +59,10 @@ namespace Sequence.Boilerplates.SignMessage
         
         private void VerifyInput(string newValue)
         {
-            if (newValue != _curInput)
-            {
-                _signatureText.text = _initSignatureText;
-                _copyButton.interactable = false;
-            }
-            
             _curInput = newValue;
             _signButton.interactable = _curInput.Length > 0;
+            _signatureText.text = _initSignatureText;
+            _copyButton.interactable = false;
         }
     }
 }
