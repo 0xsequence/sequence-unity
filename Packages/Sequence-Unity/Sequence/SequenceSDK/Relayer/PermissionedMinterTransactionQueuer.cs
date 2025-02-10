@@ -27,7 +27,8 @@ namespace Sequence.Relayer
 
         private void OnDestroy()
         {
-            _minter.OnMintTokenFailed -= HandleMintTokenFailed;
+            if (_minter != null)
+                _minter.OnMintTokenFailed -= HandleMintTokenFailed;
         }
 
         public void Enqueue(PermissionedMintTransaction transaction, IMinter minter = null)
