@@ -1,6 +1,7 @@
 using Sequence;
 using Sequence.Demo;
 using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,6 +45,8 @@ namespace SequenceSDK.Samples
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             _loadingScreen.SetActive(false);
+            _tilePool.Cleanup();
+            
             SetOverviewState();
             LoadBalances();
         }
@@ -60,9 +63,15 @@ namespace SequenceSDK.Samples
         {
             var recipient = _sendRecipientInput.text;
             var amountInput = _sendAmountInput.text;
-            if (!uint.TryParse(amountInput, out uint amount))
+            if (!uint.TryParse(amountInput, out uint amount) || amount == 0)
             {
                 _messagePopup.Show("Invalid amount.", true);
+                return;
+            }
+
+            if (!recipient.IsAddress())
+            {
+                _messagePopup.Show("Invalid wallet address.", true);
                 return;
             }
             

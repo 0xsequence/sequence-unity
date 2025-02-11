@@ -1,4 +1,3 @@
-using Sequence.Config;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
@@ -29,8 +28,8 @@ namespace Sequence.Demo
         private void OnWalletCreated(SequenceWallet wallet)
         {
             _wallet = wallet;
-            var sdkVersion = PackageVersionReader.GetVersion();
-            _text.text = $"Sequence Unity SDK {sdkVersion}";
+            var versionFile = Resources.Load<TextAsset>("sequence-unity-version");
+            _text.text = $"Sequence Unity SDK {versionFile.text}";
         }
     }
 }

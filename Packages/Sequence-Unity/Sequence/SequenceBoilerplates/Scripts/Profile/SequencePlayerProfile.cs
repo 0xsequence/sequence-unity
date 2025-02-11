@@ -37,6 +37,8 @@ namespace SequenceSDK.Samples
         {
             _wallet = wallet;
             gameObject.SetActive(true);
+            _transactionPool.Cleanup();
+            
             SetOverviewState();
             
             var walletAddress = _wallet.GetWalletAddress();
