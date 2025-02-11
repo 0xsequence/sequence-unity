@@ -19,9 +19,9 @@ import "./App.css";
       loadingProgression,
     } = useUnityContext({
       loaderUrl: "Build/Demo.loader.js",
-      dataUrl: "Build/Demo.data.gz",
-      frameworkUrl: "Build/Demo.framework.js.gz",
-      codeUrl: "Build/Demo.wasm.gz",
+      dataUrl: "Build/Demo.data.unityweb",
+      frameworkUrl: "Build/Demo.framework.js.unityweb",
+      codeUrl: "Build/Demo.wasm.unityweb",
     });
 
   const loadingPercentage = Math.round(loadingProgression * 100);
