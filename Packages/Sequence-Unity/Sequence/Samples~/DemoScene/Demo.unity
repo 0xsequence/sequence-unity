@@ -998,6 +998,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 555789712913665550, guid: 2a449fc68fd1f42fe829e2127512e265, type: 3}
+      propertyPath: _apiUrl
+      value: https://master.boilerplate-test-bb7.pages.dev/dailyRewards
+      objectReference: {fileID: 0}
     - target: {fileID: 6531445616084800503, guid: 2a449fc68fd1f42fe829e2127512e265, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 2

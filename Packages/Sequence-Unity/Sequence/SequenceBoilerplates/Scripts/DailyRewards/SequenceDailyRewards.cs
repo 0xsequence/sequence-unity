@@ -91,19 +91,23 @@ namespace SequenceSDK.Samples
             
             var idToken = await _wallet.GetIdToken();
             request.SetRequestHeader("Authorization", $"Bearer {idToken.IdToken}");
-
+            
             try
             {
                 await request.SendWebRequest();
             }
             catch (Exception e)
             {
-                Debug.Log($"{e.Message} ({e.StackTrace})");
+                Debug.Log($"{e.Message} {request.downloadHandler.text}");
+                _messagePopup.Show(e.Message, true);
                 return false;
             }
 
             if (!request.isDone || request.result != UnityWebRequest.Result.Success)
+            {
+                _messagePopup.Show("Request failed.", true);
                 return false;
+            }
 
             var json = request.downloadHandler.text;
             var rewardsData = JsonConvert.DeserializeObject<DailyRewardsStatusData>(json);
