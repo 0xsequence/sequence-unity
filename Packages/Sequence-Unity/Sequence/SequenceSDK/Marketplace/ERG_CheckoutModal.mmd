@@ -1,8 +1,10 @@
 graph TD
+    %% Define nodes and relationships
     panel[CheckoutPanel] --> |has| modal
     modal[CheckoutPage] --> |has| ch[ICheckoutHelper]
     modal --> |may have| fc[IFiatCheckout]
     ch --> |implemented by| nc[NftCheckout]
+    ch --> |implemented by| psc[PrimarySaleCheckout]
     nc --> |has| swap[ISwap]
     nc --> |has| reader[IMarketplaceReader]
     nc --> |has| checkout[ICheckout]
@@ -19,13 +21,20 @@ graph TD
     fp --> |implemented by| tfp[TransakFiatPay]
     tfp --> |has| tor[TransakOnRamp]
     tfp --> |has| tnc[TransakNFTCheckout]
+    psc --> |has| pssft[ERC1155Sale]
+    psc --> |has| psnft[ERC721Sale]
+    fp --> |uses| pssft
+    fp --> |uses| psnft
+    psc --> |has| swap
     
+    %% Subgraphs to group components
     subgraph Marketplace
         ch
         nc
         swap
         reader
         checkout
+        psc
     end
     subgraph Pay
         fc
@@ -44,4 +53,8 @@ graph TD
             isc
             sc
         end
+    end
+    subgraph Ethereum/Contract
+        pssft
+        psnft
     end
