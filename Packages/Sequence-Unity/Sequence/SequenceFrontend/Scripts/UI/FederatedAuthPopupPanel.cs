@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
-using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -11,7 +10,9 @@ namespace Sequence.Demo
 {
     public class FederatedAuthPopupPanel : UIPanel
     {
-        [FormerlySerializedAs("_overrideAccountConfirmationPage")] [SerializeField] private  NewAccountConfirmationPage newAccountConfirmationPage;
+        [FormerlySerializedAs("_overrideAccountConfirmationPage")] 
+        [SerializeField] private  NewAccountConfirmationPage newAccountConfirmationPage;
+        
         private LoginPanel _loginPanel;
         private ILogin _login;
         private string _email;
@@ -37,7 +38,7 @@ namespace Sequence.Demo
         public void ReturnToLogin()
         {
             Close();
-            _loginPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
+            _loginPanel.Open();
         }
         
         public void OverrideAccount()

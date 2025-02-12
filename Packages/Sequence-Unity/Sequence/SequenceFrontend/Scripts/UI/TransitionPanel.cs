@@ -47,15 +47,34 @@ namespace Sequence.Demo
             _ui.OpenSendTransactionWithFeeOptionsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
         
-        public void OpenPrimarySalePanel()
+        public void OpenPlayerProfilePanel()
         {
-            _ui.OpenPrimarySalePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
+            gameObject.SetActive(false);
+            _ui.OpenPlayerProfile(Wallet);
         }
         
-        public void LinkEOAWallet()
+        public void OpenDailyRewardsPanel()
         {
-            EOAWalletLinker linker = new EOAWalletLinker(Wallet, "https://api.sequence.app/rpc/API/GenerateWaaSVerificationURL");
-            linker.OpenEOAWalletLink(Chain.ArbitrumNova);
+            gameObject.SetActive(false);
+            _ui.OpenDailyRewards(Wallet);
+        }
+        
+        public void OpenInventoryPanel()
+        {
+            gameObject.SetActive(false);
+            _ui.OpenInventory(Wallet);
+        }
+        
+        public void OpenInGameShopPanel()
+        {
+            gameObject.SetActive(false);
+            _ui.OpenInGameShop(Wallet);
+        }
+        
+        public async void LinkEOAWallet()
+        {
+            var linker = new EOAWalletLinker(Wallet, Chain.ArbitrumNova);
+            await linker.OpenEoaWalletLink();
         }
         
         public void OpenSeeMarketplaceListingsPanel()
