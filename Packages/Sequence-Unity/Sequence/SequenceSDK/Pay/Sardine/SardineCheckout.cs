@@ -24,7 +24,7 @@ namespace Sequence.Pay.Sardine
         private ICheckout _checkout;
         private IMarketplaceReader _reader;
         private IEthClient _ethClient;
-        
+
         private const string _baseUrl = "https://api.sequence.app/rpc/API";
 
         private const string _sardineCheckoutUrl =
@@ -35,7 +35,8 @@ namespace Sequence.Pay.Sardine
 
         private const string _sardineCheckoutUrlSuffix = "&show_features=true";
 
-        public SardineCheckout(Chain chain, IWallet wallet, ICheckout checkout = null, IMarketplaceReader reader = null, IEthClient ethClient = null)
+        public SardineCheckout(Chain chain, IWallet wallet, ICheckout checkout = null, IMarketplaceReader reader = null,
+            IEthClient ethClient = null)
         {
             _chain = chain;
             SequenceConfig config = SequenceConfig.GetConfig();
@@ -44,22 +45,26 @@ namespace Sequence.Pay.Sardine
             {
                 _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays";
             }
+
             _client = new HttpClient(_apiKey);
             _wallet = wallet;
             if (checkout == null)
             {
                 checkout = new Checkout(wallet, chain);
             }
+
             _checkout = checkout;
             if (reader == null)
             {
                 reader = new MarketplaceReader(chain);
             }
+
             _reader = reader;
             if (ethClient == null)
             {
                 ethClient = new SequenceEthClient(chain);
             }
+
             _ethClient = ethClient;
         }
 
@@ -85,16 +90,21 @@ namespace Sequence.Pay.Sardine
                 imageUrl, _chain, Address.ZeroAddress, marketplaceAddress, blockchainNftId, quantity, decimals,
                 tokenAmount,
                 tokenAddress, tokenSymbol, tokenDecimals, callData, name, platform, executionType);
-            
-            try {
+
+            try
+            {
                 await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, SardineNFTCheckout>(url, request);
                 return true;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 if (e.Message.Contains("It must me allow listed") || e.Message.Contains("It must be allow listed"))
                 {
                     return false;
                 }
-                Debug.LogWarning("Error fetching Sardine whitelist status: " + e.Message + "\nThe contract has most likely been whitelisted as we didn't receive an error indicating otherwise");
+
+                Debug.LogWarning("Error fetching Sardine whitelist status: " + e.Message +
+                                 "\nThe contract has most likely been whitelisted as we didn't receive an error indicating otherwise");
                 return true;
             }
         }
@@ -106,10 +116,14 @@ namespace Sequence.Pay.Sardine
             SardineGetQuoteParams request = new SardineGetQuoteParams(token.assetSymbol, token.network, amount,
                 _wallet.GetWalletAddress(), quotedCurrency?.currencySymbol, paymentType, quoteType);
             string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetQuote";
-            try {
-                SardineQuoteResponse response = await _client.SendRequest<SardineGetQuoteParams, SardineQuoteResponse>(url, request);
+            try
+            {
+                SardineQuoteResponse response =
+                    await _client.SendRequest<SardineGetQuoteParams, SardineQuoteResponse>(url, request);
                 return response.quote;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new Exception("Error fetching Sardine quote: " + e.Message);
             }
         }
@@ -117,10 +131,13 @@ namespace Sequence.Pay.Sardine
         public async Task<string> SardineGetClientToken()
         {
             string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetClientToken";
-            try {
+            try
+            {
                 SardineTokenResponse response = await _client.SendRequest<SardineTokenResponse>(url);
                 return response.token;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new Exception("Error fetching Sardine client token: " + e.Message);
             }
         }
@@ -137,20 +154,25 @@ namespace Sequence.Pay.Sardine
             OnRamp(token);
         }
 
-        private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, Address recipient, BigInteger quantity, string callData, Address marketplaceContractAddress)
+        private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder[] orders, Address recipient,
+            BigInteger quantity, string callData, Address marketplaceContractAddress)
         {
+            CollectibleOrder order = orders[0];
             string priceSymbol = ChainDictionaries.GasCurrencyOf[_chain];
             string currencyAddress = order.order.priceCurrencyAddress;
             if (!currencyAddress.IsZeroAddress())
             {
                 priceSymbol = await new ERC20(order.order.priceCurrencyAddress).Symbol(new SequenceEthClient(_chain));
             }
+
             GetSardineNFTCheckoutTokenRequest request = new GetSardineNFTCheckoutTokenRequest(
                 new PaymentMethodTypeConfig(EnumExtensions.GetEnumValuesAsList<PaymentMethod>().ToArray(),
                     PaymentMethod.us_debit),
-                order.metadata.image, _chain, recipient, marketplaceContractAddress, order.order.tokenId, quantity, order.order.quantityDecimals,
+                order.metadata.image, _chain, recipient, marketplaceContractAddress, order.order.tokenId, quantity,
+                order.order.quantityDecimals,
                 order.order.priceAmount,
-                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData, order.metadata.name);
+                new Address(order.order.priceCurrencyAddress), priceSymbol, order.order.priceDecimals, callData,
+                order.metadata.name);
             return await SardineGetNFTCheckoutToken(request);
         }
 
@@ -161,31 +183,43 @@ namespace Sequence.Pay.Sardine
                 throw new ArgumentException(
                     "Sardine doesn't support native currency checkout; please choose a different payment token");
             }
+
             string url = _baseUrl.AppendTrailingSlashIfNeeded() + "SardineGetNFTCheckoutToken";
-            try {
-                CheckoutTokenResponse response = await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, CheckoutTokenResponse>(url, request);
+            try
+            {
+                CheckoutTokenResponse response =
+                    await _client.SendRequest<GetSardineNFTCheckoutTokenRequest, CheckoutTokenResponse>(url, request);
                 return response.resp;
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 throw new Exception("Error fetching Sardine NFT checkout token: " + e.Message);
             }
         }
 
-        public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, BigInteger quantity, Address recipient = null, AdditionalFee additionalFee = null, string marketplaceContractAddress = ISardineCheckout.SequenceMarketplaceV2Contract)
+        public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder[] orders, BigInteger quantity,
+            Address recipient = null, AdditionalFee[] additionalFee = null,
+            string marketplaceContractAddress = ISardineCheckout.SequenceMarketplaceV2Contract)
         {
             if (recipient == null)
             {
                 recipient = _wallet.GetWalletAddress();
             }
 
-            if (order.order.priceCurrencyAddress.IsZeroAddress())
+            if (orders == null || orders.Length < 1)
+            {
+                throw new ArgumentException($"{orders} must not be null or empty");
+            }
+
+            if (orders[0].order.priceCurrencyAddress.IsZeroAddress())
             {
                 throw new ArgumentException("Sardine checkout does not support native currency checkout; please choose an order with a different payment token");
             }
             
-            Step[] steps = await _checkout.GenerateBuyTransaction(order.order, quantity, additionalFee);
+            Step[] steps = await _checkout.GenerateBuyTransaction(orders, quantity, additionalFee, recipient);
             string callData = steps.ExtractBuyStep().data;
             
-            return await SardineGetNFTCheckoutToken(order, recipient, quantity, callData, new Address(marketplaceContractAddress));
+            return await SardineGetNFTCheckoutToken(orders, recipient, quantity, callData, new Address(marketplaceContractAddress));
         }
 
         // Todo add test
@@ -406,10 +440,14 @@ namespace Sequence.Pay.Sardine
             return filteredTokens.ToArray();
         }
 
-
+        public string CheckoutUrl(SardineNFTCheckout token)
+        {
+            return _sardineCheckoutUrl + token.token + _sardineCheckoutUrlSuffix;
+        }
+        
         public void Checkout(SardineNFTCheckout token)
         {
-            string url = _sardineCheckoutUrl + token.token + _sardineCheckoutUrlSuffix;
+            string url = CheckoutUrl(token);
             Application.OpenURL(url);
         }
     }

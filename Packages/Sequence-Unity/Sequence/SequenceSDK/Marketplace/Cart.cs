@@ -66,6 +66,7 @@ namespace Sequence.Marketplace
                 }
             }
             
+            _listings = _listings.OrderBy(listing => listing.order.priceUSD).ToArray();
             Setup(swap, marketplaceReader, indexer, checkout);
         }
 
@@ -158,7 +159,9 @@ namespace Sequence.Marketplace
         {
             if (GetOrderByOrderId(order.order.orderId) == null)
             {
+                // Todo optimize this
                 _listings = _listings.AppendObject(order);
+                _listings = _listings.OrderBy(listing => listing.order.priceUSD).ToArray();
             }
             _collectibleImagesByOrderId[order.order.orderId] = collectibleImage;
             _amountsRequestedByOrderId[order.order.orderId] = amountRequested;

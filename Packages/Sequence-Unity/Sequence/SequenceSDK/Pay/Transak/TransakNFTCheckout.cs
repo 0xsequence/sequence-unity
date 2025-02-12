@@ -146,17 +146,40 @@ namespace Sequence.Pay.Transak
             return transakLink;
         }
 
-        public async Task<string> GetNFTCheckoutLink(CollectibleOrder collectibleOrder, ulong quantity, NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
+        public Task<string> GetNFTCheckoutLink(CollectibleOrder order, ulong quantity,
+            NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
+        {
+            if (order == null)
+            {
+                throw new ArgumentNullException(nameof(order));
+            }
+
+            AdditionalFee[] additionalFees = new[] { additionalFee };
+            if (additionalFee == null)
+            {
+                additionalFees = null;
+            }
+            return GetNFTCheckoutLink(new [] { order }, quantity, nftType, additionalFees);
+        }
+
+        public async Task OpenNFTCheckoutLink(CollectibleOrder order, ulong quantity,
+            NFTType nftType = NFTType.ERC721, AdditionalFee additionalFee = null)
+        {
+            string link = await GetNFTCheckoutLink(order, quantity, nftType, additionalFee);
+            Application.OpenURL(link);
+        }
+
+        public async Task<string> GetNFTCheckoutLink(CollectibleOrder[] collectibleOrder, ulong quantity, NFTType nftType = NFTType.ERC721, AdditionalFee[] additionalFee = null)
         {
             if (quantity <= 0)
             {
                 throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
             }
 
-            Order order = collectibleOrder.order;
-            TokenMetadata metadata = collectibleOrder.metadata;
+            Order order = collectibleOrder[0].order;
+            TokenMetadata metadata = collectibleOrder[0].metadata;
             
-            Step[] steps = await _checkout.GenerateBuyTransaction(order, quantity, additionalFee, TransakContractAddresses[_chain]);
+            Step[] steps = await _checkout.GenerateBuyTransaction(collectibleOrder, quantity, additionalFee, TransakContractAddresses[_chain]);
             string callData = steps.ExtractBuyStep().data;
 
             TransakNftData nftData = new TransakNftData(metadata.image, metadata.name,
@@ -169,9 +192,9 @@ namespace Sequence.Pay.Transak
             return await GetNFTCheckoutLink(nftData, callData, new Address(order.collectionContractAddress), contractId);
         }
         
-        public async Task OpenNFTCheckoutLink(CollectibleOrder order, ulong quantity, NFTType nftType = NFTType.ERC721)
+        public async Task OpenNFTCheckoutLink(CollectibleOrder[] order, ulong quantity, NFTType nftType = NFTType.ERC721, AdditionalFee[] additionalFees = null)
         {
-            string link = await GetNFTCheckoutLink(order, quantity, nftType);
+            string link = await GetNFTCheckoutLink(order, quantity, nftType, additionalFees);
             Application.OpenURL(link);
         }
 

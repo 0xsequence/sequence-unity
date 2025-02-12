@@ -38,7 +38,7 @@ namespace Sequence.Pay.Tests.Transak
         {
             CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.Polygon, "0x079294e6ffec16234578c672fa3fbfd4b6c48640");
             TransakNFTCheckout transakCheckout =
-                new TransakNFTCheckout(_testWallet, Chain.Polygon, new MockEthClientForGasEstimation());
+                new TransakNFTCheckout(_testWallet, Chain.Polygon);
 
             string transakNFTCheckoutLink = await transakCheckout.GetNFTCheckoutLink(collectibleOrders[0], 1, NFTType.ERC1155);
 

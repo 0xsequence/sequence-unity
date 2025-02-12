@@ -56,14 +56,14 @@ namespace Sequence.Pay.Sardine
         /// You can check if a marketplace contract is whitelisted with CheckSardineWhitelistStatus or by catching the exception
         /// If your marketplace contract is not whitelisted, please reach out to Sequence for support and next steps
         /// </summary>
-        /// <param name="order"></param>
+        /// <param name="orders">the collectible orders to fulfill - must all be the same collectible!</param>
         /// <param name="quantity"></param>
         /// <param name="recipient"></param>
         /// <param name="additionalFee"></param>
         /// <param name="marketplaceContractAddress"></param>
         /// <returns></returns>
-        public Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder order, BigInteger quantity,
-            Address recipient = null, AdditionalFee additionalFee = null,
+        public Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder[] orders, BigInteger quantity,
+            Address recipient = null, AdditionalFee[] additionalFee = null,
             string marketplaceContractAddress = SequenceMarketplaceV2Contract);
         
         /// <summary>
@@ -82,6 +82,22 @@ namespace Sequence.Pay.Sardine
         /// <returns></returns>
         public Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC1155Sale saleContract, Address collection,
             BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] data = null, FixedByte[] proof = null);
+
+        /// <summary>
+        /// Request a checkout token for the given ERC721Sale contract, collection, tokenId, and amount
+        /// Requires that the ERC721Sale contract has been whitelisted for the given Chain; will throw an exception if not
+        /// You can check if an ERC721Sale contract is whitelisted with CheckSardineWhitelistStatus or by catching the exception
+        /// If your ERC721Sale contract is not whitelisted, please reach out to Sequence for support and next steps
+        /// </summary>
+        /// <param name="saleContract"></param>
+        /// <param name="collection"></param>
+        /// <param name="amount"></param>
+        /// <param name="tokenId"></param>
+        /// <param name="recipient"></param>
+        /// <param name="proof"></param>
+        /// <returns></returns>
+        public Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC721Sale saleContract, Address collection,
+            BigInteger amount, BigInteger tokenId, Address recipient = null, byte[] proof = null);
 
         /// <summary>
         /// Check on the status of an NFT checkout order
@@ -120,6 +136,13 @@ namespace Sequence.Pay.Sardine
         /// <param name="fullList"></param>
         /// <returns></returns>
         public Task<SardineEnabledToken[]> SardineGetEnabledTokens(bool fullList = false);
+
+        /// <summary>
+        /// Given a SardineNFTCheckout token, generate the URL for the web-based NFT checkout flow
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public string CheckoutUrl(SardineNFTCheckout token);
 
         /// <summary>
         /// Given a SardineNFTCheckout token, open the web-based NFT checkout flow

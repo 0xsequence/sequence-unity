@@ -83,7 +83,7 @@ namespace Sequence.Pay.Tests.Sardine
             CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.Polygon, "0x079294e6ffec16234578c672fa3fbfd4b6c48640");
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
 
-            SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders[0], 1);
+            SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders, 1);
             
             Assert.NotNull(token);
             Assert.IsFalse(string.IsNullOrWhiteSpace(token.token));

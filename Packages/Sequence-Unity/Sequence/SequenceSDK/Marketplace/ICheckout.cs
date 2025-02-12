@@ -60,6 +60,16 @@ namespace Sequence.Marketplace
         /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
         /// <returns></returns>
         public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null);
+        
+        /// <summary>
+        /// Get the Step[] that, when executed, will create a buy transaction for the given orders and amount, fulfilling the orders in increasing order of price
+        /// </summary>
+        /// <param name="orders">the orders to be fulfilled - must all be for the same collectible!</param>
+        /// <param name="amount"></param>
+        /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
+        /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
+        /// <returns></returns>
+        public Task<Step[]> GenerateBuyTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address buyer = null);
 
         /// <summary>
         /// Get the Step[] that, when executed, will create a sell transaction for the given order and amount, fulfilling the order
@@ -67,8 +77,39 @@ namespace Sequence.Marketplace
         /// <param name="order"></param>
         /// <param name="amount"></param>
         /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
+        /// <param name="seller">optionally specify the seller of the order when assembling the transaction</param>
         /// <returns></returns>
-        public Task<Step[]> GenerateSellTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null);
+        public Task<Step[]> GenerateSellTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address seller = null);
+        
+        /// <summary>
+        /// Get the Step[] that, when executed, will create a sell transaction for the given order and amount, fulfilling the orders in decreasing order of price
+        /// </summary>
+        /// <param name="orders">the orders to be fulfilled - must all be for the same collectible!</param>
+        /// <param name="amount"></param>
+        /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
+        /// <param name="seller">optionally specify the seller of the order when assembling the transaction</param>
+        /// <returns></returns>
+        public Task<Step[]> GenerateSellTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address seller = null);
+        
+        /// <summary>
+        /// Get the Step[] that, when executed, will create a buy transaction for the given orders and amount, fulfilling the orders in increasing order of price
+        /// </summary>
+        /// <param name="orders">the orders to be fulfilled - must all be for the same collectible!</param>
+        /// <param name="amount"></param>
+        /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
+        /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
+        /// <returns></returns>
+        public Task<Step[]> GenerateBuyTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address buyer = null);
+        
+        /// <summary>
+        /// Get the Step[] that, when executed, will create a sell transaction for the given order and amount, fulfilling the orders in decreasing order of price
+        /// </summary>
+        /// <param name="orders">the orders to be fulfilled - must all be for the same collectible!</param>
+        /// <param name="amount"></param>
+        /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
+        /// <param name="seller">optionally specify the seller of the order when assembling the transaction</param>
+        /// <returns></returns>
+        public Task<Step[]> GenerateSellTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address seller = null);
 
         /// <summary>
         /// Get the Step[] that, when executed, will create a new listing order

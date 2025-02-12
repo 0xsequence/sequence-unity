@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 
@@ -106,7 +108,7 @@ namespace Sequence.Marketplace
         public event Action<Step[]> OnTransactionStepsReturn;
         public event Action<string> OnTransactionStepsError;
         
-        public async Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null)
+        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null)
         {
             OrderData[] ordersData = new OrderData[]
                 { new OrderData(order.orderId, amount.ToString()) };
@@ -115,12 +117,18 @@ namespace Sequence.Marketplace
             {
                 additionalFees = null;
             }
+            
+            return GenerateBuyTransaction(ordersData, order.collectionContractAddress, order.marketplace, additionalFees, buyer);
+        }
+        
+        private async Task<Step[]> GenerateBuyTransaction(OrderData[] ordersData, string collectionContractAddress, MarketplaceKind marketplaceKind, AdditionalFee[] additionalFees = null, Address buyer = null)
+        {
             if (buyer == null)
             {
                 buyer = _wallet.GetWalletAddress();
             }
-            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(order.collectionContractAddress, buyer,
-                order.marketplace, ordersData, additionalFees, _wallet.GetWalletKind());
+            GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(collectionContractAddress, buyer,
+                marketplaceKind, ordersData, additionalFees, _wallet.GetWalletKind());
 
             try
             {
@@ -132,13 +140,73 @@ namespace Sequence.Marketplace
             catch (Exception e)
             {
                 string error =
-                    $"Error generating buy transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}";
+                    $"Error generating buy transaction for {_wallet} with {nameof(ordersData)} {ordersData}: {e.Message}";
                 OnTransactionStepsError?.Invoke(error);
                 throw new Exception(error);
             }
         }
-        
-        public async Task<Step[]> GenerateSellTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null)
+
+        public Task<Step[]> GenerateBuyTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
+            Address buyer = null)
+        {
+            ValidateOrders(orders);
+
+            orders = orders.OrderBy(order => order.priceUSD).ToArray();
+
+            OrderData[] orderDatas = AssembleOrderDatas(orders, amount);
+
+            return GenerateBuyTransaction(orderDatas, orders[0].collectionContractAddress, orders[0].marketplace,
+                additionalFee, buyer);
+        }
+
+        private void ValidateOrders(Order[] orders)
+        {
+            if (orders == null || orders.Length < 1)
+            {
+                throw new ArgumentException($"{nameof(orders)} cannot be null or empty");
+            }
+
+            BigInteger collectibleId = orders[0].collectibleId;
+            int length = orders.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (orders[i].collectibleId != collectibleId)
+                {
+                    throw new ArgumentException("All orders must be for the same collectible");
+                }
+            }
+        }
+
+        private OrderData[] AssembleOrderDatas(Order[] orders, BigInteger amount)
+        {
+            BigInteger amountLeft = amount;
+            List<OrderData> orderDatas = new List<OrderData>();
+            int length = orders.Length;
+            for (int i = 0; i < length; i++)
+            {
+                BigInteger available = BigInteger.Parse(orders[i].quantityAvailable);
+                if (amountLeft <= available)
+                {
+                    orderDatas.Add(new OrderData(orders[i].orderId, amountLeft.ToString()));
+                    break;
+                }
+                else
+                {
+                    orderDatas.Add(new OrderData(orders[i].orderId, orders[i].quantityAvailable));
+                    amountLeft -= available;
+                    if (amountLeft == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            Assert.AreEqual(BigInteger.Zero, amountLeft);
+
+            return orderDatas.ToArray();
+        }
+
+        public Task<Step[]> GenerateSellTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, 
+            Address seller = null)
         {
             OrderData[] ordersData = new OrderData[]
                 { new OrderData(order.orderId, amount.ToString()) };
@@ -147,8 +215,20 @@ namespace Sequence.Marketplace
             {
                 additionalFees = null;
             }
-            GenerateSellTransaction generateBuyTransaction = new GenerateSellTransaction(order.collectionContractAddress, _wallet.GetWalletAddress(),
-                order.marketplace, ordersData, additionalFees, _wallet.GetWalletKind());
+            
+            return GenerateSellTransaction(ordersData, order.collectionContractAddress, order.marketplace, additionalFees, seller);
+        }
+
+        private async Task<Step[]> GenerateSellTransaction(OrderData[] ordersData, string collectionContractAddress,
+            MarketplaceKind marketplaceKind, AdditionalFee[] additionalFees = null, Address seller = null)
+        {
+            if (seller == null)
+            {
+                seller = _wallet.GetWalletAddress();
+            }
+            
+            GenerateSellTransaction generateBuyTransaction = new GenerateSellTransaction(collectionContractAddress, seller,
+                marketplaceKind, ordersData, additionalFees, _wallet.GetWalletKind());
 
             try
             {
@@ -160,10 +240,49 @@ namespace Sequence.Marketplace
             catch (Exception e)
             {
                 string error =
-                    $"Error generating sell transaction for {_wallet} with order {order} and {nameof(ordersData)} {ordersData}: {e.Message}";
+                    $"Error generating sell transaction for {_wallet} with {nameof(ordersData)} {ordersData}: {e.Message}";
                 OnTransactionStepsError?.Invoke(error);
                 throw new Exception(error);
             }
+        }
+
+        public Task<Step[]> GenerateSellTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
+            Address seller = null)
+        {
+            ValidateOrders(orders);
+
+            orders = orders.OrderByDescending(order => order.priceUSD).ToArray();
+
+            OrderData[] orderDatas = AssembleOrderDatas(orders, amount);
+
+            return GenerateSellTransaction(orderDatas, orders[0].collectionContractAddress, orders[0].marketplace,
+                additionalFee, seller);
+        }
+
+        public Task<Step[]> GenerateBuyTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
+            Address buyer = null)
+        {
+            int length = orders.Length;
+            Order[] orderArray = new Order[length];
+            for (int i = 0; i < length; i++)
+            {
+                orderArray[i] = orders[i].order;
+            }
+
+            return GenerateBuyTransaction(orderArray, amount, additionalFee, buyer);
+        }
+
+        public Task<Step[]> GenerateSellTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
+            Address seller = null)
+        {
+            int length = orders.Length;
+            Order[] orderArray = new Order[length];
+            for (int i = 0; i < length; i++)
+            {
+                orderArray[i] = orders[i].order;
+            }
+
+            return GenerateSellTransaction(orderArray, amount, additionalFee, seller);
         }
 
         public async Task<Step[]> GenerateListingTransaction(Address collection, string tokenId, BigInteger amount, ContractType contractType, Address currencyTokenAddress, BigInteger pricePerToken, DateTime expiry, OrderbookKind orderbookKind = OrderbookKind.sequence_marketplace_v2)

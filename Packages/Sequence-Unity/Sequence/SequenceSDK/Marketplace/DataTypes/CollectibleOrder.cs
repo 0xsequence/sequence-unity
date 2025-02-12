@@ -26,6 +26,11 @@ namespace Sequence.Marketplace
             CollectibleOrder other = (CollectibleOrder) obj;
             return Equals(metadata, other.metadata) && Equals(order, other.order);
         }
+
+        public static implicit operator Order(CollectibleOrder order)
+        {
+            return order.order;
+        }
     }
     
     public static class CollectibleOrderExtensions
