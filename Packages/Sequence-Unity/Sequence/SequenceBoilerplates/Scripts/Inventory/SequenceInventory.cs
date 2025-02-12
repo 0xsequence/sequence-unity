@@ -10,10 +10,6 @@ namespace SequenceSDK.Samples
 {
     public class SequenceInventory : MonoBehaviour
     {
-        [Header("Config")]
-        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
-        [SerializeField] private string _contractAddress = "0x00";
-        
         [Header("Components")]
         [SerializeField] private RawImage _tokenDetailsImage;
         [SerializeField] private TMP_Text _tokenDetailsNameText;
@@ -32,6 +28,8 @@ namespace SequenceSDK.Samples
         [SerializeField] private GenericObjectPool<SequenceInventoryTile> _tilePool;
 
         private IWallet _wallet;
+        private Chain _chain;
+        private string _contractAddress;
         private TokenBalance _selectedBalance;
         
         public void Hide()
@@ -39,9 +37,11 @@ namespace SequenceSDK.Samples
             gameObject.SetActive(false);
         }
         
-        public void Show(IWallet wallet)
+        public void Show(IWallet wallet, Chain chain, string contractAddress)
         {
             _wallet = wallet;
+            _chain = chain;
+            _contractAddress = contractAddress;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             _loadingScreen.SetActive(false);

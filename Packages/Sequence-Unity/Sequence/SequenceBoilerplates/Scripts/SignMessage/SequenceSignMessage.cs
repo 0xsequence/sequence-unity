@@ -8,9 +8,6 @@ namespace Sequence.Boilerplates.SignMessage
 {
     public class SequenceSignMessage : MonoBehaviour
     {
-        [Header("Configuration")]
-        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
-        
         [Header("Components")]
         [SerializeField] private Button _signButton;
         [SerializeField] private Button _copyButton;
@@ -20,6 +17,7 @@ namespace Sequence.Boilerplates.SignMessage
         [SerializeField] private string _initSignatureText;
         
         private IWallet _wallet;
+        private Chain _chain;
         private string _curInput;
         private string _curSignature;
 
@@ -35,9 +33,10 @@ namespace Sequence.Boilerplates.SignMessage
             gameObject.SetActive(false);
         }
 
-        public void Show(IWallet wallet)
+        public void Show(IWallet wallet, Chain chain)
         {
             _wallet = wallet;
+            _chain = chain;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             _messageInput.text = string.Empty;

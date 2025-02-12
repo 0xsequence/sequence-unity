@@ -8,9 +8,6 @@ namespace SequenceSDK.Samples
 {
     public class SequencePlayerProfile : MonoBehaviour
     {
-        [Header("Config")] 
-        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
-        
         [Header("Components")]
         [SerializeField] private TMP_Text _etherBalanceText;
         [SerializeField] private TMP_InputField _recipientInput;
@@ -26,6 +23,7 @@ namespace SequenceSDK.Samples
         [SerializeField] private GenericObjectPool<LinkedWalletTile> _walletsPool;
         
         private IWallet _wallet;
+        private Chain _chain;
         private EOAWalletLinker _walletLinker;
 
         public void Hide()
@@ -33,9 +31,10 @@ namespace SequenceSDK.Samples
             gameObject.SetActive(false);
         }
 
-        public async void Show(IWallet wallet)
+        public async void Show(IWallet wallet, Chain chain)
         {
             _wallet = wallet;
+            _chain = chain;
             gameObject.SetActive(true);
             _transactionPool.Cleanup();
             

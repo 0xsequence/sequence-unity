@@ -14,10 +14,6 @@ namespace SequenceSDK.Samples
 {
     public class SequenceDailyRewards : MonoBehaviour
     {
-        [Header("Config")]
-        [SerializeField] private string _apiUrl;
-        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
-        
         [Header("Components")]
         [SerializeField] private GameObject _contentParent;
         [SerializeField] private GameObject _loadingScreen;
@@ -25,6 +21,8 @@ namespace SequenceSDK.Samples
         [SerializeField] private GenericObjectPool<SequenceDailyRewardTile> _tilePool;
         
         private IWallet _wallet;
+        private Chain _chain;
+        private string _apiUrl;
         private DailyRewardsStatusData _rewardsData;
         private Dictionary<string, TokenSupply[]> _supplies;
         
@@ -33,9 +31,11 @@ namespace SequenceSDK.Samples
             gameObject.SetActive(false);
         }
         
-        public void Show(IWallet wallet)
+        public void Show(IWallet wallet, Chain chain, string apiUrl)
         {
             _wallet = wallet;
+            _chain = chain;
+            _apiUrl = apiUrl;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             GetRewards();

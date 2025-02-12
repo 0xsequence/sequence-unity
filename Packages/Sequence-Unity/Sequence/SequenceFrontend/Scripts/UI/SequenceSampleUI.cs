@@ -96,22 +96,18 @@ namespace Sequence.Demo
 
         public void OpenPlayerProfile(IWallet wallet)
         {
-            _playerProfile.Show(wallet);
         }
         
         public void OpenDailyRewards(IWallet wallet)
         {
-            _dailyRewards.Show(wallet);
         }
 
         public void OpenInventory(IWallet wallet)
         {
-            _inventory.Show(wallet);
         }
 
         public void OpenInGameShop(IWallet wallet)
         {
-            _inGameShop.Show(wallet);
         }
 
         public void OpenWalletPanelWithDelay(float delayInSeconds, params object[] openArgs)

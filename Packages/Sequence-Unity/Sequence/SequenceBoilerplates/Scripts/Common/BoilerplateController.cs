@@ -10,6 +10,14 @@ namespace Sequence.Demo
 {
     public class BoilerplateController : MonoBehaviour
     {
+        [Header("Configuration")]
+        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
+        [SerializeField] private string _dailyRewardsApi;
+        [SerializeField] private string _collectionAddress;
+        [SerializeField] private string _saleContractAddress;
+        [SerializeField] private int[] _itemsForSale;
+        
+        [Header("Components")]
         [SerializeField] private GameObject _featureSelection;
         [SerializeField] private SequenceLoginWindow _loginWindow;
         [SerializeField] private SequencePlayerProfile _playerProfile;
@@ -49,31 +57,31 @@ namespace Sequence.Demo
         public void OpenPlayerProfilePanel()
         {
             _featureSelection.SetActive(false);
-            _playerProfile.Show(_wallet);
+            _playerProfile.Show(_wallet, _chain);
         }
         
         public void OpenDailyRewardsPanel()
         {
             _featureSelection.SetActive(false);
-            _dailyRewards.Show(_wallet);
+            _dailyRewards.Show(_wallet, _chain, _dailyRewardsApi);
         }
         
         public void OpenInventoryPanel()
         {
             _featureSelection.SetActive(false);
-            _inventory.Show(_wallet);
+            _inventory.Show(_wallet, _chain, _collectionAddress);
         }
         
         public void OpenInGameShopPanel()
         {
             _featureSelection.SetActive(false);
-            _inGameShop.Show(_wallet);
+            _inGameShop.Show(_wallet, _chain, _collectionAddress, _saleContractAddress, _itemsForSale);
         }
 
         public void OpenSignMessage()
         {
             _featureSelection.SetActive(false);
-            _signMessage.Show(_wallet);
+            _signMessage.Show(_wallet, _chain);
         }
 
         private void HideAll()

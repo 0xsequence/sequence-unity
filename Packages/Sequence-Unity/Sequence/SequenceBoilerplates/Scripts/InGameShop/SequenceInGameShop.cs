@@ -12,12 +12,6 @@ namespace Sequence.Demo
 {
     public class SequenceInGameShop : MonoBehaviour
     {
-        [Header("Configuration")]
-        [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
-        [SerializeField] private string _tokenContractAddress;
-        [SerializeField] private string _saleContractAddress;
-        [SerializeField] private int[] _itemsForSale;
-        
         [Header("Components")]
         [SerializeField] private GameObject _loadingView;
         [SerializeField] private QrCodeView _qrCodeView;
@@ -28,6 +22,10 @@ namespace Sequence.Demo
         [SerializeField] private GenericObjectPool<SequenceInGameShopTile> _tilePool;
 
         private IWallet _wallet;
+        private Chain _chain;
+        private string _tokenContractAddress;
+        private string _saleContractAddress;
+        private int[] _itemsForSale;
         private SequenceInGameShopState _saleState;
 
         public void Hide()
@@ -35,9 +33,13 @@ namespace Sequence.Demo
             gameObject.SetActive(false);
         }
 
-        public void Show(IWallet wallet)
+        public void Show(IWallet wallet, Chain chain, string tokenContractAddress, string saleContractAddress, int[] itemsForSale)
         {
             _wallet = wallet;
+            _chain = chain;
+            _tokenContractAddress = tokenContractAddress;
+            _saleContractAddress = saleContractAddress;
+            _itemsForSale = itemsForSale;
             
             gameObject.SetActive(true);
             _loadingView.SetActive(false);
