@@ -5,6 +5,7 @@ using PlayFab;
 using PlayFab.ClientModels;
 using Sequence.EmbeddedWallet;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Sequence.EmbeddedWallet.Tests
 {
@@ -86,7 +87,7 @@ namespace Sequence.EmbeddedWallet.Tests
         {
             if (error.Contains("AccountAlreadyLinked"))
             {
-                _email = "a" + _email;
+                _email = Random.Range(0, 9999999).ToString() + _email;
                 var request = new LoginWithEmailAddressRequest
                 {
                     Email = _email,
