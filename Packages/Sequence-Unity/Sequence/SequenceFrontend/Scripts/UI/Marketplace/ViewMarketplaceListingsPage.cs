@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Sequence.Demo.Mocks;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
+using Sequence.Pay.Transak;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
@@ -127,7 +128,7 @@ namespace Sequence.Demo
                 }
                 Transform marketplaceTile = _marketplaceTilePool.GetNextAvailable();
                 marketplaceTile.SetParent(_scrollviewContentParent);
-                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet, _checkoutPanel);
+                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet, _checkoutPanel, NFTType.ERC1155);
                 marketplaceTile.localScale = Vector3.one;
                 _items++;
                 UpdateScrollViewSize();

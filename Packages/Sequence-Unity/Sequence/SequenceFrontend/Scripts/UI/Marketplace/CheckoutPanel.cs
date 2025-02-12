@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using Sequence.Marketplace;
+using Sequence.Pay;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Demo
 {
@@ -23,6 +25,13 @@ namespace Sequence.Demo
             {
                 throw new ArgumentException(
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(ICheckoutHelper)} as an argument");
+            }
+
+            IFiatCheckout fiatCheckout = args.GetObjectOfTypeIfExists<IFiatCheckout>();
+            if (fiatCheckout == null)
+            {
+                Debug.LogWarning(
+                    $"{GetType().Name} must be opened with a {typeof(IFiatCheckout)} as an argument in order to use fiat checkout features");
             }
         }
 

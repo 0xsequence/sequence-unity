@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using NBitcoin.RPC;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
+using Sequence.Pay;
+using Sequence.Pay.Transak;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -28,6 +30,7 @@ namespace Sequence.Demo
         private IWallet _wallet;
         private CheckoutPanel _checkoutPanel;
         private Sprite _collectibleSprite;
+        private NFTType _nftType;
         
         private void Awake()
         {
@@ -44,8 +47,12 @@ namespace Sequence.Demo
             OnCollectibleSelected -= HandleCollectibleSelected;
         }
 
-        public void Assemble(CollectibleOrder order, Sprite currencyIcon, IWallet wallet, CheckoutPanel checkoutPanel)
+        public void Assemble(CollectibleOrder order, Sprite currencyIcon, IWallet wallet, CheckoutPanel checkoutPanel, NFTType nftType)
         {
+            if (order == null)
+            {
+                throw new ArgumentNullException($"{nameof(order)} cannot be null");
+            }
             _collectibleOrder = order;
             FetchImage().ConfigureAwait(false);
             _currencyIcon.sprite = currencyIcon;
@@ -54,6 +61,7 @@ namespace Sequence.Demo
             _amountAvailableText.text = "Available: " + _collectibleOrder.order.quantityAvailable;
             _wallet = wallet;
             _checkoutPanel = checkoutPanel;
+            _nftType = nftType;
         }
 
         private async Task FetchImage()
@@ -121,7 +129,9 @@ namespace Sequence.Demo
 
         public void OpenBuyPage()
         {
-            _checkoutPanel.Open(new NftCheckout(_wallet, _collectibleOrder, _collectibleSprite, 1));
+            _checkoutPanel.Open(new NftCheckout(_wallet, _collectibleOrder, _collectibleSprite, 1),
+                new SequenceCheckout(_wallet, ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()],
+                    new[] { _collectibleOrder }, 1, _nftType));
         }
     }
 }

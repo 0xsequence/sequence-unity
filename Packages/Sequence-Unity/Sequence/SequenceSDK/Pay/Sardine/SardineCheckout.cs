@@ -224,7 +224,7 @@ namespace Sequence.Pay.Sardine
 
         // Todo add test
         public async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC721Sale saleContract, Address collection,
-            BigInteger amount, BigInteger tokenId, Address recipient = null, byte[] proof = null)
+            BigInteger amount, BigInteger tokenId, Address recipient = null, FixedByte[] proof = null)
         {
             if (recipient == null)
             {

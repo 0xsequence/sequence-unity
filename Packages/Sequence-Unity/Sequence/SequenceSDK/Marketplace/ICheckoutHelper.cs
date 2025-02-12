@@ -97,11 +97,5 @@ namespace Sequence.Marketplace
         /// <param name="orderId"></param>
         /// <param name="amount"></param>
         public void SetAmountRequested(string orderId, uint amount);
-        
-        /// <summary>
-        /// Get the ICheckout instance being used by the ICheckoutHelper
-        /// </summary>
-        /// <returns></returns>
-        public ICheckout GetICheckout();
     }
 }

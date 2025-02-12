@@ -19,12 +19,12 @@ namespace Sequence.Pay
         private ICheckout _checkout;
         private IFiatPayFactory _factory; // We use the factory pattern to create the correct IFiatPay implementation based on which Pay method is available to the user based on their location, chain, etc. - this makes it easy to add new Fiat Payment providers
 
-        public SequencePay(IWallet wallet, Chain chain, IFiatPayFactory factory, IEthClient client = null, ICheckout checkout = null,
+        public SequencePay(IWallet wallet, Chain chain, IFiatPayFactory factory = null, IEthClient client = null, ICheckout checkout = null,
             IMarketplaceReader reader = null)
         {
             if (client == null)
             {
-                client = new SequenceEthClient(_chain);
+                client = new SequenceEthClient(chain);
             }
 
             if (checkout == null)
@@ -46,6 +46,31 @@ namespace Sequence.Pay
             _chain = chain;
             _checkout = checkout;
             _factory = factory;
+        }
+        
+        public bool IsOnRampAvailable()
+        {
+            IFiatPay onRamp = _factory.OnRamp();
+            return onRamp is not UnsupportedPay;
+        }
+
+        public async Task<bool> NftCheckoutEnabled(CollectibleOrder[] orders)
+        {
+            IFiatPay nftCheckout = await _factory.NftCheckout(orders);
+            return nftCheckout is not UnsupportedPay;
+        }
+
+        public async Task<bool> NftCheckoutEnabled(ERC1155Sale saleContract, Address collection,
+            Dictionary<string, BigInteger> amountsByTokenId)
+        {
+            IFiatPay nftCheckout = await _factory.NftCheckout(saleContract, collection, amountsByTokenId);
+            return nftCheckout is not UnsupportedPay;
+        }
+        
+        public async Task<bool> NftCheckoutEnabled(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount)
+        {
+            IFiatPay nftCheckout = await _factory.NftCheckout(saleContract, collection, tokenId, amount);
+            return nftCheckout is not UnsupportedPay;
         }
 
         public Task OnRamp()
@@ -87,7 +112,7 @@ namespace Sequence.Pay
         }
 
         public async Task<string> GetNftCheckoutLink(ERC721Sale saleContract, Address collection, BigInteger tokenId, BigInteger amount,
-            Address recipient = null, byte[] proof = null)
+            Address recipient = null, FixedByte[] proof = null)
         {
             IFiatPay pay = await _factory.NftCheckout(saleContract, collection, tokenId.ToString(), amount);
             return await pay.GetNftCheckoutLink(saleContract, collection, tokenId, amount, recipient, proof);

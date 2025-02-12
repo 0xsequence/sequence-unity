@@ -37,6 +37,10 @@ namespace Sequence.Marketplace
     {
         public static Order[] ToOrderArray(this CollectibleOrder[] collectibleOrders)
         {
+            if (collectibleOrders == null)
+            {
+                return null;
+            }
             Order[] orders = new Order[collectibleOrders.Length];
             for (int i = 0; i < collectibleOrders.Length; i++)
             {

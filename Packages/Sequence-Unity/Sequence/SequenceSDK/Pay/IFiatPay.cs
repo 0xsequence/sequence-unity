@@ -71,7 +71,7 @@ namespace Sequence.Pay
         /// <param name="proof"></param>
         /// <returns></returns>
         public Task<string> GetNftCheckoutLink(ERC721Sale saleContract, Address collection,
-            BigInteger tokenId, BigInteger amount, Address recipient = null, byte[] proof = null);
+            BigInteger tokenId, BigInteger amount, Address recipient = null, FixedByte[] proof = null);
         
         /// <summary>
         /// Retrieve a link to a web-based flow where the user can fulfill CollectibleOrders and purchase ERC1155 or ERC721 tokens

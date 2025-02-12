@@ -229,7 +229,7 @@ namespace Sequence.Pay.Transak
         }
 
         public async Task<string> GetNFTCheckoutLink(ERC721Sale saleContract, Address collection, BigInteger tokenId,
-            ulong quantity, TransakContractId contractId, byte[] proof = null)
+            ulong quantity, TransakContractId contractId, FixedByte[] proof = null)
         {
             if (quantity <= 0)
             {

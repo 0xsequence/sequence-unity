@@ -53,7 +53,7 @@ namespace Sequence.Pay.Sardine
         }
 
         public async Task<string> GetNftCheckoutLink(ERC721Sale saleContract, Address collection, BigInteger tokenId, BigInteger amount,
-            Address recipient = null, byte[] proof = null)
+            Address recipient = null, FixedByte[] proof = null)
         {
             SardineNFTCheckout nftCheckout =
                 await _checkout.SardineGetNFTCheckoutToken(saleContract, collection, tokenId, amount, recipient, proof);

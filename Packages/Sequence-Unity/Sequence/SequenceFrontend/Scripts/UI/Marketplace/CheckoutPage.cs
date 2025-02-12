@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
 using Sequence.Pay.Transak;
 using Sequence.Marketplace;
+using Sequence.Pay;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
@@ -28,11 +29,11 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _loadingScreen;
         [SerializeField] private GameObject _qrCodeButtonPrefab;
         [SerializeField] private GameObject _fundWithCreditCardPrefab;
+        [SerializeField] private GameObject _payWithCreditCardPrefab;
         
         private CollectibleOrder[] _listings;
         private Chain _chain;
         private IWallet _wallet;
-        private ICheckout _checkout;
         private Dictionary<string, Sprite> _collectibleImagesByOrderId;
         private Dictionary<string, uint> _amountsRequestedByOrderId;
         private ICheckoutHelper _cart;
@@ -41,6 +42,7 @@ namespace Sequence.Demo
         private List<TokenPaymentOption> _tokenPaymentOptions;
         private Marketplace.Currency _bestCurrency;
         private List<GameObject> _spawnedGameObjects;
+        private IFiatCheckout _fiatCheckout;
 
         protected override void Awake()
         {
@@ -57,6 +59,14 @@ namespace Sequence.Demo
                 throw new ArgumentException(
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(ICheckoutHelper)} as an argument");
             }
+            
+            _fiatCheckout = args.GetObjectOfTypeIfExists<IFiatCheckout>();
+            if (_fiatCheckout == null)
+            {
+                Debug.LogWarning(
+                    $"{GetType().Name} must be opened with a {typeof(IFiatCheckout)} as an argument in order to use fiat checkout features");
+            }
+            
             Configure();
             
             CartItem.OnAmountChanged += OnCartAmountChanged;
@@ -72,7 +82,6 @@ namespace Sequence.Demo
             _collectibleImagesByOrderId = _cart.GetCollectibleImagesByOrderId();
             _amountsRequestedByOrderId = _cart.GetAmountsRequestedByOrderId();
             _tokenPaymentOptions = new List<TokenPaymentOption>();
-            _checkout = _cart.GetICheckout();
         }
 
         public override void Close()
@@ -117,20 +126,14 @@ namespace Sequence.Demo
                 _completePurchaseButton.interactable = false;
             }
 
-            Marketplace.CheckoutOptions options = null;
-            try
+            if (_fiatCheckout != null)
             {
-                options = await _checkout.GetCheckoutOptions(_listings.ToOrderArray());
-            }
-            catch (Exception e)
-            {
-                string message =  $"Error fetching checkout options: {e.Message}";
-                Debug.LogError(message);
-            }
+                bool onRampEnabled = _fiatCheckout.OnRampEnabled();
+                AddOnRamp(onRampEnabled);
             
-            AddOnRamp(options);
-            
-            // Todo instantiate credit card based checkout stuff (only if we have one cart item)
+                bool creditCardCheckoutEnabled = await _fiatCheckout.NftCheckoutEnabled();
+                AddCreditCardCheckout(creditCardCheckoutEnabled);
+            }
 
             await AsyncExtensions.DelayTask(.1f);
             UpdateScrollViewSize();
@@ -197,26 +200,38 @@ namespace Sequence.Demo
             _spawnedGameObjects.Add(qrCodeButtonGameObject);
         }
 
-        protected void AddOnRamp(Marketplace.CheckoutOptions options)
+        protected void AddOnRamp(bool onRampEnabled)
         {
-            if (options != null && options.onRamp != null && options.onRamp.Length > 0)
+            if (!onRampEnabled)
             {
-                GameObject fundWithCreditCardGameObject = Instantiate(_fundWithCreditCardPrefab, _cartItemsParent);
-                Button fundWithCreditCardButton = fundWithCreditCardGameObject.GetComponent<Button>();
-                fundWithCreditCardButton.onClick.AddListener(() =>
-                {
-                    if (options.onRamp.Contains(TransactionOnRampProvider.transak))
-                    {
-                        TransakOnRamp transakOnRamp = new TransakOnRamp(_wallet.GetWalletAddress());
-                        transakOnRamp.OpenTransakLink();
-                    }
-                });
-                _spawnedGameObjects.Add(fundWithCreditCardGameObject);
+                return;
             }
-            else
+            
+            GameObject fundWithCreditCardGameObject = Instantiate(_fundWithCreditCardPrefab, _cartItemsParent);
+            Button fundWithCreditCardButton = fundWithCreditCardGameObject.GetComponent<Button>();
+            fundWithCreditCardButton.onClick.AddListener(async () =>
             {
-                Debug.LogWarning($"No {nameof(Marketplace.CheckoutOptions)} found. Assuming crypto only checkout.");
+                string onRampLink = await _fiatCheckout.GetOnRampLink();
+                Application.OpenURL(onRampLink);
+            });
+            _spawnedGameObjects.Add(fundWithCreditCardGameObject);
+        }
+
+        protected void AddCreditCardCheckout(bool creditCardCheckoutEnabled)
+        {
+            if (!creditCardCheckoutEnabled)
+            {
+                return;
             }
+            
+            GameObject payWithCreditCardGameObject = Instantiate(_payWithCreditCardPrefab, _cartItemsParent);
+            Button payWithCreditCardButton = payWithCreditCardGameObject.GetComponent<Button>();
+            payWithCreditCardButton.onClick.AddListener(async () =>
+            {
+                string checkoutLink = await _fiatCheckout.GetNftCheckoutLink();
+                Application.OpenURL(checkoutLink);
+            });
+            _spawnedGameObjects.Add(payWithCreditCardGameObject);
         }
 
         private bool HasAtLeastOneCryptoPaymentOption()

@@ -97,7 +97,7 @@ namespace Sequence.Pay.Sardine
         /// <param name="proof"></param>
         /// <returns></returns>
         public Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(ERC721Sale saleContract, Address collection,
-            BigInteger amount, BigInteger tokenId, Address recipient = null, byte[] proof = null);
+            BigInteger amount, BigInteger tokenId, Address recipient = null, FixedByte[] proof = null);
 
         /// <summary>
         /// Check on the status of an NFT checkout order

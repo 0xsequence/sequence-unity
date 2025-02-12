@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.ABI;
 using Sequence.Provider;
 
 namespace Sequence.Contracts
@@ -41,7 +42,7 @@ namespace Sequence.Contracts
             _contract = new Contract(contractAddress, abi ?? Abi);
         }
 
-        public CallContractFunction Mint(string to, BigInteger amount, string paymentToken, BigInteger maxTotal, byte[] proof)
+        public CallContractFunction Mint(string to, BigInteger amount, string paymentToken, BigInteger maxTotal, FixedByte[] proof)
         {
             return _contract.CallFunction("mint", to, amount, paymentToken, maxTotal, proof);
         }

@@ -48,7 +48,7 @@ namespace Sequence.Pay
 
         public Task<IFiatPay> NftCheckout(CollectibleOrder[] orders)
         {
-            Order[] orderArray = orders.ConvertToTArray<Order, CollectibleOrder[]>();
+            Order[] orderArray = orders.ToOrderArray();
             return NftCheckout(orderArray);
         }
 
