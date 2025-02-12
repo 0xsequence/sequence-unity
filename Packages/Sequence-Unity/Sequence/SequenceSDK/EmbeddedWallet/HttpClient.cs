@@ -238,6 +238,30 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
+        public async Task<TimeSpan> GetTimeShift()
+        {
+            UnityWebRequest request = UnityWebRequest.Get(_waasUrl.AppendTrailingSlashIfNeeded() + "status");
+            request.method = UnityWebRequest.kHttpVerbGET;
+
+            try
+            {
+                await request.SendWebRequest();
+                DateTime serverTime = DateTime.Parse(request.GetResponseHeader("date")).ToUniversalTime();
+                DateTime localTime = DateTime.UtcNow;
+                TimeSpan timeShift = serverTime - localTime;
+                return timeShift;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error getting time shift: " + e.Message);
+                return TimeSpan.Zero;
+            }
+            finally
+            {
+                request.Dispose();
+            }
+        }
+
         private string GetRequestErrorIfAvailable(UnityWebRequest request)
         {
             if (request.downloadHandler != null && request.downloadHandler.data != null)

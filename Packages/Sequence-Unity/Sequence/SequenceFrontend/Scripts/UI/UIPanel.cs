@@ -98,6 +98,7 @@ namespace Sequence.Demo
 
         public virtual void Back(params object[] injectAdditionalParams)
         {
+            Debug.Log($"Go Back, stack: {_pageStack.Count}");
             if (_pageStack.Count <= 1)
             {
                 return;

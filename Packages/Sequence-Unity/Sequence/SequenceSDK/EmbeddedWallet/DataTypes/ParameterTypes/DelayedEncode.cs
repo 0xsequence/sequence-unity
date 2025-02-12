@@ -1,9 +1,11 @@
+using System;
 using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
     [Preserve]
     [System.Serializable]
+    [Obsolete("It is recommended to use SequenceContractCall instead")]
     public class DelayedEncode : Transaction
     {
         public const string TypeIdentifier = "delayedEncode";

@@ -109,6 +109,63 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
         }
 
         [Test]
+        public async Task TestContractCall()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    string erc20Address = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
+                    ChainIndexer indexer = new ChainIndexer(_chain);
+                    GetTokenBalancesReturn balanceReturn =
+                        await indexer.GetTokenBalances(
+                            new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20Address));
+                    BigInteger balance;
+                    if (balanceReturn == null || balanceReturn.balances.Length == 0)
+                    {
+                        balance = 0;
+                    }
+                    else
+                    {
+                        balance = balanceReturn.balances[0].balance;
+                    }
+
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(_chain,
+                        new Transaction[]
+                        {
+                            new SequenceContractCall(erc20Address, 
+                                new AbiData("mint(address,uint256)",
+                                    new object[]
+                                    {
+                                        wallet.GetWalletAddress().Value, DecimalNormalizer.Normalize(1)
+                                    }))
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    await Task.Delay(5000); // Allow indexer some time to pick up transaction
+                    balanceReturn =
+                        await indexer.GetTokenBalances(
+                            new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20Address));
+                    BigInteger balance2 = balanceReturn.balances[0].balance;
+                    Assert.Greater(balance2, balance);
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+
+            await tcs.Task;
+        }
+
+        [Test]
         public async Task TestSendErc20()
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -422,6 +479,76 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
             }, error =>
             {
                 tcs.TrySetException(new Exception(error.GenerateErrorReport()));
+            });
+
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestInteractingWithContractFunctionsInSnakeCase_LocalABIEncoding()
+        {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            Contract testUnderscores = new Contract("0x8f408550720b268b0ea0969c527ac997d969a638");
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(_chain,
+                        new Transaction[]
+                        {
+                            new RawTransaction(testUnderscores.GetAddress(), "0", 
+                                testUnderscores.CallFunction("test_function_name_with_underscores(uint256)", BigInteger.One).CallData)
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestInteractingWithContractFunctionsInSnakeCase_DelayedServerSideABIEncoding()
+        {
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            Contract testUnderscores = new Contract("0x8f408550720b268b0ea0969c527ac997d969a638");
+
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(_chain,
+                        new Transaction[]
+                        {
+                            new DelayedEncode(testUnderscores.GetAddress(), "0",
+                                new DelayedEncodeData("test_function_name_with_underscores(uint256)", new object[] { "1" }, "test_function_name_with_underscores"))
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
             });
 
             await tcs.Task;

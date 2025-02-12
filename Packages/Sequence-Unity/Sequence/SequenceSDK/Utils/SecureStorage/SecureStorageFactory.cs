@@ -7,8 +7,12 @@ namespace Sequence.Utils.SecureStorage
     {
         public static ISecureStorage CreateSecureStorage()
         {
-#if UNITY_IOS && !UNITY_EDITOR
+#if UNITY_EDITOR
+            return new EditorSecureStorage();
+#elif UNITY_IOS && !UNITY_EDITOR
             return new iOSKeychainStorage();
+#elif UNITY_ANDROID && !UNITY_EDITOR
+            return new AndroidKeystoreStorage();
 #elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
             return new MacOSKeychainStorage();
 #elif UNITY_WEBGL && !UNITY_EDITOR

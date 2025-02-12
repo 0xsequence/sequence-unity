@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -38,7 +39,12 @@ namespace Sequence.Config
         {
             if (_config == null)
             {
-                _config = Resources.Load<SequenceConfig>("SequenceConfig");
+                _config = LoadConfig();
+                if (_config == null)
+                {
+                    throw new Exception("SequenceConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > SequenceConfig");
+                }
+                
                 TextAsset versionFile = Resources.Load<TextAsset>("sequence-unity-version");
                 if (versionFile != null)
                 {
@@ -54,12 +60,26 @@ namespace Sequence.Config
 #endif
             }
 
-            if (_config == null)
+            return _config;
+        }
+
+        private static SequenceConfig LoadConfig()
+        {
+#if UNITY_EDITOR
+            string[] guids = AssetDatabase.FindAssets($"SequenceConfig t:{nameof(SequenceConfig)}");
+            foreach (string guid in guids)
             {
-                throw new Exception("SequenceConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > SequenceConfig");
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (path.StartsWith("Assets"))
+                {
+                    return AssetDatabase.LoadAssetAtPath<SequenceConfig>(path);
+                }
             }
 
-            return _config;
+            return Resources.Load<SequenceConfig>("SequenceConfig");
+#else
+            return Resources.Load<SequenceConfig>("SequenceConfig");
+#endif
         }
 
         public static Exception MissingConfigError(string valueName)

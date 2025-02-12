@@ -11,15 +11,15 @@ namespace Sequence.EmbeddedWallet
     public class IntentPayload
     {
         public JObject data;
-        public uint expiresAt;
-        public uint issuedAt;
+        public ulong expiresAt;
+        public ulong issuedAt;
         public string name;
         public Signature[] signatures;
         public string version;
 
         [Preserve]
         [JsonConstructor]
-        public IntentPayload(string version, string name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
+        public IntentPayload(string version, string name, ulong expiresAt, ulong issuedAt, JObject data, Signature[] signatures)
         {
             this.version = version;
             this.name = name;
@@ -29,7 +29,7 @@ namespace Sequence.EmbeddedWallet
             this.signatures = signatures;
         }
         
-        public IntentPayload(string version, IntentType name, uint expiresAt, uint issuedAt, JObject data, Signature[] signatures)
+        public IntentPayload(string version, IntentType name, ulong expiresAt, ulong issuedAt, JObject data, Signature[] signatures)
         {
             this.version = version;
             this.name = IntentNames[name];
@@ -39,7 +39,7 @@ namespace Sequence.EmbeddedWallet
             this.signatures = signatures;
         }
 
-        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
+        public IntentPayload(string version, IntentType type, JObject data, Signature[] signatures, uint timeBeforeExpiryInSeconds = 30, ulong currentTime = 0)
         {
             this.version = version;
             this.name = IntentNames[type];

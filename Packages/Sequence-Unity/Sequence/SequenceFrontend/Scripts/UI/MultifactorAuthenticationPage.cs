@@ -4,7 +4,6 @@ using Sequence.Authentication;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
@@ -14,7 +13,7 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI[] _inputBoxes;
         [SerializeField] private TextMeshProUGUI _enterCodeText;
         [SerializeField] private TextMeshProUGUI _errorText;
-        [SerializeField] private GameObject _loadingScreenPrefab;
+        [SerializeField] private GameObject _loadingScreen;
 
         private int _numberOfMFADigits;
         internal ILogin LoginHandler { get; private set; }
@@ -32,6 +31,8 @@ namespace Sequence.Demo
         {
             base.Close();
             _errorText.text = "";
+            
+            LoginHandler.OnLoginSuccess -= OnLoginSuccessHandler;
             LoginHandler.OnLoginFailed -= OnLoginFailedHandler;
         }
 
@@ -60,6 +61,8 @@ namespace Sequence.Demo
             }
             _enterCodeText.text = $"Enter the code sent to\n<b>{email}</b>";
             _inputField.text = "";
+            
+            LoginHandler.OnLoginSuccess += OnLoginSuccessHandler;
             LoginHandler.OnLoginFailed += OnLoginFailedHandler;
         }
 
@@ -90,18 +93,25 @@ namespace Sequence.Demo
             string code = _inputField.text.Substring(0, Math.Min(_numberOfMFADigits, _inputField.text.Length));
             Debug.Log($"Attempting to sign in with email {email} and code {code}");
             LoginHandler.Login(email, code);
-            InstantiateLoadingScreen();
+            EnableLoadingScreen(true);
         }
 
+        private void OnLoginSuccessHandler(string sessionId, string walletAddress)
+        {
+            Debug.Log($"Login Succeeded {walletAddress}");
+            EnableLoadingScreen(false);
+        }
+        
         private void OnLoginFailedHandler(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
         {
             Debug.LogError($"Failed login: {error}");
             _errorText.text = error;
+            EnableLoadingScreen(false);
         }
 
-        private void InstantiateLoadingScreen()
+        private void EnableLoadingScreen(bool enable)
         {
-            Instantiate(_loadingScreenPrefab, transform.parent);
+            _loadingScreen.SetActive(enable);
         }
     }
 }
