@@ -349,17 +349,17 @@ namespace Sequence.Indexer.Tests
         
         private void OnSubscribeReceiptsMessageReceived(SubscribeReceiptsReturn @event)
         {
-            Debug.Log($"Receipt Event Received, hash: {@event.receipt.transactionHash}");
+            Debug.Log($"Receipt Event Received - hash: {@event.receipt.txnHash}");
         }
 
         private void OnSubscribeEventsMessageReceived(SubscribeEventsReturn @event)
         {
-            Debug.Log($"Contract Event Received, address: {@event.log.contractAddress}");
+            Debug.Log($"Contract Event Received - {@event.log.type} {@event.log.contractType}: {@event.log.txnHash}");
         }
         
         private void OnSubscribeEventsMessageReceived(SubscribeBalanceUpdatesReturn @event)
         {
-            Debug.Log($"Balance Update Received, balance: {@event.balance.balance}");
+            Debug.Log($"Balance Update Received - {@event.balance.accountAddress} owns {@event.balance.balance}");
         }
 
         private void OnWebRPCErrorReceived(WebRPCError error)

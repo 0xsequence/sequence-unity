@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Utils;
@@ -112,7 +113,7 @@ namespace Sequence
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("X-Access-Key", _builderApiKey); 
-            req.downloadHandler = new DownloadHandlerStream();
+            req.downloadHandler = new DownloadHandlerStream<T>(options);
             req.method = UnityWebRequest.kHttpVerbPOST;
             
             await req.SendWebRequest();
@@ -144,16 +145,6 @@ namespace Sequence
         {
             var indexerName = Indexer.IndexerNames[chainID];
             return $"https://{indexerName}-indexer.sequence.app";
-        }
-    }
-
-    public class DownloadHandlerStream : DownloadHandlerScript
-    {
-        protected override bool ReceiveData(byte[] data, int dataLength)
-        {
-            Debug.Log($"Received Stream Data");
-            
-            return true;
         }
     }
 }
