@@ -114,5 +114,10 @@ namespace Sequence
         /// <param name="args">Define the contract address you want to receive events from.</param>
         /// <param name="options">Actions triggered whenever a message or error event is received.</param>
         public void SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options);
+
+        /// <summary>
+        /// Aborts all running streams.
+        /// </summary>
+        public void AbortStreams();
     }
 }

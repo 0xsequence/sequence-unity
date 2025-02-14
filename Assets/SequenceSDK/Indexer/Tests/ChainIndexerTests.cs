@@ -346,6 +346,12 @@ namespace Sequence.Indexer.Tests
             var contractAddress = "0x4ab3b16e9d3328f6d8025e71cefc64305ae4fe9c";
             indexer.SubscribeBalanceUpdates(new SubscribeBalanceUpdatesArgs(contractAddress), streamOptions);
         }
+
+        [TestCase]
+        public void TestAbortStreams()
+        {
+            new ChainIndexer(Chain.TestnetArbitrumSepolia).AbortStreams();
+        }
         
         private void OnSubscribeReceiptsMessageReceived(SubscribeReceiptsReturn @event)
         {

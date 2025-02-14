@@ -325,7 +325,7 @@ namespace Sequence
         /// <summary>
         /// Subscribe to receipt events.
         /// </summary>
-        public static void SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static void SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, IIndexer caller)
         {
             new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeReceipts", args, options);
         }
@@ -333,7 +333,7 @@ namespace Sequence
         /// <summary>
         /// Subscribe to smart contract events.
         /// </summary>
-        public static void SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static void SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, IIndexer caller)
         {
             new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeEvents", args, options);
         }
@@ -341,9 +341,17 @@ namespace Sequence
         /// <summary>
         /// Subscribe to balance update events for a given contract address.
         /// </summary>
-        public static void SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static void SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, IIndexer caller)
         {
             new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeBalanceUpdates", args, options);
+        }
+        
+        /// <summary>
+        /// Subscribe to balance update events for a given contract address.
+        /// </summary>
+        public static void AbortStreams(IIndexer caller)
+        {
+            new HttpHandler(_builderApiKey, caller).AbortStreams();
         }
 
         [Obsolete]

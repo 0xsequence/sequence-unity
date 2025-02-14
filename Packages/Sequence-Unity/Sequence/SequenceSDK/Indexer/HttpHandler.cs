@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Utils;
@@ -13,6 +13,8 @@ namespace Sequence
 {
     public class HttpHandler : IHttpHandler
     {
+        private static List<UnityWebRequest> _streams = new();
+        
         private string _builderApiKey;
         private IIndexer _caller;
 
@@ -116,7 +118,19 @@ namespace Sequence
             req.downloadHandler = new DownloadHandlerStream<T>(options);
             req.method = UnityWebRequest.kHttpVerbPOST;
             
+            _streams.Add(req);
             await req.SendWebRequest();
+            
+            if (_streams.Contains(req))
+                _streams.Remove(req);
+        }
+
+        public void AbortStreams()
+        {
+            foreach (var stream in _streams)
+                stream.Abort();
+            
+            _streams.Clear();
         }
 
         private async Task<string> RetryHttpPost(string chainID, string endPoint, object args, float waitInSeconds, int retries)

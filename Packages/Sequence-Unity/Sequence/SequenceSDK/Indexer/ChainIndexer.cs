@@ -151,17 +151,22 @@ namespace Sequence
 
         public void SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options)
         {
-            Indexer.SubscribeReceipts(ChainId, args, options, 0, _customHttpHandler, this);
+            Indexer.SubscribeReceipts(ChainId, args, options, this);
         }
         
         public void SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options)
         {
-            Indexer.SubscribeEvents(ChainId, args, options, 0, _customHttpHandler, this);
+            Indexer.SubscribeEvents(ChainId, args, options, this);
         }
         
         public void SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options)
         {
-            Indexer.SubscribeBalanceUpdates(ChainId, args, options, 0, _customHttpHandler, this);
+            Indexer.SubscribeBalanceUpdates(ChainId, args, options, this);
+        }
+
+        public void AbortStreams()
+        {
+            Indexer.AbortStreams(this);
         }
     }
 }

@@ -31,5 +31,10 @@ namespace Sequence
         {
             throw new NotImplementedException();
         }
+
+        public void AbortStreams()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

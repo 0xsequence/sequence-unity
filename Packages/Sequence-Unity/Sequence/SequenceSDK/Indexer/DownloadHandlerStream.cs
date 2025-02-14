@@ -17,6 +17,8 @@ namespace Sequence
         
         protected override bool ReceiveData(byte[] data, int dataLength)
         {
+            CompleteContent();
+            
             // Stream returns a ping of size 1
             if (dataLength <= 1)
                 return true;
