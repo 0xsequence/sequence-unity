@@ -98,7 +98,37 @@ namespace Sequence.Utils
 
             return newArr;
         }
-        
-        
+
+        public static T[] AppendArray<T>(this T[] arr1, T[] arr2)
+        {
+            if (arr1 == null)
+            {
+                if (arr2 == null)
+                {
+                    return new T[] { };
+                }
+                return arr2;
+            }
+
+            if (arr2 == null)
+            {
+                return arr1;
+            }
+            
+            int length1 = arr1.Length;
+            int length2 = arr2.Length;
+            T[] newArr = new T[length1 + length2];
+            for (int i = 0; i < length1; i++)
+            {
+                newArr[i] = arr1[i];
+            }
+
+            for (int i = 0; i < length2; i++)
+            {
+                newArr[i + length1] = arr2[i];
+            }
+
+            return newArr;
+        }
     }
 }
