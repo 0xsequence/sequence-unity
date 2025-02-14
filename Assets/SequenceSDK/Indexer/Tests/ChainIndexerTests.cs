@@ -5,9 +5,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sequence;
+using Sequence.Contracts;
+using Sequence.EmbeddedWallet;
+using Sequence.EmbeddedWallet.Tests;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.TestTools;
+using EOAWallet = Sequence.Wallet.EOAWallet;
+using Transaction = System.Transactions.Transaction;
 
 namespace Sequence.Indexer.Tests
 {
@@ -315,6 +320,72 @@ namespace Sequence.Indexer.Tests
 
             indexer.SubscribeReceipts(new SubscribeReceiptsArgs(filter), streamOptions);
         }
+
+        [Test]
+        public async Task TestReceiptSubscriptionReceived()
+        {
+            Chain chain = Chain.ArbitrumNova;
+            bool receiptReceived = false;
+            IIndexer indexer = new ChainIndexer(chain);
+            ERC1155 universallyMintable = new ERC1155("0x0ee3af1874789245467e7482f042ced9c5171073");
+            var streamOptions = new WebRPCStreamOptions<SubscribeReceiptsReturn>(
+                (@return =>
+                {
+                    Assert.IsNotNull(@return);
+                    Assert.IsNotNull(@return.receipt);
+                    receiptReceived = true;
+                }),
+                OnWebRPCErrorReceived);
+
+
+            var filter = new TransactionFilter()
+            {
+                contractAddress = universallyMintable.Contract.GetAddress()
+            };
+            indexer.SubscribeReceipts(new SubscribeReceiptsArgs(filter), streamOptions);
+
+            await DoMintTransaction(chain);
+
+            while (!receiptReceived)
+            {
+                await Task.Yield();
+            }
+        }
+
+        private async Task DoMintTransaction(Chain chain)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            EOAWallet toWallet = new EOAWallet();
+            string toAddress = toWallet.GetAddress().Value;
+            
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    ERC1155 erc1155 = new ERC1155("0x0ee3af1874789245467e7482f042ced9c5171073");
+
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(chain,
+                        new EmbeddedWallet.Transaction[]
+                        {
+                            new RawTransaction(erc1155.Mint(toAddress, 1, 1)),
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+
+            await tcs.Task;
+        }
         
         [TestCase]
         public void TestSubscribeEvents()
@@ -334,6 +405,42 @@ namespace Sequence.Indexer.Tests
             
             indexer.SubscribeEvents(new SubscribeEventsArgs(eventFilter), streamOptions);
         }
+
+        [Test]
+        public async Task TestEventSubscriptionReceived()
+        {
+            Chain chain = Chain.ArbitrumNova;
+            bool eventReceived = false;
+            IIndexer indexer = new ChainIndexer(chain);
+            ERC1155 universallyMintable = new ERC1155("0x0ee3af1874789245467e7482f042ced9c5171073");
+            var streamOptions = new WebRPCStreamOptions<SubscribeEventsReturn>(
+                (@return =>
+                {
+                    Assert.IsNotNull(@return);
+                    Assert.IsNotNull(@return.log);
+                    Assert.AreEqual(universallyMintable.Contract.GetAddress().Value, @return.log.contractAddress);
+                    eventReceived = true;
+                }),
+                OnWebRPCErrorReceived);
+
+
+            var eventFilter = new EventFilter
+            {
+                accounts = Array.Empty<string>(),
+                contractAddresses = new[] {universallyMintable.Contract.GetAddress().Value},
+                tokenIDs = new[] {"1"},
+                events = new[] {"TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)"}
+            };
+            
+            indexer.SubscribeEvents(new SubscribeEventsArgs(eventFilter), streamOptions);
+
+            await DoMintTransaction(chain);
+
+            while (!eventReceived)
+            {
+                await Task.Yield();
+            }
+        }
         
         [TestCase]
         public void TestSubscribeBalanceUpdates()
@@ -347,10 +454,47 @@ namespace Sequence.Indexer.Tests
             indexer.SubscribeBalanceUpdates(new SubscribeBalanceUpdatesArgs(contractAddress), streamOptions);
         }
 
+        [Test]
+        public async Task TestBalanceUpdateSubscriptionReceived()
+        {
+            Chain chain = Chain.ArbitrumNova;
+            bool eventReceived = false;
+            IIndexer indexer = new ChainIndexer(chain);
+            var streamOptions = new WebRPCStreamOptions<SubscribeBalanceUpdatesReturn>(
+                (@return =>
+                {
+                    Assert.IsNotNull(@return);
+                    Assert.IsNotNull(@return.balance);
+                    if (!@return.balance.accountAddress.IsZeroAddress())
+                    {
+                        Assert.AreEqual(BigInteger.One, @return.balance.balance);
+                    }
+                    eventReceived = true;
+                }),
+                OnWebRPCErrorReceived);
+
+            ERC1155 universallyMintable = new ERC1155("0x0ee3af1874789245467e7482f042ced9c5171073");
+            
+            indexer.SubscribeBalanceUpdates(new SubscribeBalanceUpdatesArgs(universallyMintable.Contract.GetAddress()), streamOptions);
+
+            await DoMintTransaction(chain);
+
+            while (!eventReceived)
+            {
+                await Task.Yield();
+            }
+        }
+
         [TestCase]
         public void TestAbortStreams()
         {
             new ChainIndexer(Chain.TestnetArbitrumSepolia).AbortStreams();
+        }
+
+        [TearDown]
+        public void UnsubscribeFromEvents()
+        {
+            new ChainIndexer(Chain.ArbitrumNova).AbortStreams();
         }
         
         private void OnSubscribeReceiptsMessageReceived(SubscribeReceiptsReturn @event)

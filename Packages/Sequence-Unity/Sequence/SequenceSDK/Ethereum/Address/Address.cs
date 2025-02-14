@@ -82,4 +82,19 @@ namespace Sequence {
             return true;
         }
     }
+
+    public static class AddressExtensions
+    {
+        public static bool IsZeroAddress(this Address address)
+        {
+            return IsZeroAddress(address.Value);
+        }
+
+        public static bool IsZeroAddress(this string address)
+        {
+            string toCheck = address.WithoutHexPrefix();
+            toCheck = toCheck.Replace("0", "");
+            return toCheck.Length == 0;
+        }
+    }
 }
