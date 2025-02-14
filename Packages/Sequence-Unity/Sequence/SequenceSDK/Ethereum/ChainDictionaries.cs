@@ -29,6 +29,8 @@ namespace Sequence
             { Chain.Soneium, "Soneium" },
             { Chain.Telos, "Telos" },
             { Chain.Moonbeam, "Moonbeam"},
+            { Chain.Etherlink, "Etherlink" },
+            { Chain.XR1, "XR1" },
 
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -53,6 +55,7 @@ namespace Sequence
             { Chain.TestnetLAOSSigma, "LAOS Sigma Testnet" },
             { Chain.TestnetTelos, "Telos Testnet" },
             { Chain.TestnetMoonbaseAlpha, "Moonbase Alpha" },
+            { Chain.TestnetEtherlink, "Etherlink Testnet" },
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -80,6 +83,8 @@ namespace Sequence
             { Chain.Soneium, "ETH" },
             { Chain.Telos, "TLOS" },
             { Chain.Moonbeam, "GLMR" },
+            { Chain.Etherlink, "XTZ" },
+            { Chain.XR1, "XR1" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -104,6 +109,7 @@ namespace Sequence
             { Chain.TestnetLAOSSigma, "SIGMA" },
             { Chain.TestnetTelos, "TLOS" },
             { Chain.TestnetMoonbaseAlpha, "DEV" },
+            { Chain.TestnetEtherlink, "XTZ" },
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -164,6 +170,8 @@ namespace Sequence
             { Chain.Soneium, "https://vk9a3tgpne6qmub8.blockscout.com/" },
             { Chain.Telos, "https://www.teloscan.io/" },
             { Chain.Moonbeam, "https://moonscan.io/"},
+            { Chain.Etherlink, "https://explorer.etherlink.com/"},
+            { Chain.XR1, ""}, // TDB
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -187,7 +195,8 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" },
             { Chain.TestnetLAOSSigma, "https://sigma.explorer.laosnetwork.io/" },
             { Chain.TestnetTelos, "https://testnet.teloscan.io/" },
-            { Chain.TestnetMoonbaseAlpha, "https://moonbase.moonscan.io/"},
+            { Chain.TestnetMoonbaseAlpha, "https://moonbase.moonscan.io/" },
+            { Chain.TestnetEtherlink, "https://testnet.explorer.etherlink.com/" },
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -217,6 +226,8 @@ namespace Sequence
             { Chain.Soneium, "1868" },
             { Chain.Telos, "40" },
             { Chain.Moonbeam, "1284" },
+            { Chain.Etherlink, "42793" },
+            { Chain.XR1, "273" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -240,7 +251,8 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "7672" },
             { Chain.TestnetLAOSSigma, "62850" },
             { Chain.TestnetTelos, "41" },
-            { Chain.TestnetMoonbaseAlpha, "1287" }
+            { Chain.TestnetMoonbaseAlpha, "1287" },
+            { Chain.TestnetEtherlink, "128123" },
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -268,6 +280,8 @@ namespace Sequence
             { "1868", Chain.Soneium },
             { "40", Chain.Telos },
             { "1284", Chain.Moonbeam },
+            { "42793", Chain.Etherlink },
+            { "273", Chain.XR1 },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -291,7 +305,8 @@ namespace Sequence
             { "7672", Chain.TestnetRootPorcini },
             { "62850", Chain.TestnetLAOSSigma },
             { "41", Chain.TestnetTelos },
-            { "1287", Chain.TestnetMoonbaseAlpha }
+            { "1287", Chain.TestnetMoonbaseAlpha },
+            { "128123", Chain.TestnetEtherlink },
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -319,6 +334,8 @@ namespace Sequence
             { Chain.Soneium, "soneium" },
             { Chain.Telos, "telos" },
             { Chain.Moonbeam, "moonbeam" },
+            { Chain.Etherlink, "etherlink" },
+            { Chain.XR1, "xr1" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
@@ -342,7 +359,8 @@ namespace Sequence
             { Chain.TestnetRootPorcini, "rootnet-porcini" },
             { Chain.TestnetLAOSSigma, "laos-sigma-testnet" },
             { Chain.TestnetTelos, "telos-testnet" },
-            { Chain.TestnetMoonbaseAlpha, "moonbase-alpha" }
+            { Chain.TestnetMoonbaseAlpha, "moonbase-alpha" },
+            { Chain.TestnetEtherlink, "etherlink-testnet" },
         };
     }
 }
