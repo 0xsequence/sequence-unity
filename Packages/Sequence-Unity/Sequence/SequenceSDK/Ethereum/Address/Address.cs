@@ -40,7 +40,12 @@ namespace Sequence {
             }
 
             Address address = (Address)obj;
-            return this.Value == address.Value;
+            return Value.Equals(address.Value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.ToLowerInvariant().GetHashCode();
         }
     }
 
