@@ -149,17 +149,17 @@ namespace Sequence
             return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler, this);
         }
 
-        public Task<bool> SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options)
+        public Task SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options)
         {
             return Indexer.SubscribeReceipts(ChainId, args, options, 0, _customHttpHandler, this);
         }
         
-        public Task<bool> SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options)
+        public Task SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options)
         {
             return Indexer.SubscribeEvents(ChainId, args, options, 0, _customHttpHandler, this);
         }
         
-        public Task<bool> SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options)
+        public Task SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options)
         {
             return Indexer.SubscribeBalanceUpdates(ChainId, args, options, 0, _customHttpHandler, this);
         }

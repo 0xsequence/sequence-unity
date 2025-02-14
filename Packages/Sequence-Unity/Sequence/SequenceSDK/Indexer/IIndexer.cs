@@ -95,21 +95,24 @@ namespace Sequence
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args);
 
         /// <summary>
-        /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
+        /// Subscribe to receipt events.
         /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public Task<bool> SubscribeReceipts();
+        /// <param name="args">Specify the account or event you want to receive events from by defining a filter.</param>
+        /// <param name="options">Actions triggered whenever a message or error event is received.</param>
+        public Task SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options);
         
         /// <summary>
-        /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
+        /// Subscribe to smart contract events.
         /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public Task<bool> SubscribeEvents();
+        /// <param name="args">Specify the accounts or contracts you want to receive events from by defining a filter.</param>
+        /// <param name="options">Actions triggered whenever a message or error event is received.</param>
+        public Task SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options);
         
         /// <summary>
-        /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
+        /// Subscribe to balance update events for a given contract address.
         /// </summary>
-        /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public Task<bool> SubscribeBalanceUpdates();
+        /// <param name="args">Define the contract address you want to receive events from.</param>
+        /// <param name="options">Actions triggered whenever a message or error event is received.</param>
+        public Task SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options);
     }
 }

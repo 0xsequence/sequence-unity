@@ -322,22 +322,28 @@ namespace Sequence
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
         }
         
-        public static async Task<bool> SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        /// <summary>
+        /// Subscribe to receipt events.
+        /// </summary>
+        public static async Task SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "SubscribeReceipts", args, retries, httpHandler, caller);
-            return false;
+            await HttpPost(chainID, "SubscribeReceipts", args, retries, httpHandler, caller);
         }
         
-        public static async Task<bool> SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        /// <summary>
+        /// Subscribe to smart contract events.
+        /// </summary>
+        public static async Task SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "SubscribeEvents", args, retries, httpHandler, caller);
-            return false;
+            await HttpPost(chainID, "SubscribeEvents", args, retries, httpHandler, caller);
         }
         
-        public static async Task<bool> SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        /// <summary>
+        /// Subscribe to balance update events for a given contract address.
+        /// </summary>
+        public static async Task SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            var responseBody = await HttpPost(chainID, "SubscribeBalanceUpdates", args, retries, httpHandler, caller);
-            return false;
+            await HttpPost(chainID, "SubscribeBalanceUpdates", args, retries, httpHandler, caller);
         }
 
         [Obsolete]
