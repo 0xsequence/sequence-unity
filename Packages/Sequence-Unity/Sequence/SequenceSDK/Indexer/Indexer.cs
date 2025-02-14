@@ -41,6 +41,7 @@ namespace Sequence
     public enum EventLogDataType
     {
         UNKNOWN,
+        EVENT,
         TOKEN_TRANSFER,
         SEQUENCE_TXN,
         NATIVE_TOKEN_TRANSFER
