@@ -1,10 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.Config;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,6 +13,8 @@ namespace Sequence
 {
     public class HttpHandler : IHttpHandler
     {
+        private static List<UnityWebRequest> _streams = new();
+        
         private string _builderApiKey;
         private IIndexer _caller;
 
@@ -36,9 +38,11 @@ namespace Sequence
             req.SetRequestHeader("X-Access-Key", _builderApiKey); 
             req.method = UnityWebRequest.kHttpVerbPOST;
             req.timeout = 10; // Request will timeout after 10 seconds
-                
+            
             string curlRequest = 
                 $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
+            
+            Debug.Log($"{curlRequest}");
             try
             {
                 await req.SendWebRequest();
@@ -51,6 +55,7 @@ namespace Sequence
                 }
 
                 string returnText = req.downloadHandler.text;
+                Debug.Log(returnText);
                 req.Dispose();
                 return returnText;
             }
@@ -102,6 +107,30 @@ namespace Sequence
             }
 
             return "";
+        }
+
+        public async void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options, int retries = 0)
+        {
+            var requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            req.SetRequestHeader("Content-Type", "application/json");
+            req.SetRequestHeader("X-Access-Key", _builderApiKey); 
+            req.downloadHandler = new DownloadHandlerStream<T>(options);
+            req.method = UnityWebRequest.kHttpVerbPOST;
+            
+            _streams.Add(req);
+            await req.SendWebRequest();
+            
+            if (_streams.Contains(req))
+                _streams.Remove(req);
+        }
+
+        public void AbortStreams()
+        {
+            foreach (var stream in _streams)
+                stream.Abort();
+            
+            _streams.Clear();
         }
 
         private async Task<string> RetryHttpPost(string chainID, string endPoint, object args, float waitInSeconds, int retries)

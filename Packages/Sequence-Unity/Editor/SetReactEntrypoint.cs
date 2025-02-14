@@ -30,6 +30,10 @@ namespace Sequence.Editor
             {
                 loaderUrl += ".gz";
             }
+            else if (File.Exists(Path.Combine(buildDir, loaderUrl + ".unityweb")))
+            {
+                loaderUrl += ".unityweb";
+            }
 
             if (File.Exists(Path.Combine(buildDir, dataUrl + ".br")))
             {
@@ -38,6 +42,10 @@ namespace Sequence.Editor
             else if (File.Exists(Path.Combine(buildDir, dataUrl + ".gz")))
             {
                 dataUrl += ".gz";
+            }
+            else if (File.Exists(Path.Combine(buildDir, dataUrl + ".unityweb")))
+            {
+                dataUrl += ".unityweb";
             }
 
             if (File.Exists(Path.Combine(buildDir, frameworkUrl + ".br")))
@@ -48,6 +56,10 @@ namespace Sequence.Editor
             {
                 frameworkUrl += ".gz";
             }
+            else if (File.Exists(Path.Combine(buildDir, frameworkUrl + ".unityweb")))
+            {
+                frameworkUrl += ".unityweb";
+            }
 
             if (File.Exists(Path.Combine(buildDir, codeUrl + ".br")))
             {
@@ -56,6 +68,10 @@ namespace Sequence.Editor
             else if (File.Exists(Path.Combine(buildDir, codeUrl + ".gz")))
             {
                 codeUrl += ".gz";
+            }
+            else if (File.Exists(Path.Combine(buildDir, codeUrl + ".unityweb")))
+            {
+                codeUrl += ".unityweb";
             }
 
             string appTsxContent = File.ReadAllText(appTsxPath);
