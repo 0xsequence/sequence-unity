@@ -93,5 +93,23 @@ namespace Sequence
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args);
+
+        /// <summary>
+        /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
+        /// </summary>
+        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        public Task<bool> SubscribeReceipts();
+        
+        /// <summary>
+        /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
+        /// </summary>
+        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        public Task<bool> SubscribeEvents();
+        
+        /// <summary>
+        /// Retrieve transaction history <see cref="GetTransactionHistoryReturn"/>
+        /// </summary>
+        /// <exception cref="HttpRequestException">If the network request fails</exception>
+        public Task<bool> SubscribeBalanceUpdates();
     }
 }

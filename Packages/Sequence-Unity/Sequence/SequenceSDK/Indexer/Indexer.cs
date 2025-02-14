@@ -321,6 +321,24 @@ namespace Sequence
             var responseBody = await HttpPost(chainID, "GetTransactionHistory", args, retries, httpHandler, caller);
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
         }
+        
+        public static async Task<bool> SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        {
+            var responseBody = await HttpPost(chainID, "SubscribeReceipts", args, retries, httpHandler, caller);
+            return false;
+        }
+        
+        public static async Task<bool> SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        {
+            var responseBody = await HttpPost(chainID, "SubscribeEvents", args, retries, httpHandler, caller);
+            return false;
+        }
+        
+        public static async Task<bool> SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        {
+            var responseBody = await HttpPost(chainID, "SubscribeBalanceUpdates", args, retries, httpHandler, caller);
+            return false;
+        }
 
         [Obsolete]
         private static async Task<string> HttpPost(BigInteger chainID, string endPoint, object args, int retries = 0)
