@@ -18,6 +18,11 @@ namespace Sequence.Pay.Transak
                             new TransakContractId("6675a6d0f597abb8f3e2e9c2",
                                 new Address("0xc2c862322e9c97d6244a3506655da95f05246fd8"), Chain.Polygon, "MATIC")
                         },
+                        {
+                            OrderbookKind.sequence_marketplace_v2,
+                            new TransakContractId("67ac543448035690a20ac131",
+                                new Address("0xfdb42A198a932C8D3B506Ffa5e855bC4b348a712"), Chain.Polygon, "POL")
+                        }
                     }
                 },
                 {
