@@ -6,6 +6,7 @@ namespace Sequence
     [System.Serializable]
     public class TransactionReceipt
     {
+        public string txnHash;
         public string transactionHash;
         public string transactionIndex;
         public string blockHash;
@@ -22,6 +23,4 @@ namespace Sequence
         public string root;
         public string status;
     }
-
-   
 }

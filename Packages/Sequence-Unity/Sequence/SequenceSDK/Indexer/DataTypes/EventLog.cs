@@ -17,5 +17,6 @@ namespace Sequence
         public EventLogDataType logDataType;
         public string ts;
         public string logData;
+        public EventDecoded @event;
     }
 }
