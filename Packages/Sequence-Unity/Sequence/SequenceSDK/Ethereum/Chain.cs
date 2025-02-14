@@ -30,6 +30,8 @@ namespace Sequence
         Soneium = 1868,
         Telos = 40,
         Moonbeam = 1284,
+        Etherlink = 42793,
+        XR1 = 273,
 
         // Testnets
         TestnetSepolia = 11155111,
@@ -56,6 +58,7 @@ namespace Sequence
         TestnetLAOSSigma = 62850,
         TestnetTelos = 41,
         TestnetMoonbaseAlpha = 1287,
+        TestnetEtherlink = 128123,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
