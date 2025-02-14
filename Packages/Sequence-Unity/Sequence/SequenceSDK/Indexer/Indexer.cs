@@ -325,25 +325,25 @@ namespace Sequence
         /// <summary>
         /// Subscribe to receipt events.
         /// </summary>
-        public static async Task SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static void SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            await HttpPost(chainID, "SubscribeReceipts", args, retries, httpHandler, caller);
+            new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeReceipts", args, options);
         }
         
         /// <summary>
         /// Subscribe to smart contract events.
         /// </summary>
-        public static async Task SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static void SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            await HttpPost(chainID, "SubscribeEvents", args, retries, httpHandler, caller);
+            new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeEvents", args, options);
         }
         
         /// <summary>
         /// Subscribe to balance update events for a given contract address.
         /// </summary>
-        public static async Task SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static void SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
-            await HttpPost(chainID, "SubscribeBalanceUpdates", args, retries, httpHandler, caller);
+            new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeBalanceUpdates", args, options);
         }
 
         [Obsolete]

@@ -99,20 +99,20 @@ namespace Sequence
         /// </summary>
         /// <param name="args">Specify the account or event you want to receive events from by defining a filter.</param>
         /// <param name="options">Actions triggered whenever a message or error event is received.</param>
-        public Task SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options);
+        public void SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options);
         
         /// <summary>
         /// Subscribe to smart contract events.
         /// </summary>
         /// <param name="args">Specify the accounts or contracts you want to receive events from by defining a filter.</param>
         /// <param name="options">Actions triggered whenever a message or error event is received.</param>
-        public Task SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options);
+        public void SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options);
         
         /// <summary>
         /// Subscribe to balance update events for a given contract address.
         /// </summary>
         /// <param name="args">Define the contract address you want to receive events from.</param>
         /// <param name="options">Actions triggered whenever a message or error event is received.</param>
-        public Task SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options);
+        public void SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options);
     }
 }

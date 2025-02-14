@@ -26,5 +26,10 @@ namespace Sequence
             }
             return Task.FromResult(_response);
         }
+
+        public void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options, int retries = 0)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

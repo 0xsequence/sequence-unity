@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.Config;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -39,6 +38,8 @@ namespace Sequence
             
             string curlRequest = 
                 $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
+            
+            Debug.Log($"{curlRequest}");
             try
             {
                 await req.SendWebRequest();
@@ -51,6 +52,7 @@ namespace Sequence
                 }
 
                 string returnText = req.downloadHandler.text;
+                Debug.Log(returnText);
                 req.Dispose();
                 return returnText;
             }
@@ -104,6 +106,18 @@ namespace Sequence
             return "";
         }
 
+        public async void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options, int retries = 0)
+        {
+            var requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            req.SetRequestHeader("Content-Type", "application/json");
+            req.SetRequestHeader("X-Access-Key", _builderApiKey); 
+            req.downloadHandler = new DownloadHandlerStream();
+            req.method = UnityWebRequest.kHttpVerbPOST;
+            
+            await req.SendWebRequest();
+        }
+
         private async Task<string> RetryHttpPost(string chainID, string endPoint, object args, float waitInSeconds, int retries)
         {
             await AsyncExtensions.DelayTask(waitInSeconds);
@@ -130,6 +144,16 @@ namespace Sequence
         {
             var indexerName = Indexer.IndexerNames[chainID];
             return $"https://{indexerName}-indexer.sequence.app";
+        }
+    }
+
+    public class DownloadHandlerStream : DownloadHandlerScript
+    {
+        protected override bool ReceiveData(byte[] data, int dataLength)
+        {
+            Debug.Log($"Received Stream Data");
+            
+            return true;
         }
     }
 }

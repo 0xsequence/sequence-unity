@@ -299,5 +299,72 @@ namespace Sequence.Indexer.Tests
             
             Assert.IsTrue(errorEventFired);
         }
+
+        [TestCase]
+        public void TestSubscribeReceipts()
+        {
+            var indexer = new ChainIndexer(Chain.TestnetArbitrumSepolia);
+            var streamOptions = new WebRPCStreamOptions<SubscribeReceiptsReturn>(
+                OnSubscribeReceiptsMessageReceived,
+                OnWebRPCErrorReceived);
+
+            var filter = new TransactionFilter
+            {
+                contractAddress = "0x4ab3b16e9d3328f6d8025e71cefc64305ae4fe9c"
+            };
+
+            indexer.SubscribeReceipts(new SubscribeReceiptsArgs(filter), streamOptions);
+        }
+        
+        [TestCase]
+        public void TestSubscribeEvents()
+        {
+            var indexer = new ChainIndexer(Chain.TestnetArbitrumSepolia);
+            var streamOptions = new WebRPCStreamOptions<SubscribeEventsReturn>(
+                OnSubscribeEventsMessageReceived,
+                OnWebRPCErrorReceived);
+
+            var eventFilter = new EventFilter
+            {
+                accounts = Array.Empty<string>(),
+                contractAddresses = new[] {"0x4ab3b16e9d3328f6d8025e71cefc64305ae4fe9c"},
+                tokenIDs = new[] {"0"},
+                events = new[] {"Transfer(address from, address to, uint256 value)"}
+            };
+            
+            indexer.SubscribeEvents(new SubscribeEventsArgs(eventFilter), streamOptions);
+        }
+        
+        [TestCase]
+        public void TestSubscribeBalanceUpdates()
+        {
+            var indexer = new ChainIndexer(Chain.TestnetArbitrumSepolia);
+            var streamOptions = new WebRPCStreamOptions<SubscribeBalanceUpdatesReturn>(
+                OnSubscribeEventsMessageReceived,
+                OnWebRPCErrorReceived);
+
+            var contractAddress = "0x4ab3b16e9d3328f6d8025e71cefc64305ae4fe9c";
+            indexer.SubscribeBalanceUpdates(new SubscribeBalanceUpdatesArgs(contractAddress), streamOptions);
+        }
+        
+        private void OnSubscribeReceiptsMessageReceived(SubscribeReceiptsReturn @event)
+        {
+            Debug.Log($"Receipt Event Received, hash: {@event.receipt.transactionHash}");
+        }
+
+        private void OnSubscribeEventsMessageReceived(SubscribeEventsReturn @event)
+        {
+            Debug.Log($"Contract Event Received, address: {@event.log.contractAddress}");
+        }
+        
+        private void OnSubscribeEventsMessageReceived(SubscribeBalanceUpdatesReturn @event)
+        {
+            Debug.Log($"Balance Update Received, balance: {@event.balance.balance}");
+        }
+
+        private void OnWebRPCErrorReceived(WebRPCError error)
+        {
+            Debug.LogError($"OnWebRPCErrorReceived: {error.msg}");
+        }
     }
 }
