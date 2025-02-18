@@ -18,8 +18,8 @@ namespace Sequence.Demo
         public BigInteger UserPaymentBalance { get; private set; }
         public BigInteger Cost { get; private set; }
         public BigInteger SupplyCap { get; private set; }
-        public int StartTime { get; private set; }
-        public int EndTime { get; private set; }
+        public long StartTime { get; private set; }
+        public long EndTime { get; private set; }
         public int TotalMinted { get; private set; }
         public Dictionary<BigInteger, TokenSupply> TokenSupplies { get; private set; }
 
@@ -81,8 +81,8 @@ namespace Sequence.Demo
             var globalSaleDetails = await _saleContract.GetGlobalSaleDetailsAsync(_client);
             Cost = globalSaleDetails.Cost;
             SupplyCap = globalSaleDetails.SupplyCap;
-            StartTime = globalSaleDetails.StartTime;
-            EndTime = globalSaleDetails.EndTime;
+            StartTime = globalSaleDetails.StartTimeLong;
+            EndTime = globalSaleDetails.EndTimeLong;
         }
 
         private async Task UpdatePaymentTokenAsync()
@@ -127,7 +127,7 @@ namespace Sequence.Demo
         {
             TotalMinted += amount;
             var curSupplyStr = TokenSupplies[tokenId].supply;
-            var curSupply = int.TryParse(curSupplyStr, out var value) ? value : 0;
+            var curSupply = BigInteger.TryParse(curSupplyStr, out var value) ? value : 0;
             TokenSupplies[tokenId].supply = (curSupply + amount).ToString();
         }
     }

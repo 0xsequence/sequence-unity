@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Sequence.Utils
 {
@@ -28,6 +29,7 @@ namespace Sequence.Utils
         public static int HexStringToInt(this string hexString)
         {
             hexString = hexString.Replace("0x", "");
+            hexString.TrimStart('0');
             return int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
         }
 
