@@ -9,6 +9,7 @@ using PlayFab.ClientModels;
 using Sequence.Authentication;
 using Sequence.Contracts;
 using Sequence.Ethereum.Tests;
+using Sequence.Provider;
 using Sequence.Utils;
 using Sequence.Wallet;
 
@@ -541,6 +542,69 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                     Assert.IsNotNull(transactionReturn);
                     Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
                     
+                    tcs.TrySetResult(true);
+                }
+                catch (System.Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                tcs.TrySetException(new Exception(error));
+            });
+
+            await tcs.Task;
+        }
+
+        [Test]
+        public async Task TestInteractWithTupleContract()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness();
+            Contract contract = new Contract("0x88e57238a23e2619fd42f479d546560b44c698fe");
+            IEthClient client = new SequenceEthClient(Chain.ArbitrumNova);
+            
+            Address someAddress = new Address("0x8f408550720b268b0ea0969c527ac997d969a638");
+            Address anotherAddress = new Address("0x38104f7bb130756dcdd24d804e3e2d2e9df25d7d");
+            byte[] data = "Something".ToByteArray();
+            int integer = 3;
+            string first = "firstWord";
+            string second = "secondWord";
+            int number = 7;
+            
+            testHarness.Login(async wallet =>
+            {
+                try
+                {
+                    TransactionReturn transactionReturn = await wallet.SendTransaction(_chain,
+                        new Transaction[]
+                        {
+                            new SequenceContractCall(contract.GetAddress(), 
+                                new AbiData("testTuple((address,string),(string,address,bytes,uint),int)", new object[]
+                                {
+                                    (someAddress, first),
+                                    (second, anotherAddress, data, integer.ToString()),
+                                    number.ToString()
+                                }))
+                        });
+                    Assert.IsNotNull(transactionReturn);
+                    Assert.IsTrue(transactionReturn is SuccessfulTransactionReturn);
+                    
+                    Address storedAddress = await contract.QueryContract<Address>("getStoredAddress").Invoke(client);
+                    Assert.AreEqual(someAddress, storedAddress);
+                    Address storedAddress2 = await contract.QueryContract<Address>("getStoredAddress2").Invoke(client);
+                    Assert.AreEqual(anotherAddress, storedAddress2);
+                    byte[] storedBytes = await contract.QueryContract<byte[]>("getStoredBytes").Invoke(client);
+                    Assert.AreEqual(data, storedBytes);
+                    int storedInt = await contract.QueryContract<int>("getStoredInt").Invoke(client);
+                    Assert.AreEqual(integer, storedInt);
+                    string storedString = await contract.QueryContract<string>("getStoredString").Invoke(client);
+                    Assert.AreEqual(first, storedString);
+                    string storedString2 = await contract.QueryContract<string>("getStoredString2").Invoke(client);
+                    Assert.AreEqual(second, storedString2);
+                    uint storedUint = await contract.QueryContract<uint>("getStoredUint").Invoke(client);
+                    Assert.AreEqual(number, storedUint);
+
                     tcs.TrySetResult(true);
                 }
                 catch (System.Exception e)

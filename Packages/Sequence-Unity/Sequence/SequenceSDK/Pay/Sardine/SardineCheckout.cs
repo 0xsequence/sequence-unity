@@ -25,7 +25,9 @@ namespace Sequence.Pay.Sardine
         private IMarketplaceReader _reader;
         private IEthClient _ethClient;
 
-        private const string _baseUrl = "https://api.sequence.app/rpc/API";
+        private string _baseUrl;
+        private const string _devUrl = "https://dev-api.sequence.app/rpc/API";
+        private const string _prodUrl = "https://api.sequence.app/rpc/API";
 
         private const string _sardineCheckoutUrl =
             "https://sardine-checkout.sequence.info?api_url=https://sardine-api.sequence.info&client_token=";
@@ -41,10 +43,12 @@ namespace Sequence.Pay.Sardine
             _chain = chain;
             SequenceConfig config = SequenceConfig.GetConfig();
             _apiKey = config.BuilderAPIKey;
-            if (_baseUrl.Contains("dev"))
-            {
-                _apiKey = "AQAAAAAAAAOciu6BP4WM_6ftwlZFRT5pays";
-            }
+            
+#if SEQUENCE_DEV_STACK || SEQUENCE_DEV
+            _baseUrl = _devUrl;
+#else
+            _baseUrl = _prodUrl;
+#endif
 
             _client = new HttpClient(_apiKey);
             _wallet = wallet;
@@ -144,7 +148,7 @@ namespace Sequence.Pay.Sardine
 
         public void OnRamp(string clientToken)
         {
-            string url = _sardineCheckoutUrl + clientToken + _sardineCheckoutUrlSuffix;
+            string url = CheckoutUrl(clientToken);
             Application.OpenURL(url);
         }
 
@@ -440,9 +444,18 @@ namespace Sequence.Pay.Sardine
             return filteredTokens.ToArray();
         }
 
+        private string CheckoutUrl(string clientToken)
+        {
+#if SEQUENCE_DEV_STACK || SEQUENCE_DEV
+            return _sardineSandboxCheckoutUrl + clientToken + _sardineCheckoutUrlSuffix;
+#else
+            return _sardineCheckoutUrl + clientToken + _sardineCheckoutUrlSuffix;
+#endif
+        }
+
         public string CheckoutUrl(SardineNFTCheckout token)
         {
-            return _sardineCheckoutUrl + token.token + _sardineCheckoutUrlSuffix;
+            return CheckoutUrl(token.token);
         }
         
         public void Checkout(SardineNFTCheckout token)

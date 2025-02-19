@@ -15,6 +15,7 @@ namespace Sequence.Marketplace
     {
         private string _apiKey;
         private const string _prodUrl = "https://marketplace-api.sequence.app/";
+        private const string _devUrl = "https://dev-marketplace-api.sequence-dev.app/";
         private static string _baseUrl = "https://marketplace-api.sequence.app/";
         private const string _endUrl = "/rpc/Marketplace/";
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
@@ -24,9 +25,13 @@ namespace Sequence.Marketplace
         
         public HttpClient()
         {
-            SequenceConfig config = SequenceConfig.GetConfig();
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.Marketplace);
             _apiKey = config.BuilderAPIKey;
+#if SEQUENCE_DEV_MARKETPLACE || SEQUENCE_DEV
+            _baseUrl = _devUrl;
+#else
             _baseUrl = _prodUrl;
+#endif            
         }
         
         public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)

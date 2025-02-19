@@ -149,6 +149,26 @@ namespace Sequence
             return Indexer.GetTransactionHistory(ChainId, args, 0, _customHttpHandler, this);
         }
 
+        public void SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options)
+        {
+            Indexer.SubscribeReceipts(ChainId, args, options, this);
+        }
+        
+        public void SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options)
+        {
+            Indexer.SubscribeEvents(ChainId, args, options, this);
+        }
+        
+        public void SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options)
+        {
+            Indexer.SubscribeBalanceUpdates(ChainId, args, options, this);
+        }
+
+        public void AbortStreams()
+        {
+            Indexer.AbortStreams(this);
+        }
+
         public bool ChainMatched(Chain chain)
         {
             return chain == GetChain();

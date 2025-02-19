@@ -12,8 +12,12 @@ namespace Sequence.EmbeddedWallet
     {
         private RSAParameters _waasPublicKey;
         public bool PublicKeyFetched { get; private set; }
+#if SEQUENCE_DEV_WAAS || SEQUENCE_DEV
+        private const string _jwks = "{\"keys\":[{\"alg\":\"RS256\",\"e\":\"AQAB\",\"kid\":\"9LkLZyHdNq1N2aeHMlC5jw\",\"kty\":\"RSA\",\"n\":\"qllUB_ERsOjbKx4SirGow4XDov05lQyhiF7Duo4sPkH9CwMN11OqhLuIqeIXPq0rPNIXGP99A7riXTcpRNk-5ZNL29zs-Xjj3idp7nZQZLIU1CBQErTcbxbwUYp8Q46k7lJXVlMmwoLQvQAgH8BZLuSe-Xk1tye0mDC-bHvmrMfqm2zmuWeDnZercU3Jg2iYwyPrjKWx7YSBSMTXTKPGndws4m3s3XIEpI2alLcLLWsPQk2UjIlux6I7vLwvjM_BgjFhYHqgg1tgZUPn_Xxt4wvhobF8UIacRVmGcuyYBnhRxKnBQhEClGSBVtnFYYBSvRjTgliOwf3DhFoXdnmyPQ\",\"use\":\"sig\"}]}";
+#else        
         private const string _jwks = "{\"keys\":[{\"alg\":\"RS256\",\"e\":\"AQAB\",\"kid\":\"nWh-_3nQ1lnhhI1ZSQTQmw\",\"kty\":\"RSA\",\"n\":\"pECaEq2k0k22J9e7hFLAFmKbzPLlWToUJJmFeWAdEiU4zpW17EUEOyfjRzjgBewc7KFJQEblC3eTD7Vc5bh9-rafPEj8LaKyZzzS5Y9ZATXhlMo5Pnlar3BrTm48XcnT6HnLsvDeJHUVbrYd1JyE1kqeTjUKWvgKX4mgIJiuYhpdzbOC22cPaWb1dYCVhArDVAPHGqaEwRjX7JneETdY5hLJ6JhsAws706W7fwfNKddPQo2mY95S9q8HFxMr5EaXEMmhwxk8nT5k-Ouar2dobMXRMmQiEZSt9fJaGKlK7KWJSnbPOVa2cZud1evs1Rz2SdCSA2bhuZ6NnZCxkqnagw\",\"use\":\"sig\"}]}";
-        
+#endif  
+      
         public ResponseSignatureValidator()
         {
             LoadPublicKey();

@@ -103,6 +103,26 @@ namespace Sequence.Marketplace.Mocks
             throw new System.NotImplementedException();
         }
 
+        public void SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void AbortStreams()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public bool ChainMatched(Chain chain)
         {
             throw new System.NotImplementedException();

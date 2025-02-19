@@ -41,6 +41,7 @@ namespace Sequence
     public enum EventLogDataType
     {
         UNKNOWN,
+        EVENT,
         TOKEN_TRANSFER,
         SEQUENCE_TXN,
         NATIVE_TOKEN_TRANSFER
@@ -89,6 +90,7 @@ namespace Sequence
         { Chain.LAOS.GetChainId(), "laos" },
         { Chain.Soneium.GetChainId(), "soneium" },
         { Chain.Telos.GetChainId(), "telos" },
+        { Chain.Moonbeam.GetChainId(), "moonbeam" },
 
         { Chain.TestnetSepolia.GetChainId(), "sepolia" },
         { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
@@ -111,10 +113,11 @@ namespace Sequence
         { Chain.TestnetImmutableZkEvm.GetChainId(), "immutable-zkevm-testnet" },
         { Chain.TestnetRootPorcini.GetChainId(), "rootnet-porcini" },
         { Chain.TestnetLAOSSigma.GetChainId(), "laos-sigma-testnet" },
-        { Chain.TestnetTelos.GetChainId(), "telos-testnet" }
+        { Chain.TestnetTelos.GetChainId(), "telos-testnet" },
+        { Chain.TestnetMoonbaseAlpha.GetChainId(), "moonbase-alpha" }
     };
 
-        private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+        private static string _builderApiKey = SequenceConfig.GetConfig(SequenceService.Indexer).BuilderAPIKey;
         
         public static Action<string> OnQueryFailed;
         public static Action<string> OnQueryIssue;
@@ -318,6 +321,38 @@ namespace Sequence
         {
             var responseBody = await HttpPost(chainID, "GetTransactionHistory", args, retries, httpHandler, caller);
             return BuildResponse<GetTransactionHistoryReturn>(responseBody);
+        }
+        
+        /// <summary>
+        /// Subscribe to receipt events.
+        /// </summary>
+        public static void SubscribeReceipts(string chainID, SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options, IIndexer caller)
+        {
+            new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeReceipts", args, options);
+        }
+        
+        /// <summary>
+        /// Subscribe to smart contract events.
+        /// </summary>
+        public static void SubscribeEvents(string chainID, SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options, IIndexer caller)
+        {
+            new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeEvents", args, options);
+        }
+        
+        /// <summary>
+        /// Subscribe to balance update events for a given contract address.
+        /// </summary>
+        public static void SubscribeBalanceUpdates(string chainID, SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options, IIndexer caller)
+        {
+            new HttpHandler(_builderApiKey, caller).HttpStream(chainID, "SubscribeBalanceUpdates", args, options);
+        }
+        
+        /// <summary>
+        /// Subscribe to balance update events for a given contract address.
+        /// </summary>
+        public static void AbortStreams(IIndexer caller)
+        {
+            new HttpHandler(_builderApiKey, caller).AbortStreams();
         }
 
         [Obsolete]

@@ -30,7 +30,7 @@ namespace Sequence.Demo
         private void OnWalletCreated(SequenceWallet wallet)
         {
             _wallet = wallet;
-            var sdkVersion = SequenceConfig.GetConfig().WaaSVersion;
+            var sdkVersion = SequenceConfig.GetConfig(SequenceService.WaaS).WaaSVersion;
             var email = PlayerPrefs.GetString(OpenIdAuthenticator.LoginEmail);
             
             if (_wallet == null || string.IsNullOrEmpty(email))

@@ -95,6 +95,32 @@ namespace Sequence
         public Task<GetTransactionHistoryReturn> GetTransactionHistory(GetTransactionHistoryArgs args);
 
         /// <summary>
+        /// Subscribe to receipt events.
+        /// </summary>
+        /// <param name="args">Specify the account or event you want to receive events from by defining a filter.</param>
+        /// <param name="options">Actions triggered whenever a message or error event is received.</param>
+        public void SubscribeReceipts(SubscribeReceiptsArgs args, WebRPCStreamOptions<SubscribeReceiptsReturn> options);
+        
+        /// <summary>
+        /// Subscribe to smart contract events.
+        /// </summary>
+        /// <param name="args">Specify the accounts or contracts you want to receive events from by defining a filter.</param>
+        /// <param name="options">Actions triggered whenever a message or error event is received.</param>
+        public void SubscribeEvents(SubscribeEventsArgs args, WebRPCStreamOptions<SubscribeEventsReturn> options);
+        
+        /// <summary>
+        /// Subscribe to balance update events for a given contract address.
+        /// </summary>
+        /// <param name="args">Define the contract address you want to receive events from.</param>
+        /// <param name="options">Actions triggered whenever a message or error event is received.</param>
+        public void SubscribeBalanceUpdates(SubscribeBalanceUpdatesArgs args, WebRPCStreamOptions<SubscribeBalanceUpdatesReturn> options);
+
+        /// <summary>
+        /// Aborts all running streams.
+        /// </summary>
+        public void AbortStreams();
+
+        /// <summary>
         /// Returns true if the provided Chain matches the Chain of this Indexer, false otherwise
         /// </summary>
         /// <param name="chain"></param>
