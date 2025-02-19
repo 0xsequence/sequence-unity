@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -26,20 +27,27 @@ namespace Sequence.Demo
         private string _tokenContractAddress;
         private string _saleContractAddress;
         private int[] _itemsForSale;
+        private Action _onClose;
         private SequenceInGameShopState _saleState;
 
+        /// <summary>
+        /// This function is called when the user clicks the close button.
+        /// </summary>
         public void Hide()
         {
             gameObject.SetActive(false);
+            _onClose?.Invoke();
         }
 
-        public void Show(IWallet wallet, Chain chain, string tokenContractAddress, string saleContractAddress, int[] itemsForSale)
+        public void Show(IWallet wallet, Chain chain, string tokenContractAddress, string saleContractAddress, 
+            int[] itemsForSale, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;
             _tokenContractAddress = tokenContractAddress;
             _saleContractAddress = saleContractAddress;
             _itemsForSale = itemsForSale;
+            _onClose = onClose;
             
             gameObject.SetActive(true);
             _loadingView.SetActive(false);
@@ -55,7 +63,7 @@ namespace Sequence.Demo
         {
             _qrCodeView.gameObject.SetActive(true);
             var destinationAddress = _wallet.GetWalletAddress();
-            await _qrCodeView.Show(_saleState.PaymentToken, (int)_chain, destinationAddress, "1e2");
+            await _qrCodeView.Show(_saleState.PaymentToken, destinationAddress, "1e2");
         }
 
         public async void RefreshState()

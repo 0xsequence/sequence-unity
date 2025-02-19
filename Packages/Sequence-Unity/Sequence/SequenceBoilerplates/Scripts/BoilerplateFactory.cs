@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using Sequence.Boilerplates.SignMessage;
+using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using SequenceSDK.Samples;
 using UnityEngine;
@@ -8,19 +11,63 @@ namespace Sequence.Boilerplates
 {
     public static class BoilerplateFactory
     {
-        public static void OpenSequenceLoginWindow(Transform parent)
+        private static Dictionary<Type, GameObject> _objects = new();
+        
+        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent)
         {
-            GameObject loginWindowGameObject = (GameObject)Resources.Load("Prefabs/Login/SequenceLoginWindow");
+            return GetOrSpawnBoilerplate<SequenceLoginWindow>("Login/SequenceLoginWindow", parent, 
+                b => b.Show());
+        }
+
+        public static SequencePlayerProfile OpenSequencePlayerProfile(Transform parent, IWallet wallet, Chain chain, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<SequencePlayerProfile>("PlayerProfile/SequencePlayerProfile", parent, 
+                b => b.Show(wallet, chain, onClose));
+        }
+
+        public static SequenceDailyRewards OpenSequenceDailyRewards(Transform parent, IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<SequenceDailyRewards>("DailyRewards/SequenceDailyRewards", parent, 
+                b => b.Show(wallet, chain, apiUrl, onClose));
+        }
+        
+        public static SequenceInventory OpenSequenceInventory(Transform parent, IWallet wallet, Chain chain, string contractAddress, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<SequenceInventory>("Inventory/SequenceInventory", parent, 
+                b => b.Show(wallet, chain, contractAddress, onClose));
+        }
+        
+        public static SequenceInGameShop OpenSequenceInGameShop(Transform parent, IWallet wallet, Chain chain, 
+            string tokenContractAddress, string saleContractAddress, int[] itemsForSale, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<SequenceInGameShop>("InGameShop/SequenceInGameShop", parent, 
+                b => b.Show(wallet, chain, tokenContractAddress, saleContractAddress, itemsForSale, onClose));
+        }
+        
+        public static SequenceSignMessage OpenSequenceSignMessage(Transform parent, IWallet wallet, Chain chain, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<SequenceSignMessage>("SignMessage/SequenceSignMessage", parent, 
+                b => b.Show(wallet, chain, onClose));
+        }
+        
+        private static T GetOrSpawnBoilerplate<T>(string path, Transform parent, Action<T> show) where T : MonoBehaviour
+        {
+            var type = typeof(T);
+            if (_objects.ContainsKey(type))
+            {
+                var cachedBoilerplate = _objects[type].GetComponent<T>();
+                show.Invoke(cachedBoilerplate);
+                return cachedBoilerplate;
+            }
             
-            if (loginWindowGameObject != null)
-            {
-                GameObject window = Object.Instantiate(loginWindowGameObject, parent);
-                window.GetComponent<SequenceLoginWindow>().Show(SequenceLogin.GetInstance());
-            }
-            else
-            {
-                throw new Exception("Prefab not found in Resources folder");
-            }
+            var prefab = ((GameObject)Resources.Load($"Prefabs/{path}")).GetComponent<T>();
+            if (prefab == null)
+                throw new Exception($"Prefab at {path} not found in Resources folder");
+            
+            var boilerplate = Object.Instantiate(prefab, parent);
+            _objects.Add(type, boilerplate.gameObject);
+            show.Invoke(boilerplate);
+            return boilerplate;
         }
     }
 }

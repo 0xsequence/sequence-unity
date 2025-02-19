@@ -14,7 +14,7 @@ namespace Sequence.Demo
         [SerializeField] private int _size;
         [SerializeField] private RawImage _qrImage;
         
-        public async Task Show(string paymentToken, int chainId, string destinationAddress, string amount)
+        public async Task Show(string paymentToken, string destinationAddress, string amount)
         {
             var deeplink = string.Format(_format, paymentToken, destinationAddress, amount);
             await Show(deeplink);

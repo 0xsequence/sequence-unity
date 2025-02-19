@@ -23,19 +23,25 @@ namespace SequenceSDK.Samples
         private IWallet _wallet;
         private Chain _chain;
         private string _apiUrl;
+        private Action _onClose;
         private DailyRewardsStatusData _rewardsData;
         private Dictionary<string, TokenSupply[]> _supplies;
         
+        /// <summary>
+        /// This function is called when the user clicks the close button.
+        /// </summary>
         public void Hide()
         {
             gameObject.SetActive(false);
+            _onClose?.Invoke();
         }
         
-        public void Show(IWallet wallet, Chain chain, string apiUrl)
+        public void Show(IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;
             _apiUrl = apiUrl;
+            _onClose = onClose;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             GetRewards();

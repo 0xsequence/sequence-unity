@@ -38,7 +38,7 @@ namespace Sequence.Demo
         public void ReturnToLogin()
         {
             Close();
-            _loginPanel.Open();
+            _loginPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
         
         public void OverrideAccount()

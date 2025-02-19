@@ -1,3 +1,4 @@
+using System;
 using Sequence;
 using Sequence.Demo;
 using Sequence.EmbeddedWallet;
@@ -24,17 +25,23 @@ namespace SequenceSDK.Samples
         
         private IWallet _wallet;
         private Chain _chain;
+        private Action _onClose;
         private EOAWalletLinker _walletLinker;
 
+        /// <summary>
+        /// This function is called when the user clicks the close button.
+        /// </summary>
         public void Hide()
         {
             gameObject.SetActive(false);
+            _onClose?.Invoke();
         }
 
-        public async void Show(IWallet wallet, Chain chain)
+        public async void Show(IWallet wallet, Chain chain, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;
+            _onClose = onClose;
             gameObject.SetActive(true);
             _transactionPool.Cleanup();
             
@@ -63,7 +70,6 @@ namespace SequenceSDK.Samples
             EnableLoading(true);
             await _wallet.DropThisSession();
             EnableLoading(false);
-            Hide();
         }
 
         public async void SendToken()

@@ -1,12 +1,12 @@
-using Sequence.Authentication;
 using Sequence.Boilerplates.SignMessage;
 using Sequence.Config;
+using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils.SecureStorage;
 using SequenceSDK.Samples;
 using UnityEngine;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class BoilerplateController : MonoBehaviour
     {
@@ -19,30 +19,34 @@ namespace Sequence.Demo
         
         [Header("Components")]
         [SerializeField] private GameObject _featureSelection;
-        [SerializeField] private SequenceLoginWindow _loginWindow;
-        [SerializeField] private SequencePlayerProfile _playerProfile;
-        [SerializeField] private SequenceDailyRewards _dailyRewards;
-        [SerializeField] private SequenceInventory _inventory;
-        [SerializeField] private SequenceInGameShop _inGameShop;
-        [SerializeField] private SequenceSignMessage _signMessage;
         
         private IWallet _wallet;
-        private ILogin _loginHandler;
-        private GameObject _lastOpenedWindow;
+        private SequenceLoginWindow _loginWindow;
+        private SequencePlayerProfile _playerProfile;
+        private SequenceDailyRewards _dailyRewards;
+        private SequenceInventory _inventory;
+        private SequenceInGameShop _inGameShop;
+        private SequenceSignMessage _signMessage;
         
         private void Awake()
         {
+            SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 _wallet = wallet;
-                _loginWindow.Hide();
-                _featureSelection.gameObject.SetActive(true);
+                ShowFeatureSelection();
+                
+                if (_loginWindow)
+                    _loginWindow.Hide();
                 
                 wallet.OnDropSessionComplete += s =>
                 {
                     if (s == wallet.SessionId)
                     {
-                        TryRecoverSession();
+                        if (_playerProfile)
+                            _playerProfile.Hide();
+                        
+                        TryRecoverSessionToOpenLoginWindow();
                     }
                 };
             };
@@ -50,63 +54,61 @@ namespace Sequence.Demo
 
         private void Start()
         {
-            HideAll();
-            TryRecoverSession();
+            TryRecoverSessionToOpenLoginWindow();
         }
 
         public void OpenPlayerProfilePanel()
         {
-            _featureSelection.SetActive(false);
-            _playerProfile.Show(_wallet, _chain);
+            HideFeatureSelection();
+            _playerProfile = BoilerplateFactory.OpenSequencePlayerProfile(transform, _wallet, _chain, ShowFeatureSelection);
         }
         
         public void OpenDailyRewardsPanel()
         {
-            _featureSelection.SetActive(false);
-            _dailyRewards.Show(_wallet, _chain, _dailyRewardsApi);
+            HideFeatureSelection();
+            BoilerplateFactory.OpenSequenceDailyRewards(transform, _wallet, _chain, _dailyRewardsApi, ShowFeatureSelection);
         }
         
         public void OpenInventoryPanel()
         {
-            _featureSelection.SetActive(false);
-            _inventory.Show(_wallet, _chain, _collectionAddress);
+            HideFeatureSelection();
+            BoilerplateFactory.OpenSequenceInventory(transform, _wallet, _chain, _collectionAddress, ShowFeatureSelection);
         }
         
         public void OpenInGameShopPanel()
         {
-            _featureSelection.SetActive(false);
-            _inGameShop.Show(_wallet, _chain, _collectionAddress, _saleContractAddress, _itemsForSale);
+            HideFeatureSelection();
+            BoilerplateFactory.OpenSequenceInGameShop(transform, _wallet, _chain, _collectionAddress,
+                _saleContractAddress, _itemsForSale, ShowFeatureSelection);
         }
 
         public void OpenSignMessage()
         {
-            _featureSelection.SetActive(false);
-            _signMessage.Show(_wallet, _chain);
+            HideFeatureSelection();
+            BoilerplateFactory.OpenSequenceSignMessage(transform, _wallet, _chain, ShowFeatureSelection);
         }
 
-        private void HideAll()
+        private void ShowFeatureSelection()
         {
-            _featureSelection.SetActive(false);
-            _loginWindow.Hide();
-            _playerProfile.Hide();
-            _dailyRewards.Hide();
-            _inventory.Hide();
-            _inGameShop.Hide();
-            _signMessage.Hide();
+            _featureSelection.SetActive(true);
         }
         
-        private void TryRecoverSession()
+        private void HideFeatureSelection()
         {
-            SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
-
+            _featureSelection.SetActive(false);
+        }
+        
+        private void TryRecoverSessionToOpenLoginWindow()
+        {
+            HideFeatureSelection();
             var config = SequenceConfig.GetConfig();
             var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
-            _loginHandler = SequenceLogin.GetInstance();
+            var loginHandler = SequenceLogin.GetInstance();
             
             if (SecureStorageFactory.IsSupportedPlatform() && storeSessionInfoAndSkipLoginWhenPossible)
             {
-                _loginHandler.TryToRestoreSession();
-                _loginHandler.SetupAuthenticator();
+                loginHandler.TryToRestoreSession();
+                loginHandler.SetupAuthenticator();
             }
             else
             {
@@ -116,11 +118,8 @@ namespace Sequence.Demo
 
         private void OnFailedToRecoverSession(string error)
         {
-            SequenceWallet.OnFailedToRecoverSession -= OnFailedToRecoverSession;
             Debug.LogError($"Error attempting to recover Sequence session: {error}");
-            
-            HideAll();
-            _loginWindow.Show(_loginHandler);
+            _loginWindow = BoilerplateFactory.OpenSequenceLoginWindow(transform);
         }
     }
 }

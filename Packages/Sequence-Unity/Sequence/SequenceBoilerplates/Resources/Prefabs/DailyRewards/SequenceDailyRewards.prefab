@@ -57,8 +57,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17631297b8d0f42eab41c2e998d32cae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _apiUrl: https://boilerplate-test-bb7.pages.dev/dailyRewards
-  _chain: 421614
   _contentParent: {fileID: 5575978303766843060}
   _loadingScreen: {fileID: 3802941984327144995}
   _messagePopup: {fileID: 7616688174144764780}
@@ -499,10 +497,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231713997470665517}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 555789712913665550}
+        m_TargetAssemblyTypeName: SequenceSDK.Samples.SequenceDailyRewards, Sequence.Boilerplates
+        m_MethodName: Hide
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

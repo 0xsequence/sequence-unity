@@ -32,7 +32,7 @@ namespace Sequence.Demo
             _panel = this;
         }
 
-        protected virtual void Update()
+        private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {

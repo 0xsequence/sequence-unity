@@ -1,3 +1,4 @@
+using System;
 using Sequence;
 using Sequence.Demo;
 using Sequence.EmbeddedWallet;
@@ -30,18 +31,24 @@ namespace SequenceSDK.Samples
         private IWallet _wallet;
         private Chain _chain;
         private string _contractAddress;
+        private Action _onClose;
         private TokenBalance _selectedBalance;
         
+        /// <summary>
+        /// This function is called when the user clicks the close button.
+        /// </summary>
         public void Hide()
         {
             gameObject.SetActive(false);
+            _onClose?.Invoke();
         }
         
-        public void Show(IWallet wallet, Chain chain, string contractAddress)
+        public void Show(IWallet wallet, Chain chain, string contractAddress, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;
             _contractAddress = contractAddress;
+            _onClose = onClose;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             _loadingScreen.SetActive(false);

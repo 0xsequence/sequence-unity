@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Sequence.Authentication;
+using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,13 +36,17 @@ namespace SequenceSDK.Samples
             _loginHandler.OnMFAEmailSent -= LoginHandlerOnOnMFAEmailSent;
         }
 
+        /// <summary>
+        /// This function is called when the user clicks the close button.
+        /// </summary>
         public void Hide()
         {
             gameObject.SetActive(false);
         }
         
-        public void Show(ILogin loginHandler)
+        public void Show()
         {
+            var loginHandler = SequenceLogin.GetInstance();
             if (_loginHandler == null)
             {
                 _loginHandler = loginHandler;

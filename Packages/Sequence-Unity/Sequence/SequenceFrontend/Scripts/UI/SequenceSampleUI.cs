@@ -87,7 +87,6 @@ namespace Sequence.Demo
                 pages[i].gameObject.SetActive(false);
             }
             
-            _loginWindow.Hide();
             _playerProfile.Hide();
             _inventory.Hide();
             _inGameShop.Hide();
@@ -165,7 +164,7 @@ namespace Sequence.Demo
             Debug.LogError($"Error attempting to recover Sequence session: {error}");
             
             DisableAllUIPages();
-            _loginWindow.Show(_loginHandler);
+            _loginWindow.Show();
         }
     }
 }
