@@ -9,7 +9,11 @@ namespace Sequence.Marketplace
     {
         private Chain _chain;
         private IHttpClient _client;
+#if SEQUENCE_DEV_STACK || SEQUENCE_DEV
+        private const string BaseUrl = "https://dev-api.sequence.app/rpc/API";
+#else        
         private const string BaseUrl = "https://api.sequence.app/rpc/API";
+#endif
         private IIndexer _indexer;
         
         public CurrencySwap(Chain chain, IHttpClient client = null)

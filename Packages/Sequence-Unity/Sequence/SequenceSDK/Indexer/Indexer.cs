@@ -117,7 +117,7 @@ namespace Sequence
         { Chain.TestnetMoonbaseAlpha.GetChainId(), "moonbase-alpha" }
     };
 
-        private static string _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+        private static string _builderApiKey = SequenceConfig.GetConfig(SequenceService.Indexer).BuilderAPIKey;
         
         public static Action<string> OnQueryFailed;
         public static Action<string> OnQueryIssue;

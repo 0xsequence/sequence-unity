@@ -39,7 +39,7 @@ namespace Sequence.Demo
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(List<LoginMethod>)} as an argument");
             }
 
-            _enableMultipleAccountsPerEmail = SequenceConfig.GetConfig().EnableMultipleAccountsPerEmail;
+            _enableMultipleAccountsPerEmail = SequenceConfig.GetConfig(SequenceService.WaaS).EnableMultipleAccountsPerEmail;
 
             
             _overrideAccountButton.SetActive(_enableMultipleAccountsPerEmail);
@@ -84,7 +84,7 @@ namespace Sequence.Demo
 
         public void NewAccount()
         {
-            if (!SequenceConfig.GetConfig().EnableMultipleAccountsPerEmail)
+            if (!SequenceConfig.GetConfig(SequenceService.WaaS).EnableMultipleAccountsPerEmail)
             {
                 throw new SystemException("Creating accounts with the same email is not enabled");
             }

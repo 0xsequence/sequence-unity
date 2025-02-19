@@ -87,7 +87,7 @@ namespace Sequence.EmbeddedWallet
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
             SetConnectedWalletAddress(connectedWalletAddress);
             
-            bool storeSessionWallet = SequenceConfig.GetConfig().StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
+            bool storeSessionWallet = SequenceConfig.GetConfig(SequenceService.WaaS).StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
             {
                 _storeSessionWallet = true;
@@ -190,7 +190,7 @@ namespace Sequence.EmbeddedWallet
 
         private void Configure()
         {
-            SequenceConfig config = SequenceConfig.GetConfig();
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
             string waasVersion = config.WaaSVersion;
             if (string.IsNullOrWhiteSpace(waasVersion))
             {

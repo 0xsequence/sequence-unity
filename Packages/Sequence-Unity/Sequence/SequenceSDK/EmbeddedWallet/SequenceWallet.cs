@@ -27,10 +27,14 @@ namespace Sequence.EmbeddedWallet
         public SequenceWallet(Address address, string sessionId, IIntentSender intentSender, string email = "")
         {
             _address = address;
+#if SEQUENCE_DEV_WAAS || SEQUENCE_DEV           
+            _httpClient = new HttpClient("https://dev-api.sequence.app/rpc");
+#else
             _httpClient = new HttpClient("https://api.sequence.app/rpc");
+#endif            
             _intentSender = intentSender;
             SessionId = sessionId;
-            _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+            _builderApiKey = SequenceConfig.GetConfig(SequenceService.WaaS).BuilderAPIKey;
             _email = email;
         }
 

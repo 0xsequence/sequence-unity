@@ -34,12 +34,11 @@ namespace Sequence.Config
         public bool EditorStoreSessionPrivateKeyInSecureStorage = false;
         
         private static SequenceConfig _config;
-
-        public static SequenceConfig GetConfig()
+        public static SequenceConfig GetConfig(SequenceService sequenceService = SequenceService.Unspecified)
         {
             if (_config == null)
             {
-                _config = LoadConfig();
+                _config = GetAppropriateConfig(sequenceService);
                 if (_config == null)
                 {
                     throw new Exception("SequenceConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > SequenceConfig");
@@ -63,10 +62,64 @@ namespace Sequence.Config
             return _config;
         }
 
-        private static SequenceConfig LoadConfig()
+        private static SequenceConfig GetAppropriateConfig(SequenceService sequenceService)
+        {
+            switch (sequenceService)
+            {
+                case SequenceService.WaaS:
+#if SEQUENCE_DEV_WAAS || SEQUENCE_DEV
+                    return LoadDevConfig();
+#else
+                    return LoadProdConfig();
+#endif
+                case SequenceService.Indexer:
+#if SEQUENCE_DEV_INDEXER || SEQUENCE_DEV
+                    return LoadDevConfig();
+#else
+                    return LoadProdConfig();
+#endif
+                case SequenceService.NodeGateway:
+#if SEQUENCE_DEV_NODEGATEWAY || SEQUENCE_DEV
+                    return LoadDevConfig();
+#else
+                    return LoadProdConfig();
+#endif
+                case SequenceService.Marketplace:
+#if SEQUENCE_DEV_MARKETPLACE || SEQUENCE_DEV
+                    return LoadDevConfig();
+#else
+                    return LoadProdConfig();
+#endif
+                case SequenceService.Stack:
+#if SEQUENCE_DEV_STACK || SEQUENCE_DEV
+                    return LoadDevConfig();
+#else
+                    return LoadProdConfig();
+#endif
+                
+                default:
+#if SEQUENCE_DEV
+                    return LoadDevConfig();
+#else
+                    return LoadProdConfig();
+#endif
+            }
+        }
+
+        private static SequenceConfig LoadDevConfig()
+        {
+            return LoadConfig("SequenceDevConfig");
+        }
+
+        private static SequenceConfig LoadProdConfig()
+        {
+            return LoadConfig("SequenceConfig");
+        }
+
+        private static SequenceConfig LoadConfig(string configName)
         {
 #if UNITY_EDITOR
-            string[] guids = AssetDatabase.FindAssets($"SequenceConfig t:{nameof(SequenceConfig)}");
+            string[] guids = AssetDatabase.FindAssets($"{configName} t:{nameof(SequenceConfig)}");
             foreach (string guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -76,9 +129,9 @@ namespace Sequence.Config
                 }
             }
 
-            return Resources.Load<SequenceConfig>("SequenceConfig");
+            return Resources.Load<SequenceConfig>(configName);
 #else
-            return Resources.Load<SequenceConfig>("SequenceConfig");
+            return Resources.Load<SequenceConfig>(configName);
 #endif
         }
 

@@ -21,7 +21,7 @@ namespace Sequence.Provider
         public HttpRpcClient(string url)
         {
             _url = url;
-            _builderApiKey = SequenceConfig.GetConfig().BuilderAPIKey;
+            _builderApiKey = SequenceConfig.GetConfig(SequenceService.NodeGateway).BuilderAPIKey;
         }
 
         public async Task<RpcResponse> SendRequest(RpcRequest rpcRequest)
