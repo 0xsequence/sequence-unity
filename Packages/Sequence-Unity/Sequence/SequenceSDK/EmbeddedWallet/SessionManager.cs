@@ -34,7 +34,7 @@ namespace Sequence.EmbeddedWallet
 
         private void OnApplicationQuit()
         {
-            if (SequenceConfig.GetConfig().StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform())
+            if (SequenceConfig.GetConfig(SequenceService.WaaS).StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform())
             {
                 return;
             }

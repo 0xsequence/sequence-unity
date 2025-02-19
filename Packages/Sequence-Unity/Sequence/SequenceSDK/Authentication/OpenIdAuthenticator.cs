@@ -44,7 +44,7 @@ namespace Sequence.Authentication
 
         public OpenIdAuthenticator(string nonce = null)
         {
-            SequenceConfig config = SequenceConfig.GetConfig();
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
 
             _urlScheme = config.UrlScheme;
             SetClientIds(config);

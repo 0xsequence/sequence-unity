@@ -38,7 +38,7 @@ namespace Sequence.EmbeddedWallet
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            SequenceConfig config = SequenceConfig.GetConfig();
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
             _defaultHeaders["X-Access-Key"] = config.BuilderAPIKey;
             _defaultHeaders["Accept-Signature"] = "sig=()";
             if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))

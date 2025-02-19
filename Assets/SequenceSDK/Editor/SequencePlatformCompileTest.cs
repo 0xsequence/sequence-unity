@@ -140,7 +140,7 @@ namespace Sequence.Editor
 
         private static void AndroidBuildTest(string path, string[] scenes)
         {
-            SequenceConfig config = SequenceConfig.GetConfig();
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
             bool isSecureStorageEnabled = config.StoreSessionPrivateKeyInSecureStorage;
             BuildTarget target = BuildTarget.Android;
 
