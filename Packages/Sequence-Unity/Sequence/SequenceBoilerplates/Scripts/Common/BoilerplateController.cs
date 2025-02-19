@@ -1,3 +1,4 @@
+using System;
 using Sequence.Boilerplates.Login;
 using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Config;
@@ -50,6 +51,11 @@ namespace Sequence.Boilerplates
         private void Start()
         {
             TryRecoverSessionToOpenLoginWindow();
+        }
+
+        private void OnDestroy()
+        {
+            BoilerplateFactory.CleanUp();
         }
 
         public void OpenPlayerProfilePanel()

@@ -15,6 +15,14 @@ namespace Sequence.Boilerplates
     public static class BoilerplateFactory
     {
         private static Dictionary<Type, GameObject> _objects = new();
+
+        /// <summary>
+        /// Call this function to clear references in memory when objects are destroyed. For example, when loading a new scene.
+        /// </summary>
+        public static void CleanUp()
+        {
+            _objects.Clear();
+        }
         
         public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent)
         {
