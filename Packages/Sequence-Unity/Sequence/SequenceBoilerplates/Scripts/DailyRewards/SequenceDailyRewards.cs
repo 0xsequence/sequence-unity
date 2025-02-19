@@ -36,6 +36,13 @@ namespace SequenceSDK.Samples
             _onClose?.Invoke();
         }
         
+        /// <summary>
+        /// Required function to configure this Boilerplate.
+        /// </summary>
+        /// <param name="wallet">This Wallet instance will perform transactions.</param>
+        /// <param name="chain">Chain used to get balances and send transactions.</param>
+        /// <param name="apiUrl">API Url you deployed using the server boilerplate.</param>
+        /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         public void Show(IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
         {
             _wallet = wallet;

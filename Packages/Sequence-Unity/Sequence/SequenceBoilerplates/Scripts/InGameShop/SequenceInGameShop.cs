@@ -39,6 +39,15 @@ namespace Sequence.Demo
             _onClose?.Invoke();
         }
 
+        /// <summary>
+        /// Required function to configure this Boilerplate.
+        /// </summary>
+        /// <param name="wallet">This Wallet instance will perform transactions.</param>
+        /// <param name="chain">Chain used to get balances and send transactions.</param>
+        /// <param name="tokenContractAddress">ERC1155 Contract you deployed on Sequence's Builder.</param>
+        /// <param name="saleContractAddress">ERC1155 Sale Contract you deployed on Sequence's Builder.</param>
+        /// <param name="itemsForSale">Define the token Ids you want to sell from your collection.</param>
+        /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         public void Show(IWallet wallet, Chain chain, string tokenContractAddress, string saleContractAddress, 
             int[] itemsForSale, Action onClose = null)
         {

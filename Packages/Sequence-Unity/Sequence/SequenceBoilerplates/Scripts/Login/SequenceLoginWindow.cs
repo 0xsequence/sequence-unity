@@ -44,6 +44,9 @@ namespace SequenceSDK.Samples
             gameObject.SetActive(false);
         }
         
+        /// <summary>
+        /// Required function to configure this Boilerplate.
+        /// </summary>
         public void Show()
         {
             var loginHandler = SequenceLogin.GetInstance();
