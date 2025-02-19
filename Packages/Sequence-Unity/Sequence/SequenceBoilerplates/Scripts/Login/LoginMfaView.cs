@@ -26,15 +26,6 @@ namespace Sequence.Boilerplates.Login
             _codeInput.Select();
             OnInputValueChanged(string.Empty);
         }
-        
-        private void Update()
-        {
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftCommand))
-                && Input.GetKeyDown(KeyCode.V))
-            {
-                _codeInput.text = GUIUtility.systemCopyBuffer;
-            }
-        }
 
         private void OnInputValueChanged(string newValue)
         {

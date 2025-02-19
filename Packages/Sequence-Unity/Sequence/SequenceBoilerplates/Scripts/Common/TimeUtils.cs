@@ -6,8 +6,7 @@ namespace Sequence.Boilerplates
     {
         public static int GetTimestampSecondsNow()
         {
-            var epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            return (int)(DateTime.UtcNow - epochStart).TotalSeconds;
+            return (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         }
         
         public static string FormatRemainingTime(int totalSeconds)

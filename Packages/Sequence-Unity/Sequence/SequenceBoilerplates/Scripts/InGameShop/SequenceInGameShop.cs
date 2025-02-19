@@ -115,7 +115,6 @@ namespace Sequence.Boilerplates.InGameShop
                     supply.tokenMetadata, 
                     _saleState.Cost,
                     _saleState.PaymentTokenSymbol, 
-                    supply.supply, 
                     PurchaseToken);
             }
         }

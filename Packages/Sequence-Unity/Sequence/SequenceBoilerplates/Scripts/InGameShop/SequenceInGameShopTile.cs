@@ -22,7 +22,7 @@ namespace Sequence.Boilerplates.InGameShop
         private Func<BigInteger, int, Task> _purchase;
         
         public async void Initialize(BigInteger tokenId, TokenMetadata metadata, BigInteger cost, string symbol, 
-            string supply, Func<BigInteger, int, Task> purchase)
+            Func<BigInteger, int, Task> purchase)
         {
             _tokenId = tokenId;
             _cost = cost;
