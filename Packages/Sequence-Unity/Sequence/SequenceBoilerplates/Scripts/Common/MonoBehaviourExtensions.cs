@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Sequence.Demo.Utils
+namespace Sequence.Boilerplates
 {
     public static class MonoBehaviourExtensions
     {

@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates
 {
     [RequireComponent(typeof(TweenAnimation))]
     public class MessagePopup : MonoBehaviour

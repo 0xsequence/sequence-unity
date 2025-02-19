@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class QrCodeView : MonoBehaviour
     {

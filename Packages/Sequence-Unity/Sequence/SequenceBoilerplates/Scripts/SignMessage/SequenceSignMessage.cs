@@ -1,6 +1,5 @@
 using System;
 using Sequence.EmbeddedWallet;
-using SequenceSDK.Samples;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

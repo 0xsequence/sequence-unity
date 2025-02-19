@@ -1,12 +1,10 @@
-using Sequence;
-using Sequence.Demo;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.Inventory
 {
     public class SequenceInventoryTile : MonoBehaviour, IPointerClickHandler
     {

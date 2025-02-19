@@ -1,9 +1,8 @@
-using Sequence.Boilerplates.SignMessage;
+using Sequence.Boilerplates.Login;
+using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Config;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils.SecureStorage;
-using SequenceSDK.Samples;
 using UnityEngine;
 
 namespace Sequence.Boilerplates
@@ -23,10 +22,6 @@ namespace Sequence.Boilerplates
         private IWallet _wallet;
         private SequenceLoginWindow _loginWindow;
         private SequencePlayerProfile _playerProfile;
-        private SequenceDailyRewards _dailyRewards;
-        private SequenceInventory _inventory;
-        private SequenceInGameShop _inGameShop;
-        private SequenceSignMessage _signMessage;
         
         private void Awake()
         {

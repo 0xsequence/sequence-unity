@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates
 {
     [RequireComponent(typeof(CanvasGroup))]
     public class TweenAnimation : MonoBehaviour

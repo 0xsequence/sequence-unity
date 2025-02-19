@@ -4,13 +4,11 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Sequence.Demo.Utils;
-using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public static class AssetHandler
     {

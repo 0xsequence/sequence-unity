@@ -8,7 +8,7 @@ using Sequence.Provider;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates.InGameShop
 {
     public class SequenceInGameShopState
     {

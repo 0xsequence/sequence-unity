@@ -2,14 +2,12 @@ using System;
 using System.Collections;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.Demo.Utils;
 using Sequence.EmbeddedWallet;
-using SequenceSDK.Samples;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates.InGameShop
 {
     public class SequenceInGameShop : MonoBehaviour
     {

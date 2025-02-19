@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Boilerplates;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Serialization;

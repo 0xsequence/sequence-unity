@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Sequence.Boilerplates.DailyRewards;
+using Sequence.Boilerplates.InGameShop;
+using Sequence.Boilerplates.Inventory;
+using Sequence.Boilerplates.Login;
+using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Boilerplates.SignMessage;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
-using SequenceSDK.Samples;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

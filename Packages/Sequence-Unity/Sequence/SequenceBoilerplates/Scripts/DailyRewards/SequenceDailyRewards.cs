@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.DailyRewards
 {
     public class SequenceDailyRewards : MonoBehaviour
     {

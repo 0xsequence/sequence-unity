@@ -1,13 +1,11 @@
 using System;
-using Sequence;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.Inventory
 {
     public class SequenceInventory : MonoBehaviour
     {

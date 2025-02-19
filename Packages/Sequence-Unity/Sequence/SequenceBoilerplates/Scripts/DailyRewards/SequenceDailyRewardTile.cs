@@ -1,15 +1,12 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
-using Sequence;
-using Sequence.Demo;
-using Sequence.Demo.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.DailyRewards
 {
     public class SequenceDailyRewardTile : MonoBehaviour
     {

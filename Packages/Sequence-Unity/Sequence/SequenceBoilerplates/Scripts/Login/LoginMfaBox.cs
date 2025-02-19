@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Demo
+namespace Sequence.Boilerplates.Login
 {
     public class LoginMfaBox : MonoBehaviour
     {

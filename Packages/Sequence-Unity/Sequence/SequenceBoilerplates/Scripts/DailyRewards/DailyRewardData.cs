@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.DailyRewards
 {
     public struct DailyRewardsStatusData
     {

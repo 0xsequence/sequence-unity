@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     [Serializable]
     public class GenericObjectPool<T> where T : Component

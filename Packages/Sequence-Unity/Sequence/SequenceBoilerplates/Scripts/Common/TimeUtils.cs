@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.Demo.Utils
+namespace Sequence.Boilerplates
 {
     public static class TimeUtils
     {

@@ -1,9 +1,8 @@
-using SequenceSDK.Demo;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.Login
 {
     public class LoginMfaView : MonoBehaviour
     {

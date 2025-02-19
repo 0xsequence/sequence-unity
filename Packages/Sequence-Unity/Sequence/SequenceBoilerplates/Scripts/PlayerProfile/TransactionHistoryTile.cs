@@ -1,9 +1,7 @@
-using Sequence;
-using Sequence.Demo.Utils;
 using TMPro;
 using UnityEngine;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.PlayerProfile
 {
     public class TransactionHistoryTile : MonoBehaviour
     {

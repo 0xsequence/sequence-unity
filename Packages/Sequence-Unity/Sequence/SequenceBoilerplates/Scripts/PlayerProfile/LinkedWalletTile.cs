@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.PlayerProfile
 {
     public class LinkedWalletTile : MonoBehaviour
     {

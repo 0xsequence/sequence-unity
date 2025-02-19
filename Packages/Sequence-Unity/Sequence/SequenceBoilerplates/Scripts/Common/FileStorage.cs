@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Sequence.Demo.Utils
+namespace Sequence.Boilerplates
 {
     public static class FileStorage
     {

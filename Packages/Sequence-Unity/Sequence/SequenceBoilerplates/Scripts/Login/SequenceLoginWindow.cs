@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
@@ -6,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.Login
 {
     public class SequenceLoginWindow : MonoBehaviour
     {

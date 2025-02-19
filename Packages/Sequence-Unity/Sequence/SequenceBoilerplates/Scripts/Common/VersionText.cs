@@ -2,7 +2,7 @@ using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class VersionText : MonoBehaviour
     {

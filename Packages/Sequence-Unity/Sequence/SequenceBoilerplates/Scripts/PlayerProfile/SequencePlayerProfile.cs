@@ -1,11 +1,9 @@
 using System;
-using Sequence;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
 
-namespace SequenceSDK.Samples
+namespace Sequence.Boilerplates.PlayerProfile
 {
     public class SequencePlayerProfile : MonoBehaviour
     {

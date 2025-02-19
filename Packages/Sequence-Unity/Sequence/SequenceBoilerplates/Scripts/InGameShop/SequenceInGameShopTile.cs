@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates.InGameShop
 {
     public class SequenceInGameShopTile : MonoBehaviour
     {
