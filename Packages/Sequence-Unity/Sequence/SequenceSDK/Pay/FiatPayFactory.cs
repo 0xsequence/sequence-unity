@@ -31,6 +31,7 @@ namespace Sequence.Pay
             _reader = reader;
             _checkout = checkout;
             _sardine = new SardineFiatPay(new SardineCheckout(chain, wallet, checkout, reader, client));
+            _transak = new TransakFiatPay(new TransakOnRamp(wallet.GetWalletAddress()), new TransakNFTCheckout(wallet, chain, client, checkout, reader));
         }
 
         public IFiatPay OnRamp(TransactionOnRampProvider provider = TransactionOnRampProvider.transak)
