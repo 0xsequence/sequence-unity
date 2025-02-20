@@ -300,7 +300,7 @@ namespace Sequence.Pay.Sardine
             if (paymentToken.IsZeroAddress())
             {
                 throw new ArgumentException(
-                    "Sardine checkout does not support native currency checkout; please choose an sales contract with a different payment token");
+                    "Sardine checkout does not support native currency checkout; please choose a sales contract with a different payment token");
             }
             
             (string, BigInteger) paymentTokenDetails = await GetPaymentTokenDetails(paymentToken);

@@ -121,7 +121,7 @@ namespace Sequence.Pay.Tests.Sardine
             }
             catch (Exception e)
             {
-                Assert.AreEqual("Sardine doesn't support native currency checkout; please choose a different payment token", e.Message);
+                Assert.AreEqual("Sardine checkout does not support native currency checkout; please choose a sales contract with a different payment token", e.Message);
             }
         }
 
