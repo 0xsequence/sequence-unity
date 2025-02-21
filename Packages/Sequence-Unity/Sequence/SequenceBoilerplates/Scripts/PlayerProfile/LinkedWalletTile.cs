@@ -1,3 +1,4 @@
+using System;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
@@ -9,9 +10,12 @@ namespace Sequence.Boilerplates.PlayerProfile
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private Button _removeButton;
+
+        private Action _unlink;
         
-        public void Show(LinkedWalletData wallet)
+        public void Show(LinkedWalletData wallet, Action unlink)
         {
+            _unlink = unlink;
             _nameText.text = wallet.linkedWalletAddress;
             _removeButton.gameObject.SetActive(true);
         }
@@ -20,6 +24,11 @@ namespace Sequence.Boilerplates.PlayerProfile
         {
             _nameText.text = "You don't have any wallets linked.";
             _removeButton.gameObject.SetActive(false);
+        }
+
+        public void UnlinkWallet()
+        {
+            _unlink?.Invoke();
         }
     }
 }

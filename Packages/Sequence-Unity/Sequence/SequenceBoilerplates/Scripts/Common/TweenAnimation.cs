@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Sequence.Boilerplates
 {
     [RequireComponent(typeof(CanvasGroup))]
-    public class TweenAnimation : MonoBehaviour
+    public class TweenAnimation : MonoBehaviour, ITween
     {
         [SerializeField] private float _start = 0.7f;
         [SerializeField] private float _duration = 0.3f;
@@ -21,16 +21,21 @@ namespace Sequence.Boilerplates
 
         private void OnEnable()
         {
-            PlayForward();
+            AnimateIn(_duration);
+        }
+        
+        public void Initialize(RectTransform rectTransform)
+        {
+            throw new System.NotImplementedException();
         }
 
-        public void PlayForward()
+        public void AnimateIn(float _)
         {
             gameObject.SetActive(true);
             RestartRoutine(true);
         }
 
-        public void PlayBackward()
+        public void AnimateOut(float _)
         {
             RestartRoutine(false);
         }

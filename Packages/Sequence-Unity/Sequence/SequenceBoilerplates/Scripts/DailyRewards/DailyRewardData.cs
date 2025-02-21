@@ -6,7 +6,7 @@ namespace Sequence.Boilerplates.DailyRewards
     {
         public int timeSpan;
         public UserRewardStatusData userStatus;
-        public List<List<RewardData>> rewards;
+        public List<RewardData> rewards;
     }
 
     public struct UserRewardStatusData

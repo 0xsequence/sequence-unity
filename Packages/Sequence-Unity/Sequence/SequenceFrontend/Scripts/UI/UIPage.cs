@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Sequence.Boilerplates;
 using Sequence.Demo.Tweening;
 using Sequence.Utils;
 using UnityEngine;

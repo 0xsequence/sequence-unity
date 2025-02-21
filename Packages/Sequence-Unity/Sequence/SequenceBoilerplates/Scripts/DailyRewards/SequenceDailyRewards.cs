@@ -78,9 +78,7 @@ namespace Sequence.Boilerplates.DailyRewards
             _tilePool.Cleanup();
             for (var index = 0; index < _rewardsData.rewards.Count; index++)
             {
-                var rewards = _rewardsData.rewards[index];
-                var reward = rewards[0];
-                
+                var reward = _rewardsData.rewards[index];
                 var metadata = _supplies[reward.contractAddress]
                     .First(s => s.tokenID == reward.tokenId).tokenMetadata;
                 
@@ -123,9 +121,9 @@ namespace Sequence.Boilerplates.DailyRewards
             var json = request.downloadHandler.text;
             var rewardsData = JsonConvert.DeserializeObject<DailyRewardsStatusData>(json);
 
-            var dict = rewardsData.rewards.GroupBy(reward => reward[0].contractAddress)
+            var dict = rewardsData.rewards.GroupBy(reward => reward.contractAddress)
                 .ToDictionary(group => group.Key, 
-                    group => group.Select(e => e[0].tokenId.ToString())
+                    group => group.Select(e => e.tokenId.ToString())
                         .Distinct()
                         .ToArray());
 

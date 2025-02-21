@@ -240,7 +240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chain: 421614
-  _dailyRewardsApi: https://boilerplate-test-bb7.pages.dev/dailyRewards
+  _dailyRewardsApi: https://master.boilerplate-test-bb7.pages.dev/dailyRewards
   _collectionAddress: 0xd2926e2ee243e8df781ab907b48f77ec5d7a8be1
   _saleContractAddress: 0x476f14887372e21fea64baba11c849b518a2e928
   _itemsForSale: 010000000200000003000000

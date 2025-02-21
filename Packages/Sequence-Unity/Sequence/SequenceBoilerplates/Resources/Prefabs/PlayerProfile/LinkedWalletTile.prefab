@@ -273,9 +273,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SequenceSDK.Samples.MessagePopup, SequenceExamples
-        m_MethodName: Hide
+      - m_Target: {fileID: 762773241403894419}
+        m_TargetAssemblyTypeName: Sequence.Boilerplates.PlayerProfile.LinkedWalletTile,
+          Sequence.Boilerplates
+        m_MethodName: UnlinkWallet
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -389,7 +390,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 70528f3440ea84f968e5a4ecf4b389a9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e0aca7c4ac2ed4cc589962721c508d77, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

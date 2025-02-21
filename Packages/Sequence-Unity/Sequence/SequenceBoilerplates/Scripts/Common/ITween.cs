@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Sequence.Demo.Tweening
+namespace Sequence.Boilerplates
 {
     public interface ITween
     {

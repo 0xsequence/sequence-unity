@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Sequence.Boilerplates
 {
-    [RequireComponent(typeof(TweenAnimation))]
+    [RequireComponent(typeof(ITween))]
     public class MessagePopup : MonoBehaviour
     {
         [SerializeField] private float _waitDuration = 3f;
@@ -14,12 +14,12 @@ namespace Sequence.Boilerplates
         [SerializeField] private GameObject _successStatus;
         [SerializeField] private GameObject _errorStatus;
 
-        private TweenAnimation _tweenAnimation;
+        private ITween _tweenAnimation;
         
         public void Show(string message, bool error = false)
         {
-            _tweenAnimation ??= GetComponent<TweenAnimation>();
-            _tweenAnimation.PlayForward();
+            _tweenAnimation ??= GetComponent<ITween>();
+            _tweenAnimation.AnimateIn(0.3f);
             
             _messageText.text = message;
             
@@ -32,7 +32,7 @@ namespace Sequence.Boilerplates
 
         public void Hide()
         {
-            _tweenAnimation.PlayBackward();
+            _tweenAnimation.AnimateOut(0.3f);
         }
 
         private IEnumerator WaitRoutine()

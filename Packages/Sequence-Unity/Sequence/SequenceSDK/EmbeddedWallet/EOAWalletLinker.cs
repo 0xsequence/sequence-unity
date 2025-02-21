@@ -7,7 +7,8 @@ namespace Sequence.EmbeddedWallet
 {
     public class EOAWalletLinker
     {
-        private const string NonceGenerationLink = "https://api.sequence.app/rpc/API/GenerateWaaSVerificationURL";
+        private const string ApiUrl = "https://api.sequence.app/rpc/API/";
+        private const string NonceGenerationLink = ApiUrl + "GenerateWaaSVerificationURL";
         private const string VerificationUrl = "https://demo-waas-wallet-link.pages.dev/";
         
         private IWallet _wallet;
@@ -21,20 +22,18 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<LinkedWalletData[]> GetLinkedWallets()
         {
-            var url = "https://api.sequence.app/rpc/API/";
-            var walletAddress = _wallet.GetWalletAddress();
-
-            var messageToSign = $"parent wallet with address {walletAddress}";
+            var parentWalletAddress = _wallet.GetWalletAddress();
+            var messageToSign = $"parent wallet with address {parentWalletAddress}";
             var signature = await _wallet.SignMessage(_chain, messageToSign);
 
             try
             {
-                var client = new HttpClient(url);
+                var client = new HttpClient(ApiUrl);
                 var response = await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
                     "GetLinkedWallets", new LinkedWalletsRequestData
                     {
                         signatureChainId = _chain.GetChainId(),
-                        parentWalletAddress = walletAddress,
+                        parentWalletAddress = parentWalletAddress,
                         parentWalletMessage = messageToSign,
                         parentWalletSignature = signature
                     });
@@ -50,7 +49,30 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<bool> UnlinkWallet(string walletAddress)
         {
-            return false;
+            var parentWalletAddress = _wallet.GetWalletAddress();
+            var messageToSign = $"parent wallet with address {parentWalletAddress}";
+            var signature = await _wallet.SignMessage(_chain, messageToSign);
+            
+            try
+            {
+                var client = new HttpClient(ApiUrl);
+                await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
+                    "RemoveLinkedWallet", new LinkedWalletsRequestData
+                    {
+                        signatureChainId = _chain.GetChainId(),
+                        parentWalletAddress = parentWalletAddress,
+                        parentWalletMessage = messageToSign,
+                        parentWalletSignature = signature,
+                        linkedWalletAddress = walletAddress
+                    });
+                
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return false;
+            }
         }
 
         public async Task<string> GenerateEoaWalletLink()

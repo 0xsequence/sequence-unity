@@ -140,15 +140,21 @@ namespace Sequence.Boilerplates.PlayerProfile
 
         private async void LoadLinkedWallets()
         {
+            _walletsPool.Cleanup();
             _walletLinker = new EOAWalletLinker(_wallet, _chain);
             var linkedWallets = await _walletLinker.GetLinkedWallets();
             
-            _walletsPool.Cleanup();
             if (linkedWallets.Length == 0)
                 _walletsPool.GetObject().ShowEmpty();
             
             foreach (var wallet in linkedWallets)
-                _walletsPool.GetObject().Show(wallet);
+                _walletsPool.GetObject().Show(wallet, () => UnlinkWallet(wallet));
+        }
+
+        private async void UnlinkWallet(LinkedWalletData wallet)
+        {
+            var success = await _walletLinker.UnlinkWallet(wallet.linkedWalletAddress);
+            _messagePopup.Show(success ? "Unlinked." : "Failed to unlink", !success);
         }
     }
 }
