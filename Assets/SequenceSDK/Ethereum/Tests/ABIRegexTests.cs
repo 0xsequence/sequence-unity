@@ -36,6 +36,15 @@ namespace Sequence.Ethereum.Tests
         [TestCase("functionName(a[],a)", true)]
         [TestCase("functionName(a[5],a)", true)]
         [TestCase("functionName(a[][],a)", true)]
+        [TestCase("functionName((a[5],a))", true)]
+        [TestCase("functionName((a[][],a),int)", true)]
+        [TestCase("functionName((a[][],a),int)", true)]
+        [TestCase("functionName((a[][],a,int)", false)]
+        [TestCase("functionName((a[][),a,int)", false)]
+        [TestCase("functionName((a[][]),a,int)", true)]
+        [TestCase("functionName(a[][],(a,int))", true)]
+        [TestCase("functionName(a[][],a,int))", false)]
+        [TestCase("functionName(a[][],(a,int),string,(uint,int,a,bytes[5][]))", true)]
         public void TestMatchesFunctionABI(string input, bool expected)
         {
             bool result = ABIRegex.MatchesFunctionABI(input);

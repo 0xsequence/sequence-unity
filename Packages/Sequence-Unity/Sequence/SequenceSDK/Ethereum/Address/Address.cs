@@ -40,7 +40,12 @@ namespace Sequence {
             }
 
             Address address = (Address)obj;
-            return this.Value == address.Value;
+            return Value.Equals(address.Value, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.ToLowerInvariant().GetHashCode();
         }
     }
 
@@ -80,6 +85,21 @@ namespace Sequence {
         public override bool CanConvert(Type objectType)
         {
             return true;
+        }
+    }
+
+    public static class AddressExtensions
+    {
+        public static bool IsZeroAddress(this Address address)
+        {
+            return IsZeroAddress(address.Value);
+        }
+
+        public static bool IsZeroAddress(this string address)
+        {
+            string toCheck = address.WithoutHexPrefix();
+            toCheck = toCheck.Replace("0", "");
+            return toCheck.Length == 0;
         }
     }
 }
