@@ -1,4 +1,11 @@
 using System;
+using Sequence.Authentication;
+using Sequence.Boilerplates.DailyRewards;
+using Sequence.Boilerplates.InGameShop;
+using Sequence.Boilerplates.Inventory;
+using Sequence.Boilerplates.Login;
+using Sequence.Boilerplates.PlayerProfile;
+using Sequence.Config;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils.SecureStorage;
 using UnityEngine;
