@@ -74,11 +74,26 @@ The SDK comes with a number of samples that can be imported via `Samples` using 
 
 These live inside the `Samples~` folder as required by the [Package Manager specification](https://docs.unity3d.com/Manual/cus-samples.html). However, the Unity Editor will ignore any folders/files with a '~' character in their name and will not create a `.meta` file for them or import them. In order to facilitate our development, we create a symbolic link named `Samples` that points to the `Samples~` folder - allowing us to see and interact with our Samples and Setup scripts.
 
+## Environments
+
+Sequence generally uses two environments for our backend services: dev and production. By default, the SDK will always use production.
+
+However, during development, it is occasionally useful to send requests against the dev environment. To do this, you'll first need to have access to the dev version of the Sequence Builder; here, you can generate credentials (API key, WaaS config key, etc.) for your SequenceConfig. This time however, you'll place your configuration in a SequenceConfig instance titled 'SequenceDevConfig' in a `Resources` folder.
+
+In order to use the dev environment, you'll want to set the appropriate scripting define symbol for your service in your Player Settings.
+
+- `SEQUENCE_DEV` - every Sequence service
+- `SEQUENCE_DEV_WAAS` - the WaaS/EmbeddedWallet service
+- `SEQUENCE_DEV_INDEXER` - the Indexer service
+- `SEQUENCE_DEV_MARKETPLACE` - the Marketplace service
+- `SEQUENCE_DEV_NODEGATEWAY` - the Node Gateway services
+- `SEQUENCE_DEV_STACK` - generic Sequence API; unnamed services and functions
+
 ## Assembly Overview
 
 The SDK is split into a number of assemblies with different purposes. Each assembly also has a Test assembly or assembly reference containing tests - this way, our tests aren't included in builds.
 
-### SequenceExamples
+### SequenceFrontend
 
 This contains front-end and example code. Front-end/UI code is considered "example" code for the purposes of this SDK, though it may still be used in production applications.
 
@@ -89,6 +104,10 @@ This contains code related to authentication via Email + OTP, [OIDC](https://ope
 ### SequenceConfig
 
 Defines the `SequenceConfig` scriptable object and scripts needed to read it. Configuration is done in conjunction with the [Sequence Builder](https://sequence.build/).
+
+### SequenceEmbeddedWallet
+
+The integration with our [WaaS/Embedded Wallet API](https://docs.sequence.xyz/solutions/wallets/embedded-wallet/overview). Used to provide users with a seemless and invisible Web3 wallet experience.
 
 ### SequenceEthereum
 
@@ -102,6 +121,10 @@ The integration with our [Indexer API](https://docs.sequence.xyz/api/indexer/ove
 
 Houses code integrating with third-party service providers like [Transak](https://transak.com/).
 
+### SequenceMarketplace
+
+The integration with our Marketplace API v2. Used to enable secondary marketplace sales of ERC721/1155s.
+
 ### SequenceRelayer
 
 SDK-side extensions to our Sequence Relayer - e.g. transaction queuers.
@@ -109,10 +132,6 @@ SDK-side extensions to our Sequence Relayer - e.g. transaction queuers.
 ### SequenceUtils
 
 Universally useful extension methods, helpers, and platform native code used throughout the SDK for a variety of purposes.
-
-### SequenceWaaS
-
-The integration with our [WaaS/Embedded Wallet API](https://docs.sequence.xyz/solutions/wallets/embedded-wallet/overview). Used to provide users with a seemless and invisible Web3 wallet experience.
 
 ## Component Overview - Ethereum Client (SequenceEthereum)
 The SDK is broken into a number of components with different responsibilities. This section will give an overview of some of the most important components for users and their intended purposes.
