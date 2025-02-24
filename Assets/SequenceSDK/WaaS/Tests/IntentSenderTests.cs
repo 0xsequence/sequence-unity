@@ -138,7 +138,7 @@ namespace Sequence.EmbeddedWallet.Tests
         public async Task TestTimeMismatchExceptionResultsInRetry(int timeOffset)
         {
             SequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(config);
             IntentSender intentSender = new IntentSender(new HttpClient($"{configJwt.rpcServer.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator"), new EOAWallet(), "", configJwt.projectId, config.WaaSVersion);
             LogAssert.Expect(LogType.Warning, new Regex("Time mismatch*"));
             try
