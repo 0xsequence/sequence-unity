@@ -155,7 +155,11 @@ namespace Sequence
         private string HostName(string chainID)
         {
             var indexerName = Indexer.IndexerNames[chainID];
+#if SEQUENCE_DEV_INDEXER || SEQUENCE_DEV            
+            return $"https://dev-{indexerName}-indexer.sequence.app";
+#else
             return $"https://{indexerName}-indexer.sequence.app";
+#endif            
         }
     }
 }

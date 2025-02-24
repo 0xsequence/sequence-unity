@@ -7,9 +7,13 @@ namespace Sequence.Provider
 {
     public static class NodeGatewayBridge
     {
-        private static SequenceConfig _config = SequenceConfig.GetConfig();
+        private static SequenceConfig _config = SequenceConfig.GetConfig(SequenceService.NodeGateway);
         
+#if SEQUENCE_DEV_NODEGATEWAY || SEQUENCE_DEV
+        private const string _baseUrl = "https://dev-nodes.sequence.app/";
+#else
         private const string _baseUrl = "https://nodes.sequence.app/";
+#endif        
         
         public static string GetNodeGatewayUrl(Chain chain)
         {

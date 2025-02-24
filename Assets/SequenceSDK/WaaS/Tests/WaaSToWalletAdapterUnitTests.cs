@@ -10,7 +10,7 @@ namespace Sequence.EmbeddedWallet.Tests
     public class WaaSToWalletAdapterUnitTests
     {
         private IEthClient _client =
-            new SequenceEthClient("https://nodes.sequence.app/polygon/YfeuczOMRyP7fpr1v7h8SvrCAAAAAAAAA");
+            new SequenceEthClient(Chain.Polygon);
         private Address address = new Address("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
         
         [Test]
