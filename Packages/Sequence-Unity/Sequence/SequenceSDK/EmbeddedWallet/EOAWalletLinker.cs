@@ -7,23 +7,79 @@ namespace Sequence.EmbeddedWallet
 {
     public class EOAWalletLinker
     {
-        private string _nonceGenerationLink;
+        private const string ApiUrl = "https://api.sequence.app/rpc/API/";
+        private const string NonceGenerationLink = ApiUrl + "GenerateWaaSVerificationURL";
+        private const string VerificationUrl = "https://demo-waas-wallet-link.pages.dev/";
         
         private IWallet _wallet;
+        private Chain _chain;
 
-        private const string _verificationUrl = "https://demo-waas-wallet-link.pages.dev/";
-
-        public EOAWalletLinker(IWallet wallet, string nonceGenerationLink)
+        public EOAWalletLinker(IWallet wallet, Chain chain)
         {
             _wallet = wallet;
-            _nonceGenerationLink = nonceGenerationLink;
+            _chain = chain;
         }
 
-        public async Task<string> GenerateEOAWalletLink(Chain chain)
+        public async Task<LinkedWalletData[]> GetLinkedWallets()
         {
-            IHttpClient client = new HttpClient(_nonceGenerationLink);
+            var parentWalletAddress = _wallet.GetWalletAddress();
+            var messageToSign = $"parent wallet with address {parentWalletAddress}";
+            var signature = await _wallet.SignMessage(_chain, messageToSign);
+
             try
             {
+                var client = new HttpClient(ApiUrl);
+                var response = await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
+                    "GetLinkedWallets", new LinkedWalletsRequestData
+                    {
+                        signatureChainId = _chain.GetChainId(),
+                        parentWalletAddress = parentWalletAddress,
+                        parentWalletMessage = messageToSign,
+                        parentWalletSignature = signature
+                    });
+                
+                return response.linkedWallets;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return Array.Empty<LinkedWalletData>();
+            }
+        }
+
+        public async Task<bool> UnlinkWallet(string walletAddress)
+        {
+            var parentWalletAddress = _wallet.GetWalletAddress();
+            var messageToSign = $"parent wallet with address {parentWalletAddress}";
+            var signature = await _wallet.SignMessage(_chain, messageToSign);
+            
+            try
+            {
+                var client = new HttpClient(ApiUrl);
+                await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
+                    "RemoveLinkedWallet", new LinkedWalletsRequestData
+                    {
+                        signatureChainId = _chain.GetChainId(),
+                        parentWalletAddress = parentWalletAddress,
+                        parentWalletMessage = messageToSign,
+                        parentWalletSignature = signature,
+                        linkedWalletAddress = walletAddress
+                    });
+                
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return false;
+            }
+        }
+
+        public async Task<string> GenerateEoaWalletLink()
+        {
+            try
+            {
+                var client = new HttpClient(NonceGenerationLink);
                 NonceResponseData nonceResponse =
                     await client.SendRequest<NonceRequestData, NonceResponseData>("",
                         new NonceRequestData(_wallet.GetWalletAddress()),
@@ -31,12 +87,12 @@ namespace Sequence.EmbeddedWallet
                         {
                             { "X-Access-Key", null }
                         });
-                IntentResponseSessionAuthProof proof = await _wallet.GetSessionAuthProof(chain, nonceResponse.nonce);
+                IntentResponseSessionAuthProof proof = await _wallet.GetSessionAuthProof(_chain, nonceResponse.nonce);
                 if (proof == null)
                 {
                     throw new Exception("Received null session auth proof");
                 }
-                string eoaWalletLink = $"{_verificationUrl}?nonce={nonceResponse.nonce}&signature={proof.signature}&sessionId={proof.sessionId}&chainId={chain.GetChainId()}";
+                string eoaWalletLink = $"{VerificationUrl}?nonce={nonceResponse.nonce}&signature={proof.signature}&sessionId={proof.sessionId}&chainId={_chain.GetChainId()}";
                 return eoaWalletLink;
             }
             catch (System.Exception e)
@@ -46,11 +102,34 @@ namespace Sequence.EmbeddedWallet
             }
         }
         
-        public async Task OpenEOAWalletLink(Chain chain)
+        public async Task OpenEoaWalletLink()
         {
-            string link = await GenerateEOAWalletLink(chain);
+            var link = await GenerateEoaWalletLink();
             Application.OpenURL(link);
         }
+    }
+    
+    internal class LinkedWalletsRequestData
+    {
+        public string signatureChainId;
+        public string parentWalletAddress;
+        public string parentWalletMessage;
+        public string parentWalletSignature;
+        public string linkedWalletAddress;
+    }
+    
+    internal class LinkedWalletsResponseData
+    {
+        public LinkedWalletData[] linkedWallets;
+    }
+
+    public class LinkedWalletData
+    {
+        public int id;
+        public string walletType;
+        public string walletAddress;
+        public string linkedWalletAddress;
+        public string createdAt;
     }
 
     internal class NonceRequestData

@@ -1,3 +1,4 @@
+using Sequence.Boilerplates;
 using UnityEngine;
 using UnityEngine.UI;
 using Sequence.Marketplace;
@@ -21,7 +22,7 @@ namespace Sequence.Demo
         {
             if (_order != null)
             {
-                await _qrCodeView.Show("0x00000000000000000000000000000000", (int)_order.order.chainId, 
+                await _qrCodeView.Show("0x00000000000000000000000000000000", 
                     "0x00000000000000000000000000000000", "1e2"); 
                 _qrPanel.SetActive(true);
             }

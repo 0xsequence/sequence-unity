@@ -26,7 +26,7 @@ namespace Sequence.Demo
             _inputField.onValueChanged.AddListener(OnInputValueChanged);
             _numberOfMFADigits = _inputBoxes.Length;
         }
-        
+
         public override void Close()
         {
             base.Close();

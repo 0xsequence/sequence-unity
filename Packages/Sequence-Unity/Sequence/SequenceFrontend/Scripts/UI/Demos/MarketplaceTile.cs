@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
+using Sequence.Boilerplates;
 using Sequence.Marketplace;
 using TMPro;
 using UnityEngine;
