@@ -46,7 +46,7 @@ namespace Sequence.EmbeddedWallet
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
             
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(config);
             string rpcUrl = configJwt.rpcServer;
             if (string.IsNullOrWhiteSpace(rpcUrl))
             {

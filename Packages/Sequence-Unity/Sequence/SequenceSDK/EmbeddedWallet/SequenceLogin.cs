@@ -128,7 +128,7 @@ namespace Sequence.EmbeddedWallet
 
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(SequenceConfig.GetConfig(SequenceService.WaaS));
             if (_connectedWalletAddress == null || _sessionWallet == null)
             {
                 _sessionWallet = new EOAWallet();
@@ -198,7 +198,7 @@ namespace Sequence.EmbeddedWallet
             }
             _waasVersion = waasVersion;
 
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(config);
 
             string rpcUrl = configJwt.rpcServer;
             if (string.IsNullOrWhiteSpace(rpcUrl))
