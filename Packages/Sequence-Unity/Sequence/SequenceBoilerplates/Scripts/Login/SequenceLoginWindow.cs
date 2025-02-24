@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
@@ -153,6 +154,23 @@ namespace Sequence.Boilerplates.Login
 
             if (method == LoginMethod.Email)
                 _emailCodeErrorText.text = "Invalid code.";
+        }
+        
+        private void OnApplicationFocus(bool hasFocus)
+        {
+#if !UNITY_IOS
+            if (hasFocus)
+            {
+                StartCoroutine(DisableLoadingScreenIfNotLoggingIn());
+            }
+#endif
+        }
+
+        private IEnumerator DisableLoadingScreenIfNotLoggingIn()
+        {
+            yield return new WaitForSecondsRealtime(0.1f);
+            if (!_loginHandler.IsLoggingIn())
+                SetLoading(false);
         }
     }
 }
