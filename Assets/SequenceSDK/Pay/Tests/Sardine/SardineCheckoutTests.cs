@@ -80,7 +80,7 @@ namespace Sequence.Pay.Tests.Sardine
         [Test]
         public async Task TestSardineGetNFTCheckoutToken_SecondarySale_ERC1155()
         {
-            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.Polygon, "0x079294e6ffec16234578c672fa3fbfd4b6c48640");
+            CollectibleOrder[] collectibleOrders = await OrderFetcher.FetchListings(Chain.Polygon, "0x0ee3af1874789245467e7482f042ced9c5171073");
             SardineCheckout sardine = new SardineCheckout(Chain.Polygon, _testWallet);
 
             SardineNFTCheckout token = await sardine.SardineGetNFTCheckoutToken(collectibleOrders, 1);
@@ -89,6 +89,7 @@ namespace Sequence.Pay.Tests.Sardine
             Assert.IsFalse(string.IsNullOrWhiteSpace(token.token));
             Assert.IsFalse(string.IsNullOrWhiteSpace(token.expiresAt));
             Assert.IsFalse(string.IsNullOrWhiteSpace(token.orderId));
+            Debug.Log(sardine.CheckoutUrl(token));
         }
 
         [Test]
