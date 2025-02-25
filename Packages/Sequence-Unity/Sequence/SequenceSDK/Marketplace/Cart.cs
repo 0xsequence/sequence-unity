@@ -262,6 +262,21 @@ namespace Sequence.Marketplace
             return _wallet;
         }
 
+        public Dictionary<Address, Dictionary<string, Sprite>> GetCollectibleImagesByCollectible()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<Address, Dictionary<string, ulong>> GetAmountsRequestedByCollectible()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ulong> SetAmountRequested(Address collection, string tokenId, ulong amount)
+        {
+            throw new NotImplementedException();
+        }
+
         public Dictionary<string, Sprite> GetCollectibleImagesByOrderId()
         {
             return _collectibleImagesByOrderId;

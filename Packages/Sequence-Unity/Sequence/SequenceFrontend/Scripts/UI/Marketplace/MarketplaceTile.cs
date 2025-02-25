@@ -4,9 +4,11 @@ using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using NBitcoin.RPC;
+using Sequence.Demo.Mocks;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;
+using Sequence.Pay.Sardine;
 using Sequence.Pay.Transak;
 using TMPro;
 using UnityEngine;
@@ -52,6 +54,12 @@ namespace Sequence.Demo
             if (order == null)
             {
                 throw new ArgumentNullException($"{nameof(order)} cannot be null");
+            }
+
+            if (!String.Equals(order.order.priceCurrencyAddress, "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", StringComparison.InvariantCultureIgnoreCase))
+            {
+                Destroy(gameObject);
+                return;
             }
             _collectibleOrder = order;
             FetchImage().ConfigureAwait(false);
@@ -131,7 +139,11 @@ namespace Sequence.Demo
         {
             _checkoutPanel.Open(new NftCheckout(_wallet, _collectibleOrder, _collectibleSprite, 1),
                 new SequenceCheckout(_wallet, ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()],
-                    new[] { _collectibleOrder }, 1, _nftType));
+                    new[] { _collectibleOrder }, 1, _nftType,
+                    pay: new SequencePay(_wallet,
+                        ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()],
+                        checkout: new MockCheckoutWithSardineForCanada(new Checkout(_wallet,
+                            ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()])))));
         }
     }
 }

@@ -18,20 +18,25 @@ namespace Sequence.Demo
         [SerializeField] private Image _collectibleImage;
         [SerializeField] private TextMeshProUGUI _collectionNameText;
         [SerializeField] private TextMeshProUGUI _collectibleNameText;
+        [SerializeField] private Button _incrementAmountButton;
          
         private CollectibleOrder _order;
-        private uint _amountRequested;
+        private ulong _amountRequested;
         private Sprite _collectibleSprite;
         private string _collectionName;
         private string _collectibleName;
         private ICheckoutHelper _cart;
+        private Address _collectionAddress;
+        private string _tokenId;
 
-        public void Assemble(ICheckoutHelper cart, string orderId, string collectionName = "")
+        public void Assemble(ICheckoutHelper cart, CollectibleOrder order, string collectionName = "")
         {
             _cart = cart;
-            _order = _cart.GetListings().GetCollectibleOrder(orderId);
-            _collectibleSprite = _cart.GetCollectibleImagesByOrderId()[orderId];
-            _amountRequested = _cart.GetAmountsRequestedByOrderId()[orderId];
+            _order = order;
+            _collectionAddress = new Address(order.order.collectionContractAddress);
+            _tokenId = order.order.tokenId;
+            _collectibleSprite = _cart.GetCollectibleImagesByCollectible()[_collectionAddress][_tokenId];
+            _amountRequested = _cart.GetAmountsRequestedByCollectible()[_collectionAddress][_tokenId];
             _collectionName = collectionName;
             _collectibleName = _order.metadata.name;
 
@@ -76,54 +81,35 @@ namespace Sequence.Demo
 
         public void IncrementAmount()
         {
-            if (uint.TryParse(_order.order.quantityAvailable, out uint quantityAvailable))
-            {
-                if (_amountRequested < quantityAvailable)
-                {
-                    _amountRequested++;
-                    _amountField.text = _amountRequested.ToString();
-                    _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
-                    OnAmountChanged?.Invoke();
-                }
-            }
-            else
-            {
-                throw new SystemException($"Failed to parse quantity available for {_order.order.orderId}, given: {_order.order.quantityAvailable}");
-            }
+            SetAmount(_amountRequested + 1).ConfigureAwait(false);
         }
-        
+
+        private async Task SetAmount(ulong newAmount)
+        {
+            ulong remaining = await _cart.SetAmountRequested(_collectionAddress, _tokenId, _amountRequested);
+            _incrementAmountButton.interactable = remaining == 0;
+            _amountRequested = newAmount - remaining;
+            _amountField.text = _amountRequested.ToString();
+            OnAmountChanged?.Invoke();
+        }
+
         public void DecrementAmount()
         {
             if (_amountRequested > 0)
             {
-                _amountRequested--;
-                _amountField.text = _amountRequested.ToString();
-                _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
-                OnAmountChanged?.Invoke();
+                SetAmount(_amountRequested - 1).ConfigureAwait(false);
             }
         }
         
         private void OnAmountFieldChanged(string value)
         {
-            if (uint.TryParse(value, out uint newValue))
+            if (ulong.TryParse(value, out ulong newValue))
             {
-                if (newValue > 0)
-                {
-                    _amountRequested = newValue;
-                }
-                else
-                {
-                    _amountRequested = 0;
-                }
-                if (newValue > uint.Parse(_order.order.quantityAvailable))
-                {
-                    _amountRequested = uint.Parse(_order.order.quantityAvailable);
-                }
-                _cart.SetAmountRequested(_order.order.orderId, _amountRequested);
-                _amountField.text = _amountRequested.ToString();
+                SetAmount(newValue).ConfigureAwait(false);
             }
             else
             {
+                Debug.LogWarning("Unable to parse provided value: " + value + " as a number");
                 _amountField.text = _amountRequested.ToString();
             }
         }

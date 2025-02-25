@@ -41,7 +41,7 @@ namespace Sequence.Pay.Sardine
             IEthClient ethClient = null)
         {
             _chain = chain;
-            SequenceConfig config = SequenceConfig.GetConfig();
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.Stack);
             _apiKey = config.BuilderAPIKey;
             
 #if SEQUENCE_DEV_STACK || SEQUENCE_DEV

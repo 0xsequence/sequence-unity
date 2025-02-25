@@ -188,6 +188,7 @@ namespace Sequence.Marketplace
                 if (amountLeft <= available)
                 {
                     orderDatas.Add(new OrderData(orders[i].orderId, amountLeft.ToString()));
+                    amountLeft = BigInteger.Zero;
                     break;
                 }
                 else

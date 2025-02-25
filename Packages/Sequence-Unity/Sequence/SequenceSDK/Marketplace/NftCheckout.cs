@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Contracts;
 using Sequence.Demo;
 using Sequence.EmbeddedWallet;
+using Sequence.Provider;
 using Sequence.Utils;
 using UnityEngine;
 
@@ -13,8 +16,9 @@ namespace Sequence.Marketplace
     {
         private IWallet _wallet;
         private CollectibleOrder _listing;
+        private Order[] _listings;
         private Sprite _collectibleImage;
-        private uint _amountRequested;
+        private ulong _amountRequested;
         private ISwap _swap;
         private IMarketplaceReader _marketplaceReader;
         private IIndexer _indexer;
@@ -23,24 +27,28 @@ namespace Sequence.Marketplace
         private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
         private Chain _chain;
         private Currency _chosenCurrency;
+        private Page _page;
+        private Dictionary<Order, ulong> _amountsByOrder;
+        private IEthClient _client;
 
-        public NftCheckout(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, uint amount, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null)
+        public NftCheckout(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, ulong amount, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null, IEthClient client = null)
         {
             _wallet = wallet;
             _listing = listing;
             _collectibleImage = collectibleIcon;
             _amountRequested = amount;
             
-            Setup(swap, marketplaceReader, indexer, checkout);
+            Setup(swap, marketplaceReader, indexer, checkout, client);
         }
         
-        private void Setup(ISwap swap, IMarketplaceReader marketplaceReader, IIndexer indexer, ICheckout checkout)
+        private void Setup(ISwap swap, IMarketplaceReader marketplaceReader, IIndexer indexer, ICheckout checkout, IEthClient client)
         {
             _chain = ChainDictionaries.ChainById[_listing.order.chainId.ToString()];
             SetSwap(swap);
             SetReader(marketplaceReader);
             SetIndexer(indexer);
             SetCheckout(checkout);
+            SetClient(client);
 
             ICheckoutHelper.OnSelectedCurrency += currency =>
             {
@@ -70,6 +78,7 @@ namespace Sequence.Marketplace
             }
             
             FetchCurrencies().ConfigureAwait(false);
+            FetchOtherListings().ConfigureAwait(false);
         }
 
         private void SetIndexer(IIndexer indexer)
@@ -89,6 +98,15 @@ namespace Sequence.Marketplace
                 _checkout = new Checkout(_wallet, _chain);
             }
         }
+
+        private void SetClient(IEthClient client)
+        {
+            _client = client;
+            if (_client == null)
+            {
+                _client = new SequenceEthClient(_chain);
+            }
+        }
         
         private async Task FetchCurrencies()
         {
@@ -96,38 +114,119 @@ namespace Sequence.Marketplace
             _chosenCurrency = _currencies.FindDefaultChainCurrency();
         }
 
+        private async Task FetchOtherListings()
+        {
+            ListCollectibleListingsReturn result =
+                await _marketplaceReader.ListListingsForCollectible(
+                    new Address(_listing.order.collectionContractAddress), _listing.order.tokenId,
+                    new OrderFilter(null, null, new[] { _listing.order.priceCurrencyAddress }));
+            _page = result.page;
+            _listings = result.listings;
+            _listings = _listings.OrderBy(listing => listing.priceUSD).ToArray(); // Todo confirm if this comes pre-sorted by the API
+
+            ulong remaining = await SetAmountsByOrder();
+            if (remaining > 0)
+            {
+                ulong requested = _amountRequested + remaining; // We should already revert _amountRequested to the max available in SetAmountsByOrder
+                Debug.LogError($"Amount requested exceeds what is available in the marketplace for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}), amount requested: {requested} available: {_amountRequested}. Setting requested amount to the available amount: {_amountRequested}");
+            }
+        }
+
+        private async Task<ulong> SetAmountsByOrder()
+        {
+            _amountsByOrder = new Dictionary<Order, ulong>();
+            ulong remaining = _amountRequested;
+            foreach (Order order in _listings)
+            {
+                ulong amount = Math.Min(remaining, ulong.Parse(order.quantityRemaining));
+                _amountsByOrder[order] = amount;
+                remaining -= amount;
+                if (remaining == 0)
+                {
+                    break;
+                }
+            }
+
+            if (remaining > 0 && _page.more)
+            {
+                await FetchMoreListings();
+                await SetAmountsByOrder();
+            }
+            
+            _amountRequested -= remaining;
+            
+            return remaining;
+        }
+
+        private async Task FetchMoreListings()
+        {
+            if (!_page.more)
+            {
+                return;
+            }
+
+            ListCollectibleListingsReturn result =
+                await _marketplaceReader.ListListingsForCollectible(
+                    new Address(_listing.order.collectionContractAddress), _listing.order.tokenId,
+                    new OrderFilter(null, null, new[] { _listing.order.priceCurrencyAddress }), _page);
+            _page = result.page;
+            _listings.AppendArray(result.listings);
+        }
+
         public string GetApproximateTotalInUSD()
         {
-            decimal total = _listing.order.priceUSD * _amountRequested;
+            decimal total = 0;
+            foreach (var order in _amountsByOrder.Keys)
+            {
+                total = order.priceUSD * _amountsByOrder[order];
+            }
             
             return total.ToString("F2");
         }
 
         public async Task<string> GetApproximateTotalInCurrency(Address currencyAddress)
         {
-            double total = 0;
-            Order order = _listing.order;
-            uint amountRequested = _amountRequested;
+            decimal total = 0;
+            ulong amountRemaining = _amountRequested;
+            try
+            {
+                foreach (var order in _amountsByOrder.Keys)
+                {
+                    total += await GetApproximateTotalInCurrency(currencyAddress, amountRemaining, order);
+                    amountRemaining -= _amountsByOrder[order];
+                }
+                return total.ToString("F99").TrimEnd('0').TrimEnd('.');
+            }
+            catch (Exception e)
+            {
+                return $"Error calculating approximate total in {currencyAddress}: {e.Message}";
+            }
+        }
+
+        private async Task<decimal> GetApproximateTotalInCurrency(Address currencyAddress, ulong amountRemaining, Order order)
+        {
+            decimal total = 0;
+            ulong amountRequested = amountRemaining;
             if (order.priceCurrencyAddress == currencyAddress)
             {
-                total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(order.priceAmount), (int)order.priceDecimals) * amountRequested;
+                total += DecimalNormalizer.ReturnToNormalPrecise(BigInteger.Parse(order.priceAmount), (int)order.priceDecimals) * amountRequested;
             }
             else
             {
                 try
                 {
                     SwapPrice price = await _swap.GetSwapPrice(currencyAddress, new Address(order.priceCurrencyAddress), order.priceAmount);
-                    total += DecimalNormalizer.ReturnToNormal(BigInteger.Parse(price.maxPrice), (int)order.priceDecimals) * amountRequested;
+                    total += DecimalNormalizer.ReturnToNormalPrecise(BigInteger.Parse(price.maxPrice), (int)order.priceDecimals) * amountRequested;
                 }
                 catch (Exception e)
                 {
                     string error =
                         $"Error fetching swap price for buying {order.priceAmount} of {order.priceCurrencyAddress} with {currencyAddress}: {e.Message}";
-                    return error;
+                    throw new Exception(error);
                 }
             }
             
-            return total.ToString("F99").TrimEnd('0').TrimEnd('.');
+            return total;
         }
 
         public async Task<Currency[]> GetCurrencies()
@@ -153,6 +252,7 @@ namespace Sequence.Marketplace
             }
         }
 
+        // Todo consider re-write such that we first check what currencies they have in their wallet before checking the swap price
         public async Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress)
         {
             string total = await GetApproximateTotalInCurrency(new Address(currencyContractAddress));
@@ -185,7 +285,16 @@ namespace Sequence.Marketplace
                     int decimals = 18;
                     if (balance.contractInfo == null)
                     {
-                        Debug.LogWarning($"No contract info found for {balance.contractAddress}, using default decimals of 18");
+                        Debug.LogWarning($"No contract info found for {balance.contractAddress}, attempting to fetch from contract...");
+                        try
+                        {
+                            var decimalsFromContract = await new ERC20(currencyContractAddress).Decimals(_client);
+                            decimals = (int)decimalsFromContract;
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError($"Error fetching decimals from contract for {currencyContractAddress}: {e.Message}\nUsing default of 18 decimals");
+                        }
                     }
                     else
                     {
@@ -282,35 +391,40 @@ namespace Sequence.Marketplace
             return _wallet;
         }
 
-        public Dictionary<string, Sprite> GetCollectibleImagesByOrderId()
+        public Dictionary<Address, Dictionary<string, Sprite>> GetCollectibleImagesByCollectible()
         {
-            return new Dictionary<string, Sprite>
+            return new Dictionary<Address, Dictionary<string, Sprite>>()
             {
-                {_listing.order.orderId, _collectibleImage}
+                {
+                    new Address(_listing.order.collectionContractAddress), new Dictionary<string, Sprite>()
+                    {
+                        { _listing.order.tokenId, _collectibleImage }
+                    }
+                }
             };
         }
 
-        public Dictionary<string, uint> GetAmountsRequestedByOrderId()
+        public Dictionary<Address, Dictionary<string, ulong>> GetAmountsRequestedByCollectible()
         {
-            return new Dictionary<string, uint>
+            return new Dictionary<Address, Dictionary<string, ulong>>()
             {
-                { _listing.order.orderId, _amountRequested }
+                {
+                    new Address(_listing.order.collectionContractAddress), new Dictionary<string, ulong>()
+                    {
+                        { _listing.order.tokenId, _amountRequested }
+                    }
+                }
             };
         }
 
-        public void SetAmountRequested(string orderId, uint amount)
+        public Task<ulong> SetAmountRequested(Address collection, string tokenId, ulong amount)
         {
-            if (orderId != _listing.order.orderId)
+            if (collection.Value != _listing.order.collectionContractAddress || tokenId != _listing.order.tokenId)
             {
-                throw new ArgumentException($"Invalid order ID: {orderId}, expected {_listing.order.orderId}");
+                throw new ArgumentException($"Invalid collectible: {collection}, {tokenId}, expected {_listing.order.collectionContractAddress}, {_listing.order.tokenId}");
             }
-            
             _amountRequested = amount;
-        }
-
-        public ICheckout GetICheckout()
-        {
-            return _checkout;
+            return SetAmountsByOrder();
         }
 
         private async Task<Transaction[]> BuildCheckoutTransactionArray()
@@ -329,6 +443,7 @@ namespace Sequence.Marketplace
                     new Address(_chosenCurrency.contractAddress),
                     listing.order.priceAmount, true);
                 transactions.AddRange(quote.AsTransactionArray());
+                // Todo test this, I think I may be missing adding the buy transaction to the transactions list
             }
             
             return transactions.ToArray();

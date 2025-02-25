@@ -34,8 +34,6 @@ namespace Sequence.Demo
         private CollectibleOrder[] _listings;
         private Chain _chain;
         private IWallet _wallet;
-        private Dictionary<string, Sprite> _collectibleImagesByOrderId;
-        private Dictionary<string, uint> _amountsRequestedByOrderId;
         private ICheckoutHelper _cart;
         private RectTransform _scrollViewLayoutGroupRectTransform;
         private EstimatedTotal _estimatedTotal;
@@ -52,7 +50,6 @@ namespace Sequence.Demo
 
         public override void Open(params object[] args)
         {
-            base.Open(args);
             _cart = args.GetObjectOfTypeIfExists<ICheckoutHelper>();
             if (_cart == null)
             {
@@ -71,7 +68,7 @@ namespace Sequence.Demo
             
             CartItem.OnAmountChanged += OnCartAmountChanged;
 
-            Assemble().ConfigureAwait(false);
+            Assemble(args).ConfigureAwait(false);
         }
 
         protected void Configure()
@@ -79,8 +76,6 @@ namespace Sequence.Demo
             _listings = _cart.GetListings();
             _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
             _wallet = _cart.GetWallet();
-            _collectibleImagesByOrderId = _cart.GetCollectibleImagesByOrderId();
-            _amountsRequestedByOrderId = _cart.GetAmountsRequestedByOrderId();
             _tokenPaymentOptions = new List<TokenPaymentOption>();
         }
 
@@ -95,7 +90,7 @@ namespace Sequence.Demo
             }
         }
 
-        protected async Task Assemble()
+        protected async Task Assemble(object[] args)
         {
             int listings = _listings.Length;
             _numberOfUniqueItemsText.text = $"{listings} items";
@@ -134,8 +129,10 @@ namespace Sequence.Demo
                 bool creditCardCheckoutEnabled = await _fiatCheckout.NftCheckoutEnabled();
                 AddCreditCardCheckout(creditCardCheckoutEnabled);
             }
+            
+            base.Open(args);
 
-            await AsyncExtensions.DelayTask(.1f);
+            await AsyncExtensions.DelayTask(.3f);
             UpdateScrollViewSize();
         }
 
@@ -145,7 +142,7 @@ namespace Sequence.Demo
             {
                 CollectibleOrder listing = _listings[i];
                 GameObject cartItem = Instantiate(_cartItemPrefab, _cartItemsParent);
-                cartItem.GetComponent<CartItem>().Assemble(_cart, listing.order.orderId);
+                cartItem.GetComponent<CartItem>().Assemble(_cart, listing);
                 _spawnedGameObjects.Add(cartItem);
             }
         }
@@ -266,7 +263,7 @@ namespace Sequence.Demo
 
             if (quotedPrice.StartsWith("Error"))
             {
-                Debug.LogError(quotedPrice + "\nSkipping...");
+                Debug.LogWarning(quotedPrice + "\nSkipping...");
                 return false;
             }
                 
@@ -344,10 +341,15 @@ namespace Sequence.Demo
                     Debug.LogError(failedTransactionReturn.error);
                     return false;
                 }
+                else if (transactionReturn is SuccessfulTransactionReturn result)
+                {
+                    Debug.Log($"Checkout successful. See transaction here: {ChainDictionaries.BlockExplorerOf[_chain].AppendTrailingSlashIfNeeded()}tx/{result?.txHash}");
+                    return true;
+                }
                 else
                 {
-                    Debug.Log("Checkout successful");
-                    return true;
+                    throw new Exception(
+                        $"Encountered unexpected result type {transactionReturn.GetType()} when checking out");
                 }
             }
             catch (Exception e)

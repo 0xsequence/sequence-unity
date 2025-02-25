@@ -78,24 +78,26 @@ namespace Sequence.Marketplace
         /// </summary>
         /// <returns></returns>
         public IWallet GetWallet();
-        
+
         /// <summary>
-        /// Get the collectible icons/images organized in a dictionary with their associated order ids as keys
+        /// Get the collectible icons/images organized in a dictionary with their associated collection Address and token id as keys
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, Sprite> GetCollectibleImagesByOrderId();
-        
+        Dictionary<Address, Dictionary<string, Sprite>> GetCollectibleImagesByCollectible();
+
         /// <summary>
-        /// Get the amounts of collectibles to purchase organized in a dictionary with their associated order ids as keys
+        /// Get the amounts of collectibles to purchase organized in a dictionary with their associated collection Address and token id as keys
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, uint> GetAmountsRequestedByOrderId();
-        
+        public Dictionary<Address, Dictionary<string, ulong>> GetAmountsRequestedByCollectible();
+
         /// <summary>
-        /// Set the amount of a given collectible (identified by order id) the user wishes to purchase
+        /// Set the amount of a given collectible (identified by collection address and token id) the user wishes to purchase
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="collection"></param>
+        /// <param name="tokenId"></param>
         /// <param name="amount"></param>
-        public void SetAmountRequested(string orderId, uint amount);
+        /// <returns></returns>
+        public Task<ulong> SetAmountRequested(Address collection, string tokenId, ulong amount);
     }
 }

@@ -32,6 +32,7 @@ namespace Sequence.Pay
             _checkout = checkout;
             _sardine = new SardineFiatPay(new SardineCheckout(chain, wallet, checkout, reader, client));
             _transak = new TransakFiatPay(new TransakOnRamp(wallet.GetWalletAddress()), new TransakNFTCheckout(wallet, chain, client, checkout, reader));
+            _unsupported = new UnsupportedPay();
         }
 
         public IFiatPay OnRamp(TransactionOnRampProvider provider = TransactionOnRampProvider.transak)
@@ -67,18 +68,19 @@ namespace Sequence.Pay
         private IFiatPay NftCheckout(Marketplace.CheckoutOptions checkoutOptions)
         {
             var options = checkoutOptions.nftCheckout;
+            if (options == null)
+            {
+                return _unsupported;
+            }
             if (options.Contains(TransactionNFTCheckoutProvider.sardine))
             {
                 return _sardine;
             }
-            else if (options.Contains(TransactionNFTCheckoutProvider.transak))
+            if (options.Contains(TransactionNFTCheckoutProvider.transak))
             {
                 return _transak;
             }
-            else
-            {
-                return _unsupported;
-            }
+            return _unsupported;
         }
 
         public async Task<IFiatPay> NftCheckout(ERC1155Sale saleContract, Address collection, Dictionary<string, BigInteger> amountsByTokenId)
