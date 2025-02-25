@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Pay.Transak;
 
@@ -12,5 +13,7 @@ namespace Sequence.Pay
         public Task<string> GetOnRampLink();
 
         public Task<string> GetNftCheckoutLink();
+
+        public void SetAmountRequested(BigInteger newAmount);
     }
 }

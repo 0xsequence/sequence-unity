@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Contracts;
 using Sequence.Marketplace;
@@ -12,7 +13,7 @@ namespace Sequence.Demo
 {
     public class CartItem : MonoBehaviour
     {
-        public static event Action OnAmountChanged;
+        public static event Action<BigInteger> OnAmountChanged;
         
         [SerializeField] private TMP_InputField _amountField;
         [SerializeField] private Image _collectibleImage;
@@ -90,7 +91,7 @@ namespace Sequence.Demo
             _incrementAmountButton.interactable = remaining == 0;
             _amountRequested = newAmount - remaining;
             _amountField.text = _amountRequested.ToString();
-            OnAmountChanged?.Invoke();
+            OnAmountChanged?.Invoke(newAmount);
         }
 
         public void DecrementAmount()

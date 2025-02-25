@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
 using Sequence.Pay.Transak;
@@ -10,6 +11,7 @@ using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Vector2 = UnityEngine.Vector2;
 
 namespace Sequence.Demo
 {
@@ -92,6 +94,8 @@ namespace Sequence.Demo
 
         protected async Task Assemble(object[] args)
         {
+            // Todo add load screen animation
+            
             int listings = _listings.Length;
             _numberOfUniqueItemsText.text = $"{listings} items";
             
@@ -131,6 +135,8 @@ namespace Sequence.Demo
             }
             
             base.Open(args);
+            
+            // todo remove load screen animation
 
             await AsyncExtensions.DelayTask(.3f);
             UpdateScrollViewSize();
@@ -272,10 +278,11 @@ namespace Sequence.Demo
             return true;
         }
 
-        private void OnCartAmountChanged()
+        private void OnCartAmountChanged(BigInteger newAmount)
         {
             RefreshEstimatedTotal().ConfigureAwait(false);
             RefreshTokenPaymentOptions().ConfigureAwait(false);
+            _fiatCheckout.SetAmountRequested(newAmount);
         }
 
         // Todo switch to using object pool for token payment options

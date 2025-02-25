@@ -146,5 +146,10 @@ namespace Sequence.Pay
                     throw new SystemException($"Encountered unknown configuration type: {_config}");
             }
         }
+
+        public void SetAmountRequested(BigInteger newAmount)
+        {
+            _amount = newAmount;
+        }
     }
 }
