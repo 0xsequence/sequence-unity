@@ -16,13 +16,12 @@ namespace Sequence.Marketplace
             return collectiblesResponse.collectibles;
         }
 
-        public static async Task<Order[]> FetchListingsForCollectible(string tokenId)
+        public static async Task<Order[]> FetchListingsForCollectible(string collectionAddress, string tokenId)
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             
-            ListCollectibleListingsReturn collectiblesResponse = await marketplaceReader.ListListingsForCollectible(new Address(contractAddress), tokenId);
+            ListCollectibleListingsReturn collectiblesResponse = await marketplaceReader.ListListingsForCollectible(new Address(collectionAddress), tokenId);
             
             ValidateCollectibleListingsResponse(collectiblesResponse);
             return collectiblesResponse.listings;
@@ -30,9 +29,9 @@ namespace Sequence.Marketplace
         
         public static async Task<CollectibleOrder[]> FetchOffers()
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+            string contractAddress = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
             ListCollectiblesReturn collectiblesResponse = await marketplaceReader.ListCollectibleOffersWithHighestPricedOfferFirst(contractAddress, filter);
@@ -43,9 +42,9 @@ namespace Sequence.Marketplace
 
         public static async Task<Order[]> FetchOffersForCollectible(string tokenId)
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+            string contractAddress = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
             
             ListCollectibleOffersReturn collectiblesResponse = await marketplaceReader.ListOffersForCollectible(new Address(contractAddress), tokenId);
             

@@ -56,9 +56,9 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestListAllCollectibleOffersWithHighestPricedOfferFirst()
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+            string contractAddress = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
             CollectiblesFilter filter = new CollectiblesFilter(false);
             
             marketplaceReader.OnListCollectibleOrdersReturn += OnSuccess;
@@ -115,7 +115,7 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestGetLowestPriceOfferForCollectible()
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
@@ -134,7 +134,7 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestGetHighestPriceOfferForCollectible()
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";
@@ -209,7 +209,7 @@ namespace Sequence.Marketplace
         [Test]
         public async Task TestListAllOffersForCollectible()
         {
-            Chain chain = Chain.ArbitrumNova;
+            Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
             string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
             string tokenId = "1";

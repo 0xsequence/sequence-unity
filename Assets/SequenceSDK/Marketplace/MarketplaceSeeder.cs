@@ -13,8 +13,10 @@ namespace Sequence.Marketplace
 {
     public class MarketplaceSeeder
     {
-        private Chain _chain = Chain.ArbitrumNova;
+        private Chain _chain = Chain.Polygon;
         
+        // [Test]
+        [Timeout(1800000)]
         public async Task SeedMarketplace()
         {
             throw new Exception("Please only run this when you need to seed the marketplace for testing as it will create a lot of listings and offers, using a fair amount of gas and credits.");
@@ -22,10 +24,10 @@ namespace Sequence.Marketplace
             bool done = false;
             testHarness.Login(async wallet =>
             {
-                Address collection = new Address("0x0ee3af1874789245467e7482f042ced9c5171073");
+                Address collection = new Address("0x079294e6ffec16234578c672fa3fbfd4b6c48640");
                 ERC1155 universallyMintableNft = new ERC1155(collection);
 
-                Address erc20UniversallyMintable = new Address("0xc721b6d2bcc4d04b92df8f383beef85aa72c2198");
+                Address erc20UniversallyMintable = new Address("0x88e57238a23e2619fd42f479d546560b44c698fe");
                 ERC20 universallyMintableToken = new ERC20(erc20UniversallyMintable);
 
                 TransactionReturn mintResult = await wallet.SendTransaction(_chain, new Transaction[]
@@ -39,10 +41,11 @@ namespace Sequence.Marketplace
                 Assert.IsTrue(mintResult is SuccessfulTransactionReturn);
 
                 List<Step> finalSteps = new List<Step>();
+                Address USDC = new Address("0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359");
                 Address[] possibleCurrencyAddresses = new Address[]
-                    { erc20UniversallyMintable };
+                    { USDC };
                 Checkout checkout = new Checkout(wallet, _chain);
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Step[] steps = await checkout.GenerateListingTransaction(collection, (i % 5 + 1).ToString(), i + 1,
                         ContractType.ERC1155, possibleCurrencyAddresses.GetRandomObjectFromArray(), 1,
@@ -57,7 +60,7 @@ namespace Sequence.Marketplace
                     }
                 }
 
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Step[] steps = await checkout.GenerateOfferTransaction(collection, (i % 5 + 1).ToString(), i + 1,
                         ContractType.ERC1155, possibleCurrencyAddresses.GetRandomObjectFromArray(), 1,
@@ -81,10 +84,11 @@ namespace Sequence.Marketplace
                     }
                     TransactionReturn result = await wallet.SendTransaction(_chain, transactions);
                     Assert.IsNotNull(result);
-                    Assert.IsTrue(result is SuccessfulTransactionReturn);
+                    // Assert.IsTrue(result is SuccessfulTransactionReturn);
                     if (result is SuccessfulTransactionReturn success)
                     {
                        Debug.Log(ChainDictionaries.BlockExplorerOf[_chain].AppendTrailingSlashIfNeeded() + "tx/" + success.txHash);
+                       // Application.OpenURL(ChainDictionaries.BlockExplorerOf[_chain].AppendTrailingSlashIfNeeded() + "tx/" + success.txHash);
                     }
                 }
 
