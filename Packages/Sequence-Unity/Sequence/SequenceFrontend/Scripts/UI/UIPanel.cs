@@ -32,6 +32,7 @@ namespace Sequence.Demo
             _panel = this;
         }
 
+#if ENABLE_LEGACY_INPUT_MANAGER
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -39,6 +40,7 @@ namespace Sequence.Demo
                 GoBack();
             }
         }
+#endif
 
         public override void Open(params object[] args)
         {
