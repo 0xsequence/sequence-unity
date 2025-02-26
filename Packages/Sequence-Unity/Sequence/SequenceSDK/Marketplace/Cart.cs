@@ -252,6 +252,11 @@ namespace Sequence.Marketplace
             return _currencies.GetCurrencyByContractAddress(bestCurrencyAddress);
         }
 
+        public CartItemData[] GetCartItemData()
+        {
+            throw new NotImplementedException();
+        }
+
         public CollectibleOrder[] GetListings()
         {
             return _listings;

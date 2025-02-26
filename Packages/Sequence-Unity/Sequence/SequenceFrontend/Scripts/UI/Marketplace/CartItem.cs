@@ -21,7 +21,7 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _collectibleNameText;
         [SerializeField] private Button _incrementAmountButton;
          
-        private CollectibleOrder _order;
+        private CartItemData _itemData;
         private ulong _amountRequested;
         private Sprite _collectibleSprite;
         private string _collectionName;
@@ -30,16 +30,16 @@ namespace Sequence.Demo
         private Address _collectionAddress;
         private string _tokenId;
 
-        public void Assemble(ICheckoutHelper cart, CollectibleOrder order, string collectionName = "")
+        public void Assemble(ICheckoutHelper cart, CartItemData itemData, string collectionName = "")
         {
             _cart = cart;
-            _order = order;
-            _collectionAddress = new Address(order.order.collectionContractAddress);
-            _tokenId = order.order.tokenId;
+            _itemData = itemData;
+            _collectionAddress = itemData.Collection;
+            _tokenId = itemData.TokenId;
             _collectibleSprite = _cart.GetCollectibleImagesByCollectible()[_collectionAddress][_tokenId];
             _amountRequested = _cart.GetAmountsRequestedByCollectible()[_collectionAddress][_tokenId];
             _collectionName = collectionName;
-            _collectibleName = _order.metadata.name;
+            _collectibleName = itemData.Name;
 
             if (string.IsNullOrEmpty(_collectionName))
             {
@@ -55,9 +55,9 @@ namespace Sequence.Demo
         
         private async Task TryToGetCollectionNameFromContract()
         {
-            Chain chain = ChainDictionaries.ChainById[_order.order.chainId.ToString()];
+            Chain chain = _itemData.Network;
             IEthClient client = new SequenceEthClient(chain);
-            Contract contract = new Contract(_order.order.collectionContractAddress);
+            Contract contract = new Contract(_itemData.Collection);
 
             try
             {
@@ -76,7 +76,7 @@ namespace Sequence.Demo
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Failed to get collection name from contract {_order.order.collectionContractAddress}: {e.Message}. No collection name will be displayed in the UI. If the collection name is known, please provide it when calling {nameof(Assemble)}");
+                Debug.LogError($"Failed to get collection name from contract {_itemData.Collection}: {e.Message}. No collection name will be displayed in the UI. If the collection name is known, please provide it when calling {nameof(Assemble)}");
             }
         }
 

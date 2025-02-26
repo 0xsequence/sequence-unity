@@ -33,7 +33,7 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _fundWithCreditCardPrefab;
         [SerializeField] private GameObject _payWithCreditCardPrefab;
         
-        private CollectibleOrder[] _listings;
+        private CartItemData[] _cartItemDatas;
         private Chain _chain;
         private IWallet _wallet;
         private ICheckoutHelper _cart;
@@ -75,8 +75,13 @@ namespace Sequence.Demo
 
         protected void Configure()
         {
-            _listings = _cart.GetListings();
-            _chain = ChainDictionaries.ChainById[_listings[0].order.chainId.ToString()];
+            _cartItemDatas = _cart.GetCartItemData();
+            if (_cartItemDatas == null || _cartItemDatas.Length == 0)
+            {
+                throw new SystemException(
+                    "Must have at least one cart item");
+            }
+            _chain = _cartItemDatas[0].Network;
             _wallet = _cart.GetWallet();
             _tokenPaymentOptions = new List<TokenPaymentOption>();
         }
@@ -96,7 +101,7 @@ namespace Sequence.Demo
         {
             // Todo add load screen animation
             
-            int listings = _listings.Length;
+            int listings = _cartItemDatas.Length;
             _numberOfUniqueItemsText.text = $"{listings} items";
             
             _spawnedGameObjects = new List<GameObject>();
@@ -146,9 +151,9 @@ namespace Sequence.Demo
         {
             for (int i = 0; i < listings; i++)
             {
-                CollectibleOrder listing = _listings[i];
+                CartItemData itemData = _cartItemDatas[i];
                 GameObject cartItem = Instantiate(_cartItemPrefab, _cartItemsParent);
-                cartItem.GetComponent<CartItem>().Assemble(_cart, listing);
+                cartItem.GetComponent<CartItem>().Assemble(_cart, itemData);
                 _spawnedGameObjects.Add(cartItem);
             }
         }

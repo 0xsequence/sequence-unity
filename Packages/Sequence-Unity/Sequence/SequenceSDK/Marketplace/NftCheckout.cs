@@ -378,11 +378,11 @@ namespace Sequence.Marketplace
             return _currencies.GetCurrencyByContractAddress(_listing.order.priceCurrencyAddress);
         }
 
-        public CollectibleOrder[] GetListings()
+        public CartItemData[] GetCartItemData()
         {
-            return new CollectibleOrder[]
+            return new CartItemData[]
             {
-                _listing
+                new CartItemData(_listing.metadata.name, _listing.order.tokenId, new Address(_listing.order.collectionContractAddress), _chain)
             };
         }
 

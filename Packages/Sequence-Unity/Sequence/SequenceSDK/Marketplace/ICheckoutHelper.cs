@@ -68,10 +68,10 @@ namespace Sequence.Marketplace
         public Task<Currency> GetBestCurrency();
         
         /// <summary>
-        /// Get the CollectibleOrder[] of listings the user is looking to buy (that have been added to the ICheckoutHelper)
+        /// Get the CartItemData[] of collectibles the user is looking to buy (that have been added to the ICheckoutHelper)
         /// </summary>
         /// <returns></returns>
-        public CollectibleOrder[] GetListings();
+        public CartItemData[] GetCartItemData();
         
         /// <summary>
         /// Get the wallet that will be making the purchases
