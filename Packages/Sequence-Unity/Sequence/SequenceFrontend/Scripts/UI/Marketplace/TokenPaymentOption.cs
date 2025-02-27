@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Sequence.Marketplace;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

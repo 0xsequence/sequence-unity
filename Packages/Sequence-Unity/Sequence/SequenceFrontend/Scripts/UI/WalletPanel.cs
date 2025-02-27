@@ -16,7 +16,6 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _walletAddressText;
         
         private WalletPage _walletPage;
-        private TransitionPanel _transitionPanel;
         private TokenInfoPage _tokenInfoPage;
         private NftInfoPage _nftInfoPage;
         private SearchPage _searchPage;
@@ -39,7 +38,6 @@ namespace Sequence.Demo
         {
             base.Awake();
             _walletPage = GetComponentInChildren<WalletPage>();
-            _transitionPanel = FindObjectOfType<TransitionPanel>();
             _tokenInfoPage = GetComponentInChildren<TokenInfoPage>();
             _nftInfoPage = GetComponentInChildren<NftInfoPage>();
             _collectionInfoPage = GetComponentInChildren<CollectionInfoPage>();
@@ -111,11 +109,6 @@ namespace Sequence.Demo
             _nftContentFetcher.OnNftFetchSuccess += _collectionNftMapper.HandleNftFetch;
 
             return args;
-        }
-
-        public void OpenTransitionPanel()
-        {
-            _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
         }
 
         public void SetTopBarMode(TopBarMode mode)

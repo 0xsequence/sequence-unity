@@ -42,8 +42,6 @@ namespace Sequence
             
             string curlRequest = 
                 $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
-            
-            Debug.Log($"{curlRequest}");
             try
             {
                 await req.SendWebRequest();
@@ -56,7 +54,6 @@ namespace Sequence
                 }
 
                 string returnText = req.downloadHandler.text;
-                Debug.Log(returnText);
                 req.Dispose();
                 return returnText;
             }

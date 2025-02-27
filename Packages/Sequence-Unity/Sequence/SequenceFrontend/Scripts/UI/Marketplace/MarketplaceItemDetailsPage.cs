@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 using System.Globalization;
 using TMPro;
 using Sequence.Marketplace;
+using Sequence.Utils;
 
 namespace Sequence.Demo
 {

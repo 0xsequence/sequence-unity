@@ -1,16 +1,19 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Sequence.Demo
+namespace Sequence.Utils
 {
     public static class AssetHandler
     {
         public static readonly Texture2D DefaultTexture = new Texture2D(100, 100); // Default if we fail to fetch the texture
+        private static readonly string Directory = Path.Combine(Application.persistentDataPath, "assets");
         
         public static async Task<Sprite> GetSpriteAsync(string url)
         {
@@ -25,8 +28,12 @@ namespace Sequence.Demo
         public static async Task<Texture2D> GetTexture2DAsync(string url)
         {
             var texture = DefaultTexture;
+            var cacheKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(url));
             if (url == null || url.Length <= 0 || url.EndsWith(".gif"))
                 return texture;
+
+            if (TryGetTexture(cacheKey, out var cachedTexture))
+                return cachedTexture;
             
             try
             {
@@ -40,6 +47,8 @@ namespace Sequence.Demo
                 else
                 {
                     texture = ((DownloadHandlerTexture) imageRequest.downloadHandler).texture;
+                    var data = texture.EncodeToPNG();
+                    FileStorage.Save(data, cacheKey, Directory);
                 }
             } catch (HttpRequestException e) {
                 Debug.LogWarning("HTTP Request failed: " + e.Message);
@@ -57,6 +66,20 @@ namespace Sequence.Demo
             }
 
             return texture;
+        }
+        
+        public static bool TryGetTexture(string key, out Texture2D texture)
+        {
+            var data = FileStorage.Read(Path.Combine(Directory, key));
+            if (data == null)
+            {
+                texture = null;
+                return false;
+            }
+
+            texture = new Texture2D(1, 1);
+            texture.LoadImage(data);
+            return true;
         }
     }
 }

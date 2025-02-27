@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using Sequence.Demo.Tweening;
 using Sequence.Utils;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Scale = Sequence.Demo.Tweening.Scale;
 
 namespace Sequence.Demo

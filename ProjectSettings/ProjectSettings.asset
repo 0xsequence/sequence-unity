@@ -46,8 +46,8 @@ PlayerSettings:
   m_HolographicTrackingLossScreen: {fileID: 0}
   defaultScreenWidth: 1920
   defaultScreenHeight: 1080
-  defaultScreenWidthWeb: 1024
-  defaultScreenHeightWeb: 768
+  defaultScreenWidthWeb: 1920
+  defaultScreenHeightWeb: 1080
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 0
   m_MTRendering: 1
@@ -816,7 +816,7 @@ PlayerSettings:
     Android: ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE
     Server: 
     Standalone: UNITY_ASTOOLS_EXPERIMENTAL
-    WebGL: VUPLEX_CCU;VUPLEX_STANDALONE
+    WebGL: VUPLEX_CCU;VUPLEX_STANDALONE;SEQUENCE_DEV
     iPhone: APPLE_AUTH_MANAGER_NATIVE_IMPLEMENTATION_AVAILABLE
   additionalCompilerArguments: {}
   platformArchitecture: {}

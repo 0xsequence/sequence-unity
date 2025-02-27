@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Sequence;
+using Sequence.Boilerplates;
 using Sequence.Demo;
 using Sequence.Utils;
 using Sequence.EmbeddedWallet;

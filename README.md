@@ -22,7 +22,7 @@ Unity 2021.3.6f1 or later
 
 As an open source project, we welcome and encourage your contributions!
 
-Please make sure to increment the package version in `Assets/package.json` according to [Semantic Versioning](https://semver.org/) along with your submissions.
+Please make sure to increment the package version in `Packages/Sequence-Unity/package.json` according to [Semantic Versioning](https://semver.org/) along with your submissions.
 
 ## Testing
 The project makes use of Unity's test runner. You can open the test runner window in 

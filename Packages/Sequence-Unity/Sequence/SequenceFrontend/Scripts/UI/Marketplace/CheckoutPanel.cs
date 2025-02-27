@@ -9,12 +9,14 @@ namespace Sequence.Demo
 {
     public class CheckoutPanel : UIPanel
     {
+        public CheckoutPage CheckoutPage { get; private set; }
         private QrCodePage _qrCodePage;
         
         protected override void Awake()
         {
             base.Awake();
             _qrCodePage = GetComponentInChildren<QrCodePage>();
+            CheckoutPage = GetComponentInChildren<CheckoutPage>();
         }
         
         public override void Open(params object[] args)
