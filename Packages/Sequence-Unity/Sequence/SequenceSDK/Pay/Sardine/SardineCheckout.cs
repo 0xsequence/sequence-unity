@@ -228,7 +228,7 @@ namespace Sequence.Pay.Sardine
                 throw new ArgumentException("Sardine checkout does not support native currency checkout; please choose an order with a different payment token");
             }
             
-            Step[] steps = await _checkout.GenerateBuyTransaction(orders, quantity, additionalFee, recipient);
+            Step[] steps = await _checkout.GenerateBuyTransaction(orders, quantity, additionalFee, recipient, walletType: WalletKind.unknown);
             
             return await SardineGetNFTCheckoutToken(orders, recipient, quantity, steps.ExtractBuyStep(), new Address(marketplaceContractAddress));
         }

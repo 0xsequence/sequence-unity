@@ -108,7 +108,7 @@ namespace Sequence.Marketplace
         public event Action<Step[]> OnTransactionStepsReturn;
         public event Action<string> OnTransactionStepsError;
         
-        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null)
+        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
             OrderData[] ordersData = new OrderData[]
                 { new OrderData(order.orderId, amount.ToString()) };
@@ -118,17 +118,22 @@ namespace Sequence.Marketplace
                 additionalFees = null;
             }
             
-            return GenerateBuyTransaction(ordersData, order.collectionContractAddress, order.marketplace, additionalFees, buyer);
+            return GenerateBuyTransaction(ordersData, order.collectionContractAddress, order.marketplace, additionalFees, buyer, walletType);
         }
         
-        private async Task<Step[]> GenerateBuyTransaction(OrderData[] ordersData, string collectionContractAddress, MarketplaceKind marketplaceKind, AdditionalFee[] additionalFees = null, Address buyer = null)
+        private async Task<Step[]> GenerateBuyTransaction(OrderData[] ordersData, string collectionContractAddress, MarketplaceKind marketplaceKind, AdditionalFee[] additionalFees = null, Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
             if (buyer == null)
             {
                 buyer = _wallet.GetWalletAddress();
             }
+
+            if (walletType == WalletKind.unspecified)
+            {
+                walletType = _wallet.GetWalletKind();
+            }
             GenerateBuyTransaction generateBuyTransaction = new GenerateBuyTransaction(collectionContractAddress, buyer,
-                marketplaceKind, ordersData, additionalFees, _wallet.GetWalletKind());
+                marketplaceKind, ordersData, additionalFees, walletType);
 
             try
             {
@@ -147,7 +152,7 @@ namespace Sequence.Marketplace
         }
 
         public Task<Step[]> GenerateBuyTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
-            Address buyer = null)
+            Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
             ValidateOrders(orders);
 
@@ -156,7 +161,7 @@ namespace Sequence.Marketplace
             OrderData[] orderDatas = AssembleOrderDatas(orders, amount);
 
             return GenerateBuyTransaction(orderDatas, orders[0].collectionContractAddress, orders[0].marketplace,
-                additionalFee, buyer);
+                additionalFee, buyer, walletType);
         }
 
         private void ValidateOrders(Order[] orders)
@@ -261,7 +266,7 @@ namespace Sequence.Marketplace
         }
 
         public Task<Step[]> GenerateBuyTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
-            Address buyer = null)
+            Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
             int length = orders.Length;
             Order[] orderArray = new Order[length];
@@ -270,7 +275,7 @@ namespace Sequence.Marketplace
                 orderArray[i] = orders[i].order;
             }
 
-            return GenerateBuyTransaction(orderArray, amount, additionalFee, buyer);
+            return GenerateBuyTransaction(orderArray, amount, additionalFee, buyer, walletType);
         }
 
         public Task<Step[]> GenerateSellTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,

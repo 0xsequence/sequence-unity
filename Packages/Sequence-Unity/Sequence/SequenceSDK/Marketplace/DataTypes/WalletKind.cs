@@ -10,7 +10,8 @@ namespace Sequence.Marketplace
     public enum WalletKind
     {
         unknown,
-        sequence
+        sequence,
+        unspecified,
     }
     
     public static class WalletKindExtensions {

@@ -78,13 +78,13 @@ namespace Sequence.Demo.Mocks
 
         public event Action<Step[]> OnTransactionStepsReturn;
         public event Action<string> OnTransactionStepsError;
-        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null)
+        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
             return _checkout.GenerateBuyTransaction(order, amount, additionalFee, buyer);
         }
 
         public Task<Step[]> GenerateBuyTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
-            Address buyer = null)
+            Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
             return _checkout.GenerateBuyTransaction(orders, amount, additionalFee, buyer);
         }
@@ -101,9 +101,9 @@ namespace Sequence.Demo.Mocks
         }
 
         public Task<Step[]> GenerateBuyTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,
-            Address buyer = null)
+            Address buyer = null, WalletKind walletType = WalletKind.unspecified)
         {
-            return _checkout.GenerateBuyTransaction(orders, amount, additionalFee, buyer);
+            return _checkout.GenerateBuyTransaction(orders, amount, additionalFee, buyer, walletType);
         }
 
         public Task<Step[]> GenerateSellTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null,

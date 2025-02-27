@@ -58,8 +58,9 @@ namespace Sequence.Marketplace
         /// <param name="amount"></param>
         /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
         /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
+        /// <param name="walletType">optionally specify the kind of wallet submitting the transaction</param>
         /// <returns></returns>
-        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null);
+        public Task<Step[]> GenerateBuyTransaction(Order order, BigInteger amount, AdditionalFee additionalFee = null, Address buyer = null, WalletKind walletType = WalletKind.unspecified);
         
         /// <summary>
         /// Get the Step[] that, when executed, will create a buy transaction for the given orders and amount, fulfilling the orders in increasing order of price
@@ -68,8 +69,9 @@ namespace Sequence.Marketplace
         /// <param name="amount"></param>
         /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
         /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
+        /// <param name="walletType">optionally specify the kind of wallet submitting the transaction</param>
         /// <returns></returns>
-        public Task<Step[]> GenerateBuyTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address buyer = null);
+        public Task<Step[]> GenerateBuyTransaction(Order[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address buyer = null, WalletKind walletType = WalletKind.unspecified);
 
         /// <summary>
         /// Get the Step[] that, when executed, will create a sell transaction for the given order and amount, fulfilling the order
@@ -98,8 +100,9 @@ namespace Sequence.Marketplace
         /// <param name="amount"></param>
         /// <param name="additionalFee">add an additional fee to be paid during the order fulfillment</param>
         /// <param name="buyer">optionally specify the buyer of the order when assembling the transaction</param>
+        /// <param name="walletType">optionally specify the kind of wallet submitting the transaction</param>
         /// <returns></returns>
-        public Task<Step[]> GenerateBuyTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address buyer = null);
+        public Task<Step[]> GenerateBuyTransaction(CollectibleOrder[] orders, BigInteger amount, AdditionalFee[] additionalFee = null, Address buyer = null, WalletKind walletType = WalletKind.unspecified);
         
         /// <summary>
         /// Get the Step[] that, when executed, will create a sell transaction for the given order and amount, fulfilling the orders in decreasing order of price
