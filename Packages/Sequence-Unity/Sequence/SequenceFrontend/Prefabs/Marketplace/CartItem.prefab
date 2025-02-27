@@ -1228,6 +1228,7 @@ MonoBehaviour:
   _collectibleImage: {fileID: 2125785572327887178}
   _collectionNameText: {fileID: 2125785572185484120}
   _collectibleNameText: {fileID: 2125785573336398539}
+  _incrementAmountButton: {fileID: 2125785572916013181}
 --- !u!1 &2125785574144285997
 GameObject:
   m_ObjectHideFlags: 0

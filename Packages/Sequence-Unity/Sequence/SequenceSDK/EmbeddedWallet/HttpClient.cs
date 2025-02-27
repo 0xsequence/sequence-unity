@@ -137,6 +137,7 @@ namespace Sequence.EmbeddedWallet
             UnityWebRequest request = newRequest.Item1;
             string curlRequest = newRequest.Item2;
             string url = newRequest.Item3;
+            Debug.Log(curlRequest);
 
             try
             {

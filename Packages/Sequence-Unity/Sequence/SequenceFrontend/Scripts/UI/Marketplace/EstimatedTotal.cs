@@ -10,11 +10,18 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _estimatedPriceInTokenText;
         [SerializeField] private Image _tokenIcon;
 
-        public void Assemble(string estimatedPriceInUSD, string estimatedPriceInToken, string tokenSymbol, Sprite tokenIcon)
+        public bool Assemble(string estimatedPriceInUSD, string estimatedPriceInToken, string tokenSymbol, Sprite tokenIcon)
         {
+            if (string.IsNullOrWhiteSpace(estimatedPriceInUSD))
+            {
+                Destroy(gameObject);
+                return false;
+            }
             _estimatedPriceInUSDText.text = $"${estimatedPriceInUSD} estimated total";
             _estimatedPriceInTokenText.text = $"{estimatedPriceInToken} {tokenSymbol}";
             _tokenIcon.sprite = tokenIcon;
+
+            return true;
         }
     }
 }

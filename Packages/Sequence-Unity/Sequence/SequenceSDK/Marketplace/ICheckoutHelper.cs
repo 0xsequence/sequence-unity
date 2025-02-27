@@ -23,7 +23,7 @@ namespace Sequence.Marketplace
         /// Get the approximate total cost to checkout in USD as a string
         /// </summary>
         /// <returns></returns>
-        public string GetApproximateTotalInUSD();
+        public Task<string> GetApproximateTotalInUSD();
         
         /// <summary>
         /// Get the approximate total cost to checkout using the specified currencyAddress as a string in human-readable format
@@ -97,7 +97,7 @@ namespace Sequence.Marketplace
         /// <param name="collection"></param>
         /// <param name="tokenId"></param>
         /// <param name="amount"></param>
-        /// <returns></returns>
+        /// <returns>Any amount requested that exceeds what is available or 0 if requested amount is fulfill-able. e.g. if there are 10 available and amount is 12, 2 would be returned</returns>
         public Task<ulong> SetAmountRequested(Address collection, string tokenId, ulong amount);
     }
 }

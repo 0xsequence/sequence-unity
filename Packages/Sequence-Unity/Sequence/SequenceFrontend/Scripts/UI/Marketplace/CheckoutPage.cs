@@ -93,6 +93,10 @@ namespace Sequence.Demo
             
             foreach (var spawnedGameObject in _spawnedGameObjects)
             {
+                if (spawnedGameObject == null)
+                {
+                    continue;
+                }
                 Destroy(spawnedGameObject);
             }
         }
@@ -260,7 +264,12 @@ namespace Sequence.Demo
                 Debug.LogError(estimatedCurrencyRequired);
             }
             Sprite currencyIcon = await _cart.GetCurrencyIcon(_bestCurrency);
-            _estimatedTotal.Assemble(_cart.GetApproximateTotalInUSD(), estimatedCurrencyRequired, _bestCurrency.symbol, currencyIcon);
+            string approximateTotalInUsd = await _cart.GetApproximateTotalInUSD();
+            bool success = _estimatedTotal.Assemble(approximateTotalInUsd, estimatedCurrencyRequired, _bestCurrency.symbol, currencyIcon);
+            if (!success)
+            {
+                _estimatedTotal = null;
+            }
         }
 
         protected async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency)

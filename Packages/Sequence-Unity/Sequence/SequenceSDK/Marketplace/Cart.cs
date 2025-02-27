@@ -167,7 +167,7 @@ namespace Sequence.Marketplace
             _amountsRequestedByOrderId[order.order.orderId] = amountRequested;
         }
 
-        public string GetApproximateTotalInUSD()
+        public async Task<string> GetApproximateTotalInUSD()
         {
             int listings = _listings.Length;
             decimal total = 0;

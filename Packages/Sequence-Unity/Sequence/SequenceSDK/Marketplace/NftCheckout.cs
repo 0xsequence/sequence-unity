@@ -173,7 +173,7 @@ namespace Sequence.Marketplace
             _listings.AppendArray(result.listings);
         }
 
-        public string GetApproximateTotalInUSD()
+        public async Task<string> GetApproximateTotalInUSD()
         {
             decimal total = 0;
             foreach (var order in _amountsByOrder.Keys)
@@ -252,97 +252,9 @@ namespace Sequence.Marketplace
             }
         }
 
-        // Todo consider re-write such that we first check what currencies they have in their wallet before checking the swap price
-        public async Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress)
+        public Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress)
         {
-            string total = await GetApproximateTotalInCurrency(new Address(currencyContractAddress));
-            if (string.IsNullOrWhiteSpace(total) || total.StartsWith("Error"))
-            {
-                return total;
-            }
-            
-            double price = double.Parse(total);
-            if (price <= 0)
-            {
-                return "";
-            }
-
-            if (currencyContractAddress != Currency.NativeCurrencyAddress)
-            {
-                try
-                {
-                    GetTokenBalancesReturn balancesReturn = await _indexer.GetTokenBalances(new GetTokenBalancesArgs(_wallet.GetWalletAddress(), currencyContractAddress));
-                    if (balancesReturn == null || balancesReturn.balances == null)
-                    {
-                        throw new Exception("Received unexpected null response from indexer");
-                    }
-                    TokenBalance[] balances = balancesReturn.balances;
-                    if (balances.Length == 0)
-                    {
-                        return "";
-                    }
-                    TokenBalance balance = balances[0];
-                    int decimals = 18;
-                    if (balance.contractInfo == null)
-                    {
-                        Debug.LogWarning($"No contract info found for {balance.contractAddress}, attempting to fetch from contract...");
-                        try
-                        {
-                            var decimalsFromContract = await new ERC20(currencyContractAddress).Decimals(_client);
-                            decimals = (int)decimalsFromContract;
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogError($"Error fetching decimals from contract for {currencyContractAddress}: {e.Message}\nUsing default of 18 decimals");
-                        }
-                    }
-                    else
-                    {
-                        decimals = balance.contractInfo.decimals;
-                    }
-
-                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance.balance, decimals);
-                    if (balanceAmount >= price)
-                    {
-                        return total;
-                    }
-                    else
-                    {
-                        return "";
-                    }
-                }
-                catch (Exception e)
-                {
-                    string error = $"Error fetching token balances for {currencyContractAddress}: {e.Message}";
-                    return error;
-                }
-            }
-            else
-            {
-                try
-                {
-                    EtherBalance balancesReturn = await _indexer.GetEtherBalance(_wallet.GetWalletAddress());
-                    if (balancesReturn == null)
-                    {
-                        throw new Exception("Received unexpected null response from indexer");
-                    }
-                    BigInteger balance = balancesReturn.balanceWei;
-                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance,1);
-                    if (balanceAmount >= price)
-                    {
-                        return total;
-                    }
-                    else
-                    {
-                        return "";
-                    }
-                }
-                catch (Exception e)
-                {
-                    string error = $"Error fetching native balance for {_chain}: {e.Message}";
-                    return error;
-                }
-            }
+            return new AffordabilityCalculator(GetApproximateTotalInCurrency, _indexer, _wallet, _client, _chain).GetApproximateTotalInCurrencyIfAffordable(currencyContractAddress);
         }
 
         public async Task<TransactionReturn> Checkout()
@@ -431,20 +343,16 @@ namespace Sequence.Marketplace
         {
             List<Transaction> transactions = new List<Transaction>();
             CollectibleOrder listing = _listing;
-            if (listing.order.priceCurrencyAddress == _chosenCurrency.contractAddress)
-            {
-                Step[] steps = await _checkout.GenerateBuyTransaction(listing.order, _amountRequested);
-                transactions.AddRange(steps.AsTransactionArray());
-            }
-            else
+            if (listing.order.priceCurrencyAddress != _chosenCurrency.contractAddress)
             {
                 SwapQuote quote = await _swap.GetSwapQuote(_wallet.GetWalletAddress(),
                     new Address(listing.order.priceCurrencyAddress),
                     new Address(_chosenCurrency.contractAddress),
                     listing.order.priceAmount, true);
                 transactions.AddRange(quote.AsTransactionArray());
-                // Todo test this, I think I may be missing adding the buy transaction to the transactions list
             }
+            Step[] steps = await _checkout.GenerateBuyTransaction(listing.order, _amountRequested);
+            transactions.AddRange(steps.AsTransactionArray());
             
             return transactions.ToArray();
         }

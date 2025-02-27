@@ -23,7 +23,7 @@ namespace Sequence.Marketplace
         [TestCase(new uint[]{100}, new float[] { 1.12345f }, "112.35")]
         [TestCase(new uint[]{1, 2, 5, 3, 2, 10, 27}, new float[] { 5f, 2f, 1.1f, 3.33f, 22f, 1f, .246f }, "85.13")]
         [TestCase(new uint[]{0}, new float[] { 100f }, "0.00")]
-        public void TestGetApproximateTotalInUSD(uint[] amounts, float[] pricesUSD, string expected)
+        public async Task TestGetApproximateTotalInUSD(uint[] amounts, float[] pricesUSD, string expected)
         {
             int orderCount = amounts.Length;
             Assert.AreEqual(orderCount, pricesUSD.Length, "Invalid test. Must have same amount of amounts and prices");
@@ -42,7 +42,7 @@ namespace Sequence.Marketplace
                 quantities[order.order.orderId] = amounts[i];
             }
             Cart cart = new Cart(null, orders, sprites, quantities);
-            string totalInUSD = cart.GetApproximateTotalInUSD();
+            string totalInUSD = await cart.GetApproximateTotalInUSD();
             
             Assert.AreEqual(expected, totalInUSD);
         }
@@ -115,7 +115,7 @@ namespace Sequence.Marketplace
         }
 
         [Test]
-        public void TestWeCanAddOrderToCart()
+        public async Task TestWeCanAddOrderToCart()
         {
             CollectibleOrder[] orders = new CollectibleOrder[]
             {
@@ -136,13 +136,13 @@ namespace Sequence.Marketplace
             
             Cart cart = new Cart(null, orders, sprites, quantities);
             
-            string totalInUSD = cart.GetApproximateTotalInUSD();
+            string totalInUSD = await cart.GetApproximateTotalInUSD();
             Assert.AreEqual("7.72", totalInUSD);
             
             CollectibleOrder newOrder = CreateFakeOrder(2f);
             cart.AddCollectibleToCart(newOrder, null, 5);
             
-            string newTotalInUSD = cart.GetApproximateTotalInUSD();
+            string newTotalInUSD = await cart.GetApproximateTotalInUSD();
             Assert.Greater(float.Parse(newTotalInUSD), float.Parse(totalInUSD));
             Assert.AreEqual("17.72", newTotalInUSD);
         }
