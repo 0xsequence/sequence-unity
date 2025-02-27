@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Utils;
@@ -109,7 +110,65 @@ namespace Sequence
             return "";
         }
 
-        public async void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options, int retries = 0)
+        public async Task<T> HttpPost<T>(string url, object args)
+        {
+            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            using var req = UnityWebRequest.Put(url, requestJson);
+            req.SetRequestHeader("Content-Type", "application/json");
+            req.SetRequestHeader("Accept", "application/json");
+            req.SetRequestHeader("X-Access-Key", _builderApiKey); 
+            req.method = UnityWebRequest.kHttpVerbPOST;
+            req.timeout = 10;
+            
+            string curlRequest = 
+                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {url}";
+            
+            try
+            {
+                await req.SendWebRequest();
+                if (req.responseCode < 200 || req.responseCode > 299 || req.error != null ||
+                    req.result == UnityWebRequest.Result.ConnectionError ||
+                    req.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    throw new Exception("Failed to make request, non-200 status code " + req.responseCode +
+                                        " with error: " + req.error + "\nCurl-equivalent request: " + curlRequest);
+                }
+
+                byte[] results = req.downloadHandler.data;
+                var responseJson = Encoding.UTF8.GetString(results);
+                try
+                {
+                    T result = JsonConvert.DeserializeObject<T>(responseJson);
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(
+                        $"Error unmarshalling response from {url}: {e.Message} | given: {responseJson}");
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                throw new HttpRequestException("HTTP Request failed: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+            catch (FormatException e)
+            {
+               throw new FormatException("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+            catch (FileLoadException e)
+            {
+                throw new FileLoadException("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+            catch (Exception e) {
+                throw new Exception("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+            }
+            finally
+            {
+                req.Dispose();
+            }
+        }
+
+        public async void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options)
         {
             var requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
