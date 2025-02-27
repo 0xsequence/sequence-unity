@@ -17,22 +17,19 @@ namespace Sequence
         {
             public Chain Chain;
             public Address Contract;
-            public string TokenId;
 
-            public Token(Chain chain, Address contract, string tokenId = "")
+            public Token(Chain chain, Address contract)
             {
                 Chain = chain;
                 Contract = contract;
-                TokenId = tokenId;
             }
 
             [Preserve]
             [JsonConstructor]
-            public Token(BigInteger chainId, string contractAddress, string tokenId = "")
+            public Token(BigInteger chainId, string contractAddress)
             {
                 Chain = ChainDictionaries.ChainById[chainId.ToString()];
                 Contract = new Address(contractAddress);
-                TokenId = tokenId;
             }
         }
 
@@ -44,7 +41,6 @@ namespace Sequence
                 {
                     ["chainId"] = ulong.Parse(ChainDictionaries.ChainIdOf[value.Chain]),
                     ["contractAddress"] = value.Contract.ToString(),
-                    ["tokenId"] = value.TokenId
                 };
                 jsonObject.WriteTo(writer);
             }
@@ -55,9 +51,8 @@ namespace Sequence
 
                 BigInteger chainId = jsonObject["chainId"]?.Value<ulong>() ?? 0;
                 string contractAddress = jsonObject["contractAddress"]?.Value<string>();
-                string tokenId = jsonObject["tokenId"]?.Value<string>();
 
-                return new Token(chainId, contractAddress, tokenId);
+                return new Token(chainId, contractAddress);
             }
         }
         
@@ -86,13 +81,6 @@ namespace Sequence
         {
             GetTokenPricesArgs args = new GetTokenPricesArgs(tokens);
             GetTokenPricesReturn response = await _httpHandler.HttpPost<GetTokenPricesReturn>(_baseUrl.AppendTrailingSlashIfNeeded() + "GetCoinPrices", args);
-            return response.tokenPrices;
-        }
-
-        public async Task<TokenPrice[]> GetCollectiblePrices(params Token[] tokens)
-        {
-            GetTokenPricesArgs args = new GetTokenPricesArgs(tokens);
-            GetTokenPricesReturn response = await _httpHandler.HttpPost<GetTokenPricesReturn>(_baseUrl.AppendTrailingSlashIfNeeded() + "GetCollectiblePrices", args);
             return response.tokenPrices;
         }
     }
