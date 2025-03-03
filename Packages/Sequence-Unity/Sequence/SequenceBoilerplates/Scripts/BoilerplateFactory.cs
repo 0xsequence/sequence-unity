@@ -6,6 +6,7 @@ using Sequence.Boilerplates.Inventory;
 using Sequence.Boilerplates.Login;
 using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Boilerplates.SignMessage;
+using Sequence.Boilerplates.Teams;
 using Sequence.EmbeddedWallet;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -61,6 +62,21 @@ namespace Sequence.Boilerplates
         public static SequenceDailyRewards OpenSequenceDailyRewards(Transform parent, IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceDailyRewards>("DailyRewards/SequenceDailyRewards", parent, 
+                b => b.Show(wallet, chain, apiUrl, onClose));
+        }
+        
+        /// <summary>
+        /// Open the Teams UI Boilerplate from a Prefab inside the Resources folder.
+        /// </summary>
+        /// <param name="parent">Transform inside of a Canvas object.</param>
+        /// <param name="wallet">This Wallet instance will perform transactions.</param>
+        /// <param name="chain">Chain used to get balances and send transactions.</param>
+        /// <param name="apiUrl">API Url you deployed using the server boilerplate.</param>
+        /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
+        /// <returns>Instance of SequenceDailyRewards which was instantiated as a child of <paramref name="parent"/></returns>
+        public static SequenceTeams OpenSequenceTeams(Transform parent, IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<SequenceTeams>("Teams/SequenceTeams", parent, 
                 b => b.Show(wallet, chain, apiUrl, onClose));
         }
         

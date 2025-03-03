@@ -13,6 +13,7 @@ namespace Sequence.Boilerplates
         [Header("Configuration")]
         [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
         [SerializeField] private string _dailyRewardsApi;
+        [SerializeField] private string _teamsApi;
         [SerializeField] private string _collectionAddress;
         [SerializeField] private string _saleContractAddress;
         [SerializeField] private int[] _itemsForSale;
@@ -48,7 +49,7 @@ namespace Sequence.Boilerplates
             };
         }
 
-        private void Start()
+        private async void Start()
         {
             TryRecoverSessionToOpenLoginWindow();
         }
@@ -68,6 +69,12 @@ namespace Sequence.Boilerplates
         {
             HideFeatureSelection();
             BoilerplateFactory.OpenSequenceDailyRewards(transform, _wallet, _chain, _dailyRewardsApi, ShowFeatureSelection);
+        }
+
+        public void OpenTeamsPanel()
+        {
+            HideFeatureSelection();
+            BoilerplateFactory.OpenSequenceTeams(transform, _wallet, _chain, _teamsApi, ShowFeatureSelection);
         }
         
         public void OpenInventoryPanel()
