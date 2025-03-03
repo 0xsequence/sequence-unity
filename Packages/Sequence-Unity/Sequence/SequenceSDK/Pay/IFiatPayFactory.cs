@@ -17,6 +17,7 @@ namespace Sequence.Pay
         public void ConfigureSaleContractId(TransakContractId contractId);
         public Task<IFiatPay> NftCheckout(ERC1155Sale saleContract, Address collection,
             Dictionary<string, BigInteger> amountsByTokenId);
+        public Task<IFiatPay> NftCheckout(ERC1155Sale saleContract, Address collection, string tokenId, BigInteger amount);
 
         public Task<IFiatPay> NftCheckout(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount);
     }

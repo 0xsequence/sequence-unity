@@ -39,6 +39,17 @@ namespace Sequence.Marketplace
             Dictionary<string, BigInteger> amountsByTokenId);
 
         /// <summary>
+        /// Get all the checkout options for a given ERC1155 sale contract, collection, and amount
+        /// </summary>
+        /// <param name="saleContract"></param>
+        /// <param name="collection"></param>
+        /// <param name="tokenId"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public Task<CheckoutOptions> GetCheckoutOptions(ERC1155Sale saleContract, Address collection, string tokenId,
+            BigInteger amount);
+
+        /// <summary>
         /// Get all the checkout options for a given ERC721 sale contract, collection, tokenId, and amount
         /// </summary>
         /// <param name="saleContract"></param>

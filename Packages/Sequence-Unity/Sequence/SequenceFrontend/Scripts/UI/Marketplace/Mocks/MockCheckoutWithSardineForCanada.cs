@@ -70,6 +70,12 @@ namespace Sequence.Demo.Mocks
             return AppendSardine(options);
         }
 
+        public async Task<Marketplace.CheckoutOptions> GetCheckoutOptions(ERC1155Sale saleContract, Address collection, string tokenId, BigInteger amount)
+        {
+            var options = await _checkout.GetCheckoutOptions(saleContract, collection, tokenId, amount);
+            return AppendSardine(options);
+        }
+
         public async Task<Marketplace.CheckoutOptions> GetCheckoutOptions(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount)
         {
             var options = await _checkout.GetCheckoutOptions(saleContract, collection, tokenId, amount);

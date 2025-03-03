@@ -103,7 +103,7 @@ namespace Sequence.Demo
 
         protected async Task Assemble(object[] args)
         {
-            // Todo add load screen animation
+            _loadingScreen.SetActive(true);
             
             int listings = _cartItemDatas.Length;
             _numberOfUniqueItemsText.text = $"{listings} items";
@@ -145,7 +145,7 @@ namespace Sequence.Demo
             
             base.Open(args);
             
-            // todo remove load screen animation
+            _loadingScreen.SetActive(false);
 
             await AsyncExtensions.DelayTask(.3f);
             UpdateScrollViewSize();

@@ -244,6 +244,7 @@ MonoBehaviour:
   _collectionAddress: 0xd2926e2ee243e8df781ab907b48f77ec5d7a8be1
   _saleContractAddress: 0x476f14887372e21fea64baba11c849b518a2e928
   _itemsForSale: 010000000200000003000000
+  _loadingScreenPrefab: {fileID: 3094631411173026328, guid: 21aa1af318f304faca1367525db9bc28, type: 3}
   _featureSelection: {fileID: 1094787527}
 --- !u!1 &220330147
 GameObject:
@@ -975,6 +976,82 @@ PrefabInstance:
     - target: {fileID: 1040118028101958190, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
       propertyPath: m_Name
       value: FeatureSelection
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043373823616, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043373823616, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043373823616, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043373823616, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043373823623, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 171231631}
+    - target: {fileID: 5143278043373823623, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OpenCheckoutPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043373823623, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Sequence.Boilerplates.BoilerplateController, Sequence.Boilerplates
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043642355407, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043642355407, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043642355407, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043642355407, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043642355407, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043642355407, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043977365761, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043977365761, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043977365761, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043977365761, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043977365761, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5143278043977365761, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5441825245446341881, guid: e8835adb06f3742d1bf6de43dcf4489f, type: 3}
       propertyPath: m_AnchorMax.y

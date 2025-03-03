@@ -224,6 +224,9 @@ namespace Sequence.Marketplace
                 transactions.AddRange(quote.AsTransactionArray());
             }
 
+            ERC20 paymentToken = new ERC20(_paymentToken);
+            transactions.Add(new RawTransaction(paymentToken.Approve(_sale.Contract.GetAddress(), _saleDetails.Cost * _amount)));
+            
             transactions.Add(new RawTransaction(_sale.Mint(_wallet.GetWalletAddress(),
                 new BigInteger[] { BigInteger.Parse(_tokenId) },
                 new BigInteger[] { BigInteger.Parse(_amount.ToString()) }, null, _paymentToken,

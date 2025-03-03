@@ -29,7 +29,7 @@ namespace Sequence.Utils
         {
             var texture = DefaultTexture;
             var cacheKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(url));
-            if (url == null || url.Length <= 0 || url.EndsWith(".gif"))
+            if (string.IsNullOrWhiteSpace(url) || url.EndsWith(".gif"))
                 return texture;
 
             if (TryGetTexture(cacheKey, out var cachedTexture))

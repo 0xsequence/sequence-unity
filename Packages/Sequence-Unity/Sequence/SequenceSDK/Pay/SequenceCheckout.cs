@@ -60,6 +60,34 @@ namespace Sequence.Pay
             _marketplaceAddress = marketplaceAddress;
         }
         
+        public SequenceCheckout(IWallet wallet, Chain chain, ERC1155Sale saleContract, Address collection, string tokenId, BigInteger amount, Address recipient = null, byte[] data = null, FixedByte[] proof = null, SequencePay pay = null)
+        {
+            if (pay == null)
+            {
+                pay = new SequencePay(wallet, chain);
+            }
+            
+            if (recipient == null)
+            {
+                recipient = wallet.GetWalletAddress();
+            }
+
+            _recipient = recipient;
+
+            _pay = pay;
+            _erc1155Sale = saleContract;
+            _collection = collection;
+            _amount = amount;
+            _tokenId = tokenId;
+            _amountsByTokenId = new Dictionary<string, BigInteger>()
+            {
+                {tokenId, amount}
+            };
+            _config = Config.ERC1155;
+            _data = data;
+            _proof = proof;
+        }
+        
         public SequenceCheckout(IWallet wallet, Chain chain, ERC1155Sale saleContract, Address collection, Dictionary<string, BigInteger> amountsByTokenId, Address recipient = null, byte[] data = null, FixedByte[] proof = null, SequencePay pay = null)
         {
             if (pay == null)
@@ -102,6 +130,10 @@ namespace Sequence.Pay
             _collection = collection;
             _amount = amount;
             _tokenId = tokenId;
+            _amountsByTokenId = new Dictionary<string, BigInteger>()
+            {
+                {tokenId, amount}
+            };
             _config = Config.ERC721;
             _proof = proof;
         }

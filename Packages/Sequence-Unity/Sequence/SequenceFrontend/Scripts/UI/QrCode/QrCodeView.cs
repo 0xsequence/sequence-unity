@@ -34,9 +34,21 @@ namespace Sequence.Demo
                 qrCodeParams.Amount);
         }
 
-        private async Task<Sprite> GenerateQrCodeAsync(string paymentToken, BigInteger chainId, string destinationAddress, string amount)
+        public async Task Show(string deeplink)
+        {
+            _qrImage.gameObject.SetActive(false);
+            _qrImage.sprite = await GenerateQrCodeAsync(deeplink);
+            _qrImage.gameObject.SetActive(true);
+        }
+
+        private Task<Sprite> GenerateQrCodeAsync(string paymentToken, BigInteger chainId, string destinationAddress, string amount)
         {
             var deeplink = string.Format(_format, paymentToken, chainId, destinationAddress, amount);
+            return GenerateQrCodeAsync(deeplink);
+        }
+
+        private async Task<Sprite> GenerateQrCodeAsync(string deeplink)
+        {
             var encodedLink = Convert.ToBase64String(Encoding.UTF8.GetBytes(deeplink));
             var qrLink = ApiEndpoint + encodedLink + $"/{_size}";
             return await AssetHandler.GetSpriteAsync(qrLink);

@@ -215,7 +215,7 @@ namespace Sequence.EmbeddedWallet
             _waasProjectId = projectId;
         }
 
-        private void TryToLoginWithStoredSessionWallet()
+        private void TryToLoginWitShtoredSessionWallet()
         {
             (EOAWallet, string, string) walletInfo = (null, "", "");
             try

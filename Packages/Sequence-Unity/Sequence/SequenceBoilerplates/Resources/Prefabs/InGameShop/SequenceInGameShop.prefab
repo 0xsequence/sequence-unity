@@ -38,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 10}
-  m_SizeDelta: {x: -20, y: 225}
+  m_SizeDelta: {x: -20, y: 275}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1475529391814605549
 CanvasRenderer:
@@ -441,7 +441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _format: https://metamask.app.link/send/{0}/transfer?address={1}&uint256={2}
   _size: 512
-  _qrImage: {fileID: 5124856579309961258}
+  _qrImage: {fileID: 0}
 --- !u!1 &1475529392507061954
 GameObject:
   m_ObjectHideFlags: 0
@@ -941,7 +941,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 510, y: 275}
+  m_SizeDelta: {x: 510, y: 325}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1475529393372352318
 MonoBehaviour:
@@ -955,10 +955,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b1651a519de4996b123945d68dfd8ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chain: 421614
-  _tokenContractAddress: 0xd2926e2ee243e8df781ab907b48f77ec5d7a8be1
-  _saleContractAddress: 0x476f14887372e21fea64baba11c849b518a2e928
-  _itemsForSale: 010000000200000003000000
   _loadingView: {fileID: 7225771866699705346}
   _qrCodeView: {fileID: 1475529392395567243}
   _endTimeText: {fileID: 9202246608977931874}

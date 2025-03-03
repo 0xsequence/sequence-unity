@@ -104,10 +104,7 @@ namespace Sequence.Pay
         public async Task<string> GetNftCheckoutLink(ERC1155Sale saleContract, Address collection, BigInteger tokenId, BigInteger amount,
             Address recipient = null, byte[] data = null, FixedByte[] proof = null)
         {
-            IFiatPay pay = await _factory.NftCheckout(saleContract, collection, new Dictionary<string, BigInteger>()
-            {
-                { tokenId.ToString(), amount }
-            });
+            IFiatPay pay = await _factory.NftCheckout(saleContract, collection, tokenId.ToString(), amount);
             return await pay.GetNftCheckoutLink(saleContract, collection, tokenId, amount, recipient, data, proof);
         }
 

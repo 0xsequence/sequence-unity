@@ -86,6 +86,12 @@ namespace Sequence.Marketplace
             }
         }
         
+        public Task<CheckoutOptions> GetCheckoutOptions(ERC1155Sale saleContract, Address collection, string tokenId, BigInteger amount)
+        {
+            return GetCheckoutOptions(saleContract, collection,
+                new Dictionary<string, BigInteger>() { { tokenId, amount } });
+        }
+        
         public async Task<CheckoutOptions> GetCheckoutOptions(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount)
         {
             try

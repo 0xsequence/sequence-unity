@@ -1,4 +1,5 @@
 using System;
+using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;

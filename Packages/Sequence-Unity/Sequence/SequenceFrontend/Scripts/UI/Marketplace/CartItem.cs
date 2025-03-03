@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Sequence.Contracts;
 using Sequence.Marketplace;
 using Sequence.Provider;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Sequence.Demo
@@ -69,7 +69,7 @@ namespace Sequence.Demo
                 }
                 else
                 {
-                    _collectionName = collectionName;
+                    _collectionName = collectionName.HexStringToHumanReadable();
                     _collectionNameText.text = _collectionName;
                     _collectionNameText.gameObject.SetActive(true);
                 }

@@ -90,6 +90,11 @@ namespace Sequence.Pay
             return NftCheckout(options);
         }
 
+        public Task<IFiatPay> NftCheckout(ERC1155Sale saleContract, Address collection,  string tokenId, BigInteger amount)
+        {
+            return NftCheckout(saleContract, collection, new Dictionary<string, BigInteger>() { { tokenId, amount } });
+        }
+
         public async Task<IFiatPay> NftCheckout(ERC721Sale saleContract, Address collection, string tokenId, BigInteger amount)
         {
             Marketplace.CheckoutOptions options =

@@ -2,7 +2,13 @@ using System;
 using System.Collections;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Contracts;
+using Sequence.Demo;
 using Sequence.EmbeddedWallet;
+using Sequence.Marketplace;
+using Sequence.Pay;
+using Sequence.Provider;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -16,6 +22,9 @@ namespace Sequence.Boilerplates.InGameShop
         [SerializeField] private QrCodeView _qrCodeView;
         [SerializeField] private TMP_Text _endTimeText;
         [SerializeField] private MessagePopup _messagePopup;
+
+        [SerializeField] private string _paymentTokenIconUrl =
+            "https://cryptologos.cc/logos/usd-coin-usdc-logo.png";
         
         [Header("Tile Object Pool")]
         [SerializeField] private GenericObjectPool<SequenceInGameShopTile> _tilePool;
@@ -70,7 +79,7 @@ namespace Sequence.Boilerplates.InGameShop
         {
             _qrCodeView.gameObject.SetActive(true);
             var destinationAddress = _wallet.GetWalletAddress();
-            await _qrCodeView.Show(_saleState.PaymentToken, destinationAddress, "1e2");
+            await _qrCodeView.Show(_saleState.PaymentToken, _chain, destinationAddress, "1e2");
         }
 
         public async void RefreshState()
@@ -115,7 +124,8 @@ namespace Sequence.Boilerplates.InGameShop
                     supply.tokenMetadata, 
                     _saleState.Cost,
                     _saleState.PaymentTokenSymbol, 
-                    PurchaseToken);
+                    PurchaseToken, 
+                    AdditionalCheckoutOptions);
             }
         }
 
@@ -130,6 +140,19 @@ namespace Sequence.Boilerplates.InGameShop
                 RenderState();
             else
                 OpenQrCodeView();
+        }
+
+        private async Task AdditionalCheckoutOptions(BigInteger tokenId, ulong amount)
+        {
+            ERC1155 collection = new ERC1155(_tokenContractAddress);
+            string uri = await collection.URI(new SequenceEthClient(_chain), tokenId);
+            Sprite collectibleImage = await AssetHandler.GetSpriteAsync(uri);
+            ERC1155Sale sale = new ERC1155Sale(_saleContractAddress);
+            ICheckoutHelper checkoutHelper = await ERC1155SaleCheckout.Create(sale,
+                new ERC1155(_tokenContractAddress), tokenId.ToString(), amount, _chain, _wallet,
+                "Demo Primary Sale Checkout", _paymentTokenIconUrl, collectibleImage);
+            BoilerplateFactory.OpenCheckoutPanel(transform.parent, checkoutHelper,
+                new SequenceCheckout(_wallet, _chain, sale, collection, tokenId.ToString(), amount));
         }
 
         private void SetLoading(bool loading)

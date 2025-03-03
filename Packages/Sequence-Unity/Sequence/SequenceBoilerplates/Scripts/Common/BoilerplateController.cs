@@ -2,9 +2,11 @@ using System;
 using Sequence.Boilerplates.Login;
 using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Config;
+using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;
+using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
 using UnityEngine;
 
@@ -18,6 +20,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private string _collectionAddress;
         [SerializeField] private string _saleContractAddress;
         [SerializeField] private int[] _itemsForSale;
+        [SerializeField] private GameObject _loadingScreenPrefab;
         
         [Header("Components")]
         [SerializeField] private GameObject _featureSelection;
@@ -25,6 +28,7 @@ namespace Sequence.Boilerplates
         private IWallet _wallet;
         private SequenceLoginWindow _loginWindow;
         private SequencePlayerProfile _playerProfile;
+        private GameObject _loadingScreen;
         
         private void Awake()
         {
@@ -32,6 +36,7 @@ namespace Sequence.Boilerplates
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 _wallet = wallet;
+                Debug.Log("Signed in with embedded wallet address: " + _wallet.GetWalletAddress());
                 ShowFeatureSelection();
                 
                 if (_loginWindow)
@@ -65,6 +70,12 @@ namespace Sequence.Boilerplates
             HideFeatureSelection();
             _playerProfile = BoilerplateFactory.OpenSequencePlayerProfile(transform, _wallet, _chain, ShowFeatureSelection);
         }
+
+        public void OpenSignMessage()
+        {
+            HideFeatureSelection();
+            BoilerplateFactory.OpenSequenceSignMessage(transform, _wallet, _chain, ShowFeatureSelection);
+        }
         
         public void OpenDailyRewardsPanel()
         {
@@ -97,10 +108,32 @@ namespace Sequence.Boilerplates
             BoilerplateFactory.OpenViewMarketplaceListingsPanel(transform, _wallet, _chain, ShowFeatureSelection);
         }
 
-        public void OpenSignMessage()
+        public void OpenCheckoutPanel()
         {
             HideFeatureSelection();
-            BoilerplateFactory.OpenSequenceSignMessage(transform, _wallet, _chain, ShowFeatureSelection);
+            ShowLoadingScreen();
+            DoShowCheckoutPanel();
+        }
+
+        private void ShowLoadingScreen()
+        {
+            if (_loadingScreen != null)
+            {
+                return;
+            }
+            
+            _loadingScreen = Instantiate(_loadingScreenPrefab, transform);
+        }
+        
+        private void HideLoadingScreen()
+        {
+            if (_loadingScreen == null)
+            {
+                return;
+            }
+            
+            Destroy(_loadingScreen);
+            _loadingScreen = null;
         }
 
         private void ShowFeatureSelection()
@@ -111,6 +144,24 @@ namespace Sequence.Boilerplates
         private void HideFeatureSelection()
         {
             _featureSelection.SetActive(false);
+        }
+
+        private async void DoShowCheckoutPanel()
+        {
+            ERC1155Sale saleContract = new ERC1155Sale("0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b");
+            ERC1155 collection = new ERC1155("0xdeb398f41ccd290ee5114df7e498cf04fac916cb");
+            Sequence.Marketplace.TokenMetadata metadata =
+                await new MarketplaceReader(Chain.Polygon).GetCollectible(collection, "1");
+            string imageUrl = metadata.image.Replace(".webp", ".png"); // todo Sadly this still gives me a webp image that Unity doesn't support
+            Sprite collectibleImage = await AssetHandler.GetSpriteAsync(imageUrl);
+            ICheckoutHelper checkoutHelper = await ERC1155SaleCheckout.Create(saleContract, collection, "1", 1, _chain,
+                _wallet, "Demo Token Sale",
+                "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+                collectibleImage);
+            
+            HideLoadingScreen();
+            BoilerplateFactory.OpenCheckoutPanel(transform, checkoutHelper,
+                new SequenceCheckout(_wallet, Chain.Polygon, saleContract, collection, "1", 1), ShowFeatureSelection);
         }
         
         private void TryRecoverSessionToOpenLoginWindow()
