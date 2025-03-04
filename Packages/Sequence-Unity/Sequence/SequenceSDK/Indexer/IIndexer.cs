@@ -56,6 +56,9 @@ namespace Sequence
         /// Retrieve the balance of a network's native token for a given account address
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
+        public Task<EtherBalance> GetNativeTokenBalance(string accountAddress);
+        
+        [Obsolete("Call GetNativeTokenBalance instead.")]
         public Task<EtherBalance> GetEtherBalance(string accountAddress);
 
         /// <summary>
