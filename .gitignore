@@ -25,6 +25,7 @@
 /[Aa]ssets/Samples
 /[Aa]ssets/Samples~/Setup/Resources/SequenceConfig.asset
 /[Aa]ssets/Samples.meta
+!/Packages/Sequence-Unity/Sequence/Samples~/
 
 # Recordings can get excessive in size
 /[Rr]ecordings/
