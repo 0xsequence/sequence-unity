@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Sequence.Boilerplates.Login;
 using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Config;
@@ -20,41 +21,19 @@ namespace Sequence.Boilerplates
         [Header("Components")]
         [SerializeField] private GameObject _featureSelection;
         
-        private IWallet _wallet;
+        private SequenceWallet _wallet;
         private SequenceLoginWindow _loginWindow;
         private SequencePlayerProfile _playerProfile;
-        
-        private void Awake()
-        {
-            SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
-            SequenceWallet.OnWalletCreated += wallet =>
-            {
-                _wallet = wallet;
-                ShowFeatureSelection();
-                
-                if (_loginWindow)
-                    _loginWindow.Hide();
-                
-                wallet.OnDropSessionComplete += s =>
-                {
-                    if (s == wallet.SessionId)
-                    {
-                        if (_playerProfile)
-                            _playerProfile.Hide();
-                        
-                        TryRecoverSessionToOpenLoginWindow();
-                    }
-                };
-            };
-        }
 
-        private void Start()
+        private async void Start()
         {
-            TryRecoverSessionToOpenLoginWindow();
+            SequenceWallet.OnWalletCreated += HandleWalletCreated;
+            await TryRecoverSessionToOpenLoginWindow();
         }
 
         private void OnDestroy()
         {
+            SequenceWallet.OnWalletCreated -= HandleWalletCreated;
             BoilerplateFactory.CleanUp();
         }
 
@@ -99,28 +78,44 @@ namespace Sequence.Boilerplates
             _featureSelection.SetActive(false);
         }
         
-        private void TryRecoverSessionToOpenLoginWindow()
+        /// <summary>
+        /// This function is called at the start of the scene and whenever the user logged out.
+        /// </summary>
+        private async Task TryRecoverSessionToOpenLoginWindow()
         {
             HideFeatureSelection();
-            var config = SequenceConfig.GetConfig();
-            var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
-            var loginHandler = SequenceLogin.GetInstance();
             
-            if (SecureStorageFactory.IsSupportedPlatform() && storeSessionInfoAndSkipLoginWhenPossible)
-            {
-                loginHandler.TryToRestoreSession();
-                loginHandler.SetupAuthenticator();
-            }
-            else
-            {
-                OnFailedToRecoverSession("Secure Storage disabled");
-            }
+            var login = SequenceLogin.GetInstance();
+            var wallet = await login.TryToRestoreSessionAsync();
+            if (wallet != null)
+                return;
+            
+            Debug.LogError("Failed to recover session. Please login.");
+            _loginWindow = BoilerplateFactory.OpenSequenceLoginWindow(transform);
         }
 
-        private void OnFailedToRecoverSession(string error)
+        /// <summary>
+        /// This function is called after the login or session recovery succeeded.
+        /// </summary>
+        /// <param name="wallet">Instance of SequenceWallet</param>
+        private void HandleWalletCreated(SequenceWallet wallet)
         {
-            Debug.LogError($"Error attempting to recover Sequence session: {error}");
-            _loginWindow = BoilerplateFactory.OpenSequenceLoginWindow(transform);
+            _wallet = wallet;
+            ShowFeatureSelection();
+            
+            if (_loginWindow)
+                _loginWindow.Hide();
+            
+            wallet.OnDropSessionComplete += async s =>
+            {
+                if (s == wallet.SessionId)
+                {
+                    if (_playerProfile)
+                        _playerProfile.Hide();
+                        
+                    await TryRecoverSessionToOpenLoginWindow();
+                }
+            };
         }
     }
 }
