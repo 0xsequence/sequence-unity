@@ -13,9 +13,9 @@ sequenceDiagram
     App->>-User: App opens checkout link in web browser or webview, displaying it to user
     User->>+CheckoutWebpage: User checks out and pays with credit card
     CheckoutWebpage->>+ThirdPartyServer: Checkout provider confirms payment
-    ThirdPartyServer->>+PrimarySaleContract: Execute provided calldata on provided PrimarySaleContract
-    PrimarySaleContract->>+CollectionContract: PrimarySaleContract mints x instances of Collectible
-    CollectionContract-->>-PrimarySaleContract: x instances of Collectible minted
-    PrimarySaleContract-->>-ThirdPartyServer: Transaction success, return transaction hash
+    ThirdPartyServer->>+MarketplaceContract: Execute provided calldata on provided Marketplace Contract
+    MarketplaceContract->>+CollectionContract: Marketplace Contract facilitates sale of x instances of Collectible to user wallet
+    CollectionContract-->>-MarketplaceContract: x instances of Collectible transferred
+    MarketplaceContract-->>-ThirdPartyServer: Transaction success, return transaction hash
     ThirdPartyServer-->>-CheckoutWebpage: Transaction success, return transaction hash
     CheckoutWebpage-->>-User: Display to user informing them that x Collectibles were successfully purchased
