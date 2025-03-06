@@ -28,9 +28,14 @@ namespace Sequence.Marketplace
         private Page _page;
         private Dictionary<Order, ulong> _amountsByOrder;
         private IEthClient _client;
+        private bool _initialized = false;
 
         public NftCheckout(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, ulong amount, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null, IEthClient client = null)
         {
+            if (listing == null)
+            {
+                throw new ArgumentNullException($"{nameof(listing)}", $"Invalid use. {nameof(listing)} cannot be null");
+            }
             _wallet = wallet;
             _listing = listing;
             _collectibleImage = collectibleIcon;
@@ -114,12 +119,23 @@ namespace Sequence.Marketplace
 
         private async Task FetchOtherListings()
         {
-            ListCollectibleListingsReturn result =
-                await _marketplaceReader.ListListingsForCollectible(
-                    new Address(_listing.order.collectionContractAddress), _listing.order.tokenId,
-                    new OrderFilter(null, null, new[] { _listing.order.priceCurrencyAddress }));
-            _page = result.page;
-            _listings = result.listings;
+            try
+            {
+                ListCollectibleListingsReturn result =
+                    await _marketplaceReader.ListListingsForCollectible(
+                        new Address(_listing.order.collectionContractAddress), _listing.order.tokenId,
+                        new OrderFilter(null, null, new[] { _listing.order.priceCurrencyAddress }));
+                _page = result.page;
+                _listings = result.listings;
+            }
+            catch (Exception e)
+            {
+                string error =
+                    $"Error fetching other listings for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}): {e.Message}";
+                Debug.LogError(error);
+                _initialized = true;
+                throw new Exception(error);
+            }
             _listings = _listings.OrderBy(listing => listing.priceUSD).ToArray(); // Todo confirm if this comes pre-sorted by the API
 
             ulong remaining = await SetAmountsByOrder();
@@ -128,6 +144,8 @@ namespace Sequence.Marketplace
                 ulong requested = _amountRequested + remaining; // We should already revert _amountRequested to the max available in SetAmountsByOrder
                 Debug.LogError($"Amount requested exceeds what is available in the marketplace for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}), amount requested: {requested} available: {_amountRequested}. Setting requested amount to the available amount: {_amountRequested}");
             }
+            
+            _initialized = true;
         }
 
         private async Task<ulong> SetAmountsByOrder()
@@ -174,6 +192,7 @@ namespace Sequence.Marketplace
         public async Task<string> GetApproximateTotalInUSD()
         {
             decimal total = 0;
+            await AsyncExtensions.WaitUntilConditionMet(IsInitialized);
             foreach (var order in _amountsByOrder.Keys)
             {
                 total = order.priceUSD * _amountsByOrder[order];
@@ -182,12 +201,18 @@ namespace Sequence.Marketplace
             return total.ToString("F2");
         }
 
+        private bool IsInitialized()
+        {
+            return _initialized;
+        }
+
         public async Task<string> GetApproximateTotalInCurrency(Address currencyAddress)
         {
             decimal total = 0;
             ulong amountRemaining = _amountRequested;
             try
             {
+                await AsyncExtensions.WaitUntilConditionMet(IsInitialized);
                 foreach (var order in _amountsByOrder.Keys)
                 {
                     total += await GetApproximateTotalInCurrency(currencyAddress, amountRemaining, order);
