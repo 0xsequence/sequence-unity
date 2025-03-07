@@ -99,7 +99,6 @@ namespace Sequence.Marketplace
         
         public Task<ListCollectiblesReturn> ListCollectibleOffersWithHighestPricedOfferFirst(string contractAddress, CollectiblesFilter filter = default, Page page = default)
         {
-            string endpoint = "ListCollectibleOffersWithHighestPricedOfferFirst";
             return DoListCollectibles(OrderSide.offer, contractAddress, filter, page);
         }
 
