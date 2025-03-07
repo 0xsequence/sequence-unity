@@ -89,10 +89,16 @@ namespace Sequence
         {
             return ChainDictionaries.ChainById[ChainId];
         }
+        
+        public Task<EtherBalance> GetNativeTokenBalance(string accountAddress)
+        {
+            return Indexer.GetNativeTokenBalance(ChainId, accountAddress, 0, _customHttpHandler, this);
+        }
 
+        [Obsolete("Call GetNativeTokenBalance instead.")]
         public Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
-            return Indexer.GetEtherBalance(ChainId, accountAddress, 0, _customHttpHandler, this);
+            return Indexer.GetNativeTokenBalance(ChainId, accountAddress, 0, _customHttpHandler, this);
         }
 
         public Task<GetTokenBalancesReturn> GetTokenBalances(GetTokenBalancesArgs args)

@@ -230,14 +230,14 @@ namespace Sequence
         [Obsolete]
         public static async Task<EtherBalance> GetEtherBalance(BigInteger chainID, string accountAddress)
         {
-            return await GetEtherBalance(chainID.ToString(), accountAddress);
+            return await GetNativeTokenBalance(chainID.ToString(), accountAddress);
         }
 
         /// <summary>
         /// Retrieve the balance of a network's native token for a given account address
         /// </summary>
         /// <exception cref="HttpRequestException">If the network request fails</exception>
-        public static async Task<EtherBalance> GetEtherBalance(string chainID, string accountAddress, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
+        public static async Task<EtherBalance> GetNativeTokenBalance(string chainID, string accountAddress, int retries = 0, IHttpHandler httpHandler = null, IIndexer caller = null)
         {
             var responseBody = await HttpPost(chainID, "GetEtherBalance", new GetEtherBalanceArgs(accountAddress), retries, httpHandler, caller);
             GetEtherBalanceReturn result = BuildResponse<GetEtherBalanceReturn>(responseBody, caller);
