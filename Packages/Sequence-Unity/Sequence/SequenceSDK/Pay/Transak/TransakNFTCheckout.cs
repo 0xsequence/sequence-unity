@@ -246,7 +246,7 @@ namespace Sequence.Pay.Transak
                 saleDetails.Cost * quantity, proof).CallData;
             
             TransakNftData nftData = new TransakNftData(metadata.image, metadata.name, collection, new []{tokenId.ToString()}, 
-                new [] { DecimalNormalizer.ReturnToNormalPrecise(saleDetails.Cost, (int)decimals) }, quantity, NFTType.ERC1155);
+                new [] { DecimalNormalizer.ReturnToNormalPrecise(saleDetails.Cost, (int)decimals) }, quantity, NFTType.ERC721);
 
             return await GetNFTCheckoutLink(nftData, callData, collection, contractId);
         }
