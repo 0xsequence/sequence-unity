@@ -65,61 +65,6 @@ namespace Sequence
     {
         internal const string PATH = "/rpc/Indexer/";
 
-        internal static readonly Dictionary<string, string> IndexerNames
-        = new Dictionary<string, string>
-    {
-        { Chain.Ethereum.GetChainId(), "mainnet" },
-        { Chain.Polygon.GetChainId(), "polygon" },
-        { Chain.PolygonZkEvm.GetChainId(), "polygon-zkevm" },
-        { Chain.BNBSmartChain.GetChainId(), "bsc" },
-        { Chain.ArbitrumOne.GetChainId(), "arbitrum" },
-        { Chain.ArbitrumNova.GetChainId(), "arbitrum-nova" },
-        { Chain.Optimism.GetChainId(), "optimism" },
-        { Chain.Avalanche.GetChainId(), "avalanche" },
-        { Chain.Gnosis.GetChainId(), "gnosis" },
-        { Chain.Base.GetChainId(), "base" },
-        { Chain.OasysHomeverse.GetChainId(), "homeverse" },
-        { Chain.AstarZKEvm.GetChainId(), "astar-zkevm" },
-        { Chain.Xai.GetChainId(), "xai" },
-        { Chain.Blast.GetChainId(), "blast" },
-        { Chain.B3.GetChainId(), "b3" },
-        { Chain.APEChain.GetChainId(), "apechain" },
-        { Chain.ImmutableZkEvm.GetChainId(), "immutable-zkevm" },
-        { Chain.SkaleNebula.GetChainId(), "skale-nebula" },
-        { Chain.Root.GetChainId(), "rootnet" },
-        { Chain.LAOS.GetChainId(), "laos" },
-        { Chain.Soneium.GetChainId(), "soneium" },
-        { Chain.Telos.GetChainId(), "telos" },
-        { Chain.Moonbeam.GetChainId(), "moonbeam" },
-        { Chain.Etherlink.GetChainId(), "etherlink" },
-        { Chain.XR1.GetChainId(), "xr1" },
-
-        { Chain.TestnetSepolia.GetChainId(), "sepolia" },
-        { Chain.TestnetArbitrumSepolia.GetChainId(), "arbitrum-sepolia" },
-        { Chain.TestnetBNBSmartChain.GetChainId(), "bsc-testnet" },
-        { Chain.TestnetBaseSepolia.GetChainId(), "base-sepolia" },
-        { Chain.TestnetOasysHomeverse.GetChainId(), "homeverse-testnet" },
-        { Chain.TestnetAvalanche.GetChainId(), "avalanche-testnet" },
-        { Chain.TestnetOptimisticSepolia.GetChainId(), "optimism-sepolia" },
-        { Chain.TestnetPolygonAmoy.GetChainId(), "amoy" }, 
-        { Chain.TestnetAstarZKyoto.GetChainId(), "astar-zkyoto" }, 
-        { Chain.TestnetXrSepolia.GetChainId(), "xr-sepolia" },
-        { Chain.TestnetXaiSepolia.GetChainId(), "xai-sepolia" }, 
-        { Chain.TestnetB3Sepolia.GetChainId(), "b3-sepolia" },
-        { Chain.TestnetAPEChain.GetChainId(), "apechain-testnet" },
-        { Chain.TestnetBlastSepolia.GetChainId(), "blast-sepolia" },
-        { Chain.TestnetBorne.GetChainId(), "borne-testnet" },
-        { Chain.TestnetSkaleNebulaGamingHub.GetChainId(), "skale-nebula-testnet" },
-        { Chain.TestnetSoneiumMinato.GetChainId(), "soneium-minato" },
-        { Chain.TestnetToy.GetChainId(), "toy-testnet" },
-        { Chain.TestnetImmutableZkEvm.GetChainId(), "immutable-zkevm-testnet" },
-        { Chain.TestnetRootPorcini.GetChainId(), "rootnet-porcini" },
-        { Chain.TestnetLAOSSigma.GetChainId(), "laos-sigma-testnet" },
-        { Chain.TestnetTelos.GetChainId(), "telos-testnet" },
-        { Chain.TestnetMoonbaseAlpha.GetChainId(), "moonbase-alpha" },
-        { Chain.TestnetEtherlink.GetChainId(), "etherlink-testnet" }
-    };
-
         private static string _builderApiKey = SequenceConfig.GetConfig(SequenceService.Indexer).BuilderAPIKey;
         
         public static Action<string> OnQueryFailed;

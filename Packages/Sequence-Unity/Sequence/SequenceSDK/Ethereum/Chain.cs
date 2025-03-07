@@ -59,6 +59,8 @@ namespace Sequence
         TestnetTelos = 41,
         TestnetMoonbaseAlpha = 1287,
         TestnetEtherlink = 128123,
+        TestnetMonad = 10143,
+        TestnetSomnia = 50312,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
