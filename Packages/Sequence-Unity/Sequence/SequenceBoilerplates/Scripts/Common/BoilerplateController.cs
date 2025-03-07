@@ -152,7 +152,7 @@ namespace Sequence.Boilerplates
             ERC1155 collection = new ERC1155("0xdeb398f41ccd290ee5114df7e498cf04fac916cb");
             Sequence.Marketplace.TokenMetadata metadata =
                 await new MarketplaceReader(Chain.Polygon).GetCollectible(collection, "1");
-            string imageUrl = metadata.image.Replace(".webp", ".png"); // todo Sadly this still gives me a webp image that Unity doesn't support
+            string imageUrl = metadata.image.Replace(".webp", ".png");
             Sprite collectibleImage = await AssetHandler.GetSpriteAsync(imageUrl);
             ICheckoutHelper checkoutHelper = await ERC1155SaleCheckout.Create(saleContract, collection, "1", 1, _chain,
                 _wallet, "Demo Token Sale",
