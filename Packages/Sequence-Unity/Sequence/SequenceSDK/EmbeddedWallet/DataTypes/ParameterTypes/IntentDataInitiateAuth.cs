@@ -1,9 +1,8 @@
 using Newtonsoft.Json;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     public class IntentDataInitiateAuth
     {
         public string identityType;
@@ -11,7 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string sessionId;
         public string verifier;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public IntentDataInitiateAuth(string identityType, string metadata, string sessionId, string verifier)
         {

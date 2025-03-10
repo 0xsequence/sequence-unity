@@ -5,7 +5,6 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Sequence.Config;
 using Sequence.Utils;
@@ -54,8 +53,7 @@ namespace Sequence.EmbeddedWallet
             this._defaultHeaders[key] = value;
         }
 
-        public (IWebRequest, string, string) BuildRequest<T>(string path, T args,
-            [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        public (IWebRequest, string, string) BuildRequest<T>(string path, T args, Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             string url = _url.AppendTrailingSlashIfNeeded() + path;
             url = url.RemoveTrailingSlash();
@@ -64,7 +62,7 @@ namespace Sequence.EmbeddedWallet
                 url = overrideUrl.AppendTrailingSlashIfNeeded() + path;
             }
 
-            IWebRequest request = WebRequestBuilder.Post(url);
+            IWebRequest request = WebRequestBuilder.Post(url, string.Empty);
             SetHeaders(request, headers);
             
             string requestJson = SetRequestData(request, args);
@@ -123,7 +121,7 @@ namespace Sequence.EmbeddedWallet
             return requestJson;
         }
 
-        public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
+        public async Task<T2> SendRequest<T, T2>(string path, T args, Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             (IWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
             IWebRequest request = newRequest.Item1;

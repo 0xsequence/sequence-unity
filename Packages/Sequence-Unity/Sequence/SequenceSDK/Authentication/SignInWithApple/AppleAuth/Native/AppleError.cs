@@ -1,11 +1,14 @@
 using AppleAuth.Interfaces;
 using System;
-using UnityEngine;
 
 namespace AppleAuth.Native
 {
     [Serializable]
-    internal class AppleError : IAppleError, ISerializationCallbackReceiver
+#if UNITY_2017_1_OR_NEWER
+    internal class AppleError : IAppleError, UnityEngine.ISerializationCallbackReceiver
+#else
+    internal class AppleError : IAppleError
+#endif
     {
         public int _code = 0;
         public string _domain = null;

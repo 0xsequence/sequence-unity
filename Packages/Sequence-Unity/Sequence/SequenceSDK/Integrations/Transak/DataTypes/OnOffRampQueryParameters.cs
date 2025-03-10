@@ -1,7 +1,3 @@
-using System;
-using Newtonsoft.Json;
-using UnityEngine;
-
 namespace Sequence.Integrations.Transak
 {
     public class OnOffRampQueryParameters
@@ -19,7 +15,11 @@ namespace Sequence.Integrations.Transak
             bool disableWalletAddressForm = true)
         {
             this.walletAddress = walletAddress;
-            this.referrerDomain = "sequence-unity: " + Application.productName;
+#if UNITY_2017_1_OR_NEWER
+            this.referrerDomain = "sequence-unity: " + UnityEngine.Application.productName;
+#else
+            this.referrerDomain = "sequence-unity";
+#endif
             this.fiatCurrency = addFundsSettings.fiatCurrency;
             this.disableWalletAddressForm = disableWalletAddressForm;
             this.defaultFiatAmount = addFundsSettings.defaultFiatAmount;

@@ -1,8 +1,6 @@
-using UnityEngine.Scripting;
-
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [System.Serializable]
     public class MetaTxnReceiptLog
     {
@@ -16,7 +14,7 @@ namespace Sequence.EmbeddedWallet
         public uint logIndex;
         public bool removed;
         
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public MetaTxnReceiptLog(string address, string[] topics, string data, uint blockNumber, string transactionHash, uint transactionIndex, string blockHash, uint logIndex, bool removed)
         {
             this.address = address;

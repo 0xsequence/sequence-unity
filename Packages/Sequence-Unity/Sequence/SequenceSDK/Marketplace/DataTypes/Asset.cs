@@ -1,5 +1,5 @@
 using System.Numerics;
-using UnityEngine.Scripting;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
 {

@@ -3,8 +3,6 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Sequence.Utils;
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -46,7 +44,7 @@ namespace Sequence.EmbeddedWallet
             catch (Exception ex)
             {
                 string error = $"Error loading public key from JWKS: {ex.Message}";
-                Debug.LogError(error);
+                LogHandler.Error(error);
                 throw new Exception(error);
             }
         }

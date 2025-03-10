@@ -1,6 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
+
+#if UNITY_IOS && !UNITY_EDITOR
 using AOT;
+#endif
 
 namespace Sequence.Authentication
 {

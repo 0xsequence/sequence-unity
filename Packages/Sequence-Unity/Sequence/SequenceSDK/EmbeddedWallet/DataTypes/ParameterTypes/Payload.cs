@@ -1,9 +1,8 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class Payload
     {
@@ -11,7 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string payloadCiphertext;
         public string payloadSig;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public Payload(string encryptedPayloadKey, string payloadCiphertext, string payloadSig)
         {
             this.encryptedPayloadKey = encryptedPayloadKey;

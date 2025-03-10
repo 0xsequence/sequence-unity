@@ -1,10 +1,9 @@
 using System;
 using Newtonsoft.Json;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     public class IntentResponseAuthInitiated
     {
         public string challenge;
@@ -12,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string identityType;
         public string sessionId;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public IntentResponseAuthInitiated(string challenge, int expiresIn, string identityType, string sessionId)
         {

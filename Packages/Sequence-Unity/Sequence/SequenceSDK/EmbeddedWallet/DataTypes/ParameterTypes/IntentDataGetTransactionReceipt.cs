@@ -1,11 +1,9 @@
 using System;
 using Newtonsoft.Json;
-using Sequence;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class IntentDataGetTransactionReceipt
     {
@@ -13,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string network;
         public string wallet;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public IntentDataGetTransactionReceipt(string metaTxHash, string network, string wallet)
         {

@@ -8,8 +8,6 @@ using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Utils;
-using UnityEngine;
-using static Sequence.Contracts.Contract;
 
 namespace Sequence.Contracts
 {

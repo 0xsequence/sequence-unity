@@ -1,8 +1,6 @@
-using UnityEngine.Scripting;
-
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [System.Serializable]
     public class MetaTxnReceipt
     {
@@ -14,7 +12,7 @@ namespace Sequence.EmbeddedWallet
         public MetaTxnReceipt[] receipts;
         public string txnReceipt;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public MetaTxnReceipt(string id, string status, int index, MetaTxnReceiptLog[] logs, MetaTxnReceipt[] receipts, string txnReceipt, string revertReason = null)
         {
             this.id = id;

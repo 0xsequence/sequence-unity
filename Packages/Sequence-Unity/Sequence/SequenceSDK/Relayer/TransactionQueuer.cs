@@ -4,16 +4,25 @@ using System.Text;
 using System.Threading.Tasks;
 using Sequence;
 using Sequence.EmbeddedWallet;
-using UnityEngine;
-using UnityEngine.Serialization;
+using Sequence.Utils;
 
 namespace Sequence.Relayer
 {
-    public abstract class TransactionQueuer<TQueueableType, TReturnType> : MonoBehaviour
+#if UNITY_2017_1_OR_NEWER
+    public abstract class TransactionQueuer<TQueueableType, TReturnType> : UnityEngine.MonoBehaviour
+#else
+    public abstract class TransactionQueuer<TQueueableType, TReturnType>
+#endif
     {
-        [FormerlySerializedAs("_autoSubmitTransactions")] public bool AutoSubmitTransactions = false;
-        [FormerlySerializedAs("_thresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds")] public float ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds = 60f; // If _autoSubmitTransactions, we will submit all the transactions in the queue if the threshold time lapses between adding subsequent items to the queue
-        [FormerlySerializedAs("_minimumTimeBetweenTransactionSubmissionsInSeconds")] public float MinimumTimeBetweenTransactionSubmissionsInSeconds = 30f; // The minimum time before a transaction can be submitted on-chain after the last one was submitted
+#if UNITY_2017_1_OR_NEWER
+        [UnityEngine.Serialization.FormerlySerializedAs("_autoSubmitTransactions")] public bool AutoSubmitTransactions = false;
+        [UnityEngine.Serialization.FormerlySerializedAs("_thresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds")] public float ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds = 60f; // If _autoSubmitTransactions, we will submit all the transactions in the queue if the threshold time lapses between adding subsequent items to the queue
+        [UnityEngine.Serialization.FormerlySerializedAs("_minimumTimeBetweenTransactionSubmissionsInSeconds")] public float MinimumTimeBetweenTransactionSubmissionsInSeconds = 30f; // The minimum time before a transaction can be submitted on-chain after the last one was submitted
+#else
+        public bool AutoSubmitTransactions = false;
+        public float ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds = 60f;
+        public float MinimumTimeBetweenTransactionSubmissionsInSeconds = 30f;
+#endif
 
         protected List<TQueueableType> _queue = new List<TQueueableType>();
         protected float _lastTransactionAddedTime = 0f;
@@ -31,7 +40,7 @@ namespace Sequence.Relayer
         private void Update()
         {
             if (!AutoSubmitTransactions) return;
-            if (_lastTransactionAddedTime > 0f && Time.time - _lastTransactionAddedTime > ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds)
+            if (_lastTransactionAddedTime > 0f && AppEnvironment.Time - _lastTransactionAddedTime > ThresholdTimeBetweenTransactionsAddedBeforeSubmittedInSeconds)
             {
                 SubmitTransactions();
             }
@@ -44,7 +53,7 @@ namespace Sequence.Relayer
         public virtual void Enqueue(TQueueableType transaction)
         {
             _queue.Add(transaction);
-            _lastTransactionAddedTime = Time.time;
+            _lastTransactionAddedTime = AppEnvironment.Time;
         }
 
         /// <summary>
@@ -66,7 +75,7 @@ namespace Sequence.Relayer
                 throw new Exception("Wallet cannot be null. User had likely not signed in yet.");
             }
             
-            if (!overrideWait && Time.time - _lastTransactionSubmittedTime < MinimumTimeBetweenTransactionSubmissionsInSeconds && _lastTransactionSubmittedTime > 0f)
+            if (!overrideWait && AppEnvironment.Time - _lastTransactionSubmittedTime < MinimumTimeBetweenTransactionSubmissionsInSeconds && _lastTransactionSubmittedTime > 0f)
             {
                 return default;
             }
@@ -75,7 +84,7 @@ namespace Sequence.Relayer
             
             _queue.Clear();
             _lastTransactionAddedTime = 0f;
-            _lastTransactionSubmittedTime = Time.time;
+            _lastTransactionSubmittedTime = AppEnvironment.Time;
 
             return result;
         }

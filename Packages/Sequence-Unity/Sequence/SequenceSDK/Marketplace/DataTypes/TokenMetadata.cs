@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.Scripting;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
 {

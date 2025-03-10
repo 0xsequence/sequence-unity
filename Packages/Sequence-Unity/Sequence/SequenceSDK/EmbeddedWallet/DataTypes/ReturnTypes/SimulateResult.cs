@@ -1,8 +1,6 @@
-using UnityEngine.Scripting;
-
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [System.Serializable]
     public class SimulateResult
     {
@@ -13,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public uint gasUsed;
         public uint gasLimit;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public SimulateResult(bool executed, bool succeeded, uint gasUsed, uint gasLimit, string result = null, string reason = null)
         {
             this.executed = executed;

@@ -1,5 +1,5 @@
 using System;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.ABI
 {
@@ -26,7 +26,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding byte array: {ex.Message}");
+                LogHandler.Error($"Error decoding byte array: {ex.Message}");
                 return null;
             }
         }
@@ -51,7 +51,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding byte array: {ex.Message}");
+                LogHandler.Error($"Error encoding byte array: {ex.Message}");
                 return null;
             }
         }
@@ -70,7 +70,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding byte array to string: {ex.Message}");
+                LogHandler.Error($"Error encoding byte array to string: {ex.Message}");
                 return null;
             }
         }
@@ -96,7 +96,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding byte array from string: {ex.Message}");
+                LogHandler.Error($"Error decoding byte array from string: {ex.Message}");
                 return null;
             }
         }

@@ -1,9 +1,8 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class FeeOption
     {
@@ -12,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public FeeToken token;
         public string value;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public FeeOption(uint gasLimit, string to, FeeToken token, string value)
         {
             this.gasLimit = gasLimit;

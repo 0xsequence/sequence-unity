@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.Provider
 {

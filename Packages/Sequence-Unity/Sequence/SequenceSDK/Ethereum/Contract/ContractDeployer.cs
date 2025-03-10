@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Wallet;
-using UnityEngine;
 using Sequence.Transactions;
 using Sequence.Utils;
 
@@ -51,7 +50,7 @@ namespace Sequence.Contracts
             byte[] hashed = SequenceCoder.KeccakHash(encoded);
             string hashedString = SequenceCoder.ByteArrayToHexString(hashed).EnsureHexPrefix();
             string address = hashedString.Substring(hashedString.Length - 40, 40).EnsureHexPrefix();
-            Debug.Log($"Deployer {senderAddress}, nonce {nonce} - deployed to {address}");
+            EmbeddedWallet.LogHandler.Info($"Deployer {senderAddress}, nonce {nonce} - deployed to {address}");
             return address;
         }
     }

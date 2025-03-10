@@ -1,7 +1,6 @@
 using System;
 using Sequence.ABI;
 using Sequence.Contracts;
-using UnityEngine;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -23,7 +22,7 @@ namespace Sequence.EmbeddedWallet
                         if (!ABIRegex.MatchesFunctionABI(delayedEncode.data.abi))
                         {
                             string message = $"Given {nameof(DelayedEncode)} transaction with function abi {delayedEncode.data.abi} that does not match the required regex {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"";
-                            Debug.LogWarning(message + "\nAttempting to recover and parse anyways");
+                            LogHandler.Warning(message + "\nAttempting to recover and parse anyways");
                             delayedEncode.data.abi = EventParser.ParseEventDef(delayedEncode.data.abi).ToString();
                             if (!ABIRegex.MatchesFunctionABI(delayedEncode.data.abi))
                             {
@@ -43,7 +42,7 @@ namespace Sequence.EmbeddedWallet
                     if (!ABIRegex.MatchesFunctionABI(contractCall.data.abi))
                     {
                         string message = $"Given {nameof(SequenceContractCall)} transaction with function abi {contractCall.data.abi} that does not match the required regex {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"";
-                        Debug.LogWarning(message + "\nAttempting to recover and parse anyways");
+                        LogHandler.Warning(message + "\nAttempting to recover and parse anyways");
                         contractCall.data.abi = EventParser.ParseEventDef(contractCall.data.abi).ToString();
                         if (!ABIRegex.MatchesFunctionABI(contractCall.data.abi))
                         {

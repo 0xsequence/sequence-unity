@@ -13,7 +13,7 @@ namespace Sequence.Boilerplates
     public static class AssetHandler
     {
         public static readonly Texture2D DefaultTexture = new Texture2D(100, 100); // Default if we fail to fetch the texture
-        private static readonly string Directory = Path.Combine(Application.persistentDataPath, "assets");
+        private static readonly string Directory = Path.Combine(UnityEngine.Application.persistentDataPath, "assets");
         
         public static async Task<Sprite> GetSpriteAsync(string url)
         {

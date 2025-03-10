@@ -1,14 +1,12 @@
-using UnityEngine.Scripting;
-
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     public class RegisterSessionIntent
     {
         public IntentPayload intent;
         public string friendlyName;
         
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public RegisterSessionIntent(string friendlyName, IntentPayload intent)
         {
             this.friendlyName = friendlyName;

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Provider;
-using UnityEngine;
 using System.Numerics;
-using static Sequence.Contracts.Contract;
 
 namespace Sequence.Contracts
 {

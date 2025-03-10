@@ -4,9 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.Utils;
-using UnityEngine;
-using UnityEngine.Networking;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Integrations.Transak
 {
@@ -26,20 +24,20 @@ namespace Sequence.Integrations.Transak
         
         public static async Task<SupportedCountry[]> GetSupportedCountries()
         {
-            using UnityWebRequest request = UnityWebRequest.Get("https://api.transak.com/api/v2/countries");
-            string url = request.url;
+            var url = "https://api.transak.com/api/v2/countries";
+            using IWebRequest request = WebRequestBuilder.Get(url);
             string curlRequest = $"curl -X GET {url}";
             try
             {
-                await request.SendWebRequest();
+                var response = await request.Send();
                 
-                if (request.error != null || request.result != UnityWebRequest.Result.Success || request.responseCode < 200 || request.responseCode > 299)
+                if (request.Error != null || response.Result != WebRequestResult.Success || response.ResponseCode < 200 || response.ResponseCode > 299)
                 {
-                    throw new Exception($"Error sending request to {url}: {request.responseCode} {request.error}");
+                    throw new Exception($"Error sending request to {url}: {response.ResponseCode} {request.Error}");
                 }
                 else
                 {
-                    byte[] results = request.downloadHandler.data;
+                    byte[] results = request.Data;
                     var responseJson = Encoding.UTF8.GetString(results);
                     try
                     {
@@ -59,18 +57,18 @@ namespace Sequence.Integrations.Transak
             }
             catch (HttpRequestException e)
             {
-                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data)  + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                throw new Exception("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                throw new Exception("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
-                throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl-equivalent request: " + curlRequest);
             }
             finally
             {
@@ -87,7 +85,9 @@ namespace Sequence.Integrations.Transak
         
         public void OpenTransakLink(string fiatCurrency = "USD", string defaultFiatAmount = "50", string defaultCryptoCurrency = AddFundsSettings.DefaultCryptoCurrency, string networks = AddFundsSettings.DefaultNetworks, bool disableWalletAddressForm = true)
         {
-            Application.OpenURL(GetTransakLink(fiatCurrency, defaultFiatAmount, defaultCryptoCurrency, networks, disableWalletAddressForm));
+#if UNITY_2017_1_OR_NEWER
+            UnityEngine.Application.OpenURL(GetTransakLink(fiatCurrency, defaultFiatAmount, defaultCryptoCurrency, networks, disableWalletAddressForm));
+#endif
         }
     }
 }

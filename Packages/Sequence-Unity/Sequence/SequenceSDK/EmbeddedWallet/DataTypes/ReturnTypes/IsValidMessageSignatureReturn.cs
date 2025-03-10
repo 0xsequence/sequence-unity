@@ -1,14 +1,12 @@
-using UnityEngine.Scripting;
-
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [System.Serializable]
     public class IsValidMessageSignatureReturn
     {
         public bool isValid;
         
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IsValidMessageSignatureReturn(bool IsValid)
         {
              isValid =  IsValid;

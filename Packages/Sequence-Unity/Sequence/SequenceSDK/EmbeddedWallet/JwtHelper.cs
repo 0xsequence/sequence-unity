@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -28,7 +28,7 @@ namespace Sequence.EmbeddedWallet
             JwtPayload payload;
             try
             {
-                payload = JsonUtility.FromJson<JwtPayload>(payloadJson);
+                payload = JsonConvert.DeserializeObject<JwtPayload>(payloadJson);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Utils
 {
@@ -27,7 +27,7 @@ namespace Sequence.Utils
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
+                LogHandler.Error($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
         }

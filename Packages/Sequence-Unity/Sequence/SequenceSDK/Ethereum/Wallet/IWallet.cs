@@ -10,7 +10,6 @@ using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Transactions;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.Wallet
 {

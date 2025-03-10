@@ -1,16 +1,15 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class IntentDataGetSession
     {
         public string sessionId;
         public string wallet;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IntentDataGetSession(string sessionId, string walletAddress)
         {
             this.sessionId = sessionId;

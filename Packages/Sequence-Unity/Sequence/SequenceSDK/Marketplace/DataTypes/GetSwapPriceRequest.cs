@@ -1,7 +1,6 @@
 using System;
 using Newtonsoft.Json;
-using UnityEngine.Scripting;
-using UnityEngine.Serialization;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.Marketplace
 {
@@ -12,7 +11,12 @@ namespace Sequence.Marketplace
         public string sellCurrencyAddress;
         public string buyAmount;
         public ulong chainId;
-        [FormerlySerializedAs("slippagePercentageInBasisPoints")] public ulong slippagePercentage;
+        
+#if UNITY_2017_1_OR_NEWER
+        [UnityEngine.Serialization.FormerlySerializedAs("slippagePercentageInBasisPoints")] public ulong slippagePercentage;
+#else
+        public ulong slippagePercentage;
+#endif
         
         [Preserve]
         [JsonConstructor]

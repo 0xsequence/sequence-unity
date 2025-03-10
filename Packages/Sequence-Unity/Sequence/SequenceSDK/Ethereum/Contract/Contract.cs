@@ -4,12 +4,8 @@ using System.Threading.Tasks;
 using System;
 using System.Numerics;
 using Sequence.ABI;
+using Sequence.EmbeddedWallet;
 using Sequence.Provider;
-using Sequence.Transactions;
-using System.Text;
-using System.Text.RegularExpressions;
-using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.Contracts
 {
@@ -35,7 +31,7 @@ namespace Sequence.Contracts
             this._abi = abi;
             if (abi == null)
             {
-                Debug.LogWarning("Creating a contract with a null ABI is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
+                LogHandler.Warning("Creating a contract with a null ABI is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
                 this._functionAbi = null;
             }
             else
@@ -74,7 +70,7 @@ namespace Sequence.Contracts
                 {
                     string message =
                         $"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"";
-                    Debug.LogWarning(message + "\nAttempting to recover and parse anyways");
+                    LogHandler.Warning(message + "\nAttempting to recover and parse anyways");
                     functionName = EventParser.ParseEventDef(functionName).ToString();
                     if (!ABIRegex.MatchesFunctionABI(functionName))
                     {

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 
 namespace Sequence.ABI
@@ -271,7 +271,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error generating function selector: {ex.Message}");
+                LogHandler.Error($"Error generating function selector: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -351,7 +351,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error determining parameter type: {ex.Message}");
+                LogHandler.Error($"Error determining parameter type: {ex.Message}");
             }
 
             return ABIType.NONE;

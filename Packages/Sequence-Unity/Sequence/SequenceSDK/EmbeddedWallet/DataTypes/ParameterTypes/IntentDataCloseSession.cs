@@ -1,15 +1,14 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class IntentDataCloseSession
     {
         public string sessionId;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IntentDataCloseSession(string sessionId)
         {
             this.sessionId = sessionId;

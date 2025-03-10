@@ -1,11 +1,15 @@
 using System;
 using System.Text;
 using Newtonsoft.Json;
+
+#if UNITY_2017_1_OR_NEWER
 using UnityEngine;
 using UnityEngine.Networking;
+#endif
 
 namespace Sequence
 {
+#if UNITY_2017_1_OR_NEWER
     public class DownloadHandlerStream<T> : DownloadHandlerScript
     {
         private readonly WebRPCStreamOptions<T> _options;
@@ -52,4 +56,5 @@ namespace Sequence
             }
         }
     }
+#endif
 }

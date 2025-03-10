@@ -1,5 +1,4 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {

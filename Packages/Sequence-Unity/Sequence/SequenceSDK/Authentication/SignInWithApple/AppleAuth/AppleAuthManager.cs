@@ -5,6 +5,7 @@
 using AppleAuth.Enums;
 using AppleAuth.Interfaces;
 using System;
+using Sequence.EmbeddedWallet;
 
 namespace AppleAuth
 {
@@ -16,7 +17,7 @@ namespace AppleAuth
 #if APPLE_AUTH_MANAGER_NATIVE_IMPLEMENTATION_AVAILABLE
             PInvoke.AppleAuth_LogMessage(versionMessage);
 #else
-            UnityEngine.Debug.Log(versionMessage);
+            LogHandler.Error(versionMessage);
 #endif
         }
 

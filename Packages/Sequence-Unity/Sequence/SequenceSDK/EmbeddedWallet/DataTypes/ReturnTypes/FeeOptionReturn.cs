@@ -1,16 +1,15 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class FeeOptionReturn
     {
         public FeeOption FeeOption;
         public bool InWallet;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public FeeOptionReturn(FeeOption feeOption, bool inWallet)
         {
             FeeOption = feeOption;

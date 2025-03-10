@@ -2,11 +2,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [System.Serializable]
     public class SuccessfulTransactionReturn : TransactionReturn
     {
@@ -24,7 +23,7 @@ namespace Sequence.EmbeddedWallet
 
         public SuccessfulTransactionReturn() { }
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public SuccessfulTransactionReturn(string txHash, string metaTxHash, IntentPayload request, MetaTxnReceipt receipt, JObject nativeReceipt = null, SimulateResult[] simulations = null)
         {
@@ -64,7 +63,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"Failed to load JSON: {ex.Message}");
+                LogHandler.Error($"Failed to load JSON: {ex.Message}");
                 throw;
             }
 
@@ -90,7 +89,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"Error during JSON conversion: {ex.Message}");
+                LogHandler.Error($"Error during JSON conversion: {ex.Message}");
                 throw;
             }
 

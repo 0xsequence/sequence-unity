@@ -1,12 +1,11 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
-    [System.Serializable]
+    [Preserve]
+    [Serializable]
     public class IntentDataSendTransaction
     {
         public string identifier = Guid.NewGuid().ToString();
@@ -39,7 +38,7 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public IntentDataSendTransaction(string code, uint expires, uint issued, string network, JObject[] transactions, string transactionsFeeQuote, string wallet)
         {

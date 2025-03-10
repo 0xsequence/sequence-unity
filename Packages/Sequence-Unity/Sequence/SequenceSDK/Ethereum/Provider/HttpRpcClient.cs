@@ -3,14 +3,11 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Net.Http;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Sequence.Config;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
-using UnityEngine;
-using UnityEngine.Networking;
-
 
 namespace Sequence.Provider
 {
@@ -43,26 +40,25 @@ namespace Sequence.Provider
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
             
-            using var request = UnityWebRequest.Put(_url, requestJson);
+            using var request = WebRequestBuilder.Post(_url, requestJson);
 
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Accept", "application/json");
             request.SetRequestHeader("X-Access-Key", _builderApiKey); 
-            request.method = UnityWebRequest.kHttpVerbPOST;
             
-            string curlRequest = $"curl -X {request.method} '{_url}' -H 'Content-Type: {request.GetRequestHeader("Content-Type")}' -H 'Accept: {request.GetRequestHeader("Accept")}' -H 'X-Access-Key: {request.GetRequestHeader("X-Access-Key")}' -d '{requestJson}'";
+            string curlRequest = $"curl -X {request.Method} '{_url}' -H 'Content-Type: {request.GetRequestHeader("Content-Type")}' -H 'Accept: {request.GetRequestHeader("Accept")}' -H 'X-Access-Key: {request.GetRequestHeader("X-Access-Key")}' -d '{requestJson}'";
 
             try
             {
-                await request.SendWebRequest();
+                var response = await request.Send();
             
-                if (request.error != null || request.result != UnityWebRequest.Result.Success || request.responseCode < 200 || request.responseCode > 299)
+                if (request.Error != null || response.Result != WebRequestResult.Success || response.ResponseCode < 200 || response.ResponseCode > 299)
                 {
-                    throw new Exception($"Error sending request to {_url}: {request.responseCode} {request.error}");
+                    throw new Exception($"Error sending request to {_url}: {response.ResponseCode} {request.Error}");
                 }
                 else
                 {
-                    byte[] results = request.downloadHandler.data;
+                    byte[] results = request.Data;
                     request.Dispose();
                     var responseJson = Encoding.UTF8.GetString(results);
 
@@ -79,18 +75,18 @@ namespace Sequence.Provider
             }
             catch (HttpRequestException e)
             {
-                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data)  + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("HTTP Request failed: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data)  + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FormatException e)
             {
-                throw new Exception("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("Invalid URL format: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                throw new Exception("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("File load exception: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
-                throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl-equivalent request: " + curlRequest);
+                throw new Exception("An unexpected error occurred: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl-equivalent request: " + curlRequest);
             }
             finally
             {

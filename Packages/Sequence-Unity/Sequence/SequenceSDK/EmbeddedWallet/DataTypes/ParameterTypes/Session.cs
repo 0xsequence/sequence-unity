@@ -1,9 +1,8 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class Session
     {
@@ -17,7 +16,7 @@ namespace Sequence.EmbeddedWallet
         public DateTime refreshedAt;
         public DateTime expiresAt;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public Session(string id, string address, string userId, int projectId, Identity identity, string friendlyName, DateTime createdAt, DateTime refreshedAt, DateTime expiresAt)
         {
             this.id = id;

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
 
 namespace Sequence.Utils
 {
@@ -47,7 +46,7 @@ namespace Sequence.Utils
 
         public static T GetRandomObjectFromArray<T>(this T[] arr)
         {
-            int randomIndex = Random.Range(0, arr.Length);
+            int randomIndex = AppEnvironment.GetRandomNumber(0, arr.Length);
             return arr[randomIndex];
         }
     }

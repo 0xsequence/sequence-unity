@@ -1,3 +1,4 @@
+#if UNITY_2017_1_OR_NEWER
 using System.Threading.Tasks;
 using Sequence.Utils;
 using UnityEngine.Networking;
@@ -30,6 +31,11 @@ namespace Sequence.EmbeddedWallet
             _request.SetRequestHeader(key, value);
         }
 
+        public void SetTimeout(int timeout)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string GetRequestHeader(string key)
         {
             return _request.GetRequestHeader(key);
@@ -52,3 +58,5 @@ namespace Sequence.EmbeddedWallet
         }
     }
 }
+
+#endif

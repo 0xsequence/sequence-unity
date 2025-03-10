@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Sequence.EmbeddedWallet;
-using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
@@ -17,7 +16,7 @@ namespace Sequence.Marketplace
         public string transactionValue;
         public string approveData; // Supplied when includeApprove is true
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public SwapQuote(Address currencyAddress, string currencyBalance, string price, string maxPrice, Address to, string transactionData, string transactionValue, string approveData)
         {
             this.currencyAddress = currencyAddress;

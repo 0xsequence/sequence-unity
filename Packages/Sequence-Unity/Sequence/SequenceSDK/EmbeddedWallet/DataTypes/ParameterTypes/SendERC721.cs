@@ -1,11 +1,9 @@
 using System;
 using Newtonsoft.Json;
-using UnityEngine;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class SendERC721 : Transaction
     {
@@ -25,13 +23,13 @@ namespace Sequence.EmbeddedWallet
             this.safe = safe;
             if (!safe && data != null)
             {
-                Debug.LogError($"Error creating {GetType().Name}: {nameof(data)} can only be set when {nameof(safe)} is true.\nUsing null data.");
+                LogHandler.Error($"Error creating {GetType().Name}: {nameof(data)} can only be set when {nameof(safe)} is true.\nUsing null data.");
                 data = null;
             }
             this.data = data;
         }
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public SendERC721(string data, string id, bool safe, string to, string tokenAddress, string type)
         {

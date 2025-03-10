@@ -1,8 +1,7 @@
 using System;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
-using UnityEngine;
-using Sequence;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 
 namespace Sequence.ABI
@@ -60,7 +59,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error computing checksum address({address}): {ex.Message}");
+                LogHandler.Error($"Error computing checksum address({address}): {ex.Message}");
                 return address;
             }
         }
@@ -87,7 +86,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error computing Keccak-256 hash: {ex.Message}");
+                LogHandler.Error($"Error computing Keccak-256 hash: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -112,7 +111,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error computing Keccak-256 hash: {ex.Message}");
+                LogHandler.Error($"Error computing Keccak-256 hash: {ex.Message}");
                 return new byte[0];
             }
         }
@@ -132,7 +131,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error computing Keccak-256 hash: {ex.Message}");
+                LogHandler.Error($"Error computing Keccak-256 hash: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -191,7 +190,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error converting hexadecimal string to byte array: {ex.Message}");
+                LogHandler.Error($"Error converting hexadecimal string to byte array: {ex.Message}");
                 return new byte[0];
             }
         }

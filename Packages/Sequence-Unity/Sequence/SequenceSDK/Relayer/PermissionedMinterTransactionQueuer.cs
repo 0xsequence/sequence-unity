@@ -5,7 +5,6 @@ using Sequence;
 using Sequence.Relayer;
 using Sequence.Utils;
 using Sequence.EmbeddedWallet;
-using UnityEngine;
 
 namespace Sequence.Relayer
 {
@@ -22,7 +21,7 @@ namespace Sequence.Relayer
 
         private void HandleMintTokenFailed(string error)
         {
-            Debug.LogError(error);
+            LogHandler.Error(error);
         }
 
         private void OnDestroy()
@@ -53,7 +52,7 @@ namespace Sequence.Relayer
                 if (_queue[i].Item1.TokenId == transaction.TokenId)
                 {
                     _queue[i].Item1.Amount += transaction.Amount;
-                    _lastTransactionAddedTime = Time.time;
+                    _lastTransactionAddedTime = AppEnvironment.Time;
                     return true;
                 }
             }

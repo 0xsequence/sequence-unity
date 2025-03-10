@@ -6,8 +6,6 @@ using Sequence.Config;
 using Sequence.Provider;
 using Sequence.Utils;
 using Sequence.EmbeddedWallet;
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence.Relayer
 {

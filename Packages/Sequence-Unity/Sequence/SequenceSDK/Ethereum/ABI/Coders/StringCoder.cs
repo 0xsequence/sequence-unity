@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.ABI
 {
@@ -24,7 +24,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during Decode: " + ex.Message);
+                LogHandler.Error("Exception occurred during Decode: " + ex.Message);
                 throw;
             }
         }
@@ -48,7 +48,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during Encode: " + ex.Message);
+                LogHandler.Error("Exception occurred during Encode: " + ex.Message);
                 throw;
             }
         }
@@ -66,7 +66,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during EncodeToString: " + ex.Message);
+                LogHandler.Error("Exception occurred during EncodeToString: " + ex.Message);
                 throw;
             }
         }
@@ -85,7 +85,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during DecodeFromString: " + ex.Message);
+                LogHandler.Error("Exception occurred during DecodeFromString: " + ex.Message);
                 throw;
             }
         }

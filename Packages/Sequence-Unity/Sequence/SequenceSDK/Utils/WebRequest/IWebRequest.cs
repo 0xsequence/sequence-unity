@@ -24,6 +24,7 @@ namespace Sequence.EmbeddedWallet
         byte[] Data { get; }
         void SetRequestData(byte[] data, string contentType = "application/json");
         void SetRequestHeader(string key, string value);
+        void SetTimeout(int timeout);
         string GetRequestHeader(string key);
         string GetResponseHeader(string key);
         Task<WebRequestResponse> Send();

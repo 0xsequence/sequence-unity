@@ -1,16 +1,15 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class IntentResponseSignedMessage
     {
         public string signature;
         public string message;
         
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IntentResponseSignedMessage(string message, string signature)
         {
             this.message = message;

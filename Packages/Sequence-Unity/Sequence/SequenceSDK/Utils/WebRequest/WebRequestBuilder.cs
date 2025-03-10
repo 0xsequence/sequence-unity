@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Sequence.EmbeddedWallet
 {
     public static class WebRequestBuilder
@@ -7,9 +9,13 @@ namespace Sequence.EmbeddedWallet
             return Create(url, "GET");
         }
 
-        public static IWebRequest Post(string url)
+        public static IWebRequest Post(string url, string payload = "")
         {
-            return Create(url, "POST");
+            var request = Create(url, "POST");
+            if (!string.IsNullOrEmpty(payload))
+                request.SetRequestData(Encoding.UTF8.GetBytes(payload));
+            
+            return request;
         }
 
         private static IWebRequest Create(string url, string method)

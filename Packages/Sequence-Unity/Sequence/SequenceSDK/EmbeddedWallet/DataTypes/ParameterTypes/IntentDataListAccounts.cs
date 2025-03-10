@@ -1,16 +1,14 @@
 using System;
-using Newtonsoft.Json;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class IntentDataListAccounts
     {
         public string wallet;
         
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IntentDataListAccounts(string walletAddress)
         {
             this.wallet = walletAddress;

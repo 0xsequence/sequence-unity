@@ -1,3 +1,4 @@
+#if UNITY_2017_1_OR_NEWER
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -35,3 +36,5 @@ namespace Sequence.Utils
         }
     }
 }
+
+#endif

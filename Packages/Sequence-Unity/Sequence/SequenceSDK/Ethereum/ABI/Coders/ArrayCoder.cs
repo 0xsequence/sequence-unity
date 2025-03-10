@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.ABI
 {
@@ -31,7 +31,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding array: {ex.Message}");
+                LogHandler.Error($"Error encoding array: {ex.Message}");
                 return null;
             }
         }
@@ -52,7 +52,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding array to string: {ex.Message}");
+                LogHandler.Error($"Error encoding array to string: {ex.Message}");
                 return null;
             }
         }

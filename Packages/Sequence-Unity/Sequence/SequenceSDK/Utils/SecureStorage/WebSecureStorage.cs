@@ -1,4 +1,3 @@
-using UnityEngine;
 
 namespace Sequence.Utils.SecureStorage
 {
@@ -15,13 +14,13 @@ namespace Sequence.Utils.SecureStorage
         // PlayerPrefs uses IndexedDB on web platforms https://docs.unity3d.com/ScriptReference/PlayerPrefs.html
         public void StoreString(string key, string value)
         {
-            PlayerPrefs.SetString(key, value);
-            PlayerPrefs.Save();
+            SequencePrefs.SetString(key, value);
+            SequencePrefs.Save();
         }
 
         public string RetrieveString(string key)
         {
-            return PlayerPrefs.GetString(key);
+            return SequencePrefs.GetString(key);
         }
     }
 }

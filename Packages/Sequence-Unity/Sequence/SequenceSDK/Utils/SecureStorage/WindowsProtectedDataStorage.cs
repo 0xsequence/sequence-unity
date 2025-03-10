@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using UnityEngine;
 using System.IO;
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
@@ -11,7 +10,7 @@ namespace Sequence.Utils.SecureStorage
 {
     public class WindowsProtectedDataStorage : ISecureStorage
     {
-        public static string DataFile { get { return $"{Application.persistentDataPath}/data.bin"; } }
+        public static string DataFile { get { return $"{AppEnvironment.DataPath}/data.bin"; } }
 
         public WindowsProtectedDataStorage()
         {

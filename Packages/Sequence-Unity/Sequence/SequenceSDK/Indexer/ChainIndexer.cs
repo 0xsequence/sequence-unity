@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence
 {
@@ -47,7 +47,7 @@ namespace Sequence
             error = "Indexer query failed: " + error;
             if (_logErrors)
             {
-                Debug.LogError(error);
+                LogHandler.Error(error);
             }
             
             OnQueryError?.Invoke(error);
@@ -58,7 +58,7 @@ namespace Sequence
             string issue = "Indexer query encountered an issue: " + error;
             if (_logWarnings)
             {
-                Debug.LogWarning(issue);
+                LogHandler.Warning(issue);
             }
 
             OnQueryIssue?.Invoke(issue);

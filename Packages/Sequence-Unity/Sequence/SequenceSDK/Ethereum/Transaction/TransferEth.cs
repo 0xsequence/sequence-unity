@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Provider;
 using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.Transactions
 {

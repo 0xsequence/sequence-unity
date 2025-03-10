@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Sequence.Utils
 {
@@ -13,11 +12,11 @@ namespace Sequence.Utils
         /// <param name="delayInSeconds"></param>
         public static async Task DelayTask(float delayInSeconds)
         {
-            float currentTime = Time.time;
+            float currentTime = AppEnvironment.Time;
             float elapsedTime = 0;
             while (elapsedTime < delayInSeconds)
             {
-                elapsedTime = Time.time - currentTime;
+                elapsedTime = AppEnvironment.Time - currentTime;
                 await Task.Yield();
             }
         }

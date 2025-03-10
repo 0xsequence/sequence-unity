@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
+using Sequence.Utils;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -42,7 +42,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogException(e);
+                LogHandler.Error(e.Message);
                 return Array.Empty<LinkedWalletData>();
             }
         }
@@ -70,7 +70,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogException(e);
+                LogHandler.Error(e.Message);
                 return false;
             }
         }
@@ -97,7 +97,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Failed to generate EOA Wallet Link: {e}");
+                LogHandler.Error($"Failed to generate EOA Wallet Link: {e}");
                 return null;
             }
         }
@@ -105,7 +105,7 @@ namespace Sequence.EmbeddedWallet
         public async Task OpenEoaWalletLink()
         {
             var link = await GenerateEoaWalletLink();
-            Application.OpenURL(link);
+            AppEnvironment.OpenUrl(link);
         }
     }
     

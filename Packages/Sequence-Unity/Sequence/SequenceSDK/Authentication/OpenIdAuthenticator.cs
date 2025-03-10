@@ -81,7 +81,7 @@ namespace Sequence.Authentication
 #elif UNITY_ANDROID
             return new StandaloneBrowser();    // Todo switch to AndroidBrowser
 #else
-            throw new NotImplementedException("No social sign in implementation for this platform");
+            return new EditorBrowser(this);
 #endif
         }
 

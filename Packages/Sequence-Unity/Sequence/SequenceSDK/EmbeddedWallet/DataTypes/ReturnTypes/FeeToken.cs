@@ -1,10 +1,9 @@
 using System.Numerics;
 using Newtonsoft.Json;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     public class FeeToken
     {
         public uint chainId;
@@ -16,7 +15,7 @@ namespace Sequence.EmbeddedWallet
         public string tokenID;
         public FeeTokenType type;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         [JsonConstructor]
         public FeeToken(uint chainId, string contractAddress, uint decimals, string logoURL, string name, string symbol, string tokenID, FeeTokenType type)
         {

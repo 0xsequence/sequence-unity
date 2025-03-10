@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Sequence.Utils;
-using UnityEditor;
 
 namespace Sequence.ABI
 {

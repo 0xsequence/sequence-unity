@@ -5,15 +5,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence
 {
     public class HttpHandler : IHttpHandler
     {
-        private static List<UnityWebRequest> _streams = new();
+        private static List<IWebRequest> _streams = new();
         
         private string _builderApiKey;
         private IIndexer _caller;
@@ -32,27 +31,25 @@ namespace Sequence
         public async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0)
         {
             string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
-            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            using var req = WebRequestBuilder.Post(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
             req.SetRequestHeader("X-Access-Key", _builderApiKey); 
-            req.method = UnityWebRequest.kHttpVerbPOST;
-            req.timeout = 10; // Request will timeout after 10 seconds
+            req.SetTimeout(10); // Request will timeout after 10 seconds
             
             string curlRequest = 
                 $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
             try
             {
-                await req.SendWebRequest();
-                if (req.responseCode < 200 || req.responseCode > 299 || req.error != null ||
-                    req.result == UnityWebRequest.Result.ConnectionError ||
-                    req.result == UnityWebRequest.Result.ProtocolError)
+                var response = await req.Send();
+                if (response.ResponseCode < 200 || response.ResponseCode > 299 || req.Error != null ||
+                    response.Result == WebRequestResult.Failed)
                 {
-                    throw new Exception("Failed to make request, non-200 status code " + req.responseCode +
-                                        " with error: " + req.error + "\nCurl-equivalent request: " + curlRequest);
+                    throw new Exception("Failed to make request, non-200 status code " + response.ResponseCode +
+                                        " with error: " + req.Error + "\nCurl-equivalent request: " + curlRequest);
                 }
 
-                string returnText = req.downloadHandler.text;
+                string returnText = req.Text;
                 req.Dispose();
                 return returnText;
             }
@@ -109,14 +106,13 @@ namespace Sequence
         public async void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options, int retries = 0)
         {
             var requestJson = JsonConvert.SerializeObject(args, serializerSettings);
-            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            using var req = WebRequestBuilder.Post(Url(chainID, endPoint), requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("X-Access-Key", _builderApiKey); 
-            req.downloadHandler = new DownloadHandlerStream<T>(options);
-            req.method = UnityWebRequest.kHttpVerbPOST;
+            //TODO: req.downloadHandler = new DownloadHandlerStream<T>(options);
             
             _streams.Add(req);
-            await req.SendWebRequest();
+            await req.Send();
             
             if (_streams.Contains(req))
                 _streams.Remove(req);
@@ -124,8 +120,8 @@ namespace Sequence
 
         public void AbortStreams()
         {
-            foreach (var stream in _streams)
-                stream.Abort();
+            /*TODO: foreach (var stream in _streams)
+                stream.Abort();*/
             
             _streams.Clear();
         }

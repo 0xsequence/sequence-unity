@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Config;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
-using UnityEngine.Networking;
 
 namespace Sequence.Marketplace
 {
@@ -63,31 +63,29 @@ namespace Sequence.Marketplace
             {
                 requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             }
-            using UnityWebRequest request = UnityWebRequest.Get(url);
-            request.method = UnityWebRequest.kHttpVerbPOST;
+            using IWebRequest request = WebRequestBuilder.Post(url);
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
-            request.uploadHandler = new UploadHandlerRaw(requestData);
-            request.uploadHandler.contentType = "application/json";
+            request.SetRequestData(requestData);
             request.SetRequestHeader("X-Access-Key", _apiKey);
             request.SetRequestHeader("Content-Type", "application/json");
             string headersString = ExtractHeaders(request);
-            string method = request.method;
+            string method = request.Method;
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
 
-            UnityEngine.Debug.Log(curlRequest);
+            LogHandler.Info(curlRequest);
 
             try
             {
-                await request.SendWebRequest();
+                var response = await request.Send();
 
-                if (request.error != null || request.result != UnityWebRequest.Result.Success ||
-                    request.responseCode < 200 || request.responseCode > 299)
+                if (request.Error != null || response.Result != WebRequestResult.Success ||
+                    response.ResponseCode < 200 || response.ResponseCode > 299)
                 {
-                    throw new Exception($"Error sending request to {url}: {request.responseCode} {request.error}");
+                    throw new Exception($"Error sending request to {url}: {response.ResponseCode} {request.Error}");
                 }
                 else
                 {
-                    byte[] results = request.downloadHandler.data;
+                    byte[] results = request.Data;
                     var responseJson = Encoding.UTF8.GetString(results);
                     try
                     {
@@ -129,17 +127,17 @@ namespace Sequence.Marketplace
             }
         }
 
-        private string GetRequestErrorIfAvailable(UnityWebRequest request)
+        private string GetRequestErrorIfAvailable(IWebRequest request)
         {
-            if (request.downloadHandler != null && request.downloadHandler.data != null)
+            if (request.Data != null)
             {
-                return " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data);
+                return " reason: " + Encoding.UTF8.GetString(request.Data);
             }
 
             return "";
         }
 
-        private string ExtractHeaders(UnityWebRequest request)
+        private string ExtractHeaders(IWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
             foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Key"})

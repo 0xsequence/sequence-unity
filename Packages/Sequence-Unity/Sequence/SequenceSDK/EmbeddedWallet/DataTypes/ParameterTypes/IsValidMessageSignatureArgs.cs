@@ -1,8 +1,6 @@
-using UnityEngine.Scripting;
-
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [System.Serializable]
     public class IsValidMessageSignatureArgs
     {
@@ -11,7 +9,7 @@ namespace Sequence.EmbeddedWallet
         public string message;
         public string signature;
 
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IsValidMessageSignatureArgs(Chain chain, string walletAddress, string message, string signature)
         {
             this.chainId = chain.GetChainId();

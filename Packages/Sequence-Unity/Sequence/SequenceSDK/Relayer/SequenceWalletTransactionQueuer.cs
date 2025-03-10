@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 using Sequence;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
-using UnityEngine;
-using UnityEngine.Serialization;
+using Sequence.Utils;
 
 namespace Sequence.Relayer
 {
@@ -37,7 +36,7 @@ namespace Sequence.Relayer
                         if (current.Type == transaction.Type && current.ContractAddress == transaction.ContractAddress && current.TokenId == transaction.TokenId && current.ToAddress == transaction.ToAddress && current.FromAddress == transaction.FromAddress)
                         {
                             current.Amount += transaction.Amount;
-                            _lastTransactionAddedTime = Time.time;
+                            _lastTransactionAddedTime = AppEnvironment.Time;
                             return true;
                         }
                     }

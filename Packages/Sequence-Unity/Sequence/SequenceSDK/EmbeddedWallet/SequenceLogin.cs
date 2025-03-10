@@ -7,7 +7,6 @@ using Sequence.Config;
 using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
 using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -181,9 +180,12 @@ namespace Sequence.EmbeddedWallet
                 _authenticator.PlatformSpecificSetup();
             }
             catch (Exception e) {
-                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
+                LogHandler.Error($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
             }
-            Application.deepLinkActivated += _authenticator.HandleDeepLink;
+            
+#if UNITY_2017_1_OR_NEWER
+            UnityEngine.Application.deepLinkActivated += _authenticator.HandleDeepLink;
+#endif
             _authenticator.SignedIn += OnSocialLogin;
             _authenticator.OnSignInFailed += OnSocialSignInFailed;
         }
@@ -274,7 +276,7 @@ namespace Sequence.EmbeddedWallet
         private (EOAWallet, string, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string walletInfo = secureStorage.RetrieveString(Application.companyName + "-" + Application.productName + "-" + _walletKey);
+            string walletInfo = secureStorage.RetrieveString(AppEnvironment.CompanyName + "-" + AppEnvironment.ProductName + "-" + _walletKey);
             if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "", "");
@@ -383,9 +385,9 @@ namespace Sequence.EmbeddedWallet
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion), email);
-                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
-                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
-                PlayerPrefs.Save();
+                SequencePrefs.SetInt(WaaSLoginMethod, (int)method);
+                SequencePrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+                SequencePrefs.Save();
                 _isLoggingIn = false;
                 wallet.OnDropSessionComplete += session =>
                 {
@@ -428,7 +430,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogError("Error storing session wallet securely: " + e.Message);
+                LogHandler.Error("Error storing session wallet securely: " + e.Message);
             }
         }
 
@@ -458,7 +460,7 @@ namespace Sequence.EmbeddedWallet
                     case IdentityType.OIDC:
                         if (components.Length < 3)
                         {
-                            Debug.LogError(
+                            LogHandler.Error(
                                 "Invalid response from WaaS server, expected at least 3 components in OIDC login method string");
                         }
 
@@ -480,7 +482,7 @@ namespace Sequence.EmbeddedWallet
                         }
                         else
                         {
-                            Debug.LogError("Unexpected OIDC login method string: " + components[2]);
+                            LogHandler.Error("Unexpected OIDC login method string: " + components[2]);
                         }
                         break;
                     case IdentityType.Email:
@@ -493,7 +495,7 @@ namespace Sequence.EmbeddedWallet
                         methods.Add(LoginMethod.PlayFab);
                         break;
                     default:
-                        Debug.LogError("Unexpected identity type " + identityType);
+                        LogHandler.Error("Unexpected identity type " + identityType);
                         break;
                 }
             }
@@ -575,9 +577,9 @@ namespace Sequence.EmbeddedWallet
             
             await ConnectToWaaS(_failedLoginIntent, _failedLoginMethod, _failedLoginEmail);
             
-            PlayerPrefs.SetInt(WaaSLoginMethod, (int)_failedLoginMethod);
-            PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, _failedLoginEmail);
-            PlayerPrefs.Save();
+            SequencePrefs.SetInt(WaaSLoginMethod, (int)_failedLoginMethod);
+            SequencePrefs.SetString(OpenIdAuthenticator.LoginEmail, _failedLoginEmail);
+            SequencePrefs.Save();
         }
 
         public async Task ConnectToWaaSViaPlayFab(string titleId, string sessionTicket, string email)
@@ -610,7 +612,7 @@ namespace Sequence.EmbeddedWallet
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress + "-" + email);
+            secureStorage.StoreString(AppEnvironment.CompanyName + "-" + AppEnvironment.ProductName + "-" + _walletKey, privateKey + "-" + waasWalletAddress + "-" + email);
         }
 
         public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)
@@ -625,9 +627,9 @@ namespace Sequence.EmbeddedWallet
                     throw new Exception($"Email received from WaaS server doesn't match, received {responseEmail}, sent {email}");
                 }
                 
-                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
-                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
-                PlayerPrefs.Save();
+                SequencePrefs.SetInt(WaaSLoginMethod, (int)method);
+                SequencePrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+                SequencePrefs.Save();
                 _failedLoginEmail = "";
                 _failedLoginIntent = null;
                 _failedLoginMethod = LoginMethod.None;

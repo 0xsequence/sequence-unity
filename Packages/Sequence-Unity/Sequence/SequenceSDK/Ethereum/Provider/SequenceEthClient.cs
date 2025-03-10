@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.Provider
 {
@@ -311,12 +310,12 @@ namespace Sequence.Provider
         public async Task<TransactionReceipt> WaitForTransactionReceipt(string transactionHash, int maxWaitTimeInMilliseconds = 15000, int timeBetweenChecksInMilliseconds = 500)
         {
             TransactionReceipt receipt = null;
-            float startTime = Time.time;
+            float startTime = AppEnvironment.Time;
             while (receipt == null)
             {
                 receipt = await TransactionReceipt(transactionHash);
 
-                float elapsedTime = Time.time - startTime;
+                float elapsedTime = AppEnvironment.Time - startTime;
                 if (elapsedTime * 1000 + timeBetweenChecksInMilliseconds >= maxWaitTimeInMilliseconds)
                 {
                     return receipt;

@@ -1,12 +1,12 @@
 using System;
-using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 #if UNITY_2017_1_OR_NEWER
+using NUnit.Framework;
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.Serialization;
 #endif
@@ -15,7 +15,7 @@ namespace Sequence.Config
 {
 #if UNITY_2017_1_OR_NEWER
     [CreateAssetMenu(fileName = "SequenceConfig", menuName = "Sequence/SequenceConfig", order = 1)]
-    public class SequenceConfig : UnityEngine.ScriptableObject, ISequenceConfig
+    public class SequenceConfig : ScriptableObject, ISequenceConfig
     {
         [field: SerializeField, Header("Social Sign In Configuration - Standalone & Web Platforms")] public string UrlScheme { get; set; }
         [field: SerializeField] public string GoogleClientId { get; set; }

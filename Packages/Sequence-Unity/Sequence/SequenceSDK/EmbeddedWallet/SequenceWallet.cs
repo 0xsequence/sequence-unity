@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.Config;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -117,7 +116,7 @@ namespace Sequence.EmbeddedWallet
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                            LogHandler.Error("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
                             OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
                             return result;
                         }
@@ -221,7 +220,7 @@ namespace Sequence.EmbeddedWallet
             }
             else
             {
-                Debug.LogError("Failed to drop sessionId: " + dropSessionId);
+                LogHandler.Error("Failed to drop sessionId: " + dropSessionId);
             }
             return result;
         }
@@ -241,7 +240,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Failed to list sessions: " + e.Message);
+                LogHandler.Warning("Failed to list sessions: " + e.Message);
             }
             OnSessionsFound?.Invoke(results);
             return results;
@@ -257,7 +256,7 @@ namespace Sequence.EmbeddedWallet
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                    LogHandler.Error("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
                     return successfulTransactionReturn;
                 }
             }

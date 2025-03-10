@@ -1,6 +1,5 @@
-
 using System;
-using UnityEngine;
+using Sequence.EmbeddedWallet;
 
 namespace Sequence.ABI
 {
@@ -24,7 +23,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to decode address: {ex.Message}");
+                LogHandler.Error($"Failed to decode address: {ex.Message}");
                 return null;
             }
         }
@@ -45,7 +44,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to encode address: {ex.Message}");
+                LogHandler.Error($"Failed to encode address: {ex.Message}");
                 return new byte[0];
             }
         }
@@ -79,7 +78,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to encode address to string: {ex.Message}");
+                LogHandler.Error($"Failed to encode address to string: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -99,7 +98,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to decode address from string: {ex.Message}");
+                LogHandler.Error($"Failed to decode address from string: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -118,7 +117,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to decode address: {ex.Message}");
+                LogHandler.Error($"Failed to decode address: {ex.Message}");
                 return null;
             }
         }

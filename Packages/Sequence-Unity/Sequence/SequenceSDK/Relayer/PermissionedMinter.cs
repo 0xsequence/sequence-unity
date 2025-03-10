@@ -46,7 +46,7 @@ namespace Sequence.Relayer
         
         private async Task<string> SendMintTokenRequest(string mintTokenRequestJson)
         {
-            using IWebRequest request = WebRequestBuilder.Post(_mintEndpoint);
+            using IWebRequest request = WebRequestBuilder.Post(_mintEndpoint, string.Empty);
             byte[] requestData = mintTokenRequestJson.ToByteArray();
             request.SetRequestData(requestData);
             request.SetRequestHeader("Content-Type", "application/json");

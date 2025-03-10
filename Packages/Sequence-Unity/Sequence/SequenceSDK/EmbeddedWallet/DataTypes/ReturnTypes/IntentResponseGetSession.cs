@@ -1,9 +1,8 @@
 using System;
-using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [UnityEngine.Scripting.Preserve]
+    [Preserve]
     [Serializable]
     public class IntentResponseGetSession
     {
@@ -11,7 +10,7 @@ namespace Sequence.EmbeddedWallet
         public string wallet;
         public bool validated;
         
-        [UnityEngine.Scripting.Preserve]
+        [Preserve]
         public IntentResponseGetSession(string sessionId, string wallet, bool validated)
         {
             this.sessionId = sessionId;
