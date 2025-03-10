@@ -3,14 +3,14 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentResponseSignedMessage
     {
         public string signature;
         public string message;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentResponseSignedMessage(string message, string signature)
         {
             this.message = message;

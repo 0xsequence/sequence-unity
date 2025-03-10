@@ -1,6 +1,5 @@
 using System.IO;
-using UnityEditor;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Sequence.Config
 {
@@ -44,7 +43,7 @@ namespace Sequence.Config
 
         private static string ExtractVersionFromJson(string json)
         {
-            var jsonObj = JsonUtility.FromJson<PackageJson>(json);
+            var jsonObj = JsonConvert.DeserializeObject<PackageJson>(json);
             return jsonObj.version;
         }
 

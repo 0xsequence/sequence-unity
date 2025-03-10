@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Sequence.Authentication
 {
@@ -12,7 +12,7 @@ namespace Sequence.Authentication
             IdTokenJwtPayload payload;
             try
             {
-                payload = JsonUtility.FromJson<IdTokenJwtPayload>(payloadJson);
+                payload = JsonConvert.DeserializeObject<IdTokenJwtPayload>(payloadJson);
             }
             catch (Exception ex)
             {

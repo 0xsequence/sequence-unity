@@ -1,11 +1,14 @@
 using AppleAuth.Interfaces;
 using System;
-using UnityEngine;
 
 namespace AppleAuth.Native
 {
     [Serializable]
-    internal class LoginWithAppleIdResponse : ILoginWithAppleIdResponse, ISerializationCallbackReceiver
+#if UNITY_2017_1_OR_NEWER
+    internal class LoginWithAppleIdResponse : ILoginWithAppleIdResponse, UnityEngine.ISerializationCallbackReceiver
+#else
+    internal class LoginWithAppleIdResponse : ILoginWithAppleIdResponse
+#endif
     {
         public bool _success = false;
         public bool _hasAppleIdCredential = false;

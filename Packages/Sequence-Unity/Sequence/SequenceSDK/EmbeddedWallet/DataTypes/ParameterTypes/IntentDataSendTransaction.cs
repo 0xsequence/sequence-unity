@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [System.Serializable]
     public class IntentDataSendTransaction
     {
@@ -39,7 +39,7 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentDataSendTransaction(string code, uint expires, uint issued, string network, JObject[] transactions, string transactionsFeeQuote, string wallet)
         {

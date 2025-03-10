@@ -3,7 +3,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [System.Serializable]
     public class SendERC20 : Transaction
     {
@@ -20,7 +20,7 @@ namespace Sequence.EmbeddedWallet
             this.value = value;
         }
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public SendERC20(string to, string tokenAddress, string type, string value)
         {

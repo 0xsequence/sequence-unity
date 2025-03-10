@@ -2,7 +2,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class ErrorResponse
     {
         public string error;
@@ -11,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string cause;
         public int status;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public ErrorResponse(string error, int code, string msg, string cause, int status)
         {
             this.error = error;

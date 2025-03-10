@@ -1,14 +1,10 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.Provider;
+using Sequence.EmbeddedWallet;
 using Sequence.Utils;
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence.Relayer
 {
@@ -50,29 +46,27 @@ namespace Sequence.Relayer
         
         private async Task<string> SendMintTokenRequest(string mintTokenRequestJson)
         {
-            using UnityWebRequest request = UnityWebRequest.Get(_mintEndpoint);
-            request.method = UnityWebRequest.kHttpVerbPOST;
+            using IWebRequest request = WebRequestBuilder.Post(_mintEndpoint);
             byte[] requestData = mintTokenRequestJson.ToByteArray();
-            request.uploadHandler = new UploadHandlerRaw(requestData);
-            request.uploadHandler.contentType = "application/json";
+            request.SetRequestData(requestData);
             request.SetRequestHeader("Content-Type", "application/json");
             
             string curlRequest = $"curl -X POST -H \"Content-Type: application/json\" -d '{mintTokenRequestJson}' {_mintEndpoint}";
 
             try
             {
-                await request.SendWebRequest();
+                await request.Send();
 
-                string transactionHash = request.downloadHandler.text;
+                string transactionHash = request.Text;
                 request.Dispose();
 
                 OnMintTokenSuccess?.Invoke(transactionHash);
             }
             catch (FileLoadException e)
             {
-                if (request.downloadHandler != null) // Unity sometimes throws an exception here even though the response can be properly handled. I have no idea why...
+                if (request.Text != null) // Unity sometimes throws an exception here even though the response can be properly handled. I have no idea why...
                 {
-                    string transactionHash = request.downloadHandler.text;
+                    string transactionHash = request.Text;
                     request.Dispose();
 
                     if (!transactionHash.StartsWith("0x"))
@@ -84,11 +78,11 @@ namespace Sequence.Relayer
                     OnMintTokenSuccess?.Invoke(transactionHash);
                     return transactionHash;
                 }
-                OnMintTokenFailed?.Invoke("Error minting using permissioned minter: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl request: " + curlRequest);
+                OnMintTokenFailed?.Invoke("Error minting using permissioned minter: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl request: " + curlRequest);
             }
             catch (Exception e)
             {
-                OnMintTokenFailed?.Invoke("Error minting using permissioned minter: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.downloadHandler.data) + "\nCurl request: " + curlRequest);
+                OnMintTokenFailed?.Invoke("Error minting using permissioned minter: " + e.Message + " reason: " + Encoding.UTF8.GetString(request.Data) + "\nCurl request: " + curlRequest);
             }
             finally
             {

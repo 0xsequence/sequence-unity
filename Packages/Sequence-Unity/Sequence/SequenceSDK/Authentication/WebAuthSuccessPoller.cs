@@ -1,3 +1,4 @@
+#if UNITY_2017_1_OR_NEWER
 using System;
 using System.Collections;
 using System.IO;
@@ -91,3 +92,4 @@ namespace Sequence.Authentication
         }
     }
 }
+#endif

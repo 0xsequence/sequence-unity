@@ -4,11 +4,14 @@ using AppleAuth;
 using AppleAuth.Enums;
 using AppleAuth.Interfaces;
 using AppleAuth.Native;
-using UnityEngine;
 
 namespace Sequence.Authentication
 {
-    public class SignInWithApple : MonoBehaviour
+#if UNITY_2017_1_OR_NEWER
+    public class SignInWithApple : UnityEngine.MonoBehaviour
+#else
+    public class SignInWithApple
+#endif
     {
         IAppleAuthManager m_AppleAuthManager;
         public string Token;

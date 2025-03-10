@@ -1,6 +1,6 @@
-using UnityEditor;
+#if UNITY_EDITOR
 using System.IO;
-using UnityEngine;
+using UnityEditor;
 
 namespace Sequence.Config.Editor
 {
@@ -33,3 +33,5 @@ namespace Sequence.Config.Editor
         }
     }
 }
+
+#endif

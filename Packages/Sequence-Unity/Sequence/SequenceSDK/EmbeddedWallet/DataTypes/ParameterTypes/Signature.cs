@@ -3,14 +3,14 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class Signature
     {
         public string sessionId;
         public string signature;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public Signature(string sessionId, string signature)
         {
             this.sessionId = sessionId;

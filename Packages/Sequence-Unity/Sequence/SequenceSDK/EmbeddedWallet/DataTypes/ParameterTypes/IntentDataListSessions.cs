@@ -3,13 +3,13 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentDataListSessions
     {
         public string wallet;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentDataListSessions(string walletAddress)
         {
             this.wallet = walletAddress;

@@ -3,14 +3,14 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentResponseSessionOpened
     {
         public string sessionId;
         public string wallet;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentResponseSessionOpened(string sessionId, string wallet)
         {
             this.sessionId = sessionId;

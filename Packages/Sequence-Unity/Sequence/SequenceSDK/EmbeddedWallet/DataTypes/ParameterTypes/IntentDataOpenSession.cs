@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentDataOpenSession
     {
@@ -15,7 +15,7 @@ namespace Sequence.EmbeddedWallet
         public string sessionId;
         public string verifier;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentDataOpenSession(string answer, bool forceCreateAccount, string identityType, string sessionId, string verifier)
         {

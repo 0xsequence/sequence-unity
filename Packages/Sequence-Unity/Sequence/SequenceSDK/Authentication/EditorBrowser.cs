@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using UnityEngine;
 
 namespace Sequence.Authentication
 {
@@ -25,16 +24,20 @@ namespace Sequence.Authentication
             string stateFragment = _state.Substring(stateIndex);
             _state = "unity-editor" + stateFragment;
             _authenticator.BrowserModifyStateToken(_state);
-            Application.OpenURL(authUrl);
+#if UNITY_2017_1_OR_NEWER
+            UnityEngine.Application.OpenURL(authUrl);
+#endif
             PollForSuccess();
         }
 
         private void PollForSuccess()
         {
-            GameObject successPoller = UnityEngine.Object.Instantiate(new GameObject("SuccessPoller")) as GameObject;
+#if UNITY_2017_1_OR_NEWER
+            UnityEngine.GameObject successPoller = UnityEngine.Object.Instantiate(new UnityEngine.GameObject("SuccessPoller"));
             WebAuthSuccessPoller poller = successPoller.AddComponent<WebAuthSuccessPoller>();
             poller.Setup(_authenticator, _authenticator.GetRedirectUrl(), _state);
             poller.PollForAuthSuccess();
+#endif
         }
     }
 }

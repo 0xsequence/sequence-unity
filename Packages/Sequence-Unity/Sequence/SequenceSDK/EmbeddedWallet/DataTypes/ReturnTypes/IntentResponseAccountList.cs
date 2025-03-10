@@ -2,13 +2,13 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class IntentResponseAccountList
     {
         public Account[] accounts;
         public string currentAccountId;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentResponseAccountList(Account[] accounts, string currentAccountId)
         {
             this.accounts = accounts;

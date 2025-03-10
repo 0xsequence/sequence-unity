@@ -3,7 +3,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class IntentDataFederateAccount
     {
         public string answer;
@@ -12,7 +12,7 @@ namespace Sequence.EmbeddedWallet
         public string verifier;
         public string wallet;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentDataFederateAccount(string sessionId, string wallet, string identityType, string verifier, string answer)
         {

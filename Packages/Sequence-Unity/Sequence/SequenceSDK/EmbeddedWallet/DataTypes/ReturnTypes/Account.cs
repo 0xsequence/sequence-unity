@@ -2,7 +2,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet 
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class Account
     {
         public string email;
@@ -10,7 +10,7 @@ namespace Sequence.EmbeddedWallet
         public IdentityType identityType;
         public string issuer;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public Account(string id, string type, string issuer, string email)
         {
             this.id = id;

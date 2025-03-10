@@ -3,7 +3,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [System.Serializable]
     [Obsolete("It is recommended to use SequenceContractCall instead")]
     public class DelayedEncode : Transaction
@@ -14,7 +14,7 @@ namespace Sequence.EmbeddedWallet
         public string type = TypeIdentifier;
         public string value;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public DelayedEncode(string contractAddress, string value, DelayedEncodeData data)
         {
             this.to = contractAddress;

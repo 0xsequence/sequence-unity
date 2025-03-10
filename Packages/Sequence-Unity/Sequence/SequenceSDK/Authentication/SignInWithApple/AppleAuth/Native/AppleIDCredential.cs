@@ -1,12 +1,15 @@
 using AppleAuth.Enums;
 using AppleAuth.Interfaces;
 using System;
-using UnityEngine;
 
 namespace AppleAuth.Native
 {
     [Serializable]
-    internal class AppleIDCredential : IAppleIDCredential, ISerializationCallbackReceiver
+#if UNITY_2017_1_OR_NEWER
+    internal class AppleIDCredential : IAppleIDCredential, UnityEngine.ISerializationCallbackReceiver
+#else
+    internal class AppleIDCredential : IAppleIDCredential
+#endif
     {
         public string _base64IdentityToken = null;
         public string _base64AuthorizationCode = null;

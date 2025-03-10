@@ -4,27 +4,27 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentResponse<T>
     {
         public Response<T> response;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentResponse(Response<T> response)
         {
             this.response = response;
         }
     }
 
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class Response<T>
     {
         public string code;
         public T data;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public Response(string code, T data)
         {
             this.code = code;

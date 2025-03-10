@@ -3,13 +3,13 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentDataCloseSession
     {
         public string sessionId;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentDataCloseSession(string sessionId)
         {
             this.sessionId = sessionId;

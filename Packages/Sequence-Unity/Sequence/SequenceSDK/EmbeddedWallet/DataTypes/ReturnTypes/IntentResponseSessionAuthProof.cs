@@ -2,7 +2,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class IntentResponseSessionAuthProof
     {
         public string sessionId;
@@ -11,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string message;
         public string signature;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentResponseSessionAuthProof(string sessionId, string network, string wallet, string message, string signature)
         {
             this.sessionId = sessionId;

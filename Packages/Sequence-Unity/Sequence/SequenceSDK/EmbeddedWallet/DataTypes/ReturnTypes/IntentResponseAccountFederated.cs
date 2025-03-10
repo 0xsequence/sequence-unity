@@ -2,12 +2,12 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class IntentResponseAccountFederated
     {
         public Account account;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public IntentResponseAccountFederated(Account account)
         {
             this.account = account;

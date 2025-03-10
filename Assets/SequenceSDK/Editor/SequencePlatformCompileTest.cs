@@ -140,7 +140,7 @@ namespace Sequence.Editor
 
         private static void AndroidBuildTest(string path, string[] scenes)
         {
-            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
+            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
             bool isSecureStorageEnabled = config.StoreSessionPrivateKeyInSecureStorage;
             BuildTarget target = BuildTarget.Android;
 
@@ -166,14 +166,14 @@ namespace Sequence.Editor
             }
         }
 
-        private static void AssertPluginCompatibility(SequenceConfig config, BuildTarget target)
+        private static void AssertPluginCompatibility(ISequenceConfig config, BuildTarget target)
         {
             PluginImporter pluginImporter = AssetImporter.GetAtPath(AndroidDependencyManager.SecureStoragePluginPath) as PluginImporter;
             Assert.IsNotNull(pluginImporter, "Plugin not found at path: " + AndroidDependencyManager.SecureStoragePluginPath);
             Assert.AreEqual(config.StoreSessionPrivateKeyInSecureStorage, pluginImporter.GetCompatibleWithPlatform(target));
         }
 
-        private static void AssertAppropriateScriptingDefines(SequenceConfig config, BuildTarget target)
+        private static void AssertAppropriateScriptingDefines(ISequenceConfig config, BuildTarget target)
         {
             string defines = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(BuildPipeline.GetBuildTargetGroup(target)));
             Assert.AreEqual(config.StoreSessionPrivateKeyInSecureStorage, defines.Contains(AndroidScriptDefineSetup.EnableAndroidSecureStorage));

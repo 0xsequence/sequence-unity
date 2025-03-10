@@ -1,11 +1,14 @@
 using System;
 using AppleAuth.Interfaces;
-using UnityEngine;
 
 namespace AppleAuth.Native
 {
     [Serializable]
-    internal class PersonName : IPersonName, ISerializationCallbackReceiver
+#if UNITY_2017_1_OR_NEWER
+    internal class PersonName : IPersonName, UnityEngine.ISerializationCallbackReceiver
+#else
+    internal class PersonName : IPersonName
+#endif
     {
         public string _namePrefix = null;
         public string _givenName = null;

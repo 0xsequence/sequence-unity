@@ -1,10 +1,8 @@
 using System;
-using UnityEngine;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.IO;

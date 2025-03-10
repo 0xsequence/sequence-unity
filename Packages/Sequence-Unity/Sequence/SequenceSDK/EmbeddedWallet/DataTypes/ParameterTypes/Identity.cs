@@ -11,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string sub;
         public string email;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public Identity(string type, string iss, string sub, string email)
         {
             this.type = type;

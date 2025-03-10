@@ -1,5 +1,5 @@
 using AppleAuth.Interfaces;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace AppleAuth.Native
 {
@@ -7,12 +7,12 @@ namespace AppleAuth.Native
     {
         public ICredentialStateResponse DeserializeCredentialStateResponse(string payload)
         {
-            return JsonUtility.FromJson<CredentialStateResponse>(payload);
+            return JsonConvert.DeserializeObject<CredentialStateResponse>(payload);
         }
 
         public ILoginWithAppleIdResponse DeserializeLoginWithAppleIdResponse(string payload)
         {
-            return JsonUtility.FromJson<LoginWithAppleIdResponse>(payload);
+            return JsonConvert.DeserializeObject<LoginWithAppleIdResponse>(payload);
         }
     }
 }

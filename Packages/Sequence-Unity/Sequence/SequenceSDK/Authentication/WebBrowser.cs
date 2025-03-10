@@ -7,8 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Sequence.Utils;
-using UnityEngine;
-using UnityEngine.Networking;
 using Object = System.Object;
 
 namespace Sequence.Authentication
@@ -38,7 +36,7 @@ namespace Sequence.Authentication
             Dictionary<string, string> queryParams = url.ExtractQueryAndHashParameters();
             if (queryParams.TryGetValue("client_id", out string clientId))
             {
-                GameObject receiver = new GameObject("WebBrowserMessageReceiver");
+                UnityEngine.GameObject receiver = new UnityEngine.GameObject("WebBrowserMessageReceiver");
                 receiver.AddComponent<WebBrowserMessageReceiver>().SetWebBrowser(this);
                 ISocialSignIn socialSignIn = WebSocialSignInFactory.Create(method);
                 socialSignIn.SignIn(clientId, "");
@@ -98,7 +96,8 @@ namespace Sequence.Authentication
         }
     }
     
-    public class WebBrowserMessageReceiver : MonoBehaviour
+#if UNITY_2017_1_OR_NEWER
+    public class WebBrowserMessageReceiver : UnityEngine.MonoBehaviour
     {
         private WebBrowser _webBrowser;
 
@@ -113,4 +112,5 @@ namespace Sequence.Authentication
             Destroy(gameObject);
         }
     }
+#endif
 }

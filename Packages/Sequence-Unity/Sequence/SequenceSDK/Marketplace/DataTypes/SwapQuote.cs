@@ -17,7 +17,7 @@ namespace Sequence.Marketplace
         public string transactionValue;
         public string approveData; // Supplied when includeApprove is true
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public SwapQuote(Address currencyAddress, string currencyBalance, string price, string maxPrice, Address to, string transactionData, string transactionValue, string approveData)
         {
             this.currencyAddress = currencyAddress;

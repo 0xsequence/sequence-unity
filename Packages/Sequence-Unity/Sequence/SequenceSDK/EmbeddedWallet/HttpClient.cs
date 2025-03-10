@@ -3,19 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using Sequence.ABI;
-using Sequence.Authentication;
 using Sequence.Config;
-using Sequence.Provider;
 using Sequence.Utils;
 using Sequence.WaaS.DataTypes;
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -38,7 +32,7 @@ namespace Sequence.EmbeddedWallet
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
+            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
             _defaultHeaders["X-Access-Key"] = config.BuilderAPIKey;
             _defaultHeaders["Accept-Signature"] = "sig=()";
             if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))
@@ -60,7 +54,7 @@ namespace Sequence.EmbeddedWallet
             this._defaultHeaders[key] = value;
         }
 
-        public (UnityWebRequest, string, string) BuildRequest<T>(string path, T args,
+        public (IWebRequest, string, string) BuildRequest<T>(string path, T args,
             [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
             string url = _url.AppendTrailingSlashIfNeeded() + path;
@@ -70,13 +64,12 @@ namespace Sequence.EmbeddedWallet
                 url = overrideUrl.AppendTrailingSlashIfNeeded() + path;
             }
 
-            UnityWebRequest request = UnityWebRequest.Get(url);
-            request.method = UnityWebRequest.kHttpVerbPOST;
+            IWebRequest request = WebRequestBuilder.Post(url);
             SetHeaders(request, headers);
             
             string requestJson = SetRequestData(request, args);
             
-            string method = request.method;
+            string method = request.Method;
             string headersString = ExtractHeaders(request);
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
             if (requestJson == "")
@@ -87,7 +80,7 @@ namespace Sequence.EmbeddedWallet
             return (request, curlRequest, url);
         }
 
-        private void SetHeaders(UnityWebRequest request, Dictionary<string, string> headers)
+        private void SetHeaders(IWebRequest request, Dictionary<string, string> headers)
         {
             if (headers == null)
             {
@@ -114,7 +107,7 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
-        private string SetRequestData<T>(UnityWebRequest request, T args)
+        private string SetRequestData<T>(IWebRequest request, T args)
         {
             string requestJson = "";
             if (typeof(T) == typeof(string))
@@ -126,28 +119,27 @@ namespace Sequence.EmbeddedWallet
                 requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             }
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
-            request.uploadHandler = new UploadHandlerRaw(requestData);
-            request.uploadHandler.contentType = "application/json";
+            request.SetRequestData(requestData);
             return requestJson;
         }
 
         public async Task<T2> SendRequest<T, T2>(string path, T args, [CanBeNull] Dictionary<string, string> headers = null, string overrideUrl = null)
         {
-            (UnityWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
-            UnityWebRequest request = newRequest.Item1;
+            (IWebRequest, string, string) newRequest = BuildRequest(path, args, headers, overrideUrl);
+            IWebRequest request = newRequest.Item1;
             string curlRequest = newRequest.Item2;
             string url = newRequest.Item3;
             
-            Debug.Log(curlRequest);
+            LogHandler.Info(curlRequest);
 
             try
             {
-                await request.SendWebRequest();
+                var response = await request.Send();
 
-                if (request.error != null || request.result != UnityWebRequest.Result.Success ||
-                    request.responseCode < 200 || request.responseCode > 299)
+                if (response.Result != WebRequestResult.Success ||
+                    response.ResponseCode < 200 || response.ResponseCode > 299)
                 {
-                    throw new Exception($"Error sending request to {url}: {request.responseCode} {request.error}");
+                    throw new Exception($"Error sending request to {url}: {response.ResponseCode} {request.Error}");
                 }
                 else
                 {
@@ -170,7 +162,7 @@ namespace Sequence.EmbeddedWallet
                     }
                     else
                     {
-                        byte[] results = request.downloadHandler.data;
+                        byte[] results = response.Data;
                         responseJson = Encoding.UTF8.GetString(results);
                     }
                     try
@@ -242,12 +234,11 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<TimeSpan> GetTimeShift()
         {
-            UnityWebRequest request = UnityWebRequest.Get(_waasUrl.AppendTrailingSlashIfNeeded() + "status");
-            request.method = UnityWebRequest.kHttpVerbGET;
+            IWebRequest request = WebRequestBuilder.Get(_waasUrl.AppendTrailingSlashIfNeeded() + "status");
 
             try
             {
-                await request.SendWebRequest();
+                await request.Send();
                 DateTime serverTime = DateTime.Parse(request.GetResponseHeader("date")).ToUniversalTime();
                 DateTime localTime = DateTime.UtcNow;
                 TimeSpan timeShift = serverTime - localTime;
@@ -255,7 +246,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogError("Error getting time shift: " + e.Message);
+                LogHandler.Error("Error getting time shift: " + e.Message);
                 return TimeSpan.Zero;
             }
             finally
@@ -264,17 +255,17 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
-        private string GetRequestErrorIfAvailable(UnityWebRequest request)
+        private string GetRequestErrorIfAvailable(IWebRequest request)
         {
-            if (request.downloadHandler != null && request.downloadHandler.data != null)
+            if (request.Data != null)
             {
-                return " " + Encoding.UTF8.GetString(request.downloadHandler.data);
+                return " " + Encoding.UTF8.GetString(request.Data);
             }
 
             return "";
         }
 
-        private string ExtractHeaders(UnityWebRequest request)
+        private string ExtractHeaders(IWebRequest request)
         {
             StringBuilder headerBuilder = new StringBuilder();
             foreach (string headerKey in new string[]{"Content-Type", "Accept", "Authorization", "X-Sequence-Tenant", "X-Access-Key"})

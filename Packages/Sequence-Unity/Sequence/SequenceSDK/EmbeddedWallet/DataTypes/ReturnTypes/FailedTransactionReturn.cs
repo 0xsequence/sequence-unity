@@ -4,7 +4,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [System.Serializable]
     public class FailedTransactionReturn : TransactionReturn
     {
@@ -13,7 +13,7 @@ namespace Sequence.EmbeddedWallet
         public IntentPayload request;
         public SimulateResult[] simulations;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public FailedTransactionReturn(string error, IntentPayload request, SimulateResult[] simulations)
         {

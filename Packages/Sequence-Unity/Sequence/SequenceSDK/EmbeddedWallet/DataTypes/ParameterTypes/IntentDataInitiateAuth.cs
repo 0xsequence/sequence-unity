@@ -3,7 +3,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     public class IntentDataInitiateAuth
     {
         public string identityType;
@@ -11,7 +11,7 @@ namespace Sequence.EmbeddedWallet
         public string sessionId;
         public string verifier;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentDataInitiateAuth(string identityType, string metadata, string sessionId, string verifier)
         {

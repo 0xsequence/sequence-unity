@@ -3,13 +3,13 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class SendIntentPayload
     {
         public IntentPayload intent;
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public SendIntentPayload(IntentPayload intent)
         {
             this.intent = intent;

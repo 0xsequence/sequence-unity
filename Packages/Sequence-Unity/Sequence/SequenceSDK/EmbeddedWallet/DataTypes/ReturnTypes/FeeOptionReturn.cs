@@ -3,14 +3,14 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class FeeOptionReturn
     {
         public FeeOption FeeOption;
         public bool InWallet;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public FeeOptionReturn(FeeOption feeOption, bool inWallet)
         {
             FeeOption = feeOption;

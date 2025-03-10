@@ -39,7 +39,7 @@ namespace Sequence.Demo
 
             _demoPage = FindObjectOfType<EmbeddedWalletDemoPage>();
 
-            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
+            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
             
             SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
 

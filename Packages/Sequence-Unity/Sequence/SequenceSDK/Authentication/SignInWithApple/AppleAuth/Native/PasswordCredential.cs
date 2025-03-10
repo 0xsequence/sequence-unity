@@ -1,11 +1,14 @@
 using AppleAuth.Interfaces;
 using System;
-using UnityEngine;
 
 namespace AppleAuth.Native
 {
     [Serializable]
-    internal class PasswordCredential : IPasswordCredential, ISerializationCallbackReceiver
+#if UNITY_2017_1_OR_NEWER
+    internal class PasswordCredential : IPasswordCredential, UnityEngine.ISerializationCallbackReceiver
+#else
+    internal class PasswordCredential : IPasswordCredential
+#endif
     {
         public string _user = null;
         public string _password = null;

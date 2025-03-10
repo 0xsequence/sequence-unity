@@ -190,7 +190,7 @@ namespace Sequence.EmbeddedWallet
 
         private void Configure()
         {
-            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
+            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
             string waasVersion = config.WaaSVersion;
             if (string.IsNullOrWhiteSpace(waasVersion))
             {

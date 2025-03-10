@@ -6,7 +6,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentPayload
     {
@@ -17,7 +17,7 @@ namespace Sequence.EmbeddedWallet
         public Signature[] signatures;
         public string version;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentPayload(string version, string name, ulong expiresAt, ulong issuedAt, JObject data, Signature[] signatures)
         {

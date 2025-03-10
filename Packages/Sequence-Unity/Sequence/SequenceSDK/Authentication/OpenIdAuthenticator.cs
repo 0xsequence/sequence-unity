@@ -5,8 +5,6 @@ using System.Net.Sockets;
 using System.Collections.Generic;
 using Sequence.Config;
 using Sequence.Utils;
-using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Sequence.Authentication
 {
@@ -44,7 +42,7 @@ namespace Sequence.Authentication
 
         public OpenIdAuthenticator(string nonce = null)
         {
-            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
+            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
 
             _urlScheme = config.UrlScheme;
             SetClientIds(config);
@@ -55,7 +53,7 @@ namespace Sequence.Authentication
             _browser = CreateBrowser();
         }
 
-        private void SetClientIds(SequenceConfig config)
+        private void SetClientIds(ISequenceConfig config)
         {
 #if UNITY_IOS && !UNITY_EDITOR
             GoogleClientId = config.GoogleClientIdIOS;
@@ -231,9 +229,9 @@ namespace Sequence.Authentication
 
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={_redirectUrl}&scope=openid+email&state={state}/";
-            if (PlayerPrefs.HasKey(LoginEmail))
+            if (SequencePrefs.HasKey(LoginEmail))
             {
-                url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
+                url = url.RemoveTrailingSlash() + $"&login_hint={SequencePrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
                 url = url.Replace(" ", "");
             }
 

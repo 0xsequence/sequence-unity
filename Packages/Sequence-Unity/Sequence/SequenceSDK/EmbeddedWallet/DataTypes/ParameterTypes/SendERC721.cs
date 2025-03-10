@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class SendERC721 : Transaction
     {
@@ -31,7 +31,7 @@ namespace Sequence.EmbeddedWallet
             this.data = data;
         }
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public SendERC721(string data, string id, bool safe, string to, string tokenAddress, string type)
         {

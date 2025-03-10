@@ -4,7 +4,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentDataSessionAuthProof
     {
@@ -12,7 +12,7 @@ namespace Sequence.EmbeddedWallet
         public string nonce = null;
         public string wallet;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentDataSessionAuthProof(string network, string wallet, string nonce)
         {

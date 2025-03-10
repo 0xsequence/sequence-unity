@@ -3,7 +3,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class FeeOption
     {
@@ -12,7 +12,7 @@ namespace Sequence.EmbeddedWallet
         public FeeToken token;
         public string value;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public FeeOption(uint gasLimit, string to, FeeToken token, string value)
         {
             this.gasLimit = gasLimit;

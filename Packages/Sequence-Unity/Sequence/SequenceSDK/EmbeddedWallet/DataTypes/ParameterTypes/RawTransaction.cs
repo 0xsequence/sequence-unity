@@ -7,7 +7,7 @@ using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [System.Serializable]
     public class RawTransaction : Transaction
     {
@@ -65,7 +65,7 @@ namespace Sequence.EmbeddedWallet
             this.data = callContractFunction.CallData;
         }
         
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public RawTransaction(string data, string to, string type, string value)
         {

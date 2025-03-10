@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using UnityEngine;
+using Newtonsoft.Json;
 
 namespace Sequence.Config
 {
@@ -12,7 +12,7 @@ namespace Sequence.Config
             ConfigJwt payload;
             try
             {
-                payload = JsonUtility.FromJson<ConfigJwt>(payloadJson);
+                payload = JsonConvert.DeserializeObject<ConfigJwt>(payloadJson);
                 CheckValidConfigJwt(payload);
             }
             catch (Exception ex)

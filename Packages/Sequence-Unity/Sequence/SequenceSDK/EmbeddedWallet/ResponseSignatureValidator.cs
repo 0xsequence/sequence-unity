@@ -62,9 +62,9 @@ namespace Sequence.EmbeddedWallet
             return Convert.FromBase64String(output);
         }
         
-        public string ValidateResponse(UnityWebRequest request)
+        public string ValidateResponse(IWebRequest request)
         {
-            byte[] results = request.downloadHandler.data;
+            byte[] results = request.Data;
             var responseJson = Encoding.UTF8.GetString(results);
             string contentDigest = request.GetResponseHeader("Content-Digest");
             if (string.IsNullOrWhiteSpace(contentDigest))

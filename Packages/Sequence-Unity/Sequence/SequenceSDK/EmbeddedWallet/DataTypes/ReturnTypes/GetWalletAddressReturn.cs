@@ -2,13 +2,13 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [System.Serializable]
     public class GetWalletAddressReturn
     {
         public string address;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         public GetWalletAddressReturn(string address)
         {
             this.address = address;

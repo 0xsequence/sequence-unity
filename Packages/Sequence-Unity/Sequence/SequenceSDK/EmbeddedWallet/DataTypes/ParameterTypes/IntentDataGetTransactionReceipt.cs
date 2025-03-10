@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
-    [Preserve]
+    [UnityEngine.Scripting.Preserve]
     [Serializable]
     public class IntentDataGetTransactionReceipt
     {
@@ -13,7 +13,7 @@ namespace Sequence.EmbeddedWallet
         public string network;
         public string wallet;
 
-        [Preserve]
+        [UnityEngine.Scripting.Preserve]
         [JsonConstructor]
         public IntentDataGetTransactionReceipt(string metaTxHash, string network, string wallet)
         {
