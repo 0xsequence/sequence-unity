@@ -28,11 +28,6 @@
       "displayName": "Useful Scripts",
       "description": "Basic scripts that are helpful for getting started with the SDK",
       "path": "Sequence/Samples~/Scripts"
-    },
-    {
-      "displayName": "Boilerplates",
-      "description": "Bootstrap your Game with ready-to-go features such as an Inventory or In-Game Shop.",
-      "path": "Sequence/Samples~/Boilerplates"
     }
   ],
   "documentationUrl": "https://docs.sequence.xyz/sdk/unity/overview/",
