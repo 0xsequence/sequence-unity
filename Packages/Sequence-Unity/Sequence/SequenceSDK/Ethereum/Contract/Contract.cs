@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System;
 using System.Numerics;
 using Sequence.ABI;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 using Sequence.Provider;
 
 namespace Sequence.Contracts

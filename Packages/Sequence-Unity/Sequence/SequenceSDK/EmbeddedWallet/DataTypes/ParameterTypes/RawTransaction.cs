@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Sequence.Contracts;
 using Sequence.Transactions;
 using StringExtensions = Sequence.Utils.StringExtensions;
+using Sequence.Utils;
 
 namespace Sequence.EmbeddedWallet
 {

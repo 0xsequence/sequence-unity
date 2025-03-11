@@ -1,3 +1,5 @@
+using Sequence.Utils;
+
 namespace Sequence.EmbeddedWallet 
 {
     [Preserve]

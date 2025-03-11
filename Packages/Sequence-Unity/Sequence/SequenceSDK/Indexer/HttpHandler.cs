@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 
 namespace Sequence

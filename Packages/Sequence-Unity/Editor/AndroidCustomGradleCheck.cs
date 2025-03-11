@@ -21,8 +21,8 @@ namespace Sequence.Editor
         {
             if (report.summary.platform == BuildTarget.Android)
             {
-                ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
-                if (!config.StoreSessionPrivateKeyInSecureStorage)
+                SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.None);
+                if (!configBase.StoreSessionPrivateKeyInSecureStorage)
                 {
                     return;
                 }

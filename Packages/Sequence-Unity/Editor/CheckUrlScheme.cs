@@ -20,8 +20,8 @@ namespace Sequence.Editor
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
-            _urlScheme = config.UrlScheme;
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.None);
+            _urlScheme = configBase.UrlScheme;
 
             if (string.IsNullOrWhiteSpace(_urlScheme))
             {

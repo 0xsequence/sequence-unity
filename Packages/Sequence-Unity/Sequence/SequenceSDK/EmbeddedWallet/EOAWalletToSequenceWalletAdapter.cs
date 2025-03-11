@@ -7,6 +7,7 @@ using Sequence.Transactions;
 using Sequence.Contracts;
 using Sequence.Provider;
 using Newtonsoft.Json;
+using Sequence.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace Sequence.EmbeddedWallet

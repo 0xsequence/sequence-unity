@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace Sequence.Integrations.Transak
 {

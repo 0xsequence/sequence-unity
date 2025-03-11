@@ -25,8 +25,8 @@ namespace Sequence.Marketplace
         
         public HttpClient()
         {
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.Marketplace);
-            _apiKey = config.BuilderAPIKey;
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.Marketplace);
+            _apiKey = configBase.BuilderAPIKey;
 #if SEQUENCE_DEV_MARKETPLACE || SEQUENCE_DEV
             _baseUrl = _devUrl;
 #else

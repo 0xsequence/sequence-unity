@@ -1,9 +1,8 @@
 #if UNITY_2017_1_OR_NEWER
 using System.Threading.Tasks;
-using Sequence.Utils;
 using UnityEngine.Networking;
 
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Utils
 {
     public class WebRequestUnity : IWebRequest
     {
@@ -16,6 +15,7 @@ namespace Sequence.EmbeddedWallet
         
         public WebRequestUnity(string url, string method)
         {
+            Method = method;
             _request = UnityWebRequest.Get(url);
             _request.method = method;
         }
@@ -33,7 +33,7 @@ namespace Sequence.EmbeddedWallet
 
         public void SetTimeout(int timeout)
         {
-            throw new System.NotImplementedException();
+            _request.timeout = timeout;
         }
 
         public string GetRequestHeader(string key)
@@ -49,7 +49,17 @@ namespace Sequence.EmbeddedWallet
         public async Task<WebRequestResponse> Send()
         {
             await _request.SendWebRequest();
-            return new WebRequestResponse();
+            Data = _request.downloadHandler.data;
+            Text = _request.downloadHandler.text;
+            Error = _request.error;
+            
+            return new WebRequestResponse
+            {
+                Data = Data,
+                ResponseCode = (int)_request.responseCode,
+                Result = _request.result == UnityWebRequest.Result.Success ? 
+                    WebRequestResult.Success : WebRequestResult.Failed
+            };
         }
         
         public void Dispose()

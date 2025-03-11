@@ -34,8 +34,8 @@ namespace Sequence.Editor
                     defineList = new List<string>(defines.Split(';'));
                 }
 
-                ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
-                if (config.StoreSessionPrivateKeyInSecureStorage)
+                SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.None);
+                if (configBase.StoreSessionPrivateKeyInSecureStorage)
                 {
                     if (!defineList.Contains(EnableAndroidSecureStorage))
                     {

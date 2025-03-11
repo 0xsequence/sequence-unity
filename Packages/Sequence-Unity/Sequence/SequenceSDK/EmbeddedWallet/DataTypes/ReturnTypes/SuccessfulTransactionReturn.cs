@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System;
+using Sequence.Utils;
 
 namespace Sequence.EmbeddedWallet
 {

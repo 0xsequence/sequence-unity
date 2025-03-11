@@ -1,6 +1,6 @@
 using System;
 using Newtonsoft.Json;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {

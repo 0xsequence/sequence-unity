@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Utils
 {
     public enum WebRequestResult
     {

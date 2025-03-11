@@ -5,7 +5,7 @@
 using AppleAuth.Enums;
 using AppleAuth.Interfaces;
 using System;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace AppleAuth
 {

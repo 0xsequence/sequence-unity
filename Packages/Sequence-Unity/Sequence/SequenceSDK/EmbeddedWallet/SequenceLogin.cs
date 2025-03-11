@@ -192,8 +192,8 @@ namespace Sequence.EmbeddedWallet
 
         private void Configure()
         {
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
-            string waasVersion = config.WaaSVersion;
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.WaaS);
+            string waasVersion = configBase.WaaSVersion;
             if (string.IsNullOrWhiteSpace(waasVersion))
             {
                 throw SequenceConfig.MissingConfigError("WaaS Version");

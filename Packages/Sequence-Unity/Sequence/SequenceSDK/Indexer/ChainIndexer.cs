@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace Sequence
 {

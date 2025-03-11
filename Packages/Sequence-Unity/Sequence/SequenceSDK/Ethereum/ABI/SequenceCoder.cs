@@ -1,7 +1,6 @@
 using System;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
-using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 
 namespace Sequence.ABI

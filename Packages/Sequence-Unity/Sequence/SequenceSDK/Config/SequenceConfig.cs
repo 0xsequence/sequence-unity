@@ -15,34 +15,57 @@ namespace Sequence.Config
 {
 #if UNITY_2017_1_OR_NEWER
     [CreateAssetMenu(fileName = "SequenceConfig", menuName = "Sequence/SequenceConfig", order = 1)]
-    public class SequenceConfig : ScriptableObject, ISequenceConfig
+    public class SequenceConfig : ScriptableObject
     {
-        [field: SerializeField, Header("Social Sign In Configuration - Standalone & Web Platforms")] public string UrlScheme { get; set; }
-        [field: SerializeField] public string GoogleClientId { get; set; }
-        [field: SerializeField] public string DiscordClientId { get; set; }
-        [field: SerializeField] public string FacebookClientId { get; set; }
-        [field: SerializeField] public string AppleClientId { get; set; }
-        
-        [field: SerializeField, Header("Social Sign In Configuration - iOS")] public string GoogleClientIdIOS { get; set; }
-        [field: SerializeField] public string DiscordClientIdIOS { get; set; }
-        [field: SerializeField] public string FacebookClientIdIOS { get; set; }
-        [field: SerializeField] public string AppleClientIdIOS { get; set; }
+        [Header("Social Sign In Configuration - Standalone & Web Platforms")]
+        public string UrlScheme;
+        public string GoogleClientId;
+        public string DiscordClientId;
+        public string FacebookClientId;
+        public string AppleClientId;
 
-        [field: SerializeField, Header("WaaS Configuration")] public string WaaSConfigKey { get; set; }
-        [field: SerializeField, FormerlySerializedAs("EnableAccountOverride")] public bool EnableMultipleAccountsPerEmail { get; set; } = false;
-        [field: SerializeField] public string WaaSVersion { get; set; }
+        [Header("Social Sign In Configuration - iOS")]
+        public string GoogleClientIdIOS;
+        public string DiscordClientIdIOS;
+        public string FacebookClientIdIOS;
+        public string AppleClientIdIOS;
 
-        [field: SerializeField, Header("Sequence SDK Configuration")] public string BuilderAPIKey { get; set; }
-        [field: SerializeField] public bool StoreSessionPrivateKeyInSecureStorage { get; set; } = false;
-        [field: SerializeField] public bool EditorStoreSessionPrivateKeyInSecureStorage { get; set; } = false;
+        [Header("WaaS Configuration")]
+        public string WaaSConfigKey;
+        [FormerlySerializedAs("EnableAccountOverride")] public bool EnableMultipleAccountsPerEmail = false;
+        public string WaaSVersion;
+
+        [Header("Sequence SDK Configuration")]
+        public string BuilderAPIKey;
+        public bool StoreSessionPrivateKeyInSecureStorage = false;
+        public bool EditorStoreSessionPrivateKeyInSecureStorage = false;
         
-        private static ISequenceConfig _config;
-        public static ISequenceConfig GetConfig(SequenceService sequenceService = SequenceService.Unspecified)
+        private static SequenceConfigBase _configBase;
+        public static SequenceConfigBase GetConfig(SequenceService sequenceService = SequenceService.Unspecified)
         {
-            if (_config == null)
+            if (_configBase == null)
             {
-                _config = GetAppropriateConfig(sequenceService);
-                if (_config == null)
+                var config = GetAppropriateConfig(sequenceService);
+                _configBase = new SequenceConfigBase
+                {
+                    UrlScheme = config.UrlScheme,
+                    GoogleClientId = config.GoogleClientId,
+                    DiscordClientId = config.DiscordClientId,
+                    FacebookClientId = config.FacebookClientId,
+                    AppleClientId = config.AppleClientId,
+                    GoogleClientIdIOS = config.GoogleClientIdIOS,
+                    DiscordClientIdIOS = config.DiscordClientIdIOS,
+                    FacebookClientIdIOS = config.FacebookClientIdIOS,
+                    AppleClientIdIOS = config.AppleClientIdIOS,
+                    WaaSConfigKey = config.WaaSConfigKey,
+                    WaaSVersion = config.WaaSVersion,
+                    BuilderAPIKey =  config.BuilderAPIKey,
+                    EnableMultipleAccountsPerEmail = config.EnableMultipleAccountsPerEmail,
+                    StoreSessionPrivateKeyInSecureStorage = config.StoreSessionPrivateKeyInSecureStorage,
+                    EditorStoreSessionPrivateKeyInSecureStorage = config.EditorStoreSessionPrivateKeyInSecureStorage
+                };
+                
+                if (_configBase == null)
                 {
                     throw new Exception("SequenceConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > SequenceConfig");
                 }
@@ -50,24 +73,24 @@ namespace Sequence.Config
                 TextAsset versionFile = Resources.Load<TextAsset>("sequence-unity-version");
                 if (versionFile != null)
                 {
-                    _config.WaaSVersion = $"1 (Unity {versionFile.text})";
+                    _configBase.WaaSVersion = $"1 (Unity {versionFile.text})";
                 }
                 else
                 {
-                    _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
+                    _configBase.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
                 }
                 
 #if UNITY_EDITOR && !SEQ_DISABLE_PACKAGE_OVERRIDE
-                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
+                _configBase.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
 #endif
             }
 
-            return _config;
+            return _configBase;
         }
 
-        public static void SetConfig(ISequenceConfig config)
+        public static void SetConfig(SequenceConfigBase configBase)
         {
-            _config = config;
+            _configBase = configBase;
         }
 
         private static SequenceConfig GetAppropriateConfig(SequenceService sequenceService)
@@ -150,7 +173,7 @@ namespace Sequence.Config
 
         public static ConfigJwt GetConfigJwt()
         {
-            string configKey = _config.WaaSConfigKey;
+            string configKey = _configBase.WaaSConfigKey;
             if (string.IsNullOrWhiteSpace(configKey))
             {
                 throw SequenceConfig.MissingConfigError("WaaS Config Key");
@@ -158,28 +181,18 @@ namespace Sequence.Config
 
             return JwtHelper.GetConfigJwt(configKey);
         }
-
-        public bool StoreSessionKey()
-        {
-#if UNITY_EDITOR
-            return EditorStoreSessionPrivateKeyInSecureStorage &&
-                   TestContext.CurrentTestExecutionContext?.ExecutionStatus != TestExecutionStatus.Running;
-#else
-            return StoreSessionPrivateKeyInSecureStorage;
-#endif
-        }
     }
 #else
     public class SequenceConfig
     {
-        private static ISequenceConfig _config;
+        private static SequenceConfigBase _config;
 
-        public static ISequenceConfig GetConfig(SequenceService sequenceService = SequenceService.Unspecified)
+        public static SequenceConfigBase GetConfig(SequenceService sequenceService = SequenceService.Unspecified)
         {
             return _config;
         }
         
-        public static void SetConfig(ISequenceConfig config)
+        public static void SetConfig(SequenceConfigBase config)
         {
             _config = config;
         }

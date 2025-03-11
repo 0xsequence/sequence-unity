@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 using Newtonsoft.Json;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace Sequence.Marketplace
 {

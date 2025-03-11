@@ -137,9 +137,9 @@ namespace Sequence.EmbeddedWallet.Tests
         [TestCase(1000)] // intent will have been issued in the future
         public async Task TestTimeMismatchExceptionResultsInRetry(int timeOffset)
         {
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.WaaS);
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            IntentSender intentSender = new IntentSender(new HttpClient($"{configJwt.rpcServer.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator"), new EOAWallet(), "", configJwt.projectId, config.WaaSVersion);
+            IntentSender intentSender = new IntentSender(new HttpClient($"{configJwt.rpcServer.AppendTrailingSlashIfNeeded()}rpc/WaasAuthenticator"), new EOAWallet(), "", configJwt.projectId, configBase.WaaSVersion);
             LogAssert.Expect(LogType.Warning, new Regex("Time mismatch*"));
             try
             {

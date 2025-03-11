@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Utils
 {
     public class WebRequestDotnet : IWebRequest
     {
@@ -58,6 +58,7 @@ namespace Sequence.EmbeddedWallet
 
         public string GetResponseHeader(string key)
         {
+            // .NET HttpClient can include header keys in lowercase
             return _responseHeaders.TryGetValue(key.ToLower(), out var value) ? value : string.Empty;
         }
 

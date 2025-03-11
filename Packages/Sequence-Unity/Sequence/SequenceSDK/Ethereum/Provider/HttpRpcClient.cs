@@ -6,7 +6,6 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Sequence.Config;
-using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 
 namespace Sequence.Provider

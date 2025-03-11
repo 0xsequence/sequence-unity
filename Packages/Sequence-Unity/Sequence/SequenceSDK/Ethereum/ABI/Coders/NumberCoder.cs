@@ -1,6 +1,6 @@
 using System;
 using System.Numerics;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace Sequence.ABI
 {

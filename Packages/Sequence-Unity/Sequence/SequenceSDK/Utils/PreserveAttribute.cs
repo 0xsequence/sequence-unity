@@ -1,6 +1,6 @@
 using System;
 
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Utils
 {
     [AttributeUsage(AttributeTargets.All, Inherited = false)]
     public sealed class PreserveAttribute : Attribute

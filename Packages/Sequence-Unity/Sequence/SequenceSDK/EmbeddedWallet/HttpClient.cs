@@ -31,10 +31,10 @@ namespace Sequence.EmbeddedWallet
             this._defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
-            _defaultHeaders["X-Access-Key"] = config.BuilderAPIKey;
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.WaaS);
+            _defaultHeaders["X-Access-Key"] = configBase.BuilderAPIKey;
             _defaultHeaders["Accept-Signature"] = "sig=()";
-            if (string.IsNullOrWhiteSpace(config.BuilderAPIKey))
+            if (string.IsNullOrWhiteSpace(configBase.BuilderAPIKey))
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }

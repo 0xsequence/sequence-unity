@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Sequence.Utils;
 
 namespace Sequence.EmbeddedWallet
 {

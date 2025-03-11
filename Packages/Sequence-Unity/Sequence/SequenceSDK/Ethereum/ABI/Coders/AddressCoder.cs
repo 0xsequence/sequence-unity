@@ -1,5 +1,5 @@
 using System;
-using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 
 namespace Sequence.ABI
 {

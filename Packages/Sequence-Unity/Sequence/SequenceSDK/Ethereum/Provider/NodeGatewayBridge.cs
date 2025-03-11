@@ -7,7 +7,7 @@ namespace Sequence.Provider
 {
     public static class NodeGatewayBridge
     {
-        private static ISequenceConfig _config = SequenceConfig.GetConfig(SequenceService.NodeGateway);
+        private static SequenceConfigBase _configBase = SequenceConfig.GetConfig(SequenceService.NodeGateway);
         
 #if SEQUENCE_DEV_NODEGATEWAY || SEQUENCE_DEV
         private const string _baseUrl = "https://dev-nodes.sequence.app/";
@@ -23,7 +23,7 @@ namespace Sequence.Provider
                     "Network is not supported. Please contact Sequence support and use your own RPC url in the meantime");
             }
 
-            string builderApiKey = _config.BuilderAPIKey;
+            string builderApiKey = _configBase.BuilderAPIKey;
             if (string.IsNullOrWhiteSpace(builderApiKey))
             {
                 throw SequenceConfig.MissingConfigError("Builder API Key");

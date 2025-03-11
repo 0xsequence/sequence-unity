@@ -42,10 +42,13 @@ namespace Sequence.Authentication
 
         public OpenIdAuthenticator(string nonce = null)
         {
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.None);
 
-            _urlScheme = config.UrlScheme;
-            SetClientIds(config);
+#if UNITY_2017_1_OR_NEWER
+            _urlScheme = configBase.UrlScheme;
+#endif
+            
+            SetClientIds(configBase);
             
 #if UNITY_EDITOR
             InjectRedirectUrl("http://localhost:8080/");
@@ -53,18 +56,18 @@ namespace Sequence.Authentication
             _browser = CreateBrowser();
         }
 
-        private void SetClientIds(ISequenceConfig config)
+        private void SetClientIds(SequenceConfigBase configBase)
         {
 #if UNITY_IOS && !UNITY_EDITOR
             GoogleClientId = config.GoogleClientIdIOS;
             DiscordClientId = config.DiscordClientIdIOS;
             FacebookClientId = config.FacebookClientIdIOS;
             AppleClientId = config.AppleClientIdIOS;
-#else // Todo get Android client ids on Android platform
-            GoogleClientId = config.GoogleClientId;
-            DiscordClientId = config.DiscordClientId;
-            FacebookClientId = config.FacebookClientId;
-            AppleClientId = config.AppleClientId;
+#elif UNITY_2017_1_OR_NEWER // Todo get Android client ids on Android platform
+            GoogleClientId = configBase.GoogleClientId;
+            DiscordClientId = configBase.DiscordClientId;
+            FacebookClientId = configBase.FacebookClientId;
+            AppleClientId = configBase.AppleClientId;
 #endif
         }
 

@@ -1,4 +1,4 @@
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Utils
 {
     public static class LogHandler
     {

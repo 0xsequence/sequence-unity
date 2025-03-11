@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Utils
 {
     public static class WebRequestBuilder
     {

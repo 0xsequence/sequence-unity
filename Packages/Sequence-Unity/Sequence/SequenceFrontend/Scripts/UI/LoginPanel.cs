@@ -39,11 +39,11 @@ namespace Sequence.Demo
 
             _demoPage = FindObjectOfType<EmbeddedWalletDemoPage>();
 
-            ISequenceConfig config = SequenceConfig.GetConfig(SequenceService.WaaS);
+            SequenceConfigBase configBase = SequenceConfig.GetConfig(SequenceService.WaaS);
             
             SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
 
-            _storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
+            _storeSessionInfoAndSkipLoginWhenPossible = configBase.StoreSessionKey();
             
             ILogin loginHandler = SequenceLogin.GetInstance();
             SetupLoginHandler(loginHandler);
@@ -52,7 +52,7 @@ namespace Sequence.Demo
             
             if (_urlScheme == null) 
             {
-                _urlScheme = config.UrlScheme;
+                _urlScheme = configBase.UrlScheme;
             }
         }
 
