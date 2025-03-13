@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
+using UnityEngine.Assertions;
 
 namespace Sequence.Marketplace
 {
