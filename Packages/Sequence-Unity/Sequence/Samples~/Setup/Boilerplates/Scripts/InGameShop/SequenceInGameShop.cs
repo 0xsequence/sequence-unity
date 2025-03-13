@@ -73,6 +73,13 @@ namespace Sequence.Boilerplates.InGameShop
             await _qrCodeView.Show(_saleState.PaymentToken, destinationAddress, "1e2");
         }
 
+        public void OpenInventory()
+        {
+            SetLoading(true);
+            BoilerplateFactory.OpenSequenceInventory(transform.parent, _wallet, _chain, 
+                new [] {_tokenContractAddress}, () => SetLoading(false));
+        }
+        
         public async void RefreshState()
         {
             ClearState();

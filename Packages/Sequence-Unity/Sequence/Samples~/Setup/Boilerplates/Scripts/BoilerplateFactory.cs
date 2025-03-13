@@ -70,13 +70,13 @@ namespace Sequence.Boilerplates
         /// <param name="parent">Transform inside of a Canvas object.</param>
         /// <param name="wallet">This Wallet instance will perform transactions.</param>
         /// <param name="chain">Chain used to get balances and send transactions.</param>
-        /// <param name="contractAddress">The inventory will show items from this contract.</param>
+        /// <param name="collections">The inventory will show items from these contracts.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceInventory which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequenceInventory OpenSequenceInventory(Transform parent, IWallet wallet, Chain chain, string contractAddress, Action onClose = null)
+        public static SequenceInventory OpenSequenceInventory(Transform parent, IWallet wallet, Chain chain, string[] collections, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceInventory>("Inventory/SequenceInventory", parent, 
-                b => b.Show(wallet, chain, contractAddress, onClose));
+                b => b.Show(wallet, chain, collections, onClose));
         }
         
         /// <summary>

@@ -1,20 +1,21 @@
-using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Sequence.Boilerplates
 {
-    [RequireComponent(typeof(Button))]
     public class FeatureSelectionButton : MonoBehaviour
     {
-        public UnityAction ExecuteClick => () => GetComponent<Button>().onClick?.Invoke();
-        
-        [field: SerializeField] public string Key { get; private set; }
+        [SerializeField] private TMP_Text _titleText;
+        [SerializeField] private TMP_Text _descriptionText;
+        [SerializeField] private Button _button;
 
-        public void EnableIfExists(string[] allFeatures)
+        public void Show(string title, string description, UnityAction onClick)
         {
-            gameObject.SetActive(allFeatures.Length == 0 || Array.Exists(allFeatures, f => f == Key));
+            _titleText.text = title;
+            _descriptionText.text = description;
+            _button.onClick.AddListener(onClick);
         }
     }
 }

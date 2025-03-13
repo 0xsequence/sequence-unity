@@ -28,7 +28,7 @@ namespace Sequence.Boilerplates.Inventory
 
         private IWallet _wallet;
         private Chain _chain;
-        private string _contractAddress;
+        private string[] _collections;
         private Action _onClose;
         private TokenBalance _selectedBalance;
         
@@ -46,13 +46,13 @@ namespace Sequence.Boilerplates.Inventory
         /// </summary>
         /// <param name="wallet">This Wallet instance will perform transactions.</param>
         /// <param name="chain">Chain used to get balances and send transactions.</param>
-        /// <param name="contractAddress">The inventory will show items from this contract.</param>
+        /// <param name="collections">The inventory will show items from these contracts.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public void Show(IWallet wallet, Chain chain, string contractAddress, Action onClose = null)
+        public void Show(IWallet wallet, Chain chain, string[] collections, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;
-            _contractAddress = contractAddress;
+            _collections = collections;
             _onClose = onClose;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
@@ -60,7 +60,9 @@ namespace Sequence.Boilerplates.Inventory
             _tilePool.Cleanup();
             
             SetOverviewState();
-            LoadBalances();
+            
+            foreach (var collection in _collections)
+                LoadBalances(collection);
         }
 
         public void SetOverviewState()
@@ -111,10 +113,10 @@ namespace Sequence.Boilerplates.Inventory
                 _messagePopup.Show("Sent successfully.");
         }
 
-        private async void LoadBalances()
+        private async void LoadBalances(string collection)
         {
             var indexer = new ChainIndexer(_chain);
-            var args = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), _contractAddress, true);
+            var args = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), collection, true);
             var response = await indexer.GetTokenBalances(args);
             LoadTiles(response.balances);
         }
