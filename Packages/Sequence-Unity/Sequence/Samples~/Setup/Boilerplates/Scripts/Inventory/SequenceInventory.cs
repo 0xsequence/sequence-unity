@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using TMPro;
@@ -60,9 +61,7 @@ namespace Sequence.Boilerplates.Inventory
             _tilePool.Cleanup();
             
             SetOverviewState();
-            
-            foreach (var collection in _collections)
-                LoadBalances(collection);
+            LoadAllCollections();
         }
 
         public void SetOverviewState()
@@ -113,26 +112,30 @@ namespace Sequence.Boilerplates.Inventory
                 _messagePopup.Show("Sent successfully.");
         }
 
-        private async void LoadBalances(string collection)
+        private async void LoadAllCollections()
+        {
+            _messagePool.Cleanup();
+            _tilePool.Cleanup();
+            
+            foreach (var collection in _collections)
+                await LoadCollection(collection);
+            
+            var empty = _tilePool.Parent.childCount == 0;
+            _messageList.SetActive(empty);
+            _tokenList.SetActive(!empty);
+            _messagePool.Cleanup();
+            
+            if (empty)
+                _messagePool.GetObject();
+        }
+
+        private async Task LoadCollection(string collection)
         {
             var indexer = new ChainIndexer(_chain);
             var args = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), collection, true);
             var response = await indexer.GetTokenBalances(args);
-            LoadTiles(response.balances);
-        }
-
-        private void LoadTiles(TokenBalance[] balances)
-        {
-            var empty = balances.Length == 0;
-            _messageList.SetActive(empty);
-            _tokenList.SetActive(!empty);
-            _messagePool.Cleanup();
-            _tilePool.Cleanup();
             
-            if (empty)
-                _messagePool.GetObject();
-            
-            foreach (var balance in balances)
+            foreach (var balance in response.balances)
                 _tilePool.GetObject().Load(balance, () => ShowToken(balance));
         }
 

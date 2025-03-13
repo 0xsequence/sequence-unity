@@ -30,7 +30,8 @@ namespace Sequence.Boilerplates.InGameShop
             _purchase = purchase;
             _nameText.text = $"{metadata?.name}";
             SetAmount(0);
-            
+
+            _image.sprite = null;
             _image.sprite = await AssetHandler.GetSpriteAsync(metadata?.image);
         }
 

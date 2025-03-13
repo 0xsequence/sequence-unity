@@ -165,7 +165,7 @@ namespace Sequence.Boilerplates
             if (_config.signMessage)
                 ShowSignMessageButton();
             
-            if (_config.rewardsApi.StartsWith("https://"))
+            if (!string.IsNullOrEmpty(_config.rewardsApi) && _config.rewardsApi.StartsWith("https://"))
                 ShowDailyRewardsButton();
             
             if (_config.collections.Length > 0)
