@@ -74,6 +74,18 @@ The SDK comes with a number of samples that can be imported via `Samples` using 
 
 These live inside the `Samples~` folder as required by the [Package Manager specification](https://docs.unity3d.com/Manual/cus-samples.html). However, the Unity Editor will ignore any folders/files with a '~' character in their name and will not create a `.meta` file for them or import them. In order to facilitate our development, we create a symbolic link named `Samples` that points to the `Samples~` folder - allowing us to see and interact with our Samples and Setup scripts.
 
+Samples include a set of handful feature boilerplate to get started.
+
+How to create a new Boilerplate:
+- Create the scripts inside the `Packages/Sequence Embedded Wallet SDK/Sequence/Samples/Setup/Boilerplates/`
+- Create a prefab and put it inside the Resources folder in the above directory.
+- Create a static function inside `BoilerplateFactory.cs` to instantiate a new instance of the prefab from Resources.
+- Add a new `FeatureSelectionButton.cs` inside the `Demo` scene and add a unique `Key` value to the component.
+
+The `Key` value from `FeatureSelectionButton.cs` allows us to only enable selected features in our WebGL demo.
+For example, the url `http://localhost:4444/?features=rewards+profile` will only enable the Player Profile and Daily Rewards Boilerplates.
+If you don't define any feature in the url, all boilerplates are enabled.
+
 ## Environments
 
 Sequence generally uses two environments for our backend services: dev and production. By default, the SDK will always use production.
