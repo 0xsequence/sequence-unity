@@ -240,22 +240,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _config:
-    useProjectKeys: 0
     playerProfile: 1
     signMessage: 1
-    waasConfigKey: 
-    projectAccessKey: 
-    googleClientId: 
-    appleClientId: 
     chainId: 421614
     rewardsApi: https://master.boilerplate-test-bb7.pages.dev/dailyRewards
     collections:
     - 0xd2926e2ee243e8df781ab907b48f77ec5d7a8be1
+    - 0x8e9609597f7376098ddfc441f45cae5f37057222
     primarySales:
-    - name: Pancakes
+    - name: Pancake
       collectionAddress: 0xd2926e2ee243e8df781ab907b48f77ec5d7a8be1
       saleAddress: 0x476f14887372e21fea64baba11c849b518a2e928
       itemsForSale: 010000000200000003000000
+    - name: Sword
+      collectionAddress: 0x8e9609597f7376098ddfc441f45cae5f37057222
+      saleAddress: 0x624ec4ddfb5073b9dd49712036fd56ce895f366e
+      itemsForSale: 000000000100000002000000
   _featureSelection: {fileID: 1094787527}
   _buttonPool:
     _amount: 10

@@ -147,15 +147,6 @@ namespace Sequence.Boilerplates
 
         private void SetupConfig()
         {
-            var sequenceConfig = SequenceConfig.GetConfig();
-            if (_config.useProjectKeys)
-            {
-                sequenceConfig.WaaSConfigKey = _config.waasConfigKey;
-                sequenceConfig.BuilderAPIKey = _config.projectAccessKey;
-                sequenceConfig.GoogleClientId = _config.googleClientId;
-                sequenceConfig.AppleClientId = _config.appleClientId;
-            }
-            
             _chain = ChainDictionaries.ChainById.GetValueOrDefault(_config.chainId, Chain.TestnetArbitrumSepolia);
             _buttonPool.Cleanup();
 

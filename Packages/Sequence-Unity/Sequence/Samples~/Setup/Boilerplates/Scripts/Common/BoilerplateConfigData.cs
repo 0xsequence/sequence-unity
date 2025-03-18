@@ -7,13 +7,8 @@ namespace Sequence.Boilerplates
     [Serializable]
     public class BoilerplateConfigData
     {
-        public bool useProjectKeys;
         public bool playerProfile;
         public bool signMessage;
-        public string waasConfigKey;
-        public string projectAccessKey;
-        public string googleClientId;
-        public string appleClientId;
         public string chainId;
         public string rewardsApi;
         public string[] collections;
