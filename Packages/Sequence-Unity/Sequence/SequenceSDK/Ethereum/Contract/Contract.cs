@@ -48,6 +48,11 @@ namespace Sequence.Contracts
         {
             return address;
         }
+        
+        public static implicit operator Address(Contract contract)
+        {
+            return contract.GetAddress();
+        }
 
         public async Task<string> Deploy(string bytecode, params object[] constructorArgs)
         {
