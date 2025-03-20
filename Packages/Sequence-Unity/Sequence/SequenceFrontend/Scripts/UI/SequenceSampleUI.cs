@@ -1,10 +1,4 @@
-using System;
 using Sequence.Authentication;
-using Sequence.Boilerplates.DailyRewards;
-using Sequence.Boilerplates.InGameShop;
-using Sequence.Boilerplates.Inventory;
-using Sequence.Boilerplates.Login;
-using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Config;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils.SecureStorage;
@@ -23,7 +17,7 @@ namespace Sequence.Demo
         public static SequenceSampleUI instance;
 
         private ILogin _loginHandler;
-        private SequenceLoginWindow _loginWindow;
+        private LoginPanel _loginWindow;
         private TransitionPanel _featureSelection;
         private WalletPanel _walletPanel;
         private SignMessagePanel _signMessagePanel;
@@ -31,17 +25,13 @@ namespace Sequence.Demo
         private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
         private SeeMarketplaceListingsPanel _seeMarketplaceListingsPanel;
         private MarketplaceItemDetailsPanel _marketplaceItemDetailsPanel;
-        private SequencePlayerProfile _playerProfile;
-        private SequenceDailyRewards _dailyRewards;
-        private SequenceInventory _inventory;
-        private SequenceInGameShop _inGameShop;
         
         private void Awake()
         {
             if (instance == null) instance = this;
                 else Destroy(gameObject);
 
-            _loginWindow = GetComponentInChildren<SequenceLoginWindow>();
+            _loginWindow = GetComponentInChildren<LoginPanel>();
             _featureSelection = GetComponentInChildren<TransitionPanel>();
             _walletPanel = GetComponentInChildren<WalletPanel>();
             _signMessagePanel = GetComponentInChildren<SignMessagePanel>();
@@ -49,10 +39,6 @@ namespace Sequence.Demo
             _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
             _seeMarketplaceListingsPanel = GetComponentInChildren<SeeMarketplaceListingsPanel>();
             _marketplaceItemDetailsPanel = GetComponentInChildren<MarketplaceItemDetailsPanel>();
-            _playerProfile = GetComponentInChildren<SequencePlayerProfile>();
-            _dailyRewards = GetComponentInChildren<SequenceDailyRewards>();
-            _inventory = GetComponentInChildren<SequenceInventory>();
-            _inGameShop = GetComponentInChildren<SequenceInGameShop>();
 
             if (!IsTesting)
             {
@@ -91,11 +77,6 @@ namespace Sequence.Demo
             {
                 pages[i].gameObject.SetActive(false);
             }
-            
-            _playerProfile.Hide();
-            _inventory.Hide();
-            _inGameShop.Hide();
-            _dailyRewards.Hide();
         }
 
         public void OpenPlayerProfile(IWallet wallet)
@@ -169,7 +150,7 @@ namespace Sequence.Demo
             Debug.LogError($"Error attempting to recover Sequence session: {error}");
             
             DisableAllUIPages();
-            _loginWindow.Show();
+            _loginWindow.Close();
         }
     }
 }
