@@ -26,9 +26,8 @@ namespace Sequence.Marketplace
         private Chain _chain;
         private Currency _chosenCurrency;
         private Page _page;
-        private Dictionary<Order, ulong> _amountsByOrder;
         private IEthClient _client;
-        private bool _initialized = false;
+        private OrderOrchestrator _orchestrator;
 
         public NftCheckout(IWallet wallet, CollectibleOrder listing, Sprite collectibleIcon, ulong amount, ISwap swap = null, IMarketplaceReader marketplaceReader = null, IIndexer indexer = null, ICheckout checkout = null, IEthClient client = null)
         {
@@ -84,6 +83,12 @@ namespace Sequence.Marketplace
             FetchOtherListings().ConfigureAwait(false);
         }
 
+        private async Task FetchOtherListings()
+        {
+            _orchestrator = OrderOrchestrator.GetOrchestrator(_listing, _amountRequested, _marketplaceReader);
+            await AsyncExtensions.WaitUntilConditionMet(IsInitialized);
+        }
+
         private void SetIndexer(IIndexer indexer)
         {
             _indexer = indexer;
@@ -117,85 +122,13 @@ namespace Sequence.Marketplace
             _chosenCurrency = _currencies.FindDefaultChainCurrency();
         }
 
-        private async Task FetchOtherListings()
-        {
-            try
-            {
-                ListCollectibleListingsReturn result =
-                    await _marketplaceReader.ListListingsForCollectible(
-                        new Address(_listing.order.collectionContractAddress), _listing.order.tokenId,
-                        new OrderFilter(null, null, new[] { _listing.order.priceCurrencyAddress }));
-                _page = result.page;
-                _listings = result.listings;
-            }
-            catch (Exception e)
-            {
-                string error =
-                    $"Error fetching other listings for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}): {e.Message}";
-                Debug.LogError(error);
-                _initialized = true;
-                throw new Exception(error);
-            }
-            _listings = _listings.OrderBy(listing => listing.priceUSD).ToArray(); // Todo confirm if this comes pre-sorted by the API
-
-            ulong remaining = await SetAmountsByOrder();
-            if (remaining > 0)
-            {
-                ulong requested = _amountRequested + remaining; // We should already revert _amountRequested to the max available in SetAmountsByOrder
-                Debug.LogError($"Amount requested exceeds what is available in the marketplace for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}), amount requested: {requested} available: {_amountRequested}. Setting requested amount to the available amount: {_amountRequested}");
-            }
-            
-            _initialized = true;
-        }
-
-        private async Task<ulong> SetAmountsByOrder()
-        {
-            _amountsByOrder = new Dictionary<Order, ulong>();
-            ulong remaining = _amountRequested;
-            foreach (Order order in _listings)
-            {
-                ulong amount = Math.Min(remaining, ulong.Parse(order.quantityRemaining));
-                _amountsByOrder[order] = amount;
-                remaining -= amount;
-                if (remaining == 0)
-                {
-                    break;
-                }
-            }
-
-            if (remaining > 0 && _page.more)
-            {
-                await FetchMoreListings();
-                await SetAmountsByOrder();
-            }
-            
-            _amountRequested -= remaining;
-            
-            return remaining;
-        }
-
-        private async Task FetchMoreListings()
-        {
-            if (!_page.more)
-            {
-                return;
-            }
-
-            ListCollectibleListingsReturn result =
-                await _marketplaceReader.ListListingsForCollectible(
-                    new Address(_listing.order.collectionContractAddress), _listing.order.tokenId,
-                    new OrderFilter(null, null, new[] { _listing.order.priceCurrencyAddress }), _page);
-            _page = result.page;
-            _listings.AppendArray(result.listings);
-        }
-
         public async Task<string> GetApproximateTotalInUSD()
         {
             decimal total = 0;
             await AsyncExtensions.WaitUntilConditionMet(IsInitialized);
-            foreach (var order in _amountsByOrder.Keys)
+            foreach (var order in _orchestrator.AmountsByOrder.Keys)
             {
-                total = order.priceUSD * _amountsByOrder[order];
+                total = order.priceUSD * _orchestrator.AmountsByOrder[order];
             }
             
             return total.ToString("F2");
@@ -203,7 +136,11 @@ namespace Sequence.Marketplace
 
         private bool IsInitialized()
         {
-            return _initialized;
+            if (_orchestrator == null)
+            {
+                return false;
+            }
+            return _orchestrator.Initialized;
         }
 
         public async Task<string> GetApproximateTotalInCurrency(Address currencyAddress)
@@ -213,10 +150,10 @@ namespace Sequence.Marketplace
             try
             {
                 await AsyncExtensions.WaitUntilConditionMet(IsInitialized);
-                foreach (var order in _amountsByOrder.Keys)
+                foreach (var order in _orchestrator.AmountsByOrder.Keys)
                 {
                     total += await GetApproximateTotalInCurrency(currencyAddress, amountRemaining, order);
-                    amountRemaining -= _amountsByOrder[order];
+                    amountRemaining -= _orchestrator.AmountsByOrder[order];
                 }
                 return total.ToString("F99").TrimEnd('0').TrimEnd('.');
             }
@@ -359,7 +296,7 @@ namespace Sequence.Marketplace
                 throw new ArgumentException($"Invalid collectible: {collection}, {tokenId}, expected {_listing.order.collectionContractAddress}, {_listing.order.tokenId}");
             }
             _amountRequested = amount;
-            return SetAmountsByOrder();
+            return _orchestrator.SetAmount(_amountRequested);
         }
 
         private async Task<Transaction[]> BuildCheckoutTransactionArray()
