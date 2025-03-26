@@ -59,10 +59,10 @@ namespace Sequence.Pay.Tests.Transak
             
             Debug.Log(transakNFTCheckoutLink);
             Assert.IsNotNull(transakNFTCheckoutLink);
-            // Expected link validated on February 6, 2025
+            // Expected link validated on March 26, 2025
             // This assertion will confirm that we are still generating the same link from the same data. If primary sale erc1155 with Transak checkout stops working, but this test is still passing, then Transak has made a change on their end that we need to account for 
             string expectedLink =
-                "https://global.transak.com/?apiKey=5911d9ec-46b5-48fa-a755-d59a715ff0cf&isNFT=true&calldata=eJzlT0kSwzAI%2BxKrMM9xMHlDn9%2Bk90w742N1kgABoheoQThBD7DpOY7oijjYIXPROmMVbDIE6dVWMeaT%2Fzf0np1l0%2F8Yn7Qss9yk%2BvTWwdzMeamgNapIl5eq5855693%2Fp%2B4tIP5vv6gtJDoMDhMKD7014uKGARdyhQeHXxMN%2FVRulmGRd9fMjs0UX%2FEGjwG76g%3D%3D&contractId=674eb5613d739107bbd18ed2&cryptoCurrencyCode=USDC&estimatedGasLimit=500000&nftData=W3siaW1hZ2VVUkwiOiJodHRwczovL2Rldi1tZXRhZGF0YS5zZXF1ZW5jZS5hcHAvcHJvamVjdHMvMTAxMC9jb2xsZWN0aW9ucy8zOTQvdG9rZW5zLzEvaW1hZ2Uud2VicCIsIm5mdE5hbWUiOiJLZWF0b24gVC0zMjIiLCJjb2xsZWN0aW9uQWRkcmVzcyI6IjB4ZGViMzk4ZjQxY2NkMjkwZWU1MTE0ZGY3ZTQ5OGNmMDRmYWM5MTZjYiIsInRva2VuSUQiOlsiMSJdLCJwcmljZSI6WzAuMDIwMDAwXSwicXVhbnRpdHkiOjEsIm5mdFR5cGUiOiJFUkMxMTU1In1d&walletAddress=0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07&disableWalletAddressForm=true&partnerOrderId=0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07-";
+                "https://global.transak.com/?apiKey=5911d9ec-46b5-48fa-a755-d59a715ff0cf&isNFT=true&calldata=eJzlT0kSwzAI%2BxKrMM9xMHlDn9%2Bk90w742N1kgABoheoQThBD7DpOY7oijjYIXPROmMVbDIE6dVWMeaT%2Fzf0np1l0%2F8Yn7Qss9yk%2BvTWwdzMeamgNapIl5eq5855693%2Fp%2B4tIP5vv6gtJDoMDhMKD7014uKGARdyhQeHXxMN%2FVRulmGRd9fMjs0UX%2FEGjwG76g%3D%3D&contractId=674eb5613d739107bbd18ed2&cryptoCurrencyCode=USDC&estimatedGasLimit=500000&nftData=W3siaW1hZ2VVUkwiOiJodHRwczovL2Rldi1tZXRhZGF0YS5zZXF1ZW5jZS5hcHAvcHJvamVjdHMvMTAxMC9jb2xsZWN0aW9ucy8zOTQvdG9rZW5zLzEvaW1hZ2UucG5nIiwibmZ0TmFtZSI6IktlYXRvbiBULTMyMiIsImNvbGxlY3Rpb25BZGRyZXNzIjoiMHhkZWIzOThmNDFjY2QyOTBlZTUxMTRkZjdlNDk4Y2YwNGZhYzkxNmNiIiwidG9rZW5JRCI6WyIxIl0sInByaWNlIjpbMC4wMl0sInF1YW50aXR5IjoxLCJuZnRUeXBlIjoiRVJDMTE1NSJ9XQ%3D%3D&walletAddress=0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07&disableWalletAddressForm=true&partnerOrderId=0xD2eFbb2f18bfE3D265b26D2ACe83400A65335a07-";
             Assert.True(transakNFTCheckoutLink.StartsWith(expectedLink)); // Check starts with as the timestamp at the end will differ
         }
 

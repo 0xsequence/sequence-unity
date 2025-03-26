@@ -16,12 +16,12 @@ namespace Sequence.Pay.Tests.Transak
             Address collection = new Address("0xdeb398f41ccd290ee5114df7e498cf04fac916cb");
             Marketplace.TokenMetadata metadata = await reader.GetCollectible(collection, "1");
             TransakNftData data = new TransakNftData(metadata.image, metadata.name, collection, new[] { "1" },
-                new decimal[] { Decimal.Parse("0.02") }, 1, NFTType.ERC1155);
+                new decimal[] { decimal.Parse("0.02") }, 1, NFTType.ERC1155);
             
             string encodedData = NftDataEncoder.Encode(data);
 
             string expected =
-                "W3siaW1hZ2VVUkwiOiJodHRwczovL2Rldi1tZXRhZGF0YS5zZXF1ZW5jZS5hcHAvcHJvamVjdHMvMTAxMC9jb2xsZWN0aW9ucy8zOTQvdG9rZW5zLzEvaW1hZ2Uud2VicCIsIm5mdE5hbWUiOiJLZWF0b24gVC0zMjIiLCJjb2xsZWN0aW9uQWRkcmVzcyI6IjB4ZGViMzk4ZjQxY2NkMjkwZWU1MTE0ZGY3ZTQ5OGNmMDRmYWM5MTZjYiIsInRva2VuSUQiOlsiMSJdLCJwcmljZSI6WzAuMDJdLCJxdWFudGl0eSI6MSwibmZ0VHlwZSI6IkVSQzExNTUifV0%3D";
+                "W3siaW1hZ2VVUkwiOiJodHRwczovL2Rldi1tZXRhZGF0YS5zZXF1ZW5jZS5hcHAvcHJvamVjdHMvMTAxMC9jb2xsZWN0aW9ucy8zOTQvdG9rZW5zLzEvaW1hZ2UucG5nIiwibmZ0TmFtZSI6IktlYXRvbiBULTMyMiIsImNvbGxlY3Rpb25BZGRyZXNzIjoiMHhkZWIzOThmNDFjY2QyOTBlZTUxMTRkZjdlNDk4Y2YwNGZhYzkxNmNiIiwidG9rZW5JRCI6WyIxIl0sInByaWNlIjpbMC4wMl0sInF1YW50aXR5IjoxLCJuZnRUeXBlIjoiRVJDMTE1NSJ9XQ%3D%3D";
             Assert.AreEqual(expected, encodedData);
         }
 

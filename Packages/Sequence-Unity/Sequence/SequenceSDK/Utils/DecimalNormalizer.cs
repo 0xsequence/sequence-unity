@@ -31,6 +31,10 @@ namespace Sequence.Utils
 
             int decimalPointIndex = numberStr.Length - decimals;
             string resultStr = numberStr.Insert(decimalPointIndex, ".");
+            if (resultStr.Contains('.'))
+            {
+                resultStr = resultStr.TrimEnd('0');
+            }
             return resultStr;
         }
 
