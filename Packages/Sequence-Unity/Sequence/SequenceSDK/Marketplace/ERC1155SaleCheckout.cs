@@ -186,9 +186,9 @@ namespace Sequence.Marketplace
             return _iconsByAddress[currencyAddress];
         }
 
-        public Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress)
+        public Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress, TokenBalance userBalance = null)
         {
-            return new AffordabilityCalculator(GetApproximateTotalInCurrency, _indexer, _wallet, _ethClient, _chain).GetApproximateTotalInCurrencyIfAffordable(currencyContractAddress);
+            return new AffordabilityCalculator(GetApproximateTotalInCurrency, _indexer, _wallet, _ethClient, _chain).GetApproximateTotalInCurrencyIfAffordable(currencyContractAddress, userBalance);
         }
 
         public async Task<TransactionReturn> Checkout()
