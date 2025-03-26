@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
 using UnityEngine;
@@ -50,8 +51,9 @@ namespace Sequence.Marketplace
         /// Except, if the user doesn't have sufficient balance of currencyContractAddress, then "" is returned
         /// </summary>
         /// <param name="currencyContractAddress"></param>
+        /// <param name="userBalance">If known, provide the user's balance in the currency</param>
         /// <returns></returns>
-        public Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress);
+        public Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress, TokenBalance userBalance = null);
         
         /// <summary>
         /// Purchase all the listings using the previously selected Currency, making swaps when necessary

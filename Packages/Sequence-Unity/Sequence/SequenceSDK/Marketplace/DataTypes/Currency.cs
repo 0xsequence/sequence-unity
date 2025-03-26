@@ -93,5 +93,10 @@ namespace Sequence.Marketplace
 
             return null;
         }
+        
+        public static Currency GetNativeCurrency(this Currency[] currencies)
+        {
+            return currencies.GetCurrencyByContractAddress(Currency.NativeCurrencyAddress);
+        }
     }
 }

@@ -43,6 +43,7 @@ namespace Sequence.Demo
         private Marketplace.Currency _bestCurrency;
         private List<GameObject> _spawnedGameObjects;
         private IFiatCheckout _fiatCheckout;
+        private IIndexer _indexer;
 
         protected override void Awake()
         {
@@ -66,6 +67,8 @@ namespace Sequence.Demo
                     $"{GetType().Name} must be opened with a {typeof(IFiatCheckout)} as an argument in order to use fiat checkout features");
             }
             
+            _indexer = args.GetObjectOfTypeIfExists<IIndexer>();
+            
             Configure();
             
             CartItem.OnAmountChanged += OnCartAmountChanged;
@@ -84,6 +87,11 @@ namespace Sequence.Demo
             _chain = _cartItemDatas[0].Network;
             _wallet = _cart.GetWallet();
             _tokenPaymentOptions = new List<TokenPaymentOption>();
+            
+            if (_indexer == null)
+            {
+                _indexer = new ChainIndexer(_chain);
+            }
         }
 
         public override void Close()
@@ -181,27 +189,86 @@ namespace Sequence.Demo
         protected async Task AssembleTokenPaymentOptions()
         {
             Marketplace.Currency[] currencies = await _cart.GetCurrencies();
-            int currenciesLength = currencies.Length;
-            for (int i = 0; i < currenciesLength; i++)
+            EtherBalance etherBalance = await _indexer.GetEtherBalance(_wallet.GetWalletAddress());
+            GetTokenBalancesReturn tokenBalancesReturn = await _indexer.GetTokenBalances(new GetTokenBalancesArgs(_wallet.GetWalletAddress()));
+
+            Marketplace.Currency nativeCurrency = currencies.GetNativeCurrency();
+            if (nativeCurrency != null && etherBalance.balanceWei > 0)
             {
-                Marketplace.Currency currency = currencies[i];
-                GameObject tokenPaymentOptionGameObject = Instantiate(_tokenPaymentOptionPrefab, _cartItemsParent);
-                TokenPaymentOption tokenPaymentOption = tokenPaymentOptionGameObject.GetComponent<TokenPaymentOption>();
-                bool success = await RefreshTokenPaymentOption(tokenPaymentOption, currency);
-                
-                if (!success)
+                await AddTokenPaymentOption(nativeCurrency, new TokenBalance()
                 {
-                    Destroy(tokenPaymentOptionGameObject);
-                    continue;
-                }
-                
-                if (!HasAtLeastOneCryptoPaymentOption())
-                {
-                    tokenPaymentOption.SelectCurrency();
-                }
-                _tokenPaymentOptions.Add(tokenPaymentOption);
-                _spawnedGameObjects.Add(tokenPaymentOptionGameObject);
+                    contractAddress = Marketplace.Currency.NativeCurrencyAddress,
+                    balance = etherBalance.balanceWei,
+                    contractType = ContractType.NATIVE,
+                    accountAddress = _wallet.GetWalletAddress(),
+                    chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[_chain]),
+                    tokenMetadata = new TokenMetadata()
+                    {
+                        decimals = 18,
+                    },
+                    contractInfo = new ContractInfo()
+                    {
+                        decimals = 18,
+                    }
+                });
             }
+            
+            TokenBalance[] balances = tokenBalancesReturn.balances;
+            (Marketplace.Currency, TokenBalance)[] currenciesWithBalances = GetCurrenciesWithBalances(currencies, balances);
+            await AddTokenPaymentOptions(currenciesWithBalances);
+
+            while (tokenBalancesReturn.page.more)
+            {
+                tokenBalancesReturn =
+                    await _indexer.GetTokenBalances(new GetTokenBalancesArgs(_wallet.GetWalletAddress(), false,
+                        tokenBalancesReturn.page));
+                currenciesWithBalances = GetCurrenciesWithBalances(currencies, tokenBalancesReturn.balances);
+                await AddTokenPaymentOptions(currenciesWithBalances);
+            }
+        }
+
+        private async Task AddTokenPaymentOptions((Marketplace.Currency, TokenBalance)[] currenciesWithBalances)
+        {
+            foreach (var (currency, balance) in currenciesWithBalances)
+            {
+                await AddTokenPaymentOption(currency, balance);
+            }
+        }
+
+        private async Task AddTokenPaymentOption(Marketplace.Currency currency, TokenBalance balance)
+        {
+            GameObject tokenPaymentOptionGameObject = Instantiate(_tokenPaymentOptionPrefab, _cartItemsParent);
+            TokenPaymentOption tokenPaymentOption = tokenPaymentOptionGameObject.GetComponent<TokenPaymentOption>();
+            bool success = await RefreshTokenPaymentOption(tokenPaymentOption, currency, balance);
+                
+            if (!success)
+            {
+                Destroy(tokenPaymentOptionGameObject);
+                return;
+            }
+                
+            if (!HasAtLeastOneCryptoPaymentOption())
+            {
+                tokenPaymentOption.SelectCurrency();
+            }
+            _tokenPaymentOptions.Add(tokenPaymentOption);
+            _spawnedGameObjects.Add(tokenPaymentOptionGameObject);
+        }
+        
+        private (Marketplace.Currency, TokenBalance)[] GetCurrenciesWithBalances(Marketplace.Currency[] currencies, TokenBalance[] balances)
+        {
+            List<(Marketplace.Currency, TokenBalance)> currenciesWithBalances = new List<(Marketplace.Currency, TokenBalance)>();
+            foreach (var currency in currencies)
+            {
+                int tokenIndex = balances.TokenIndex(currency.contractAddress);
+                if (tokenIndex != -1)
+                {
+                    TokenBalance balance = balances[tokenIndex];
+                    currenciesWithBalances.Add((currency, balance));
+                }
+            }
+
+            return currenciesWithBalances.ToArray();
         }
 
         protected void SetupQrCode()
@@ -272,9 +339,9 @@ namespace Sequence.Demo
             }
         }
 
-        protected async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency)
+        protected async Task<bool> RefreshTokenPaymentOption(TokenPaymentOption tokenPaymentOption, Marketplace.Currency currency, TokenBalance userBalance = null)
         {
-            string quotedPrice = await _cart.GetApproximateTotalInCurrencyIfAffordable(new Address(currency.contractAddress));
+            string quotedPrice = await _cart.GetApproximateTotalInCurrencyIfAffordable(new Address(currency.contractAddress), userBalance);
             if (string.IsNullOrWhiteSpace(quotedPrice) || quotedPrice == "")
             {
                 Debug.Log($"User {_wallet.GetWalletAddress()} has insufficient balance to pay with {currency.contractAddress}. Skipping...");
@@ -302,19 +369,11 @@ namespace Sequence.Demo
         // Todo switch to using object pool for token payment options
         protected async Task RefreshTokenPaymentOptions()
         {
-            Marketplace.Currency[] currencies = await _cart.GetCurrencies();
             int tokenPaymentOptionsCount = _tokenPaymentOptions.Count;
             for (int i = 0; i < tokenPaymentOptionsCount; i++)
             {
                 TokenPaymentOption tokenPaymentOption = _tokenPaymentOptions[i];
-                bool refreshed = false;
-                foreach (var currency in currencies)
-                {
-                    if (tokenPaymentOption.UsesCurrency(currency))
-                    {
-                        refreshed = await RefreshTokenPaymentOption(tokenPaymentOption, currency);
-                    }
-                }
+                bool refreshed = await RefreshTokenPaymentOption(tokenPaymentOption, tokenPaymentOption.Currency);
 
                 if (!refreshed)
                 {
