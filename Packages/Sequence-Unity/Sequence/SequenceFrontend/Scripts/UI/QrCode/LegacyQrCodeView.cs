@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
-    public class QrCodeView : MonoBehaviour
+    public class LegacyQrCodeView : MonoBehaviour
     {
         const string ApiEndpoint = "https://api.sequence.app/qr/";
         

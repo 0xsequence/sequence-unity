@@ -77,9 +77,9 @@ namespace Sequence.Boilerplates.Marketplace
 #endif
 
             Address defaultCollectionAddress = args.GetObjectOfTypeIfExists<Address>();
-            if (defaultCollectionAddress != default)
+            if (defaultCollectionAddress != null)
             {
-                _defaultCollectionAddress = defaultCollectionAddress.ToString();
+                _defaultCollectionAddress = defaultCollectionAddress;
             }
             
             _items = 0;

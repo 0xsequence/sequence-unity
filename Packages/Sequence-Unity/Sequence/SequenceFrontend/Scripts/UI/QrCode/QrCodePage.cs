@@ -7,16 +7,16 @@ using UnityEngine.UI;
 
 namespace Sequence.Demo
 {
-    [RequireComponent(typeof(QrCodeView))]
+    [RequireComponent(typeof(LegacyQrCodeView))]
     public class QrCodePage : WalletAddressCopyPage
     {
-        private QrCodeView _qrCodeView;
+        private LegacyQrCodeView _legacyQrCodeView;
         private QrCodeParams _qrCodeParams;
 
         protected override void Awake()
         {
             base.Awake();
-            _qrCodeView = GetComponent<QrCodeView>();
+            _legacyQrCodeView = GetComponent<LegacyQrCodeView>();
         }
 
         public override void Open(params object[] args)
@@ -29,7 +29,7 @@ namespace Sequence.Demo
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(QrCodeParams)} as an argument");
             }
 
-            _qrCodeView.Show(_qrCodeParams).ConfigureAwait(false);
+            _legacyQrCodeView.Show(_qrCodeParams).ConfigureAwait(false);
         }
     }
 }

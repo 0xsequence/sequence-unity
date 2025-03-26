@@ -170,6 +170,9 @@ namespace Sequence.Boilerplates
             
             if (_config.collections.Length > 0)
                 ShowInventoryButton();
+            
+            foreach (var sale in _config.primarySales)
+                ShowPrimarySaleButton(sale);
 
             if (_config.secondarySale != null)
             {
@@ -180,9 +183,6 @@ namespace Sequence.Boilerplates
             
             if (_config.checkout)
                 _buttonPool.GetObject().Show("Checkout Panel", _checkoutDescription, OpenCheckoutPanel);
-            
-            foreach (var sale in _config.primarySales)
-                ShowPrimarySaleButton(sale);
         }
 
         private void ShowPlayerProfileButton()
