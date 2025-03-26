@@ -145,7 +145,7 @@ namespace Sequence.Boilerplates.Marketplace
             }
             _boilerplateController.OpenCheckoutPanel(new NftCheckout(_wallet, _collectibleOrder, _collectibleSprite, 1),
                 new SequenceCheckout(_wallet, ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()],
-                    new[] { _collectibleOrder }, 1, _nftType,
+                    _collectibleOrder , 1, _nftType,
                     pay: new SequencePay(_wallet,
                         ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()],
                         checkout: new MockCheckoutWithSardineForCanada(new Checkout(_wallet,

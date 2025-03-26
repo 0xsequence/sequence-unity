@@ -14,7 +14,7 @@ namespace Sequence.Pay
     public class SequenceCheckout : IFiatCheckout
     {
         private SequencePay _pay;
-        private CollectibleOrder[] _orders;
+        private CollectibleOrder _order;
         private ERC1155Sale _erc1155Sale;
         private ERC721Sale _erc721Sale;
         private Address _collection;
@@ -27,6 +27,7 @@ namespace Sequence.Pay
         private byte[] _data;
         private FixedByte[] _proof;
         private string _marketplaceAddress;
+        private OrderOrchestrator _orchestrator;
 
         private enum Config
         {
@@ -37,7 +38,7 @@ namespace Sequence.Pay
         
         private Config _config;
 
-        public SequenceCheckout(IWallet wallet, Chain chain, CollectibleOrder[] orders, BigInteger amount, NFTType nftType = NFTType.ERC1155, string marketplaceAddress = ISardineCheckout.SequenceMarketplaceV2Contract, Address recipient = null, AdditionalFee[] additionalFees = null, SequencePay pay = null)
+        public SequenceCheckout(IWallet wallet, Chain chain, CollectibleOrder order, BigInteger amount, NFTType nftType = NFTType.ERC1155, string marketplaceAddress = ISardineCheckout.SequenceMarketplaceV2Contract, Address recipient = null, AdditionalFee[] additionalFees = null, SequencePay pay = null)
         {
             if (pay == null)
             {
@@ -52,12 +53,13 @@ namespace Sequence.Pay
             _recipient = recipient;
 
             _pay = pay;
-            _orders = orders;
+            _order = order;
             _config = Config.MARKETPLACE;
             _amount = amount;
             _nftType = nftType;
             _additionalFees = additionalFees;
             _marketplaceAddress = marketplaceAddress;
+            _orchestrator = OrderOrchestrator.GetOrchestrator(_order, (ulong)amount);
         }
         
         public SequenceCheckout(IWallet wallet, Chain chain, ERC1155Sale saleContract, Address collection, string tokenId, BigInteger amount, Address recipient = null, byte[] data = null, FixedByte[] proof = null, SequencePay pay = null)
@@ -148,7 +150,7 @@ namespace Sequence.Pay
             switch (_config)
             {
                 case Config.MARKETPLACE:
-                    return _pay.NftCheckoutEnabled(_orders);
+                    return _pay.NftCheckoutEnabled(_orchestrator.GetOrders());
                 case Config.ERC1155:
                     return _pay.NftCheckoutEnabled(_erc1155Sale, _collection, _amountsByTokenId);
                 case Config.ERC721:
@@ -168,7 +170,7 @@ namespace Sequence.Pay
             switch (_config)
             {
                 case Config.MARKETPLACE:
-                    return _pay.GetNftCheckoutLink(_orders, _amount, _nftType, _marketplaceAddress, _recipient, _additionalFees);
+                    return _pay.GetNftCheckoutLink(_orchestrator.GetOrders(), _amount, _nftType, _marketplaceAddress, _recipient, _additionalFees);
                 case Config.ERC1155:
                     return _pay.GetNftCheckoutLink(_erc1155Sale, _collection, BigInteger.Parse(_tokenId), _amount, _recipient, _data,
                         _proof);
