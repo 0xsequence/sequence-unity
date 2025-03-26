@@ -18,7 +18,7 @@ namespace Sequence.Demo
         [SerializeField] private TextMeshProUGUI _tokenAmountText;
         [SerializeField] private Image _tokenIcon;
 
-        private Marketplace.Currency _currency;
+        public Marketplace.Currency Currency { get; private set; }
 
         private void Awake()
         {
@@ -32,7 +32,7 @@ namespace Sequence.Demo
 
         public void Assemble(Marketplace.Currency currency, string amount, Sprite tokenIcon = null)
         {
-            _currency = currency;
+            Currency = currency;
             _tokenNameText.text = currency.name;
             _tokenAmountText.text = $"{amount} {currency.symbol}";
             
@@ -48,23 +48,9 @@ namespace Sequence.Demo
             GetComponent<Button>().onClick.AddListener(OnClick);
         }
 
-        /// <summary>
-        /// Returns true if no _currency is set or if the given currency is the same as the set _currency
-        /// </summary>
-        /// <param name="currency"></param>
-        /// <returns></returns>
-        public bool UsesCurrency(Marketplace.Currency currency)
-        {
-            if (_currency == null)
-            {
-                return true;
-            }
-            return _currency.contractAddress == currency.contractAddress;
-        }
-
         private async Task FetchAndApplyTokenIconSprite()
         {
-            _tokenIcon.sprite = await AssetHandler.GetSpriteAsync(_currency.imageUrl);
+            _tokenIcon.sprite = await AssetHandler.GetSpriteAsync(Currency.imageUrl);
         }
 
         private void OnClick()
@@ -74,12 +60,12 @@ namespace Sequence.Demo
 
         public void SelectCurrency()
         {
-            ICheckoutHelper.SelectCurrency(_currency);
+            ICheckoutHelper.SelectCurrency(Currency);
         }
 
         private void HandleCurrencySelected(Marketplace.Currency selectedCurrency)
         {
-            if (selectedCurrency == _currency)
+            if (selectedCurrency == Currency)
             {
                 _checkbox.sprite = _checkedSprite;
             }

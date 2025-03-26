@@ -26,8 +26,7 @@ namespace Sequence.Marketplace
             _chain = chain;
         }
 
-        // Todo consider re-write such that we first check what currencies they have in their wallet before checking the swap price
-        public async Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress)
+        public async Task<string> GetApproximateTotalInCurrencyIfAffordable(string currencyContractAddress, TokenBalance userBalance = null)
         {
             string total = await _getApproximateTotalInCurrency(new Address(currencyContractAddress));
             if (string.IsNullOrWhiteSpace(total) || total.StartsWith("Error"))
@@ -41,7 +40,15 @@ namespace Sequence.Marketplace
                 return "";
             }
 
-            if (currencyContractAddress != Currency.NativeCurrencyAddress)
+            BigInteger balanceAmount = 0;
+            int decimals = 18;
+            
+            if (userBalance != null)
+            {
+                balanceAmount = userBalance.balance;
+                decimals = await GetDecimals(userBalance, currencyContractAddress);
+            }
+            else if (currencyContractAddress != Currency.NativeCurrencyAddress)
             {
                 try
                 {
@@ -56,34 +63,8 @@ namespace Sequence.Marketplace
                         return "";
                     }
                     TokenBalance balance = balances[0];
-                    int decimals = 18;
-                    if (balance.contractInfo == null)
-                    {
-                        Debug.LogWarning($"No contract info found for {balance.contractAddress}, attempting to fetch from contract...");
-                        try
-                        {
-                            var decimalsFromContract = await new ERC20(currencyContractAddress).Decimals(_client);
-                            decimals = (int)decimalsFromContract;
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.LogError($"Error fetching decimals from contract for {currencyContractAddress}: {e.Message}\nUsing default of 18 decimals");
-                        }
-                    }
-                    else
-                    {
-                        decimals = balance.contractInfo.decimals;
-                    }
-
-                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance.balance, decimals);
-                    if (balanceAmount >= price)
-                    {
-                        return total;
-                    }
-                    else
-                    {
-                        return "";
-                    }
+                    decimals = await GetDecimals(balance, currencyContractAddress);
+                    balanceAmount = balance.balance;
                 }
                 catch (Exception e)
                 {
@@ -100,16 +81,7 @@ namespace Sequence.Marketplace
                     {
                         throw new Exception("Received unexpected null response from indexer");
                     }
-                    BigInteger balance = balancesReturn.balanceWei;
-                    double balanceAmount = DecimalNormalizer.ReturnToNormal(balance,1);
-                    if (balanceAmount >= price)
-                    {
-                        return total;
-                    }
-                    else
-                    {
-                        return "";
-                    }
+                    balanceAmount = balancesReturn.balanceWei;
                 }
                 catch (Exception e)
                 {
@@ -117,6 +89,46 @@ namespace Sequence.Marketplace
                     return error;
                 }
             }
+            double balanceNormalized = DecimalNormalizer.ReturnToNormal(balanceAmount,decimals);
+            if (balanceNormalized >= price)
+            {
+                return total;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private async Task<int> GetDecimals(TokenBalance balance, string currencyContractAddress)
+        {
+            int decimals = 18;
+            if (balance.contractInfo == null && balance.tokenMetadata == null) 
+            {
+                Debug.LogWarning($"No contract info or metadata found for {balance.contractAddress}, attempting to fetch from contract...");
+                try
+                {
+                    var decimalsFromContract = await new ERC20(currencyContractAddress).Decimals(_client);
+                    decimals = (int)decimalsFromContract;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Error fetching decimals from contract for {currencyContractAddress}: {e.Message}\nUsing default of 18 decimals");
+                }
+            }
+            else
+            {
+                if (balance.contractInfo != null)
+                {
+                    decimals = balance.contractInfo.decimals;
+                }
+                else
+                {
+                    decimals = (int)balance.tokenMetadata.decimals;
+                }
+            }
+
+            return decimals;
         }
     }
 }
