@@ -60,7 +60,7 @@ namespace Sequence.Config
                     config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
                 }
                 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !SEQ_DISABLE_PACKAGE_OVERRIDE
                 config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
 #endif
                 return config;

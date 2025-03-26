@@ -213,7 +213,7 @@ namespace Sequence
         /// <exception>Throws if the chainID isn't a Sequence-supported chain.</exception>
         private string HostName(string chainID)
         {
-            var indexerName = Indexer.IndexerNames[chainID];
+            var indexerName = ChainDictionaries.PathOf[ChainDictionaries.ChainById[chainID]];
 #if SEQUENCE_DEV_INDEXER || SEQUENCE_DEV            
             return $"https://dev-{indexerName}-indexer.sequence.app";
 #else

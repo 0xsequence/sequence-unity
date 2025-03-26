@@ -56,6 +56,8 @@ namespace Sequence
             { Chain.TestnetTelos, "Telos Testnet" },
             { Chain.TestnetMoonbaseAlpha, "Moonbase Alpha" },
             { Chain.TestnetEtherlink, "Etherlink Testnet" },
+            { Chain.TestnetMonad, "Monad Testnet" },
+            { Chain.TestnetSomnia, "Somnia Testnet" },
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -110,6 +112,8 @@ namespace Sequence
             { Chain.TestnetTelos, "TLOS" },
             { Chain.TestnetMoonbaseAlpha, "DEV" },
             { Chain.TestnetEtherlink, "XTZ" },
+            { Chain.TestnetMonad, "MON" },
+            { Chain.TestnetSomnia, "STT" },
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -197,6 +201,8 @@ namespace Sequence
             { Chain.TestnetTelos, "https://testnet.teloscan.io/" },
             { Chain.TestnetMoonbaseAlpha, "https://moonbase.moonscan.io/" },
             { Chain.TestnetEtherlink, "https://testnet.explorer.etherlink.com/" },
+            { Chain.TestnetMonad, "https://testnet.monadexplorer.com/" },
+            { Chain.TestnetSomnia, "https://somnia-testnet.socialscan.io/" },
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -253,6 +259,8 @@ namespace Sequence
             { Chain.TestnetTelos, "41" },
             { Chain.TestnetMoonbaseAlpha, "1287" },
             { Chain.TestnetEtherlink, "128123" },
+            { Chain.TestnetMonad, "10143" },
+            { Chain.TestnetSomnia, "50312" },
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -307,6 +315,8 @@ namespace Sequence
             { "41", Chain.TestnetTelos },
             { "1287", Chain.TestnetMoonbaseAlpha },
             { "128123", Chain.TestnetEtherlink },
+            { "10143", Chain.TestnetMonad },
+            { "50312", Chain.TestnetSomnia },
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -361,6 +371,8 @@ namespace Sequence
             { Chain.TestnetTelos, "telos-testnet" },
             { Chain.TestnetMoonbaseAlpha, "moonbase-alpha" },
             { Chain.TestnetEtherlink, "etherlink-testnet" },
+            { Chain.TestnetMonad, "monad-testnet" },
+            { Chain.TestnetSomnia, "somnia-testnet" },
         };
     }
 }
