@@ -257,7 +257,7 @@ MonoBehaviour:
     checkout: 1
   _featureSelection: {fileID: 1094787527}
   _buttonPool:
-    _amount: 3
+    _amount: 1
     _setAsLastSibling: 1
     _parent: {fileID: 1094787528}
     _prefab: {fileID: 1203214480512358201, guid: 2b585c6ea5ce547c3b5638accfd28750, type: 3}
