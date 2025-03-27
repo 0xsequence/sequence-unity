@@ -1,3 +1,5 @@
+using System;
+
 namespace Sequence
 {
     using System.Numerics;
@@ -46,7 +48,7 @@ namespace Sequence
             int length = balances.Length;
             for (int i = 0; i < length; i++)
             {
-                if (balances[i].contractAddress == tokenAddress)
+                if (String.Equals(balances[i].contractAddress, tokenAddress, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return i;
                 }
