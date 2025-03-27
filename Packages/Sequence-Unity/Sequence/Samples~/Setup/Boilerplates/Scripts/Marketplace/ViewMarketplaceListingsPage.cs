@@ -154,6 +154,9 @@ namespace Sequence.Boilerplates.Marketplace
 
             RectTransform content = _scrollRectContent;
             content.sizeDelta = new Vector2(content.sizeDelta.x, contentHeight + _brandingBuffer);
+            var position = content.position;
+            position = new Vector3(position.x, 0, position.z);
+            content.position = position;
         }
 
         public override void Close()
