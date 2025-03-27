@@ -26,11 +26,7 @@ namespace Sequence.Demo
 
         private ILogin _loginHandler;
         private LoginPanel _loginWindow;
-        private TransitionPanel _featureSelection;
         private WalletPanel _walletPanel;
-        private SignMessagePanel _signMessagePanel;
-        private SendTransactionPanel _sendTransactionPanel;
-        private SendTransactionWithFeeOptionsPanel _sendTransactionWithFeeOptionsPanel;
         private SequencePlayerProfile _playerProfile;
         private SequenceDailyRewards _dailyRewards;
         private SequenceInventory _inventory;
@@ -43,11 +39,7 @@ namespace Sequence.Demo
                 else Destroy(gameObject);
 
             _loginWindow = GetComponentInChildren<LoginPanel>();
-            _featureSelection = GetComponentInChildren<TransitionPanel>();
             _walletPanel = GetComponentInChildren<WalletPanel>();
-            _signMessagePanel = GetComponentInChildren<SignMessagePanel>();
-            _sendTransactionPanel = GetComponentInChildren<SendTransactionPanel>();
-            _sendTransactionWithFeeOptionsPanel = GetComponentInChildren<SendTransactionWithFeeOptionsPanel>();
             _playerProfile = GetComponentInChildren<SequencePlayerProfile>();
             _dailyRewards = GetComponentInChildren<SequenceDailyRewards>();
             _inventory = GetComponentInChildren<SequenceInventory>();
@@ -62,7 +54,6 @@ namespace Sequence.Demo
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 DisableAllUIPages();
-                _featureSelection.gameObject.SetActive(true);
                 
                 wallet.OnDropSessionComplete += s =>
                 {
@@ -113,26 +104,6 @@ namespace Sequence.Demo
         public void OpenWalletPanelWithDelay(float delayInSeconds, params object[] openArgs)
         {
             _walletPanel.OpenWithDelay(delayInSeconds, openArgs);
-        }
-        
-        public void OpenSignMessagePanelWithDelay(float delayInSeconds, params object[] openArgs)
-        {
-            _signMessagePanel.OpenWithDelay(delayInSeconds, openArgs);
-        }
-        
-        public void OpenSendTransactionPanelWithDelay(float delayInSeconds, params object[] openArgs)
-        {
-            _sendTransactionPanel.OpenWithDelay(delayInSeconds, openArgs);
-        }
-        
-        public void OpenSendTransactionWithFeeOptionsPanelWithDelay(float delayInSeconds, params object[] openArgs)
-        {
-            _sendTransactionWithFeeOptionsPanel.OpenWithDelay(delayInSeconds, openArgs);
-        }
-        
-        public void OpenViewMarketplaceListingsPanelWithDelay(float delayInSeconds, params object[] openArgs)
-        {
-            _viewMarketplaceListingsPanel.OpenWithDelay(delayInSeconds, openArgs);
         }
         
         private void ReplaceWithLoginPanel()

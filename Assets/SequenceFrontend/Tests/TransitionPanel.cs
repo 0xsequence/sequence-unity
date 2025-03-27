@@ -35,21 +35,6 @@ namespace Sequence.Boilerplates
             _ui.OpenWalletPanelWithDelay(_closeAnimationDurationInSeconds, TokenFetcher, NftFetcher, 
                 Wallet);
         }
-
-        public void OpenSignMessagePanel()
-        {
-            _ui.OpenSignMessagePanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
-        }
-        
-        public void OpenSendTransactionPanel()
-        {
-            _ui.OpenSendTransactionPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
-        }
-
-        public void OpenSendTransactionWithFeeOptionsPanel()
-        {
-            _ui.OpenSendTransactionWithFeeOptionsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
-        }
         
         public void OpenPlayerProfilePanel()
         {
@@ -79,11 +64,6 @@ namespace Sequence.Boilerplates
         {
             var linker = new EOAWalletLinker(Wallet, Chain.ArbitrumNova);
             await linker.OpenEoaWalletLink();
-        }
-        
-        public void OpenSeeMarketplaceListingsPanel()
-        {
-            _ui.OpenViewMarketplaceListingsPanelWithDelay(_closeAnimationDurationInSeconds, Wallet, this);
         }
 
         public void SignOut()
