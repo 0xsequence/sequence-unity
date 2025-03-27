@@ -2,7 +2,7 @@ graph TD
     %% Define nodes and relationships
     panel[CheckoutPanel] --> |has| modal
     modal[CheckoutPage] --> |has| ch[ICheckoutHelper]
-    modal --> |may have| fc[IFiatCheckout]
+    modal --> |has| fc[IFiatCheckout]
     ch --> |implemented by| nc[NftCheckout]
     ch --> |implemented by| psc[PrimarySaleCheckout]
     nc --> |has| swap[ISwap]
