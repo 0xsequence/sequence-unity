@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -18,6 +19,18 @@ namespace Sequence.Utils
             while (elapsedTime < delayInSeconds)
             {
                 elapsedTime = Time.time - currentTime;
+                await Task.Yield();
+            }
+        }
+        
+        /// <summary>
+        /// This thread safe method is used to block the current thread until a condition is met
+        /// USE WITH CAUTION!!! This method can cause deadlocks if not used properly
+        /// </summary>
+        public static async Task WaitUntilConditionMet(Func<bool> condition)
+        {
+            while (!condition())
+            {
                 await Task.Yield();
             }
         }

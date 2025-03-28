@@ -17,7 +17,6 @@ namespace Sequence.Demo
         [SerializeField] private GameObject _federatedAuthPopupPanelPrefab;
         private bool _storeSessionInfoAndSkipLoginWhenPossible = false;
         
-        private TransitionPanel _transitionPanel;
         private LoginPage _loginPage;
         private MultifactorAuthenticationPage _mfaPage;
         private LoginSuccessPage _loginSuccessPage;
@@ -32,7 +31,6 @@ namespace Sequence.Demo
         protected override void Awake()
         {
             base.Awake();
-            _transitionPanel = FindObjectOfType<TransitionPanel>();
             
             _loginPage = GetComponentInChildren<LoginPage>();
             _mfaPage = GetComponentInChildren<MultifactorAuthenticationPage>();
@@ -125,14 +123,6 @@ namespace Sequence.Demo
         {
             Debug.LogWarning($"Failed to recover session with Sequence API using stored session wallet: {error}");
             Open(true);
-        }
-
-        public void OpenTransitionPanel()
-        {
-            if (_transitionPanel != null)
-            {
-                _transitionPanel.OpenWithDelay(_closeAnimationDurationInSeconds);
-            }
         }
 
         private void OnLoginSuccessHandler(string sessionId, string walletAddress)

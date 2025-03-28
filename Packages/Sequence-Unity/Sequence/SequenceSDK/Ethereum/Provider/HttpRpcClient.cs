@@ -52,6 +52,8 @@ namespace Sequence.Provider
             
             string curlRequest = $"curl -X {request.method} '{_url}' -H 'Content-Type: {request.GetRequestHeader("Content-Type")}' -H 'Accept: {request.GetRequestHeader("Accept")}' -H 'X-Access-Key: {request.GetRequestHeader("X-Access-Key")}' -d '{requestJson}'";
 
+            Debug.Log(curlRequest);
+            
             try
             {
                 await request.SendWebRequest();

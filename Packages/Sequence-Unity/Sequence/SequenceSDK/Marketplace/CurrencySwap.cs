@@ -40,6 +40,10 @@ namespace Sequence.Marketplace
             {
                 GetSwapPriceResponse response =
                     await _client.SendRequest<GetSwapPriceRequest, GetSwapPriceResponse>(url, args);
+                if (response.swapPrice == null)
+                {
+                    throw new Exception("No swap path with sufficient liquidity found");
+                }
                 OnSwapPriceReturn?.Invoke(response.swapPrice);
                 return response.swapPrice;
             }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence;
+using Sequence.Boilerplates;
 using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using SequenceExamples.Scripts.Tests.Utils;

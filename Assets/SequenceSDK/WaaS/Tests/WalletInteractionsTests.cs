@@ -141,7 +141,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                                 new AbiData("mint(address,uint256)",
                                     new object[]
                                     {
-                                        wallet.GetWalletAddress().Value, DecimalNormalizer.Normalize(1)
+                                        wallet.GetWalletAddress().Value, "123456789012345678901234567890123456789012345678901234567890"
                                     }))
                         });
                     Assert.IsNotNull(transactionReturn);
@@ -152,6 +152,7 @@ multiple lines. and has funky characters like this one $ and this one ~ and all 
                             new GetTokenBalancesArgs(wallet.GetWalletAddress(), erc20Address));
                     BigInteger balance2 = balanceReturn.balances[0].balance;
                     Assert.Greater(balance2, balance);
+                    Assert.AreEqual(BigInteger.Parse("123456789012345678901234567890123456789012345678901234567890"), balance2);
                     tcs.TrySetResult(true);
                 }
                 catch (System.Exception e)

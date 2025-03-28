@@ -33,17 +33,6 @@ namespace Sequence.Marketplace
             _baseUrl = _prodUrl;
 #endif            
         }
-
-        public static HttpClient UseHttpClientWithDevEnvironment(string devApiKey)
-        {
-            _baseUrl = "https://dev-marketplace-api.sequence-dev.app/";
-            return new HttpClient(devApiKey);
-        }
-        
-        private HttpClient(string apiKey)
-        {
-            _apiKey = apiKey;
-        }
         
         public async Task<ReturnType> SendRequest<ReturnType>(Chain chain, string url)
         {

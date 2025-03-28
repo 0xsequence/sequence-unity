@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Sequence;
 using Sequence.EmbeddedWallet;
+using Sequence.Wallet;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -20,7 +21,7 @@ namespace Sequence.EmbeddedWallet
 
         public Task<string> SignMessage(Chain network, string message, uint timeBeforeExpiry = 30)
         {
-            throw new NotImplementedException();
+            return new EOAWallet().SignMessage(message, ChainDictionaries.ChainIdOf[network]);
         }
 
         public Task<IsValidMessageSignatureReturn> IsValidMessageSignature(Chain network, string message, string signature)

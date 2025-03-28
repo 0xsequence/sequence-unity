@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace Sequence.Utils
 {
@@ -28,7 +29,37 @@ namespace Sequence.Utils
         public static int HexStringToInt(this string hexString)
         {
             hexString = hexString.Replace("0x", "");
+            hexString.TrimStart('0');
             return int.Parse(hexString, System.Globalization.NumberStyles.HexNumber);
+        }
+
+        /// <summary>
+        /// Converts a string that represents a hex value to a human-readable string
+        /// </summary>
+        /// <param name="hexString"></param>
+        /// <returns></returns>
+        public static string HexStringToHumanReadable(this string hexString)
+        {
+            byte[] bytes = HexStringToByteArray(hexString);
+            string result = Encoding.UTF8.GetString(bytes);
+            string cleaned = RemoveControlCharactersExceptNewline(result); // Unity's encoding/decoding is a bit wonky and adds a bunch of \0 (null terminators) to the beginning and end of the string
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+             cleaned = cleaned.Replace("\n", "\r\n");
+#endif
+            return cleaned;
+        }
+
+        private static string RemoveControlCharactersExceptNewline(string value)
+        {
+            StringBuilder result = new StringBuilder();
+            foreach (char c in value)
+            {
+                if (!char.IsControl(c) || c == '\n')
+                {
+                    result.Append(c);
+                }
+            }
+            return result.ToString();
         }
 
         /// <summary>
@@ -161,6 +192,13 @@ namespace Sequence.Utils
             }
 
             return result;
+        }
+
+        public static string StringToBase64(this string value)
+        {
+            byte[] asBytes = value.ToByteArray();
+            string base64 = Convert.ToBase64String(asBytes);
+            return base64;
         }
     }
 }

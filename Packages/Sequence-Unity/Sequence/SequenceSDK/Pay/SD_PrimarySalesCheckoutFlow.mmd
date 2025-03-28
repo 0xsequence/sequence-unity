@@ -1,0 +1,19 @@
+sequenceDiagram
+    User->>+App: I would like to buy x amount of this Collectible with my credit card
+    App->>+SequencePay: User wants to buy x amount of this Collectible with their credit card from this PrimarySaleContract
+    SequencePay->>+SequenceAPI: Which checkout providers are available? GetCheckoutOptions
+    SequenceAPI-->>-SequencePay: Returns array of CheckoutOptions, identifying which providers are available
+    SequencePay->>+SequenceEthereum: Encode the 'mint' function on sale contract, assembling transaction calldata
+    SequenceEthereum-->>-SequencePay: Return the calldata for the 'mint' function
+    SequencePay->>+SequenceAPI: Give me a checkout link for <available provider> using this calldata, sale contract, and Collectible
+    SequenceAPI-->>-SequencePay: Returns checkout link
+    SequencePay-->>-App: Returns checkout link
+    App->>-User: App opens checkout link in web browser or webview, displaying it to user
+    User->>+CheckoutWebpage: User checks out and pays with credit card
+    CheckoutWebpage->>+ThirdPartyServer: Checkout provider confirms payment
+    ThirdPartyServer->>+PrimarySaleContract: Execute provided calldata on provided PrimarySaleContract
+    PrimarySaleContract->>+CollectionContract: PrimarySaleContract mints x instances of Collectible
+    CollectionContract-->>-PrimarySaleContract: x instances of Collectible minted
+    PrimarySaleContract-->>-ThirdPartyServer: Transaction success, return transaction hash
+    ThirdPartyServer-->>-CheckoutWebpage: Transaction success, return transaction hash
+    CheckoutWebpage-->>-User: Display to user informing them that x Collectibles were successfully purchased

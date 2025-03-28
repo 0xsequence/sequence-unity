@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using UnityEditor;
@@ -33,13 +34,18 @@ namespace Sequence.Config
         public bool StoreSessionPrivateKeyInSecureStorage = false;
         public bool EditorStoreSessionPrivateKeyInSecureStorage = false;
         
-        private static SequenceConfig _config;
+        private static Dictionary<SequenceService, SequenceConfig> _configs = new Dictionary<SequenceService, SequenceConfig>();
         public static SequenceConfig GetConfig(SequenceService sequenceService = SequenceService.Unspecified)
         {
-            if (_config == null)
+            if (_configs.TryGetValue(sequenceService, out SequenceConfig cachedConfig))
             {
-                _config = GetAppropriateConfig(sequenceService);
-                if (_config == null)
+                return cachedConfig;
+            }
+            else 
+            {
+                _configs[sequenceService] = GetAppropriateConfig(sequenceService);
+                SequenceConfig config = _configs[sequenceService];
+                if (config == null)
                 {
                     throw new Exception("SequenceConfig not found. Make sure to create and configure it and place it at the root of your Resources folder. Create it from the top bar with Assets > Create > Sequence > SequenceConfig");
                 }
@@ -47,19 +53,18 @@ namespace Sequence.Config
                 TextAsset versionFile = Resources.Load<TextAsset>("sequence-unity-version");
                 if (versionFile != null)
                 {
-                    _config.WaaSVersion = $"1 (Unity {versionFile.text})";
+                    config.WaaSVersion = $"1 (Unity {versionFile.text})";
                 }
                 else
                 {
-                    _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
+                    config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})";
                 }
                 
 #if UNITY_EDITOR && !SEQ_DISABLE_PACKAGE_OVERRIDE
-                _config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
+                config.WaaSVersion = $"1 (Unity {PackageVersionReader.GetVersion()})"; // version file is only updated when building
 #endif
+                return config;
             }
-
-            return _config;
         }
 
         private static SequenceConfig GetAppropriateConfig(SequenceService sequenceService)
@@ -140,9 +145,15 @@ namespace Sequence.Config
             return new Exception($"{valueName} is not set. Please set it in SequenceConfig asset in your Resources folder.");
         }
 
-        public static ConfigJwt GetConfigJwt()
+        public static ConfigJwt GetConfigJwt(SequenceService service = SequenceService.Unspecified)
         {
-            string configKey = _config.WaaSConfigKey;
+            SequenceConfig config = GetConfig(service);
+            return GetConfigJwt(config);
+        }
+
+        public static ConfigJwt GetConfigJwt(SequenceConfig config)
+        {
+            string configKey = config.WaaSConfigKey;
             if (string.IsNullOrWhiteSpace(configKey))
             {
                 throw SequenceConfig.MissingConfigError("WaaS Config Key");

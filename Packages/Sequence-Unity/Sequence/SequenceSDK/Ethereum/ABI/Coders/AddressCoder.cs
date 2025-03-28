@@ -1,5 +1,6 @@
 
 using System;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -91,9 +92,13 @@ namespace Sequence.ABI
         /// <returns>The decoded address string.</returns>
         public string DecodeFromString(string encodedString)
         {
+            if (encodedString.IsZeroAddress())
+            {
+                return StringExtensions.ZeroAddress;
+            }
+            
             try
             {
-                //cut leading zeros
                 encodedString = encodedString.Replace("0x", "").TrimStart('0');
                 return "0x" + encodedString;
             }

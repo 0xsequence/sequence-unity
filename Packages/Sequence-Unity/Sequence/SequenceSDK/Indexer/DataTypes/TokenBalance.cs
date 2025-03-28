@@ -1,3 +1,5 @@
+using System;
+
 namespace Sequence
 {
     using System.Numerics;
@@ -31,6 +33,28 @@ namespace Sequence
         public override string ToString()
         {
             return $"TokenBalance: id: {id}, contractAddress: {contractAddress}, contractType: {contractType}, accountAddress: {accountAddress}, tokenID: {tokenID}, balance: {balance}, blockHash: {blockHash}, blockNumber: {blockNumber}, updateID: {updateID}, chainId: {chainId}, contractInfo: {contractInfo}, tokenMetadata: {tokenMetadata}";
+        }
+    }
+
+    public static class TokenBalanceExtensions
+    {
+        public static bool ContainsToken(this TokenBalance[] balances, string tokenAddress)
+        {
+            return balances.TokenIndex(tokenAddress) != -1;
+        }
+        
+        public static int TokenIndex(this TokenBalance[] balances, string tokenAddress)
+        {
+            int length = balances.Length;
+            for (int i = 0; i < length; i++)
+            {
+                if (String.Equals(balances[i].contractAddress, tokenAddress, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return i;
+                }
+            }
+            
+            return -1;
         }
     }
 }
