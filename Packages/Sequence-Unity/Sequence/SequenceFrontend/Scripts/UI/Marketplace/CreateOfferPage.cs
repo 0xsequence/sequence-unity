@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Numerics;
+using System.Globalization;
 using TMPro;
 using System.Threading.Tasks;
 using Sequence.Utils;
@@ -11,20 +12,20 @@ namespace Sequence.Demo
 {
     public class CreateOfferPage : UIPage
     {
-        [SerializeField] private GameObject _loadingScreen;
+        [SerializeField] DatePicker _datePicker;
+        [SerializeField] GameObject _loadingScreen;
 
         private TokenBalance _nft;
-        private Chain _chain;
+        private CollectibleOrder _order;
+
+        Marketplace.Currency[] _currencies;
         private ICheckout _checkout;
 
         int _price, _amount;
 
         [SerializeField] TMP_Dropdown _currencyPicker;
 
-        Address _currencyTokenAddress;
-
-        DateTime expiryDate;
-        
+        Address _currencyTokenAddress;        
 
         protected override void Awake()
         {
@@ -38,47 +39,46 @@ namespace Sequence.Demo
             _nft = args.GetObjectOfTypeIfExists<TokenBalance>();
             if (_nft == null)
             {
-                throw new ArgumentException(
-                    $"Invalid use. {GetType().Name} must be opened with a {typeof(TokenBalance)} as an argument");
+                _order = args.GetObjectOfTypeIfExists<CollectibleOrder>();
+                if (_order == null)
+                {
+                    throw new ArgumentException(
+                        $"Invalid use. {GetType().Name} must be opened with a {typeof(TokenBalance)} or {typeof(CollectibleOrder)} as an argument");
+                }  
             }
 
             Configure();
 
         }
 
-        protected void Configure()
+        protected async void Configure()
         {
-            _chain = ChainDictionaries.ChainById[_nft.chainId.ToString()];
+            Chain chain;
+            if (_nft != null) chain = ChainDictionaries.ChainById[_nft.chainId.ToString()];
+            else if (_order != null) chain = ChainDictionaries.ChainById[_order.order.chainId.ToString()];
+            else return;
 
-            // Clear and populate the dropdown
             _currencyPicker.ClearOptions();
-            var options = new List<string>(ChainDictionaries.NativeTokenAddressOf.Keys.Select(chain => chain.ToString()));
-            _currencyPicker.AddOptions(options);
 
-            // Set default currency if available
-            if (ChainDictionaries.NativeTokenAddressOf.TryGetValue(_chain, out string defaultAddress))
+            var marketplaceReader = new MarketplaceReader(chain);
+            _currencies = await marketplaceReader.ListCurrencies();
+
+            List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+
+            foreach (var item in _currencies)
             {
-                _currencyTokenAddress = new Address(defaultAddress);
-                _currencyPicker.value = options.IndexOf(_chain.ToString());
+                options.Add(new TMP_Dropdown.OptionData(item.symbol));
             }
 
-            // Add listener for dropdown selection change
+            _currencyPicker.AddOptions(options);
+            _currencyTokenAddress = new Address(_currencies[0].contractAddress);
             _currencyPicker.onValueChanged.AddListener(OnCurrencySelected);
         }
 
+
         private void OnCurrencySelected(int index)
         {
-            var selectedChain = ChainDictionaries.NativeTokenAddressOf.Keys.ElementAt(index);
-            if (ChainDictionaries.NativeTokenAddressOf.TryGetValue(selectedChain, out string tokenAddress))
-            {
-                _currencyTokenAddress = new Address(tokenAddress);
-            }
-        }
-
-        public override void Close()
-        {
-            base.Close();
-
+            _currencyTokenAddress = new Address(_currencies[index].contractAddress); // Assign correct address        
         }
 
         public void SetPrice(string value)
@@ -97,15 +97,6 @@ namespace Sequence.Demo
             }
         }
 
-        public void SetListingCurrency()
-        {
-
-        }
-        public void SetDate()
-        {
-
-        }
-
         public void ListItem()
         {
             List().ConfigureAwait(false);
@@ -115,18 +106,35 @@ namespace Sequence.Demo
         {
             _loadingScreen.SetActive(true);
 
-            Step[] steps = await _checkout.GenerateOfferTransaction(new Address(_nft.contractAddress), _nft.tokenID.ToString(), _amount, ContractTypeExtensions.AsMarketplaceContractType(_nft.contractType), _currencyTokenAddress, _price, expiryDate);
+            DateTime date = DateTime.ParseExact(
+                _datePicker.Date.ToString("MM/dd/yyyy"),
+                "MM/dd/yyyy",
+                CultureInfo.InvariantCulture
+            );
 
+            if (_nft != null)
+            {
+                Step[] steps = await _checkout.GenerateOfferTransaction(new Address(_nft.contractAddress), _nft.tokenID.ToString(), new BigInteger(_amount), ContractTypeExtensions.AsMarketplaceContractType(_nft.contractType), _currencyTokenAddress, new BigInteger(_price), date);
+            }
+            else if (_order != null)
+            {
+                var response = await Indexer.GetTokenSupplies(_order.order.chainId, new GetTokenSuppliesArgs(_order.order.collectionContractAddress));
+                var type = response.contractType;
+
+                Step[] steps = await _checkout.GenerateOfferTransaction(new Address(_order.order.collectionContractAddress), _order.metadata.tokenId.ToString(), new BigInteger(_amount), ContractTypeExtensions.AsMarketplaceContractType(type), _currencyTokenAddress, new BigInteger(_price), date);
+
+            }
             _loadingScreen.SetActive(false);
             if (0 == 0)
             {
                 _panel.Close();
             }
-            else
-            {
-            }
+
         }
+        public override void Close()
+        {
+            base.Close();
 
-
+        }
     }
 }

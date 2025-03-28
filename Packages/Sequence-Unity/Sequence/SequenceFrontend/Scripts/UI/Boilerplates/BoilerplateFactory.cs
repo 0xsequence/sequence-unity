@@ -131,7 +131,31 @@ namespace Sequence.Boilerplates
                 b => b.Open(checkoutHelper, fiatCheckout, onClose));
             return (panel, panel.CheckoutPage);
         }
-        
+
+        public static (ListItemPanel, ListItemPage) OpenListItemPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        {
+            ListItemPanel panel = GetOrSpawnBoilerplate<ListItemPanel>("Checkout/ListItemPanel", parent, b => b.Open(checkout, item));
+            return (panel, panel.ListItemPage);
+        }
+
+
+
+        public static (CreateOfferPanel, CreateOfferPage) OpenCreateOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        {
+            CreateOfferPanel panel = GetOrSpawnBoilerplate<CreateOfferPanel>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
+            return (panel, panel.CreateOfferPage);
+        }
+        public static (CreateOfferPanel, CreateOfferPage) OpenCreateOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
+        {
+            CreateOfferPanel panel = GetOrSpawnBoilerplate<CreateOfferPanel>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
+            return (panel, panel.CreateOfferPage);
+        }
+
+        public static (SellOfferPanel, SellOfferPage) OpenSellOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        {
+            SellOfferPanel panel = GetOrSpawnBoilerplate<SellOfferPanel>("Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
+            return (panel, panel.SellOfferPage);
+        }
         /// <summary>
         /// Open the UI Boilerplate to sign messages from a Prefab inside the Resources folder.
         /// </summary>

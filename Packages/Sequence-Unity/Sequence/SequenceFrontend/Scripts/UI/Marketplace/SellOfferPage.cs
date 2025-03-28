@@ -8,14 +8,11 @@ using UnityEngine;
 namespace Sequence.Demo
 {
     public class SellOfferPage : UIPage
-    {
-
+    {  
         [SerializeField] private GameObject _loadingScreen;
           
         private CollectibleOrder _offer;
         private ICheckout _checkout;
-
-
 
         [SerializeField] TextMeshProUGUI _name, _quantityAvailable;
 
@@ -83,7 +80,5 @@ namespace Sequence.Demo
             {
             }
         }
-
-
     }
 }

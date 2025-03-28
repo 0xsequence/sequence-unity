@@ -2,16 +2,7 @@ namespace Sequence.Demo
 {
     public class SellOfferPanel : UIPanel
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        public SellOfferPage SellOfferPage { get; private set; }
 
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
 }

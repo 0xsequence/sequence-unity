@@ -31,6 +31,7 @@ namespace Sequence.Demo
         {
             base.Awake();
             _panel = this;
+            Debug.Log(this);
         }
 
 #if ENABLE_LEGACY_INPUT_MANAGER

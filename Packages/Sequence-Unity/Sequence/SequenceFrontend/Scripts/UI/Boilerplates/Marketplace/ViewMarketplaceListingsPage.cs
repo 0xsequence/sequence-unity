@@ -136,7 +136,7 @@ namespace Sequence.Boilerplates.Marketplace
                 }
                 Transform marketplaceTile = _marketplaceTilePool.GetNextAvailable();
                 marketplaceTile.SetParent(_scrollviewContentParent);
-                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet, _checkoutPanel, NFTType.ERC1155);
+                marketplaceTile.GetComponent<MarketplaceTile>().Assemble(result.collectibles[i], currencyIcon, _wallet, NFTType.ERC1155);
                 marketplaceTile.localScale = Vector3.one;
                 _items++;
                 UpdateScrollViewSize();

@@ -72,6 +72,11 @@ namespace Sequence.Boilerplates.Inventory
             _sendState.SetActive(false);
         }
 
+        public void OpenListingPanel()
+        {
+            BoilerplateFactory.OpenListItemPanel(transform, new Sequence.Marketplace.Checkout(_wallet, _chain), _selectedBalance);
+        }
+        
         public async void SendToken()
         {
             var recipient = _sendRecipientInput.text;
@@ -111,7 +116,7 @@ namespace Sequence.Boilerplates.Inventory
             else if (response is SuccessfulTransactionReturn)
                 _messagePopup.Show("Sent successfully.");
         }
-
+        
         private async void LoadAllCollections()
         {
             _messagePool.Cleanup();
