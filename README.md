@@ -191,6 +191,94 @@ To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence >
 Please add any ADRs below. In the future, it may be worthwhile to move these into separate files, but for now since there are few ADRs, the README should suffice. 
 Please use [Michael Nygard's template for ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
 
+### ADR 6 - Marketplace and Pay Ecosystem
+March 28, 2025 - author: Quinn Purdy
+
+#### Status
+Approved
+
+#### Context
+We are adding a new suite of monetization-focused features to the Unity SDK. This ADR aims to explain the overall architecture of how these features have been implemented and why that architecture was chosen.
+
+#### Decision
+
+The overall payment ecosystem looks like this.
+
+```mermaid
+graph TD
+    %% Define nodes and relationships
+    panel[CheckoutPanel] --> |has| modal
+    modal[CheckoutPage] --> |has| ch[ICheckoutHelper]
+    modal --> |has| fc[IFiatCheckout]
+    ch --> |implemented by| nc[NftCheckout]
+    ch --> |implemented by| psc[PrimarySaleCheckout]
+    nc --> |has| swap[ISwap]
+    nc --> |has| reader[IMarketplaceReader]
+    nc --> |has| checkout[ICheckout]
+    fc --> |implemented by| seqc[SequenceCheckout]
+    seqc --> |has| pay[SequencePay]
+    fp[IFiatPay] --> |implemented by| pay
+    pay --> |has| checkout
+    pay --> |has| fpf[IFiatPayFactory]
+    fpf --> |creates|fp 
+    fp --> |implemented by| up[UnsupportedPay]
+    fp --> |implemented by| sfp[SardineFiatPay]
+    sfp --> |has| isc[ISardineCheckout]
+    isc --> |implemented by| sc[SardineCheckout]
+    fp --> |implemented by| tfp[TransakFiatPay]
+    tfp --> |has| tor[TransakOnRamp]
+    tfp --> |has| tnc[TransakNFTCheckout]
+    psc --> |has| pssft[ERC1155Sale]
+    psc --> |has| psnft[ERC721Sale]
+    fp --> |uses| pssft
+    fp --> |uses| psnft
+    psc --> |has| swap
+    
+    %% Subgraphs to group components
+    subgraph Marketplace
+        ch
+        nc
+        swap
+        reader
+        checkout
+        psc
+    end
+    subgraph Pay
+        fc
+        seqc
+        pay
+        fp
+        fpf
+        up
+        subgraph Transak
+            tfp
+            tor
+            tnc
+        end
+        subgraph Sardine
+            sfp
+            isc
+            sc
+        end
+    end
+    subgraph Ethereum/Contract
+        pssft
+        psnft
+    end
+```
+
+#### Consequences
+
+Let's examine each layer of abstraction to understand some of the decision making here.
+
+First, and perhaps most obvious, are our base level abstractions: `ISwap`, `IMarketplaceReader`, and `ICheckout`. These interfaces and their implementations are the most basic integrations of the Sequence Marketplace and Swap APIs, segmented by functionality (swap, marketplace reading, and marketplace writing/checkout respectively). Higher-level abstractions rely upon the interfaces, not concrete implementations, to allow for unit testing of higher-level abstractions via injection of mocked implementations. While I don't expect that other concrete implementations are likely, this remains an option.
+
+You may notice that we have an `ISardineCheckout` but we don't have a similar interface for the Transak provider. This is due to some legacy code providing TransakOnRamp functionality; to make the changes more digestible to maintainers and advanced consumers of the SDK, we've opted to keep Transak changes more minimal and keep OnRamp and NftCheckout functionality separate. However, please keep in mind that we can, rather easily, introduce a similar interface should the need arise.
+
+Currently, the SDK integrates two different payment service providers, Transak and Sardine. These payment service providers provide a number of services including customer KYC, credit card payment processing + chargeback risk, and execution of smart contract code in a permissioned context with confirmation of payment; these services are exposed to Sequence in the form of cryptocurrency on-ramping and nft checkout products, allowing users to purchase cryptocurrencies + ERC20s and ERC721/ERC1155 collectibles respectively. An important insight is that both of these payment service providers have different integrations with different logic and have different supported regions (e.g. countries) and functionalities. For this reason, we introduced the `SequencePay` implementation and the `IFiatPay` interface. `SequencePay` is an implementation of the `IFiatPay` interface, as are `SardineFiatPay`, `TransakFiatPay`, and `UnsupportedPay`, but with some additional logic built in; `SequencePay` contains an `IFiatPayFactory` dependency (similar to above, we use an interface dependency for easy mocking) that, as implemented by `FiatPayFactory`, will determine which payment service provider(s), if any, support the desired functionality requested by the user by leveraging Sequence APIs and then will return the appropriate `IFiatPay` implementation for `SequencePay` to use as it's implementation. In addition to providing ease of use for integrators (as they don't need to worry about which payment service providers will work for a given user and operation), this architecture also makes it easy for us to add and remove payment service providers by simply providing an `IFiatPay` integration to the SDK and adding it to the `FiatPayFactory` creation logic (and upding the Sequence APIs accordingly, but this is outside of the scope of our SDK and can be thought of as a 'black box').
+
+Perhaps the most unobvious part of the architecture is our highest-level of abstraction, specifically, you may wonder why `IFiatCheckout` and `ICheckoutHelper` exist as separate interfaces to be leveraged by our `CheckoutPanel` and `CheckoutPage` UI. This is to provide further flexibility in the future. As an example, the `CheckoutPage` logic and UI, given a sufficient implementation of `ICheckoutHelper` supports having multiple types of collectibles in your checkout 'cart' at one time. While the payment service providers don't currently support this, we can support this with crypto-based checkout by extending `PrimarySaleCheckout` and/or `NftCheckout` to support multiple collectibles while adhering to the same interface by essentially looping each collectible, and checkout transaction, through an `IEnumerable` of some sort and submitting the generated `Transaction[]` as a batch using the Embedded Sequence Wallets. Splitting fiat-based payment and checkout logic into separate interfaces also fits snuggly into the existing product segmentations, and assemblies, of Sequence Pay and Sequence Marketplaces, following the basic concept Domain Driven Design.
+
 ### ADR 5 - SDK as a Local Package
 July 19, 2024 - author: Quinn Purdy
 
