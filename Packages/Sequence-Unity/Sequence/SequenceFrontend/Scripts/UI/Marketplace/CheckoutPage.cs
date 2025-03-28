@@ -307,8 +307,15 @@ namespace Sequence.Demo
             Button payWithCreditCardButton = payWithCreditCardGameObject.GetComponent<Button>();
             payWithCreditCardButton.onClick.AddListener(async () =>
             {
-                string checkoutLink = await _fiatCheckout.GetNftCheckoutLink();
-                Application.OpenURL(checkoutLink);
+                try
+                {
+                    string checkoutLink = await _fiatCheckout.GetNftCheckoutLink();
+                    Application.OpenURL(checkoutLink);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e.Message);
+                }
             });
             _spawnedGameObjects.Add(payWithCreditCardGameObject);
         }
