@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Sequence.EmbeddedWallet;
+using Sequence.Marketplace;
 
 namespace Sequence.Boilerplates.Inventory
 {

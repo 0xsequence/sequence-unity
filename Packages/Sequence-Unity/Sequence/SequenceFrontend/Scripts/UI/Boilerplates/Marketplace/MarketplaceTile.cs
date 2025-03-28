@@ -27,12 +27,12 @@ namespace Sequence.Boilerplates.Marketplace
         
         [SerializeField] private Image _collectibleImage, _currencyIcon;
         [SerializeField] private TextMeshProUGUI _nameText, _priceText, _amountAvailableText;
-        [SerializeField] private GameObject _seeInfoButton;
-        [SerializeField] private GameObject _buyButton;
+        [SerializeField] private GameObject _seeInfoButton,_buyButton, _createOfferButton;
         private CollectibleOrder _collectibleOrder;
         private Button _focusButton;
         private MarketplaceItemDetailsPage _marketplaceItemDetailsPage;
         private IWallet _wallet;
+        private Chain _chain;
         private Sprite _collectibleSprite;
         private NFTType _nftType;
         private BoilerplateController _boilerplateController;
@@ -52,7 +52,7 @@ namespace Sequence.Boilerplates.Marketplace
             OnCollectibleSelected -= HandleCollectibleSelected;
         }
 
-        public void Assemble(CollectibleOrder order, Sprite currencyIcon, IWallet wallet, CheckoutPanel checkoutPanel, NFTType nftType)
+        public void Assemble(CollectibleOrder order, Sprite currencyIcon, IWallet wallet , NFTType nftType)
         {
             if (order == null)
             {
@@ -112,6 +112,11 @@ namespace Sequence.Boilerplates.Marketplace
             {
                 _buyButton.SetActive(true);
             }
+            if (_createOfferButton != null)
+            {
+                _createOfferButton.SetActive(true);
+            }
+
         }
 
         private void ResetButtons()
@@ -124,6 +129,10 @@ namespace Sequence.Boilerplates.Marketplace
             if (_buyButton != null)
             {
                 _buyButton.SetActive(false);
+            }
+            if (_createOfferButton != null)
+            {
+                _createOfferButton.SetActive(false);
             }
         }
 
@@ -150,6 +159,13 @@ namespace Sequence.Boilerplates.Marketplace
                         ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()],
                         checkout: new MockCheckoutWithSardineForCanada(new Checkout(_wallet,
                             ChainDictionaries.ChainById[_collectibleOrder.order.chainId.ToString()])))));
+        }
+
+        public void OpenCreateOfferPage()
+        {
+            ChainDictionaries.ChainById.TryGetValue(_collectibleOrder.order.chainId.ToString(), out var chain);
+            
+            BoilerplateFactory.OpenCreateOfferPanel(transform, new Checkout(_wallet, chain),_collectibleOrder);
         }
     }
 }

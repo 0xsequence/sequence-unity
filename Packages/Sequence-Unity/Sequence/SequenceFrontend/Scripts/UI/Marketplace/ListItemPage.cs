@@ -1,6 +1,7 @@
 using System;
+using System.Globalization;
 using System.Collections.Generic;
-using System.Linq;
+using System.Numerics;
 using TMPro;
 using System.Threading.Tasks;
 using Sequence.Utils;
@@ -12,8 +13,8 @@ namespace Sequence.Demo
     public class ListItemPage : UIPage
     {
 
-        [SerializeField] private GameObject _loadingScreen;
-        //[SerializeField] DatePicker _datePicker;
+        [SerializeField] DatePicker _datePicker;
+        [SerializeField] GameObject _loadingScreen;
 
         private TokenBalance _nft;
         private Chain _chain;
@@ -23,10 +24,9 @@ namespace Sequence.Demo
 
         [SerializeField] TMP_Dropdown _currencyPicker;
 
-
+        Marketplace.Currency[] _currencies;
         Address _currencyTokenAddress;
 
-        DateTime expiryDate;
 
         protected override void Awake()
         {
@@ -36,6 +36,13 @@ namespace Sequence.Demo
         public override void Open(params object[] args)
         {
             base.Open(args);
+
+            _checkout = args.GetObjectOfTypeIfExists<ICheckout>();
+            if (_checkout == null)
+            {
+                throw new ArgumentException(
+                    $"Invalid use. {GetType().Name} must be opened with a {typeof(ICheckout)} as an argument");
+            }
 
             _nft = args.GetObjectOfTypeIfExists<TokenBalance>();
             if (_nft == null)
@@ -48,30 +55,30 @@ namespace Sequence.Demo
 
         }
 
-        protected void Configure()
+        protected async void Configure()
         {
             _chain = ChainDictionaries.ChainById[_nft.chainId.ToString()];
-
             _currencyPicker.ClearOptions();
-            var options = new List<string>(ChainDictionaries.NativeTokenAddressOf.Keys.Select(chain => chain.ToString()));
-            _currencyPicker.AddOptions(options);
 
-            if (ChainDictionaries.NativeTokenAddressOf.TryGetValue(_chain, out string defaultAddress))
+            var marketplaceReader = new MarketplaceReader(_chain);
+            _currencies = await marketplaceReader.ListCurrencies();
+
+            List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+
+            foreach (var item in _currencies)
             {
-                _currencyTokenAddress = new Address(defaultAddress);
-                _currencyPicker.value = options.IndexOf(_chain.ToString());
+                options.Add(new TMP_Dropdown.OptionData(item.symbol)); 
             }
 
+            _currencyPicker.AddOptions(options); 
+            _currencyTokenAddress = new Address(_currencies[0].contractAddress);
             _currencyPicker.onValueChanged.AddListener(OnCurrencySelected);
         }
 
+
         private void OnCurrencySelected(int index)
         {
-            var selectedChain = ChainDictionaries.NativeTokenAddressOf.Keys.ElementAt(index);
-            if (ChainDictionaries.NativeTokenAddressOf.TryGetValue(selectedChain, out string tokenAddress))
-            {
-                _currencyTokenAddress = new Address(tokenAddress);
-            }
+            _currencyTokenAddress = new Address(_currencies[index].contractAddress); // Assign correct address        
         }
 
         public override void Close()
@@ -96,11 +103,6 @@ namespace Sequence.Demo
             }
         }
 
-        public void SetDate()
-        {
- 
-        }
-
         public void ListItem()
         {
             List().ConfigureAwait(false);
@@ -110,7 +112,13 @@ namespace Sequence.Demo
         {
             _loadingScreen.SetActive(true);
 
-            Step[] steps = await _checkout.GenerateListingTransaction(new Address(_nft.contractAddress), _nft.tokenID.ToString() , _amount, ContractTypeExtensions.AsMarketplaceContractType(_nft.contractType), _currencyTokenAddress, _price, expiryDate);
+            DateTime date = DateTime.ParseExact(
+                _datePicker.Date.ToString("MM/dd/yyyy"),
+                "MM/dd/yyyy",
+                CultureInfo.InvariantCulture
+            );
+
+            Step[] steps = await _checkout.GenerateListingTransaction(new Address(_nft.contractAddress), _nft.tokenID.ToString() , new BigInteger(_amount), ContractTypeExtensions.AsMarketplaceContractType(_nft.contractType), _currencyTokenAddress, new BigInteger(_price), date);
 
             _loadingScreen.SetActive(false);
             if (0 == 0)
