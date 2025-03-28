@@ -204,7 +204,68 @@ We are adding a new suite of monetization-focused features to the Unity SDK. Thi
 
 The overall payment ecosystem looks like this.
 
-<!--MERMAID-PLACEHOLDER-->
+```mermaid
+graph TD
+    %% Define nodes and relationships
+    panel[CheckoutPanel] --> |has| modal
+    modal[CheckoutPage] --> |has| ch[ICheckoutHelper]
+    modal --> |has| fc[IFiatCheckout]
+    ch --> |implemented by| nc[NftCheckout]
+    ch --> |implemented by| psc[PrimarySaleCheckout]
+    nc --> |has| swap[ISwap]
+    nc --> |has| reader[IMarketplaceReader]
+    nc --> |has| checkout[ICheckout]
+    fc --> |implemented by| seqc[SequenceCheckout]
+    seqc --> |has| pay[SequencePay]
+    fp[IFiatPay] --> |implemented by| pay
+    pay --> |has| checkout
+    pay --> |has| fpf[IFiatPayFactory]
+    fpf --> |creates|fp 
+    fp --> |implemented by| up[UnsupportedPay]
+    fp --> |implemented by| sfp[SardineFiatPay]
+    sfp --> |has| isc[ISardineCheckout]
+    isc --> |implemented by| sc[SardineCheckout]
+    fp --> |implemented by| tfp[TransakFiatPay]
+    tfp --> |has| tor[TransakOnRamp]
+    tfp --> |has| tnc[TransakNFTCheckout]
+    psc --> |has| pssft[ERC1155Sale]
+    psc --> |has| psnft[ERC721Sale]
+    fp --> |uses| pssft
+    fp --> |uses| psnft
+    psc --> |has| swap
+    
+    %% Subgraphs to group components
+    subgraph Marketplace
+        ch
+        nc
+        swap
+        reader
+        checkout
+        psc
+    end
+    subgraph Pay
+        fc
+        seqc
+        pay
+        fp
+        fpf
+        up
+        subgraph Transak
+            tfp
+            tor
+            tnc
+        end
+        subgraph Sardine
+            sfp
+            isc
+            sc
+        end
+    end
+    subgraph Ethereum/Contract
+        pssft
+        psnft
+    end
+```
 
 #### Consequences
 
