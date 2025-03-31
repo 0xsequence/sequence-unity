@@ -26,7 +26,22 @@ namespace Sequence
 
         public static bool IsActive(this Chain chain)
         {
-            return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto);
+            return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto || chain == Chain.TestnetBorne);
         }
     }
+
+    public static class NativeTokenAddress
+    {
+        public static string Get(Chain chain)
+        {
+            return ChainDictionaries.NativeTokenAddressOf.TryGetValue(chain, out var address) ? address : null;
+        }
+        
+        public static string Get(int chainId)
+        {
+            return Get((Chain)chainId);
+        }
+    }
+    
+
 }

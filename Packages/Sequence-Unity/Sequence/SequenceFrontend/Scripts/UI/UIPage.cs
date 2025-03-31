@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
-using Sequence.Boilerplates;
 using Sequence.Demo.Tweening;
 using Sequence.Utils;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Scale = Sequence.Demo.Tweening.Scale;
 
 namespace Sequence.Demo
@@ -45,7 +42,7 @@ namespace Sequence.Demo
                     $"Invalid use. {GetType().Name} must be opened with a {typeof(UIPanel)} as an argument");
             }
             _gameObject.SetActive(true);
-            _animator.AnimateIn( _openAnimationDurationInSeconds);
+            _animator.AnimateIn(_openAnimationDurationInSeconds);
         }
 
         public virtual void Close()

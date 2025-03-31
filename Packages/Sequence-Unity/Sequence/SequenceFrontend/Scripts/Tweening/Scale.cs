@@ -1,6 +1,5 @@
 
 using System.Collections;
-using Sequence.Boilerplates;
 using UnityEngine;
 
 namespace Sequence.Demo.Tweening

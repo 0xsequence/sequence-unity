@@ -102,5 +102,17 @@ namespace Sequence.Utils
 
             return newArr;
         }
+
+        public static T[] AppendObject<T>(this T[] arr, T obj)
+        {
+            int length = arr.Length;
+            T[] newArr = new T[length + 1];
+            for (int i = 0; i < length; i++)
+            {
+                newArr[i] = arr[i];
+            }
+            newArr[length] = obj;
+            return newArr;
+        }
     }
 }

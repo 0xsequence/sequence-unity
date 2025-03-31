@@ -24,7 +24,7 @@ namespace Sequence.Demo
         {
             base.Awake();
             _inputField = GetComponentInChildren<TMP_InputField>();
-            _loginButtonHighlighter = GetComponent<LoginButtonHighlighter>();
+            _loginButtonHighlighter = GetComponent<LoginButtonHighlighter>();        
         }
 
         private void Start()

@@ -1,17 +1,13 @@
+using Newtonsoft.Json;
+using Sequence.Utils;
+
 namespace Sequence.Marketplace
 {
+    [JsonConverter(typeof(EnumConverter<OrderSide>))]
     public enum OrderSide
     {
-        unkown,
+        unknown,
         listing,
         offer,
-    }
-    
-    public static class OrderSideExtensions
-    {
-        public static string AsString(this OrderSide side)
-        {
-            return side.ToString();
-        }
     }
 }

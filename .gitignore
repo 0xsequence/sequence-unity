@@ -118,3 +118,9 @@ testchain/cache/
 
 # Test config
 Assets/SequenceSDK/WaaS/Tests/Resources/
+
+# Foundry
+
+/testchain/lib
+/testchain/artifacts/*
+

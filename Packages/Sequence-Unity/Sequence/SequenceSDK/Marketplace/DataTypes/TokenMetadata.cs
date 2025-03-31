@@ -13,6 +13,7 @@ namespace Sequence.Marketplace
         public string image;
         public string video;
         public string audio;
+        public Dictionary<string, object> properties;
         public Dictionary<string, object>[] attributes;
         public string image_data;
         public string external_url;
@@ -23,7 +24,7 @@ namespace Sequence.Marketplace
         public Asset[] assets;
 
         [Preserve]
-        public TokenMetadata(string tokenId, string name, Dictionary<string, object>[] attributes, string description = null, string image = null, string video = null, string audio = null, string imageData = null, string externalURL = null, string backgroundColor = null, string animationURL = null, uint decimals = default, string updatedAt = null, Asset[] assets = null)
+        public TokenMetadata(string tokenId, string name, Dictionary<string, object> properties = null, Dictionary<string, object>[] attributes = null, string description = null, string image = null, string video = null, string audio = null, string imageData = null, string externalURL = null, string backgroundColor = null, string animationURL = null, uint decimals = default, string updatedAt = null, Asset[] assets = null)
         {
             this.tokenId = tokenId;
             this.name = name;
@@ -31,6 +32,7 @@ namespace Sequence.Marketplace
             this.image = image;
             this.video = video;
             this.audio = audio;
+            this.properties = properties;
             this.attributes = attributes;
             image_data = imageData;
             external_url = externalURL;

@@ -10,6 +10,8 @@ namespace GuestLogin
 {
     public class GuestLogin : MonoBehaviour
     {
+        [SerializeField] private bool _loginAutomatically = true;
+        
         private ILogin _login;
         private int _signOuts = 0;
         private IWallet _wallet;
@@ -25,7 +27,10 @@ namespace GuestLogin
 
         private void Start()
         {
-            _login.GuestLogin();
+            if (_loginAutomatically)
+            {
+                _login.GuestLogin();
+            }
         }
 
         private void OnWaaSWalletCreated(SequenceWallet wallet)
@@ -57,6 +62,11 @@ namespace GuestLogin
                 
                 _login.GuestLogin();
             }
+        }
+
+        public void Login()
+        {
+            _login.GuestLogin();
         }
     }
 }
