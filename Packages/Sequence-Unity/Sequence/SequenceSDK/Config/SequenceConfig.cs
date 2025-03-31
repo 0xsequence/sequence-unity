@@ -10,7 +10,7 @@ namespace Sequence.Config
     [CreateAssetMenu(fileName = "SequenceConfig", menuName = "Sequence/SequenceConfig", order = 1)]
     public class SequenceConfig : ScriptableObject
     {
-        [Header("Social Sign In Configuration - Standalone & Web Platforms")]
+        [Header("Social Sign In Configuration - Standalone, Android & Web Platforms")]
         public string UrlScheme;
         public string GoogleClientId;
         public string DiscordClientId;
