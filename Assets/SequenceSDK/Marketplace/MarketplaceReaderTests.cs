@@ -117,7 +117,7 @@ namespace Sequence.Marketplace
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+            string contractAddress = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
             string tokenId = "1";
             
             marketplaceReader.OnGetCollectibleOrderReturn += OnSuccess;
@@ -136,7 +136,7 @@ namespace Sequence.Marketplace
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+            string contractAddress = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
             string tokenId = "1";
             
             marketplaceReader.OnGetCollectibleOrderReturn += OnSuccess;
@@ -211,7 +211,7 @@ namespace Sequence.Marketplace
         {
             Chain chain = Chain.Polygon;
             MarketplaceReader marketplaceReader = new MarketplaceReader(chain);
-            string contractAddress = "0x0ee3af1874789245467e7482f042ced9c5171073";
+            string contractAddress = "0x079294e6ffec16234578c672fa3fbfd4b6c48640";
             string tokenId = "1";
             
             marketplaceReader.OnListCollectibleOffersReturn += OnSuccess;
