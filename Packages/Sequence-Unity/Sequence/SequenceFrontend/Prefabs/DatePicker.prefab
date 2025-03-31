@@ -1412,7 +1412,7 @@ MonoBehaviour:
   m_CaptionText: {fileID: 71375405569687427}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 3854049793721379533}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
@@ -2139,7 +2139,7 @@ MonoBehaviour:
   m_CaptionText: {fileID: 3659463667690269238}
   m_CaptionImage: {fileID: 0}
   m_Placeholder: {fileID: 0}
-  m_ItemText: {fileID: 0}
+  m_ItemText: {fileID: 7806099283485565286}
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
