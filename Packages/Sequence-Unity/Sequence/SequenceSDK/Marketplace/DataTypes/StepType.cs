@@ -14,5 +14,6 @@ namespace Sequence.Marketplace
         createOffer,
         signEIP712,
         signEIP191,
+        cancel
     }
 }

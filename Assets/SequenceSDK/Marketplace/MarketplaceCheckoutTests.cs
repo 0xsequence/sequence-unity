@@ -615,66 +615,74 @@ namespace Sequence.Marketplace
         public async Task TestCancelOrder()
         {
             EndToEndTestHarness testHarness = new EndToEndTestHarness();
-            Address erc20UniversallyMintable = new Address("0x88e57238a23e2619fd42f479d546560b44c698fe");
             Address collection = new Address("0x079294e6ffec16234578c672fa3fbfd4b6c48640");
             bool cancelled = false;
 
-            testHarness.Login(async wallet =>
+            WaaSEndToEndTestConfig config = WaaSEndToEndTestConfig.GetConfig();
+            
+            string email = config.PlayFabEmail;
+            var request = new LoginWithEmailAddressRequest { Email = email, Password = config.PlayFabPassword };
+            PlayFabClientAPI.LoginWithEmailAddress(request, result =>
             {
-                await SeedWalletAndCreateListing(wallet, collection, erc20UniversallyMintable);
-
-                Order myOrder = null;
-                int retries = 5;
-                for (int i = 0; i < retries; i++)
+                testHarness.LoginWithPlayFab(result, email, async wallet =>
                 {
-                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, _chain, 
-                        new CollectiblesFilter(true, "", null, null, new string[] {wallet.GetWalletAddress()}));
-                    Assert.Greater(collectibleOrders.Length, 0);
-
-                    myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
-                    if (myOrder != null)
+                    Order myOrder = null;
+                    int retries = 5;
+                    for (int i = 0; i < retries; i++)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        Debug.Log($"No order created by {wallet.GetWalletAddress()} found. Retrying {i + 1}...");
-                    }
-                }
-                    
-                if (myOrder == null)
-                {
-                    Assert.Fail($"Failed to find order created by wallet after {retries} retries");
-                }
+                        CollectibleOrder[] collectibleOrders = await FetchListings(collection, _chain, 
+                            new CollectiblesFilter(true, "", ordersCreatedBy: new string[] {wallet.GetWalletAddress()}));
+                        Assert.Greater(collectibleOrders.Length, 0);
 
-                Checkout checkout = new Checkout(wallet, _chain);
-                Step[] steps = await checkout.GenerateCancelTransaction(collection, myOrder);
-                await SubmitStepsAsTransaction(steps, wallet);
-                    
-                for (int i = 0; i < retries; i++)
-                {
-                    CollectibleOrder[] collectibleOrders = await FetchListings(collection, _chain, 
-                        new CollectiblesFilter(true, "", null, null, new string[] {wallet.GetWalletAddress()}));
-                    Assert.Greater(collectibleOrders.Length, 0);
+                        myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
+                        if (myOrder != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Debug.Log($"No order created by {wallet.GetWalletAddress()} found. Retrying {i + 1}...");
+                        }
+                    }
 
-                    myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
                     if (myOrder == null)
                     {
-                        break;
+                        Assert.Fail($"Failed to find order created by wallet after {retries} retries. Try running {nameof(MarketplaceSeeder.SeedMarketplace_Playfab)} and seeding the marketplace with orders from this wallet first");
                     }
-                    else
-                    {
-                        Debug.Log($"My order {myOrder.orderId} is still found. Retrying {i + 1}...");
-                    }
-                }
-                    
-                if (myOrder != null)
-                {
-                    Assert.Fail($"Failed to see that order {myOrder.orderId} was cancelled after {retries} retries");
-                }
 
+                    Checkout checkout = new Checkout(wallet, _chain);
+                    Step[] steps = await checkout.GenerateCancelTransaction(collection, myOrder);
+                    await SubmitStepsAsTransaction(steps, wallet);
+
+                    for (int i = 0; i < retries; i++)
+                    {
+                        CollectibleOrder[] collectibleOrders = await FetchListings(collection, _chain);
+                        Assert.Greater(collectibleOrders.Length, 0);
+
+                        myOrder = FindOrderCreatedByWallet(wallet.GetWalletAddress(), collectibleOrders);
+                        if (myOrder == null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Debug.Log($"My order {myOrder.orderId} is still found. Retrying {i + 1}...");
+                        }
+                    }
+
+                    if (myOrder != null)
+                    {
+                        Assert.Fail(
+                            $"Failed to see that order {myOrder.orderId} was cancelled after {retries} retries");
+                    }
+
+                    cancelled = true;
+                }, (error, method, email, methods) => { Assert.Fail(error); });
+            }, error =>
+            {
+                Assert.Fail(error.ErrorMessage);
                 cancelled = true;
-            }, (error, method, email, methods) => { Assert.Fail(error); });
+            });
             
             while (!cancelled)
             {
@@ -687,7 +695,7 @@ namespace Sequence.Marketplace
             foreach (var collectibleOrder in collectibleOrders)
             {
                 Order order = collectibleOrder.order;
-                if (order.createdBy == walletAddress)
+                if (order != null && order.createdBy.ToLower() == walletAddress.Value.ToLower())
                 {
                     return order;
                 }
