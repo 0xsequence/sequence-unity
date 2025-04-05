@@ -133,6 +133,7 @@ namespace Sequence.EmbeddedWallet
             {
                 _sessionWallet = new EOAWallet();
             }
+            
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
@@ -234,7 +235,7 @@ namespace Sequence.EmbeddedWallet
             }
             
             _sessionWallet = walletInfo.Item1;
-            
+            _connectedWalletAddress = new Address(walletInfo.Item2);
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
             SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
