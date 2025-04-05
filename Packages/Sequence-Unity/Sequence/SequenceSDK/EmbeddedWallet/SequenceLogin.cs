@@ -133,7 +133,6 @@ namespace Sequence.EmbeddedWallet
             {
                 _sessionWallet = new EOAWallet();
                 _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
-                Debug.Log($"SetupAuthenticator: Session id {_sessionId}");
             }
             
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
