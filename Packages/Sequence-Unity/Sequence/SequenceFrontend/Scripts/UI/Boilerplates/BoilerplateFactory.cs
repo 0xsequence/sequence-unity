@@ -151,7 +151,7 @@ namespace Sequence.Boilerplates
             return (panel, panel.CreateOfferPage);
         }
 
-        public static (SellOfferPanel, SellOfferPage) OpenSellOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        public static (SellOfferPanel, SellOfferPage) OpenSellOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
         {
             SellOfferPanel panel = GetOrSpawnBoilerplate<SellOfferPanel>("Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
             return (panel, panel.SellOfferPage);
