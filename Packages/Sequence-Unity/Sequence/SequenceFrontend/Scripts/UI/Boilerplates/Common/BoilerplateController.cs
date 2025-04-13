@@ -50,7 +50,7 @@ namespace Sequence.Boilerplates
                 ShowDefaultWindow();
                 
                 if (_loginWindow)
-                    _loginWindow.Hide();
+                    _loginWindow.gameObject.SetActive(false);
                 
                 wallet.OnDropSessionComplete += s =>
                 {
@@ -119,7 +119,7 @@ namespace Sequence.Boilerplates
 
         private void OnFailedToRecoverSession(string error)
         {
-            Debug.LogError($"Error attempting to recover Sequence session: {error}");
+            Debug.Log($"Error attempting to recover Sequence session: {error}");
             _loginWindow = BoilerplateFactory.OpenSequenceLoginWindow(transform);
         }
 

@@ -77,6 +77,13 @@ namespace Sequence.Boilerplates.PlayerProfile
             EnableLoading(false);
         }
 
+        public void OpenLoginWindowForFederation()
+        {
+            gameObject.SetActive(false);
+            BoilerplateFactory.OpenSequenceLoginWindow(transform.parent, 
+                () => gameObject.SetActive(true));
+        }
+
         public async void SendToken()
         {
             var recipient = _recipientInput.text;

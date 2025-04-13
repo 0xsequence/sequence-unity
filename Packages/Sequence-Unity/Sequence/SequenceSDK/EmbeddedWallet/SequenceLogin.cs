@@ -75,6 +75,11 @@ namespace Sequence.EmbeddedWallet
             _connectedWalletAddress = connectedWalletAddress;
         }
 
+        public bool HasConnectedWalletAddress()
+        {
+            return _connectedWalletAddress != null;
+        }
+
         [Obsolete("Use GetInstance() instead.")]
         public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true, Address connectedWalletAddress = null)
         {

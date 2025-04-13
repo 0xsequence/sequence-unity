@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
@@ -10,8 +11,10 @@ namespace Sequence.Boilerplates.Login
 {
     public class SequenceLoginWindow : MonoBehaviour
     {
+        [SerializeField] private Button _closeButton;
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
+        [SerializeField] private Button _guestLoginButton;
         [SerializeField] private TMP_InputField _emailInput;
         [SerializeField] private TMP_InputField _emailCodeInput;
         [SerializeField] private TMP_Text _emailCodeErrorText;
@@ -19,14 +22,28 @@ namespace Sequence.Boilerplates.Login
         [SerializeField] private GameObject _loginState;
         [SerializeField] private GameObject _emailCodeState;
         [SerializeField] private GameObject _loadingOverlay;
+        [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject[] _socialTexts;
 
-        private ILogin _loginHandler;
+        private Action _onClose;
+        private SequenceLogin _loginHandler;
         private string _curEmail;
         
         private void Start()
         {
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
+        }
+
+        private void OnEnable()
+        {
+            SequenceWallet.OnAccountFederated += AccountFederated;
+            SequenceWallet.OnAccountFederationFailed += AccountFederationFailed;
+        }
+
+        private void OnDisable()
+        {
+            SequenceWallet.OnAccountFederated -= AccountFederated;
+            SequenceWallet.OnAccountFederationFailed -= AccountFederationFailed;
         }
 
         private void OnDestroy()
@@ -42,13 +59,15 @@ namespace Sequence.Boilerplates.Login
         public void Hide()
         {
             gameObject.SetActive(false);
+            _onClose?.Invoke();
         }
         
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        public void Show()
+        public void Show(Action onClose = null)
         {
+            _onClose = onClose;
             var loginHandler = SequenceLogin.GetInstance();
             if (_loginHandler == null)
             {
@@ -57,8 +76,13 @@ namespace Sequence.Boilerplates.Login
                 _loginHandler.OnLoginFailed += LoginHandlerOnOnLoginFailed;
                 _loginHandler.OnMFAEmailSent += LoginHandlerOnOnMFAEmailSent;
             }
+
+            var isFederating = _loginHandler.HasConnectedWalletAddress();
+            _closeButton.gameObject.SetActive(isFederating);
+            _guestLoginButton.gameObject.SetActive(!isFederating);
             
             gameObject.SetActive(true);
+            _messagePopup.gameObject.SetActive(false);
             _loginState.SetActive(true);
             _emailCodeState.SetActive(false);
             _emailInput.text = string.Empty;
@@ -148,12 +172,27 @@ namespace Sequence.Boilerplates.Login
         
         private void LoginHandlerOnOnLoginFailed(string error, LoginMethod method, string email, List<LoginMethod> loginmethods)
         {
-            Debug.LogError(error);
+            Debug.LogError($"Error during login: {error}");
             SetLoading(false);
             _emailCodeInput.text = string.Empty;
 
             if (method == LoginMethod.Email)
                 _emailCodeErrorText.text = "Invalid code.";
+            else
+                _messagePopup.Show(error, true);
+        }
+        
+        private void AccountFederationFailed(string error)
+        {
+            Debug.LogError($"Failed to federate account with error: {error}");
+            _messagePopup.Show(error, true);
+            SetLoading(false);
+        }
+
+        private void AccountFederated(Account account)
+        {
+            Debug.Log($"Account federated, email: {account.email}");
+            Hide();
         }
         
         private void OnApplicationFocus(bool hasFocus)

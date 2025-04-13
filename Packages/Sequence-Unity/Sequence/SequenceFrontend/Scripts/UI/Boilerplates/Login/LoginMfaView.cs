@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,12 +21,12 @@ namespace Sequence.Boilerplates.Login
             _codeInput.onSelect.AddListener(OnSelect);
             _codeInput.onDeselect.AddListener(OnDeselect);
         }
-        
+
         private void OnEnable()
         {
             _codeInput.text = string.Empty;
-            _codeInput.Select();
-            OnInputValueChanged(string.Empty);
+            OnSelect(string.Empty);
+            StartCoroutine(WaitSelect());
         }
 
         private void OnInputValueChanged(string newValue)
@@ -56,6 +58,14 @@ namespace Sequence.Boilerplates.Login
         {
             _selected = false;
             OnInputValueChanged(value);
+        }
+
+        // We need to wait one frame here otherwise the input field is not selected automatically
+        private IEnumerator WaitSelect()
+        {
+            yield return 0;
+            _codeInput.Select();
+            _codeInput.ActivateInputField();
         }
     }
 }
