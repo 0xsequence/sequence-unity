@@ -128,6 +128,7 @@ namespace Sequence.EmbeddedWallet
         public void ResetLoginAfterTest()
         {
             _connector = this;
+            SetConnectedWalletAddress(null);
             SetupAuthenticator();
         }
 
