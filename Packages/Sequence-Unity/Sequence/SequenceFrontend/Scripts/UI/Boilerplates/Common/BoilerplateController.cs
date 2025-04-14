@@ -118,7 +118,7 @@ namespace Sequence.Boilerplates
 
         private void OnFailedToRecoverSession(string error)
         {
-            Debug.Log($"Error attempting to recover Sequence session: {error}");
+            Debug.Log($"There's no session to recover from storage. Reason: {error}");
             _loginWindow = BoilerplateFactory.OpenSequenceLoginWindow(transform);
         }
 
