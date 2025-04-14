@@ -68,10 +68,9 @@ namespace Sequence.Boilerplates.Login
         public void Show(Action onClose = null)
         {
             _onClose = onClose;
-            var loginHandler = SequenceLogin.GetInstance();
             if (_loginHandler == null)
             {
-                _loginHandler = loginHandler;
+                _loginHandler = SequenceLogin.GetInstance();
                 _loginHandler.OnLoginSuccess += LoginHandlerOnOnLoginSuccess;
                 _loginHandler.OnLoginFailed += LoginHandlerOnOnLoginFailed;
                 _loginHandler.OnMFAEmailSent += LoginHandlerOnOnMFAEmailSent;

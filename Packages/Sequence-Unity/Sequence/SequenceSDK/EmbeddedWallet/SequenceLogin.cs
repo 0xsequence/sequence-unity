@@ -240,8 +240,8 @@ namespace Sequence.EmbeddedWallet
             }
             
             _sessionWallet = walletInfo.Item1;
-            _connectedWalletAddress = new Address(walletInfo.Item2);
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
+            SetConnectedWalletAddress(new Address(walletInfo.Item2));
             
             SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
 
@@ -251,6 +251,7 @@ namespace Sequence.EmbeddedWallet
         private void FailedLoginWithStoredSessionWallet(string error)
         {
             CreateWallet();
+            SetConnectedWalletAddress(null);
             SequenceWallet.OnFailedToRecoverSession?.Invoke(error);
         }
 
@@ -388,6 +389,7 @@ namespace Sequence.EmbeddedWallet
                 string sessionId = registerSessionResponse.sessionId;
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
+                SetConnectedWalletAddress(new Address(walletAddress));
                 SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion), email);
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);

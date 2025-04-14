@@ -46,7 +46,6 @@ namespace Sequence.Boilerplates
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 _wallet = wallet;
-                Debug.Log("User wallet: " + wallet.GetWalletAddress());
                 ShowDefaultWindow();
                 
                 if (_loginWindow)
