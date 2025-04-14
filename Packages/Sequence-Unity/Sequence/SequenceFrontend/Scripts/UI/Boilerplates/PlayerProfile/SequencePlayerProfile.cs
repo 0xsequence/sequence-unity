@@ -80,7 +80,7 @@ namespace Sequence.Boilerplates.PlayerProfile
         public void OpenLoginWindowForFederation()
         {
             gameObject.SetActive(false);
-            BoilerplateFactory.OpenSequenceLoginWindow(transform.parent, 
+            BoilerplateFactory.OpenSequenceLoginWindow(transform.parent, _wallet, 
                 () => gameObject.SetActive(true));
         }
 

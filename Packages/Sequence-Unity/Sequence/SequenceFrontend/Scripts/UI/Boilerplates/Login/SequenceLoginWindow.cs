@@ -25,6 +25,7 @@ namespace Sequence.Boilerplates.Login
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject[] _socialTexts;
 
+        private IWallet _wallet;
         private Action _onClose;
         private SequenceLogin _loginHandler;
         private string _curEmail;
@@ -65,8 +66,9 @@ namespace Sequence.Boilerplates.Login
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        public void Show(Action onClose = null)
+        public void Show(IWallet wallet = null, Action onClose = null)
         {
+            _wallet = wallet;
             _onClose = onClose;
             if (_loginHandler == null)
             {
@@ -75,8 +77,11 @@ namespace Sequence.Boilerplates.Login
                 _loginHandler.OnLoginFailed += LoginHandlerOnOnLoginFailed;
                 _loginHandler.OnMFAEmailSent += LoginHandlerOnOnMFAEmailSent;
             }
+            
+            if (wallet != null)
+                _loginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());
 
-            var isFederating = _loginHandler.HasConnectedWalletAddress();
+            var isFederating = _wallet != null;
             _closeButton.gameObject.SetActive(isFederating);
             _guestLoginButton.gameObject.SetActive(!isFederating);
             
