@@ -75,11 +75,6 @@ namespace Sequence.EmbeddedWallet
             _connectedWalletAddress = connectedWalletAddress;
         }
 
-        public bool HasConnectedWalletAddress()
-        {
-            return _connectedWalletAddress != null;
-        }
-
         [Obsolete("Use GetInstance() instead.")]
         public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true, Address connectedWalletAddress = null)
         {
@@ -135,7 +130,7 @@ namespace Sequence.EmbeddedWallet
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt(SequenceConfig.GetConfig(SequenceService.WaaS));
-            if (_connectedWalletAddress == null || _sessionWallet == null)
+            if (_sessionWallet == null)
             {
                 _sessionWallet = new EOAWallet();
             }
@@ -242,7 +237,6 @@ namespace Sequence.EmbeddedWallet
             
             _sessionWallet = walletInfo.Item1;
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
-            SetConnectedWalletAddress(new Address(walletInfo.Item2));
             
             SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
 
@@ -252,7 +246,6 @@ namespace Sequence.EmbeddedWallet
         private void FailedLoginWithStoredSessionWallet(string error)
         {
             CreateWallet();
-            SetConnectedWalletAddress(null);
             SequenceWallet.OnFailedToRecoverSession?.Invoke(error);
         }
 
@@ -390,7 +383,6 @@ namespace Sequence.EmbeddedWallet
                 string sessionId = registerSessionResponse.sessionId;
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
-                SetConnectedWalletAddress(new Address(walletAddress));
                 SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion), email);
                 PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
                 PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
