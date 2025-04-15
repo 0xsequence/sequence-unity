@@ -117,7 +117,7 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                Assert.IsTrue(e.Message.Contains("Error fetching swap price"));
+                Assert.IsTrue(e.Message.Contains("Error fetching swap quote"));
             }
         }
     }
