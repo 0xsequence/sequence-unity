@@ -35,17 +35,17 @@ namespace Sequence.Marketplace
         {
             GetSwapPriceRequest args = new GetSwapPriceRequest(buyCurrency, sellCurrency, buyAmount, _chain,
                 slippagePercent);
-            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapPrice";
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapPermit2Price";
             try
             {
                 GetSwapPriceResponse response =
                     await _client.SendRequest<GetSwapPriceRequest, GetSwapPriceResponse>(url, args);
-                if (response.swapPrice == null)
+                if (response.swapPermit2Price == null)
                 {
                     throw new Exception("No swap path with sufficient liquidity found");
                 }
-                OnSwapPriceReturn?.Invoke(response.swapPrice);
-                return response.swapPrice;
+                OnSwapPriceReturn?.Invoke(response.swapPermit2Price);
+                return response.swapPermit2Price;
             }
             catch (Exception e)
             {
@@ -64,13 +64,13 @@ namespace Sequence.Marketplace
         {
             GetSwapPricesRequest args = new GetSwapPricesRequest(userWallet, buyCurrency, buyAmount, _chain,
                 slippagePercentage);
-            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapPrices";
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapPermit2Prices";
             try
             {
                 GetSwapPricesResponse response =
                     await _client.SendRequest<GetSwapPricesRequest, GetSwapPricesResponse>(url, args);
-                OnSwapPricesReturn?.Invoke(response.swapPrices);
-                return response.swapPrices;
+                OnSwapPricesReturn?.Invoke(response.swapPermit2Prices);
+                return response.swapPermit2Prices;
             }
             catch (Exception e)
             {
@@ -102,7 +102,7 @@ namespace Sequence.Marketplace
             
             GetSwapQuoteRequest args = new GetSwapQuoteRequest(userWallet, buyCurrency, sellCurrency, buyAmount, _chain,
                 slippagePercentage, includeApprove);
-            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapQuote";
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapQuoteV2";
             try
             {
                 GetSwapQuoteResponse response =

@@ -6,12 +6,12 @@ namespace Sequence.Marketplace
     [Serializable]
     public class GetSwapPricesResponse
     {
-        public SwapPrice[] swapPrices;
+        public SwapPrice[] swapPermit2Prices;
 
         [Preserve]
-        public GetSwapPricesResponse(SwapPrice[] swapPrices)
+        public GetSwapPricesResponse(SwapPrice[] swapPermit2Prices)
         {
-            this.swapPrices = swapPrices;
+            this.swapPermit2Prices = swapPermit2Prices;
         }
     }
 }
