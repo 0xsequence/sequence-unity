@@ -32,11 +32,13 @@ namespace Sequence.Boilerplates
         /// Open the Login UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
+        /// <param name="wallet">Wallet to use for account federation.</param>
+        /// <param name="onClose">(Optional) Callback when the user closes this window or when an account was successfully federated.</param>
         /// <returns></returns>
-        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent)
+        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent, IWallet wallet = null, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceLoginWindow>("Login/SequenceLoginWindow", parent, 
-                b => b.Show());
+                b => b.Show(wallet, onClose));
         }
 
         /// <summary>
@@ -151,7 +153,7 @@ namespace Sequence.Boilerplates
             return (panel, panel.CreateOfferPage);
         }
 
-        public static (SellOfferPanel, SellOfferPage) OpenSellOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        public static (SellOfferPanel, SellOfferPage) OpenSellOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
         {
             SellOfferPanel panel = GetOrSpawnBoilerplate<SellOfferPanel>("Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
             return (panel, panel.SellOfferPage);

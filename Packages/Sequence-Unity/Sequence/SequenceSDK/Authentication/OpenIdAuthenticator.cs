@@ -172,7 +172,7 @@ namespace Sequence.Authentication
                     GenerateSignInUrl("https://appleid.apple.com/auth/authorize", AppleClientId, state);
                 appleSignInUrl = appleSignInUrl.RemoveTrailingSlash() + "&response_mode=form_post";
                 _browser.SetState(state);
-#if UNITY_IOS
+#if UNITY_IOS && !UNITY_EDITOR
                 GameObject appleSignInObject = Object.Instantiate(new GameObject());
                 SignInWithApple appleSignIn = appleSignInObject.AddComponent<SignInWithApple>();
                 appleSignIn.LoginToApple(this, state);

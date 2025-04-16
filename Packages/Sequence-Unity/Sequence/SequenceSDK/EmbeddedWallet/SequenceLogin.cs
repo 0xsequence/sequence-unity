@@ -123,16 +123,18 @@ namespace Sequence.EmbeddedWallet
         public void ResetLoginAfterTest()
         {
             _connector = this;
+            SetConnectedWalletAddress(null);
             SetupAuthenticator();
         }
 
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
             ConfigJwt configJwt = SequenceConfig.GetConfigJwt(SequenceConfig.GetConfig(SequenceService.WaaS));
-            if (_connectedWalletAddress == null || _sessionWallet == null)
+            if (_sessionWallet == null)
             {
                 _sessionWallet = new EOAWallet();
             }
+            
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
@@ -234,7 +236,6 @@ namespace Sequence.EmbeddedWallet
             }
             
             _sessionWallet = walletInfo.Item1;
-            
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
             SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
