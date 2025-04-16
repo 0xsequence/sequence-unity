@@ -32,11 +32,13 @@ namespace Sequence.Boilerplates
         /// Open the Login UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
+        /// <param name="wallet">Wallet to use for account federation.</param>
+        /// <param name="onClose">(Optional) Callback when the user closes this window or when an account was successfully federated.</param>
         /// <returns></returns>
-        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent)
+        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent, IWallet wallet = null, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceLoginWindow>("Login/SequenceLoginWindow", parent, 
-                b => b.Show());
+                b => b.Show(wallet, onClose));
         }
 
         /// <summary>

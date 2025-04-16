@@ -32,6 +32,7 @@ namespace Sequence.EmbeddedWallet.Tests
                     {
                         try
                         {
+                            login.ResetLoginAfterTest();
                             await wallet.DropThisSession();
                             repetitions++;
                             await login.ConnectToWaaSAsGuest();
