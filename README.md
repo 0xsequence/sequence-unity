@@ -86,21 +86,6 @@ The `Key` value from `FeatureSelectionButton.cs` allows us to only enable select
 For example, the url `http://localhost:4444/?features=rewards+profile` will only enable the Player Profile and Daily Rewards Boilerplates.
 If you don't define any feature in the url, all boilerplates are enabled.
 
-## Environments
-
-Sequence generally uses two environments for our backend services: dev and production. By default, the SDK will always use production.
-
-However, during development, it is occasionally useful to send requests against the dev environment. To do this, you'll first need to have access to the dev version of the Sequence Builder; here, you can generate credentials (API key, WaaS config key, etc.) for your SequenceConfig. This time however, you'll place your configuration in a SequenceConfig instance titled 'SequenceDevConfig' in a `Resources` folder.
-
-In order to use the dev environment, you'll want to set the appropriate scripting define symbol for your service in your Player Settings.
-
-- `SEQUENCE_DEV` - every Sequence service
-- `SEQUENCE_DEV_WAAS` - the WaaS/EmbeddedWallet service
-- `SEQUENCE_DEV_INDEXER` - the Indexer service
-- `SEQUENCE_DEV_MARKETPLACE` - the Marketplace service
-- `SEQUENCE_DEV_NODEGATEWAY` - the Node Gateway services
-- `SEQUENCE_DEV_STACK` - generic Sequence API; unnamed services and functions
-
 ## Assembly Overview
 
 The SDK is split into a number of assemblies with different purposes. Each assembly also has a Test assembly or assembly reference containing tests - this way, our tests aren't included in builds.
@@ -129,13 +114,13 @@ This is our custom Ethereum library, purpose-built for Unity.
 
 The integration with our [Indexer API](https://docs.sequence.xyz/api/indexer/overview). Used to quickly index/read on-chain data.
 
-### SequenceIntegrations
-
-Houses code integrating with third-party service providers like [Transak](https://transak.com/).
-
 ### SequenceMarketplace
 
-The integration with our Marketplace API v2. Used to enable secondary marketplace sales of ERC721/1155s.
+The integration with our Marketplace API v2 and Swap API. Used to enable secondary marketplace sales of ERC721/1155s.
+
+### SequencePay
+
+Our implementation of the Pay product line - supporting credit card based fund onboarding and collectible checkout for both primary and secondary sales. Integrations of payment service providers like Transak and Sardine.
 
 ### SequenceRelayer
 
@@ -185,202 +170,3 @@ In addition to `UIPage` responsibilities, UIPanels maintain a stack of UIPages a
 As a Made-With-Unity UI, the sample UI is cross platform and easily customizable.
 To make customization even easier, the sample UI comes equipped with a Color Scheme Manager. This monobehaviour script is attached to the `SequenceCanvas` gameObject. By attaching a `ColorScheme` scriptable object and clicking the `Apply` button in the Inspector, the `ColorSchemeManager` will quickly apply the desired color scheme, allowing for faster UI iterations.
 To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence > Color Scheme`. From here, you can give the color scheme a name, move it to the desired directory, and choose your colors.
-
-## Architecture Decision Records
-
-Please add any ADRs below. In the future, it may be worthwhile to move these into separate files, but for now since there are few ADRs, the README should suffice. 
-Please use [Michael Nygard's template for ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
-
-### ADR 6 - Marketplace and Pay Ecosystem
-March 28, 2025 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-We are adding a new suite of monetization-focused features to the Unity SDK. This ADR aims to explain the overall architecture of how these features have been implemented and why that architecture was chosen.
-
-#### Decision
-
-The overall payment ecosystem looks like this.
-
-```mermaid
-graph TD
-    %% Define nodes and relationships
-    panel[CheckoutPanel] --> |has| modal
-    modal[CheckoutPage] --> |has| ch[ICheckoutHelper]
-    modal --> |has| fc[IFiatCheckout]
-    ch --> |implemented by| nc[NftCheckout]
-    ch --> |implemented by| psc[PrimarySaleCheckout]
-    nc --> |has| swap[ISwap]
-    nc --> |has| reader[IMarketplaceReader]
-    nc --> |has| checkout[ICheckout]
-    fc --> |implemented by| seqc[SequenceCheckout]
-    seqc --> |has| pay[SequencePay]
-    fp[IFiatPay] --> |implemented by| pay
-    pay --> |has| checkout
-    pay --> |has| fpf[IFiatPayFactory]
-    fpf --> |creates|fp 
-    fp --> |implemented by| up[UnsupportedPay]
-    fp --> |implemented by| sfp[SardineFiatPay]
-    sfp --> |has| isc[ISardineCheckout]
-    isc --> |implemented by| sc[SardineCheckout]
-    fp --> |implemented by| tfp[TransakFiatPay]
-    tfp --> |has| tor[TransakOnRamp]
-    tfp --> |has| tnc[TransakNFTCheckout]
-    psc --> |has| pssft[ERC1155Sale]
-    psc --> |has| psnft[ERC721Sale]
-    fp --> |uses| pssft
-    fp --> |uses| psnft
-    psc --> |has| swap
-    
-    %% Subgraphs to group components
-    subgraph Marketplace
-        ch
-        nc
-        swap
-        reader
-        checkout
-        psc
-    end
-    subgraph Pay
-        fc
-        seqc
-        pay
-        fp
-        fpf
-        up
-        subgraph Transak
-            tfp
-            tor
-            tnc
-        end
-        subgraph Sardine
-            sfp
-            isc
-            sc
-        end
-    end
-    subgraph Ethereum/Contract
-        pssft
-        psnft
-    end
-```
-
-#### Consequences
-
-Let's examine each layer of abstraction to understand some of the decision making here.
-
-First, and perhaps most obvious, are our base level abstractions: `ISwap`, `IMarketplaceReader`, and `ICheckout`. These interfaces and their implementations are the most basic integrations of the Sequence Marketplace and Swap APIs, segmented by functionality (swap, marketplace reading, and marketplace writing/checkout respectively). Higher-level abstractions rely upon the interfaces, not concrete implementations, to allow for unit testing of higher-level abstractions via injection of mocked implementations. While I don't expect that other concrete implementations are likely, this remains an option.
-
-You may notice that we have an `ISardineCheckout` but we don't have a similar interface for the Transak provider. This is due to some legacy code providing TransakOnRamp functionality; to make the changes more digestible to maintainers and advanced consumers of the SDK, we've opted to keep Transak changes more minimal and keep OnRamp and NftCheckout functionality separate. However, please keep in mind that we can, rather easily, introduce a similar interface should the need arise.
-
-Currently, the SDK integrates two different payment service providers, Transak and Sardine. These payment service providers provide a number of services including customer KYC, credit card payment processing + chargeback risk, and execution of smart contract code in a permissioned context with confirmation of payment; these services are exposed to Sequence in the form of cryptocurrency on-ramping and nft checkout products, allowing users to purchase cryptocurrencies + ERC20s and ERC721/ERC1155 collectibles respectively. An important insight is that both of these payment service providers have different integrations with different logic and have different supported regions (e.g. countries) and functionalities. For this reason, we introduced the `SequencePay` implementation and the `IFiatPay` interface. `SequencePay` is an implementation of the `IFiatPay` interface, as are `SardineFiatPay`, `TransakFiatPay`, and `UnsupportedPay`, but with some additional logic built in; `SequencePay` contains an `IFiatPayFactory` dependency (similar to above, we use an interface dependency for easy mocking) that, as implemented by `FiatPayFactory`, will determine which payment service provider(s), if any, support the desired functionality requested by the user by leveraging Sequence APIs and then will return the appropriate `IFiatPay` implementation for `SequencePay` to use as it's implementation. In addition to providing ease of use for integrators (as they don't need to worry about which payment service providers will work for a given user and operation), this architecture also makes it easy for us to add and remove payment service providers by simply providing an `IFiatPay` integration to the SDK and adding it to the `FiatPayFactory` creation logic (and upding the Sequence APIs accordingly, but this is outside of the scope of our SDK and can be thought of as a 'black box').
-
-Perhaps the most unobvious part of the architecture is our highest-level of abstraction, specifically, you may wonder why `IFiatCheckout` and `ICheckoutHelper` exist as separate interfaces to be leveraged by our `CheckoutPanel` and `CheckoutPage` UI. This is to provide further flexibility in the future. As an example, the `CheckoutPage` logic and UI, given a sufficient implementation of `ICheckoutHelper` supports having multiple types of collectibles in your checkout 'cart' at one time. While the payment service providers don't currently support this, we can support this with crypto-based checkout by extending `PrimarySaleCheckout` and/or `NftCheckout` to support multiple collectibles while adhering to the same interface by essentially looping each collectible, and checkout transaction, through an `IEnumerable` of some sort and submitting the generated `Transaction[]` as a batch using the Embedded Sequence Wallets. Splitting fiat-based payment and checkout logic into separate interfaces also fits snuggly into the existing product segmentations, and assemblies, of Sequence Pay and Sequence Marketplaces, following the basic concept Domain Driven Design.
-
-### ADR 5 - SDK as a Local Package
-July 19, 2024 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-The SDK is currently inside the Assets folder.
-
-#### Decision
-The project is refactored such that the SDK now lives in the Packages folder as a LocalPackage. The tests, mocks, and other similar files/scripts/resources will remain in the Assets folder. The git url for importing the SDK is updated in the documentation. 
-
-#### Consequences
-Users who have imported the SDK via Package Manager using git url will need to remove the package and then re-add it using the new URL in order to update to the latest version.
-
-The SDK will be easier to submit to the Unity Asset store using the Asset Store Tools to upload it as a Local Package.
-
-It is now easier to include other dependancies, like the PlayFab SDK, that do not define package.json files without introducing dependancy conflicts into integrator projects. If we wanted to include any of these packages into our project before we would've had to modify the git url installation link anyways to a subfolder inside of Assets.
-
-The tests, mocks, and related files are no longer included inside the SDK that gets shipped to users. This reduces file size; however, users will need to check the repo to see more example use cases (i.e. to see the tests.)
-
-Intellisense and other IDE features (like refactoring) may be less refined when working within the Packages folder than within the Assets folder.
-
-Scripts in the samples folder of the SDK are not checked for compile errors by Unity. When modifying these, we will need to make sure to import them to make sure they work and compile (though we should always be doing this anyways).
-
-### ADR 4 - New WaaS auth system
-July 19, 2024 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-The current WaaS auth system is restricted to OIDC implicit flow and requires a nonce `hex(keccak256(sessionWalletAddress))` included in the idToken. This flow is rather restrictive. Additionally, the flow requires us to use AWS Cognito for email sign in and there is a limit to how many partner ids we can configure with AWS Cognitor, limiting our ability to scale efficiently.
-
-#### Decision
-The WaaS auth system is being migrated to a new system that no longer solely relies upon OIDC implicit flow. This new authentication flow requires the RegisterSession call be split into two separate calls. Initiate Auth and Open Session. The Initiate Auth call will, in some cases, return a challenge. The two calls must be joined together in order for a session to be opened - this is done by specifying the `identityType`, `verifier`, and, in the case of Open Session, the `answer`.
-
-#### Consequences
-WaaSLogin, now renamed to SequenceLogin, has been re-written to accomodate for the new flow. The AWS SDK and all its consumers have been removed from the SDK. 
-
-The OpenIdAuthenticator and related classes in the Sequence.Authentication assembly have become more usable in a general context and have become more replaceable/customizable for integrators.
-
-### ADR 3 - WaaS Client
-August 2, 2023 - author: Quinn Purdy
-Updated Aug 16, 2023 - author: Quinn Purdy
-Updated Jan 3, 2023 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http. This WaaS service, with our authentication system, can be used to provide users with a more secure and more frictionless (less "wallet-like") UX.
-
-#### Decision
-In order to save time on the integration and provide users with a more secure and frictionless UX, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
-
-For authentication, sequence-unity will use the [OIDC implicit flow](https://openid.net/specs/openid-connect-implicit-1_0.html#ImplicitFlow) or AWS Cognito Email with OTP Sign In to obtain an idToken, which is combined with some config variables to establish a session with the WaaS service. The Authentication logic (obtaining the idToken) can be found in the `SequenceAuthentication` assembly.
-
-The SDK will require developers to input a number of config variables during setup. This will be done via a ScriptableObject, defined in the `SequenceConfig` assembly, that can be fetched via [Resources.Load](https://docs.unity3d.com/ScriptReference/Resources.Load.html) when needed.
-
-Similar to ADR 2, the WaaS client will be implemented in a separate assembly from "SequenceEthereum". This assembly will be called "SequenceWaaS" and will reference and depend on the Ethereum library assembly "SequenceEthereum".
-
-Since use of WaaS requires an idToken that cannot currently be hardcoded, some of the tests live in a separate assembly, `SequenceWaaSEndToEndTests`, that is used when building the `WaaSEndToEndTests` scene for end to end testing. Additionally, we've included unit tests, and other tests using mocks that can be run from within the editor, in the `SequenceWaaSTests` assembly. 
-
-#### Consequences
-As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved and there is a better UX for end-users and developers alike, justifying the trade-off.
-
-Additionally, since the WaaS client relies on network requests, we must add additional async Tasks to the SequenceEthereum IWallet interface. This will require additional await statements throughout, harming readability.
-
-Remaining consequences follow those from ADR 2 (with respect to assemblies).
-
-### ADR 2 - Separate assemblies for Sequence integration and Ethereum library
-July 12, 2023 - author: Quinn Purdy
-
-#### Status
-Accepted - July 14, 2023
-
-#### Context
-Integration of Sequence into the sequence-unity is the next step in the Unity SDK project - preparations are being made, with modifications to project structure.
-
-#### Decision
-Move the previous Sequence integration work, and all future Sequence integration work, into a separate assembly from the Ethereum libraries we're writing. The Sequence "SequenceCore" assembly will reference and depend on the Ethereum library assembly "SequenceEthereum".
-
-For now, all tests will remain in the same assembly "SequenceTests".
-
-#### Consequences
-While SequenceCore will be able to reference namespaces in SequenceEthereum, SequenceEthereum will not be able to reference anything in SequenceCore. While, on the surface, this may sound problematic as it reduces our flexibility when writing the SDK, SequenceEthereum should not need to depend on SequenceCore; this will reduce coupling leading to an overall more readable and maintainable project. This also makes it easier for us to release SequenceEthereum as a standalone package, should we ever choose to do so.
-
-By splitting SequenceCore into a separate assembly, we will not need to recompile the entire SDK whenever we make changes to SequenceCore; instead, we will only need to recompile SequenceCore. Similarly, if we were to precompile the SDK, this would give us two separate dlls (SequenceEthereum.dll and SequenceCore.dll).
-
-### ADR 1 - sequence-unity
-June 21, 2023 - author: Quinn Purdy
-
-#### Status
-This ADR document is being made retroactively after inheriting the project.
-
-#### Context
-Sequence Unity SDK v1 was made quickly as a proof of concept. The SDK relies on Nethereum; a library that is overly heavy-weight. The SDK also relies on the Vuplex webview unity package - this package is not free, leading to developer frustrations.
-
-#### Decision
-Modifying the existing v1 SDK was deemed to be unworthy undertaking. Building a new SDK from scratch was determined to be faster and easier.
-
-#### Consequences
-Iteration on SDK v2 during development will be significantly faster and lower risk 
-than modifying the existing SDK the customers are currently using. However, this means that current customers using v1 of the SDK can expect limited support during the development of SDK v2 as v1 will be deprecated. 
