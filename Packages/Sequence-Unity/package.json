@@ -1,6 +1,6 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "displayName": "Sequence Embedded Wallet SDK",
   "description": "A Unity SDK for Sequence APIs",
   "unity": "2021.3",

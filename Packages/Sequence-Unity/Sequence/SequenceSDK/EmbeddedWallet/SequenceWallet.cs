@@ -36,6 +36,16 @@ namespace Sequence.EmbeddedWallet
             SessionId = sessionId;
             _builderApiKey = SequenceConfig.GetConfig(SequenceService.WaaS).BuilderAPIKey;
             _email = email;
+            
+            OnAccountFederated += account =>
+            {
+                if (String.Equals(account.wallet, address, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    _email = account.email;
+
+                    SequenceLogin.GetInstance().StoreWalletSecurely(_address, _email);
+                }
+            };
         }
 
         public Address GetWalletAddress()
