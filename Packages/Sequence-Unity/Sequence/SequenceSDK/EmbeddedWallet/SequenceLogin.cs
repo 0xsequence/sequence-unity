@@ -605,8 +605,9 @@ namespace Sequence.EmbeddedWallet
             await connector.ConnectToWaaSViaGuest();
         }
 
-        private void StoreWalletSecurely(string waasWalletAddress, string email)
+        internal void StoreWalletSecurely(string waasWalletAddress, string email)
         {
+            if (!_storeSessionWallet || !SecureStorageFactory.IsSupportedPlatform()) return;
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
@@ -620,6 +621,7 @@ namespace Sequence.EmbeddedWallet
             {
                 IntentResponseAccountFederated federateAccountResponse = await _intentSender.SendIntent<IntentResponseAccountFederated, IntentDataFederateAccount>(federateAccount, IntentType.FederateAccount);
                 Account account = federateAccountResponse.account;
+                account.wallet = new Address(federateAccount.wallet);
                 string responseEmail = account.email;
                 if (responseEmail != email.ToLower())
                 {
