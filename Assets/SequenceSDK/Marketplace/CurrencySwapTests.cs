@@ -200,7 +200,7 @@ namespace Sequence.Marketplace
                 
                 Token[] supportedTokens = await currencySwap.GetSupportedTokens(supportedChains);
                 Assert.IsNotNull(supportedTokens);
-                Assert.AreEqual(0, supportedTokens.Length);
+                Assert.Greater(supportedTokens.Length, 0);
             }
             catch (Exception e)
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine.Scripting;
 
@@ -18,12 +19,16 @@ namespace Sequence.Marketplace
         public Chain[] GetChains()
         {
             int length = chains.Length;
-            Chain[] result = new Chain[length];
+            List<Chain> result = new List<Chain>();
             for (int i = 0; i < length; i++)
             {
-                result[i] = ChainDictionaries.ChainById[chains[i].ToString()];
+                string chainId = chains[i].ToString();
+                if (ChainDictionaries.ChainById.TryGetValue(chainId, out Chain chain)) // There may be chains that aren't supported by Sequence
+                {
+                    result.Add(chain);
+                }
             }
-            return result;
+            return result.ToArray();
         }
     }
 }
