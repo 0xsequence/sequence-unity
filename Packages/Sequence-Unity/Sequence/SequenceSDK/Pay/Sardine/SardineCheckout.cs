@@ -161,6 +161,21 @@ namespace Sequence.Pay.Sardine
         private async Task<SardineNFTCheckout> SardineGetNFTCheckoutToken(CollectibleOrder[] orders, Address recipient,
             BigInteger quantity, Step step, Address marketplaceContractAddress)
         {
+            if (quantity <= 0)
+            {
+                throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
+            }
+            
+            if (orders == null || orders.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(orders));
+            }
+            
+            if (!orders.CheckSameCollectible())
+            {
+                throw new ArgumentException("The provided collectible orders are not for the same collectible as expected");
+            }
+            
             CollectibleOrder order = orders[0];
             string priceSymbol = ChainDictionaries.GasCurrencyOf[_chain];
             string currencyAddress = order.order.priceCurrencyAddress;
