@@ -15,6 +15,8 @@ namespace Sequence.EmbeddedWallet.Tests
         private TaskCompletionSource<bool> _tcs;
         private string _walletAddress;
         SequenceLogin _login;
+        private IWallet _wallet;
+        private Account _federatedAccount;
 
         [Test]
         public async Task TestAccountAssociation()
@@ -151,6 +153,74 @@ namespace Sequence.EmbeddedWallet.Tests
             }
             _tcs.SetResult(true);
             SequenceWallet.OnAccountFederated -= OnAccountFederated;
+        }
+
+        [Test]
+        public async Task TestRemoveFederatedAccount()
+        {
+            _login = SequenceLogin.GetInstance();
+            SequenceWallet.OnAccountFederated += OnAccountFederatedBeforeDeletion;
+            _tcs = new TaskCompletionSource<bool>();
+            EndToEndTestHarness testHarness = new EndToEndTestHarness(_login);
+
+            await testHarness.Login(async wallet =>
+            {
+                _wallet = wallet;
+                try
+                {
+                    _walletAddress = wallet.GetWalletAddress();
+                    _email = WaaSEndToEndTestConfig.GetConfig().PlayFabEmail;
+                    string titleId = WaaSEndToEndTestConfig.GetConfig().PlayFabTitleId;
+
+                    if (string.IsNullOrEmpty(PlayFabSettings.staticSettings.TitleId))
+                    {
+                        PlayFabSettings.staticSettings.TitleId = titleId;
+                    }
+
+                    var request = new LoginWithEmailAddressRequest
+                    {
+                        Email = _email,
+                        Password = WaaSEndToEndTestConfig.GetConfig().PlayFabPassword
+                    };
+                    PlayFabClientAPI.LoginWithEmailAddress(request, PlayFabLoginResult, PlayFabLoginFailed);
+                }
+                catch (Exception e)
+                {
+                    _tcs.TrySetException(e);
+                }
+            }, (error, method, email, methods) =>
+            {
+                _tcs.TrySetException(new Exception(error));
+            });
+
+            await _tcs.Task;
+        }
+
+        private void OnAccountFederatedBeforeDeletion(Account account)
+        {
+            if (account.email != _email.ToLower())
+            {
+                _tcs.TrySetException(new Exception($"Emails do not match {_email} != {account.email}"));
+            }
+            SequenceWallet.OnAccountFederated -= OnAccountFederatedBeforeDeletion;
+
+            _wallet.OnFederatedAccountRemovedComplete += OnFederatedAccountRemoved;
+            _federatedAccount = account;
+            _wallet.RemoveFederatedAccount(account);
+        }
+
+        private void OnFederatedAccountRemoved(string accountId, bool success)
+        {
+            if (accountId == _federatedAccount.id)
+            {
+                _tcs.SetResult(true);
+            }
+            else
+            {
+                _tcs.TrySetException(new Exception($"Account ids do not match {_federatedAccount.id} != {accountId}"));
+            }
+            
+            _wallet.OnFederatedAccountRemovedComplete -= OnFederatedAccountRemoved;
         }
     }
 }

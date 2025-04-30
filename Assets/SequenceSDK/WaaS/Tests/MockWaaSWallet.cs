@@ -105,5 +105,11 @@ namespace Sequence.EmbeddedWallet
         {
             throw new NotImplementedException();
         }
+
+        public event Action<string, bool> OnFederatedAccountRemovedComplete;
+        public Task<bool> RemoveFederatedAccount(Account account)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

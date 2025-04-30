@@ -172,5 +172,16 @@ namespace Sequence.EmbeddedWallet
         /// </summary>
         /// <returns></returns>
         public string GetEmail();
+
+        public event Action<string, bool> OnFederatedAccountRemovedComplete;
+        
+        /// <summary>
+        /// Drop the specified session id (dropSessionId) with the API
+        ///
+        /// Can be awaited directly and/or you can subscribe to the OnDropSessionComplete event
+        /// </summary>
+        /// <param name="dropSessionId"></param>
+        /// <returns></returns>
+        public Task<bool> RemoveFederatedAccount(Account account);
     }
 }
