@@ -176,9 +176,9 @@ namespace Sequence.EmbeddedWallet
         public event Action<string, bool> OnFederatedAccountRemovedComplete;
         
         /// <summary>
-        /// Drop the specified session id (dropSessionId) with the API
+        /// Remove a federated account association
         ///
-        /// Can be awaited directly and/or you can subscribe to the OnDropSessionComplete event
+        /// Can be awaited directly and/or you can subscribe to the OnFederatedAccountRemovedComplete event
         /// </summary>
         /// <param name="dropSessionId"></param>
         /// <returns></returns>
