@@ -3,12 +3,10 @@ using System.Text;
 using Newtonsoft.Json;
 using Sequence.Boilerplates.Login;
 using Sequence.Boilerplates.PlayerProfile;
-using Sequence.Config;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;
-using Sequence.Utils.SecureStorage;
 using UnityEngine;
 
 namespace Sequence.Boilerplates
@@ -98,22 +96,14 @@ namespace Sequence.Boilerplates
             _featureSelection.SetActive(false);
         }
         
-        private void TryRecoverSessionToOpenLoginWindow()
+        private async void TryRecoverSessionToOpenLoginWindow()
         {
             HideFeatureSelection();
-            var config = SequenceConfig.GetConfig();
-            var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
-            var loginHandler = SequenceLogin.GetInstance();
             
-            if (SecureStorageFactory.IsSupportedPlatform() && storeSessionInfoAndSkipLoginWhenPossible)
-            {
-                loginHandler.TryToRestoreSession();
-                loginHandler.SetupAuthenticator();
-            }
-            else
-            {
-                OnFailedToRecoverSession("Secure Storage disabled");
-            }
+            var loginHandler = SequenceLogin.GetInstance();
+            var (storageEnabled, wallet) = await loginHandler.TryToRestoreSessionAsync();
+            if (!storageEnabled)
+                OnFailedToRecoverSession("Secure storage is disabled");
         }
 
         private void OnFailedToRecoverSession(string error)

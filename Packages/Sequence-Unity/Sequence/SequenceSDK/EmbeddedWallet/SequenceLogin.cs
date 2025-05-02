@@ -157,6 +157,48 @@ namespace Sequence.EmbeddedWallet
             _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
         }
 
+        /// <summary>
+        /// Recover the current session asynchronously and get the associated wallet.
+        /// </summary>
+        /// <returns>
+        /// Returns StorageEnabled bool indicating if the SDK is configured to store sessions.
+        /// Returns Instance of IWallet if the session was recovered. Returns null if no session was found.
+        /// </returns>
+        public async Task<(bool StorageEnabled, IWallet Wallet)> TryToRestoreSessionAsync()
+        {
+            var config = SequenceConfig.GetConfig();
+            var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
+            if (!SecureStorageFactory.IsSupportedPlatform() || !storeSessionInfoAndSkipLoginWhenPossible)
+                return (false, null);
+            
+            var done = false;
+            SequenceWallet wallet = null;
+            SequenceWallet.OnFailedToRecoverSession += HandleFailedToRecover;
+            SequenceWallet.OnWalletCreated += HandleRecoveredWallet;
+
+            TryToRestoreSession();
+            SetupAuthenticator();
+
+            while (!done)
+                await Task.Yield();
+
+            return (true, wallet);
+            
+            void HandleRecoveredWallet(SequenceWallet newWallet)
+            {
+                wallet = newWallet;
+                done = true;
+                
+                SequenceWallet.OnFailedToRecoverSession -= HandleFailedToRecover;
+                SequenceWallet.OnWalletCreated -= HandleRecoveredWallet;
+            }
+
+            void HandleFailedToRecover(string error)
+            {
+                HandleRecoveredWallet(null);
+            }
+        }
+        
         public void TryToRestoreSession()
         {
             if (!_storeSessionWallet)
