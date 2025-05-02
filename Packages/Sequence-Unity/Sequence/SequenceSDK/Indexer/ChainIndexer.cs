@@ -174,5 +174,10 @@ namespace Sequence
         {
             Indexer.AbortStreams(this);
         }
+
+        public bool ChainMatched(Chain chain)
+        {
+            return chain == GetChain();
+        }
     }
 }

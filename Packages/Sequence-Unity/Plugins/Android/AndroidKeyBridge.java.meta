@@ -53,7 +53,7 @@ PluginImporter:
   - first:
       Standalone: OSXUniversal
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: None
   - first:
@@ -69,6 +69,11 @@ PluginImporter:
       settings:
         CPU: x86_64
   - first:
+      WebGL: WebGL
+    second:
+      enabled: 1
+      settings: {}
+  - first:
       Windows Store Apps: WindowsStoreApps
     second:
       enabled: 0
@@ -81,7 +86,7 @@ PluginImporter:
   - first:
       iPhone: iOS
     second:
-      enabled: 0
+      enabled: 1
       settings:
         AddToEmbeddedBinaries: false
         CPU: AnyCPU

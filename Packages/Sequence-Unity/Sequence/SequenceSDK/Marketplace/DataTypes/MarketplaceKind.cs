@@ -1,5 +1,11 @@
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sequence.Utils;
+
 namespace Sequence.Marketplace
 {
+    [JsonConverter(typeof(EnumConverter<MarketplaceKind>))]
     public enum MarketplaceKind
     {
         unknown,
@@ -23,13 +29,8 @@ namespace Sequence.Marketplace
         element,
         aqua_xyz,
         auranft_co,
-    }
-
-    public static class MarketplaceKindExtensions
-    {
-        public static string AsString(this MarketplaceKind kind)
-        {
-            return kind.ToString();
-        }
+        zerox,
+        alienswap,
+        payment_processor,
     }
 }

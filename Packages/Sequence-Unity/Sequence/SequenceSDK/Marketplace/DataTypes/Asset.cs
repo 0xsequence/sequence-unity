@@ -1,8 +1,10 @@
+using System;
 using System.Numerics;
 using UnityEngine.Scripting;
 
 namespace Sequence.Marketplace
 {
+    [Serializable]
     public class Asset
     {
         public BigInteger id;

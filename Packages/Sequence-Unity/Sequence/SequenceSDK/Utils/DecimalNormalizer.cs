@@ -22,16 +22,30 @@ namespace Sequence.Utils
 
         public static string ReturnToNormalString(BigInteger x, int decimals = 18)
         {
-            float result = ReturnToNormal(x, decimals);
-            return result.ToString();
+            string numberStr = BigInteger.Abs(x).ToString();
+
+            while (numberStr.Length <= decimals)
+            {
+                numberStr = "0" + numberStr;
+            }
+
+            int decimalPointIndex = numberStr.Length - decimals;
+            string resultStr = numberStr.Insert(decimalPointIndex, ".");
+            if (resultStr.Contains('.'))
+            {
+                resultStr = resultStr.TrimEnd('0');
+            }
+            return resultStr;
         }
 
         public static float ReturnToNormal(BigInteger x, int decimals = 18)
         {
-            x = Math.Abs((long)x);
-            double normalized = (long)x / Math.Pow(10, decimals);
-            float result = (float) normalized;
-            return result;
+            return float.Parse(ReturnToNormalString(x, decimals));
+        }
+        
+        public static decimal ReturnToNormalPrecise(BigInteger x, int decimals = 18)
+        {
+            return decimal.Parse(ReturnToNormalString(x, decimals));
         }
     }
 }

@@ -1,5 +1,11 @@
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Sequence.Utils;
+
 namespace Sequence.Marketplace
 {
+    [JsonConverter(typeof(EnumConverter<OrderStatus>))]
     public enum OrderStatus
     {
         unknown,
@@ -8,13 +14,5 @@ namespace Sequence.Marketplace
         expired,
         cancelled,
         filled,
-    }
-    
-    public static class OrderStatusExtensions
-    {
-        public static string AsString(this OrderStatus status)
-        {
-            return status.ToString();
-        }
     }
 }

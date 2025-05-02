@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Sequence;
+using Sequence.Boilerplates;
 using Sequence.Demo;
 using Sequence.Utils;
 using Sequence.EmbeddedWallet;
@@ -12,6 +13,7 @@ using UnityEngine.TestTools;
 
 namespace SequenceExamples.Scripts.Tests
 {
+    [Ignore("UI tests are no longer relevant with our new UI system. This test harness is kept for reference for if/when we revisit UI tests.")]
     public class UITestHarness : MonoBehaviour
     {
         private MonoBehaviour _testMonobehaviour;

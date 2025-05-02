@@ -122,5 +122,12 @@ namespace Sequence
         /// Aborts all running streams.
         /// </summary>
         public void AbortStreams();
+
+        /// <summary>
+        /// Returns true if the provided Chain matches the Chain of this Indexer, false otherwise
+        /// </summary>
+        /// <param name="chain"></param>
+        /// <returns></returns>
+        public bool ChainMatched(Chain chain);
     }
 }

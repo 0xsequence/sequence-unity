@@ -1,19 +1,11 @@
 //
 //  KeychainAccess.mm
 //
-//  Created by Quinn Purdy on 2024-06-18.
+//  Created by Quinn Purdy on 2024-06-18. Updated on 2025-04-01 by Quinn Purdy
 //
-// To update the KeychainAccess.bundle, please perform the following (at time of writing on MacOS 14.5 with XCode 15.4):
-// Create an XCode Bundle MacOS project File > New > Project ; macOS > Bundle
-// Set bundle identifier and team name then click next and select a location
-// Set deployment target to lowest possible version
-// Add KeychainAccess.mm as a file 
-// Navigate to build phases
-// Double check KeychainAccess.mm is added under Compile Sources (if not add it)
-// Expand Link Binary with Libraries and add "Security.framework"
-// Product > Build  
-// If successful, Product > Show Build Folder in Finder
-// Replace the KeychainAccess.bundle with the newly build .bundle
+// To update the libKeychainAccess.dylib, run the following command from the root of this directory:
+// clang -arch x86_64 -arch arm64 -dynamiclib -framework Foundation -framework Security \
+         -o libKeychainAccess.dylib KeychainAccess.mm
 
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>

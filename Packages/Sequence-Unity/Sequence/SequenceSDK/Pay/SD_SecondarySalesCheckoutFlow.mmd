@@ -1,0 +1,21 @@
+sequenceDiagram
+    User->>+App: I would like to buy x amount of this Collectible with my credit card
+    App->>+SequencePay: User wants to buy x amount of this Collectible with their credit card from this PrimarySaleContract
+    SequencePay->>+SequenceAPI: Which checkout providers are available? GetCheckoutOptions
+    SequenceAPI-->>-SequencePay: Returns array of CheckoutOptions, identifying which providers are available
+    SequencePay->>+SequenceMarketplace: GenerateBuyTransaction on an 'unknown' wallet type
+    SequenceMarketplace->>+SequenceAPI: GenerateBuyTransaction on an 'unknown' wallet type
+    SequenceAPI-->>-SequenceMarketplace: Return Step[]
+    SequenceMarketplace-->>-SequencePay: Return appropriate calldata from Step[] retrieved from SequenceAPI
+    SequencePay->>+SequenceAPI: Give me a checkout link for <available provider> using this calldata, sale contract, and Collectible
+    SequenceAPI-->>-SequencePay: Returns checkout link
+    SequencePay-->>-App: Returns checkout link
+    App->>-User: App opens checkout link in web browser or webview, displaying it to user
+    User->>+CheckoutWebpage: User checks out and pays with credit card
+    CheckoutWebpage->>+ThirdPartyServer: Checkout provider confirms payment
+    ThirdPartyServer->>+MarketplaceContract: Execute provided calldata on provided Marketplace Contract
+    MarketplaceContract->>+CollectionContract: Marketplace Contract facilitates sale of x instances of Collectible to user wallet
+    CollectionContract-->>-MarketplaceContract: x instances of Collectible transferred
+    MarketplaceContract-->>-ThirdPartyServer: Transaction success, return transaction hash
+    ThirdPartyServer-->>-CheckoutWebpage: Transaction success, return transaction hash
+    CheckoutWebpage-->>-User: Display to user informing them that x Collectibles were successfully purchased

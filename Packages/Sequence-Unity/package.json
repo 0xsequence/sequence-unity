@@ -1,12 +1,28 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "3.19.5",
+  "version": "4.0.6",
   "displayName": "Sequence Embedded Wallet SDK",
-  "description": "A Unity SDK for the Sequence WaaS API",
+  "description": "A Unity SDK for Sequence APIs",
   "unity": "2021.3",
-  "keywords": ["Unity", "Package", "wallet", "ethereum", "web3", "sequence", "waas", "oidc"],
+  "keywords": [
+    "Unity",
+    "Package",
+    "wallet",
+    "ethereum",
+    "web3",
+    "sequence",
+    "waas",
+    "oidc",
+    "embedded-wallet",
+    "marketplace",
+    "p2p-trading",
+    "payments",
+    "pay",
+    "IAP",
+    "collectibles"
+  ],
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json" : "3.0.2",
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
     "com.unity.test-framework": "1.3.4"
   },
   "author": {

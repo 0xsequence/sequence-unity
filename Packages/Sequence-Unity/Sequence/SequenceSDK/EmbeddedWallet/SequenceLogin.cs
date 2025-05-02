@@ -108,9 +108,9 @@ namespace Sequence.EmbeddedWallet
 
         public void ResetSessionId()
         {
-			if (_connectedWalletAddress != null) {
-				return;
-		    }
+            if (_connectedWalletAddress != null) {
+                return;
+            }
             _sessionWallet = new EOAWallet();
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
@@ -123,16 +123,18 @@ namespace Sequence.EmbeddedWallet
         public void ResetLoginAfterTest()
         {
             _connector = this;
+            SetConnectedWalletAddress(null);
             SetupAuthenticator();
         }
 
         public void SetupAuthenticator(IValidator validator = null, IAuthenticator authenticator = null)
         {
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
-            if (_connectedWalletAddress == null || _sessionWallet == null)
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(SequenceConfig.GetConfig(SequenceService.WaaS));
+            if (_sessionWallet == null)
             {
                 _sessionWallet = new EOAWallet();
             }
+            
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
@@ -237,7 +239,7 @@ namespace Sequence.EmbeddedWallet
             }
             _waasVersion = waasVersion;
 
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(config);
 
             string rpcUrl = configJwt.rpcServer;
             if (string.IsNullOrWhiteSpace(rpcUrl))
@@ -273,7 +275,6 @@ namespace Sequence.EmbeddedWallet
             }
             
             _sessionWallet = walletInfo.Item1;
-            
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
             SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
@@ -643,8 +644,9 @@ namespace Sequence.EmbeddedWallet
             await connector.ConnectToWaaSViaGuest();
         }
 
-        private void StoreWalletSecurely(string waasWalletAddress, string email)
+        internal void StoreWalletSecurely(string waasWalletAddress, string email)
         {
+            if (!_storeSessionWallet || !SecureStorageFactory.IsSupportedPlatform()) return;
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             byte[] privateKeyBytes = new byte[32];
             _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
@@ -658,6 +660,7 @@ namespace Sequence.EmbeddedWallet
             {
                 IntentResponseAccountFederated federateAccountResponse = await _intentSender.SendIntent<IntentResponseAccountFederated, IntentDataFederateAccount>(federateAccount, IntentType.FederateAccount);
                 Account account = federateAccountResponse.account;
+                account.wallet = new Address(federateAccount.wallet);
                 string responseEmail = account.email;
                 if (responseEmail != email.ToLower())
                 {

@@ -1,0 +1,6 @@
+[submodule "testchain/lib/contracts-library"]
+	path = testchain/lib/contracts-library
+	url = https://github.com/0xsequence/contracts-library.git
+[submodule "testchain/lib/forge-std"]
+	path = testchain/lib/forge-std
+	url = https://github.com/foundry-rs/forge-stdy

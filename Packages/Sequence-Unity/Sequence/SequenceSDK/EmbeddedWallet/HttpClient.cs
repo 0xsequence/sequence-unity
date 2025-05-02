@@ -46,7 +46,7 @@ namespace Sequence.EmbeddedWallet
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
             
-            ConfigJwt configJwt = SequenceConfig.GetConfigJwt();
+            ConfigJwt configJwt = SequenceConfig.GetConfigJwt(config);
             string rpcUrl = configJwt.rpcServer;
             if (string.IsNullOrWhiteSpace(rpcUrl))
             {
@@ -137,7 +137,6 @@ namespace Sequence.EmbeddedWallet
             UnityWebRequest request = newRequest.Item1;
             string curlRequest = newRequest.Item2;
             string url = newRequest.Item3;
-            
             Debug.Log(curlRequest);
 
             try

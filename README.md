@@ -74,20 +74,17 @@ The SDK comes with a number of samples that can be imported via `Samples` using 
 
 These live inside the `Samples~` folder as required by the [Package Manager specification](https://docs.unity3d.com/Manual/cus-samples.html). However, the Unity Editor will ignore any folders/files with a '~' character in their name and will not create a `.meta` file for them or import them. In order to facilitate our development, we create a symbolic link named `Samples` that points to the `Samples~` folder - allowing us to see and interact with our Samples and Setup scripts.
 
-## Environments
+Samples include a set of handful feature boilerplate to get started.
 
-Sequence generally uses two environments for our backend services: dev and production. By default, the SDK will always use production.
+How to create a new Boilerplate:
+- Create the scripts inside the `Packages/Sequence Embedded Wallet SDK/Sequence/Samples/Setup/Boilerplates/`
+- Create a prefab and put it inside the Resources folder in the above directory.
+- Create a static function inside `BoilerplateFactory.cs` to instantiate a new instance of the prefab from Resources.
+- Add a new `FeatureSelectionButton.cs` inside the `Demo` scene and add a unique `Key` value to the component.
 
-However, during development, it is occasionally useful to send requests against the dev environment. To do this, you'll first need to have access to the dev version of the Sequence Builder; here, you can generate credentials (API key, WaaS config key, etc.) for your SequenceConfig. This time however, you'll place your configuration in a SequenceConfig instance titled 'SequenceDevConfig' in a `Resources` folder.
-
-In order to use the dev environment, you'll want to set the appropriate scripting define symbol for your service in your Player Settings.
-
-- `SEQUENCE_DEV` - every Sequence service
-- `SEQUENCE_DEV_WAAS` - the WaaS/EmbeddedWallet service
-- `SEQUENCE_DEV_INDEXER` - the Indexer service
-- `SEQUENCE_DEV_MARKETPLACE` - the Marketplace service
-- `SEQUENCE_DEV_NODEGATEWAY` - the Node Gateway services
-- `SEQUENCE_DEV_STACK` - generic Sequence API; unnamed services and functions
+The `Key` value from `FeatureSelectionButton.cs` allows us to only enable selected features in our WebGL demo.
+For example, the url `http://localhost:4444/?features=rewards+profile` will only enable the Player Profile and Daily Rewards Boilerplates.
+If you don't define any feature in the url, all boilerplates are enabled.
 
 ## Assembly Overview
 
@@ -117,13 +114,13 @@ This is our custom Ethereum library, purpose-built for Unity.
 
 The integration with our [Indexer API](https://docs.sequence.xyz/api/indexer/overview). Used to quickly index/read on-chain data.
 
-### SequenceIntegrations
-
-Houses code integrating with third-party service providers like [Transak](https://transak.com/).
-
 ### SequenceMarketplace
 
-The integration with our Marketplace API v2. Used to enable secondary marketplace sales of ERC721/1155s.
+The integration with our Marketplace API v2 and Swap API. Used to enable secondary marketplace sales of ERC721/1155s.
+
+### SequencePay
+
+Our implementation of the Pay product line - supporting credit card based fund onboarding and collectible checkout for both primary and secondary sales. Integrations of payment service providers like Transak and Sardine.
 
 ### SequenceRelayer
 
@@ -173,114 +170,3 @@ In addition to `UIPage` responsibilities, UIPanels maintain a stack of UIPages a
 As a Made-With-Unity UI, the sample UI is cross platform and easily customizable.
 To make customization even easier, the sample UI comes equipped with a Color Scheme Manager. This monobehaviour script is attached to the `SequenceCanvas` gameObject. By attaching a `ColorScheme` scriptable object and clicking the `Apply` button in the Inspector, the `ColorSchemeManager` will quickly apply the desired color scheme, allowing for faster UI iterations.
 To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence > Color Scheme`. From here, you can give the color scheme a name, move it to the desired directory, and choose your colors.
-
-## Architecture Decision Records
-
-Please add any ADRs below. In the future, it may be worthwhile to move these into separate files, but for now since there are few ADRs, the README should suffice. 
-Please use [Michael Nygard's template for ADRs](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
-
-### ADR 5 - SDK as a Local Package
-July 19, 2024 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-The SDK is currently inside the Assets folder.
-
-#### Decision
-The project is refactored such that the SDK now lives in the Packages folder as a LocalPackage. The tests, mocks, and other similar files/scripts/resources will remain in the Assets folder. The git url for importing the SDK is updated in the documentation. 
-
-#### Consequences
-Users who have imported the SDK via Package Manager using git url will need to remove the package and then re-add it using the new URL in order to update to the latest version.
-
-The SDK will be easier to submit to the Unity Asset store using the Asset Store Tools to upload it as a Local Package.
-
-It is now easier to include other dependancies, like the PlayFab SDK, that do not define package.json files without introducing dependancy conflicts into integrator projects. If we wanted to include any of these packages into our project before we would've had to modify the git url installation link anyways to a subfolder inside of Assets.
-
-The tests, mocks, and related files are no longer included inside the SDK that gets shipped to users. This reduces file size; however, users will need to check the repo to see more example use cases (i.e. to see the tests.)
-
-Intellisense and other IDE features (like refactoring) may be less refined when working within the Packages folder than within the Assets folder.
-
-Scripts in the samples folder of the SDK are not checked for compile errors by Unity. When modifying these, we will need to make sure to import them to make sure they work and compile (though we should always be doing this anyways).
-
-### ADR 4 - New WaaS auth system
-July 19, 2024 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-The current WaaS auth system is restricted to OIDC implicit flow and requires a nonce `hex(keccak256(sessionWalletAddress))` included in the idToken. This flow is rather restrictive. Additionally, the flow requires us to use AWS Cognito for email sign in and there is a limit to how many partner ids we can configure with AWS Cognitor, limiting our ability to scale efficiently.
-
-#### Decision
-The WaaS auth system is being migrated to a new system that no longer solely relies upon OIDC implicit flow. This new authentication flow requires the RegisterSession call be split into two separate calls. Initiate Auth and Open Session. The Initiate Auth call will, in some cases, return a challenge. The two calls must be joined together in order for a session to be opened - this is done by specifying the `identityType`, `verifier`, and, in the case of Open Session, the `answer`.
-
-#### Consequences
-WaaSLogin, now renamed to SequenceLogin, has been re-written to accomodate for the new flow. The AWS SDK and all its consumers have been removed from the SDK. 
-
-The OpenIdAuthenticator and related classes in the Sequence.Authentication assembly have become more usable in a general context and have become more replaceable/customizable for integrators.
-
-### ADR 3 - WaaS Client
-August 2, 2023 - author: Quinn Purdy
-Updated Aug 16, 2023 - author: Quinn Purdy
-Updated Jan 3, 2023 - author: Quinn Purdy
-
-#### Status
-Approved
-
-#### Context
-A direct integration of Sequence into sequence-unity is a time-intensive process and requires porting over logic from go-sequence and/or sequence.js. Recently, we've established a WaaS service that exposes the core logic from go-sequence via http. This WaaS service, with our authentication system, can be used to provide users with a more secure and more frictionless (less "wallet-like") UX.
-
-#### Decision
-In order to save time on the integration and provide users with a more secure and frictionless UX, sequence-unity will integrate directly with the WaaS service, iceboxing the implementation of "SequenceCore" (see ADR 2) for a later date.
-
-For authentication, sequence-unity will use the [OIDC implicit flow](https://openid.net/specs/openid-connect-implicit-1_0.html#ImplicitFlow) or AWS Cognito Email with OTP Sign In to obtain an idToken, which is combined with some config variables to establish a session with the WaaS service. The Authentication logic (obtaining the idToken) can be found in the `SequenceAuthentication` assembly.
-
-The SDK will require developers to input a number of config variables during setup. This will be done via a ScriptableObject, defined in the `SequenceConfig` assembly, that can be fetched via [Resources.Load](https://docs.unity3d.com/ScriptReference/Resources.Load.html) when needed.
-
-Similar to ADR 2, the WaaS client will be implemented in a separate assembly from "SequenceEthereum". This assembly will be called "SequenceWaaS" and will reference and depend on the Ethereum library assembly "SequenceEthereum".
-
-Since use of WaaS requires an idToken that cannot currently be hardcoded, some of the tests live in a separate assembly, `SequenceWaaSEndToEndTests`, that is used when building the `WaaSEndToEndTests` scene for end to end testing. Additionally, we've included unit tests, and other tests using mocks that can be run from within the editor, in the `SequenceWaaSTests` assembly. 
-
-#### Consequences
-As the WaaS client will rely on network requests, interactions will be slower than with a direct integration. However, the speed to market with this approach is greatly improved and there is a better UX for end-users and developers alike, justifying the trade-off.
-
-Additionally, since the WaaS client relies on network requests, we must add additional async Tasks to the SequenceEthereum IWallet interface. This will require additional await statements throughout, harming readability.
-
-Remaining consequences follow those from ADR 2 (with respect to assemblies).
-
-### ADR 2 - Separate assemblies for Sequence integration and Ethereum library
-July 12, 2023 - author: Quinn Purdy
-
-#### Status
-Accepted - July 14, 2023
-
-#### Context
-Integration of Sequence into the sequence-unity is the next step in the Unity SDK project - preparations are being made, with modifications to project structure.
-
-#### Decision
-Move the previous Sequence integration work, and all future Sequence integration work, into a separate assembly from the Ethereum libraries we're writing. The Sequence "SequenceCore" assembly will reference and depend on the Ethereum library assembly "SequenceEthereum".
-
-For now, all tests will remain in the same assembly "SequenceTests".
-
-#### Consequences
-While SequenceCore will be able to reference namespaces in SequenceEthereum, SequenceEthereum will not be able to reference anything in SequenceCore. While, on the surface, this may sound problematic as it reduces our flexibility when writing the SDK, SequenceEthereum should not need to depend on SequenceCore; this will reduce coupling leading to an overall more readable and maintainable project. This also makes it easier for us to release SequenceEthereum as a standalone package, should we ever choose to do so.
-
-By splitting SequenceCore into a separate assembly, we will not need to recompile the entire SDK whenever we make changes to SequenceCore; instead, we will only need to recompile SequenceCore. Similarly, if we were to precompile the SDK, this would give us two separate dlls (SequenceEthereum.dll and SequenceCore.dll).
-
-### ADR 1 - sequence-unity
-June 21, 2023 - author: Quinn Purdy
-
-#### Status
-This ADR document is being made retroactively after inheriting the project.
-
-#### Context
-Sequence Unity SDK v1 was made quickly as a proof of concept. The SDK relies on Nethereum; a library that is overly heavy-weight. The SDK also relies on the Vuplex webview unity package - this package is not free, leading to developer frustrations.
-
-#### Decision
-Modifying the existing v1 SDK was deemed to be unworthy undertaking. Building a new SDK from scratch was determined to be faster and easier.
-
-#### Consequences
-Iteration on SDK v2 during development will be significantly faster and lower risk 
-than modifying the existing SDK the customers are currently using. However, this means that current customers using v1 of the SDK can expect limited support during the development of SDK v2 as v1 will be deprecated. 

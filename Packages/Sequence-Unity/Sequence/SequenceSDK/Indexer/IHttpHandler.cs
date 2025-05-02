@@ -9,7 +9,8 @@ namespace Sequence
         /// </summary>
         /// <returns></returns>
         public Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0);
-        public void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options, int retries = 0);
+        public Task<T> HttpPost<T>(string url, object args);
+        public void HttpStream<T>(string chainID, string endPoint, object args, WebRPCStreamOptions<T> options);
         public void AbortStreams();
     }
 }
