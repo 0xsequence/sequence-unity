@@ -102,7 +102,7 @@ namespace Sequence.Boilerplates
             
             var loginHandler = SequenceLogin.GetInstance();
             var (storageEnabled, wallet) = await loginHandler.TryToRestoreSessionAsync();
-            if (!storageEnabled && wallet == null)
+            if (!storageEnabled)
                 OnFailedToRecoverSession("Secure storage is disabled");
         }
 
