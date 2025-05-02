@@ -160,13 +160,16 @@ namespace Sequence.EmbeddedWallet
         /// <summary>
         /// Recover the current session asynchronously and get the associated wallet.
         /// </summary>
-        /// <returns>Instance of IWallet if the session was recovered. Returns null if no session was found.</returns>
-        public async Task<SequenceWallet> TryToRestoreSessionAsync()
+        /// <returns>
+        /// Returns StorageEnabled bool indicating if the SDK is configured to store sessions.
+        /// Returns Instance of IWallet if the session was recovered. Returns null if no session was found.
+        /// </returns>
+        public async Task<(bool StorageEnabled, IWallet Wallet)> TryToRestoreSessionAsync()
         {
             var config = SequenceConfig.GetConfig();
             var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
             if (!SecureStorageFactory.IsSupportedPlatform() || !storeSessionInfoAndSkipLoginWhenPossible)
-                return null;
+                return (false, null);
             
             var done = false;
             SequenceWallet wallet = null;
@@ -179,7 +182,7 @@ namespace Sequence.EmbeddedWallet
             while (!done)
                 await Task.Yield();
 
-            return wallet;
+            return (true, wallet);
             
             void HandleRecoveredWallet(SequenceWallet newWallet)
             {
