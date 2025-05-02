@@ -175,6 +175,16 @@ namespace Sequence.Pay.Transak
             {
                 throw new ArgumentException($"{nameof(quantity)} must be greater than 0");
             }
+            
+            if (collectibleOrder == null || collectibleOrder.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(collectibleOrder));
+            }
+            
+            if (!collectibleOrder.CheckSameCollectible())
+            {
+                throw new ArgumentException("The provided collectible orders are not for the same collectible as expected");
+            }
 
             Order order = collectibleOrder[0].order;
             TokenMetadata metadata = collectibleOrder[0].metadata;
