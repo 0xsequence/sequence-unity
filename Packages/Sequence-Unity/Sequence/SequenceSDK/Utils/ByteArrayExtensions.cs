@@ -90,6 +90,16 @@ namespace Sequence.Utils
             return result;
         }
         
+        public static byte[] PadRight(this byte[] input, int totalSize)
+        {
+            if (input.Length > totalSize)
+                throw new ArgumentException("Input is larger than total size");
+
+            byte[] result = new byte[totalSize];
+            Buffer.BlockCopy(input, 0, result, 0, input.Length);
+            return result;
+        }
+
         public static byte[] ByteArrayFromNumber(this BigInteger value, int? size = null)
         {
             if (value < 0)
