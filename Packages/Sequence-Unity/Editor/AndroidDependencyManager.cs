@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -16,6 +17,9 @@ namespace Sequence.Editor
     {
         private const string SecureStoragePluginFilename = "AndroidKeyBridge.java";
 
+        private const string RelevantDocsUrl =
+            "https://docs.sequence.xyz/sdk/unity/onboard/recovering-sessions#android";
+
         public int callbackOrder => 0;
 
         public void OnPreprocessBuild(BuildReport report)
@@ -29,17 +33,19 @@ namespace Sequence.Editor
             string pluginPath = matchingAssets
                 .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
                 .FirstOrDefault(path => path.EndsWith(SecureStoragePluginFilename));
-
             if (string.IsNullOrEmpty(pluginPath))
             {
-                Debug.LogWarning($"Secure Storage plugin '{SecureStoragePluginFilename}' not found in project.");
+                if (config.StoreSessionPrivateKeyInSecureStorage)
+                {
+                    ShowWarning($"Secure Storage plugin '{SecureStoragePluginFilename}' not found in project. Please make sure you have imported it via Samples in Package Manager");
+                }
                 return;
             }
 
             PluginImporter pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
             if (pluginImporter == null)
             {
-                Debug.LogWarning($"Unable to create {nameof(PluginImporter)} instance at path: {pluginPath}");
+                ShowWarning($"Unable to create {nameof(PluginImporter)} instance at path: {pluginPath}");
                 return;
             }
 
@@ -48,6 +54,12 @@ namespace Sequence.Editor
             Debug.Log(
                 $"Secure Storage plugin compatibility set to {config.StoreSessionPrivateKeyInSecureStorage} for path: {pluginPath}");
 #endif
+        }
+
+        private void ShowWarning(string warning)
+        {
+            Debug.LogWarning(warning);
+            SequenceWarningPopup.ShowWindow(new List<string>() {warning}, RelevantDocsUrl);
         }
     }
 }
