@@ -62,5 +62,36 @@ namespace Sequence.Marketplace
 
             return null;
         }
+
+        public static bool CheckSameCollectible(this CollectibleOrder[] orders)
+        {
+            int length = orders.Length;
+            if (length == 0)
+            {
+                return true;
+            }
+            
+            Collectible collectible = new Collectible(new Address(orders[0].order.collectionContractAddress), orders[0].order.tokenId);
+            for (int i = 1; i < length; i++)
+            {
+                if (orders[i].order.collectionContractAddress != collectible.Contract || orders[i].order.tokenId != collectible.TokenId)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private class Collectible
+        {
+            public Address Contract;
+            public string TokenId;
+
+            public Collectible(Address contract, string tokenId)
+            {
+                Contract = contract;
+                TokenId = tokenId;
+            }
+        }
     }
 }

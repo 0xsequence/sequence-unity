@@ -58,6 +58,7 @@ namespace Sequence
             { Chain.TestnetEtherlink, "Etherlink Testnet" },
             { Chain.TestnetMonad, "Monad Testnet" },
             { Chain.TestnetSomnia, "Somnia Testnet" },
+            { Chain.TestnetFrequency, "Frequency Testnet" },
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -114,6 +115,7 @@ namespace Sequence
             { Chain.TestnetEtherlink, "XTZ" },
             { Chain.TestnetMonad, "MON" },
             { Chain.TestnetSomnia, "STT" },
+            { Chain.TestnetFrequency, "BERA" },
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -203,6 +205,7 @@ namespace Sequence
             { Chain.TestnetEtherlink, "https://testnet.explorer.etherlink.com/" },
             { Chain.TestnetMonad, "https://testnet.monadexplorer.com/" },
             { Chain.TestnetSomnia, "https://somnia-testnet.socialscan.io/" },
+            { Chain.TestnetFrequency, "https://explorer.frequency.zeeve.net/" },
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -261,6 +264,7 @@ namespace Sequence
             { Chain.TestnetEtherlink, "128123" },
             { Chain.TestnetMonad, "10143" },
             { Chain.TestnetSomnia, "50312" },
+            { Chain.TestnetFrequency, "53716" },
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -317,6 +321,7 @@ namespace Sequence
             { "128123", Chain.TestnetEtherlink },
             { "10143", Chain.TestnetMonad },
             { "50312", Chain.TestnetSomnia },
+            { "53716", Chain.TestnetFrequency },
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -373,6 +378,7 @@ namespace Sequence
             { Chain.TestnetEtherlink, "etherlink-testnet" },
             { Chain.TestnetMonad, "monad-testnet" },
             { Chain.TestnetSomnia, "somnia-testnet" },
+            { Chain.TestnetFrequency, "frequency-testnet" },
         };
     }
 }
