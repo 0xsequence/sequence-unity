@@ -5,6 +5,7 @@ using UnityEditor.Build.Reporting;
 using UnityEngine;
 using System.Linq;
 using Sequence.Config;
+using System.IO;
 
 namespace Sequence.Editor
 {
@@ -28,11 +29,8 @@ namespace Sequence.Editor
             BuildTarget target = report.summary.platform;
             SequenceConfig config = SequenceConfig.GetConfig();
 
-            string[] matchingAssets = AssetDatabase.FindAssets(SecureStoragePluginFilename);
-
-            string pluginPath = matchingAssets
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .FirstOrDefault(path => path.EndsWith(SecureStoragePluginFilename));
+            string[] files = Directory.GetFiles("Assets", SecureStoragePluginFilename, SearchOption.AllDirectories);
+            string pluginPath = files.FirstOrDefault();
             if (string.IsNullOrEmpty(pluginPath))
             {
                 if (config.StoreSessionPrivateKeyInSecureStorage)
