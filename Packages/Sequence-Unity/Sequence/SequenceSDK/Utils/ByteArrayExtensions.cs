@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Text;
 using UnityEngine;
 
@@ -78,5 +79,55 @@ namespace Sequence.Utils
 
             return result;
         }
+        
+        public static byte[] PadLeft(this byte[] input, int totalSize)
+        {
+            if (input.Length > totalSize)
+                throw new ArgumentException("Input is larger than total size");
+
+            byte[] result = new byte[totalSize];
+            Buffer.BlockCopy(input, 0, result, totalSize - input.Length, input.Length);
+            return result;
+        }
+        
+        public static byte[] ByteArrayFromNumber(this BigInteger value, int? size = null)
+        {
+            if (value < 0)
+                throw new ArgumentException("Value must be non-negative");
+
+            byte[] rawBytes = value.ToByteArray(isUnsigned: true, isBigEndian: true);
+
+            if (size.HasValue)
+            {
+                if (rawBytes.Length > size.Value)
+                    throw new ArgumentException("Value is too large to fit in the specified size");
+
+                return PadLeft(rawBytes, size.Value);
+            }
+
+            return rawBytes;
+        }
+        
+        public static byte[] ByteArrayFromNumber(this int value, int size)
+        {
+            if (size < 1 || size > 4)
+                throw new ArgumentOutOfRangeException(nameof(size), "Size must be between 1 and 4 bytes for an int.");
+
+            byte[] bytes = BitConverter.GetBytes(value); 
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            return bytes[^size..]; 
+        }
+        
+        public static byte[] ByteArrayFromNumber(this int value)
+        {
+            byte[] bytes = BitConverter.GetBytes(value); 
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            return bytes; 
+        }
+
     }
 }

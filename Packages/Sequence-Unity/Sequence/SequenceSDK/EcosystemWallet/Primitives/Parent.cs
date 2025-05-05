@@ -14,4 +14,18 @@ namespace Sequence.EcosystemWallet.Primitives
             this.parentWallets = parentWallets;
         }
     }
+
+    [Serializable]
+    internal class Parented
+    {
+        public Address[] parentWallets;
+        public Payload payload;
+
+        [Preserve]
+        public Parented(Address[] parentWallets, Payload payload)
+        {
+            this.parentWallets = parentWallets;
+            this.payload = payload;
+        }
+    }
 }
