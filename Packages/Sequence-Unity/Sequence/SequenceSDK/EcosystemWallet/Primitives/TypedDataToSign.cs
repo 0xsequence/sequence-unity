@@ -133,5 +133,10 @@ namespace Sequence.EcosystemWallet.Primitives
                     throw new SystemException($"Encountered unexpected {nameof(PayloadType)}: {payload.payload.type}");
             }
         }
+
+        public byte[] GetSignPayload()
+        {
+            
+        }
     }
 }

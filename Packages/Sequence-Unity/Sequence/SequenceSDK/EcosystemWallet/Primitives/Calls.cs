@@ -265,7 +265,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public byte[] Hash(Address wallet, Chain chain, Parented payload)
         {
             TypedDataToSign typedData = new TypedDataToSign(wallet, chain, payload);
-            return GetSignPayload(typedData).ByteArrayToHexStringWithPrefix();
+            return typedData.GetSignPayload();
         }
     }
 }
