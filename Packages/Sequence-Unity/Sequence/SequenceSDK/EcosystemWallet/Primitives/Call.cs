@@ -36,30 +36,17 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public string Hash()
         {
-            byte[] encoded = AbiParameters.Encode(
-                new[]
-                {
-                    "bytes32",
-                    "address",
-                    "uint256",
-                    "bytes32",
-                    "uint256",
-                    "bool",
-                    "bool",
-                    "uint256"
-                },
-                new object[]
-                {
-                    CALL_TYPEHASH,
-                    to,
-                    value,
-                    SequenceCoder.KeccakHash(data),
-                    gasLimit,
-                    delegateCall,
-                    onlyFallback,
-                    (int)behaviorOnError
-                }
-            );
+            byte[] typeHash = new StaticBytesCoder().Encode(CALL_TYPEHASH);
+            byte[] toHash = new AddressCoder().Encode(to);
+            byte[] valueHash = new NumberCoder().Encode(value);
+            byte[] dataHash = new StaticBytesCoder().Encode(data);
+            byte[] gasLimitHash = new NumberCoder().Encode(gasLimit);
+            byte[] delegateCallHash = new BooleanCoder().Encode(delegateCall);
+            byte[] onlyFallbackHash = new BooleanCoder().Encode(onlyFallback);
+            byte[] behaviorOnErrorHash = new NumberCoder().Encode((int)behaviorOnError);
+
+            byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(typeHash, toHash, valueHash, dataHash,
+                gasLimitHash, delegateCallHash, onlyFallbackHash, behaviorOnErrorHash);
 
             return SequenceCoder.KeccakHash(encoded).ByteArrayToHexStringWithPrefix();
         }

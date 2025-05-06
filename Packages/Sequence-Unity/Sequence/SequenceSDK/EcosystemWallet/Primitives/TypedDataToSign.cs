@@ -13,44 +13,6 @@ namespace Sequence.EcosystemWallet.Primitives
         public Dictionary<string, NamedType[]> types;
         public string primaryType;
         public Dictionary<string, object> message;
-        
-        [Serializable]
-        public class Domain
-        {
-            public string name;
-            public string version;
-            public BigInteger chainId;
-            public Address verifyingContract;
-
-            public Domain(string name, string version, BigInteger chainId, Address verifyingContract)
-            {
-                this.name = name;
-                this.version = version;
-                this.chainId = chainId;
-                this.verifyingContract = verifyingContract;
-            }
-
-            public Domain(string name, string version, Chain chain, Address verifyingContract)
-            {
-                this.name = name;
-                this.version = version;
-                this.chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[chain]);
-                this.verifyingContract = verifyingContract;
-            }
-        }
-        
-        [Serializable]
-        public class NamedType
-        {
-            public string name;
-            public string type;
-
-            public NamedType(string name, string type)
-            {
-                this.name = name;
-                this.type = type;
-            }
-        }
 
         [Preserve]
         [JsonConstructor]
@@ -60,6 +22,11 @@ namespace Sequence.EcosystemWallet.Primitives
             this.types = types;
             this.primaryType = primaryType;
             this.message = message;
+            if (!types.ContainsKey(primaryType) || !types.ContainsKey(primaryType))
+            {
+                throw new ArgumentException(
+                    $"{nameof(primaryType)} {primaryType} not found in {nameof(types)}. Please check the provided types.");
+            }
         }
 
         // Todo: once we have tests working, let's refactor this so it isn't one giant function
@@ -74,20 +41,20 @@ namespace Sequence.EcosystemWallet.Primitives
                     {
                         ["Calls"] = new[]
                         {
-                            new TypedDataToSign.NamedType("calls", "Call[]"),
-                            new TypedDataToSign.NamedType("space", "uint256"),
-                            new TypedDataToSign.NamedType("nonce", "uint256"),
-                            new TypedDataToSign.NamedType("wallets", "address[]"),
+                            new NamedType("calls", "Call[]"),
+                            new NamedType("space", "uint256"),
+                            new NamedType("nonce", "uint256"),
+                            new NamedType("wallets", "address[]"),
                         },
                         ["Call"] = new[]
                         {
-                            new TypedDataToSign.NamedType("to", "address"),
-                            new TypedDataToSign.NamedType("value", "uint256"),
-                            new TypedDataToSign.NamedType("data", "bytes"),
-                            new TypedDataToSign.NamedType("gasLimit", "uint256"),
-                            new TypedDataToSign.NamedType("delegateCall", "bool"),
-                            new TypedDataToSign.NamedType("onlyFallback", "bool"),
-                            new TypedDataToSign.NamedType("behaviorOnError", "uint256"),
+                            new NamedType("to", "address"),
+                            new NamedType("value", "uint256"),
+                            new NamedType("data", "bytes"),
+                            new NamedType("gasLimit", "uint256"),
+                            new NamedType("delegateCall", "bool"),
+                            new NamedType("onlyFallback", "bool"),
+                            new NamedType("behaviorOnError", "uint256"),
                         }
                     };
 
@@ -121,12 +88,12 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 case PayloadType.Message:
                 {
-                    types = new Dictionary<string, TypedDataToSign.NamedType[]>
+                    types = new Dictionary<string, NamedType[]>
                     {
                         ["Message"] = new[]
                         {
-                            new TypedDataToSign.NamedType("message", "bytes"),
-                            new TypedDataToSign.NamedType("wallets", "address[]"),
+                            new NamedType("message", "bytes"),
+                            new NamedType("wallets", "address[]"),
                         }
                     };
 
@@ -141,12 +108,12 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 case PayloadType.ConfigUpdate:
                 {
-                    types = new Dictionary<string, TypedDataToSign.NamedType[]>
+                    types = new Dictionary<string, NamedType[]>
                     {
                         ["ConfigUpdate"] = new[]
                         {
-                            new TypedDataToSign.NamedType("imageHash", "bytes32"),
-                            new TypedDataToSign.NamedType("wallets", "address[]"),
+                            new NamedType("imageHash", "bytes32"),
+                            new NamedType("wallets", "address[]"),
                         }
                     };
 
