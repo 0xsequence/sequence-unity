@@ -107,12 +107,14 @@ namespace Sequence.Pay.Transak
             Application.OpenURL(link);
         }
         
-        private async Task<string> GetNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress, TransakContractId contractId)
+        private async Task<string> GetNFTCheckoutLink(TransakNftData item, string callData, Address contractAddress, TransakContractId contractId) 
         {
             if (contractId.Chain != _chain)
             {
                 throw new ArgumentException($"The provided {nameof(contractId)} is not for the same chain as the current instance of {nameof(TransakNFTCheckout)}, given: {contractId.Chain}, expected: {_chain}");
             }
+
+            Debug.Log(callData);
 
             string transakCallData = CallDataCompressor.Compress(callData);
             
