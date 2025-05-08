@@ -54,7 +54,7 @@ namespace Sequence.Marketplace
             requestJson = jsonObj.ToString(Formatting.None);
             
             return await SendRequest<ReturnType>(url, requestJson);
-        }q
+        }
 
         private string ToJson<ArgType>(ArgType args)
         {
