@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sequence.Config;
 using Sequence.Utils;
 using UnityEngine.Networking;
@@ -17,7 +18,7 @@ namespace Sequence.Marketplace
         private const string _prodUrl = "https://marketplace-api.sequence.app/";
         private const string _devUrl = "https://dev-marketplace-api.sequence-dev.app/";
         private static string _baseUrl = "https://marketplace-api.sequence.app/";
-        private const string _endUrl = "/rpc/Marketplace/";
+        private const string _endUrl = "rpc/Marketplace/";
         private JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore
@@ -41,17 +42,40 @@ namespace Sequence.Marketplace
 
         public async Task<ReturnType> SendRequest<ArgType, ReturnType>(Chain chain, string endpoint, ArgType args)
         {
-            string url = _baseUrl + ChainDictionaries.PathOf[chain] + _endUrl + endpoint;
-            return await SendRequest<ArgType, ReturnType>(url, args);
-        }
+            string url = _baseUrl + _endUrl + endpoint;
+            string requestJson = ToJson(args);
+            if (string.IsNullOrWhiteSpace(requestJson))
+            {
+                requestJson = "{}";
+            }
+            string chainId = ChainDictionaries.ChainIdOf[chain];
+            JObject jsonObj = JsonConvert.DeserializeObject<JObject>(requestJson);
+            jsonObj["chainId"] = chainId;
+            requestJson = jsonObj.ToString(Formatting.None);
+            
+            return await SendRequest<ReturnType>(url, requestJson);
+        }q
 
-        public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
+        private string ToJson<ArgType>(ArgType args)
         {
             string requestJson = "";
             if (args != null)
             {
                 requestJson = JsonConvert.SerializeObject(args, serializerSettings);
             }
+
+            return requestJson;
+        }
+
+        public async Task<ReturnType> SendRequest<ArgType, ReturnType>(string url, ArgType args)
+        {
+            string requestJson = ToJson(args);
+
+            return await SendRequest<ReturnType>(url, requestJson);
+        }
+
+        private async Task<ReturnType> SendRequest<ReturnType>(string url, string requestJson)
+        {
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbPOST;
             byte[] requestData = Encoding.UTF8.GetBytes(requestJson);
