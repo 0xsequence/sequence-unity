@@ -16,7 +16,7 @@ namespace Sequence.Editor
     /// </summary>
     public class AndroidDependencyManager : IPreprocessBuildWithReport
     {
-        private const string SecureStoragePluginFilename = "AndroidKeyBridge.java";
+        public const string SecureStoragePluginFilename = "AndroidKeyBridge.java";
 
         private const string RelevantDocsUrl =
             "https://docs.sequence.xyz/sdk/unity/onboard/recovering-sessions#android";
