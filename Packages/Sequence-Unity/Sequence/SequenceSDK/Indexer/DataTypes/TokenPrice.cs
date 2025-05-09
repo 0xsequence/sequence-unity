@@ -6,7 +6,7 @@ namespace Sequence
     [Serializable]
     public class TokenPrice
     {
-        public PriceFeed.Token token;
+        public Token token;
         public Price price;
         public Price price24hChange;
         public Price floorPrice;
@@ -15,7 +15,7 @@ namespace Sequence
         public DateTime updatedAt;
         
         [Preserve]
-        public TokenPrice(PriceFeed.Token token, Price price, Price price24hChange, Price floorPrice, Price buyPrice, Price sellPrice, DateTime updatedAt)
+        public TokenPrice(Token token, Price price, Price price24hChange, Price floorPrice, Price buyPrice, Price sellPrice, DateTime updatedAt)
         {
             this.token = token;
             this.price = price;

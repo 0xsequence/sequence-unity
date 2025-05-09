@@ -48,5 +48,15 @@ namespace Sequence.Marketplace.Mocks
         {
             throw new NotImplementedException();
         }
+
+        public Task<Chain[]> GetSupportedChains()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Token[]> GetSupportedTokens(Chain[] chains)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -48,5 +48,18 @@ namespace Sequence.Marketplace
         /// <returns></returns>
         public Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency,
             string buyAmount, bool includeApprove, uint slippagePercentage = DefaultSlippagePercentage);
+
+        /// <summary>
+        /// Get a Chain[] of all supported chains for the swap provider
+        /// </summary>
+        /// <returns></returns>
+        public Task<Chain[]> GetSupportedChains();
+
+        /// <summary>
+        /// Get the supported tokens by the swap provider for a given set of chains
+        /// </summary>
+        /// <param name="chains"></param>
+        /// <returns></returns>
+        public Task<Token[]> GetSupportedTokens(Chain[] chains);
     }
 }

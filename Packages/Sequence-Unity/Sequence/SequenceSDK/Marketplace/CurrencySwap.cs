@@ -165,5 +165,37 @@ namespace Sequence.Marketplace
                     $"Insufficient balance of {sellCurrency} to buy {buyAmount} of {buyCurrency}, have {have}, need {required}");
             }
         }
+
+        public async Task<Chain[]> GetSupportedChains()
+        {
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetLifiChains";
+            try
+            {
+                LifiSupportedChainsResponse response =
+                    await _client.SendRequest<object, LifiSupportedChainsResponse>(url, null);
+                return response.GetChains();
+            }
+            catch (Exception e)
+            {
+                string error = $"Error fetching supported chains: {e.Message}";
+                throw new Exception(error);
+            }
+        }
+
+        public async Task<Token[]> GetSupportedTokens(Chain[] chains)
+        {
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetLifiTokens";
+            try
+            {
+                GetLifiTokensResponse response =
+                    await _client.SendRequest<GetLifiTokensRequest, GetLifiTokensResponse>(url, new GetLifiTokensRequest(chains));
+                return response.tokens;
+            }
+            catch (Exception e)
+            {
+                string error = $"Error fetching supported tokens: {e.Message}";
+                throw new Exception(error);
+            }
+        }
     }
 }

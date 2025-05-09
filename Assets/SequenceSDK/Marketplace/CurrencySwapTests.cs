@@ -120,5 +120,92 @@ namespace Sequence.Marketplace
                 Assert.IsTrue(e.Message.Contains("Error fetching swap quote"));
             }
         }
+
+        [Test]
+        public async Task TestGetSupportedChains()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+
+            try
+            {
+                Chain[] supportedChains = await currencySwap.GetSupportedChains();
+                Assert.IsNotNull(supportedChains);
+                Assert.Greater(supportedChains.Length, 0);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Exception encountered while fetching supported chains: {e.Message}");
+            }
+        }
+
+        [Test]
+        public async Task TestGetSupportedTokens()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            
+            try
+            {
+                Token[] supportedTokens = await currencySwap.GetSupportedTokens(new[] { _chain });
+                Assert.IsNotNull(supportedTokens);
+                Assert.Greater(supportedTokens.Length, 0);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Exception encountered while fetching supported tokens: {e.Message}");
+            }
+        }
+        
+        [Test]
+        public async Task TestGetSupportedTokens_EmptyChains()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            
+            try
+            {
+                Token[] supportedTokens = await currencySwap.GetSupportedTokens(new Chain[0]);
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error fetching supported tokens:"));
+            }
+        }
+        
+        [Test]
+        public async Task TestGetSupportedTokens_NullChains()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            
+            try
+            {
+                Token[] supportedTokens = await currencySwap.GetSupportedTokens(null);
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error fetching supported tokens:"));
+            }
+        }
+
+        [Test]
+        public async Task TestGetSupportedTokens_AllSupportedChains()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+
+            try
+            {
+                Chain[] supportedChains = await currencySwap.GetSupportedChains();
+                Assert.IsNotNull(supportedChains);
+                Assert.Greater(supportedChains.Length, 0);
+                
+                Token[] supportedTokens = await currencySwap.GetSupportedTokens(supportedChains);
+                Assert.IsNotNull(supportedTokens);
+                Assert.Greater(supportedTokens.Length, 0);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Exception encountered while fetching supported tokens: {e.Message}");
+            }
+        }
     }
 }
