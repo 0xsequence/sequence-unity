@@ -16,8 +16,10 @@ namespace Sequence.Marketplace
         public string[] notInAccounts = null; // Filter out any collectibles owned by the specified addresses
         public string[] ordersCreatedBy = null; // Filter for orders created by the specified addresses
         public string[] ordersNotCreatedBy = null; // Filter out any orders created by the specified addresses
+        public string[] inCurrencyAddresses = null; // Filter for collectibles priced with the specified currency addresses
+        public string[] notInCurrencyAddresses = null; // Filter out any collectibles priced with the specified currency addresses
         
-        public CollectiblesFilter(bool includeEmpty, string searchText = "", PropertyFilter[] properties = null, MarketplaceKind[] marketplaces = null, string[] inAccounts = null, string[] notInAccounts = null, string[] ordersCreatedBy = null, string[] ordersNotCreatedBy = null)
+        public CollectiblesFilter(bool includeEmpty, string searchText = "", PropertyFilter[] properties = null, MarketplaceKind[] marketplaces = null, string[] inAccounts = null, string[] notInAccounts = null, string[] ordersCreatedBy = null, string[] ordersNotCreatedBy = null, string[] inCurrencyAddresses = null, string[] notInCurrencyAddresses = null)
         {
             this.includeEmpty = includeEmpty;
             this.searchText = searchText;
@@ -27,11 +29,13 @@ namespace Sequence.Marketplace
             this.notInAccounts = notInAccounts;
             this.ordersCreatedBy = ordersCreatedBy;
             this.ordersNotCreatedBy = ordersNotCreatedBy;
+            this.inCurrencyAddresses = inCurrencyAddresses;
+            this.notInCurrencyAddresses = notInCurrencyAddresses;
         }
 
         [Preserve]
         [JsonConstructor]
-        public CollectiblesFilter(bool includeEmpty, string searchText, PropertyFilter[] properties, string[] marketplaces, string[] inAccounts, string[] notInAccounts, string[] ordersCreatedBy, string[] ordersNotCreatedBy)
+        public CollectiblesFilter(bool includeEmpty, string searchText, PropertyFilter[] properties, string[] marketplaces, string[] inAccounts, string[] notInAccounts, string[] ordersCreatedBy, string[] ordersNotCreatedBy, string[] inCurrencyAddresses = null, string[] notInCurrencyAddresses = null)
         {
             this.includeEmpty = includeEmpty;
             this.searchText = searchText;
@@ -41,6 +45,8 @@ namespace Sequence.Marketplace
             this.notInAccounts = notInAccounts;
             this.ordersCreatedBy = ordersCreatedBy;
             this.ordersNotCreatedBy = ordersNotCreatedBy;
+            this.inCurrencyAddresses = inCurrencyAddresses;
+            this.notInCurrencyAddresses = notInCurrencyAddresses;
         }
 
         private string[] MarketplacesToStringArray(MarketplaceKind[] marketplaces)
