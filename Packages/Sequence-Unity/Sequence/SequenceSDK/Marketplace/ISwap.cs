@@ -13,11 +13,24 @@ namespace Sequence.Marketplace
         /// <summary>
         /// Get the current SwapPrice for a given buyCurrency, sellCurrency, and buyAmount 
         /// </summary>
+        /// <param name="userWallet"></param>
         /// <param name="buyCurrency"></param>
         /// <param name="sellCurrency"></param>
         /// <param name="buyAmount"></param>
         /// <param name="slippagePercent">the maximum slippage percentage allowed</param>
         /// <returns></returns>
+        [Obsolete("Swap provider no longer supports fetching swap prices without provider the user's wallet address")]
+        public Task<SwapPrice> GetSwapPrice(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount);
+        
+        /// <summary>
+        /// Get the current SwapPrice for a given buyCurrency, sellCurrency, and buyAmount 
+        /// </summary>
+        /// <param name="buyCurrency"></param>
+        /// <param name="sellCurrency"></param>
+        /// <param name="buyAmount"></param>
+        /// <param name="slippagePercent">the maximum slippage percentage allowed</param>
+        /// <returns></returns>
+        [Obsolete("Swap provider no longer supports fetching swap prices without provider the user's wallet address")]
         public Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, uint slippagePercent = DefaultSlippagePercentage);
 
         public event Action<SwapPrice[]> OnSwapPricesReturn;
@@ -61,15 +74,5 @@ namespace Sequence.Marketplace
         /// <param name="chains"></param>
         /// <returns></returns>
         public Task<Token[]> GetSupportedTokens(Chain[] chains);
-        
-        /// <summary>
-        /// Base integration of GetLifiSwapRoutes API
-        /// In general, it is not recommended to use this method directly
-        /// </summary>
-        /// <param name="userWallet"></param>
-        /// <param name="buyCurrency"></param>
-        /// <param name="buyAmount"></param>
-        /// <returns></returns>
-        public Task<LifiSwapRoute[]> GetLifiSwapRoutes(Address userWallet, Address buyCurrency, string buyAmount);
     }
 }

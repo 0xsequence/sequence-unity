@@ -17,14 +17,11 @@ namespace Sequence.Marketplace
             CurrencySwap currencySwap = new CurrencySwap(_chain);
             string amount = "1000";
             
-            SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address(USDC), new Address(USDCe), amount);
+            SwapPrice swapPrice = await currencySwap.GetSwapPrice(new Address("0xe8db071f698aBA1d60babaE8e08F5cBc28782108"), new Address(USDC), new Address(USDCe), amount);
             
             Assert.IsNotNull(swapPrice);
             Assert.AreEqual(USDCe.ToLower(), swapPrice.currencyAddress.Value.ToLower());
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.price));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.maxPrice));
-            Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.transactionValue));
-            Assert.GreaterOrEqual(BigInteger.Parse(swapPrice.transactionValue), BigInteger.Zero);
         }
 
         [Test]
@@ -41,9 +38,7 @@ namespace Sequence.Marketplace
             {
                 Assert.IsNotNull(swapPrice);
                 Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.price));
-                Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.maxPrice));
-                Assert.IsFalse(string.IsNullOrWhiteSpace(swapPrice.transactionValue));
-                Assert.GreaterOrEqual(BigInteger.Parse(swapPrice.transactionValue), BigInteger.Zero);
+                Assert.NotNull(swapPrice.currencyAddress);
             }
         }
         
@@ -81,6 +76,8 @@ namespace Sequence.Marketplace
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.transactionValue));
             Assert.GreaterOrEqual(BigInteger.Parse(swapQuote.transactionValue), BigInteger.Zero);
             Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.approveData));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.amount));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(swapQuote.amountMin));
         }
         
         [Test]
@@ -98,7 +95,7 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                Assert.IsTrue(e.Message.Contains("Insufficient balance"));
+                Assert.IsTrue(e.Message.Contains("not enough balance for swap"));
             }
         }
         

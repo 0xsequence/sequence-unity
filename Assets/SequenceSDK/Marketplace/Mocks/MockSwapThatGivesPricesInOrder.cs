@@ -20,6 +20,11 @@ namespace Sequence.Marketplace.Mocks
         public event Action<SwapPrice> OnSwapPriceReturn;
         public event Action<string> OnSwapPriceError;
 
+        public Task<SwapPrice> GetSwapPrice(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount,
             uint slippagePercent = ISwap.DefaultSlippagePercentage)
         {

@@ -17,7 +17,6 @@ namespace Sequence.Marketplace
 #else        
         private const string BaseUrl = "https://api.sequence.app/rpc/API";
 #endif
-        private IIndexer _indexer;
         
         public CurrencySwap(Chain chain, IHttpClient client = null)
         {
@@ -27,12 +26,41 @@ namespace Sequence.Marketplace
                 client = new HttpClient();
             }
             _client = client;
-            _indexer = new ChainIndexer(_chain);
         }
 
         public event Action<SwapPrice> OnSwapPriceReturn;
         public event Action<string> OnSwapPriceError;
-        
+
+        public async Task<SwapPrice> GetSwapPrice(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount)
+        {
+            try
+            {
+                SwapPrice[] swapPrices = await GetSwapPrices(userWallet, buyCurrency, buyAmount);
+                if (swapPrices == null || swapPrices.Length == 0)
+                {
+                    throw new Exception("No swap path with sufficient liquidity found");
+                }
+                
+                foreach (SwapPrice swapPrice in swapPrices)
+                {
+                    if (swapPrice.currencyAddress.Equals(sellCurrency))
+                    {
+                        OnSwapPriceReturn?.Invoke(swapPrice);
+                        return swapPrice;
+                    }
+                }
+                
+                throw new Exception("No swap path with sufficient liquidity found");
+            }
+            catch (Exception e)
+            {
+                string error = $"Error fetching swap price for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}";
+                OnSwapPriceError?.Invoke(error);
+                throw new Exception(error);
+            }
+        }
+
+        [Obsolete("Swap provider no longer supports fetching swap prices without provider the user's wallet address")]
         public async Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, 
             uint slippagePercent = ISwap.DefaultSlippagePercentage)
         {
@@ -65,15 +93,38 @@ namespace Sequence.Marketplace
         public async Task<SwapPrice[]> GetSwapPrices(Address userWallet, Address buyCurrency, string buyAmount,
             uint slippagePercentage = ISwap.DefaultSlippagePercentage)
         {
-            GetSwapPricesRequest args = new GetSwapPricesRequest(userWallet, buyCurrency, buyAmount, _chain,
-                slippagePercentage);
-            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapPermit2Prices";
             try
             {
-                GetSwapPricesResponse response =
-                    await _client.SendRequest<GetSwapPricesRequest, GetSwapPricesResponse>(url, args);
-                OnSwapPricesReturn?.Invoke(response.swapPermit2Prices);
-                return response.swapPermit2Prices;
+                LifiSwapRoute[] swapRoutes = await GetLifiSwapRoutes(userWallet, buyCurrency, buyAmount);
+                List<SwapPrice> swapPrices = new List<SwapPrice>();
+                foreach (var route in swapRoutes)
+                {
+                    if (route.fromChainId.ToString() != ChainDictionaries.ChainIdOf[_chain])
+                    {
+                        continue;
+                    }
+                    if (route.toChainId.ToString() != ChainDictionaries.ChainIdOf[_chain])
+                    {
+                        continue;
+                    }
+
+                    if (!route.toTokens.ContainsToken(buyCurrency))
+                    {
+                        continue;
+                    }
+
+                    foreach (var fromToken in route.fromTokens)
+                    {
+                        swapPrices.Add(new SwapPrice(fromToken.Contract, fromToken.Price.ToString()));
+                    }
+                }
+
+                if (swapPrices.Count == 0)
+                {
+                    throw new SystemException($"Unable to find a swap route with the appropriate {nameof(buyCurrency)} address {buyCurrency} in the response from the swap provider");
+                }
+                
+                return swapPrices.ToArray();
             }
             catch (Exception e)
             {
@@ -93,31 +144,11 @@ namespace Sequence.Marketplace
         {
             try
             {
-                await AssertWeHaveSufficientBalance(userWallet, buyCurrency, sellCurrency, buyAmount,
-                    slippagePercentage);
-            }
-            catch (Exception e)
-            {
-                string error = $"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}";
-                OnSwapQuoteError?.Invoke(error);
-                throw new Exception(error);
-            }
-            
-            GetSwapQuoteRequest args = new GetSwapQuoteRequest(userWallet, buyCurrency, sellCurrency, buyAmount, _chain,
-                slippagePercentage, includeApprove);
-            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetSwapQuoteV2";
-            try
-            {
-                GetSwapQuoteResponse response =
-                    await _client.SendRequest<GetSwapQuoteRequest, GetSwapQuoteResponse>(url, args);
-                if (response.swapQuote == null)
-                {
-                    string error = $"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: Unknown error - swap API has returned a null response";
-                    OnSwapQuoteError?.Invoke(error);
-                    throw new Exception(error);
-                }
-                OnSwapQuoteReturn?.Invoke(response.swapQuote);
-                return response.swapQuote;
+                LifiSwapQuote swapQuote = await GetLifiSwapQuote(userWallet, buyCurrency, sellCurrency, buyAmount, null,
+                    includeApprove, slippagePercentage);
+                SwapQuote quote = new SwapQuote(swapQuote);
+                OnSwapQuoteReturn?.Invoke(quote);
+                return quote;
             }
             catch (Exception e)
             {
@@ -125,47 +156,6 @@ namespace Sequence.Marketplace
                     $"Error fetching swap quote for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}";
                 OnSwapQuoteError?.Invoke(error);
                 throw new Exception(error);
-            }
-        }
-
-        private async Task AssertWeHaveSufficientBalance(Address userWallet, Address buyCurrency, Address sellCurrency,
-            string buyAmount, uint slippagePercentage = ISwap.DefaultSlippagePercentage)
-        {
-            BigInteger required, have;
-            try
-            {
-                SwapPrice price = await GetSwapPrice(buyCurrency, sellCurrency, buyAmount, slippagePercentage);
-                required = BigInteger.Parse(price.maxPrice);
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error fetching swap price for buying {buyAmount} of {buyCurrency} with {sellCurrency}: {e.Message}");
-            }
-
-            TokenBalance[] sellCurrencyBalances;
-            try
-            {
-                GetTokenBalancesReturn balanceResponse = await _indexer.GetTokenBalances(new GetTokenBalancesArgs(userWallet, sellCurrency));
-                sellCurrencyBalances = balanceResponse.balances;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Error fetching token balance of {sellCurrency}: {e.Message}");
-            }
-
-            if (sellCurrencyBalances == null || sellCurrencyBalances.Length == 0)
-            {
-                have = 0;
-            }
-            else
-            {
-                have = sellCurrencyBalances[0].balance;
-            }
-
-            if (have < required)
-            {
-                throw new Exception(
-                    $"Insufficient balance of {sellCurrency} to buy {buyAmount} of {buyCurrency}, have {have}, need {required}");
             }
         }
 
@@ -201,6 +191,15 @@ namespace Sequence.Marketplace
             }
         }
 
+        /// <summary>
+        /// Base integration of GetLifiSwapRoutes API
+        /// In general, it is not recommended to use this method directly - use GetSwapPrice or GetSwapPrices instead
+        /// </summary>
+        /// <param name="userWallet"></param>
+        /// <param name="buyCurrency"></param>
+        /// <param name="buyAmount"></param>
+        /// <returns></returns>
+        [Obsolete("Use GetSwapPrices or GetSwapPrice instead")]
         public async Task<LifiSwapRoute[]> GetLifiSwapRoutes(Address userWallet, Address buyCurrency, string buyAmount)
         {
             GetLifiSwapRoutesArgs args =
@@ -238,6 +237,19 @@ namespace Sequence.Marketplace
             }
         }
 
+        /// <summary>
+        /// Base integration of GetLifiSwapQuote API
+        /// In general, it is not recommended to use this method directly - use GetSwapQuote instead
+        /// </summary>
+        /// <param name="userWallet"></param>
+        /// <param name="buyCurrency"></param>
+        /// <param name="fromCurrency"></param>
+        /// <param name="buyAmount"></param>
+        /// <param name="fromAmount"></param>
+        /// <param name="includeApprove"></param>
+        /// <param name="slippageInBasisPoints"></param>
+        /// <returns></returns>
+        [Obsolete("Use GetSwapQuote instead")]
         public async Task<LifiSwapQuote> GetLifiSwapQuote(Address userWallet, Address buyCurrency, Address fromCurrency, string buyAmount = null, string fromAmount = null, bool includeApprove = true, ulong slippageInBasisPoints = 50)
         {
             string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetLifiSwapQuote";

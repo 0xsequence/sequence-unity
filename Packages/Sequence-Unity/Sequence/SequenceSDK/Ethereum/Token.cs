@@ -102,6 +102,10 @@ namespace Sequence
 
             BigInteger chainId = jsonObject["chainId"]?.Value<ulong>() ?? 0;
             string contractAddress = jsonObject["contractAddress"]?.Value<string>();
+            if (string.IsNullOrWhiteSpace(contractAddress))
+            {
+                contractAddress = jsonObject["address"]?.Value<string>();
+            }
             string tokenId = jsonObject["tokenId"]?.Value<string>();
             string symbol = jsonObject["symbol"]?.Value<string>();
             string name = jsonObject["name"]?.Value<string>();
