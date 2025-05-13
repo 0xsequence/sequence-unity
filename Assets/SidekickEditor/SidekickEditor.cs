@@ -10,9 +10,6 @@ public class SidekickEditor : Editor
     {
         SidekickEditorController controller = (SidekickEditorController)target;
 
-        serializedObject.Update();
-
-
         #region Deploy ERC1155
 
         EditorGUILayout.LabelField("Deploy ERC1155");

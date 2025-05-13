@@ -10,21 +10,21 @@ public class SidekickEditorController : MonoBehaviour
 
     #region Deploy ERC1155
 
-    public string deployDefaultAdmin = "0xeBc14a7f27824A13A6a0c58a4C5C34d35c9F43a8";
-    public string deployMinter = "0xeBc14a7f27824A13A6a0c58a4C5C34d35c9F43a8";
-    public string deployName = "myerc";
+    public string deployDefaultAdmin { get; set; }
+    public string deployMinter { get; set; }
+    public string deployName { get; set; }
 
     public async void DeployERC1155(string defaultAdmin, string minter, string name)
     {
-        var deployJson = new
+        var deployPayload = new DeployERC1155Payload
         {
             defaultAdmin = defaultAdmin,
             minter = minter,
             name = name
         };
-        string jsonString = JsonUtility.ToJson(deployJson);
+        string jsonString = JsonUtility.ToJson(deployPayload);
 
-        Debug.Log(jsonString);
+        Debug.Log("Deploying ERC1155:" + jsonString);
 
         EditorApplication.delayCall += async () =>
         {
@@ -78,4 +78,11 @@ public class SidekickEditorController : MonoBehaviour
 
     #endregion
 
+}
+[System.Serializable]
+public class DeployERC1155Payload
+{
+    public string defaultAdmin;
+    public string minter;
+    public string name;
 }
