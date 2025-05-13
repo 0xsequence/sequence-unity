@@ -149,5 +149,13 @@ namespace Sequence.Wallet
 
             return message;
         }
+
+        /// <summary>
+        /// Simply use the private key to sign the given message
+        /// Don't apply any hashing or prefixes to the message - this should be done elsewhere
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public string SignWithoutPrefixesOrHashing(byte[] message);
     }
 }

@@ -258,6 +258,11 @@ namespace Sequence.Wallet
             return IWallet.PrefixedMessage(message);
         }
 
+        public string SignWithoutPrefixesOrHashing(byte[] message)
+        {
+            return EthSignature.Sign(message, privKey);
+        }
+
         /// <summary>
         /// Recovers the Ethereum address from a message and its signature.
         /// </summary>

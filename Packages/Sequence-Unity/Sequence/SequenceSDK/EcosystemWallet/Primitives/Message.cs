@@ -1,4 +1,5 @@
 using System;
+using Sequence.ABI;
 using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -13,6 +14,12 @@ namespace Sequence.EcosystemWallet.Primitives
         public Message(byte[] message)
         {
             this.message = message;
+        }
+        
+        public override byte[] GetEIP712EncodeData()
+        {
+            byte[] encoded = new BytesCoder().Encode(message);
+            return encoded;
         }
     }
 }

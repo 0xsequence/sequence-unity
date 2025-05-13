@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -25,6 +26,17 @@ namespace Sequence.EcosystemWallet.Primitives
             public Address to;
             public BigInteger value;
             public BigInteger behaviorOnError;
+
+            public EncodedCall(Call call)
+            {
+                to = call.to;
+                value = call.value;
+                data = call.data.ByteArrayToHexStringWithPrefix();
+                gasLimit = call.gasLimit;
+                delegateCall = call.delegateCall;
+                onlyFallback = call.onlyFallback;
+                behaviorOnError = (int)call.behaviorOnError;
+            }
         }
     }
 }

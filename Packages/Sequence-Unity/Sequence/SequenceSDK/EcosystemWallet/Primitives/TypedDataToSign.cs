@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 using Newtonsoft.Json;
+using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
 
@@ -13,6 +15,9 @@ namespace Sequence.EcosystemWallet.Primitives
         public Dictionary<string, NamedType[]> types;
         public string primaryType;
         public Dictionary<string, object> message;
+        
+        private string[] _types;
+        private Parented _payload;
 
         [Preserve]
         [JsonConstructor]
@@ -32,6 +37,7 @@ namespace Sequence.EcosystemWallet.Primitives
         // Todo: once we have tests working, let's refactor this so it isn't one giant function
         public TypedDataToSign(Address wallet, Chain chain, Parented payload)
         {
+            _payload = payload;
             this.domain = new Domain("Sequence Wallet", "3", chain, wallet);
             switch (payload.payload.type)
             {
@@ -71,16 +77,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     for (int i = 0; i < callsLength; i++)
                     {
                         Call call = callPayload.calls[i];
-                        encoded[i] = new EncodeSapient.EncodedCall
-                        {
-                            to = call.to,
-                            value = call.value,
-                            data = call.data.ByteArrayToHexStringWithPrefix(),
-                            gasLimit = call.gasLimit,
-                            delegateCall = call.delegateCall,
-                            onlyFallback = call.onlyFallback,
-                            behaviorOnError = (int)call.behaviorOnError
-                        };
+                        encoded[i] = new EncodeSapient.EncodedCall(call);
                     }
                     message.Add("calls", encoded);
                     primaryType = "Calls";
@@ -136,7 +133,73 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public byte[] GetSignPayload()
         {
+            _types = types.GetKeys();
+            SortTypes();
+            string encodeType = CalculateEncodeType();
+            byte[] encodeData = CalculateEncodeData();
+            byte[] hashStruct = SequenceCoder.KeccakHash(
+                ByteArrayExtensions.ConcatenateByteArrays(SequenceCoder.KeccakHash(encodeType).HexStringToByteArray(),
+                    encodeData));
+            byte[] domainSeparator = domain.GetDomainSeparator();
+
+            byte[] signablePayload = ByteArrayExtensions.ConcatenateByteArrays(
+                SequenceCoder.HexStringToByteArray("0x19"),
+                SequenceCoder.HexStringToByteArray("0x01"),
+                domainSeparator,
+                hashStruct);
+            byte[] hashedMessage = SequenceCoder.KeccakHash(signablePayload);
+            return hashedMessage;
+        }
+        
+        private void SortTypes()
+        {
+            int typesCount = _types.Length;
+            if (typesCount == 0)
+            {
+                throw new ArgumentException($"Must have at least one entry in {nameof(types)} dictionary");
+            }
+            List<string> newTypes = new List<string>();
+            newTypes.Add(primaryType);
             
+            Array.Sort(_types);
+            for (int i = 0; i < typesCount; i++)
+            {
+                if (_types[i] == primaryType)
+                {
+                    continue;
+                }
+                newTypes.Add(_types[i]);
+            }
+
+            _types = newTypes.ToArray();
+        }
+
+        private string CalculateEncodeType()
+        {
+            StringBuilder encodeType = new StringBuilder();
+            int typeCount = _types.Length;
+            for (int i = 0; i < typeCount; i++)
+            {
+                string type = _types[i];
+                encodeType.Append(type);
+                encodeType.Append("(");
+                foreach (var namedTypes in types[type])
+                {
+                    encodeType.Append(namedTypes.type);
+                    encodeType.Append(" ");
+                    encodeType.Append(namedTypes.name);
+                    encodeType.Append(",");
+                }
+                encodeType.Remove(encodeType.Length - 1, 1); // remove last comma
+                encodeType.Append(")");
+            }
+
+            return encodeType.ToString();
+        }
+
+        private byte[] CalculateEncodeData()
+        {
+            return _payload.GetEIP712EncodeData();
         }
     }
 }

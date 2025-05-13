@@ -50,5 +50,10 @@ namespace Sequence.EcosystemWallet.Primitives
 
             return SequenceCoder.KeccakHash(encoded).ByteArrayToHexStringWithPrefix();
         }
+
+        public byte[] HashStruct()
+        {
+            return Hash().HexStringToByteArray();
+        }
     }
 }

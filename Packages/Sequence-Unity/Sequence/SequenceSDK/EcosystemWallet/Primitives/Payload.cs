@@ -9,5 +9,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public bool isMessage => type == PayloadType.Message;
         public bool isConfigUpdate => type == PayloadType.ConfigUpdate;
         public bool isDigest => type == PayloadType.Digest;
+
+        public abstract byte[] GetEIP712EncodeData();
     }
 }

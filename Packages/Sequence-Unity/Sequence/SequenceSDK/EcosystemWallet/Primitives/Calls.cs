@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
 
@@ -13,6 +14,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public const uint MaxCalls = 65536;
         
         public override PayloadType type => PayloadType.Call;
+
         public BigInteger space;
         public BigInteger nonce;
         public Call[] calls;
@@ -23,6 +25,24 @@ namespace Sequence.EcosystemWallet.Primitives
             this.space = space;
             this.nonce = nonce;
             this.calls = calls;
+        }
+        
+        public override byte[] GetEIP712EncodeData()
+        {
+            byte[] spaceEncoded = new NumberCoder().Encode(space);
+            byte[] nonceEncoded = new NumberCoder().Encode(nonce);
+            byte[] callsEncoded = new byte[] { };
+            foreach (var call in calls)
+            {
+                callsEncoded = ByteArrayExtensions.ConcatenateByteArrays(callsEncoded, call.HashStruct());
+            }
+            callsEncoded = SequenceCoder.KeccakHash(callsEncoded);
+            byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(
+                spaceEncoded,
+                nonceEncoded,
+                callsEncoded
+            );
+            return encoded;
         }
 
         // Todo: once we're able to test the following code, let's refactor it into separate classes and methods instead of giant methods
@@ -208,13 +228,14 @@ namespace Sequence.EcosystemWallet.Primitives
             return outBytes;
         }
 
+        // Todo maybe I should move this to Parented?
         public EncodeSapient DoEncodeSapient(Chain chain, Parented payload)
         {
             EncodeSapient encoded = new EncodeSapient
             {
                 kind = (int)payload.payload.type,
                 noChainId = chain != Chain.None,
-                calls = new Call[]{},
+                calls = new EncodeSapient.EncodedCall[]{},
                 space = BigInteger.Zero,
                 nonce = BigInteger.Zero,
                 message = "0x",
@@ -231,16 +252,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     for (int i = 0; i < callsLength; i++)
                     {
                         Call call = callsPayload.calls[i];
-                        encoded.calls[i] = new EncodeSapient.EncodedCall
-                        {
-                            to = call.to,
-                            value = call.value,
-                            data = call.data.ByteArrayToHexStringWithPrefix(),
-                            gasLimit = call.gasLimit,
-                            delegateCall = call.delegateCall,
-                            onlyFallback = call.onlyFallback,
-                            behaviorOnError = (int)call.behaviorOnError
-                        };
+                        encoded.calls[i] = new EncodeSapient.EncodedCall(call);
                     }
                     encoded.space = callsPayload.space;
                     encoded.nonce = callsPayload.nonce;
@@ -262,6 +274,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return encoded;
         }
 
+        // Todo maybe I should move this to Parented?
         public byte[] Hash(Address wallet, Chain chain, Parented payload)
         {
             TypedDataToSign typedData = new TypedDataToSign(wallet, chain, payload);
