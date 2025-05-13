@@ -61,5 +61,7 @@ namespace Sequence.Marketplace
         /// <param name="chains"></param>
         /// <returns></returns>
         public Task<Token[]> GetSupportedTokens(Chain[] chains);
+        
+        public Task<LifiSwapRoute[]> GetLifiSwapRoutes(Address userWallet, Address buyCurrency, string buyAmount);
     }
 }

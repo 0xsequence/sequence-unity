@@ -58,5 +58,10 @@ namespace Sequence.Marketplace.Mocks
         {
             throw new NotImplementedException();
         }
+
+        public Task<LifiSwapRoute[]> GetLifiSwapRoutes(Address userWallet, Address buyCurrency, string buyAmount)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

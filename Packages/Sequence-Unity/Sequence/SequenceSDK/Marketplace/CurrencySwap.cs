@@ -197,5 +197,27 @@ namespace Sequence.Marketplace
                 throw new Exception(error);
             }
         }
+
+        public async Task<LifiSwapRoute[]> GetLifiSwapRoutes(Address userWallet, Address buyCurrency, string buyAmount)
+        {
+            GetLifiSwapRoutesArgs args =
+                new GetLifiSwapRoutesArgs(BigInteger.Parse(ChainDictionaries.ChainIdOf[_chain]), buyCurrency, buyAmount,
+                    userWallet);
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetLifiSwapRoutes";
+            try
+            {
+                LifiSwapRoutesResponse response = await _client.SendRequest<GetLifiSwapRoutesArgs, LifiSwapRoutesResponse>(url, args);
+                if (response.routes == null || response.routes.Length == 0)
+                {
+                    throw new Exception("No swap path with sufficient liquidity found");
+                }
+                return response.routes;
+            }
+            catch (Exception e)
+            {
+                string error = $"Error fetching Lifi swap routes: {e.Message}";
+                throw new Exception(error);
+            }
+        }
     }
 }

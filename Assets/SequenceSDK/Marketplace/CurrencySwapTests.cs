@@ -207,5 +207,22 @@ namespace Sequence.Marketplace
                 Assert.Fail($"Exception encountered while fetching supported tokens: {e.Message}");
             }
         }
+
+        [Test]
+        public async Task TestGetLifiSwapRoutes()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            try
+            {
+                LifiSwapRoute[] swapRoutes = await currencySwap.GetLifiSwapRoutes(
+                    new Address("0xe8db071f698aBA1d60babaE8e08F5cBc28782108"), new Address(USDC), "1000");
+                Assert.NotNull(swapRoutes);
+                Assert.Greater(swapRoutes.Length, 0);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Exception encountered while fetching Lifi swap routes: {e.Message}");
+            }
+        }
     }
 }
