@@ -17,9 +17,7 @@ namespace Sequence.Marketplace
         /// <param name="buyCurrency"></param>
         /// <param name="sellCurrency"></param>
         /// <param name="buyAmount"></param>
-        /// <param name="slippagePercent">the maximum slippage percentage allowed</param>
         /// <returns></returns>
-        [Obsolete("Swap provider no longer supports fetching swap prices without provider the user's wallet address")]
         public Task<SwapPrice> GetSwapPrice(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount);
         
         /// <summary>
