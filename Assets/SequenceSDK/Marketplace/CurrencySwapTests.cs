@@ -224,5 +224,39 @@ namespace Sequence.Marketplace
                 Assert.Fail($"Exception encountered while fetching Lifi swap routes: {e.Message}");
             }
         }
+
+        [Test]
+        public async Task TestGetLifiSwapQuote()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            try
+            {
+                LifiSwapQuote swapQuote = await currencySwap.GetLifiSwapQuote(
+                    new Address("0xe8db071f698aBA1d60babaE8e08F5cBc28782108"), new Address(USDC), new Address(USDCe),
+                    "1000");
+                Assert.NotNull(swapQuote);
+                Assert.AreEqual(USDCe.ToLower(), swapQuote.currencyAddress.Value.ToLower());
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Exception encountered while fetching Lifi swap quote: {e.Message}");
+            }
+        }
+
+        [Test]
+        public async Task TestGetLifiSwapQuote_NoAmounts()
+        {
+            CurrencySwap currencySwap = new CurrencySwap(_chain);
+            try
+            {
+                LifiSwapQuote swapQuote = await currencySwap.GetLifiSwapQuote(
+                    new Address("0xe8db071f698aBA1d60babaE8e08F5cBc28782108"), new Address(USDC), new Address(USDCe));
+                Assert.Fail("Expected exception but none was thrown");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.Message.Contains("Error fetching Lifi swap quote:"));
+            }
+        }
     }
 }

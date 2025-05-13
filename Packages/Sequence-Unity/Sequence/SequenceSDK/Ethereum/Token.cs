@@ -113,4 +113,41 @@ namespace Sequence
             return new Token(chainId, contractAddress, tokenId, symbol, name, decimals, priceUsd, logoUri, price);
         }
     }
+
+    public static class TokenExtensions
+    {
+        public static bool ContainsToken(this Token[] tokens, Token token)
+        {
+            if (tokens == null || token == null)
+            {
+                return false;
+            }
+            foreach (var t in tokens)
+            {
+                if (t.Chain == token.Chain && t.Contract.Equals(token.Contract) && t.TokenId == token.TokenId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool ContainsToken(this Token[] tokens, Address token)
+        {
+            if (tokens == null || token == null)
+            {
+                return false;
+            }
+            foreach (var t in tokens)
+            {
+                if (t.Contract.Equals(token))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 }

@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Marketplace
 {
@@ -211,11 +214,51 @@ namespace Sequence.Marketplace
                 {
                     throw new Exception("No swap path with sufficient liquidity found");
                 }
+
+                ValidateNoExtraToTokens(response.routes);
                 return response.routes;
             }
             catch (Exception e)
             {
                 string error = $"Error fetching Lifi swap routes: {e.Message}";
+                throw new Exception(error);
+            }
+        }
+
+        private void ValidateNoExtraToTokens(LifiSwapRoute[] routes)
+        {
+            foreach (var route in routes)
+            {
+                if (route.toTokens.Length > 1)
+                {
+                    LifiSwapRoutesResponse response = new LifiSwapRoutesResponse(routes);
+                    string responseJson = JsonConvert.ToString(response);
+                    Debug.LogError($"Received multiple {nameof(route.toTokens)} in response from Lifi: {responseJson}");
+                }
+            }
+        }
+
+        public async Task<LifiSwapQuote> GetLifiSwapQuote(Address userWallet, Address buyCurrency, Address fromCurrency, string buyAmount = null, string fromAmount = null, bool includeApprove = true, ulong slippageInBasisPoints = 50)
+        {
+            string url = BaseUrl.AppendTrailingSlashIfNeeded() + "GetLifiSwapQuote";
+            try
+            {
+                GetLifiSwapQuoteParams args =
+                    new GetLifiSwapQuoteParams(ulong.Parse(ChainDictionaries.ChainIdOf[_chain]), userWallet,
+                        fromCurrency, buyCurrency, includeApprove, slippageInBasisPoints, 
+                        buyAmount, fromAmount);
+                GetLifiSwapQuoteResponse response =
+                    await _client.SendRequest<GetLifiSwapQuoteRequest, GetLifiSwapQuoteResponse>(url, new GetLifiSwapQuoteRequest(args));
+                if (response.quote == null)
+                {
+                    throw new Exception("No swap path with sufficient liquidity found");
+                }
+
+                return response.quote;
+            }
+            catch (Exception e)
+            {
+                string error = $"Error fetching Lifi swap quote: {e.Message}";
                 throw new Exception(error);
             }
         }
