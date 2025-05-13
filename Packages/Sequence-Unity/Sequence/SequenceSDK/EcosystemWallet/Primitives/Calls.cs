@@ -227,58 +227,5 @@ namespace Sequence.EcosystemWallet.Primitives
 
             return outBytes;
         }
-
-        // Todo maybe I should move this to Parented?
-        public EncodeSapient DoEncodeSapient(Chain chain, Parented payload)
-        {
-            EncodeSapient encoded = new EncodeSapient
-            {
-                kind = (int)payload.payload.type,
-                noChainId = chain != Chain.None,
-                calls = new EncodeSapient.EncodedCall[]{},
-                space = BigInteger.Zero,
-                nonce = BigInteger.Zero,
-                message = "0x",
-                imageHash = "0x0000000000000000000000000000000000000000000000000000000000000000",
-                digest = "0x0000000000000000000000000000000000000000000000000000000000000000",
-                parentWallets = payload.parentWallets,
-            };
-            
-            switch (payload.payload)
-            {
-                case Calls callsPayload:
-                    int callsLength = callsPayload.calls.Length;
-                    encoded.calls = new EncodeSapient.EncodedCall[callsLength];
-                    for (int i = 0; i < callsLength; i++)
-                    {
-                        Call call = callsPayload.calls[i];
-                        encoded.calls[i] = new EncodeSapient.EncodedCall(call);
-                    }
-                    encoded.space = callsPayload.space;
-                    encoded.nonce = callsPayload.nonce;
-                    break;
-
-                case Message messagePayload:
-                    encoded.message = messagePayload.message.ByteArrayToHexStringWithPrefix();
-                    break;
-
-                case ConfigUpdate configPayload:
-                    encoded.imageHash = configPayload.imageHash;
-                    break;
-
-                case Digest digestPayload:
-                    encoded.digest = digestPayload.digest;
-                    break;
-            }
-
-            return encoded;
-        }
-
-        // Todo maybe I should move this to Parented?
-        public byte[] Hash(Address wallet, Chain chain, Parented payload)
-        {
-            TypedDataToSign typedData = new TypedDataToSign(wallet, chain, payload);
-            return typedData.GetSignPayload();
-        }
     }
 }
