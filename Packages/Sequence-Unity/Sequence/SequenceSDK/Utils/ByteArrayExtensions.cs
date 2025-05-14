@@ -139,5 +139,15 @@ namespace Sequence.Utils
             return bytes; 
         }
 
+        public static byte[] Slice(this byte[] source, int start, int length)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (start < 0 || length < 0 || start + length > source.Length)
+                throw new ArgumentOutOfRangeException("Invalid slice range.");
+
+            byte[] result = new byte[length];
+            Buffer.BlockCopy(source, start, result, 0, length);
+            return result;
+        }
     }
 }

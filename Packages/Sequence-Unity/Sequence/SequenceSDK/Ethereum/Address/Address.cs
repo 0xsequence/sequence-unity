@@ -15,10 +15,22 @@ namespace Sequence {
         /// </summary>
         /// <param name="value"></param>
         public Address(string value) {
+            ValidateIsAddress(value);
+            Value = value;
+        }
+
+        private void ValidateIsAddress(string value)
+        {
             if (!value.IsAddress())
             {
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
+        }
+
+        public Address(byte[] bytes)
+        {
+            string value = bytes.ByteArrayToHexStringWithPrefix();
+            ValidateIsAddress(value);
             Value = value;
         }
 
