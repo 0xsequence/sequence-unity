@@ -193,6 +193,39 @@ namespace Sequence.Utils
 
             return result;
         }
+        
+        public static byte[] HexStringToByteArray(this string hex, int expectedSize)
+        {
+            if (hex.StartsWith("0x"))
+            {
+                hex = hex.Substring(2);
+            }
+
+            int byteCount = hex.Length / 2;
+            byte[] rawBytes = new byte[byteCount];
+
+            for (int i = 0; i < byteCount; i++)
+            {
+                string byteValue = hex.Substring(i * 2, 2);
+                rawBytes[i] = Convert.ToByte(byteValue, 16);
+            }
+
+            if (rawBytes.Length == expectedSize)
+            {
+                return rawBytes;
+            }
+
+            if (rawBytes.Length > expectedSize)
+            {
+                byte[] trimmed = new byte[expectedSize];
+                Buffer.BlockCopy(rawBytes, rawBytes.Length - expectedSize, trimmed, 0, expectedSize);
+                return trimmed;
+            }
+
+            byte[] padded = new byte[expectedSize];
+            Buffer.BlockCopy(rawBytes, 0, padded, expectedSize - rawBytes.Length, rawBytes.Length);
+            return padded;
+        }
 
         public static string StringToBase64(this string value)
         {
