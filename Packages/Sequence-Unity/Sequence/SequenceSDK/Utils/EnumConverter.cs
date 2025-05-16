@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace Sequence.Utils
 {
@@ -36,15 +37,26 @@ namespace Sequence.Utils
                 var enumValues = new T[array.Count];
                 for (int i = 0; i < array.Count; i++)
                 {
-                    enumValues[i] = Enum.Parse<T>(array[i].ToString());
+                    enumValues[i] = ParseEnum<T>(array[i].ToString());
                 }
                 return enumValues;
             }
             else
             {
                 var enumString = JToken.Load(reader).ToString();
-                return Enum.Parse<T>(enumString);
+                return ParseEnum<T>(enumString);
             }
+        }
+    
+        private T ParseEnum<T>(string enumString) where T : struct
+        {
+            if (!Enum.TryParse<T>(enumString, ignoreCase: true, out var parsed))
+            {
+                Debug.LogWarning($"Unknown enum value '{enumString}' for type {typeof(T).Name}. Returning default.");
+                return default(T);
+            }
+
+            return parsed;
         }
     }
 
