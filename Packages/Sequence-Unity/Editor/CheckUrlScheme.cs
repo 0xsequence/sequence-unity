@@ -3,16 +3,17 @@ using System.IO;
 using Sequence.Config;
 using UnityEditor;
 using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
 using UnityEditor.Callbacks;
 using UnityEngine;
-#if UNITY_IOS || UNITY_STANDALONE_OSX
 using System.Collections.Generic;
+#if UNITY_IOS || UNITY_STANDALONE_OSX
 using UnityEditor.iOS.Xcode;
 #endif
 
 namespace Sequence.Editor
 {
-    public class CheckUrlScheme
+    public class CheckUrlScheme : IPreprocessBuildWithReport
     {
         private static string _plistPath;
         private static string _urlScheme;
@@ -90,6 +91,35 @@ namespace Sequence.Editor
                 }
             }
 #endif
+        }
+        
+        public int callbackOrder => 0;
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            SequenceConfig config = SequenceConfig.GetConfig();
+            _urlScheme = config.UrlScheme;
+
+            List<string> warnings = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(_urlScheme))
+            {
+                warnings.Add(SequenceConfig.MissingConfigError("Url Scheme").Message);
+            }
+
+            if (_urlScheme.ToLower() != _urlScheme)
+            {
+                warnings.Add($"{nameof(config.UrlScheme)} should be all lowercase; if uppercase characters are included, you may encounter difficulties with deep-linking on certain platforms.");
+            }
+            
+            if (warnings.Count > 0)
+            {
+                foreach (var warning in warnings)
+                {
+                    Debug.LogWarning(warning);
+                }
+                
+                SequenceWarningPopup.ShowWindow(warnings, "https://docs.sequence.xyz/sdk/unity/onboard/authentication/oidc");
+            }
         }
     }
 }
