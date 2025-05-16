@@ -112,7 +112,17 @@ namespace Sequence
             BigInteger decimals = (jsonObject["decimals"]?.Value<ulong>() ?? 18);
             decimal priceUsd = jsonObject["priceUsd"]?.Value<decimal>() ?? default;
             string logoUri = jsonObject["logoUri"]?.Value<string>();
-            BigInteger price = (jsonObject["price"]?.Value<ulong>() ?? 0);
+            BigInteger price = 0;
+            JToken priceToken = jsonObject["price"];
+            if (priceToken != null && priceToken.Type != JTokenType.Null)
+            {
+                string priceStr = priceToken.Value<string>();
+                if (!string.IsNullOrWhiteSpace(priceStr) && BigInteger.TryParse(priceStr, out var parsedPrice))
+                {
+                    price = parsedPrice;
+                }
+            }
+
 
             return new Token(chainId, contractAddress, tokenId, symbol, name, decimals, priceUsd, logoUri, price);
         }
