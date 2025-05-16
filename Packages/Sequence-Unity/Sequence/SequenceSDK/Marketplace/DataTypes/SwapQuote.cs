@@ -16,6 +16,8 @@ namespace Sequence.Marketplace
         public string transactionData;
         public string transactionValue;
         public string approveData; // Supplied when includeApprove is true
+        public string amount;
+        public string amountMin;
 
         [Preserve]
         public SwapQuote(Address currencyAddress, string currencyBalance, string price, string maxPrice, Address to, string transactionData, string transactionValue, string approveData)
@@ -28,6 +30,20 @@ namespace Sequence.Marketplace
             this.transactionData = transactionData;
             this.transactionValue = transactionValue;
             this.approveData = approveData;
+        }
+
+        public SwapQuote(LifiSwapQuote quote)
+        {
+            this.currencyAddress = quote.currencyAddress;
+            this.currencyBalance = quote.currencyBalance;
+            this.price = quote.price;
+            this.maxPrice = quote.maxPrice;
+            this.to = quote.to;
+            this.transactionData = quote.transactionData;
+            this.transactionValue = quote.transactionValue;
+            this.approveData = quote.approveData;
+            this.amount = quote.amount;
+            this.amountMin = quote.amountMin;
         }
     }
     

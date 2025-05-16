@@ -463,5 +463,24 @@ namespace Sequence.EmbeddedWallet
         {
             return _email;
         }
+
+        public event Action<string, bool> OnFederatedAccountRemovedComplete;
+        public async Task<bool> RemoveFederatedAccount(Account account)
+        {
+            IntentDataRemoveAccount args = new IntentDataRemoveAccount(account.wallet, account.id);
+            try
+            {
+                var response =
+                    await _intentSender.SendIntent<IntentResponseAccountRemoved, IntentDataRemoveAccount>(args,
+                        IntentType.RemoveAccount);
+                OnFederatedAccountRemovedComplete?.Invoke(account.id, true);
+                return true;
+            }
+            catch (Exception e)
+            {
+                OnFederatedAccountRemovedComplete?.Invoke($"Failed to remove federated account with id {account.id}, reason: {e.Message}", false);
+                return false;
+            }
+        }
     }
 }

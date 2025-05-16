@@ -71,6 +71,7 @@ namespace Sequence.EmbeddedWallet
             {IntentType.FederateAccount, "federateAccount"},
             {IntentType.ListAccounts, "listAccounts"},
             {IntentType.GetIdToken, "getIdToken"},
+            {IntentType.RemoveAccount, "removeAccount"},
         };
     }
 
@@ -91,6 +92,7 @@ namespace Sequence.EmbeddedWallet
         FederateAccount,
         ListAccounts,
         GetIdToken,
+        RemoveAccount,
         None
     }
 }
