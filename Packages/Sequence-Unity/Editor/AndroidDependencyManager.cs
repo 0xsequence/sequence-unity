@@ -1,9 +1,11 @@
-using Sequence.Config;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using UnityEditor.Callbacks;
 using UnityEngine;
+using System.Linq;
+using Sequence.Config;
+using System.IO;
 
 namespace Sequence.Editor
 {
@@ -14,27 +16,48 @@ namespace Sequence.Editor
     /// </summary>
     public class AndroidDependencyManager : IPreprocessBuildWithReport
     {
-        public const string SecureStoragePluginPath = "Packages/xyz.0xsequence.waas-unity/Plugins/Android/AndroidKeyBridge.java";
-        
+        public const string SecureStoragePluginFilename = "AndroidKeyBridge.java";
+
+        private const string RelevantDocsUrl =
+            "https://docs.sequence.xyz/sdk/unity/onboard/recovering-sessions#android";
+
         public int callbackOrder => 0;
-        
+
         public void OnPreprocessBuild(BuildReport report)
         {
 #if UNITY_ANDROID
             BuildTarget target = report.summary.platform;
             SequenceConfig config = SequenceConfig.GetConfig();
-            
-            PluginImporter pluginImporter = AssetImporter.GetAtPath(SecureStoragePluginPath) as PluginImporter;
 
-            if (pluginImporter == null)
+            string[] files = Directory.GetFiles("Assets", SecureStoragePluginFilename, SearchOption.AllDirectories);
+            string pluginPath = files.FirstOrDefault();
+            if (string.IsNullOrEmpty(pluginPath))
             {
-                Debug.LogWarning($"Plugin not found at path: {SecureStoragePluginPath}");
+                if (config.StoreSessionPrivateKeyInSecureStorage)
+                {
+                    ShowWarning($"Secure Storage plugin '{SecureStoragePluginFilename}' not found in project. Please make sure you have imported it via Samples in Package Manager");
+                }
                 return;
             }
-            
+
+            PluginImporter pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
+            if (pluginImporter == null)
+            {
+                ShowWarning($"Unable to create {nameof(PluginImporter)} instance at path: {pluginPath}");
+                return;
+            }
+
             pluginImporter.SetCompatibleWithPlatform(target, config.StoreSessionPrivateKeyInSecureStorage);
             pluginImporter.SaveAndReimport();
+            Debug.Log(
+                $"Secure Storage plugin compatibility set to {config.StoreSessionPrivateKeyInSecureStorage} for path: {pluginPath}");
 #endif
+        }
+
+        private void ShowWarning(string warning)
+        {
+            Debug.LogWarning(warning);
+            SequenceWarningPopup.ShowWindow(new List<string>() {warning}, RelevantDocsUrl);
         }
     }
 }

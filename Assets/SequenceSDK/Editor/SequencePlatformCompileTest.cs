@@ -168,10 +168,32 @@ namespace Sequence.Editor
 
         private static void AssertPluginCompatibility(SequenceConfig config, BuildTarget target)
         {
-            PluginImporter pluginImporter = AssetImporter.GetAtPath(AndroidDependencyManager.SecureStoragePluginPath) as PluginImporter;
-            Assert.IsNotNull(pluginImporter, "Plugin not found at path: " + AndroidDependencyManager.SecureStoragePluginPath);
-            Assert.AreEqual(config.StoreSessionPrivateKeyInSecureStorage, pluginImporter.GetCompatibleWithPlatform(target));
+            string[] files = Directory.GetFiles("Assets", AndroidDependencyManager.SecureStoragePluginFilename, SearchOption.AllDirectories);
+            string pluginPath = files.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(pluginPath))
+            {
+                files = Directory.GetFiles("Packages", AndroidDependencyManager.SecureStoragePluginFilename, SearchOption.AllDirectories);
+                pluginPath = files.FirstOrDefault();
+            }
+
+            Assert.IsFalse(string.IsNullOrWhiteSpace(pluginPath), $"Secure Storage plugin '{AndroidDependencyManager.SecureStoragePluginFilename}' not found in project.");
+            
+            if (pluginPath.StartsWith("Packages"))
+            {
+                Debug.Log(
+                    $"Secure Storage plugin found in Packages directory at: {pluginPath}. Skipping the test to see if it is enabled/disabled appropriately based on config because we won't be able to create a {nameof(PluginImporter)}, you can move {AndroidDependencyManager.SecureStoragePluginFilename} to the Assets directory and try again.");
+                return;
+            }
+
+            PluginImporter pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
+            Assert.IsNotNull(pluginImporter, $"Unable to create PluginImporter at path: {pluginPath}");
+
+            bool expected = config.StoreSessionPrivateKeyInSecureStorage;
+            bool actual = pluginImporter.GetCompatibleWithPlatform(target);
+
+            Assert.AreEqual(expected, actual, $"Plugin compatibility mismatch. Expected: {expected}, Actual: {actual}");
         }
+
 
         private static void AssertAppropriateScriptingDefines(SequenceConfig config, BuildTarget target)
         {
