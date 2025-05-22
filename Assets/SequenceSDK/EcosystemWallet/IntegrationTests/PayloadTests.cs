@@ -20,7 +20,9 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         public async Task<string> PayloadToPacked(Dictionary<string, object> parameters)
         {
             string inputPayload = (string)parameters["payload"];
-            Address wallet = new Address((string)parameters["wallet"]);
+            Address wallet = parameters.TryGetValue("wallet", out var walletValue) && walletValue is string walletStr
+                ? new Address(walletStr)
+                : null;
             string result = DoConvertToPacked(inputPayload, wallet);
             return result;
         }

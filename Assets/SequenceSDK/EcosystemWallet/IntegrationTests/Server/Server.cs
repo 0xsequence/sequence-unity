@@ -65,7 +65,37 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
             
             try
             {
-                var result = await Methods[method](@params as Dictionary<string, object>);
+                Dictionary<string, object> methodParams;
+                
+                if (debug && !silent)
+                {
+                    Debug.Log($"[{DateTime.UtcNow:O}] Raw params: {JsonConvert.SerializeObject(@params)}");
+                }
+                
+                // Convert params to JObject for more flexible parsing if needed
+                Newtonsoft.Json.Linq.JObject paramsJObject = null;
+                if (@params is Dictionary<string, object> paramsDict)
+                {
+                    paramsJObject = Newtonsoft.Json.Linq.JObject.FromObject(paramsDict);
+                }
+                else if (@params is Newtonsoft.Json.Linq.JObject jObj)
+                {
+                    paramsJObject = jObj;
+                }
+                
+                methodParams = paramsJObject?.ToObject<Dictionary<string, object>>();
+                
+                if (methodParams == null || methodParams.Count == 0)
+                {
+                    Debug.LogWarning("No method params");
+                }
+                
+                if (debug && !silent)
+                {
+                    Debug.Log($"[{DateTime.UtcNow:O}] Final methodParams: {JsonConvert.SerializeObject(methodParams)}");
+                }
+                
+                var result = await Methods[method](methodParams);
                 JsonRpcSuccessResponse response = new JsonRpcSuccessResponse(result, id);
                 if (!silent)
                 {
