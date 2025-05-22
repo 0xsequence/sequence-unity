@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [JsonConverter(typeof(PayloadTypeConverter))] // We use a custom converter here instead of EnumConverter because ConfigUpdate -> config-update and '-' aren't supported in enums in C#
-    internal enum PayloadType 
+    public enum PayloadType 
     {
         Call,
         Message,

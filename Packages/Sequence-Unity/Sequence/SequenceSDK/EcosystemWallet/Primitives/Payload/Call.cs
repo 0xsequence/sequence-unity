@@ -8,7 +8,7 @@ using StringExtensions = Sequence.Utils.StringExtensions;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class Call
+    public class Call
     {
         public static readonly byte[] CALL_TYPEHASH = SequenceCoder.KeccakHash(
             StringExtensions.ToByteArray(

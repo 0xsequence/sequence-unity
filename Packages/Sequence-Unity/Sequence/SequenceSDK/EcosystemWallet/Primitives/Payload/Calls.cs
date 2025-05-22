@@ -10,7 +10,7 @@ using StringExtensions = Sequence.Utils.StringExtensions;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class Calls : Payload
+    public class Calls : Payload
     {
         public const uint MaxNonceBytes = 15;
         public const uint MaxCalls = 65536;
@@ -393,6 +393,11 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             return new Calls(space, nonce, calls.ToArray());
+        }
+        
+        internal static Calls FromSolidityEncoding(SolidityDecoded decoded)
+        {
+            return new Calls(decoded.space, decoded.nonce, decoded.calls);
         }
     }
 }

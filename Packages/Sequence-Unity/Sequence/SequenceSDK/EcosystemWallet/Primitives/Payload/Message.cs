@@ -1,5 +1,6 @@
 using System;
 using Sequence.ABI;
+using Sequence.Utils;
 using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -20,6 +21,11 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             byte[] encoded = new BytesCoder().Encode(message);
             return encoded;
+        }
+        
+        internal static Message FromSolidityEncoding(SolidityDecoded decoded)
+        {
+            return new Message(decoded.message.HexStringToByteArray());
         }
     }
 }

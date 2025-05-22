@@ -5,7 +5,7 @@ using Sequence.Utils;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class EncodeSapient
+    public class EncodeSapient
     {
         public int kind;
         public bool noChainId;

@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal abstract class Payload
+    public abstract class Payload
     {
         public abstract PayloadType type { get; }
         public Address[] parentWallets { get; set; }

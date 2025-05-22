@@ -22,5 +22,10 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] encoded = new FixedBytesCoder().Encode(new FixedByte(32, imageHash.HexStringToByteArray()));
             return encoded;
         }
+        
+        internal static ConfigUpdate FromSolidityEncoding(SolidityDecoded decoded)
+        {
+            return new ConfigUpdate(decoded.imageHash.EnsureHexPrefix());
+        }
     }
 }

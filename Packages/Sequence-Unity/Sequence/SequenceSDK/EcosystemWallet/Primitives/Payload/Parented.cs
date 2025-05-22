@@ -7,7 +7,7 @@ using UnityEngine.Scripting;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class Parented
+    public class Parented
     {
         public Payload payload;
         public Address[] parentWallets;
@@ -83,6 +83,31 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             return encoded;
+        }
+
+        public static Parented DecodeFromSolidityEncoding(string solidityEncodedPayload)
+        {
+            SolidityDecoded decoded = SolidityDecoded.FromSolidityEncoding(solidityEncodedPayload);
+            Address[] parentWallets = decoded.parentWallets;
+            Payload payload = null;
+            switch (decoded.kind)
+            {
+                case SolidityDecoded.Kind.Transaction:
+                    payload = Calls.FromSolidityEncoding(decoded);
+                    break;
+                case SolidityDecoded.Kind.Message:
+                    payload = Message.FromSolidityEncoding(decoded);
+                    break;
+                case SolidityDecoded.Kind.ConfigUpdate:
+                    payload = ConfigUpdate.FromSolidityEncoding(decoded);
+                    break;
+                case SolidityDecoded.Kind.Digest:
+                    payload = Digest.FromSolidityEncoding(decoded);
+                    break;
+                default:
+                    throw new NotImplementedException($"Unknown payload type: {decoded.kind}");
+            }
+            return new Parented(parentWallets, payload);
         }
     }
 }
