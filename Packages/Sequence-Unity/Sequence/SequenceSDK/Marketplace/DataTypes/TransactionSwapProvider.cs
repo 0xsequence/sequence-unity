@@ -1,3 +1,4 @@
+using System;
 using Newtonsoft.Json;
 using Sequence.Utils;
 
@@ -7,6 +8,8 @@ namespace Sequence.Marketplace
     public enum TransactionSwapProvider
     {
         unknown,
-        zerox
+        [Obsolete("zerox is no longer supported")]
+        zerox,
+        lifi
     }
 }

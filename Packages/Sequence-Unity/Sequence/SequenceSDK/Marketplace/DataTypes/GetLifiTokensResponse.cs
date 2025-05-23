@@ -1,14 +1,15 @@
 using System;
 using UnityEngine.Scripting;
 
-namespace Sequence
+namespace Sequence.Marketplace
 {
     [Serializable]
-    internal class GetTokenPricesArgs
+    public class GetLifiTokensResponse
     {
         public Token[] tokens;
-        
-        public GetTokenPricesArgs(Token[] tokens)
+
+        [Preserve]
+        public GetLifiTokensResponse(Token[] tokens)
         {
             this.tokens = tokens;
         }
