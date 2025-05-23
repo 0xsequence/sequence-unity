@@ -233,5 +233,16 @@ namespace Sequence.Utils
             string base64 = Convert.ToBase64String(asBytes);
             return base64;
         }
+
+        public static string HexStringMultiline(this string value, int lineLength = 64) // Default to 32 bytes
+        {
+            value = value.Replace("0x", "");
+            var sb = new StringBuilder();
+            for (int i = 0; i < value.Length; i += lineLength)
+            {
+                sb.AppendLine(value.Substring(i, Math.Min(lineLength, value.Length - i)));
+            }
+            return sb.ToString();
+        }
     }
 }

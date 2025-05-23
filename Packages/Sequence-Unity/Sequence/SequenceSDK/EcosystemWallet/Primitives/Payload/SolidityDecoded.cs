@@ -37,16 +37,17 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public static SolidityDecoded FromSolidityEncoding(string solidityEncodedPayload)
         {
+            solidityEncodedPayload = solidityEncodedPayload.Replace("0x", "").Substring(64); // Drop the first 32 bytes; for some reason we include an offset of 32 bytes in all of the encodings - todo ask Agustin why
             object[] decoded = ABI.ABI.Decode<object[]>(solidityEncodedPayload, DecodedAbi);
             return new SolidityDecoded(
-                kind : (Kind)(int)decoded[0],
+                kind : ToKind((BigInteger)decoded[0]),
                 noChainId : (bool)decoded[1],
-                calls : ((object[])decoded[2]).ConvertToTArray<Call, object[]>(),
+                calls : ToCalls((object[])decoded[2]),
                 space : (BigInteger)decoded[3],
                 nonce : (BigInteger)decoded[4],
-                message : (string)decoded[5],
-                imageHash : (string)decoded[6],
-                digest : (string)decoded[7],
+                message : ((byte[])decoded[5]).ByteArrayToHexStringWithPrefix(),
+                imageHash : ((byte[])decoded[6]).ByteArrayToHexString().PadRight(64, '0').EnsureHexPrefix(),
+                digest : ((byte[])decoded[7]).ByteArrayToHexString().PadRight(64, '0').EnsureHexPrefix(),
                 parentWallets : ((object[])decoded[8]).ConvertToTArray<Address, object[]>()
             );
         }
@@ -57,6 +58,46 @@ namespace Sequence.EcosystemWallet.Primitives
             Message = 0x01,
             ConfigUpdate = 0x02,
             Digest = 0x03,
+        }
+        
+        internal static Kind ToKind(BigInteger kind)
+        {
+            if (kind == BigInteger.Zero) return Kind.Transaction;
+            if (kind == BigInteger.One) return Kind.Message;
+            if (kind == new BigInteger(2)) return Kind.ConfigUpdate;
+            if (kind == new BigInteger(3)) return Kind.Digest;
+
+            throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+        }
+        
+        internal static Call[] ToCalls(object[] calls)
+        {
+            int length = calls.Length;
+            Call[] callArray = new Call[length];
+            for (int i = 0; i < length; i++)
+            {
+                object[] call = (object[])calls[i];
+                callArray[i] = new Call(
+                    to : (Address)call[0],
+                    value : (BigInteger)call[1],
+                    data : (byte[])call[2],
+                    gasLimit : (BigInteger)call[3],
+                    delegateCall : (bool)call[4],
+                    onlyFallback : (bool)call[5],
+                    behaviorOnError : ToBehaviourOnError((BigInteger)call[6])
+                );
+            }
+
+            return callArray;
+        }
+
+        internal static BehaviourOnError ToBehaviourOnError(BigInteger behaviour)
+        {
+            if (behaviour == BigInteger.Zero) return BehaviourOnError.ignore;
+            if (behaviour == BigInteger.One) return BehaviourOnError.revert;
+            if (behaviour == new BigInteger(2)) return BehaviourOnError.abort;
+            
+            throw new ArgumentOutOfRangeException(nameof(behaviour), behaviour, null);
         }
     }
 }

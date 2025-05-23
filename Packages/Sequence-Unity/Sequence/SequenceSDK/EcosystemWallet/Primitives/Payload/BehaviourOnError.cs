@@ -6,8 +6,8 @@ namespace Sequence.EcosystemWallet.Primitives
     [JsonConverter(typeof(EnumConverter<BehaviourOnError>))]
     public enum BehaviourOnError
     {
-        ignore,
-        revert,
-        abort
+        ignore = 0x00,
+        revert = 0x01,
+        abort = 0x02
     }
 }

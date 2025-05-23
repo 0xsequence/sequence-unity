@@ -29,20 +29,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
 
         private string DoConvertToPacked(string payload, Address wallet)
         {
-            Parented decodedPayload = null;
-            try
-            {
-                decodedPayload = Parented.DecodeFromSolidityEncoding(payload);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Failed to decode payload: {ex.Message}", ex);
-            }
-            
-            if (decodedPayload == null || decodedPayload.payload == null)
-            {
-                throw new Exception("Decoded payload is null or invalid");
-            }
+            Parented decodedPayload = Decode(payload);
 
             if (decodedPayload.payload.isCalls)
             {
@@ -71,12 +58,20 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         {
             string inputPayload = (string)parameters["payload"];
             Address wallet = new Address((string)parameters["wallet"]);
-            BigInteger chainId = (BigInteger)parameters["chainId"];
+            string chainId = (string)parameters["chainId"];
             string result = DoHash(inputPayload, wallet, chainId);
             return result;
         }
 
-        private string DoHash(string payload, Address wallet, BigInteger chainId)
+        private string DoHash(string payload, Address wallet, string chainId)
+        {
+            Parented decodedPayload = Decode(payload);
+
+            byte[] hashed = decodedPayload.Hash(wallet, ChainDictionaries.ChainById[chainId]);
+            return hashed.ByteArrayToHexStringWithPrefix();
+        }
+
+        private Parented Decode(string payload)
         {
             Parented decodedPayload = null;
             try
@@ -93,9 +88,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 throw new Exception("Decoded payload is null or invalid");
             }
 
-
-            byte[] hashed = decodedPayload.Hash(wallet, ChainDictionaries.ChainById[chainId.ToString()]);
-            return hashed.ByteArrayToHexStringWithPrefix();
+            return decodedPayload;
         }
     }
 }
