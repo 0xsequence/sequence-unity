@@ -39,7 +39,7 @@ namespace Sequence.Sidekick
                 
                 string deployJson = JsonConvert.SerializeObject(deployBody);
 
-                string deployResult = await sidekick.DeployERC1155(chainId, deployJson);
+                string deployResult = await sidekick.DeployERC1155(deployJson);
 
                 Debug.Log("Deploy result: " + deployResult);
                 Assert.IsNotNull(deployResult, "Deploy result must not be null");
@@ -68,7 +68,7 @@ namespace Sequence.Sidekick
                     data = "0x00"
                 };
                 string mintJson = JsonConvert.SerializeObject(mintBody);
-                string mintResult = await sidekick.MintERC1155(chainId, "0x63c12baa017b2bcb6855d83506500edcac423c3c", mintJson);
+                string mintResult = await sidekick.MintERC1155("0x63c12baa017b2bcb6855d83506500edcac423c3c", mintJson);
 
                 Debug.Log("Mint result: " + mintResult);
 
