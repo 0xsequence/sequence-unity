@@ -4,6 +4,8 @@ using System.Text;
 using Sequence;
 using Sequence.Sidekick;
 using Sequence.Provider;
+using Sequence.SidekickEditor;
+
 public class SidekickEditorController : MonoBehaviour
 {
 
