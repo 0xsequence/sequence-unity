@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -61,8 +62,20 @@ namespace Sequence.ABI
         {
             try
             {
-                string valueStr = SequenceCoder.ByteArrayToHexString(((FixedByte)value).Data);
-                string encodedStr = (valueStr).PadRight(64, '0');
+                string valueString = "";
+                if (value is FixedByte fixedByte)
+                {
+                    valueString = fixedByte.Data.ByteArrayToHexString();
+                }
+                else if (value is byte[] bytes)
+                {
+                    valueString = bytes.ByteArrayToHexString();
+                }
+                else
+                {
+                    throw new ArgumentException($"Encountered unexpected value type: {value.GetType().Name}. Expected {nameof(FixedByte)} or byte[].");
+                }
+                string encodedStr = (valueString).PadRight(64, '0');
                 return encodedStr;
             }
 
