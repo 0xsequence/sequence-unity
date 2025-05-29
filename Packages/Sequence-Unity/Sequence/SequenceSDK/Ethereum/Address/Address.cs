@@ -52,7 +52,8 @@ namespace Sequence {
             }
 
             Address address = (Address)obj;
-            return Value.Equals(address.Value, StringComparison.OrdinalIgnoreCase);
+            return Value.Equals(address.Value, StringComparison.OrdinalIgnoreCase) ||
+                   (this.Value.IsZeroAddress() && address.Value.IsZeroAddress());
         }
 
         public override int GetHashCode()
