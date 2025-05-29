@@ -28,7 +28,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 foreach (var parentWallet in parentWallets)
                 {
                     parentWalletsEncoded =
-                        ByteArrayExtensions.ConcatenateByteArrays(new AddressCoder().Encode(parentWalletsEncoded));
+                        ByteArrayExtensions.ConcatenateByteArrays(parentWalletsEncoded, new AddressCoder().Encode(parentWallet));
                 }
             }
 
@@ -92,6 +92,11 @@ namespace Sequence.EcosystemWallet.Primitives
         public static Parented DecodeFromSolidityEncoding(string solidityEncodedPayload)
         {
             SolidityDecoded decoded = SolidityDecoded.FromSolidityEncoding(solidityEncodedPayload);
+            return DecodeFromSolidityDecoded(decoded);
+        }
+
+        public static Parented DecodeFromSolidityDecoded(SolidityDecoded decoded)
+        {
             Address[] parentWallets = decoded.parentWallets;
             Payload payload = null;
             switch (decoded.kind)

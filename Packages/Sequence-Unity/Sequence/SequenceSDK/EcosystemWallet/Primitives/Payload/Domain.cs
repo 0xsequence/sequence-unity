@@ -52,12 +52,12 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             string encodeType =
                 "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)";
-            byte[] typeHash = SequenceCoder.KeccakHash(encodeType).HexStringToByteArray();
-            byte[] nameHash = new TupleCoder().EncodeToString(name, new[] { "string" }).HexStringToByteArray();
-            byte[] versionHash = new TupleCoder().EncodeToString(version, new[] { "string" }).HexStringToByteArray();
+            byte[] typeHash = SequenceCoder.KeccakHashASCII(encodeType).HexStringToByteArray();
+            byte[] nameHash = name.EncodeStringAsBytes();
+            byte[] versionHash = version.EncodeStringAsBytes();
             byte[] chainIdHash = new NumberCoder().Encode(chainId);
             byte[] verifyingContractHash = new AddressCoder().Encode(verifyingContract);
-            byte[] saltHash = salt != null ? new FixedBytesCoder().Encode(salt) : null;
+            byte[] saltHash = salt != null ? new FixedBytesCoder().Encode(salt) : new byte[]{};
             byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(typeHash, nameHash, versionHash,
                 chainIdHash, verifyingContractHash, saltHash);
             return encoded;

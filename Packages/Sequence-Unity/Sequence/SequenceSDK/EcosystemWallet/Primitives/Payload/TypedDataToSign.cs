@@ -137,8 +137,9 @@ namespace Sequence.EcosystemWallet.Primitives
             SortTypes();
             string encodeType = CalculateEncodeType();
             byte[] encodeData = CalculateEncodeData();
+            string hashedEncodeType = SequenceCoder.KeccakHashASCII(encodeType);
             byte[] hashStruct = SequenceCoder.KeccakHash(
-                ByteArrayExtensions.ConcatenateByteArrays(SequenceCoder.KeccakHash(encodeType).HexStringToByteArray(),
+                ByteArrayExtensions.ConcatenateByteArrays(hashedEncodeType.HexStringToByteArray(),
                     encodeData));
             byte[] domainSeparator = domain.GetDomainSeparator();
 
