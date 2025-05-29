@@ -23,11 +23,15 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             byte[] payloadEncoded = payload.GetEIP712EncodeData();
             byte[] parentWalletsEncoded = new byte[] { };
-            foreach (var parentWallet in parentWallets)
+            if (parentWallets != null)
             {
-                parentWalletsEncoded =
-                    ByteArrayExtensions.ConcatenateByteArrays(new AddressCoder().Encode(parentWalletsEncoded));
+                foreach (var parentWallet in parentWallets)
+                {
+                    parentWalletsEncoded =
+                        ByteArrayExtensions.ConcatenateByteArrays(new AddressCoder().Encode(parentWalletsEncoded));
+                }
             }
+
             parentWalletsEncoded = SequenceCoder.KeccakHash(parentWalletsEncoded);
             
             byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(payloadEncoded, parentWalletsEncoded);

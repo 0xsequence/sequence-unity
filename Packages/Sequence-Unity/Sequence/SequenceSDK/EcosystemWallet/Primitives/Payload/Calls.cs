@@ -34,9 +34,12 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] spaceEncoded = new NumberCoder().Encode(space);
             byte[] nonceEncoded = new NumberCoder().Encode(nonce);
             byte[] callsEncoded = new byte[] { };
-            foreach (var call in calls)
+            if (calls != null)
             {
-                callsEncoded = ByteArrayExtensions.ConcatenateByteArrays(callsEncoded, call.HashStruct());
+                foreach (var call in calls)
+                {
+                    callsEncoded = ByteArrayExtensions.ConcatenateByteArrays(callsEncoded, call.HashStruct());
+                }
             }
             callsEncoded = SequenceCoder.KeccakHash(callsEncoded);
             byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(

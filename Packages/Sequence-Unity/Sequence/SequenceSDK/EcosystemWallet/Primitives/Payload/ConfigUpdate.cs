@@ -19,7 +19,8 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public override byte[] GetEIP712EncodeData()
         {
-            byte[] encoded = new FixedBytesCoder().Encode(new FixedByte(32, imageHash.HexStringToByteArray()));
+            FixedByte bytes = new FixedByte(32, imageHash.HexStringToByteArray());
+            byte[] encoded = new FixedBytesCoder().Encode(bytes);
             return encoded;
         }
         
