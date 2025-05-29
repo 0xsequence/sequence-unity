@@ -34,7 +34,8 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             if (decodedPayload.payload.isCalls)
             {
                 byte[] packed = ((Calls)decodedPayload.payload).Encode(wallet);
-                return packed.ByteArrayToHexStringWithPrefix();
+                string packedHex = packed.ByteArrayToHexStringWithPrefix();
+                return packedHex;
             }
             
             throw new Exception("Not implemented or unsupported payload format");

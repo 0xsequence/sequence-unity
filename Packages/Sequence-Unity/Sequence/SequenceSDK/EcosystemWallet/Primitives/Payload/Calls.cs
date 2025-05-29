@@ -29,6 +29,28 @@ namespace Sequence.EcosystemWallet.Primitives
             this.calls = calls;
         }
         
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Calls))
+            {
+                return false;
+            }
+            
+            Calls other = (Calls)obj;
+            if (space != other.space || nonce != other.nonce || calls.Length != other.calls.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < calls.Length; i++)
+            {
+                if (!calls[i].Equals(other.calls[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public override byte[] GetEIP712EncodeData()
         {
             byte[] spaceEncoded = new NumberCoder().Encode(space);

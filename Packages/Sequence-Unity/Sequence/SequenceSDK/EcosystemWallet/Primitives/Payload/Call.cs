@@ -34,6 +34,23 @@ namespace Sequence.EcosystemWallet.Primitives
             this.behaviorOnError = behaviorOnError;
         }
         
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Call))
+            {
+                return false;
+            }
+            
+            Call call = (Call)obj;
+            return to.Equals(call.to) &&
+                   value == call.value &&
+                   data.Equals(call.data) &&
+                   gasLimit == call.gasLimit &&
+                   delegateCall == call.delegateCall &&
+                   onlyFallback == call.onlyFallback &&
+                   behaviorOnError == call.behaviorOnError;
+        }
+        
         public string Hash()
         {
             byte[] typeHash = new StaticBytesCoder().Encode(CALL_TYPEHASH);
