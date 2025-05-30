@@ -85,13 +85,7 @@ namespace Sequence.ABI
         {
             try
             {
-                int trailingZero = 0;
-                for (int i = encodedString.Length - 1; i > 64; i--)
-                {
-                    if (encodedString[i] == '0') trailingZero++;
-                    else break;
-                }
-                string fixedStr = EnsureEvenLength(encodedString.Substring(0, encodedString.Length - trailingZero));
+                string fixedStr = EnsureEvenLength(encodedString);
                 return _fixedBytesCoder.DecodeFromString(fixedStr);
             }
             catch (Exception ex)
