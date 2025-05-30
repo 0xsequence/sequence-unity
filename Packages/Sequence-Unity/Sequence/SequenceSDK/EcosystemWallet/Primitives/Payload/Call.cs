@@ -42,9 +42,19 @@ namespace Sequence.EcosystemWallet.Primitives
             }
             
             Call call = (Call)obj;
-            return to.Equals(call.to) &&
+            bool toEqual = to.Equals(call.to);
+            int dataLength = data.Length;
+            bool dataEqual = dataLength == call.data.Length;
+            if (dataEqual)
+            {
+                for (int i = 0; i < dataLength; i++)
+                {
+                    dataEqual &= data[i] == call.data[i];
+                }
+            }
+            return toEqual &&
                    value == call.value &&
-                   data.Equals(call.data) &&
+                   dataEqual &&
                    gasLimit == call.gasLimit &&
                    delegateCall == call.delegateCall &&
                    onlyFallback == call.onlyFallback &&

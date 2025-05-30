@@ -18,6 +18,33 @@ namespace Sequence.EcosystemWallet.Primitives
             this.parentWallets = parentWallets;
             this.payload = payload;
         }
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Parented))
+            {
+                return false;
+            }
+            
+            Parented other = (Parented)obj;
+            if (parentWallets.Length != other.parentWallets.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < parentWallets.Length; i++)
+            {
+                if (!parentWallets[i].Equals(other.parentWallets[i]))
+                {
+                    return false;
+                }
+            }
+
+            if (!payload.Equals(other.payload))
+            {
+                return false;
+            }
+            return true;
+        }
 
         public byte[] GetEIP712EncodeData()
         {
