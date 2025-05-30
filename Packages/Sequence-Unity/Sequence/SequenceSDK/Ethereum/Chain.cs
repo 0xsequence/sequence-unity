@@ -31,6 +31,7 @@ namespace Sequence
         Telos = 40,
         Moonbeam = 1284,
         Etherlink = 42793,
+        [Obsolete("Chain is not currently supported")]
         XR1 = 273,
 
         // Testnets
@@ -44,6 +45,7 @@ namespace Sequence
         TestnetOptimisticSepolia = 11155420,
         [Obsolete("Chain is no longer active; use TestnetSoneiumMinato instead")]
         TestnetAstarZKyoto = 6038361,
+        [Obsolete("Chain is not currently supported")]
         TestnetXrSepolia = 2730,
         TestnetB3Sepolia = 1993,
         TestnetAPEChain = 33111,
