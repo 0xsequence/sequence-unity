@@ -62,6 +62,7 @@ namespace Sequence
         TestnetMonad = 10143,
         TestnetSomnia = 50312,
         TestnetFrequency = 53716,
+        TestnetIncentiv = 11690,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
