@@ -6,7 +6,7 @@ using UnityEngine.Scripting;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class ConfigUpdate : Payload
+    public class ConfigUpdate : Payload
     {
         public override PayloadType type => PayloadType.ConfigUpdate;
         public string imageHash;

@@ -14,5 +14,16 @@ namespace Sequence.EcosystemWallet.Primitives
             this.name = name;
             this.type = type;
         }
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is NamedType))
+            {
+                return false;
+            }
+            
+            NamedType other = (NamedType)obj;
+            return name.Equals(other.name) && type.Equals(other.type);
+        }
     }
 }

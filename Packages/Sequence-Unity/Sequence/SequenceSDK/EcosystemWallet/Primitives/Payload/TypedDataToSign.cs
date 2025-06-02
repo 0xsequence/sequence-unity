@@ -9,7 +9,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class TypedDataToSign
+    public class TypedDataToSign
     {
         public Domain domain;
         public Dictionary<string, NamedType[]> types;
@@ -18,6 +18,84 @@ namespace Sequence.EcosystemWallet.Primitives
         
         private string[] _types;
         private Parented _payload;
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is TypedDataToSign))
+            {
+                return false;
+            }
+            
+            TypedDataToSign other = (TypedDataToSign)obj;
+            if (!other.domain.Equals(domain))
+            {
+                return false;
+            }
+
+            if (types.GetKeys().Length.Equals(other.types.GetKeys().Length))
+            {
+                foreach (var key in types.GetKeys())
+                {
+                    NamedType[] namedTypes = types[key];
+                    NamedType[] otherNamedTypes;
+                    if (other.types.TryGetValue(key, out otherNamedTypes))
+                    {
+                        int length = namedTypes.Length;
+                        if (length != otherNamedTypes.Length)
+                        {
+                            return false;
+                        }
+
+                        for (int i = 0; i < length; i++)
+                        {
+                            if (!namedTypes[i].Equals(otherNamedTypes[i]))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+            
+            if (!primaryType.Equals(other.primaryType))
+            {
+                return false;
+            }
+
+            if (message.GetKeys().Length.Equals(other.message.GetKeys().Length))
+            {
+                foreach (var key in message.GetKeys())
+                {
+                    object value = message[key];
+                    object otherValue;
+                    if (other.message.TryGetValue(key, out otherValue))
+                    {
+                        if (!value.Equals(otherValue))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+            
+            return true;
+        }
 
         [Preserve]
         [JsonConstructor]

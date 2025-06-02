@@ -13,6 +13,30 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger chainId;
         public Address verifyingContract;
         public FixedByte salt;
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Domain))
+            {
+                return false;
+            }
+            
+            Domain other = (Domain)obj;
+            if (salt != null && other.salt != null)
+            {
+                if (!salt.Equals(other.salt))
+                {
+                    return false;
+                }
+            }
+            else if (salt != null && other.salt == null ||
+                     salt == null && other.salt != null)
+            {
+                return false;
+            }
+            return name.Equals(other.name) && version.Equals(other.version) && chainId.Equals(other.chainId) &&
+                   verifyingContract.Equals(other.verifyingContract);
+        }
 
         public Domain(string name, string version, BigInteger chainId, Address verifyingContract, FixedByte salt = null)
         {
