@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
@@ -78,6 +79,34 @@ namespace Sequence.EcosystemWallet.Primitives
                     object otherValue;
                     if (other.message.TryGetValue(key, out otherValue))
                     {
+                        if (value is IEnumerable)
+                        {
+                            if (!(otherValue is IEnumerable))
+                            {
+                                return false;
+                            }
+                            
+                            IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+                            IEnumerator otherValueEnumerator = ((IEnumerable)otherValue).GetEnumerator();
+                            
+                            while (valueEnumerator.MoveNext() && otherValueEnumerator.MoveNext())
+                            {
+                                if (valueEnumerator.Current != null && !valueEnumerator.Current.Equals(otherValueEnumerator.Current))
+                                {
+                                    return false;
+                                }
+                                if (valueEnumerator.Current == null && otherValueEnumerator.Current != null)
+                                {
+                                    return false;
+                                }
+                            }
+                            
+                            if (valueEnumerator.MoveNext() || otherValueEnumerator.MoveNext())
+                            {
+                                return false;
+                            }
+                            continue;
+                        }
                         if (!value.Equals(otherValue))
                         {
                             return false;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Numerics;
 using NUnit.Framework;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
@@ -108,6 +109,73 @@ namespace Sequence.EcosystemWallet.UnitTests
                     105, 68, 5, 129, 240, 232, 111, 245, 18,
                     103, 251, 122, 31, 240, 32, 160, 73
                 }));
+            
+            TypedDataToSign result = new TypedDataToSign(fromWallet, chain, parented);
+            
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void TestCreateFromCallsPayload()
+        {
+            TypedDataToSign expected = new TypedDataToSign(new Domain("Sequence Wallet", "3", Chain.LocalChain,
+                new Address("0xd0B2e0C7b8a2D267733B573Bdc87cC73f551b8A4")), new Dictionary<string, NamedType[]>()
+            {
+                {
+                    "Calls", new NamedType[]
+                    {
+                        new NamedType("calls", "Call[]"),
+                        new NamedType("space", "uint256"),
+                        new NamedType("nonce", "uint256"),
+                        new NamedType("wallets", "address[]")
+                    }
+                },
+                {
+                    "Call", new NamedType[]
+                    {
+                        new NamedType("to", "address"),
+                        new NamedType("value", "uint256"),
+                        new NamedType("data", "bytes"),
+                        new NamedType("gasLimit", "uint256"),
+                        new NamedType("delegateCall", "bool"),
+                        new NamedType("onlyFallback", "bool"),
+                        new NamedType("behaviorOnError", "uint256")
+                    }
+                }
+            }, "Calls", new Dictionary<string, object>()
+            {
+                {
+                    "calls", new EncodeSapient.EncodedCall[]
+                    {
+                        new EncodeSapient.EncodedCall(new Call(new Address("0x6810c263f45be5dc8e8e6ffd2ab9bd6f152412ed"),
+                            BigInteger.Parse("19035696402805033763977015876"),
+                            "0xf51267fb7a1ff020a04971203a2f57eb5ab06b45dcf3e824145375ab46af51334f823837f90c2d459f147b3fb3ea6e07a4af02201f85aa995aec66e632"
+                                .HexStringToByteArray(), BigInteger.Parse("29"), false, true, BehaviourOnError.abort)),
+                        new EncodeSapient.EncodedCall(new Call(new Address("0x7fa9385be102ac3eac297483dd6233d62b3e1496"), BigInteger.Parse("0"),
+                            "0x001122".HexStringToByteArray(), BigInteger.Parse("1000000"), false, false,
+                            BehaviourOnError.ignore)),
+                    }
+                },
+                { "space", "1266736520029721018202413622017" },
+                { "nonce", "55846603721928660" },
+                { "wallets", _addressArray }
+            });
+
+            Address fromWallet = new Address("0xd0B2e0C7b8a2D267733B573Bdc87cC73f551b8A4");
+            Chain chain = Chain.LocalChain;
+
+            Parented parented = new Parented(_addressArray,
+                new Calls(BigInteger.Parse("1266736520029721018202413622017"), BigInteger.Parse("55846603721928660"),
+                    new Call[]
+                    {
+                        new Call(new Address("0x6810c263f45be5dc8e8e6ffd2ab9bd6f152412ed"),
+                            BigInteger.Parse("19035696402805033763977015876"),
+                            "0xf51267fb7a1ff020a04971203a2f57eb5ab06b45dcf3e824145375ab46af51334f823837f90c2d459f147b3fb3ea6e07a4af02201f85aa995aec66e632"
+                                .HexStringToByteArray(), BigInteger.Parse("29"), false, true, BehaviourOnError.abort),
+                        new Call(new Address("0x7fa9385be102ac3eac297483dd6233d62b3e1496"), BigInteger.Parse("0"),
+                            "0x001122".HexStringToByteArray(), BigInteger.Parse("1000000"), false, false,
+                            BehaviourOnError.ignore),
+                    }));
             
             TypedDataToSign result = new TypedDataToSign(fromWallet, chain, parented);
             
