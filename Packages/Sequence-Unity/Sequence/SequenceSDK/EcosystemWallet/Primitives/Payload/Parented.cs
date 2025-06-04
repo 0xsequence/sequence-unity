@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using Sequence.ABI;
 using Sequence.Utils;
@@ -44,6 +45,12 @@ namespace Sequence.EcosystemWallet.Primitives
                 return false;
             }
             return true;
+        }
+        
+        public override string ToString()
+        {
+            string parentWalletsStr = parentWallets != null ? string.Join(", ", parentWallets.Select(w => w.ToString()).ToArray()) : "null";
+            return $"Parented {{ payload: {payload}, parentWallets: [{parentWalletsStr}] }}";
         }
 
         public byte[] GetEIP712EncodeData()

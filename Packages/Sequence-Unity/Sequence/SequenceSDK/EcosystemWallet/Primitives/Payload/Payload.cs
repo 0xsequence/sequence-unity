@@ -11,5 +11,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public bool isDigest => type == PayloadType.Digest;
 
         public abstract byte[] GetEIP712EncodeData();
+        
+        public abstract override string ToString();
     }
 }

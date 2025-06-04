@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
@@ -21,6 +22,13 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             byte[] encoded = new BytesCoder().Encode(message);
             return encoded;
+        }
+        
+        public override string ToString()
+        {
+            string messageHex = message != null ? message.ByteArrayToHexStringWithPrefix() : "null";
+            string parentWalletsStr = parentWallets != null ? string.Join(", ", parentWallets.Select(w => w.ToString()).ToArray()) : "null";
+            return $"Message {{ message: {messageHex}, parentWallets: [{parentWalletsStr}] }}";
         }
         
         internal static Message FromSolidityEncoding(SolidityDecoded decoded)

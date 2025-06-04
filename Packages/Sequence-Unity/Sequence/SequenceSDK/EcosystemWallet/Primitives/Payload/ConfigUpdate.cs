@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
@@ -21,7 +22,14 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             FixedByte bytes = new FixedByte(32, imageHash.HexStringToByteArray());
             byte[] encoded = new FixedBytesCoder().Encode(bytes);
+            string asHex = encoded.ByteArrayToHexStringWithPrefix();
             return encoded;
+        }
+        
+        public override string ToString()
+        {
+            string parentWalletsStr = parentWallets != null ? string.Join(", ", parentWallets.Select(w => w.ToString()).ToArray()) : "null";
+            return $"ConfigUpdate {{ imageHash: {imageHash}, parentWallets: [{parentWalletsStr}] }}";
         }
         
         internal static ConfigUpdate FromSolidityEncoding(SolidityDecoded decoded)

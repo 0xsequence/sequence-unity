@@ -6,6 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -126,6 +127,77 @@ namespace Sequence.EcosystemWallet.Primitives
             return true;
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.AppendLine("TypedDataToSign {");
+            sb.AppendLine($"  PrimaryType: {primaryType}");
+            
+            // Append domain information
+            sb.AppendLine($"  Domain: {domain}");
+            
+            // Append types
+            sb.AppendLine("  Types: {");
+            foreach (var typeEntry in types)
+            {
+                sb.AppendLine($"    {typeEntry.Key}: [");
+                foreach (var namedType in typeEntry.Value)
+                {
+                    sb.AppendLine($"      {namedType}");
+                }
+                sb.AppendLine("    ]");
+            }
+            sb.AppendLine("  }");
+            
+            // Append message
+            sb.AppendLine("  Message: {");
+            foreach (var msgEntry in message)
+            {
+                if (msgEntry.Value is byte[])
+                {
+                    // Convert byte arrays to hex string
+                    byte[] byteArray = (byte[])msgEntry.Value;
+                    string hexValue = byteArray.ByteArrayToHexStringWithPrefix();
+                    sb.AppendLine($"    {msgEntry.Key}: {hexValue}");
+                }
+                else if (msgEntry.Value is IEnumerable && !(msgEntry.Value is string))
+                {
+                    sb.AppendLine($"    {msgEntry.Key}: [");
+                    foreach (var item in (IEnumerable)msgEntry.Value)
+                    {
+                        if (item is byte[])
+                        {
+                            // Convert byte arrays to hex string
+                            byte[] byteArray = (byte[])item;
+                            string hexValue = byteArray.ByteArrayToHexStringWithPrefix();
+                            sb.AppendLine($"      {hexValue}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"      {item}");
+                        }
+                    }
+                    sb.AppendLine("    ]");
+                }
+                else
+                {
+                    sb.AppendLine($"    {msgEntry.Key}: {msgEntry.Value}");
+                }
+            }
+            sb.AppendLine("  }");
+            
+            // Append payload information if available
+            if (_payload != null)
+            {
+                sb.AppendLine($"  Payload: {_payload}");
+            }
+            
+            sb.AppendLine("}");
+            
+            return sb.ToString();
+        }
+
         [Preserve]
         [JsonConstructor]
         public TypedDataToSign(Domain domain, Dictionary<string, NamedType[]> types, string primaryType, Dictionary<string, object> message)
@@ -242,22 +314,56 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             _types = types.GetKeys();
             SortTypes();
+
+            StringBuilder logBuilder = new StringBuilder();
+            logBuilder.Append($"GetSignPayload for TypedDataToSign: {ToString()}\n");
+            logBuilder.Append("GetSignPaylod calculations -----\n");
+
+            logBuilder.Append("Sorted types:");
+            foreach (string type in _types)
+            {
+                logBuilder.AppendLine($"  {type}");
+            }
+
+            logBuilder.Append("\n");
+
             string encodeType = CalculateEncodeType();
+            logBuilder.Append($"Encode type: {encodeType}\n");
+
             byte[] encodeData = CalculateEncodeData();
+            logBuilder.Append($"Encode data: {encodeData.ByteArrayToHexStringWithPrefix()}\n");
+
             string hashedEncodeType = SequenceCoder.KeccakHashASCII(encodeType);
+            logBuilder.Append($"Hashed encode type: {hashedEncodeType}\n");
+
             byte[] hashStruct = SequenceCoder.KeccakHash(
-                ByteArrayExtensions.ConcatenateByteArrays(hashedEncodeType.HexStringToByteArray(),
-                    encodeData));
+                ByteArrayExtensions.ConcatenateByteArrays(
+                    hashedEncodeType.HexStringToByteArray(),
+                    encodeData
+                )
+            );
+            logBuilder.Append($"Hash struct: {hashStruct.ByteArrayToHexStringWithPrefix()}\n");
+
             byte[] domainSeparator = domain.GetDomainSeparator();
+            logBuilder.Append($"Domain separator: {domainSeparator.ByteArrayToHexStringWithPrefix()}\n");
 
             byte[] signablePayload = ByteArrayExtensions.ConcatenateByteArrays(
                 SequenceCoder.HexStringToByteArray("0x19"),
                 SequenceCoder.HexStringToByteArray("0x01"),
                 domainSeparator,
-                hashStruct);
+                hashStruct
+            );
+            logBuilder.Append($"Signable payload: {signablePayload.ByteArrayToHexStringWithPrefix()}\n");
+
             byte[] hashedMessage = SequenceCoder.KeccakHash(signablePayload);
+            logBuilder.Append($"Final hashed message: {hashedMessage.ByteArrayToHexStringWithPrefix()}\n");
+
+            string log = logBuilder.ToString();
+            Debug.Log(log);
+
             return hashedMessage;
         }
+
         
         private void SortTypes()
         {

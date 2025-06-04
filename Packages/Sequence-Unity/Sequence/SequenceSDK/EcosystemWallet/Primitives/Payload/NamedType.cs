@@ -25,5 +25,10 @@ namespace Sequence.EcosystemWallet.Primitives
             NamedType other = (NamedType)obj;
             return name.Equals(other.name) && type.Equals(other.type);
         }
+        
+        public override string ToString()
+        {
+            return $"{type} {name}";
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using NUnit.Framework;
 using Sequence.ABI;
@@ -70,6 +71,26 @@ namespace Sequence.EcosystemWallet.Primitives
                 callsEncoded
             );
             return encoded;
+        }
+
+        public override string ToString()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            
+            sb.AppendLine($"Calls {{ space: {space}, nonce: {nonce}, calls: [");
+            
+            if (calls != null)
+            {
+                for (int i = 0; i < calls.Length; i++)
+                {
+                    sb.AppendLine($"    {calls[i]},");
+                }
+            }
+            
+            string parentWalletsStr = parentWallets != null ? string.Join(", ", parentWallets.Select(w => w.ToString()).ToArray()) : "null";
+            sb.AppendLine($"], parentWallets: [{parentWalletsStr}] }}");
+            
+            return sb.ToString();
         }
 
         // Todo: once we're able to test the following code, let's refactor it into separate classes and methods instead of giant methods

@@ -61,6 +61,19 @@ namespace Sequence.EcosystemWallet.Primitives
                    behaviorOnError == call.behaviorOnError;
         }
         
+        public override string ToString()
+        {
+            string dataHex = data != null ? data.ByteArrayToHexStringWithPrefix() : "null";
+            // Truncate data if it's too long for display
+            if (dataHex != null && dataHex.Length > 50)
+            {
+                dataHex = dataHex.Substring(0, 47) + "...";
+            }
+            
+            return $"Call {{ to: {to}, value: {value}, data: {dataHex}, gasLimit: {gasLimit}, " +
+                   $"delegateCall: {delegateCall}, onlyFallback: {onlyFallback}, behaviorOnError: {behaviorOnError} }}";
+        }
+        
         public string Hash()
         {
             byte[] typeHash = new StaticBytesCoder().Encode(CALL_TYPEHASH);

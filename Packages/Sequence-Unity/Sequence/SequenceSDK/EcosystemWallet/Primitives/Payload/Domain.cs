@@ -37,6 +37,12 @@ namespace Sequence.EcosystemWallet.Primitives
             return name.Equals(other.name) && version.Equals(other.version) && chainId.Equals(other.chainId) &&
                    verifyingContract.Equals(other.verifyingContract);
         }
+        
+        public override string ToString()
+        {
+            string saltStr = salt != null ? salt.ToString() : "null";
+            return $"Domain {{ name: {name}, version: {version}, chainId: {chainId}, verifyingContract: {verifyingContract}, salt: {saltStr} }}";
+        }
 
         public Domain(string name, string version, BigInteger chainId, Address verifyingContract, FixedByte salt = null)
         {
