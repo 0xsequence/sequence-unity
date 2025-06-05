@@ -181,5 +181,51 @@ namespace Sequence.EcosystemWallet.UnitTests
             
             Assert.AreEqual(expected, result);
         }
+
+        private Address[] _otherAddressArray = new Address[]
+        {
+            new Address("0xE86Ff51267fb7a1ff020A04971203a2F57eb5AB0"),
+            new Address("0x6b45dCf3e824145375aB46Af51334F823837f90C"),
+            new Address("0x2D459F147b3fb3ea6E07A4af02201f85Aa995aeC"),
+            new Address("0x66e63215A4994D95930c5D39231D36c23Ab03fC0"),
+            new Address("0xf1BE39A6AA2279e119A65d15C44456827e48f81a"),
+            new Address("0xfc9C1687F8CA3e01e4FD1F7a2C07EDFF2f1657c4"),
+            new Address("0xA3D430FB60a138d1740231bC499df3C89011ddFa"),
+            new Address("0x2f6B49AaEC1Fa5b04485dA48Dacdd0A2f4786E9b"),
+            new Address("0x6339f581b1A4bE3878c41b84319b9AEd756bAE7b"),
+            new Address("0x66067612ABC3ABD2c48b5820cef62727F46016Cd"),
+            new Address("0xC9A9f3BF19c80ECD30277ac1Be0Ab17dD538dB34"),
+            new Address("0x6aF6509ADca19EF0F1c2b183C0A12FBde4F1b3f2"),
+            new Address("0xd51d83Fc620CF678ccE893703E753d693f106403"),
+            new Address("0x262db8E0F4a2fCbA5fA7199490F1C609ecFCEf1c"),
+            new Address("0x2205fD44262D7d5ceEAd32F2F7D9E1aBA9c04C9D"),
+            new Address("0xbE010524b4818Ef8168498fc55813A462DefCaF3"),
+            new Address("0x5759cD0751fE51e6Bb5232A86b4E0E56e32F20fC"),
+            new Address("0xd50153fb2144323d989CBBb440670c5A6101dBcE"),
+            new Address("0x622E3a3dA94079fA0CbF994e06768035e8791527"),
+            new Address("0x04B8B03dBa0d960415cE5177acCf9D399ED852eb"),
+            new Address("0xB4cB75bEcC7D6C25a8815D3a31d997105772d12B"),
+            new Address("0x6aA42b1d0f63dAE3a5bF785101c2D2bF26679463"),
+            new Address("0x992C74Ff99dAbAacD47dDf171747B927Bb9318E9"),
+            new Address("0x9fF1939E31843CD8DF1Eb4f9f9B3B4E2688DCDC9"),
+            new Address("0x9Fe63115bD584E296A71dDAe97087EBb2724C6FD"),
+            new Address("0x2c99841fB733C81fC049713CF8a5c250c85B92f4"),
+            new Address("0xD232072F82e45a6DdBe592f3ffe77B3E0D44fd21")
+        };
+
+        [Test]
+        public void TestGetSignedPayload()
+        {
+            TypedDataToSign toSign = new TypedDataToSign(new Address("0x4caf9086ccf2e486f331Bde537A559d9Be7D2fc4"),
+                Chain.LocalChain,
+                new Parented(_otherAddressArray,
+                    new ConfigUpdate("0x6810c263f45be5dc8e8e6ffd2ab9bd6f152412edb66111b6f56e39a42c694405")));
+
+            string expected = "0x2c685e56801c1443071309b0faa1ba71991982226f3faba021a6083d2063afdb";
+
+            string result = toSign.GetSignPayload().ByteArrayToHexStringWithPrefix();
+            
+            Assert.AreEqual(expected, result);
+        }
     }
 }
