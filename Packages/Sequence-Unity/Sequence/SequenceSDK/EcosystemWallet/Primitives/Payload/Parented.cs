@@ -66,7 +66,11 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
             }
 
+            string asHex = parentWalletsEncoded.ByteArrayToHexStringWithPrefix();
+            
             parentWalletsEncoded = SequenceCoder.KeccakHash(parentWalletsEncoded);
+            
+            asHex = parentWalletsEncoded.ByteArrayToHexStringWithPrefix();
             
             byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(payloadEncoded, parentWalletsEncoded);
             return encoded;

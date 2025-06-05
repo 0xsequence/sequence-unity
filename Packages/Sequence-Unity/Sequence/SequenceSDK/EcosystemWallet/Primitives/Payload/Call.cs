@@ -79,7 +79,7 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] typeHash = new StaticBytesCoder().Encode(CALL_TYPEHASH);
             byte[] toHash = new AddressCoder().Encode(to);
             byte[] valueHash = new NumberCoder().Encode(value);
-            byte[] dataHash = new StaticBytesCoder().Encode(data);
+            byte[] dataHash = SequenceCoder.KeccakHash(data);
             byte[] gasLimitHash = new NumberCoder().Encode(gasLimit);
             byte[] delegateCallHash = new BooleanCoder().Encode(delegateCall);
             byte[] onlyFallbackHash = new BooleanCoder().Encode(onlyFallback);

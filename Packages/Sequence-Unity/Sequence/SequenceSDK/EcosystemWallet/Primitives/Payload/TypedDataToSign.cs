@@ -344,6 +344,7 @@ namespace Sequence.EcosystemWallet.Primitives
             );
             logBuilder.Append($"Hash struct: {hashStruct.ByteArrayToHexStringWithPrefix()}\n");
 
+            logBuilder.Append($"Domain {domain.ToString()}");
             byte[] domainSeparator = domain.GetDomainSeparator();
             logBuilder.Append($"Domain separator: {domainSeparator.ByteArrayToHexStringWithPrefix()}\n");
 
