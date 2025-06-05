@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
@@ -8,6 +9,8 @@ using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Scripting;
+using Nethereum.ABI.EIP712;
+using Nethereum.Util;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -310,111 +313,268 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
+        // Todo clean up this AI slop
+        // Todo replace Nethereum
         public byte[] GetSignPayload()
         {
-            _types = types.GetKeys();
-            SortTypes();
-
-            StringBuilder logBuilder = new StringBuilder();
-            logBuilder.Append($"GetSignPayload for TypedDataToSign: {ToString()}\n");
-            logBuilder.Append("GetSignPaylod calculations -----\n");
-
-            logBuilder.Append("Sorted types:");
-            foreach (string type in _types)
+            try
             {
-                logBuilder.AppendLine($"  {type}");
-            }
-
-            logBuilder.Append("\n");
-
-            string encodeType = CalculateEncodeType();
-            logBuilder.Append($"Encode type: {encodeType}\n");
-
-            byte[] encodeData = CalculateEncodeData();
-            logBuilder.Append($"Encode data: {encodeData.ByteArrayToHexStringWithPrefix()}\n");
-
-            string hashedEncodeType = SequenceCoder.KeccakHashASCII(encodeType);
-            logBuilder.Append($"Hashed encode type: {hashedEncodeType}\n");
-
-            byte[] hashStruct = SequenceCoder.KeccakHash(
-                ByteArrayExtensions.ConcatenateByteArrays(
-                    hashedEncodeType.HexStringToByteArray(),
-                    encodeData
-                )
-            );
-            logBuilder.Append($"Hash struct: {hashStruct.ByteArrayToHexStringWithPrefix()}\n");
-
-            logBuilder.Append($"Domain {domain.ToString()}\n");
-            byte[] domainSeparator = domain.GetDomainSeparator();
-            logBuilder.Append($"Domain separator: {domainSeparator.ByteArrayToHexStringWithPrefix()}\n");
-
-            byte[] signablePayload = ByteArrayExtensions.ConcatenateByteArrays(
-                SequenceCoder.HexStringToByteArray("0x19"),
-                SequenceCoder.HexStringToByteArray("0x01"),
-                domainSeparator,
-                hashStruct
-            );
-            logBuilder.Append($"Signable payload: {signablePayload.ByteArrayToHexStringWithPrefix()}\n");
-
-            byte[] hashedMessage = SequenceCoder.KeccakHash(signablePayload);
-            logBuilder.Append($"Final hashed message: {hashedMessage.ByteArrayToHexStringWithPrefix()}\n");
-
-            string log = logBuilder.ToString();
-            Debug.Log(log);
-
-            return hashedMessage;
-        }
-
-        
-        private void SortTypes()
-        {
-            int typesCount = _types.Length;
-            if (typesCount == 0)
-            {
-                throw new ArgumentException($"Must have at least one entry in {nameof(types)} dictionary");
-            }
-            List<string> newTypes = new List<string>();
-            newTypes.Add(primaryType);
-            
-            Array.Sort(_types);
-            for (int i = 0; i < typesCount; i++)
-            {
-                if (_types[i] == primaryType)
+                // Use Nethereum's EIP-712 encoder
+                var eip712TypedDataEncoder = new Eip712TypedDataEncoder();
+                byte[] encodedTypedData;
+                
+                // Check if we have salt data to determine which domain type to use
+                if (domain.salt?.Data != null && domain.salt.Data.Length > 0)
                 {
+                    // Convert to Nethereum's TypedData format with salt
+                    var nethereumTypedDataWithSalt = ConvertToNethereumTypedDataWithSalt();
+                    encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedDataWithSalt);
+                }
+                else
+                {
+                    // Convert to Nethereum's TypedData format without salt
+                    var nethereumTypedData = ConvertToNethereumTypedDataWithoutSalt();
+                    encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedData);
+                }
+                
+                Debug.Log($"EIP-712 encoded payload: {encodedTypedData.ByteArrayToHexStringWithPrefix()}");
+                
+                return SequenceCoder.KeccakHash(encodedTypedData);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error encoding EIP-712 data: {ex.Message}");
+                throw;
+            }
+        }
+        
+        private TypedData<Nethereum.ABI.EIP712.DomainWithSalt> ConvertToNethereumTypedDataWithSalt()
+        {
+            // Convert domain using Nethereum's DomainWithSalt
+            var nethereumDomain = new Nethereum.ABI.EIP712.DomainWithSalt()
+            {
+                Name = domain.name,
+                Version = domain.version,
+                ChainId = domain.chainId,
+                VerifyingContract = domain.verifyingContract,
+                Salt = domain.salt.Data
+            };
+            
+            // Convert types to Nethereum format
+            var nethereumTypes = new Dictionary<string, MemberDescription[]>();
+            
+            // Add the required EIP712Domain type definition with salt
+            var domainMembers = new List<MemberDescription>
+            {
+                new MemberDescription { Name = "name", Type = "string" },
+                new MemberDescription { Name = "version", Type = "string" },
+                new MemberDescription { Name = "chainId", Type = "uint256" },
+                new MemberDescription { Name = "verifyingContract", Type = "address" },
+                new MemberDescription { Name = "salt", Type = "bytes32" }
+            };
+            
+            nethereumTypes["EIP712Domain"] = domainMembers.ToArray();
+            
+            foreach (var typeEntry in types)
+            {
+                var members = new MemberDescription[typeEntry.Value.Length];
+                for (int i = 0; i < typeEntry.Value.Length; i++)
+                {
+                    members[i] = new MemberDescription
+                    {
+                        Name = typeEntry.Value[i].name,
+                        Type = typeEntry.Value[i].type
+                    };
+                }
+                nethereumTypes[typeEntry.Key] = members;
+            }
+            
+            // Convert message to proper format
+            var convertedMessage = ConvertMessageForNethereum();
+            
+            return new TypedData<Nethereum.ABI.EIP712.DomainWithSalt>
+            {
+                Domain = nethereumDomain,
+                Types = nethereumTypes,
+                PrimaryType = primaryType,
+                Message = convertedMessage
+            };
+        }
+        
+        private TypedData<Nethereum.ABI.EIP712.Domain> ConvertToNethereumTypedDataWithoutSalt()
+        {
+            // Convert domain using Nethereum's Domain (without salt)
+            var nethereumDomain = new Nethereum.ABI.EIP712.Domain()
+            {
+                Name = domain.name,
+                Version = domain.version,
+                ChainId = (int)domain.chainId,
+                VerifyingContract = domain.verifyingContract.ToString()
+            };
+            
+            // Convert types to Nethereum format
+            var nethereumTypes = new Dictionary<string, MemberDescription[]>();
+            
+            // Add the required EIP712Domain type definition without salt
+            var domainMembers = new List<MemberDescription>
+            {
+                new MemberDescription { Name = "name", Type = "string" },
+                new MemberDescription { Name = "version", Type = "string" },
+                new MemberDescription { Name = "chainId", Type = "uint256" },
+                new MemberDescription { Name = "verifyingContract", Type = "address" }
+            };
+            
+            nethereumTypes["EIP712Domain"] = domainMembers.ToArray();
+            
+            foreach (var typeEntry in types)
+            {
+                var members = new MemberDescription[typeEntry.Value.Length];
+                for (int i = 0; i < typeEntry.Value.Length; i++)
+                {
+                    members[i] = new MemberDescription
+                    {
+                        Name = typeEntry.Value[i].name,
+                        Type = typeEntry.Value[i].type
+                    };
+                }
+                nethereumTypes[typeEntry.Key] = members;
+            }
+            
+            // Convert message to proper format
+            var convertedMessage = ConvertMessageForNethereum();
+            
+            return new TypedData<Nethereum.ABI.EIP712.Domain>
+            {
+                Domain = nethereumDomain,
+                Types = nethereumTypes,
+                PrimaryType = primaryType,
+                Message = convertedMessage
+            };
+        }
+        
+        private MemberValue[] ConvertMessageForNethereum()
+        {
+            var memberValues = new List<MemberValue>();
+            
+            // Get the primary type definition to ensure correct ordering
+            if (!types.TryGetValue(primaryType, out NamedType[] namedTypes))
+            {
+                Debug.LogError($"Primary type '{primaryType}' not found in types dictionary");
+                return memberValues.ToArray();
+            }
+            
+            // Process fields in the order they appear in the type definition
+            foreach (var namedType in namedTypes)
+            {
+                if (!message.TryGetValue(namedType.name, out object value))
+                {
+                    Debug.LogError($"Field '{namedType.name}' not found in message for type '{primaryType}'");
                     continue;
                 }
-                newTypes.Add(_types[i]);
-            }
-
-            _types = newTypes.ToArray();
-        }
-
-        private string CalculateEncodeType()
-        {
-            StringBuilder encodeType = new StringBuilder();
-            int typeCount = _types.Length;
-            for (int i = 0; i < typeCount; i++)
-            {
-                string type = _types[i];
-                encodeType.Append(type);
-                encodeType.Append("(");
-                foreach (var namedTypes in types[type])
+                
+                object convertedValue;
+                
+                // Skip null values for bytes32 and other non-nullable types
+                if (value == null)
                 {
-                    encodeType.Append(namedTypes.type);
-                    encodeType.Append(" ");
-                    encodeType.Append(namedTypes.name);
-                    encodeType.Append(",");
+                    if (namedType.type == "bytes32" || namedType.type == "address" || namedType.type.StartsWith("uint"))
+                    {
+                        Debug.LogError($"Null value found for non-nullable type '{namedType.type}' in field '{namedType.name}'");
+                        continue;
+                    }
                 }
-                encodeType.Remove(encodeType.Length - 1, 1); // remove last comma
-                encodeType.Append(")");
+                
+                Debug.Log($"Converting field '{namedType.name}' of type '{namedType.type}' with value: {value}");
+                
+                // Handle different value types for Nethereum compatibility
+                if (value is string strValue)
+                {
+                    // Check if it's a hex string that should be converted to BigInteger
+                    if (strValue.StartsWith("0x"))
+                    {
+                        // Convert based on the specific type
+                        if (namedType.type == "uint256")
+                        {
+                            convertedValue = BigInteger.Parse(strValue.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                        }
+                        else if (namedType.type == "bytes32")
+                        {
+                            // Convert bytes32 hex string to byte array
+                            convertedValue = strValue.HexStringToByteArray();
+                        }
+                        else
+                        {
+                            // Keep as hex string for other types (address, bytes)
+                            convertedValue = strValue;
+                        }
+                    }
+                    else if (BigInteger.TryParse(strValue, out BigInteger bigIntValue))
+                    {
+                        convertedValue = bigIntValue;
+                    }
+                    else
+                    {
+                        convertedValue = strValue;
+                    }
+                }
+                else if (value is Address[] addresses)
+                {
+                    convertedValue = addresses.Select(addr => addr.ToString()).ToArray();
+                }
+                else if (value is EncodeSapient.EncodedCall[] calls)
+                {
+                    convertedValue = calls.Select(ConvertCallForNethereum).ToArray();
+                }
+                else if (value is byte[] bytes)
+                {
+                    convertedValue = bytes.ByteArrayToHexStringWithPrefix();
+                }
+                else
+                {
+                    convertedValue = value;
+                }
+                
+                Debug.Log($"Converted field '{namedType.name}' to: {convertedValue}");
+                
+                memberValues.Add(new MemberValue
+                {
+                    TypeName = namedType.type,
+                    Value = convertedValue
+                });
             }
-
-            return encodeType.ToString();
+            
+            Debug.Log($"Created {memberValues.Count} member values for type '{primaryType}'");
+            return memberValues.ToArray();
         }
-
-        private byte[] CalculateEncodeData()
+        
+        private Dictionary<string, object> ConvertCallForNethereum(EncodeSapient.EncodedCall call)
         {
-            return _payload.GetEIP712EncodeData();
+            return new Dictionary<string, object>
+            {
+                ["to"] = call.to.ToString(),
+                ["value"] = call.value,
+                ["data"] = call.data,
+                ["gasLimit"] = call.gasLimit,
+                ["delegateCall"] = call.delegateCall,
+                ["onlyFallback"] = call.onlyFallback,
+                ["behaviorOnError"] = call.behaviorOnError
+            };
+        }
+        
+        private string GetFieldType(string fieldName)
+        {
+            // Find the field type in the primary type definition
+            if (types.TryGetValue(primaryType, out NamedType[] namedTypes))
+            {
+                foreach (var namedType in namedTypes)
+                {
+                    if (namedType.name == fieldName)
+                    {
+                        return namedType.type;
+                    }
+                }
+            }
+            return "string"; // default fallback
         }
     }
 }
