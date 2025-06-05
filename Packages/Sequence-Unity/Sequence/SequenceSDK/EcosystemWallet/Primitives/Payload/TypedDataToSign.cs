@@ -313,50 +313,45 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
-        // Todo clean up this AI slop
-        // Todo replace Nethereum
         public byte[] GetSignPayload()
         {
-            try
+            // Use Nethereum's EIP-712 encoder
+            var eip712TypedDataEncoder = new Eip712TypedDataEncoder();
+            
+            // Check if we have salt data to determine which domain type to use
+            bool hasSalt = domain.salt?.Data != null && domain.salt.Data.Length > 0;
+            
+            byte[] encodedTypedData;
+            if (hasSalt)
             {
-                // Use Nethereum's EIP-712 encoder
-                var eip712TypedDataEncoder = new Eip712TypedDataEncoder();
-                byte[] encodedTypedData;
-                
-                // Check if we have salt data to determine which domain type to use
-                if (domain.salt?.Data != null && domain.salt.Data.Length > 0)
-                {
-                    // Convert to Nethereum's TypedData format with salt
-                    var nethereumTypedDataWithSalt = ConvertToNethereumTypedDataWithSalt();
-                    encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedDataWithSalt);
-                }
-                else
-                {
-                    // Convert to Nethereum's TypedData format without salt
-                    var nethereumTypedData = ConvertToNethereumTypedDataWithoutSalt();
-                    encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedData);
-                }
-                
-                Debug.Log($"EIP-712 encoded payload: {encodedTypedData.ByteArrayToHexStringWithPrefix()}");
-                
-                return SequenceCoder.KeccakHash(encodedTypedData);
+                // Convert to Nethereum's TypedData format with salt
+                var nethereumTypedDataWithSalt = ConvertToNethereumTypedDataWithSalt();
+                encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedDataWithSalt);
             }
-            catch (Exception ex)
+            else
             {
-                Debug.LogError($"Error encoding EIP-712 data: {ex.Message}");
-                throw;
+                // Convert to Nethereum's TypedData format without salt
+                var nethereumTypedData = ConvertToNethereumTypedDataWithoutSalt();
+                encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedData);
             }
+
+            return SequenceCoder.KeccakHash(encodedTypedData);
         }
         
-        private TypedData<Nethereum.ABI.EIP712.DomainWithSalt> ConvertToNethereumTypedDataWithSalt()
+        internal TypedData<Nethereum.ABI.EIP712.DomainWithSalt> ConvertToNethereumTypedDataWithSalt()
         {
+            if (domain.salt == null || domain.salt.Data == null || domain.salt.Data.Length == 0)
+            {
+                throw new ArgumentException("Domain salt is required for EIP-712 with salt.");
+            }
+
             // Convert domain using Nethereum's DomainWithSalt
             var nethereumDomain = new Nethereum.ABI.EIP712.DomainWithSalt()
             {
                 Name = domain.name,
                 Version = domain.version,
-                ChainId = domain.chainId,
-                VerifyingContract = domain.verifyingContract,
+                ChainId = (int)domain.chainId,
+                VerifyingContract = domain.verifyingContract.ToString(),
                 Salt = domain.salt.Data
             };
             
@@ -400,8 +395,8 @@ namespace Sequence.EcosystemWallet.Primitives
                 Message = convertedMessage
             };
         }
-        
-        private TypedData<Nethereum.ABI.EIP712.Domain> ConvertToNethereumTypedDataWithoutSalt()
+
+        internal TypedData<Nethereum.ABI.EIP712.Domain> ConvertToNethereumTypedDataWithoutSalt()
         {
             // Convert domain using Nethereum's Domain (without salt)
             var nethereumDomain = new Nethereum.ABI.EIP712.Domain()
@@ -411,7 +406,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 ChainId = (int)domain.chainId,
                 VerifyingContract = domain.verifyingContract.ToString()
             };
-            
+
             // Convert types to Nethereum format
             var nethereumTypes = new Dictionary<string, MemberDescription[]>();
             
@@ -439,10 +434,10 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 nethereumTypes[typeEntry.Key] = members;
             }
-            
+
             // Convert message to proper format
             var convertedMessage = ConvertMessageForNethereum();
-            
+
             return new TypedData<Nethereum.ABI.EIP712.Domain>
             {
                 Domain = nethereumDomain,
@@ -452,10 +447,10 @@ namespace Sequence.EcosystemWallet.Primitives
             };
         }
         
-        private MemberValue[] ConvertMessageForNethereum()
+        internal MemberValue[] ConvertMessageForNethereum()
         {
             var memberValues = new List<MemberValue>();
-            
+        
             // Get the primary type definition to ensure correct ordering
             if (!types.TryGetValue(primaryType, out NamedType[] namedTypes))
             {
@@ -523,7 +518,19 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 else if (value is EncodeSapient.EncodedCall[] calls)
                 {
-                    convertedValue = calls.Select(ConvertCallForNethereum).ToArray();
+                    // Convert each call to a MemberValue[] representing the Call struct
+                    var callMemberArrays = calls.Select(call => new MemberValue[]
+                    {
+                        new MemberValue { TypeName = "address", Value = call.to.ToString() },
+                        new MemberValue { TypeName = "uint256", Value = call.value },
+                        new MemberValue { TypeName = "bytes", Value = call.data.HexStringToByteArray() },
+                        new MemberValue { TypeName = "uint256", Value = call.gasLimit },
+                        new MemberValue { TypeName = "bool", Value = call.delegateCall },
+                        new MemberValue { TypeName = "bool", Value = call.onlyFallback },
+                        new MemberValue { TypeName = "uint256", Value = call.behaviorOnError }
+                    }).ToArray();
+                    
+                    convertedValue = callMemberArrays;
                 }
                 else if (value is byte[] bytes)
                 {
@@ -545,36 +552,6 @@ namespace Sequence.EcosystemWallet.Primitives
             
             Debug.Log($"Created {memberValues.Count} member values for type '{primaryType}'");
             return memberValues.ToArray();
-        }
-        
-        private Dictionary<string, object> ConvertCallForNethereum(EncodeSapient.EncodedCall call)
-        {
-            return new Dictionary<string, object>
-            {
-                ["to"] = call.to.ToString(),
-                ["value"] = call.value,
-                ["data"] = call.data,
-                ["gasLimit"] = call.gasLimit,
-                ["delegateCall"] = call.delegateCall,
-                ["onlyFallback"] = call.onlyFallback,
-                ["behaviorOnError"] = call.behaviorOnError
-            };
-        }
-        
-        private string GetFieldType(string fieldName)
-        {
-            // Find the field type in the primary type definition
-            if (types.TryGetValue(primaryType, out NamedType[] namedTypes))
-            {
-                foreach (var namedType in namedTypes)
-                {
-                    if (namedType.name == fieldName)
-                    {
-                        return namedType.type;
-                    }
-                }
-            }
-            return "string"; // default fallback
         }
     }
 }
