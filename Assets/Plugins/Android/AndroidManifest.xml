@@ -5,7 +5,7 @@
 >
     <application>
         <activity
-                android:name="xyz.sequence.SequenceUnityActivity"
+                android:name="com.unity3d.player.UnityPlayerActivity"
                 android:theme="@style/UnityThemeSelector"
                 android:exported="true">
             <intent-filter>
