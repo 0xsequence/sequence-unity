@@ -313,6 +313,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
+        // Todo replace nethereum (introduced after commit 871466dbc7faf88f1201f963af6a372c59263d2f in commit d44d3bedfcbe875f2e5edc335e1d143bfb1358d3) - I think we were close with our own implementation so worth looking at it, even if only as a reference
         public byte[] GetSignPayload()
         {
             // Use Nethereum's EIP-712 encoder
