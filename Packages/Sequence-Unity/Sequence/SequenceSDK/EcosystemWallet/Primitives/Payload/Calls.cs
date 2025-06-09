@@ -105,6 +105,21 @@ namespace Sequence.EcosystemWallet.Primitives
                     $"{nameof(nonce)} is too large, need {nonceBytesNeeded} bytes to represent it, but max is {MaxNonceBytes}");
             }
 
+            int globalFlag = SetGlobalFlag(nonceBytesNeeded, (uint)callsLength);
+            
+            // Start building the output
+            // We'll accumulate in a Bytes object as we go
+            byte[] outBytes = globalFlag.ByteArrayFromNumber(1);
+            outBytes = SetSpaceBytes(outBytes);
+            outBytes = SetNonceBytes(outBytes, nonceBytesNeeded);
+            outBytes = StoreCallsLength(outBytes, callsLength);
+            outBytes = EncodeCalls(outBytes, callsLength, self);
+
+            return outBytes;
+        }
+
+        private int SetGlobalFlag(int nonceBytesNeeded, uint callsLength)
+        {
             /*
                 globalFlag layout:
                   bit 0: spaceZeroFlag => 1 if space == 0, else 0
@@ -128,10 +143,20 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 globalFlag |= 0x10;
             }
+            
+            if (GetCallsCountSize(callsLength) > 1)
+            {
+                globalFlag |= 0x20; // We need more than one byte for the calls count
+                                    // bit [5] => callsCountSizeFlag: 1 => 2 bytes, 0 => 1 byte
+            }
 
+            return globalFlag;
+        }
+
+        private int GetCallsCountSize(uint callsLength)
+        {
             /*
               If there's more than one call, we decide if we store the #calls in 1 or 2 bytes.
-              bit [5] => callsCountSizeFlag: 1 => 2 bytes, 0 => 1 byte
             */
             int callsCountSize = 0;
             if (callsLength != 1)
@@ -143,34 +168,43 @@ namespace Sequence.EcosystemWallet.Primitives
                 else if (callsLength < MaxCalls)
                 {
                     callsCountSize = 2;
-                    globalFlag |= 0x20;
                 }
                 else
                 {
                     throw new ArgumentException($"{calls} is too large, cannot have more than {MaxCalls} calls, given {callsLength}");
                 }
             }
-            
-            // Start building the output
-            // We'll accumulate in a Bytes object as we go
-            byte[] outBytes = globalFlag.ByteArrayFromNumber(1);
-            
+            return callsCountSize;
+        }
+
+        private byte[] SetSpaceBytes(byte[] outBytes)
+        {
             // If space isn't 0, store it as exactly 20 bytes (like uint160)
             if (space != BigInteger.Zero)
             {
                 byte[] spaceBytes = space.ByteArrayFromNumber().PadLeft(20);
                 outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, spaceBytes);
             }
-            
+
+            return outBytes;
+        }
+        
+        private byte[] SetNonceBytes(byte[] outBytes, int nonceBytesNeeded)
+        {
             // Encode nonce in nonceBytesNeeded
             if (nonceBytesNeeded > 0)
             {
-                // We'll store nonce in exactly nonceBytesNeeded bytes
                 byte[] nonceBytes = nonce.ByteArrayFromNumber().PadLeft(nonceBytesNeeded);
                 outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, nonceBytes);
             }
-            
-            // Store callsLength if not single-call
+
+
+            return outBytes;
+        }
+
+        private byte[] StoreCallsLength(byte[] outBytes, int callsLength)
+        {
+            int callsCountSize = GetCallsCountSize((uint)callsLength);
             if (callsLength != 1)
             {
                 if (callsCountSize > 2 || callsCountSize <= 0)
@@ -180,97 +214,16 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, callsLength.ByteArrayFromNumber(callsCountSize));
             }
-            
-            // Now encode each call
+
+            return outBytes;
+        }
+
+        private byte[] EncodeCalls(byte[] outBytes, int callsLength, Address self)
+        {
             for (int i = 0; i < callsLength; i++)
             {
                 Call call = calls[i];
-                /*
-                  call flags layout (1 byte):
-                    bit 0 => toSelf (call.to == this)
-                    bit 1 => hasValue (call.value != 0)
-                    bit 2 => hasData (call.data.length > 0)
-                    bit 3 => hasGasLimit (call.gasLimit != 0)
-                    bit 4 => delegateCall
-                    bit 5 => onlyFallback
-                    bits [6..7] => behaviorOnError => 0=ignore, 1=revert, 2=abort
-                */
-                int flags = 0;
-                if (self != null && self.Equals(call.to))
-                {
-                    flags |= 0x01;
-                }
-                
-                if (call.value != BigInteger.Zero)
-                {
-                    flags |= 0x02;
-                }
-                
-                if (call.data != null && call.data.Length > 0)
-                {
-                    flags |= 0x04;
-                }
-                
-                if (call.gasLimit != BigInteger.Zero)
-                {
-                    flags |= 0x08;
-                }
-                
-                if (call.delegateCall)
-                {
-                    flags |= 0x10;
-                }
-
-                if (call.onlyFallback)
-                {
-                    flags |= 0x20;
-                }
-
-                flags |= (int)call.behaviorOnError << 6;
-
-                outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, flags.ByteArrayFromNumber(1));
-                
-                // If toSelf bit not set, store 20-byte address
-                if ((flags & 0x01) == 0)
-                {
-                    byte[] toAddressBytes = call.to.Value.HexStringToByteArray();
-                    if (toAddressBytes.Length != 20)
-                    {
-                        throw new SystemException($"Invalid '{nameof(call.to)}' address {call.to}, must be 20 bytes long but got {toAddressBytes.Length} bytes");
-                    }
-                    outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, toAddressBytes);
-                }
-                
-                // If hasValue, store 32 bytes of value
-                if ((flags & 0x02) != 0)
-                {
-                    byte[] valueBytes = call.value.ByteArrayFromNumber().PadLeft(32);
-                    outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, valueBytes);
-                }
-                
-                // If hasData, store 3 bytes of data length + data
-                if ((flags & 0x04) != 0)
-                {
-                    if (call.data == null)
-                    {
-                        throw new SystemException($"If ({nameof(flags)} & 0x04) != 0, then {nameof(call.data)} cannot be null");
-                    }
-                    int callDataLength = call.data!.Length;
-                    if (callDataLength > 0xffffff)
-                    {
-                        throw new ArgumentException($"{nameof(call.data)} is too large, length cannot exceed 0xffffff, given {callDataLength.ToHexadecimal()}");
-                    }
-                    // 3 bytes => up to 16,777,215
-                    byte[] callDataLengthBytes = callDataLength.ByteArrayFromNumber(3);
-                    outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, callDataLengthBytes, call.data);
-                }
-                
-                // If hasGasLimit, store 32 bytes of gasLimit
-                if ((flags & 0x08) != 0)
-                {
-                    byte[] gasBytes = call.gasLimit.ByteArrayFromNumber().PadLeft(32);
-                    outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, gasBytes);
-                }
+                outBytes = call.Encode(outBytes, self);
             }
 
             return outBytes;
