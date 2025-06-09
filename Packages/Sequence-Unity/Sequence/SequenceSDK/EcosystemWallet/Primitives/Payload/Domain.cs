@@ -92,5 +92,10 @@ namespace Sequence.EcosystemWallet.Primitives
                 chainIdHash, verifyingContractHash, saltHash);
             return encoded;
         }
+
+        public bool HasSalt()
+        {
+            return salt?.Data != null && salt.Data.Length > 0;
+        }
     }
 }

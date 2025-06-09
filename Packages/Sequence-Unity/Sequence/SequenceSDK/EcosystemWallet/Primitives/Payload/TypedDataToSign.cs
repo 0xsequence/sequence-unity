@@ -316,243 +316,25 @@ namespace Sequence.EcosystemWallet.Primitives
         // Todo replace nethereum (introduced after commit 871466dbc7faf88f1201f963af6a372c59263d2f in commit d44d3bedfcbe875f2e5edc335e1d143bfb1358d3) - I think we were close with our own implementation so worth looking at it, even if only as a reference
         public byte[] GetSignPayload()
         {
-            // Use Nethereum's EIP-712 encoder
             var eip712TypedDataEncoder = new Eip712TypedDataEncoder();
             
-            // Check if we have salt data to determine which domain type to use
-            bool hasSalt = domain.salt?.Data != null && domain.salt.Data.Length > 0;
-            
+            bool hasSalt = domain.HasSalt();
             byte[] encodedTypedData;
+            ConvertTypedDataToSignToNethereum converter = new ConvertTypedDataToSignToNethereum(this);
             if (hasSalt)
             {
-                // Convert to Nethereum's TypedData format with salt
-                var nethereumTypedDataWithSalt = ConvertToNethereumTypedDataWithSalt();
+                TypedData<Nethereum.ABI.EIP712.DomainWithSalt> nethereumTypedDataWithSalt =
+                    converter.ConvertToNethereumTypedDataWithSalt();
                 encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedDataWithSalt);
             }
             else
             {
-                // Convert to Nethereum's TypedData format without salt
-                var nethereumTypedData = ConvertToNethereumTypedDataWithoutSalt();
+                TypedData<Nethereum.ABI.EIP712.Domain> nethereumTypedData =
+                    converter.ConvertToNethereumTypedDataWithoutSalt();
                 encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedData);
             }
 
             return SequenceCoder.KeccakHash(encodedTypedData);
-        }
-        
-        internal TypedData<Nethereum.ABI.EIP712.DomainWithSalt> ConvertToNethereumTypedDataWithSalt()
-        {
-            if (domain.salt == null || domain.salt.Data == null || domain.salt.Data.Length == 0)
-            {
-                throw new ArgumentException("Domain salt is required for EIP-712 with salt.");
-            }
-
-            // Convert domain using Nethereum's DomainWithSalt
-            var nethereumDomain = new Nethereum.ABI.EIP712.DomainWithSalt()
-            {
-                Name = domain.name,
-                Version = domain.version,
-                ChainId = (int)domain.chainId,
-                VerifyingContract = domain.verifyingContract.ToString(),
-                Salt = domain.salt.Data
-            };
-            
-            // Convert types to Nethereum format
-            var nethereumTypes = new Dictionary<string, MemberDescription[]>();
-            
-            // Add the required EIP712Domain type definition with salt
-            var domainMembers = new List<MemberDescription>
-            {
-                new MemberDescription { Name = "name", Type = "string" },
-                new MemberDescription { Name = "version", Type = "string" },
-                new MemberDescription { Name = "chainId", Type = "uint256" },
-                new MemberDescription { Name = "verifyingContract", Type = "address" },
-                new MemberDescription { Name = "salt", Type = "bytes32" }
-            };
-            
-            nethereumTypes["EIP712Domain"] = domainMembers.ToArray();
-            
-            foreach (var typeEntry in types)
-            {
-                var members = new MemberDescription[typeEntry.Value.Length];
-                for (int i = 0; i < typeEntry.Value.Length; i++)
-                {
-                    members[i] = new MemberDescription
-                    {
-                        Name = typeEntry.Value[i].name,
-                        Type = typeEntry.Value[i].type
-                    };
-                }
-                nethereumTypes[typeEntry.Key] = members;
-            }
-            
-            // Convert message to proper format
-            var convertedMessage = ConvertMessageForNethereum();
-            
-            return new TypedData<Nethereum.ABI.EIP712.DomainWithSalt>
-            {
-                Domain = nethereumDomain,
-                Types = nethereumTypes,
-                PrimaryType = primaryType,
-                Message = convertedMessage
-            };
-        }
-
-        internal TypedData<Nethereum.ABI.EIP712.Domain> ConvertToNethereumTypedDataWithoutSalt()
-        {
-            // Convert domain using Nethereum's Domain (without salt)
-            var nethereumDomain = new Nethereum.ABI.EIP712.Domain()
-            {
-                Name = domain.name,
-                Version = domain.version,
-                ChainId = (int)domain.chainId,
-                VerifyingContract = domain.verifyingContract.ToString()
-            };
-
-            // Convert types to Nethereum format
-            var nethereumTypes = new Dictionary<string, MemberDescription[]>();
-            
-            // Add the required EIP712Domain type definition without salt
-            var domainMembers = new List<MemberDescription>
-            {
-                new MemberDescription { Name = "name", Type = "string" },
-                new MemberDescription { Name = "version", Type = "string" },
-                new MemberDescription { Name = "chainId", Type = "uint256" },
-                new MemberDescription { Name = "verifyingContract", Type = "address" }
-            };
-            
-            nethereumTypes["EIP712Domain"] = domainMembers.ToArray();
-            
-            foreach (var typeEntry in types)
-            {
-                var members = new MemberDescription[typeEntry.Value.Length];
-                for (int i = 0; i < typeEntry.Value.Length; i++)
-                {
-                    members[i] = new MemberDescription
-                    {
-                        Name = typeEntry.Value[i].name,
-                        Type = typeEntry.Value[i].type
-                    };
-                }
-                nethereumTypes[typeEntry.Key] = members;
-            }
-
-            // Convert message to proper format
-            var convertedMessage = ConvertMessageForNethereum();
-
-            return new TypedData<Nethereum.ABI.EIP712.Domain>
-            {
-                Domain = nethereumDomain,
-                Types = nethereumTypes,
-                PrimaryType = primaryType,
-                Message = convertedMessage
-            };
-        }
-        
-        internal MemberValue[] ConvertMessageForNethereum()
-        {
-            var memberValues = new List<MemberValue>();
-        
-            // Get the primary type definition to ensure correct ordering
-            if (!types.TryGetValue(primaryType, out NamedType[] namedTypes))
-            {
-                Debug.LogError($"Primary type '{primaryType}' not found in types dictionary");
-                return memberValues.ToArray();
-            }
-            
-            // Process fields in the order they appear in the type definition
-            foreach (var namedType in namedTypes)
-            {
-                if (!message.TryGetValue(namedType.name, out object value))
-                {
-                    Debug.LogError($"Field '{namedType.name}' not found in message for type '{primaryType}'");
-                    continue;
-                }
-                
-                object convertedValue;
-                
-                // Skip null values for bytes32 and other non-nullable types
-                if (value == null)
-                {
-                    if (namedType.type == "bytes32" || namedType.type == "address" || namedType.type.StartsWith("uint"))
-                    {
-                        Debug.LogError($"Null value found for non-nullable type '{namedType.type}' in field '{namedType.name}'");
-                        continue;
-                    }
-                }
-                
-                Debug.Log($"Converting field '{namedType.name}' of type '{namedType.type}' with value: {value}");
-                
-                // Handle different value types for Nethereum compatibility
-                if (value is string strValue)
-                {
-                    // Check if it's a hex string that should be converted to BigInteger
-                    if (strValue.StartsWith("0x"))
-                    {
-                        // Convert based on the specific type
-                        if (namedType.type == "uint256")
-                        {
-                            convertedValue = BigInteger.Parse(strValue.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                        }
-                        else if (namedType.type == "bytes32")
-                        {
-                            // Convert bytes32 hex string to byte array
-                            convertedValue = strValue.HexStringToByteArray();
-                        }
-                        else
-                        {
-                            // Keep as hex string for other types (address, bytes)
-                            convertedValue = strValue;
-                        }
-                    }
-                    else if (BigInteger.TryParse(strValue, out BigInteger bigIntValue))
-                    {
-                        convertedValue = bigIntValue;
-                    }
-                    else
-                    {
-                        convertedValue = strValue;
-                    }
-                }
-                else if (value is Address[] addresses)
-                {
-                    convertedValue = addresses.Select(addr => addr.ToString()).ToArray();
-                }
-                else if (value is EncodeSapient.EncodedCall[] calls)
-                {
-                    // Convert each call to a MemberValue[] representing the Call struct
-                    var callMemberArrays = calls.Select(call => new MemberValue[]
-                    {
-                        new MemberValue { TypeName = "address", Value = call.to.ToString() },
-                        new MemberValue { TypeName = "uint256", Value = call.value },
-                        new MemberValue { TypeName = "bytes", Value = call.data.HexStringToByteArray() },
-                        new MemberValue { TypeName = "uint256", Value = call.gasLimit },
-                        new MemberValue { TypeName = "bool", Value = call.delegateCall },
-                        new MemberValue { TypeName = "bool", Value = call.onlyFallback },
-                        new MemberValue { TypeName = "uint256", Value = call.behaviorOnError }
-                    }).ToArray();
-                    
-                    convertedValue = callMemberArrays;
-                }
-                else if (value is byte[] bytes)
-                {
-                    convertedValue = bytes.ByteArrayToHexStringWithPrefix();
-                }
-                else
-                {
-                    convertedValue = value;
-                }
-                
-                Debug.Log($"Converted field '{namedType.name}' to: {convertedValue}");
-                
-                memberValues.Add(new MemberValue
-                {
-                    TypeName = namedType.type,
-                    Value = convertedValue
-                });
-            }
-            
-            Debug.Log($"Created {memberValues.Count} member values for type '{primaryType}'");
-            return memberValues.ToArray();
         }
     }
 }
