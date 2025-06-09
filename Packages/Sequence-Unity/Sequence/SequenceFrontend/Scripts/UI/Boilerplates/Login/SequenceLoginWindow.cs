@@ -201,7 +201,7 @@ namespace Sequence.Boilerplates.Login
         
         private void OnApplicationFocus(bool hasFocus)
         {
-#if !UNITY_IOS
+#if !UNITY_IOS && !UNITY_ANDROID
             if (hasFocus)
             {
                 StartCoroutine(DisableLoadingScreenIfNotLoggingIn());

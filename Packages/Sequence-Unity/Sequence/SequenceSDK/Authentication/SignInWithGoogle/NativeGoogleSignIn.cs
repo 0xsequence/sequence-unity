@@ -28,12 +28,11 @@ namespace Sequence.Authentication
             _receiver = NativeGoogleSignInReceiver.Create();
             
             Assert.IsNotNull(_receiver, "NativeGoogleSignInReceiver not initialized");
-            Debug.Log($"SignIn");
+            
             _receiver.OnIdTokenReceived.AddListener(receivedIdToken =>
             {
                 idToken = receivedIdToken;
                 done = true;
-                Debug.Log($"receivedIdToken: {receivedIdToken}");
             });
             
             _receiver.OnSignInFailed.AddListener(error =>

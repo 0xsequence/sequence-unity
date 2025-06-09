@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Sequence.Config;
 using Sequence.Utils;
 using UnityEngine;
@@ -95,11 +96,12 @@ namespace Sequence.Authentication
                 {
                     throw SequenceConfig.MissingConfigError("Google Client Id");
                 }
-
-                string state = GenerateState(LoginMethod.Google);
-                string googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, state);
-                _browser.SetState(state);
-                _browser.Authenticate(googleSignInUrl, ReverseClientId(GoogleClientId));
+                
+#if UNITY_ANDROID && !UNITY_EDITOR
+                SignInWithGoogleNativePlugin();
+#else
+                SignInWithGoogleExternalBrowser();
+#endif
             }
             catch (Exception e)
             {
@@ -107,6 +109,27 @@ namespace Sequence.Authentication
             }
         }
 
+        private async Task SignInWithGoogleNativePlugin()
+        {
+            var nativeHandler = new NativeGoogleSignIn(GoogleClientId);
+            var idToken = await nativeHandler.SignIn();
+            if (string.IsNullOrEmpty(idToken))
+            {
+                OnSignInFailed?.Invoke($"Google sign in error using native android plugin.", LoginMethod.Google);
+                return;
+            }
+
+            InvokeSignedIn(new OpenIdAuthenticationResult(idToken, LoginMethod.Google));
+        }
+
+        private void SignInWithGoogleExternalBrowser()
+        {
+            var state = GenerateState(LoginMethod.Google);
+            var googleSignInUrl = GenerateSignInUrl("https://accounts.google.com/o/oauth2/auth", GoogleClientId, state);
+            _browser.SetState(state);
+            _browser.Authenticate(googleSignInUrl, ReverseClientId(GoogleClientId));
+        }
+        
         private string ReverseClientId(string clientId)
         {
             string[] parts = clientId.Split('.');
