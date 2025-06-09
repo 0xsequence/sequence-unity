@@ -8,17 +8,20 @@ namespace Sequence.Authentication
     {
         private AndroidJavaClass _pluginClass;
         private NativeGoogleSignInReceiver _receiver;
+
+        private string _clientId;
         
         public NativeGoogleSignIn(string clientId)
         {
-            _pluginClass = new AndroidJavaClass("xyz.sequence.GoogleSignInPlugin");
-            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-            _pluginClass.CallStatic("initialize", activity, clientId);
+            _clientId = clientId;
         }
 
         public async Task<string> SignIn()
         {
+            _pluginClass = new AndroidJavaClass("xyz.sequence.GoogleSignInPlugin");
+            var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+            
             var done = false;
             var idToken = string.Empty;
             
@@ -39,12 +42,12 @@ namespace Sequence.Authentication
                 Debug.LogError($"Error during native google sign-in: {error}");
             });
             
-            _pluginClass.CallStatic("signIn");
+            _pluginClass.CallStatic("signIn", activity, _clientId);
 
             while (!done)
                 await Task.Delay(200);
-            Debug.Log($"SignIn Done");
-            GameObject.Destroy(_receiver);
+            
+            GameObject.Destroy(_receiver.gameObject);
             return idToken;
         }
     }

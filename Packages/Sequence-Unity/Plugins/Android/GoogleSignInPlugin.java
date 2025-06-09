@@ -1,69 +1,91 @@
 package xyz.sequence;
 
-import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.credentials.Credential;
+import androidx.credentials.CredentialManager;
+import androidx.credentials.CredentialManagerCallback;
+import androidx.credentials.CustomCredential;
+import androidx.credentials.GetCredentialRequest;
+import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialException;
+import androidx.credentials.exceptions.NoCredentialException;
+import androidx.credentials.exceptions.GetCredentialCustomException;
 
-import com.google.android.gms.auth.api.signin.*;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
+
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.concurrent.Executors;
 
 import com.unity3d.player.UnityPlayer;
 
 public class GoogleSignInPlugin {
-    private static final String TAG = "GoogleSignInPlugin";
-    private static final int RC_SIGN_IN = 9001;
-    private static GoogleSignInClient mGoogleSignInClient;
-    private static Activity unityActivity;
+    private static final String TAG = "SequenceGoogleSignIn";
 
-    public static void initialize(Activity activity, String clientId) {
-        unityActivity = activity;
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(clientId)
-            .requestEmail()
+    public static void signIn(Context context, String clientId)
+    {
+        getCredentialAsync(context, clientId);
+    }
+
+    private static void getCredentialAsync(Context context, String clientId)
+    {
+        GetSignInWithGoogleOption googleIdOption = new GetSignInWithGoogleOption
+            .Builder(clientId)
+            .setNonce(generateNonce())
             .build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(activity, gso);
+        GetCredentialRequest request = new GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build();
+
+        CredentialManager credentialManager = CredentialManager.create(context);
+        credentialManager.getCredentialAsync(
+                context,
+                request,
+                null,
+                Executors.newSingleThreadExecutor(),
+                new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+                    @Override
+                    public void onResult(GetCredentialResponse getCredentialResponse) {
+                        handleGetCredentialResponse(getCredentialResponse);
+                    }
+
+                    @Override
+                    public void onError(@NonNull GetCredentialException e) {
+                         Log.e(TAG, "Error getting credential", e);
+                         if (e instanceof GetCredentialCustomException) {
+                             GetCredentialCustomException customException = (GetCredentialCustomException) e;
+                             Log.e(TAG, "Custom Exception Type: " + customException.getType());
+                        }
+                        
+                        UnityPlayer.UnitySendMessage("NativeGoogleSignInReceiver", "HandleError", "Error");
+                    }
+                }
+        );
     }
 
-    public static void signIn() {
-        if (mGoogleSignInClient == null) {
-            Log.e(TAG, "GoogleSignInClient is null. Did you call initialize()?");
-            return;
+    private static void handleGetCredentialResponse(GetCredentialResponse getCredentialResponse) {
+        Credential credential = getCredentialResponse.getCredential();
+        if (credential instanceof CustomCredential && GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL.equals(credential.getType())) {
+            try {
+                GoogleIdTokenCredential idTokenCredential = GoogleIdTokenCredential.createFrom(credential.getData());
+                String idToken = idTokenCredential.getIdToken();
+                
+                UnityPlayer.UnitySendMessage("NativeGoogleSignInReceiver", "HandleIdToken", idToken);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to parse Google ID token response", e);
+            }
+        } else {
+            Log.e(TAG, "Unexpected credential type");
         }
+    }
     
-        Log.d(TAG, "Starting Google Sign-In intent");
-    
-        mGoogleSignInClient.revokeAccess().addOnCompleteListener(task -> {
-            mGoogleSignInClient.signOut().addOnCompleteListener(signOutTask -> {
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                unityActivity.startActivityForResult(signInIntent, RC_SIGN_IN);
-            });
-        });
-    }
-
-    public static void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Log.d(TAG, "onActivityResult called with requestCode: " + requestCode + ", resultCode: " + resultCode);
-
-        if (requestCode == RC_SIGN_IN) {
-            Log.d(TAG, "Handling Google Sign-In result");
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private static void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            String token = account.getIdToken();
-            
-            Log.d(TAG, "Sign-In success: ID token = " + token);
-            UnityPlayer.UnitySendMessage("NativeGoogleSignInReceiver", "HandleIdToken", token);
-        } catch (ApiException e) {
-            Log.e(TAG, "Sign-In failed: code=" + e.getStatusCode() + " message=" + e.getMessage(), e);
-            UnityPlayer.UnitySendMessage("NativeGoogleSignInReceiver", "HandleError", e.getMessage());
-        }
+    private static String generateNonce() {
+        SecureRandom random = new SecureRandom();
+        byte[] nonce = new byte[32];
+        random.nextBytes(nonce);
+        return Base64.getEncoder().encodeToString(nonce);
     }
 }
