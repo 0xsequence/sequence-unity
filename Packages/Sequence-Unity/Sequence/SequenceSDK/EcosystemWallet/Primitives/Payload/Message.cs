@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Sequence.ABI;
 using Sequence.Utils;
@@ -9,6 +10,15 @@ namespace Sequence.EcosystemWallet.Primitives
     [Serializable]
     public class Message : Payload
     {
+        public static readonly Dictionary<string, NamedType[]> Types = new Dictionary<string, NamedType[]>
+        {
+            ["Message"] = new[]
+            {
+                new NamedType("message", "bytes"),
+                new NamedType("wallets", "address[]"),
+            }
+        };
+        
         public override PayloadType type => PayloadType.Message;
         public byte[] message;
 

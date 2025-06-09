@@ -12,6 +12,7 @@ using Nethereum.ABI.EIP712;
 
 namespace Sequence.EcosystemWallet.UnitTests
 {
+    // AI generated, but can be useful for debugging
     public class NethereumConversionTests
     {
         private Address[] _testAddressArray = new Address[]

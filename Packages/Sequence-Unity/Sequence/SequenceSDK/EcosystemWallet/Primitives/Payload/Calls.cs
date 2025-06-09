@@ -13,6 +13,27 @@ namespace Sequence.EcosystemWallet.Primitives
     [Serializable]
     public class Calls : Payload
     {
+        public static readonly Dictionary<string, NamedType[]> Types = new Dictionary<string, NamedType[]>()
+        {
+            ["Calls"] = new[]
+            {
+                new NamedType("calls", "Call[]"),
+                new NamedType("space", "uint256"),
+                new NamedType("nonce", "uint256"),
+                new NamedType("wallets", "address[]"),
+            },
+            ["Call"] = new[]
+            {
+                new NamedType("to", "address"),
+                new NamedType("value", "uint256"),
+                new NamedType("data", "bytes"),
+                new NamedType("gasLimit", "uint256"),
+                new NamedType("delegateCall", "bool"),
+                new NamedType("onlyFallback", "bool"),
+                new NamedType("behaviorOnError", "uint256"),
+            }
+        };
+        
         public const uint MaxNonceBytes = 15;
         public const uint MaxCalls = 65536;
         

@@ -216,7 +216,6 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
-        // Todo: once we have tests working, let's refactor this so it isn't one giant function
         public TypedDataToSign(Address wallet, Chain chain, Parented payload)
         {
             _payload = payload;
@@ -225,28 +224,8 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 case PayloadType.Call:
                 {
-                    types = new Dictionary<string, NamedType[]>()
-                    {
-                        ["Calls"] = new[]
-                        {
-                            new NamedType("calls", "Call[]"),
-                            new NamedType("space", "uint256"),
-                            new NamedType("nonce", "uint256"),
-                            new NamedType("wallets", "address[]"),
-                        },
-                        ["Call"] = new[]
-                        {
-                            new NamedType("to", "address"),
-                            new NamedType("value", "uint256"),
-                            new NamedType("data", "bytes"),
-                            new NamedType("gasLimit", "uint256"),
-                            new NamedType("delegateCall", "bool"),
-                            new NamedType("onlyFallback", "bool"),
-                            new NamedType("behaviorOnError", "uint256"),
-                        }
-                    };
+                    types = Calls.Types;
 
-                    // We ensure 'behaviorOnError' is turned into a numeric value
                     Calls callPayload = (Calls)payload.payload;
                     message = new Dictionary<string, object>
                     {
@@ -267,14 +246,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 case PayloadType.Message:
                 {
-                    types = new Dictionary<string, NamedType[]>
-                    {
-                        ["Message"] = new[]
-                        {
-                            new NamedType("message", "bytes"),
-                            new NamedType("wallets", "address[]"),
-                        }
-                    };
+                    types = Message.Types;
 
                     var messagePayload = (Message)payload.payload;
                     message = new Dictionary<string, object>
@@ -287,14 +259,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 case PayloadType.ConfigUpdate:
                 {
-                    types = new Dictionary<string, NamedType[]>
-                    {
-                        ["ConfigUpdate"] = new[]
-                        {
-                            new NamedType("imageHash", "bytes32"),
-                            new NamedType("wallets", "address[]"),
-                        }
-                    };
+                    types = ConfigUpdate.Types;
 
                     var configPayload = (ConfigUpdate)payload.payload;
                     message = new Dictionary<string, object>
