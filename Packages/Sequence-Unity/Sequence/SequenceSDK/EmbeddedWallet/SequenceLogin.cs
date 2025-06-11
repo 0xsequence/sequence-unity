@@ -72,7 +72,7 @@ namespace Sequence.EmbeddedWallet
         
         public void SetConnectedWalletAddress(Address connectedWalletAddress)
         {
-            if (string.IsNullOrEmpty(connectedWalletAddress))
+            if (connectedWalletAddress == null)
             {
                 Debug.LogError($"The connected wallet address cannot be null or empty.");
                 throw new ArgumentNullException(nameof(connectedWalletAddress));
