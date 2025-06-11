@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Linq;
 using Sequence.Config;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Sequence.Editor
 {
@@ -18,6 +19,16 @@ namespace Sequence.Editor
     {
         public const string SecureStoragePluginFilename = "AndroidKeyBridge.java";
         public const string SequenceGoogleSignInPluginFilename = "GoogleSignInPlugin.java";
+        public const string GradleTemplateFilename = "mainTemplate.gradle";
+
+        private static string[] GradleDependencies = new[]
+        {
+            "androidx.security:security-crypto",
+            "com.google.android.gms:play-services-auth",
+            "androidx.credentials:credentials",
+            "androidx.credentials:credentials-play-services-auth",
+            "com.google.android.libraries.identity.googleid:googleid",
+        };
         
         private const string RelevantDocsUrl =
             "https://docs.sequence.xyz/sdk/unity/onboard/recovering-sessions#android";
@@ -32,6 +43,8 @@ namespace Sequence.Editor
             
             CheckPlugin(SecureStoragePluginFilename, config.StoreSessionPrivateKeyInSecureStorage, target);
             CheckPlugin(SequenceGoogleSignInPluginFilename, true, target);
+            CheckGradleTemplateDependencies();
+            AssetDatabase.Refresh();
 #endif
         }
 
@@ -40,7 +53,6 @@ namespace Sequence.Editor
         {
             CheckPlugin(SecureStoragePluginFilename, true, BuildTarget.Android);
             CheckPlugin(SequenceGoogleSignInPluginFilename, true, BuildTarget.Android);
-            AssetDatabase.Refresh();
         }
 
         private static void CheckPlugin(string fileName, bool enable, BuildTarget platform)
@@ -79,6 +91,27 @@ namespace Sequence.Editor
                 Directory.CreateDirectory(directory);
 
             File.Copy(sourcePath, targetPath);
+        }
+        
+        private static void CheckGradleTemplateDependencies()
+        {
+            var existingFiles = Directory.GetFiles("Assets", GradleTemplateFilename, SearchOption.AllDirectories);
+            var gradleFilePath = existingFiles.FirstOrDefault();
+            
+            if (string.IsNullOrEmpty(gradleFilePath) || !File.Exists(gradleFilePath))
+            {
+                ShowWarning("mainTemplate.gradle does not exist. Trigger a build once to generate it.");
+                return;
+            }
+
+            var content = File.ReadAllText(gradleFilePath);
+            foreach (var dep in GradleDependencies)
+            {
+                if (!content.Contains(dep))
+                {
+                    ShowWarning($"{GradleTemplateFilename} does not include '{dep}' as a dependency.");
+                }
+            }
         }
 
         private static void ShowWarning(string warning)
