@@ -1,7 +1,9 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SidekickConfig", menuName = "ScriptableObjects/SidekickConfig")]
+[CreateAssetMenu(fileName = "SidekickConfig", menuName = "Sequence/SidekickConfig")]
 public class SidekickConfig : ScriptableObject
 {
-    public string path;
+    public string secretKey;
+    public string sidekickPath;
+    public string dockerDesktopPath;
 }

@@ -1,6 +1,6 @@
-namespace Sequence
+namespace Sequence.EmbeddedWallet
 {
-    public static class ReceiptExtractor
+    public static class DeployedeContractAddressExtractor
     {
         public static string ExtractFirstContractAddressExceptOwn(TransactionReceipt receipt, string ownContractAddress)
         {

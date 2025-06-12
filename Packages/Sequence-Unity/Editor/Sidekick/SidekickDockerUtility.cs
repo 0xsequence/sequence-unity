@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
 public static class SidekickDockerUtility
 {
     private static SidekickConfig config;
@@ -21,11 +20,29 @@ public static class SidekickDockerUtility
                     return string.Empty;
                 }
             }
-            return config.path;
+            return config.sidekickPath;
         }
     }
 
-    [MenuItem("Sequence Dev/Start Sidekick", false, 0)]
+    private static string dockerDesktopPath
+    {
+        get
+        {
+            if (config == null)
+            {
+                config = Resources.Load<SidekickConfig>("SidekickConfig");
+                if (config == null)
+                {
+                    UnityEngine.Debug.LogError("Could not load SidekickConfig from Resources.");
+                    return string.Empty;
+                }
+            }
+            return config.dockerDesktopPath;
+        }
+    }
+
+
+    [MenuItem("Sequence Sidekick/Start", false, 0)]
     private static void StartSidekick()
     {
         if (IsSidekickRunning()) return;
@@ -35,10 +52,10 @@ public static class SidekickDockerUtility
         RunCommand("pnpm docker:restart", SidekickPath);
     }
 
-    [MenuItem("Sequence Dev/Start Sidekick", true)]
+    [MenuItem("Sequence Sidekick/Start", true)]
     private static bool ValidateStart() => !IsSidekickRunning();
 
-    [MenuItem("Sequence Dev/Stop Sidekick", false, 1)]
+    [MenuItem("Sequence Sidekick/Stop", false, 1)]
     private static void StopSidekick()
     {
         if (!IsSidekickRunning()) return;
@@ -46,7 +63,7 @@ public static class SidekickDockerUtility
         RunCommand("pnpm docker:stop", SidekickPath);
     }
 
-    [MenuItem("Sequence Dev/Stop Sidekick", true)]
+    [MenuItem("Sequence Sidekick/Stop", true)]
     private static bool ValidateStop() => IsSidekickRunning();
 
     private static void RunCommand(string command, string workingDirectory)
@@ -86,40 +103,42 @@ public static class SidekickDockerUtility
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
     }
-
     private static void EnsureDockerDesktopRunning()
     {
         const int maxWaitTimeSeconds = 120;
         const int pollIntervalMs = 2000;
 
-        if (!Process.GetProcessesByName("Docker Desktop").Any())
+        System.Threading.Tasks.Task.Run(() =>
         {
-            string dockerDesktopPath = @"C:\Program Files\Docker\Docker\Docker Desktop.exe";
-            if (File.Exists(dockerDesktopPath))
+            if (!Process.GetProcessesByName("Docker Desktop").Any())
             {
-                Process.Start(dockerDesktopPath);
-            }
-            else
-            {
-                UnityEngine.Debug.LogWarning("[Docker] Docker Desktop not found at default path.");
-                return;
-            }
-        }
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-
-        while (stopwatch.Elapsed.TotalSeconds < maxWaitTimeSeconds)
-        {
-            if (IsDockerDaemonReady())
-            {
-                return;
+                if (File.Exists(config.dockerDesktopPath))
+                {
+                    Process.Start(config.dockerDesktopPath);
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning("[Docker] Docker Desktop not found at Sidekick Config set path.");
+                    return;
+                }
             }
 
-            System.Threading.Thread.Sleep(pollIntervalMs);
-        }
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-        UnityEngine.Debug.LogError("[Docker] Timed out waiting for Docker to become ready.");
+            while (stopwatch.Elapsed.TotalSeconds < maxWaitTimeSeconds)
+            {
+                if (IsDockerDaemonReady())
+                {
+                    UnityEngine.Debug.Log("[Docker] Docker is ready.");
+                    return;
+                }
+
+                System.Threading.Thread.Sleep(pollIntervalMs);
+            }
+
+            UnityEngine.Debug.LogError("[Docker] Timed out waiting for Docker to become ready.");
+        });
     }
 
     private static bool IsDockerDaemonReady()
