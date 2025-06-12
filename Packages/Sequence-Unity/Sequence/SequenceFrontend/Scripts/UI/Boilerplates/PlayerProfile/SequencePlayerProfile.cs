@@ -57,7 +57,7 @@ namespace Sequence.Boilerplates.PlayerProfile
             var indexer = new ChainIndexer(_chain);
             var balanceResponse = await indexer.GetEtherBalance(walletAddress);
 
-            var balance = DecimalNormalizer.ReturnToNormal(balanceResponse.balanceWei);
+            var balance = DecimalNormalizer.ReturnToNormalString(balanceResponse.balanceWei);
             _etherBalanceText.text = $"{balance} ETH";
             _messagePopup.gameObject.SetActive(false);
             EnableLoading(false);
