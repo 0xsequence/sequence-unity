@@ -8,5 +8,15 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger checkpoint;
         public Topology topology;
         public Address checkpointer;
+
+        public Leaf FindSignerLeaf(Address address)
+        {
+            if (topology == null)
+            {
+                return null;
+            }
+
+            return topology.FindSignerLeaf(address);
+        }
     }
 }
