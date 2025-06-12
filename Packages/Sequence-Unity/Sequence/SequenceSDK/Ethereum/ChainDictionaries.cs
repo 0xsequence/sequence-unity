@@ -59,6 +59,7 @@ namespace Sequence
             { Chain.TestnetMonad, "Monad Testnet" },
             { Chain.TestnetSomnia, "Somnia Testnet" },
             { Chain.TestnetFrequency, "Frequency Testnet" },
+            { Chain.TestnetIncentiv, "Incentiv Testnet"},
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
@@ -116,6 +117,7 @@ namespace Sequence
             { Chain.TestnetMonad, "MON" },
             { Chain.TestnetSomnia, "STT" },
             { Chain.TestnetFrequency, "BERA" },
+            { Chain.TestnetIncentiv, "CENT"}
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -206,6 +208,7 @@ namespace Sequence
             { Chain.TestnetMonad, "https://testnet.monadexplorer.com/" },
             { Chain.TestnetSomnia, "https://somnia-testnet.socialscan.io/" },
             { Chain.TestnetFrequency, "https://explorer.frequency.zeeve.net/" },
+            { Chain.TestnetIncentiv, "https://explorer.testnet.incentiv.net/"}
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -265,6 +268,7 @@ namespace Sequence
             { Chain.TestnetMonad, "10143" },
             { Chain.TestnetSomnia, "50312" },
             { Chain.TestnetFrequency, "53716" },
+            { Chain.TestnetIncentiv, "11690" }
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -322,6 +326,7 @@ namespace Sequence
             { "10143", Chain.TestnetMonad },
             { "50312", Chain.TestnetSomnia },
             { "53716", Chain.TestnetFrequency },
+            { "11690", Chain.TestnetIncentiv }
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -379,6 +384,7 @@ namespace Sequence
             { Chain.TestnetMonad, "monad-testnet" },
             { Chain.TestnetSomnia, "somnia-testnet" },
             { Chain.TestnetFrequency, "frequency-testnet" },
+            { Chain.TestnetIncentiv, "incentiv-testnet" }
         };
     }
 }
