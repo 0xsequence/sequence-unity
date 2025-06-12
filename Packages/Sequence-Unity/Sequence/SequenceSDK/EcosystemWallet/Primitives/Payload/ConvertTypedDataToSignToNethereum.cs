@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class ConvertTypedDataToSignToNethereum
+    public class ConvertTypedDataToSignToNethereum
     {
         private Domain domain;
         private Dictionary<string, NamedType[]> types;
@@ -33,7 +33,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
         
-        internal TypedData<Nethereum.ABI.EIP712.DomainWithSalt> ConvertToNethereumTypedDataWithSalt()
+        public TypedData<Nethereum.ABI.EIP712.DomainWithSalt> ConvertToNethereumTypedDataWithSalt()
         {
             if (domain.salt == null || domain.salt.Data == null || domain.salt.Data.Length == 0)
             {
@@ -76,7 +76,7 @@ namespace Sequence.EcosystemWallet.Primitives
             };
         }
 
-        internal TypedData<Nethereum.ABI.EIP712.Domain> ConvertToNethereumTypedDataWithoutSalt()
+        public TypedData<Nethereum.ABI.EIP712.Domain> ConvertToNethereumTypedDataWithoutSalt()
         {
             var nethereumDomain = new Nethereum.ABI.EIP712.Domain()
             {
@@ -131,7 +131,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return nethereumTypes;
         }
         
-        private MemberValue[] ConvertMessageForNethereum()
+        public MemberValue[] ConvertMessageForNethereum()
         {
             var memberValues = new List<MemberValue>();
         
