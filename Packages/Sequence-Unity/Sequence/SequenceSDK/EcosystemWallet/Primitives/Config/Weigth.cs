@@ -43,6 +43,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return GetWeight(configuration.topology, canSign);
         }
 
+        // Todo once tests are passing refactor to get the weight on the leafs directly, we can create an abstract method and overwrite it
         private static Weigth GetWeightForLeaf(RawLeaf leaf, Func<Leaf, bool> canSign)
         {
             if (leaf is SignedSignerLeaf signedSigner)
