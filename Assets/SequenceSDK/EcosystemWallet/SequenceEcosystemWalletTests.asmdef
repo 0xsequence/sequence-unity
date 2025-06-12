@@ -20,7 +20,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll",
+        "Nethereum.ABI.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [

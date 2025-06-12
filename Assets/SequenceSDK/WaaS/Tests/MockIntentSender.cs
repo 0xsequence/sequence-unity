@@ -46,7 +46,7 @@ namespace Sequence.EmbeddedWallet
             throw new System.NotImplementedException();
         }
 
-        public Task<Session[]> ListSessions()
+        public Task<Session[]> ListSessions(Address walletAddress = null)
         {
             throw new System.NotImplementedException();
         }

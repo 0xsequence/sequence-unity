@@ -247,7 +247,7 @@ namespace Sequence.EmbeddedWallet
             Session[] results = null;
             try
             {
-                results = await _intentSender.ListSessions();
+                results = await _intentSender.ListSessions(GetWalletAddress());
             }
             catch (Exception e)
             {
