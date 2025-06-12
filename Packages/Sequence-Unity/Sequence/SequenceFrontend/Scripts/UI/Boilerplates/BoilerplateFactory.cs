@@ -115,7 +115,7 @@ namespace Sequence.Boilerplates
         public static ViewMarketplaceListingsPanel OpenViewMarketplaceListingsPanel(Transform parent, IWallet wallet, Chain chain, Address marketplaceCollectionAddress, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<ViewMarketplaceListingsPanel>("Marketplace/ViewMarketplaceListingsPanel", parent, 
-                b => b.Open(wallet, chain, onClose));
+                b => b.Open(wallet, chain, marketplaceCollectionAddress, onClose));
         }
 
         /// <summary>

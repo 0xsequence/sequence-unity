@@ -35,6 +35,10 @@ namespace Sequence.Utils
             {
                 resultStr = resultStr.TrimEnd('0');
             }
+            if (resultStr.EndsWith("."))
+            {
+                resultStr = resultStr.TrimEnd('.');
+            }
             return resultStr;
         }
 
