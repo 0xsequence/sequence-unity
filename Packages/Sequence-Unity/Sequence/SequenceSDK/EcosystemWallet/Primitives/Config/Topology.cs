@@ -92,6 +92,76 @@ namespace Sequence.EcosystemWallet.Primitives
             return null;
         }
 
+        // Todo refactor
+        public object Encode()
+        {
+            if (IsNode())
+            {
+                return new object[]
+                {
+                    Node.left.Encode(),
+                    Node.right.Encode()
+                };
+            }
+            else if (Leaf.isSignerLeaf)
+            {
+                SignerLeaf signerLeaf = (SignerLeaf)Leaf;
+                return new
+                {
+                    type = "signer",
+                    address = signerLeaf.address,
+                    weight = signerLeaf.weight.ToString()
+                };
+            }
+            else if (Leaf.isSapientSignerLeaf)
+            {
+                SapientSignerLeaf sapientLeaf = (SapientSignerLeaf)Leaf;
+                return new
+                {
+                    type = "sapient-signer",
+                    address = sapientLeaf.address,
+                    weight = sapientLeaf.weight.ToString(),
+                    imageHash = sapientLeaf.imageHash
+                };
+            }
+            else if (Leaf.isSubdigestLeaf)
+            {
+                SubdigestLeaf subdigestLeaf = (SubdigestLeaf)Leaf;
+                return new
+                {
+                    type = "subdigest",
+                    digest = subdigestLeaf.digest.ByteArrayToHexString()
+                };
+            }
+            else if (Leaf.isAnyAddressSubdigestLeaf)
+            {
+                AnyAddressSubdigestLeaf anyAddressSubdigestLeaf = (AnyAddressSubdigestLeaf)Leaf;
+                return new
+                {
+                    type = "any-address-subdigest",
+                    digest = anyAddressSubdigestLeaf.digest.ByteArrayToHexString()
+                };
+            }
+            else if (Leaf.isNodeLeaf)
+            {
+                NodeLeaf nodeLeaf = (NodeLeaf)Leaf;
+                return nodeLeaf.Value.ByteArrayToHexString();
+            }
+            else if (Leaf.isNestedLeaf)
+            {
+                NestedLeaf nestedLeaf = (NestedLeaf)Leaf;
+                return new
+                {
+                    type = "nested",
+                    tree = nestedLeaf.tree.Encode(),
+                    weight = nestedLeaf.weight.ToString(),
+                    threshold = nestedLeaf.threshold.ToString()
+                };
+            }
+
+            throw new InvalidOperationException("Invalid topology");
+        }
+
         // Todo once tests are passing refactor to use a HashConfiguration method on the leafs specifically, we can add an abstract method to be overwritten
         public byte[] HashConfiguration()
         {

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
 
@@ -41,6 +42,19 @@ namespace Sequence.EcosystemWallet.Primitives
             root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, checkpointerBytes));
             
             return root;
+        }
+
+        public string ToJson()
+        {
+            var jsonObject = new
+            {
+                threshold = threshold.ToString(),
+                checkpoint = checkpoint.ToString(),
+                topology = topology?.Encode(),
+                checkpointer = checkpointer?.Value
+            };
+
+            return JsonConvert.SerializeObject(jsonObject);
         }
     }
 }
