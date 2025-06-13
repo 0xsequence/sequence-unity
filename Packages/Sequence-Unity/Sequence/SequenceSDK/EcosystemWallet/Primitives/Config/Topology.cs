@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using System.Text;
+using System.Collections.Generic;
 using Sequence.ABI;
 using Sequence.Utils;
 
@@ -19,6 +20,33 @@ namespace Sequence.EcosystemWallet.Primitives
         public Topology(Node node)
         {
             this.Node = node;
+        }
+
+        public static Topology FromLeaves(List<Leaf> leaves)
+        {
+            if (leaves == null || leaves.Count == 0)
+            {
+                throw new ArgumentException("Cannot create topology from empty leaves");
+            }
+
+            if (leaves.Count == 1)
+            {
+                return new Topology(leaves[0]);
+            }
+
+            if (leaves.Count == 2)
+            {
+                return new Topology(new Node(
+                    new Topology(leaves[0]),
+                    new Topology(leaves[1])
+                ));
+            }
+
+            int midPoint = leaves.Count / 2;
+            return new Topology(new Node(
+                FromLeaves(leaves.GetRange(0, midPoint)),
+                FromLeaves(leaves.GetRange(midPoint, leaves.Count - midPoint))
+            ));
         }
 
         public bool IsLeaf()
