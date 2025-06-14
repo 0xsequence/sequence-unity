@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Linq;
 using Sequence.Config;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Sequence.Editor
 {
@@ -17,7 +18,18 @@ namespace Sequence.Editor
     public class AndroidDependencyManager : IPreprocessBuildWithReport
     {
         public const string SecureStoragePluginFilename = "AndroidKeyBridge.java";
+        public const string SequenceGoogleSignInPluginFilename = "GoogleSignInPlugin.java";
+        public const string GradleTemplateFilename = "mainTemplate.gradle";
 
+        private static string[] GradleDependencies = new[]
+        {
+            "androidx.security:security-crypto",
+            "com.google.android.gms:play-services-auth",
+            "androidx.credentials:credentials",
+            "androidx.credentials:credentials-play-services-auth",
+            "com.google.android.libraries.identity.googleid:googleid",
+        };
+        
         private const string RelevantDocsUrl =
             "https://docs.sequence.xyz/sdk/unity/onboard/recovering-sessions#android";
 
@@ -26,38 +38,107 @@ namespace Sequence.Editor
         public void OnPreprocessBuild(BuildReport report)
         {
 #if UNITY_ANDROID
-            BuildTarget target = report.summary.platform;
-            SequenceConfig config = SequenceConfig.GetConfig();
+            var target = report.summary.platform;
+            var config = SequenceConfig.GetConfig();
+            
+            CheckPlugin(SecureStoragePluginFilename, config.StoreSessionPrivateKeyInSecureStorage, target);
+            CheckPlugin(SequenceGoogleSignInPluginFilename, true, target);
+            CheckGradleTemplateDependencies();
+            AssetDatabase.Refresh();
+#endif
+        }
 
-            string[] files = Directory.GetFiles("Assets", SecureStoragePluginFilename, SearchOption.AllDirectories);
-            string pluginPath = files.FirstOrDefault();
+        [MenuItem("Sequence/Android Plugins")]
+        public static void Test()
+        {
+            CheckPlugin(SecureStoragePluginFilename, true, BuildTarget.Android);
+            CheckPlugin(SequenceGoogleSignInPluginFilename, true, BuildTarget.Android);
+        }
+
+        private static void CheckPlugin(string fileName, bool enable, BuildTarget platform)
+        {
+            var existingFiles = Directory.GetFiles("Assets", fileName, SearchOption.AllDirectories);
+            var pluginPath = existingFiles.FirstOrDefault();
+            
             if (string.IsNullOrEmpty(pluginPath))
             {
-                if (config.StoreSessionPrivateKeyInSecureStorage)
-                {
-                    ShowWarning($"Secure Storage plugin '{SecureStoragePluginFilename}' not found in project. Please make sure you have imported it via Samples in Package Manager");
-                }
+                if (enable)
+                    TryCopyPlugin(fileName);
+                
                 return;
             }
 
-            PluginImporter pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
-            if (pluginImporter == null)
+            var pluginImporter = AssetImporter.GetAtPath(pluginPath) as PluginImporter;
+            if (!pluginImporter)
             {
                 ShowWarning($"Unable to create {nameof(PluginImporter)} instance at path: {pluginPath}");
                 return;
             }
 
-            pluginImporter.SetCompatibleWithPlatform(target, config.StoreSessionPrivateKeyInSecureStorage);
+            pluginImporter.SetCompatibleWithPlatform(platform, enable);
             pluginImporter.SaveAndReimport();
-            Debug.Log(
-                $"Secure Storage plugin compatibility set to {config.StoreSessionPrivateKeyInSecureStorage} for path: {pluginPath}");
-#endif
+            
+            Debug.Log($"Plugin {fileName} compatibility set to {enable} for path: {pluginPath}");
         }
 
-        private void ShowWarning(string warning)
+        private static void TryCopyPlugin(string fileName)
+        {
+            var targetPath = Path.Combine(Application.dataPath, "Plugins/Android", fileName);
+            var sourcePath = FindFileInPackages("Plugins/Android/" + fileName);
+            
+            var directory = Path.GetDirectoryName(targetPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            File.Copy(sourcePath, targetPath);
+        }
+        
+        private static void CheckGradleTemplateDependencies()
+        {
+            var existingFiles = Directory.GetFiles("Assets", GradleTemplateFilename, SearchOption.AllDirectories);
+            var gradleFilePath = existingFiles.FirstOrDefault();
+            
+            if (string.IsNullOrEmpty(gradleFilePath) || !File.Exists(gradleFilePath))
+            {
+                ShowWarning("mainTemplate.gradle does not exist. Trigger a build once to generate it.");
+                return;
+            }
+
+            var content = File.ReadAllText(gradleFilePath);
+            foreach (var dep in GradleDependencies)
+            {
+                if (!content.Contains(dep))
+                {
+                    ShowWarning($"{GradleTemplateFilename} does not include '{dep}' as a dependency.");
+                }
+            }
+        }
+
+        private static void ShowWarning(string warning)
         {
             Debug.LogWarning(warning);
             SequenceWarningPopup.ShowWindow(new List<string>() {warning}, RelevantDocsUrl);
+        }
+
+        private static string FindFileInPackages(string relativeFilePath)
+        {
+            var filePath = $"Packages/Sequence-Unity/{relativeFilePath}";
+            if (File.Exists(filePath))
+                return filePath;
+
+            var directories = Directory.GetDirectories("Library/PackageCache/", "xyz.0xsequence.waas-unity*", SearchOption.TopDirectoryOnly);
+            if (directories.Length > 0)
+            {
+                var packageDir = directories[0];
+                var packageJsonPath = Path.Combine(packageDir, relativeFilePath);
+                if (File.Exists(packageJsonPath))
+                {
+                    return packageJsonPath;
+                }
+            }
+            
+            ShowWarning("Plugin file not found: " + relativeFilePath);
+            return null;
         }
     }
 }

@@ -25,28 +25,15 @@ public class AndroidKeyBridge {
 
     public void init(Context context)
     {
-        if (context == null) {
-            Log.w("AndroidKeyBridge", "Provided context is null, trying to get UnityPlayer.currentActivity");
-            try {
-                context = com.unity3d.player.UnityPlayer.currentActivity;
-            } catch (Exception e) {
-                Log.e("AndroidKeyBridge", "Failed to get UnityPlayer.currentActivity", e);
-            }
-        }
-    
-        if (context == null) {
-            Log.e("AndroidKeyBridge", "Context is still null, cannot initialize AndroidKeyBridge");
-            return;
-        }
-    
         this.context = context;
 
-        if (masterKey == null || sharedPreferences == null) {
+        if (masterKey == null) {
 
             try {
             masterKey = new MasterKey.Builder(context)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build();
+
             sharedPreferences = EncryptedSharedPreferences.create(
                     context,
                     "secret_shared_prefs",
@@ -55,9 +42,9 @@ public class AndroidKeyBridge {
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
                 );
             } catch (GeneralSecurityException e){
-                Log.d("AndroidKeyBridge", "Encountered error when initializing AndroidKeyBridge: " + e.getMessage());
+                Log.d("Exception", e.getMessage());
             } catch (IOException e){
-                Log.d("AndroidKeyBridge", "Encountered error when initializing AndroidKeyBridge: " + e.getMessage());
+                Log.d("Exception", e.getMessage());
             }
         }
     }
@@ -87,17 +74,11 @@ public class AndroidKeyBridge {
 
     private void RunSaveKeychainValue(String key, String value)
     {
-        if (masterKey == null || sharedPreferences == null) {
-            init(context);
-        }
         sharedPreferences.edit().putString(key, value).apply();
     }
 
     private String RunGetKeychainValue(String key)
     {
-        if (masterKey == null || sharedPreferences == null) {
-            init(context);
-        }
         return sharedPreferences.getString(key, "");
     }
 }
