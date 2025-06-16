@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using NUnit.Framework;
 using Sequence.ABI;
 using Sequence.EcosystemWallet.Primitives;
@@ -360,26 +359,23 @@ namespace Sequence.EcosystemWallet.UnitTests
             }
         }
         
-        // Helper methods using reflection to access internal methods
+        // Helper methods using the converter class directly
         private TypedData<Nethereum.ABI.EIP712.Domain> CallConvertToNethereumTypedDataWithoutSalt(TypedDataToSign instance)
         {
-            var method = typeof(TypedDataToSign).GetMethod("ConvertToNethereumTypedDataWithoutSalt", 
-                BindingFlags.NonPublic | BindingFlags.Instance);
-            return (TypedData<Nethereum.ABI.EIP712.Domain>)method.Invoke(instance, null);
+            var converter = new ConvertTypedDataToSignToNethereum(instance);
+            return converter.ConvertToNethereumTypedDataWithoutSalt();
         }
         
         private TypedData<Nethereum.ABI.EIP712.DomainWithSalt> CallConvertToNethereumTypedDataWithSalt(TypedDataToSign instance)
         {
-            var method = typeof(TypedDataToSign).GetMethod("ConvertToNethereumTypedDataWithSalt", 
-                BindingFlags.NonPublic | BindingFlags.Instance);
-            return (TypedData<Nethereum.ABI.EIP712.DomainWithSalt>)method.Invoke(instance, null);
+            var converter = new ConvertTypedDataToSignToNethereum(instance);
+            return converter.ConvertToNethereumTypedDataWithSalt();
         }
         
         private MemberValue[] CallConvertMessageForNethereum(TypedDataToSign instance)
         {
-            var method = typeof(TypedDataToSign).GetMethod("ConvertMessageForNethereum", 
-                BindingFlags.NonPublic | BindingFlags.Instance);
-            return (MemberValue[])method.Invoke(instance, null);
+            var converter = new ConvertTypedDataToSignToNethereum(instance);
+            return converter.ConvertMessageForNethereum();
         }
         
         // Helper methods to identify space and nonce fields since they have the same type
