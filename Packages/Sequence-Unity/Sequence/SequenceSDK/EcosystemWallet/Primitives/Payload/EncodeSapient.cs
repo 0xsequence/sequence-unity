@@ -37,6 +37,25 @@ namespace Sequence.EcosystemWallet.Primitives
                 onlyFallback = call.onlyFallback;
                 behaviorOnError = (int)call.behaviorOnError;
             }
+            
+            public override bool Equals(object obj)
+            {
+                if (obj == null || !(obj is EncodedCall))
+                {
+                    return false;
+                }
+            
+                EncodedCall call = (EncodedCall)obj;
+                bool toEqual = to.Equals(call.to);
+                bool dataEqual = data.Equals(call.data);
+                return toEqual &&
+                       value == call.value &&
+                       dataEqual &&
+                       gasLimit == call.gasLimit &&
+                       delegateCall == call.delegateCall &&
+                       onlyFallback == call.onlyFallback &&
+                       behaviorOnError == call.behaviorOnError;
+            }
         }
     }
 }

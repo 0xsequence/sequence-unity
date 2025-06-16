@@ -17,7 +17,10 @@ namespace Sequence.Utils
         
         public static int MinimumBytesNeeded(this BigInteger value)
         {
-            return (int)Math.Ceiling(value.ToString("X").Length / 2.0);
+            if (value == 0) return 1;
+
+            byte[] bytes = value.ByteArrayFromNumber();
+            return bytes.Length;
         }
     }
 }

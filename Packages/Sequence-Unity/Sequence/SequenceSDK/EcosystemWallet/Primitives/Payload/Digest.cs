@@ -2,6 +2,7 @@ using System;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
+using System.Linq;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -19,9 +20,14 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public override byte[] GetEIP712EncodeData()
         {
-            FixedByte bytes = new FixedByte(32, digest.HexStringToByteArray());
-            byte[] encoded = new FixedBytesCoder().Encode(bytes);
+            byte[] encoded = SequenceCoder.KeccakHash(digest.HexStringToByteArray());
             return encoded;
+        }
+        
+        public override string ToString()
+        {
+            string parentWalletsStr = parentWallets != null ? string.Join(", ", parentWallets.Select(w => w.ToString()).ToArray()) : "null";
+            return $"Digest {{ digest: {digest}, parentWallets: [{parentWalletsStr}] }}";
         }
         
         internal static Digest FromSolidityEncoding(SolidityDecoded decoded)

@@ -1,15 +1,20 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 using UnityEngine.Scripting;
+using Nethereum.ABI.EIP712;
+using Nethereum.Util;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class TypedDataToSign
+    public class TypedDataToSign
     {
         public Domain domain;
         public Dictionary<string, NamedType[]> types;
@@ -18,6 +23,183 @@ namespace Sequence.EcosystemWallet.Primitives
         
         private string[] _types;
         private Parented _payload;
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is TypedDataToSign))
+            {
+                return false;
+            }
+            
+            TypedDataToSign other = (TypedDataToSign)obj;
+            if (!other.domain.Equals(domain))
+            {
+                return false;
+            }
+
+            if (types.GetKeys().Length.Equals(other.types.GetKeys().Length))
+            {
+                foreach (var key in types.GetKeys())
+                {
+                    NamedType[] namedTypes = types[key];
+                    NamedType[] otherNamedTypes;
+                    if (other.types.TryGetValue(key, out otherNamedTypes))
+                    {
+                        int length = namedTypes.Length;
+                        if (length != otherNamedTypes.Length)
+                        {
+                            return false;
+                        }
+
+                        for (int i = 0; i < length; i++)
+                        {
+                            if (!namedTypes[i].Equals(otherNamedTypes[i]))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+            
+            if (!primaryType.Equals(other.primaryType))
+            {
+                return false;
+            }
+
+            if (message.GetKeys().Length.Equals(other.message.GetKeys().Length))
+            {
+                foreach (var key in message.GetKeys())
+                {
+                    object value = message[key];
+                    object otherValue;
+                    if (other.message.TryGetValue(key, out otherValue))
+                    {
+                        if (value is IEnumerable)
+                        {
+                            if (!(otherValue is IEnumerable))
+                            {
+                                return false;
+                            }
+                            
+                            IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+                            IEnumerator otherValueEnumerator = ((IEnumerable)otherValue).GetEnumerator();
+                            
+                            while (valueEnumerator.MoveNext() && otherValueEnumerator.MoveNext())
+                            {
+                                if (valueEnumerator.Current != null && !valueEnumerator.Current.Equals(otherValueEnumerator.Current))
+                                {
+                                    return false;
+                                }
+                                if (valueEnumerator.Current == null && otherValueEnumerator.Current != null)
+                                {
+                                    return false;
+                                }
+                            }
+                            
+                            if (valueEnumerator.MoveNext() || otherValueEnumerator.MoveNext())
+                            {
+                                return false;
+                            }
+                            continue;
+                        }
+                        if (!value.Equals(otherValue))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+            
+            return true;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.AppendLine("TypedDataToSign {");
+            sb.AppendLine($"  PrimaryType: {primaryType}");
+            
+            // Append domain information
+            sb.AppendLine($"  Domain: {domain}");
+            
+            // Append types
+            sb.AppendLine("  Types: {");
+            foreach (var typeEntry in types)
+            {
+                sb.AppendLine($"    {typeEntry.Key}: [");
+                foreach (var namedType in typeEntry.Value)
+                {
+                    sb.AppendLine($"      {namedType}");
+                }
+                sb.AppendLine("    ]");
+            }
+            sb.AppendLine("  }");
+            
+            // Append message
+            sb.AppendLine("  Message: {");
+            foreach (var msgEntry in message)
+            {
+                if (msgEntry.Value is byte[])
+                {
+                    // Convert byte arrays to hex string
+                    byte[] byteArray = (byte[])msgEntry.Value;
+                    string hexValue = byteArray.ByteArrayToHexStringWithPrefix();
+                    sb.AppendLine($"    {msgEntry.Key}: {hexValue}");
+                }
+                else if (msgEntry.Value is IEnumerable && !(msgEntry.Value is string))
+                {
+                    sb.AppendLine($"    {msgEntry.Key}: [");
+                    foreach (var item in (IEnumerable)msgEntry.Value)
+                    {
+                        if (item is byte[])
+                        {
+                            // Convert byte arrays to hex string
+                            byte[] byteArray = (byte[])item;
+                            string hexValue = byteArray.ByteArrayToHexStringWithPrefix();
+                            sb.AppendLine($"      {hexValue}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"      {item}");
+                        }
+                    }
+                    sb.AppendLine("    ]");
+                }
+                else
+                {
+                    sb.AppendLine($"    {msgEntry.Key}: {msgEntry.Value}");
+                }
+            }
+            sb.AppendLine("  }");
+            
+            // Append payload information if available
+            if (_payload != null)
+            {
+                sb.AppendLine($"  Payload: {_payload}");
+            }
+            
+            sb.AppendLine("}");
+            
+            return sb.ToString();
+        }
 
         [Preserve]
         [JsonConstructor]
@@ -34,7 +216,6 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
-        // Todo: once we have tests working, let's refactor this so it isn't one giant function
         public TypedDataToSign(Address wallet, Chain chain, Parented payload)
         {
             _payload = payload;
@@ -43,28 +224,8 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 case PayloadType.Call:
                 {
-                    types = new Dictionary<string, NamedType[]>()
-                    {
-                        ["Calls"] = new[]
-                        {
-                            new NamedType("calls", "Call[]"),
-                            new NamedType("space", "uint256"),
-                            new NamedType("nonce", "uint256"),
-                            new NamedType("wallets", "address[]"),
-                        },
-                        ["Call"] = new[]
-                        {
-                            new NamedType("to", "address"),
-                            new NamedType("value", "uint256"),
-                            new NamedType("data", "bytes"),
-                            new NamedType("gasLimit", "uint256"),
-                            new NamedType("delegateCall", "bool"),
-                            new NamedType("onlyFallback", "bool"),
-                            new NamedType("behaviorOnError", "uint256"),
-                        }
-                    };
+                    types = Calls.Types;
 
-                    // We ensure 'behaviorOnError' is turned into a numeric value
                     Calls callPayload = (Calls)payload.payload;
                     message = new Dictionary<string, object>
                     {
@@ -85,14 +246,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 case PayloadType.Message:
                 {
-                    types = new Dictionary<string, NamedType[]>
-                    {
-                        ["Message"] = new[]
-                        {
-                            new NamedType("message", "bytes"),
-                            new NamedType("wallets", "address[]"),
-                        }
-                    };
+                    types = Message.Types;
 
                     var messagePayload = (Message)payload.payload;
                     message = new Dictionary<string, object>
@@ -105,14 +259,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 case PayloadType.ConfigUpdate:
                 {
-                    types = new Dictionary<string, NamedType[]>
-                    {
-                        ["ConfigUpdate"] = new[]
-                        {
-                            new NamedType("imageHash", "bytes32"),
-                            new NamedType("wallets", "address[]"),
-                        }
-                    };
+                    types = ConfigUpdate.Types;
 
                     var configPayload = (ConfigUpdate)payload.payload;
                     message = new Dictionary<string, object>
@@ -131,76 +278,28 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
+        // Todo replace nethereum (introduced after commit 871466dbc7faf88f1201f963af6a372c59263d2f in commit d44d3bedfcbe875f2e5edc335e1d143bfb1358d3) - I think we were close with our own implementation so worth looking at it, even if only as a reference
         public byte[] GetSignPayload()
         {
-            _types = types.GetKeys();
-            SortTypes();
-            string encodeType = CalculateEncodeType();
-            byte[] encodeData = CalculateEncodeData();
-            string hashedEncodeType = SequenceCoder.KeccakHashASCII(encodeType);
-            byte[] hashStruct = SequenceCoder.KeccakHash(
-                ByteArrayExtensions.ConcatenateByteArrays(hashedEncodeType.HexStringToByteArray(),
-                    encodeData));
-            byte[] domainSeparator = domain.GetDomainSeparator();
-
-            byte[] signablePayload = ByteArrayExtensions.ConcatenateByteArrays(
-                SequenceCoder.HexStringToByteArray("0x19"),
-                SequenceCoder.HexStringToByteArray("0x01"),
-                domainSeparator,
-                hashStruct);
-            byte[] hashedMessage = SequenceCoder.KeccakHash(signablePayload);
-            return hashedMessage;
-        }
-        
-        private void SortTypes()
-        {
-            int typesCount = _types.Length;
-            if (typesCount == 0)
-            {
-                throw new ArgumentException($"Must have at least one entry in {nameof(types)} dictionary");
-            }
-            List<string> newTypes = new List<string>();
-            newTypes.Add(primaryType);
+            var eip712TypedDataEncoder = new Eip712TypedDataEncoder();
             
-            Array.Sort(_types);
-            for (int i = 0; i < typesCount; i++)
+            bool hasSalt = domain.HasSalt();
+            byte[] encodedTypedData;
+            ConvertTypedDataToSignToNethereum converter = new ConvertTypedDataToSignToNethereum(this);
+            if (hasSalt)
             {
-                if (_types[i] == primaryType)
-                {
-                    continue;
-                }
-                newTypes.Add(_types[i]);
+                TypedData<Nethereum.ABI.EIP712.DomainWithSalt> nethereumTypedDataWithSalt =
+                    converter.ConvertToNethereumTypedDataWithSalt();
+                encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedDataWithSalt);
+            }
+            else
+            {
+                TypedData<Nethereum.ABI.EIP712.Domain> nethereumTypedData =
+                    converter.ConvertToNethereumTypedDataWithoutSalt();
+                encodedTypedData = eip712TypedDataEncoder.EncodeTypedData(nethereumTypedData);
             }
 
-            _types = newTypes.ToArray();
-        }
-
-        private string CalculateEncodeType()
-        {
-            StringBuilder encodeType = new StringBuilder();
-            int typeCount = _types.Length;
-            for (int i = 0; i < typeCount; i++)
-            {
-                string type = _types[i];
-                encodeType.Append(type);
-                encodeType.Append("(");
-                foreach (var namedTypes in types[type])
-                {
-                    encodeType.Append(namedTypes.type);
-                    encodeType.Append(" ");
-                    encodeType.Append(namedTypes.name);
-                    encodeType.Append(",");
-                }
-                encodeType.Remove(encodeType.Length - 1, 1); // remove last comma
-                encodeType.Append(")");
-            }
-
-            return encodeType.ToString();
-        }
-
-        private byte[] CalculateEncodeData()
-        {
-            return _payload.GetEIP712EncodeData();
+            return SequenceCoder.KeccakHash(encodedTypedData);
         }
     }
 }

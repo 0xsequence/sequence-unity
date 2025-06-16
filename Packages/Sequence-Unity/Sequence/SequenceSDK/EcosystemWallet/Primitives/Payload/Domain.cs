@@ -13,6 +13,36 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger chainId;
         public Address verifyingContract;
         public FixedByte salt;
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Domain))
+            {
+                return false;
+            }
+            
+            Domain other = (Domain)obj;
+            if (salt != null && other.salt != null)
+            {
+                if (!salt.Equals(other.salt))
+                {
+                    return false;
+                }
+            }
+            else if (salt != null && other.salt == null ||
+                     salt == null && other.salt != null)
+            {
+                return false;
+            }
+            return name.Equals(other.name) && version.Equals(other.version) && chainId.Equals(other.chainId) &&
+                   verifyingContract.Equals(other.verifyingContract);
+        }
+        
+        public override string ToString()
+        {
+            string saltStr = salt != null ? salt.ToString() : "null";
+            return $"Domain {{ name: {name}, version: {version}, chainId: {chainId}, verifyingContract: {verifyingContract}, salt: {saltStr} }}";
+        }
 
         public Domain(string name, string version, BigInteger chainId, Address verifyingContract, FixedByte salt = null)
         {
@@ -53,14 +83,19 @@ namespace Sequence.EcosystemWallet.Primitives
             string encodeType =
                 "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)";
             byte[] typeHash = SequenceCoder.KeccakHashASCII(encodeType).HexStringToByteArray();
-            byte[] nameHash = name.EncodeStringAsBytes();
-            byte[] versionHash = version.EncodeStringAsBytes();
+            byte[] nameHash = SequenceCoder.KeccakHashASCII(name).HexStringToByteArray();
+            byte[] versionHash = SequenceCoder.KeccakHashASCII(version).HexStringToByteArray();
             byte[] chainIdHash = new NumberCoder().Encode(chainId);
             byte[] verifyingContractHash = new AddressCoder().Encode(verifyingContract);
-            byte[] saltHash = salt != null ? new FixedBytesCoder().Encode(salt) : new byte[]{};
+            byte[] saltHash = salt != null ? new FixedBytesCoder().Encode(salt) : new FixedBytesCoder().Encode(new byte[32]);
             byte[] encoded = ByteArrayExtensions.ConcatenateByteArrays(typeHash, nameHash, versionHash,
                 chainIdHash, verifyingContractHash, saltHash);
             return encoded;
+        }
+
+        public bool HasSalt()
+        {
+            return salt?.Data != null && salt.Data.Length > 0;
         }
     }
 }

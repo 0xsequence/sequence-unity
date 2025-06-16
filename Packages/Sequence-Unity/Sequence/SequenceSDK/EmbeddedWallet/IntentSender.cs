@@ -173,10 +173,14 @@ namespace Sequence.EmbeddedWallet
             return result;
         }
 
-        public async Task<Session[]> ListSessions()
+        public async Task<Session[]> ListSessions(Address walletAddress = null)
         {
+            if (walletAddress == null)
+            {
+                walletAddress = _sessionWallet.GetAddress();
+            }
             Session[] sessions = await SendIntent<Session[], IntentDataListSessions>(
-                new IntentDataListSessions(_sessionWallet.GetAddress()), IntentType.ListSessions);
+                new IntentDataListSessions(walletAddress), IntentType.ListSessions);
             return sessions;
         }
         

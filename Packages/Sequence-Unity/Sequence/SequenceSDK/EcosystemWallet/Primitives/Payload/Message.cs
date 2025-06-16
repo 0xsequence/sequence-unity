@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
@@ -6,8 +8,17 @@ using UnityEngine.Scripting;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class Message : Payload
+    public class Message : Payload
     {
+        public static readonly Dictionary<string, NamedType[]> Types = new Dictionary<string, NamedType[]>
+        {
+            ["Message"] = new[]
+            {
+                new NamedType("message", "bytes"),
+                new NamedType("wallets", "address[]"),
+            }
+        };
+        
         public override PayloadType type => PayloadType.Message;
         public byte[] message;
 
@@ -19,8 +30,15 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public override byte[] GetEIP712EncodeData()
         {
-            byte[] encoded = new BytesCoder().Encode(message);
+            byte[] encoded = SequenceCoder.KeccakHash(message);
             return encoded;
+        }
+        
+        public override string ToString()
+        {
+            string messageHex = message != null ? message.ByteArrayToHexStringWithPrefix() : "null";
+            string parentWalletsStr = parentWallets != null ? string.Join(", ", parentWallets.Select(w => w.ToString()).ToArray()) : "null";
+            return $"Message {{ message: {messageHex}, parentWallets: [{parentWalletsStr}] }}";
         }
         
         internal static Message FromSolidityEncoding(SolidityDecoded decoded)
