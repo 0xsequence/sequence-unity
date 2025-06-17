@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal abstract class Leaf : RawLeaf
+    public abstract class Leaf : RawLeaf
     {
         public bool isSignerLeaf => this is SignerLeaf;
         public bool isSapientSignerLeaf => this is SapientSignerLeaf;

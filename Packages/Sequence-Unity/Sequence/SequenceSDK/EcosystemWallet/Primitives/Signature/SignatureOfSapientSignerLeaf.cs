@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class SignatureOfSapientSignerLeaf : SignatureType
+    public class SignatureOfSapientSignerLeaf : SignatureType
     {
         public Address address;
         public byte[] data;

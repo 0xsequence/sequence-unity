@@ -2,12 +2,13 @@ using System;
 using System.Numerics;
 using System.Text;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class Topology
+    public class Topology
     {
         public Node Node;
         public Leaf Leaf;
@@ -160,6 +161,83 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             throw new InvalidOperationException("Invalid topology");
+        }
+
+        public static Topology Decode(string input)
+        {
+            // Case: array → binary node
+            /* if (obj is List<object> list)
+            {
+                if (list.Count != 2)
+                {
+                    throw new Exception("Invalid node structure in JSON");
+                }
+
+                return new List<object>
+                {
+                    DecodeTopology(list[0]),
+                    DecodeTopology(list[1])
+                };
+            }
+
+            // Case: string → leaf node (digest hash or node ID)
+            if (input.IsHexFormat())
+            {
+                Leaf
+                return hex;
+            }*/
+
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(input);
+            string type = (string)data["type"];
+            Leaf leaf;
+            
+            switch (type)
+            {
+                case "signer":
+                    leaf = new SignerLeaf
+                    {
+                        address = new Address((string)data["address"]),
+                        weight = BigInteger.Parse((string)data["weight"])
+                    };
+
+                    break;
+                case "sapient-signer":
+                    leaf = new SapientSignerLeaf
+                    {
+                        address = new Address((string)data["address"]),
+                        weight = BigInteger.Parse((string)data["weight"]),
+                        imageHash = (string)data["imageHash"]
+                    };
+
+                    break;
+                case "subdigest":
+                    leaf = new SubdigestLeaf
+                    {
+                        digest = ((string)data["digest"]).HexStringToByteArray()
+                    };
+                    
+                    break;
+                case "any-address-subdigest":
+                    leaf = new AnyAddressSubdigestLeaf
+                    {
+                        digest = ((string)data["digest"]).HexStringToByteArray()
+                    };
+
+                    break;
+                case "nested":
+                    leaf = new NestedLeaf
+                    {
+                        tree = FromLeaves(null),
+                        weight = BigInteger.Parse((string)data["weight"]),
+                        threshold = BigInteger.Parse((string)data["threshold"])
+                    };
+
+                    break;
+                default:
+                    throw new Exception("Invalid type in topology JSON");
+            }
+
+            return new Topology(leaf);
         }
 
         // Todo once tests are passing refactor to use a HashConfiguration method on the leafs specifically, we can add an abstract method to be overwritten

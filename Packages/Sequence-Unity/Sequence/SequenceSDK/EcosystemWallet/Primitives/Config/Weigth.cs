@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class Weigth
+    public class Weigth
     {
         public BigInteger weight;
         public BigInteger maxWeight;

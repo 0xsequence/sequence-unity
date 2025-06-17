@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class SignerLeaf : Leaf
+    public class SignerLeaf : Leaf
     {
         public const string type = "signer";
         public Address address;

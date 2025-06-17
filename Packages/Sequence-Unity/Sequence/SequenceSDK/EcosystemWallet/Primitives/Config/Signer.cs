@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class Signer
+    public class Signer
     {
         public Address[] signers;
         public SapientSigner[] sapientSigners;

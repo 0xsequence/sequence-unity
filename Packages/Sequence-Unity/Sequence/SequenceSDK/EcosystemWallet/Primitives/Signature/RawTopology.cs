@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class RawTopology
+    public class RawTopology
     {
         public RawLeaf Leaf { get; private set; }
         public RawNode Node { get; private set; }

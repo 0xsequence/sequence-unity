@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class WeightCalculator
+    public class WeightCalculator
     {
         public struct WeightResult
         {

@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class RawConfig
+    public class RawConfig
     {
         public BigInteger threshold;
         public BigInteger checkpoint;
