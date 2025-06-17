@@ -19,6 +19,13 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 ["payload_toPacked"] = async (parameters) => await new PayloadTests().PayloadToPacked(parameters),
                 ["payload_toJson"] = async (parameters) => await new PayloadTests().PayloadToJson(parameters),
                 ["payload_hashFor"] = async (parameters) => await new PayloadTests().PayloadHashFor(parameters),
+                ["config_new"] = async (parameters) => await new ConfigTests().ConfigNew(parameters),
+                ["config_encode"] = async (parameters) => await new ConfigTests().ConfigEncode(parameters),
+                ["config_imageHash"] = async (parameters) => await new ConfigTests().ConfigImageHash(parameters),
+                ["devTools_randomConfig"] = async (parameters) => await new DevToolsTest().DevToolsRandomConfig(parameters),
+                ["devTools_randomSessionTopology"] = async (parameters) => await new DevToolsTest().DevToolsRandomSessionTopology(parameters),
+                ["signature_encode"] = async (parameters) => await new SignatureTests().SignatureEncode(parameters),
+                ["signature_concat"] = async (parameters) => await new SignatureTests().SignatureConcat(parameters),
             };
 
         public async Task<JsonRpcResponse> HandleSingleRequest(
@@ -112,7 +119,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 JsonRpcErrorResponse error = new JsonRpcErrorResponse(new JsonRpcErrorResponse.Error(-32000, $"Unknown error: {ex.Message}"), id);
                 if (!silent)
                 {
-                    Debug.LogError($"[{DateTime.UtcNow:O}] Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)}");
+                    Debug.LogError($"[{DateTime.UtcNow:O}] Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)} {ex.StackTrace}");
                 }
                 return error;
             }

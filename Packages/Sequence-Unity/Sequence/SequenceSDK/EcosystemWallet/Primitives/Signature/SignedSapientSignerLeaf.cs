@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class SignedSapientSignerLeaf : SapientSignerLeaf
+    public class SignedSapientSignerLeaf : SapientSignerLeaf
     {
         public bool signed = true;
     }

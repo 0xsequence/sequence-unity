@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class NodeLeaf : Leaf
+    public class NodeLeaf : Leaf
     {
         public byte[] Value;
 

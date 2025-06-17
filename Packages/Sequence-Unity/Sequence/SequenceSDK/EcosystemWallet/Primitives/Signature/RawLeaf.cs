@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal abstract class RawLeaf
+    public abstract class RawLeaf
     {
         
     }
