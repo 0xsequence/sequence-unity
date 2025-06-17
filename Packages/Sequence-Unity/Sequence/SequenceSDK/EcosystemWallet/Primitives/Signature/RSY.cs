@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal abstract class RSY : SignatureOfSignerLeaf
+    public abstract class RSY : SignatureOfSignerLeaf
     {
         public abstract string type { get; }
         public BigInteger r;

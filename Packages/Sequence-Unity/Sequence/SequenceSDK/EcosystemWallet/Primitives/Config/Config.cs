@@ -3,6 +3,7 @@ using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -43,23 +44,6 @@ namespace Sequence.EcosystemWallet.Primitives
             root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, checkpointerBytes));
             
             return root;
-        }
-
-        public static Config FromJson(string json)
-        {
-            var parsed = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-            var threshold = (string)parsed["threshold"];
-            var checkpoint = (string)parsed["checkpoint"];
-            var checkpointer = (string)parsed["checkpointer"];
-            var topology = JsonConvert.SerializeObject((Dictionary<string, object>)parsed["topology"]);
-            
-            return new Config
-            {
-                threshold = BigInteger.Parse(threshold),
-                checkpoint = BigInteger.Parse(checkpoint),
-                checkpointer = new Address(checkpointer),
-                topology = Topology.Decode(topology)
-            };
         }
 
         public string ToJson()

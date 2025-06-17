@@ -9,6 +9,6 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger weight;
         public string imageHash;
         public bool signed;
-        public SignatureOfSapientSignerLeaf signature;
+        public SignatureType signature;
     }
 }

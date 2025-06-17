@@ -165,23 +165,19 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public static Topology Decode(string input)
         {
-            // Case: array → binary node
-            /* if (obj is List<object> list)
+            if (input.StartsWith("["))
             {
+                var list = JsonConvert.DeserializeObject<List<object>>(input);
                 if (list.Count != 2)
                 {
                     throw new Exception("Invalid node structure in JSON");
                 }
 
-                return new List<object>
-                {
-                    DecodeTopology(list[0]),
-                    DecodeTopology(list[1])
-                };
+                return new Topology(new Node(Decode(list[0].ToString()), Decode(list[1].ToString())));
             }
 
             // Case: string → leaf node (digest hash or node ID)
-            if (input.IsHexFormat())
+            /*if (input.IsHexFormat())
             {
                 Leaf
                 return hex;

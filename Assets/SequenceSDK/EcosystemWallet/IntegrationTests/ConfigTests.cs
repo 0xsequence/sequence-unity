@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
@@ -14,43 +13,42 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         {
             var threshold = (string)parameters["threshold"];
             var checkpoint = (string)parameters["checkpoint"];
-            var content = ((string)parameters["content"]).Split(' ');
-            var checkpointer = (string)parameters["checkpointer"];
+            var content = (string)parameters["content"];
+            
+            var checkpointer = parameters.TryGetValue("checkpointer", out var checkpointerValue) && 
+                               checkpointerValue != null ? new Address(checkpointerValue as string) : null;
             
             var config = new Primitives.Config
             {
                 threshold = BigInteger.Parse(threshold),
                 checkpoint = checkpoint.HexStringToBigInteger(),
                 topology = Topology.FromLeaves(ParseContentToLeafs(content)),
-                checkpointer = new Address(checkpointer)
+                checkpointer = checkpointer
             };
 
             return Task.FromResult(config.ToJson());
         }
         
-        public async Task<string> ConfigEncode(Dictionary<string, object> parameters)
+        public Task<string> ConfigEncode(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException("Not implemented");
+            throw new System.NotImplementedException();
         }
         
         public Task<string> ConfigImageHash(Dictionary<string, object> parameters)
         {
-            var input = (JsonToken)parameters["input"];
-            var inputJson = JsonConvert.SerializeObject(input);
-
-            var config = Primitives.Config.FromJson(inputJson);
+            var input = parameters["input"].ToString();
+            var config = ConfigUtils.FromJson(input);
             var imageHash = config.HashConfiguration().ByteArrayToHexStringWithPrefix();
             return Task.FromResult(imageHash);
         }
 
-        private List<Leaf> ParseContentToLeafs(string[] elements)
+        private List<Leaf> ParseContentToLeafs(string elements)
         {
             var leaves = new List<Leaf>();
-            var index = 0;
 
-            while (index < elements.Length)
+            while (!string.IsNullOrWhiteSpace(elements))
             {
-                string firstElement = elements[index];
+                string firstElement = elements.Split(' ')[0];
                 string firstElementType = firstElement.Split(':')[0];
 
                 if (firstElementType == "signer")
@@ -61,13 +59,13 @@ namespace Sequence.EcosystemWallet.IntegrationTests
 
                     leaves.Add(new SignerLeaf
                     {
-                        address = new Address(address),
+                        address = new  Address(address),
                         weight = weight
                     });
 
-                    index++;
+                    elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == SubdigestLeaf.type)
+                else if (firstElementType == "subdigest")
                 {
                     var parts = firstElement.Split(':');
                     string digest = parts[1];
@@ -77,9 +75,9 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                         digest = digest.HexStringToByteArray()
                     });
 
-                    index++;
+                    elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == AnyAddressSubdigestLeaf.type)
+                else if (firstElementType == "any-address-subdigest")
                 {
                     var parts = firstElement.Split(':');
                     string digest = parts[1];
@@ -89,7 +87,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                         digest = digest.HexStringToByteArray()
                     });
 
-                    index++;
+                    elements = elements.Substring(firstElement.Length).TrimStart();
                 }
                 else if (firstElementType == "sapient")
                 {
@@ -108,32 +106,29 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                         weight = weight
                     });
 
-                    index++;
+                    elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == NestedLeaf.type)
+                else if (firstElementType == "nested")
                 {
                     var parts = firstElement.Split(':');
                     BigInteger threshold = BigInteger.Parse(parts[1]);
                     BigInteger weight = BigInteger.Parse(parts[2]);
 
-                    if (index + 1 >= elements.Length || !elements[index + 1].StartsWith("("))
-                        throw new Exception("Missing nested element group after 'nested'");
+                    int start = elements.IndexOf('(');
+                    int end = elements.IndexOf(')');
+                    if (start == -1 || end == -1)
+                        throw new Exception($"Missing ( ) for nested element: {elements}");
 
-                    string nestedGroup = elements[index + 1];
-                    if (!nestedGroup.EndsWith(")"))
-                        throw new Exception("Unclosed nested group: " + nestedGroup);
-
-                    string inner = nestedGroup.Substring(1, nestedGroup.Length - 2);
-                    string[] innerElements = inner.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    string inner = elements.Substring(start + 1, end - start - 1);
 
                     leaves.Add(new NestedLeaf
                     {
                         threshold = threshold,
                         weight = weight,
-                        tree = Topology.FromLeaves(ParseContentToLeafs(innerElements))
+                        tree = Topology.FromLeaves(ParseContentToLeafs(inner))
                     });
 
-                    index++;
+                    elements = elements.Substring(end + 1).TrimStart();
                 }
                 else if (firstElementType == "node")
                 {
@@ -145,7 +140,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                         Value = hash.HexStringToByteArray()
                     });
 
-                    index++;
+                    elements = elements.Substring(firstElement.Length).TrimStart();
                 }
                 else
                 {

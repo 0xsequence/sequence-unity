@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace Sequence.Utils
 {
@@ -36,7 +37,5 @@ namespace Sequence.Utils
 
             return keys;
         }
-
-
     }
 }

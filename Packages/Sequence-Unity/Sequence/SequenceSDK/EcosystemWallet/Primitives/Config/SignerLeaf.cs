@@ -8,6 +8,6 @@ namespace Sequence.EcosystemWallet.Primitives
         public Address address;
         public BigInteger weight;
         public bool signed;
-        public SignatureOfSignerLeaf signature;
+        public SignatureType signature;
     }
 }
