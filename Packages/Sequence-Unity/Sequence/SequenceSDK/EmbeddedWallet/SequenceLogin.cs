@@ -96,7 +96,11 @@ namespace Sequence.EmbeddedWallet
             _connector = connector;
             
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
-            SetConnectedWalletAddress(connectedWalletAddress);
+
+            if (connectedWalletAddress != null)
+            {
+                SetConnectedWalletAddress(connectedWalletAddress);
+            }
             
             bool storeSessionWallet = SequenceConfig.GetConfig(SequenceService.WaaS).StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
