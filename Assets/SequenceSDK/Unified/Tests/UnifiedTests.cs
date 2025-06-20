@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Sequence.Quickstart;
+using Sequence.Unified;
 
 namespace Sequence.Pay.Tests.Transak
 {
-    public class QuickstartTests
+    public class UnifiedTests
     {
         private const string TokenId = "0";
         
@@ -17,7 +17,8 @@ namespace Sequence.Pay.Tests.Transak
         [Test]
         public async Task QuickstartEndToEndTest()
         {
-            var quickstart = new SequenceQuickstart(Chain.TestnetArbitrumSepolia);
+            UnifiedWallet quickstart = new UnifiedWallet(Chain.TestnetArbitrumSepolia);
+            quickstart.TryRecoverWalletFromStorage();
             
             var recovered = await quickstart.TryRecoverWalletFromStorage();
             if (!recovered)
@@ -35,7 +36,7 @@ namespace Sequence.Pay.Tests.Transak
                 1, 1000, DateTime.MaxValue);
             
             var listings = await quickstart.GetAllListingsFromMarketplace(TokenAddress);
-            await quickstart.BuyTokenFromMarketplace(listings[0].order, 1);
+            await quickstart.PurchaseOrderFromMarketplace(listings[0].order, 1);
         }
     }
 }

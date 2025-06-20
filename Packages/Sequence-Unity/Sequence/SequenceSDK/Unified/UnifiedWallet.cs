@@ -5,23 +5,23 @@ using NUnit.Framework;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 
-namespace Sequence.Quickstart
+namespace Sequence.Unified
 {
-    public class SequenceQuickstart
+    public class UnifiedWallet : IUnifiedWallet, IDisposable
     {
         private IWallet _wallet;
         public IWallet Wallet
         {
             get
             {
-                Assert.IsNotNull(Wallet, "Please sign in first. For example, call 'new SequenceQuickstart().GuestLogin();'");
+                EnsureWalletReferenceExists();
                 return _wallet;
             }
             set => _wallet = value;
         }
 
         private SequenceLogin _loginHandler;
-        public SequenceLogin LoginHandler
+        private SequenceLogin LoginHandler
         {
             get
             {
@@ -36,22 +36,21 @@ namespace Sequence.Quickstart
         private readonly MarketplaceReader _marketplace;
         private Checkout _checkout;
 
-        public SequenceQuickstart(Chain chain)
+        public UnifiedWallet(Chain chain)
         {
             _chain = chain;
             _indexer = new ChainIndexer(_chain);
             _swap = new CurrencySwap(_chain);
             _marketplace = new MarketplaceReader(_chain);
 
-            SequenceWallet.OnWalletCreated += wallet =>
-            {
-                Wallet = wallet;
-                _checkout = new Checkout(wallet, _chain);
-            };
+            SequenceWallet.OnWalletCreated += UpdateWallet;
         }
         
-        // ONBOARD
-
+        public void Dispose()
+        {
+            SequenceWallet.OnWalletCreated -= UpdateWallet;
+        }
+        
         public async Task<bool> TryRecoverWalletFromStorage()
         {
             var result = await _loginHandler.TryToRestoreSessionAsync();
@@ -83,13 +82,6 @@ namespace Sequence.Quickstart
             return response.IdToken;
         }
         
-        // POWER
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="walletAddress"></param>
-        /// <returns></returns>
         public async Task<BigInteger> GetMyNativeTokenBalance()
         {
             var result = await _indexer.GetNativeTokenBalance(Wallet.GetWalletAddress());
@@ -111,17 +103,9 @@ namespace Sequence.Quickstart
             return result.tokenIDs;
         }
         
-        /// <summary>
-        /// Send any ERC20, ERC1155 or ERC721 token to another wallet.
-        /// </summary>
-        /// <param name="recipientAddress">The address of the wallet you want to send the token to.</param>
-        /// <param name="tokenAddress">The address of your token. For example one you have deployed through https://sequence.build/</param>
-        /// <param name="tokenId">Leave it blank for ERC20 contracts.</param>
-        /// <param name="amount">Leave it blank for ERC721 contracts.</param>
-        /// <returns>Transaction receipt used to check transaction information onchain.</returns>
-        /// <exception cref="Exception"></exception>
         public async Task<string> SendToken(Address recipientAddress, Address tokenAddress, string tokenId, BigInteger amount)
         {
+            EnsureWalletReferenceExists();
             var supplies = await _indexer.GetTokenSupplies(new GetTokenSuppliesArgs(tokenAddress, true));
 
             Transaction transaction = supplies.contractType switch
@@ -136,8 +120,6 @@ namespace Sequence.Quickstart
             return await SendTransaction(new[] { transaction });
         }
         
-        // MONETIZATION
-
         public async Task SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount)
         {
             var walletAddress = Wallet.GetWalletAddress();
@@ -152,14 +134,15 @@ namespace Sequence.Quickstart
             );
         }
         
-        public async Task<CollectibleOrder[]> GetAllListingsFromMarketplace(Address contractAddress)
+        public async Task<CollectibleOrder[]> GetAllListingsFromMarketplace(Address collectionAddress)
         {
-            return await _marketplace.ListAllCollectibleListingsWithLowestPricedListingsFirst(contractAddress);
+            return await _marketplace.ListAllCollectibleListingsWithLowestPricedListingsFirst(collectionAddress);
         }
         
         public async Task<string> CreateListingOnMarketplace(Address contractAddress, Address currencyAddress, 
             string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry)
         {
+            EnsureWalletReferenceExists();
             var steps = await _checkout.GenerateListingTransaction(contractAddress, tokenId, amount, 
                 Marketplace.ContractType.ERC20, currencyAddress, pricePerToken, expiry);
             
@@ -167,8 +150,9 @@ namespace Sequence.Quickstart
             return await SendTransaction(transactions);
         }
         
-        public async Task<string> BuyTokenFromMarketplace(Order order, BigInteger amount)
+        public async Task<string> PurchaseOrderFromMarketplace(Order order, BigInteger amount)
         {
+            EnsureWalletReferenceExists();
             var steps = await _checkout.GenerateBuyTransaction(order, amount);
             var transactions = steps.AsTransactionArray();
             return await SendTransaction(transactions);
@@ -183,6 +167,17 @@ namespace Sequence.Quickstart
                 FailedTransactionReturn failed => throw new Exception($"Failed transaction {failed.error}"),
                 _ => throw new Exception("Unknown error while sending transaction.")
             };
+        }
+
+        private void UpdateWallet(IWallet wallet)
+        {
+            Wallet = wallet;
+            _checkout = new Checkout(wallet, _chain);
+        }
+        
+        private void EnsureWalletReferenceExists()
+        {
+            Assert.IsNotNull(Wallet, "Please sign in first. For example, call 'new SequenceQuickstart().GuestLogin();'");
         }
     }
 }
