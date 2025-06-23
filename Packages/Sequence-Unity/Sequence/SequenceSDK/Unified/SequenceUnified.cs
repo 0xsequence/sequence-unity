@@ -75,6 +75,16 @@ namespace Sequence.Unified
         {
             await LoginHandler.GuestLogin();
         }
+        
+        public void GoogleLogin()
+        {
+            LoginHandler.GoogleLogin();
+        }
+        
+        public void AppleLogin()
+        {
+            LoginHandler.AppleLogin();
+        }
 
         public async Task<string> GetIdToken()
         {
