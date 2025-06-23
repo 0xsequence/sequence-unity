@@ -6,7 +6,7 @@ using Sequence.Marketplace;
 
 namespace Sequence.Unified
 {
-    public interface IUnifiedWallet
+    public interface ISequenceUnified
     {
         /// <summary>
         /// The underlying Sequence Embedded Wallet reference. Use it for more control, such as transaction batches. 

@@ -7,7 +7,7 @@ using Sequence.Marketplace;
 
 namespace Sequence.Unified
 {
-    public class UnifiedWallet : IUnifiedWallet, IDisposable
+    public class SequenceUnified : ISequenceUnified, IDisposable
     {
         private IWallet _wallet;
         public IWallet Wallet
@@ -36,7 +36,7 @@ namespace Sequence.Unified
         private readonly MarketplaceReader _marketplace;
         private Checkout _checkout;
 
-        public UnifiedWallet(Chain chain)
+        public SequenceUnified(Chain chain)
         {
             _chain = chain;
             _indexer = new ChainIndexer(_chain);

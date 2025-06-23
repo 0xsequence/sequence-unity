@@ -15,28 +15,28 @@ namespace Sequence.Pay.Tests.Transak
         private static readonly Address RecipientAddress = new ("");
 
         [Test]
-        public async Task QuickstartEndToEndTest()
+        public async Task UnifiedEndToEndTest()
         {
-            UnifiedWallet quickstart = new UnifiedWallet(Chain.TestnetArbitrumSepolia);
-            quickstart.TryRecoverWalletFromStorage();
+            var sequenceUnified = new SequenceUnified(Chain.TestnetArbitrumSepolia);
+            await sequenceUnified.TryRecoverWalletFromStorage();
             
-            var recovered = await quickstart.TryRecoverWalletFromStorage();
+            var recovered = await sequenceUnified.TryRecoverWalletFromStorage();
             if (!recovered)
-                await quickstart.GuestLogin();
+                await sequenceUnified.GuestLogin();
             
-            await quickstart.GetIdToken();
+            await sequenceUnified.GetIdToken();
 
-            var nativeTokenBalance= await quickstart.GetMyNativeTokenBalance();
-            var tokenBalance = await quickstart.GetMyTokenBalance(TokenAddress);
+            var nativeTokenBalance= await sequenceUnified.GetMyNativeTokenBalance();
+            var tokenBalance = await sequenceUnified.GetMyTokenBalance(TokenAddress);
 
-            await quickstart.SendToken(TokenAddress, RecipientAddress, TokenId, 1);
-            await quickstart.SwapToken(SellCurrencyAddress, CurrencyAddress, 1000);
+            await sequenceUnified.SendToken(TokenAddress, RecipientAddress, TokenId, 1);
+            await sequenceUnified.SwapToken(SellCurrencyAddress, CurrencyAddress, 1000);
 
-            await quickstart.CreateListingOnMarketplace(TokenAddress, CurrencyAddress, TokenId, 
+            await sequenceUnified.CreateListingOnMarketplace(TokenAddress, CurrencyAddress, TokenId, 
                 1, 1000, DateTime.MaxValue);
             
-            var listings = await quickstart.GetAllListingsFromMarketplace(TokenAddress);
-            await quickstart.PurchaseOrderFromMarketplace(listings[0].order, 1);
+            var listings = await sequenceUnified.GetAllListingsFromMarketplace(TokenAddress);
+            await sequenceUnified.PurchaseOrderFromMarketplace(listings[0].order, 1);
         }
     }
 }
