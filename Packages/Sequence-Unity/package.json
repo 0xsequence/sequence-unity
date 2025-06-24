@@ -1,6 +1,6 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "4.2.5",
+  "version": "4.3.0",
   "displayName": "Sequence Embedded Wallet SDK",
   "description": "A Unity SDK for Sequence APIs",
   "unity": "2021.3",
@@ -36,23 +36,18 @@
   "category": "web3",
   "samples": [
     {
-      "displayName": "Setup",
-      "description": "Import this into your project to get started",
-      "path": "Sequence/Samples~/Setup"
-    },
-    {
-      "displayName": "Demo Scene",
-      "description": "Basic demo scene showcasing the SDK functionality",
-      "path": "Sequence/Samples~/DemoScene"
+      "displayName": "Demo",
+      "description": "Basic demo scene showcasing the SDK functionality using Sequence's boilerplates.",
+      "path": "Sequence/Samples~/Demo"
     },
     {
       "displayName": "Android Secure Storage",
-      "description": "Android native code required for secure, Keystore-based, storage",
+      "description": "Android native code required for secure, Keystore-based, storage.",
       "path": "Sequence/Samples~/AndroidSecureStorage"
     },
     {
       "displayName": "Useful Scripts",
-      "description": "Basic scripts that are helpful for getting started with the SDK",
+      "description": "Basic scripts that are helpful for getting started with the SDK.",
       "path": "Sequence/Samples~/Scripts"
     }
   ],
