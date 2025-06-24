@@ -344,7 +344,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5033393881823671670}
-  - component: {fileID: 1496243451206117047}
   m_Layer: 5
   m_Name: SellOfferPage
   m_TagString: Untagged
@@ -375,24 +374,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1496243451206117047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5033393881823671665}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2aace35490c6b14ba3bd4f2f5e87b97, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _openAnimationDurationInSeconds: 0
-  _closeAnimationDurationInSeconds: 0
-  _animation: 1
-  _loadingScreen: {fileID: 8708828509589296268}
-  _name: {fileID: 3517187561797139247}
-  _quantityAvailable: {fileID: 4367974950017546420}
 --- !u!1 &5033393881914010541
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,7 +385,7 @@ GameObject:
   - component: {fileID: 5033393881914010530}
   - component: {fileID: 5033393881914010529}
   - component: {fileID: 5033393881914010528}
-  - component: {fileID: 353660754160120435}
+  - component: {fileID: 3997405088739966388}
   m_Layer: 5
   m_Name: SellOfferPanel
   m_TagString: Untagged
@@ -472,7 +453,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &353660754160120435
+--- !u!114 &3997405088739966388
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -481,13 +462,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5033393881914010541}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 551d26cfa2688d94db6ca9d59505d1e1, type: 3}
+  m_Script: {fileID: 11500000, guid: a2aace35490c6b14ba3bd4f2f5e87b97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _openAnimationDurationInSeconds: 0
-  _closeAnimationDurationInSeconds: 0
-  _animation: 0
-  InitialPage: {fileID: 1496243451206117047}
+  _loadingScreen: {fileID: 8708828509589296268}
+  _name: {fileID: 3517187561797139247}
+  _quantityAvailable: {fileID: 4367974950017546420}
 --- !u!1 &5033393882511660879
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,10 +589,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 353660754160120435}
-        m_TargetAssemblyTypeName: Sequence.Demo.UIPanel, SequenceExamples
-        m_MethodName: Close
-        m_Mode: 1
+      - m_Target: {fileID: 5033393881914010541}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1018,8 +998,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1496243451206117047}
-        m_TargetAssemblyTypeName: Sequence.Demo.SellOfferPage, Assembly-CSharp
+      - m_Target: {fileID: 3997405088739966388}
+        m_TargetAssemblyTypeName: Sequence.Demo.SellOfferPage, SequenceExamples
         m_MethodName: SellOffer
         m_Mode: 1
         m_Arguments:
@@ -1458,7 +1438,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1496243451206117047}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Sequence.Demo.SellOfferPage, Assembly-CSharp
         m_MethodName: SetAmount
         m_Mode: 0

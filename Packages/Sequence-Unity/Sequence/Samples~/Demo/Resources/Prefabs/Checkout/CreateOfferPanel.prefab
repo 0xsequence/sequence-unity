@@ -2046,8 +2046,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Sequence.Demo.ListItemPage, SequenceExamples
+      - m_Target: {fileID: 1943577284728792413}
+        m_TargetAssemblyTypeName: Sequence.Demo.CreateOfferPage, SequenceExamples
         m_MethodName: ListItem
         m_Mode: 1
         m_Arguments:
@@ -2216,7 +2216,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2958957155603013923}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Sequence.Demo.CreateOfferPage, SequenceExamples
         m_MethodName: SetPrice
         m_Mode: 0
@@ -2323,7 +2323,7 @@ GameObject:
   - component: {fileID: 5826079517356838969}
   - component: {fileID: 5826079517356838968}
   - component: {fileID: 3953168768328130161}
-  - component: {fileID: 8340541946107351585}
+  - component: {fileID: 1943577284728792413}
   m_Layer: 5
   m_Name: CreateOfferPanel
   m_TagString: Untagged
@@ -2403,7 +2403,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &8340541946107351585
+--- !u!114 &1943577284728792413
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2412,13 +2412,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5826079517356838965}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dd195e84d5192e4f89146b6c0a084d4, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b05e96f5b9e17848bd2316e51e10496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _openAnimationDurationInSeconds: 0
-  _closeAnimationDurationInSeconds: 0
-  _animation: 0
-  InitialPage: {fileID: 2958957155603013923}
+  _datePicker: {fileID: 6823970954239075570}
+  _loadingScreen: {fileID: 7916105514042093332}
+  _currencyPicker: {fileID: 7245318709956553017}
 --- !u!1 &5826079517597847273
 GameObject:
   m_ObjectHideFlags: 0
@@ -2428,7 +2427,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5826079517597847278}
-  - component: {fileID: 2958957155603013923}
   m_Layer: 5
   m_Name: CreateOfferPage
   m_TagString: Untagged
@@ -2460,24 +2458,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2958957155603013923
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5826079517597847273}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b05e96f5b9e17848bd2316e51e10496, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _openAnimationDurationInSeconds: 0.3
-  _closeAnimationDurationInSeconds: 0.7
-  _animation: 1
-  _datePicker: {fileID: 6823970954239075570}
-  _loadingScreen: {fileID: 7916105514042093332}
-  _currencyPicker: {fileID: 7245318709956553017}
 --- !u!1 &5826079517983861975
 GameObject:
   m_ObjectHideFlags: 0
@@ -2599,10 +2579,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Sequence.Demo.UIPanel, SequenceExamples
-        m_MethodName: Close
-        m_Mode: 1
+      - m_Target: {fileID: 5826079517356838965}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3047,7 +3027,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2958957155603013923}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Sequence.Demo.CreateOfferPage, SequenceExamples
         m_MethodName: SetQuantity
         m_Mode: 0
@@ -3674,7 +3654,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7367381529247333178, guid: 8b2c48b893a79b8489b719918807a34d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -79.2025
+      value: -83.6257
       objectReference: {fileID: 0}
     - target: {fileID: 8248640464632574729, guid: 8b2c48b893a79b8489b719918807a34d, type: 3}
       propertyPath: m_AnchorMax.y

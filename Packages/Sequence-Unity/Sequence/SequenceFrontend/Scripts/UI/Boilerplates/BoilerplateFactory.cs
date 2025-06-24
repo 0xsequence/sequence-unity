@@ -112,9 +112,9 @@ namespace Sequence.Boilerplates
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <param name="marketplaceCollectionAddress">The initial collection address to show when opening the window.</param>
         /// <returns>Instance of ViewMarketplaceListingsPanel which was instantiated as a child of <paramref name="parent"/></returns>
-        public static ViewMarketplaceListingsPanel OpenViewMarketplaceListingsPanel(Transform parent, IWallet wallet, Chain chain, Address marketplaceCollectionAddress, Action onClose = null)
+        public static ViewMarketplaceListingsPage OpenViewMarketplaceListingsPanel(Transform parent, IWallet wallet, Chain chain, Address marketplaceCollectionAddress, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<ViewMarketplaceListingsPanel>("Marketplace/ViewMarketplaceListingsPanel", parent, 
+            return GetOrSpawnBoilerplate<ViewMarketplaceListingsPage>("Marketplace/ViewMarketplaceListingsPanel", parent, 
                 b => b.Open(wallet, chain, marketplaceCollectionAddress, onClose));
         }
 
@@ -126,37 +126,32 @@ namespace Sequence.Boilerplates
         /// <param name="fiatCheckout">An implementation of the IFiatCheckout interface.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns></returns>
-        public static (CheckoutPanel, CheckoutPage) OpenCheckoutPanel(Transform parent, ICheckoutHelper checkoutHelper,
+        public static CheckoutPage OpenCheckoutPanel(Transform parent, ICheckoutHelper checkoutHelper,
             IFiatCheckout fiatCheckout, Action onClose = null)
         {
-            CheckoutPanel panel = GetOrSpawnBoilerplate<CheckoutPanel>("Checkout/CheckoutPanel", parent,
+            return GetOrSpawnBoilerplate<CheckoutPage>("Checkout/CheckoutPanel", parent,
                 b => b.Open(checkoutHelper, fiatCheckout, onClose));
-            return (panel, panel.CheckoutPage);
         }
 
-        public static (ListItemPanel, ListItemPage) OpenListItemPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        public static ListItemPage OpenListItemPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
         {
-            ListItemPanel panel = GetOrSpawnBoilerplate<ListItemPanel>("Checkout/ListItemPanel", parent, b => b.Open(checkout, item));
-            return (panel, panel.ListItemPage);
+            return GetOrSpawnBoilerplate<ListItemPage>("Checkout/ListItemPanel", parent, b => b.Open(checkout, item));
         }
 
 
 
-        public static (CreateOfferPanel, CreateOfferPage) OpenCreateOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
+        public static CreateOfferPage OpenCreateOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
         {
-            CreateOfferPanel panel = GetOrSpawnBoilerplate<CreateOfferPanel>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
-            return (panel, panel.CreateOfferPage);
+            return GetOrSpawnBoilerplate<CreateOfferPage>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
         }
-        public static (CreateOfferPanel, CreateOfferPage) OpenCreateOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
+        public static CreateOfferPage OpenCreateOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
         {
-            CreateOfferPanel panel = GetOrSpawnBoilerplate<CreateOfferPanel>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
-            return (panel, panel.CreateOfferPage);
+            return GetOrSpawnBoilerplate<CreateOfferPage>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
         }
 
-        public static (SellOfferPanel, SellOfferPage) OpenSellOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
+        public static SellOfferPage OpenSellOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
         {
-            SellOfferPanel panel = GetOrSpawnBoilerplate<SellOfferPanel>("Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
-            return (panel, panel.SellOfferPage);
+            return GetOrSpawnBoilerplate<SellOfferPage>("Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
         }
         /// <summary>
         /// Open the UI Boilerplate to sign messages from a Prefab inside the Resources folder.

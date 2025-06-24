@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4998048029056796112}
   - component: {fileID: 6161600812657428697}
   - component: {fileID: 5480996979706444522}
-  - component: {fileID: -6231145603314955144}
   m_Layer: 5
   m_Name: CheckoutOption
   m_TagString: Untagged
@@ -123,18 +122,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &-6231145603314955144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 251241542836311151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5e53df05f6849b4480313f97d58c59f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3050058393588349162
 GameObject:
   m_ObjectHideFlags: 0

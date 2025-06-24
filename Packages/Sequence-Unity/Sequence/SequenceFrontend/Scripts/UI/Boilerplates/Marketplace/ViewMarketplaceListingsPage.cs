@@ -15,7 +15,7 @@ using Currency = Sequence.Marketplace.Currency;
 
 namespace Sequence.Boilerplates.Marketplace
 {
-    public class ViewMarketplaceListingsPage : UIPage
+    public class ViewMarketplaceListingsPage : MonoBehaviour
     {
         [SerializeField] private TMP_InputField _collectionAddressInputField;
         [SerializeField] private GameObject _marketplaceTilePrefab;
@@ -36,24 +36,21 @@ namespace Sequence.Boilerplates.Marketplace
         private Dictionary<string, Sprite> _currencyIcons = new Dictionary<string, Sprite>();
         private bool _currenciesFetched = false;
         private IWallet _wallet;
-        private CheckoutPanel _checkoutPanel;
+        private CheckoutPage _checkoutPanel;
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             _scrollRectContent = GetComponentInChildren<ScrollRect>().content;
             _grid = GetComponentInChildren<GridLayoutGroup>();
             _widthInItems = _grid.constraintCount;
             _marketplaceReader = new MarketplaceReader(_chain);
-            _checkoutPanel = FindObjectOfType<CheckoutPanel>();
+            _checkoutPanel = FindObjectOfType<CheckoutPage>();
 
             DestroyGridChildren();
         }
 
-        public override void Open(params object[] args)
+        public void Open(params object[] args)
         {
-            base.Open(args);
-            
             _wallet = args.GetObjectOfTypeIfExists<IWallet>();
             if (_wallet == default)
             {
@@ -159,9 +156,8 @@ namespace Sequence.Boilerplates.Marketplace
             content.position = position;
         }
 
-        public override void Close()
+        public void Close()
         {
-            base.Close();
             Clear();
             _collectionAddressInputField.onValueChanged.RemoveListener(OnInputValueChanged);
         }

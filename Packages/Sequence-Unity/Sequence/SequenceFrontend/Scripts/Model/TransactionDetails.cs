@@ -58,7 +58,7 @@ namespace Sequence.Demo
 
         public float GetPreviousCurrencyValue()
         {
-            throw new NotSupportedException($"A {nameof(TransactionDetailsBlock)} does not need to know anything about changes in currency value so we do not keep track of previous currency values.");
+            return 0f;
         }
 
         public void SetPreviousCurrencyValue(float value)

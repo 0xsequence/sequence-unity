@@ -1,5 +1,4 @@
 using System.Collections;
-using Sequence.Demo.Tweening;
 using TMPro;
 using UnityEngine;
 
