@@ -1,11 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Sequence.Unified;
 
 namespace Sequence.Pay.Tests.Transak
 {
-    public class UnifiedTests
+    public class AdapterTests
     {
         private const string TokenId = "0";
         
@@ -17,7 +16,7 @@ namespace Sequence.Pay.Tests.Transak
         [Test]
         public async Task UnifiedEndToEndTest()
         {
-            var sequenceUnified = new SequenceUnified(Chain.TestnetArbitrumSepolia);
+            var sequenceUnified = new Adapter.Sequence(Chain.TestnetArbitrumSepolia);
             await sequenceUnified.TryRecoverWalletFromStorage();
             
             var recovered = await sequenceUnified.TryRecoverWalletFromStorage();

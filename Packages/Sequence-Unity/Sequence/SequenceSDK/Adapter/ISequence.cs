@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 
-namespace Sequence.Unified
+namespace Sequence.Adapter
 {
-    public interface ISequenceUnified
+    public interface ISequence
     {
         /// <summary>
         /// The underlying Sequence Embedded Wallet reference. Use it for more control, such as transaction batches. 

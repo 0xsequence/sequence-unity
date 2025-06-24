@@ -5,9 +5,9 @@ using NUnit.Framework;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 
-namespace Sequence.Unified
+namespace Sequence.Adapter
 {
-    public class SequenceUnified : ISequenceUnified, IDisposable
+    public class Sequence : ISequence, IDisposable
     {
         private IWallet _wallet;
         public IWallet Wallet
@@ -36,7 +36,7 @@ namespace Sequence.Unified
         private readonly MarketplaceReader _marketplace;
         private Checkout _checkout;
 
-        public SequenceUnified(Chain chain)
+        public Sequence(Chain chain)
         {
             _chain = chain;
             _indexer = new ChainIndexer(_chain);
