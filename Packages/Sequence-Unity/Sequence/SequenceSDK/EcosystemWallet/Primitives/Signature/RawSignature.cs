@@ -80,16 +80,21 @@ namespace Sequence.EcosystemWallet.Primitives
 
             var thresholdBytes = configuration.threshold.ToByteArray().PadLeft(bytesForThreshold);
             output = output.Concat(thresholdBytes).ToArray();
-
+            
+            // TODO: 
+            /*
             var topologyBytes = EncodeTopology(configuration.topology, signature);
             output = Bytes.Concat(output, topologyBytes);
 
-            return erc6492 != null ? Wrap(output, erc6492) : output;
+            return erc6492 != null ? Wrap(output, erc6492) : output;*/
+            
+            return output;
         }
 
         public static RawSignature Decode(byte[] erc6492Signature)
         {
-            
+            // TODO: 
+            return new RawSignature();
         }
     }
 }

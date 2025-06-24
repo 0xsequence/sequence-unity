@@ -47,14 +47,14 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                             {
                                 r = new BigInteger(candidate.Values[0].HexStringToByteArray(32)),
                                 s = new BigInteger(candidate.Values[1].HexStringToByteArray(32)),
-                                yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
+                                // TODO: yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
                             };
                         case "hash":
                             return new SignatureOfSignerLeafHash
                             {
                                 r = new BigInteger(candidate.Values[0].HexStringToByteArray(32)),
                                 s = new BigInteger(candidate.Values[1].HexStringToByteArray(32)),
-                                yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
+                                // TODO: yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
                             };
                         case "sapient":
                         case "sapient_compact":
@@ -92,7 +92,10 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 return null;
             });
 
-            var encoded = Signature.EncodeSignature(new SignatureEncodingInput
+            var encoded = new byte[] {};
+            
+            // TODO: 
+            /*var encoded = Signature.EncodeSignature(new SignatureEncodingInput
             {
                 NoChainId = noChainId,
                 Configuration = new Configuration
@@ -102,7 +105,8 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 CheckpointerData = checkpointerData != null ? checkpointerData.ToByteArray() : null
             });
 
-            return Hex.FromBytes(encoded);
+            return Hex.FromBytes(encoded);*/
+            return encoded.ByteArrayToHexStringWithPrefix();
         }
 
         public static async Task<string> DoConcat(List<string> signatures)
@@ -111,26 +115,31 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 throw new Exception("No signatures provided");
 
             var decoded = signatures
-                .Select(s => Signature.DecodeSignature(Bytes.FromHex(s)))
+                // TODO: .Select(s => Signature.DecodeSignature(Bytes.FromHex(s)))
                 .ToList();
 
-            var reEncoded = Signature.EncodeSignature(new SignatureEncodingInput
+            var encoded = new byte[] {};
+            
+            // TODO: 
+            /*encoded = Signature.EncodeSignature(new SignatureEncodingInput
             {
                 // Copy the base structure
                 NoChainId = decoded[0].NoChainId,
                 Configuration = decoded[0].Configuration,
                 CheckpointerData = decoded[0].CheckpointerData,
                 Suffix = decoded.Skip(1).ToList()
-            });
+            });*/
 
-            return Hex.FromBytes(reEncoded);
+            return encoded.ByteArrayToHexStringWithPrefix();
         }
 
         public static async Task<string> DoDecode(string signature)
         {
-            var bytes = Bytes.FromHex(signature);
+            // TODO: 
+            /*var bytes = Bytes.FromHex(signature);
             var decoded = Signature.DecodeSignature(bytes);
-            return Signature.RawSignatureToJson(decoded);
+            return Signature.RawSignatureToJson(decoded);*/
+            return string.Empty;
         }
     }
 }
