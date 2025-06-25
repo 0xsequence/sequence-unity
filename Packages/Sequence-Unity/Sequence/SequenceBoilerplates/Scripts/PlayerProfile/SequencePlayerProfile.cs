@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Sequence.Demo;
 using Sequence.EmbeddedWallet;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -56,9 +57,11 @@ namespace Sequence.Boilerplates.PlayerProfile
             
             var walletAddress = _wallet.GetWalletAddress();
             var indexer = new ChainIndexer(_chain);
-            var balance = await indexer.GetNativeTokenBalance(walletAddress);
+            var balanceResponse = await indexer.GetNativeTokenBalance(walletAddress);
 
-            SetBalance(balance.balanceWei);
+            var balance = DecimalNormalizer.ReturnToNormalString(balanceResponse.balanceWei);
+            _etherBalanceText.text = $"{balance} ETH";
+            SetBalance(balance);
             _messagePopup.gameObject.SetActive(false);
             EnableLoading(false);
 
