@@ -44,7 +44,7 @@ namespace Sequence.Boilerplates.PlayerProfile
         /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public async void Show(IWallet wallet, Chain chain, Address currency = null, Action onClose = null)
+        public async void Show(IWallet wallet, Chain chain, Address currency = null, string currencySymbol = null, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;
@@ -53,13 +53,24 @@ namespace Sequence.Boilerplates.PlayerProfile
             _transactionPool.Cleanup();
             
             SetOverviewState();
-            SetBalance(0);
-            
-            var walletAddress = _wallet.GetWalletAddress();
-            var indexer = new ChainIndexer(_chain);
-            var balanceResponse = await indexer.GetNativeTokenBalance(walletAddress);
+            SetBalance(0, string.Empty);
 
-            SetBalance(balanceResponse.balanceWei);
+            var indexer = new ChainIndexer(_chain);
+            var walletAddress = _wallet.GetWalletAddress();
+            
+            if (currency == null)
+            {
+                var balanceResponse = await indexer.GetNativeTokenBalance(walletAddress);
+                SetNativeBalance(balanceResponse.balanceWei);
+            }
+            else
+            {
+                var response = await indexer.GetTokenBalances(new GetTokenBalancesArgs(walletAddress, currency, true));
+                var balances = response.balances;
+                var balance = balances.Length > 0 ? balances[0].balance : 0;
+                SetBalance(balance, currencySymbol);
+            }
+            
             _messagePopup.gameObject.SetActive(false);
             EnableLoading(false);
 
@@ -168,10 +179,15 @@ namespace Sequence.Boilerplates.PlayerProfile
             _messagePopup.Show(success ? "Unlinked." : "Failed to unlink", !success);
         }
 
-        private void SetBalance(BigInteger amount)
+        private void SetNativeBalance(BigInteger balance)
         {
-            var decimals = DecimalNormalizer.ReturnToNormalString(amount);
             var symbol = ChainDictionaries.GasCurrencyOf[_chain];
+            SetBalance(balance, symbol);
+        }
+
+        private void SetBalance(BigInteger balance, string symbol)
+        {
+            var decimals = DecimalNormalizer.ReturnToNormalString(balance);
             _etherBalanceText.text = $"{decimals} {symbol}";
         }
     }
