@@ -59,9 +59,7 @@ namespace Sequence.Boilerplates.PlayerProfile
             var indexer = new ChainIndexer(_chain);
             var balanceResponse = await indexer.GetNativeTokenBalance(walletAddress);
 
-            var balance = DecimalNormalizer.ReturnToNormalString(balanceResponse.balanceWei);
-            _etherBalanceText.text = $"{balance} ETH";
-            SetBalance(balance);
+            SetBalance(balanceResponse.balanceWei);
             _messagePopup.gameObject.SetActive(false);
             EnableLoading(false);
 
@@ -172,7 +170,9 @@ namespace Sequence.Boilerplates.PlayerProfile
 
         private void SetBalance(BigInteger amount)
         {
-            _etherBalanceText.text = $"{amount} {ChainDictionaries.GasCurrencyOf[_chain]}";
+            var decimals = DecimalNormalizer.ReturnToNormalString(amount);
+            var symbol = ChainDictionaries.GasCurrencyOf[_chain];
+            _etherBalanceText.text = $"{decimals} {symbol}";
         }
     }
 }
