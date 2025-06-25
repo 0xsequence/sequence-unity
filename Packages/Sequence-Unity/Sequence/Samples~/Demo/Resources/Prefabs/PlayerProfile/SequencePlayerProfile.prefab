@@ -2727,7 +2727,7 @@ MonoBehaviour:
   _etherBalanceText: {fileID: 4200167383919074304}
   _recipientInput: {fileID: 705883701692983092}
   _tokenAmountInput: {fileID: 8254898056543049490}
-  _qrImage: {fileID: 0}
+  _qrImage: {fileID: 6621555060424372103}
   _messagePopup: {fileID: 2634582482796634257}
   _loadingScreen: {fileID: 2207242179709257925}
   _overviewState: {fileID: 4200167382559960304}
@@ -2948,8 +2948,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4200167382304887186}
   - component: {fileID: 4200167382304887188}
-  - component: {fileID: 4200167382304887189}
   - component: {fileID: 3454237295736038207}
+  - component: {fileID: 6621555060424372103}
   m_Layer: 5
   m_Name: QrImage
   m_TagString: Untagged
@@ -2985,21 +2985,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4200167382304887185}
   m_CullTransparentMesh: 1
---- !u!114 &4200167382304887189
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4200167382304887185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 250db09c678b4c708f26b52f55aa527f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _format: https://metamask.app.link/send/{0}@{1}/transfer?address={2}&uint256={3}
-  _size: 512
-  _qrImage: {fileID: 0}
 --- !u!114 &3454237295736038207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3027,6 +3012,21 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &6621555060424372103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4200167382304887185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae25cfb0e2edb49fb9ad0b1da69eb3cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _format: https://metamask.app.link/send/{0}/transfer?address={1}&uint256={2}
+  _size: 512
+  _qrImage: {fileID: 3454237295736038207}
 --- !u!1 &4200167382559960304
 GameObject:
   m_ObjectHideFlags: 0
@@ -7508,7 +7508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2000836223614552171
 RectTransform:
   m_ObjectHideFlags: 0

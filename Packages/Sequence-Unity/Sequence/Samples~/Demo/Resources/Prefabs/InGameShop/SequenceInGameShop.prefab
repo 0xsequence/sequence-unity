@@ -441,7 +441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _format: https://metamask.app.link/send/{0}/transfer?address={1}&uint256={2}
   _size: 512
-  _qrImage: {fileID: 0}
+  _qrImage: {fileID: 5124856579309961258}
 --- !u!1 &1475529392507061954
 GameObject:
   m_ObjectHideFlags: 0
