@@ -1,6 +1,5 @@
 using System;
 using System.Numerics;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using TMPro;
@@ -43,8 +42,9 @@ namespace Sequence.Boilerplates.PlayerProfile
         /// </summary>
         /// <param name="wallet">This Wallet instance will perform transactions.</param>
         /// <param name="chain">Chain used to get balances and send transactions.</param>
+        /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public async void Show(IWallet wallet, Chain chain, Action onClose = null)
+        public async void Show(IWallet wallet, Chain chain, Address currency = null, Action onClose = null)
         {
             _wallet = wallet;
             _chain = chain;

@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Sequence.Demo;
-using Sequence.Demo.Mocks;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay.Transak;
@@ -13,7 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Currency = Sequence.Marketplace.Currency;
 
-namespace Sequence.Boilerplates.Marketplace
+namespace Sequence.Boilerplates
 {
     public class ViewMarketplaceListingsPage : MonoBehaviour
     {

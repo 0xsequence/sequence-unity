@@ -4,10 +4,8 @@ using Sequence.Boilerplates.DailyRewards;
 using Sequence.Boilerplates.InGameShop;
 using Sequence.Boilerplates.Inventory;
 using Sequence.Boilerplates.Login;
-using Sequence.Boilerplates.Marketplace;
 using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Boilerplates.SignMessage;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;
@@ -48,11 +46,12 @@ namespace Sequence.Boilerplates
         /// <param name="wallet">This Wallet instance will perform transactions.</param>
         /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
+        /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <returns>Instance of SequencePlayerProfile which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequencePlayerProfile OpenSequencePlayerProfile(Transform parent, IWallet wallet, Chain chain, Action onClose = null)
+        public static SequencePlayerProfile OpenSequencePlayerProfile(Transform parent, IWallet wallet, Chain chain, Address currency, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequencePlayerProfile>("PlayerProfile/SequencePlayerProfile", parent, 
-                b => b.Show(wallet, chain, onClose));
+                b => b.Show(wallet, chain, currency, onClose));
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using Sequence.Marketplace;
 using Sequence.Utils;
 using UnityEngine;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class ListItemPanel : MonoBehaviour
     {

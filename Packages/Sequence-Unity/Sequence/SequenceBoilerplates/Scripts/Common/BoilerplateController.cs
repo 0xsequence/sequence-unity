@@ -211,7 +211,7 @@ namespace Sequence.Boilerplates
         private void OpenPlayerProfilePanel()
         {
             HideFeatureSelection();
-            _playerProfile = BoilerplateFactory.OpenSequencePlayerProfile(transform, _wallet, _chain, ShowDefaultWindow);
+            _playerProfile = BoilerplateFactory.OpenSequencePlayerProfile(transform, _wallet, _chain, null, ShowDefaultWindow);
         }
         
         private void OpenDailyRewardsPanel()

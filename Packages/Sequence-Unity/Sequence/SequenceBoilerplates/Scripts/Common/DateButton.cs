@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class DateButton : MonoBehaviour
     {

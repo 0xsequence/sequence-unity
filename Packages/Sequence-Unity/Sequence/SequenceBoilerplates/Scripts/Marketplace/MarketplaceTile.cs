@@ -1,12 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Globalization;
 using System.Threading.Tasks;
-using NBitcoin.RPC;
-using Sequence.Boilerplates;
-using Sequence.Demo;
-using Sequence.Demo.Mocks;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;
@@ -18,7 +11,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace Sequence.Boilerplates.Marketplace
+namespace Sequence.Boilerplates
 {
     [RequireComponent(typeof(Button))]
     public class MarketplaceTile : MonoBehaviour

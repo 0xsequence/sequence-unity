@@ -3,7 +3,6 @@ using System.Collections;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.Contracts;
-using Sequence.Demo;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;

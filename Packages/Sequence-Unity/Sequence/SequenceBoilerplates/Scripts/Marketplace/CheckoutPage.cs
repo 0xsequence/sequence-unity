@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vector2 = UnityEngine.Vector2;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class CheckoutPage : MonoBehaviour
     {

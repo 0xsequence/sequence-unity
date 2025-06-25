@@ -7,7 +7,7 @@ using Sequence.Utils;
 using UnityEditor;
 using Random = UnityEngine.Random;
 
-namespace Sequence.Demo.Mocks
+namespace Sequence.Boilerplates
 {
     public class MockMarketplaceReaderReturnsRandomFakeListings : IMarketplaceReader
     {

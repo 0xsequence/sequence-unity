@@ -5,7 +5,7 @@ using TMPro;
 using Sequence.Marketplace;
 using Sequence.Utils;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class MarketplaceItemDetailsPage : MonoBehaviour
     {

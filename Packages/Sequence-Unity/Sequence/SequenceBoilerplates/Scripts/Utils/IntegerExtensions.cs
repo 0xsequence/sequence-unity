@@ -1,4 +1,4 @@
-namespace Sequence.Demo.Utils
+namespace Sequence.Boilerplates.Utils
 {
     public static class NumberExtensions
     {

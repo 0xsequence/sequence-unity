@@ -8,7 +8,7 @@ using Sequence.Utils;
 using Sequence.Marketplace;
 using UnityEngine;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class ListItemPage : MonoBehaviour
     {

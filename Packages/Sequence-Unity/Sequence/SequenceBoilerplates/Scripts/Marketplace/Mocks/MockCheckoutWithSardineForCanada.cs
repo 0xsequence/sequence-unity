@@ -7,7 +7,7 @@ using Sequence.Contracts;
 using Sequence.Marketplace;
 using Sequence.Utils;
 
-namespace Sequence.Demo.Mocks
+namespace Sequence.Boilerplates
 {
     /// <summary>
     /// This mock implementation of ICheckout uses Checkout to implement all methods. Additionally, it will append Sardine as a CheckoutOption if not there - useful for people who live in Canada (or other countries that Sardine doesn't support)

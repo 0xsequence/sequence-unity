@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     public class EstimatedTotal : MonoBehaviour
     {

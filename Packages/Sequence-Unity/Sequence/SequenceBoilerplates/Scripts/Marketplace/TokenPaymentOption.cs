@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Sequence.Demo
+namespace Sequence.Boilerplates
 {
     [RequireComponent(typeof(Button))]
     public class TokenPaymentOption : MonoBehaviour
