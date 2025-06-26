@@ -257,13 +257,26 @@ namespace Sequence.EmbeddedWallet
             return results;
         }
 
+        public async Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn transactionReturn)
+        {
+            try
+            {
+                return await _intentSender.GetTransactionReceipt(transactionReturn);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                throw;
+            }
+        }
+
         public async Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
         {
             while (string.IsNullOrWhiteSpace(successfulTransactionReturn.txHash))
             {
                 try
                 {
-                    successfulTransactionReturn = await _intentSender.GetTransactionReceipt(successfulTransactionReturn);
+                    successfulTransactionReturn = await GetTransactionReceipt(successfulTransactionReturn);
                 }
                 catch (Exception e)
                 {

@@ -283,6 +283,11 @@ namespace Sequence.EmbeddedWallet
             throw new NotSupportedException();
         }
 
+        public Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
+        {
+            throw new NotSupportedException();
+        }
+
         public Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
         {
             throw new NotSupportedException();

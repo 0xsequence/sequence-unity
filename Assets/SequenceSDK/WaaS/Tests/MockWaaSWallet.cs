@@ -62,6 +62,11 @@ namespace Sequence.EmbeddedWallet
             throw new NotImplementedException();
         }
 
+        public Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<SuccessfulTransactionReturn> WaitForTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn)
         {
             throw new NotImplementedException();

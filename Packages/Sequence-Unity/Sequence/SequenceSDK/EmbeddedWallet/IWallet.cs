@@ -88,6 +88,13 @@ namespace Sequence.EmbeddedWallet
         /// </summary>
         /// <returns></returns>
         public Task<Session[]> ListSessions();
+
+        /// <summary>
+        /// Get the current receipt for your transaction. Use this whenever your receipt from "SendTransaction" does not have a success status.
+        /// </summary>
+        /// <param name="successfulTransactionReturn"></param>
+        /// <returns></returns>
+        public Task<SuccessfulTransactionReturn> GetTransactionReceipt(SuccessfulTransactionReturn successfulTransactionReturn);
         
         /// <summary>
         /// Continually poll the API for a TransactionReceipt
