@@ -1,4 +1,7 @@
 using System.Numerics;
+using System.Text;
+using Sequence.ABI;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -10,5 +13,31 @@ namespace Sequence.EcosystemWallet.Primitives
         public string imageHash;
         public bool signed;
         public SignatureType signature;
+        
+        public override object Parse()
+        {
+            return new
+            {
+                type = type,
+                address = address,
+                weight = weight.ToString(),
+                imageHash = imageHash
+            };
+        }
+
+        public override byte[] Encode(bool noChainId, byte[] checkpointerData)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override byte[] HashConfiguration()
+        {
+            byte[] prefix = Encoding.UTF8.GetBytes("Sequence sapient config:\n");
+            byte[] address = this.address.Value.HexStringToByteArray();
+            byte[] weight = this.weight.ByteArrayFromNumber().PadLeft(32);
+            byte[] imageHash = this.imageHash.HexStringToByteArray().PadLeft(32);
+                
+            return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, address, weight, imageHash));
+        }
     }
 }

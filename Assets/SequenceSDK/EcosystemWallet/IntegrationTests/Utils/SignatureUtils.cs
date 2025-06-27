@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.IntegrationTests
 {
     public static class SignatureUtils
     {
-        public static async Task<string> DoEncode(string input, List<string> signatures, bool noChainId,
-            string? checkpointerData = null)
+        public static async Task<string> DoEncode(string input, string[] signatures, bool noChainId,
+            byte[] checkpointerData = null)
         {
             var config = ConfigUtils.FromJson(input);
             var allSignatures = signatures.Select(s =>
@@ -25,14 +27,15 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 };
             }).ToList();
 
-            var fullTopology = Signature.FillLeaves(config.topology, leaf =>
+            var fullTopology = SignatureHandler.FillLeaves(config.topology, leaf =>
             {
-                if (leaf.isSignerLeaf)
+                if (leaf is SignerLeaf signerLeaf)
                 {
-                    var signerLeaf = leaf as SignerLeaf;
-                    var candidate = allSignatures.FirstOrDefault(s => s.Address == signerLeaf.address);
+                    var candidate = allSignatures.FirstOrDefault(s => s.Address.Equals(signerLeaf.address));
                     if (candidate == null) 
                         return null;
+                    
+                    Debug.Log($"Candidate = {candidate.Address}:{candidate.Type}:{candidate.Values}");
 
                     switch (candidate.Type)
                     {
@@ -57,17 +60,27 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                                 // TODO: yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
                             };
                         case "sapient":
+                            return new SignatureOfSapientSignerLeaf
+                            {
+                                curType = SignatureOfSapientSignerLeaf.Type.sapient,
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray()
+                            };
                         case "sapient_compact":
-                            throw new Exception($"Incorrect type for leaf");
+                            return new SignatureOfSapientSignerLeaf
+                            {
+                                curType = SignatureOfSapientSignerLeaf.Type.sapient_compact,
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray()
+                            };
                         default:
                             throw new Exception($"Unsupported signature type: {candidate.Type}");
                     }
                 }
 
-                if (leaf.isSapientSignerLeaf)
+                if (leaf is SapientSignerLeaf sapientSignerLeaf)
                 {
-                    var signerLeaf = leaf as SapientSignerLeaf;
-                    var candidate = allSignatures.FirstOrDefault(s => s.Address == signerLeaf.address);
+                    var candidate = allSignatures.FirstOrDefault(s => s.Address.Equals(sapientSignerLeaf.address));
                     if (candidate == null) 
                         return null;
 
@@ -92,21 +105,20 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 return null;
             });
 
-            var encoded = new byte[] {};
-            
-            // TODO: 
-            /*var encoded = Signature.EncodeSignature(new SignatureEncodingInput
+            var rawSignature = new RawSignature
             {
-                NoChainId = noChainId,
-                Configuration = new Configuration
+                noChainId = noChainId,
+                configuration =
                 {
-                    topology = fullTopology,
+                    threshold = config.threshold,
+                    checkpoint = config.checkpoint,
+                    checkpointer = config.checkpointer,
+                    topology = fullTopology
                 },
-                CheckpointerData = checkpointerData != null ? checkpointerData.ToByteArray() : null
-            });
+                checkpointerData = checkpointerData
+            };
 
-            return Hex.FromBytes(encoded);*/
-            return encoded.ByteArrayToHexStringWithPrefix();
+            return rawSignature.Encode().ByteArrayToHexString();
         }
 
         public static async Task<string> DoConcat(List<string> signatures)

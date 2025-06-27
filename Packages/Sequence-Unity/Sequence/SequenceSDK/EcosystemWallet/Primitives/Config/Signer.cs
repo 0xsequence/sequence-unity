@@ -40,30 +40,27 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 else if (top.IsLeaf())
                 {
-                    if (top.Leaf.isSignerLeaf)
+                    if (top.Leaf is SignerLeaf signerLeaf)
                     {
-                        SignerLeaf signerLeaf = (SignerLeaf)top.Leaf;
                         if (signerLeaf.weight > 0)
                         {
                             signers.Add(signerLeaf.address);
                         }
                     }
-                    else if (top.Leaf.isSapientSignerLeaf)
+                    else if (top.Leaf is SapientSignerLeaf sapientSignerLeaf)
                     {
-                        SapientSignerLeaf sapientLeaf = (SapientSignerLeaf)top.Leaf;
                         sapientSigners.Add(new SapientSigner 
                         { 
-                            address = sapientLeaf.address, 
-                            imageHash = sapientLeaf.imageHash 
+                            address = sapientSignerLeaf.address, 
+                            imageHash = sapientSignerLeaf.imageHash 
                         });
                     }
-                    else if (top.Leaf.isNodeLeaf)
+                    else if (top.Leaf is NodeLeaf)
                     {
                         isComplete = false;
                     }
-                    else if (top.Leaf.isNestedLeaf)
+                    else if (top.Leaf is NestedLeaf nestedLeaf)
                     {
-                        NestedLeaf nestedLeaf = (NestedLeaf)top.Leaf;
                         if (nestedLeaf.weight > 0)
                         {
                             Scan(nestedLeaf.tree);

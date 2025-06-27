@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
-using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
@@ -10,6 +10,18 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class Topology
     {
+        public const int FlagSignatureHash = 0;
+        public const int FlagAddress = 1;
+        public const int FlagSignatureErc1271 = 2;
+        public const int FlagNode = 3;
+        public const int FlagBranch = 4;
+        public const int FlagSubdigest = 5;
+        public const int FlagNested = 6;
+        public const int FlagSignatureEthSign = 7;
+        public const int FlagSignatureAnyAddressSubdigest = 8;
+        public const int FlagSignatureSapient = 9;
+        public const int FlagSignatureSapientCompact = 10;
+        
         public Node Node;
         public Leaf Leaf;
 
@@ -71,93 +83,67 @@ namespace Sequence.EcosystemWallet.Primitives
                 }
                 return Node.right.FindSignerLeaf(address);
             }
-            else if (IsLeaf())
+            
+            if (IsLeaf())
             {
-                if (Leaf.isSignerLeaf)
+                if (Leaf is SignerLeaf signerLeaf)
                 {
-                    SignerLeaf signerLeaf = (SignerLeaf)Leaf;
                     if (signerLeaf.address.Equals(address))
                     {
                         return signerLeaf;
                     }
                 }
-                else if (Leaf.isSapientSignerLeaf)
+                else if (Leaf is SapientSignerLeaf sapientSignerLeaf)
                 {
-                    SapientSignerLeaf sapientLeaf = (SapientSignerLeaf)Leaf;
-                    if (sapientLeaf.address.Equals(address))
+                    if (sapientSignerLeaf.address.Equals(address))
                     {
-                        return sapientLeaf;
+                        return sapientSignerLeaf;
                     }
                 }
             }
+            
             return null;
         }
 
-        // Todo refactor
-        public object Encode()
+        public object Parse()
         {
             if (IsNode())
             {
                 return new object[]
                 {
-                    Node.left.Encode(),
-                    Node.right.Encode()
+                    Node.left.Parse(),
+                    Node.right.Parse()
                 };
             }
-            else if (Leaf.isSignerLeaf)
+            
+            if (Leaf is SignerLeaf signerLeaf)
             {
-                SignerLeaf signerLeaf = (SignerLeaf)Leaf;
-                return new
-                {
-                    type = "signer",
-                    address = signerLeaf.address,
-                    weight = signerLeaf.weight.ToString()
-                };
+                return signerLeaf.Parse();
             }
-            else if (Leaf.isSapientSignerLeaf)
+            
+            if (Leaf is SapientSignerLeaf sapientSignerLeaf)
             {
-                SapientSignerLeaf sapientLeaf = (SapientSignerLeaf)Leaf;
-                return new
-                {
-                    type = "sapient-signer",
-                    address = sapientLeaf.address,
-                    weight = sapientLeaf.weight.ToString(),
-                    imageHash = sapientLeaf.imageHash
-                };
+                return sapientSignerLeaf.Parse();
             }
-            else if (Leaf.isSubdigestLeaf)
+            
+            if (Leaf is SubdigestLeaf subdigestLeaf)
             {
-                SubdigestLeaf subdigestLeaf = (SubdigestLeaf)Leaf;
-                return new
-                {
-                    type = "subdigest",
-                    digest = subdigestLeaf.digest.ByteArrayToHexString()
-                };
+                return subdigestLeaf.Parse();
             }
-            else if (Leaf.isAnyAddressSubdigestLeaf)
+            
+            if (Leaf is AnyAddressSubdigestLeaf anyAddressSubdigestLeaf)
             {
-                AnyAddressSubdigestLeaf anyAddressSubdigestLeaf = (AnyAddressSubdigestLeaf)Leaf;
-                return new
-                {
-                    type = "any-address-subdigest",
-                    digest = anyAddressSubdigestLeaf.digest.ByteArrayToHexString()
-                };
+                return anyAddressSubdigestLeaf.Parse();
             }
-            else if (Leaf.isNodeLeaf)
+            
+            if (Leaf is NodeLeaf nodeLeaf)
             {
-                NodeLeaf nodeLeaf = (NodeLeaf)Leaf;
                 return nodeLeaf.Value.ByteArrayToHexString();
             }
-            else if (Leaf.isNestedLeaf)
+            
+            if (Leaf is NestedLeaf nestedLeaf)
             {
-                NestedLeaf nestedLeaf = (NestedLeaf)Leaf;
-                return new
-                {
-                    type = "nested",
-                    tree = nestedLeaf.tree.Encode(),
-                    weight = nestedLeaf.weight.ToString(),
-                    threshold = nestedLeaf.threshold.ToString()
-                };
+                return nestedLeaf.Parse();
             }
 
             throw new InvalidOperationException("Invalid topology");
@@ -236,7 +222,6 @@ namespace Sequence.EcosystemWallet.Primitives
             return new Topology(leaf);
         }
 
-        // Todo once tests are passing refactor to use a HashConfiguration method on the leafs specifically, we can add an abstract method to be overwritten
         public byte[] HashConfiguration()
         {
             if (IsNode())
@@ -246,64 +231,84 @@ namespace Sequence.EcosystemWallet.Primitives
                 return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(leftHash, rightHash));
             }
             
-            if (Leaf.isSignerLeaf)
+            if (Leaf is SignerLeaf signerLeaf)
             {
-                SignerLeaf signerLeaf = (SignerLeaf)Leaf;
-                byte[] prefix = Encoding.UTF8.GetBytes("Sequence signer:\n");
-                byte[] address = signerLeaf.address.Value.HexStringToByteArray();
-                byte[] weight = signerLeaf.weight.ByteArrayFromNumber().PadLeft(32);
-                
-                return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, address, weight));
+                return signerLeaf.HashConfiguration();
             }
             
-            if (Leaf.isSapientSignerLeaf)
+            if (Leaf is SapientSignerLeaf sapientSignerLeaf)
             {
-                SapientSignerLeaf sapientLeaf = (SapientSignerLeaf)Leaf;
-                byte[] prefix = Encoding.UTF8.GetBytes("Sequence sapient config:\n");
-                byte[] address = sapientLeaf.address.Value.HexStringToByteArray();
-                byte[] weight = sapientLeaf.weight.ByteArrayFromNumber().PadLeft(32);
-                byte[] imageHash = sapientLeaf.imageHash.HexStringToByteArray().PadLeft(32);
-                
-                return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, address, weight, imageHash));
+                return sapientSignerLeaf.HashConfiguration();
             }
             
-            if (Leaf.isSubdigestLeaf)
+            if (Leaf is SubdigestLeaf subdigestLeaf)
             {
-                SubdigestLeaf subdigestLeaf = (SubdigestLeaf)Leaf;
-                byte[] prefix = Encoding.UTF8.GetBytes("Sequence static digest:\n");
-                byte[] digest = subdigestLeaf.digest;
-                
-                return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, digest));
+                return subdigestLeaf.HashConfiguration();
             }
             
-            if (Leaf.isAnyAddressSubdigestLeaf)
+            if (Leaf is AnyAddressSubdigestLeaf anyAddressSubdigestLeaf)
             {
-                AnyAddressSubdigestLeaf anyAddressSubdigestLeaf = (AnyAddressSubdigestLeaf)Leaf;
-                byte[] prefix = Encoding.UTF8.GetBytes("Sequence any address subdigest:\n");
-                byte[] digest = anyAddressSubdigestLeaf.digest;
-                
-                return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, digest));
+                return anyAddressSubdigestLeaf.HashConfiguration();
             }
             
-            if (Leaf.isNodeLeaf)
+            if (Leaf is NodeLeaf nodeLeaf)
             {
-                // In the JS code, this just returns the topology itself, but in C# we need to return bytes
-                // Since NodeLeaf doesn't have any properties to hash, we'll return a byte array
-                return new byte[]{};
+                return nodeLeaf.HashConfiguration();
             }
             
-            if (Leaf.isNestedLeaf)
+            if (Leaf is NestedLeaf nestedLeaf)
             {
-                NestedLeaf nestedLeaf = (NestedLeaf)Leaf;
-                byte[] prefix = Encoding.UTF8.GetBytes("Sequence nested config:\n");
-                byte[] treeHash = nestedLeaf.tree.HashConfiguration();
-                byte[] threshold = nestedLeaf.threshold.ByteArrayFromNumber().PadLeft(32);
-                byte[] weight = nestedLeaf.weight.ByteArrayFromNumber().PadLeft(32);
-                
-                return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, treeHash, threshold, weight));
+                return nestedLeaf.HashConfiguration();
             }
             
             throw new InvalidOperationException($"Invalid topology, given {GetType()}");
+        }
+        
+        public byte[] Encode(bool noChainId, byte[] checkpointerData)
+        {
+            if (IsNode())
+            {
+                var encoded0 = Node.left.Encode(noChainId, checkpointerData);
+                var encoded1 = Node.right.Encode(noChainId, checkpointerData);
+                
+                var isBranching = Node.right.IsNode();
+                if (!isBranching) 
+                    return encoded0.Concat(encoded1).ToArray();
+                
+                var encoded1Size = encoded1.Length.MinBytesFor();
+                if (encoded1Size > 15) 
+                    throw new Exception("Branch too large");
+
+                int flag = (FlagBranch << 4) | encoded1Size;
+                return encoded0
+                    .Concat(flag.ByteArrayFromNumber())
+                    .Concat(encoded1.Length.ByteArrayFromNumber()
+                        .PadLeft(encoded1Size))
+                    .Concat(encoded1)
+                    .ToArray();
+            }
+
+            if (Leaf is NestedLeaf nestedLeaf)
+            {
+                nestedLeaf.Encode(noChainId, checkpointerData);
+            }
+
+            if (Leaf is NodeLeaf nodeLeaf)
+            {
+                return nodeLeaf.Encode(noChainId, checkpointerData);
+            }
+
+            if (Leaf is SignedSignerLeaf signedSignerLeaf)
+            {
+                signedSignerLeaf.Encode(noChainId, checkpointerData);
+            }
+
+            if (Leaf is RawSignerLeaf rawSignerLeaf)
+            {
+                rawSignerLeaf.Encode(noChainId, checkpointerData);
+            }
+
+            throw new Exception("Unrecognized topology structure.");
         }
     }
 }

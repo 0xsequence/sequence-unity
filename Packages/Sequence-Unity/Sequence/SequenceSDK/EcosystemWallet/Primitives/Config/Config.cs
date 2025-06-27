@@ -52,7 +52,7 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 threshold = threshold.ToString(),
                 checkpoint = checkpoint.ToString(),
-                topology = topology?.Encode(),
+                topology = topology?.Parse(),
                 checkpointer = checkpointer?.Value
             };
 

@@ -8,7 +8,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger weight;
         public BigInteger maxWeight;
         
-        public static Weigth GetWeight(RawTopology topology, Func<Leaf, bool> canSign)
+        public static Weigth GetWeight(Topology topology, Func<Leaf, bool> canSign)
         {
             if (topology == null)
             {
@@ -33,7 +33,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new Weigth { weight = 0, maxWeight = 0 };
         }
 
-        public static Weigth GetWeight(RawConfig configuration, Func<Leaf, bool> canSign)
+        public static Weigth GetWeight(Config configuration, Func<Leaf, bool> canSign)
         {
             if (configuration?.topology == null)
             {
@@ -44,7 +44,7 @@ namespace Sequence.EcosystemWallet.Primitives
         }
 
         // Todo once tests are passing refactor to get the weight on the leafs directly, we can create an abstract method and overwrite it
-        private static Weigth GetWeightForLeaf(RawLeaf leaf, Func<Leaf, bool> canSign)
+        private static Weigth GetWeightForLeaf(Leaf leaf, Func<Leaf, bool> canSign)
         {
             if (leaf is SignedSignerLeaf signedSigner)
             {

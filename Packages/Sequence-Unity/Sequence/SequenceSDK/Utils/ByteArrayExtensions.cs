@@ -118,6 +118,18 @@ namespace Sequence.Utils
             return rawBytes;
         }
         
+        public static int MinBytesFor(this int value)
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Value must be non-negative.");
+
+            if (value == 0)
+                return 1;
+
+            int bits = (int)Math.Ceiling(BigInteger.Log(value + 1, 2));
+            return (bits + 7) / 8;
+        }
+        
         public static byte[] ByteArrayFromNumber(this int value, int size)
         {
             if (size < 1 || size > 4)

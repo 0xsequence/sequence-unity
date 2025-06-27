@@ -11,7 +11,7 @@ namespace Sequence.EcosystemWallet.Primitives
             public BigInteger maxWeight;
         }
 
-        public static WeightResult GetWeight(RawTopology topology, Func<Leaf, bool> canSign)
+        public static WeightResult GetWeight(Topology topology, Func<Leaf, bool> canSign)
         {
             if (topology == null)
             {
@@ -36,7 +36,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new WeightResult { weight = 0, maxWeight = 0 };
         }
 
-        public static WeightResult GetWeight(RawConfig configuration, Func<Leaf, bool> canSign)
+        public static WeightResult GetWeight(Config configuration, Func<Leaf, bool> canSign)
         {
             if (configuration?.topology == null)
             {
@@ -46,7 +46,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return GetWeight(configuration.topology, canSign);
         }
 
-        private static WeightResult GetWeightForLeaf(RawLeaf leaf, Func<Leaf, bool> canSign)
+        private static WeightResult GetWeightForLeaf(Leaf leaf, Func<Leaf, bool> canSign)
         {
             // Handle signed leaves (they have weight)
             if (leaf is SignedSignerLeaf signedSigner)

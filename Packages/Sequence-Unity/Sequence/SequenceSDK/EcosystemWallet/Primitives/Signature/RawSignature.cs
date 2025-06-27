@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -9,7 +10,7 @@ namespace Sequence.EcosystemWallet.Primitives
     {
         public bool noChainId;
         public byte[] checkpointerData;
-        public RawConfig configuration;
+        public Config configuration;
         public RawSignature[] suffix;
         public Erc6492 erc6492;
 
@@ -81,14 +82,10 @@ namespace Sequence.EcosystemWallet.Primitives
             var thresholdBytes = configuration.threshold.ToByteArray().PadLeft(bytesForThreshold);
             output = output.Concat(thresholdBytes).ToArray();
             
-            // TODO: 
-            /*
-            var topologyBytes = EncodeTopology(configuration.topology, signature);
-            output = Bytes.Concat(output, topologyBytes);
+            var topologyBytes = configuration.topology.Encode(noChainId, checkpointerData);
+            output = output.Concat(topologyBytes).ToArray();
 
-            return erc6492 != null ? Wrap(output, erc6492) : output;*/
-            
-            return output;
+            return erc6492 != null ? Erc6492Helper.Wrap(output.ByteArrayToHexStringWithPrefix(), erc6492.to, erc6492.data.ByteArrayToHexStringWithPrefix()) : output;
         }
 
         public static RawSignature Decode(byte[] erc6492Signature)
