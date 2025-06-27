@@ -8,11 +8,10 @@ namespace Sequence.EcosystemWallet.Primitives
     public class SapientSignerLeaf : Leaf
     {
         public const string type = "sapient-signer";
+        
         public Address address;
         public BigInteger weight;
         public string imageHash;
-        public bool signed;
-        public SignatureType signature;
         
         public override object Parse()
         {
@@ -27,7 +26,8 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
         {
-            throw new System.NotImplementedException();
+            var flag = Topology.FlagNode << 4;
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(), HashConfiguration());
         }
 
         public override byte[] HashConfiguration()

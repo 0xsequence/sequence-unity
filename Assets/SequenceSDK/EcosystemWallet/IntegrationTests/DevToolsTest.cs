@@ -11,7 +11,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             var maxDepth = parameters["maxDepth"].ToString();
             var seed = (string)parameters["seed"];
             var minThresholdOnNested = parameters["minThresholdOnNested"].ToString();
-            var checkpointer = (string)parameters["checkpointer"];
+            var checkpointer = parameters.TryGetValue("checkpointer", out var checkpointerObj) ? checkpointerObj.ToString() : null;
             
             return Task.FromResult("");
         }

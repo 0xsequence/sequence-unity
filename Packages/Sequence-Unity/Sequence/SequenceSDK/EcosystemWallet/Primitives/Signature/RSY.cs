@@ -20,9 +20,13 @@ namespace Sequence.EcosystemWallet.Primitives
 
             byte[] rBytes = r.ByteArrayFromNumber().PadLeft(32);
             byte[] sBytes = s.ByteArrayFromNumber().PadLeft(32);
-            byte[] yByte = new byte[] { (byte)(yParity % 2) };
-
-            return rBytes.Concat(sBytes).Concat(yByte).ToArray();
+            
+            if (yParity % 2 == 1)
+            {
+                sBytes[0] |= 0x80;
+            }
+            
+            return ByteArrayExtensions.ConcatenateByteArrays(rBytes, sBytes);
         }
     }
 }

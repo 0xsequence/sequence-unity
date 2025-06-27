@@ -25,7 +25,6 @@ namespace Sequence.EcosystemWallet.Primitives
                 {
                     address = signerLeaf.address,
                     weight = signerLeaf.weight,
-                    signed = true,
                     signature = signature
                 } : signerLeaf;
                 
@@ -40,7 +39,6 @@ namespace Sequence.EcosystemWallet.Primitives
                     address = sapientSignerLeaf.address,
                     imageHash = sapientSignerLeaf.imageHash,
                     weight = sapientSignerLeaf.weight,
-                    signed = true,
                     signature = signature
                 } : sapientSignerLeaf;
                 

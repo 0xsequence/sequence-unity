@@ -23,7 +23,7 @@ namespace Sequence.EcosystemWallet.Primitives
             else
                 throw new Exception("Weight too large");
 
-            return flag.ByteArrayFromNumber().Concat(weightBytes).Concat(Pack()).ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(), weightBytes, Pack());
         }
     }
 }

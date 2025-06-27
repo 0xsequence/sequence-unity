@@ -83,7 +83,9 @@ namespace Sequence.Utils
         public static byte[] PadLeft(this byte[] input, int totalSize)
         {
             if (input.Length > totalSize)
-                throw new ArgumentException("Input is larger than total size");
+            {
+                return input;
+            }
 
             byte[] result = new byte[totalSize];
             Buffer.BlockCopy(input, 0, result, totalSize - input.Length, input.Length);
@@ -117,17 +119,19 @@ namespace Sequence.Utils
 
             return rawBytes;
         }
-        
+
         public static int MinBytesFor(this int value)
+        {
+            return MinBytesFor(new BigInteger(value));
+        }
+        
+        public static int MinBytesFor(this BigInteger value)
         {
             if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), "Value must be non-negative.");
 
-            if (value == 0)
-                return 1;
-
-            int bits = (int)Math.Ceiling(BigInteger.Log(value + 1, 2));
-            return (bits + 7) / 8;
+            var hex = value.ToString("X");
+            return (int)Math.Ceiling(hex.Length / 2.0);
         }
         
         public static byte[] ByteArrayFromNumber(this int value, int size)

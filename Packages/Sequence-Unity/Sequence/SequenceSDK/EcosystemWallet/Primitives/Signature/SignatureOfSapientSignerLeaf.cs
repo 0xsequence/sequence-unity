@@ -20,7 +20,7 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public override byte[] Encode(Leaf leaf)
         {
-            if (leaf is not SignerLeaf signerLeaf)
+            if (leaf is not SapientSignerLeaf signerLeaf)
                 throw new Exception();
 
             var weightBytes = Array.Empty<byte>();
@@ -39,14 +39,14 @@ namespace Sequence.EcosystemWallet.Primitives
             else
                 throw new Exception("Weight too large");
 
-            return flag.ByteArrayFromNumber()
-                .Concat(weightBytes)
-                .Concat(address.Value.HexStringToByteArray()
-                    .PadLeft(20))
-                .Concat(data.Length.ByteArrayFromNumber()
-                    .PadLeft(sizeLen))
-                .Concat(data)
-                .ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                flag.ByteArrayFromNumber(), 
+                weightBytes,
+                address.Value.HexStringToByteArray()
+                    .PadLeft(20),
+                data.Length.ByteArrayFromNumber()
+                    .PadLeft(sizeLen),
+                data);
         }
     }
 }

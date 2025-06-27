@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -16,12 +14,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public Leaf FindSignerLeaf(Address address)
         {
-            if (topology == null)
-            {
-                return null;
-            }
-
-            return topology.FindSignerLeaf(address);
+            return topology?.FindSignerLeaf(address);
         }
 
         public byte[] HashConfiguration()

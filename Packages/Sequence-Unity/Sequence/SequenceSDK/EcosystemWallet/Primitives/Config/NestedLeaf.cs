@@ -50,12 +50,12 @@ namespace Sequence.EcosystemWallet.Primitives
             if (nested.Length > 0xFFFFFF)
                 throw new Exception("Nested tree too large");
 
-            return flag.ByteArrayFromNumber()
-                .Concat(weightBytes)
-                .Concat(thresholdBytes)
-                .Concat(nested.Length.ByteArrayFromNumber().PadLeft(3))
-                .Concat(nested)
-                .ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                flag.ByteArrayFromNumber(),
+                weightBytes,
+                thresholdBytes,
+                nested.Length.ByteArrayFromNumber().PadLeft(3),
+                nested);
         }
 
         public override byte[] HashConfiguration()

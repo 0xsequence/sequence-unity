@@ -12,8 +12,6 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public Address address;
         public BigInteger weight;
-        public bool signed;
-        public SignatureType signature;
         
         public override object Parse()
         {
@@ -27,27 +25,18 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
         {
-            if (signature is SignatureOfSignerLeafHash hash)
-            {
-                return hash.Encode(this);
-            }
+            var flag = Topology.FlagAddress << 4;
+            var weightBytes = Array.Empty<byte>();
 
-            if (signature is SignatureOfSignerLeafEthSign ethSign)
-            {
-                return ethSign.Encode(this);
-            }
+            if (weight > 0 && weight <= 15)
+                flag |= (int)weight;
+            else if (weight <= 255)
+                weightBytes = weight.ByteArrayFromNumber();
+            else
+                throw new ArgumentException("Weight too large");
 
-            if (signature is SignatureOfSignerLeafErc1271 erc1271)
-            {
-                return erc1271.Encode(this);
-            }
-
-            if (signature is SignatureOfSapientSignerLeaf sapientSigner)
-            {
-                return sapientSigner.Encode(this);
-            }
-                
-            throw new Exception($"Invalid signature type: {signature.type}");
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(), weightBytes,
+                address.Value.HexStringToByteArray().PadLeft(20));
         }
 
         public override byte[] HashConfiguration()

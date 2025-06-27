@@ -19,7 +19,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
         {
-            return (Topology.FlagNode << 4).ByteArrayFromNumber().Concat(Value).ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays((Topology.FlagNode << 4).ByteArrayFromNumber(), Value);
         }
 
         // In the JS code, this just returns the topology itself, but in C# we need to return bytes

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.ABI;
 using Nethereum.ABI.FunctionEncoding;
@@ -40,16 +41,16 @@ namespace Sequence.EcosystemWallet.Utils
             return encoder.EncodeRequest(function.Sha3Signature, Array.Empty<Parameter>(), stage1, deployHash.HexToByteArray());
         }
 
-        public static string Wrap(string signature, string to, string data)
+        public static byte[] Wrap(byte[] signature, Address to, byte[] data)
         {
             var encoder = new ABIEncode();
             var encoded = encoder.GetABIEncodedPacked(
                 new ABIValue("address", to),
-                new ABIValue("bytes", data.HexToByteArray()),
-                new ABIValue("bytes", signature.HexToByteArray())
-            ).ToHex();
+                new ABIValue("bytes", data),
+                new ABIValue("bytes", signature)
+            );
 
-            return encoded + MagicBytes[2..];
+            return encoded.Concat(MagicBytes.HexToByteArray()).ToArray();
         }
 
         public static (string Signature, (string To, string Data)? Erc6492) Decode(string signature)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
@@ -26,6 +27,8 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                     Values = values.Skip(2).ToArray()
                 };
             }).ToList();
+            
+            Debug.Log($"All Signatures: {JsonConvert.SerializeObject(allSignatures)}");
 
             var fullTopology = SignatureHandler.FillLeaves(config.topology, leaf =>
             {
@@ -48,16 +51,16 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                         case "eth_sign":
                             return new SignatureOfSignerLeafEthSign
                             {
-                                r = new BigInteger(candidate.Values[0].HexStringToByteArray(32)),
-                                s = new BigInteger(candidate.Values[1].HexStringToByteArray(32)),
-                                // TODO: yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
+                                r = candidate.Values[0].HexStringToBigInteger(),
+                                s = candidate.Values[1].HexStringToBigInteger(),
+                                yParity = int.Parse(candidate.Values[2]) % 2
                             };
                         case "hash":
                             return new SignatureOfSignerLeafHash
                             {
-                                r = new BigInteger(candidate.Values[0].HexStringToByteArray(32)),
-                                s = new BigInteger(candidate.Values[1].HexStringToByteArray(32)),
-                                // TODO: yParity = OxSignature.VToYParity(int.Parse(candidate.Values[2])),
+                                r = candidate.Values[0].HexStringToBigInteger(),
+                                s = candidate.Values[1].HexStringToBigInteger(),
+                                yParity = int.Parse(candidate.Values[2]) % 2
                             };
                         case "sapient":
                             return new SignatureOfSapientSignerLeaf
@@ -105,10 +108,12 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 return null;
             });
 
+            Debug.Log(JsonConvert.SerializeObject(fullTopology));
+
             var rawSignature = new RawSignature
             {
                 noChainId = noChainId,
-                configuration =
+                configuration = new Primitives.Config
                 {
                     threshold = config.threshold,
                     checkpoint = config.checkpoint,
@@ -118,7 +123,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 checkpointerData = checkpointerData
             };
 
-            return rawSignature.Encode().ByteArrayToHexString();
+            return rawSignature.Encode().ByteArrayToHexStringWithPrefix();
         }
 
         public static async Task<string> DoConcat(List<string> signatures)

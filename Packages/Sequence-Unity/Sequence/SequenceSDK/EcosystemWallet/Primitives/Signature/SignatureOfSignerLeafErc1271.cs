@@ -31,14 +31,14 @@ namespace Sequence.EcosystemWallet.Primitives
             else
                 throw new Exception("Weight too large");
 
-            return flag.ByteArrayFromNumber()
-                .Concat(weightBytes)
-                .Concat(address.Value.HexStringToByteArray()
-                    .PadLeft(20))
-                .Concat(data.Length.ByteArrayFromNumber()
-                    .PadLeft(sizeLen))
-                .Concat(data)
-                .ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                flag.ByteArrayFromNumber(), 
+                weightBytes,
+                address.Value.HexStringToByteArray()
+                    .PadLeft(20),
+                data.Length.ByteArrayFromNumber()
+                    .PadLeft(sizeLen),
+                data);
         }
     }
 }

@@ -11,8 +11,8 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         {
             var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
             
-            var threshold = (string)input["threshold"];
-            var checkpoint = (string)input["checkpoint"];
+            var threshold = input["threshold"].ToString();
+            var checkpoint = input["checkpoint"].ToString();
             var checkpointer = input.GetAddress("checkpointer");
             var topology = input["topology"].ToString();
             

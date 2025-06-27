@@ -1,10 +1,10 @@
 using System;
 using System.Numerics;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -116,37 +116,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 };
             }
             
-            if (Leaf is SignerLeaf signerLeaf)
-            {
-                return signerLeaf.Parse();
-            }
-            
-            if (Leaf is SapientSignerLeaf sapientSignerLeaf)
-            {
-                return sapientSignerLeaf.Parse();
-            }
-            
-            if (Leaf is SubdigestLeaf subdigestLeaf)
-            {
-                return subdigestLeaf.Parse();
-            }
-            
-            if (Leaf is AnyAddressSubdigestLeaf anyAddressSubdigestLeaf)
-            {
-                return anyAddressSubdigestLeaf.Parse();
-            }
-            
-            if (Leaf is NodeLeaf nodeLeaf)
-            {
-                return nodeLeaf.Value.ByteArrayToHexString();
-            }
-            
-            if (Leaf is NestedLeaf nestedLeaf)
-            {
-                return nestedLeaf.Parse();
-            }
-
-            throw new InvalidOperationException("Invalid topology");
+            return Leaf.Parse();
         }
 
         public static Topology Decode(string input)
@@ -231,37 +201,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(leftHash, rightHash));
             }
             
-            if (Leaf is SignerLeaf signerLeaf)
-            {
-                return signerLeaf.HashConfiguration();
-            }
-            
-            if (Leaf is SapientSignerLeaf sapientSignerLeaf)
-            {
-                return sapientSignerLeaf.HashConfiguration();
-            }
-            
-            if (Leaf is SubdigestLeaf subdigestLeaf)
-            {
-                return subdigestLeaf.HashConfiguration();
-            }
-            
-            if (Leaf is AnyAddressSubdigestLeaf anyAddressSubdigestLeaf)
-            {
-                return anyAddressSubdigestLeaf.HashConfiguration();
-            }
-            
-            if (Leaf is NodeLeaf nodeLeaf)
-            {
-                return nodeLeaf.HashConfiguration();
-            }
-            
-            if (Leaf is NestedLeaf nestedLeaf)
-            {
-                return nestedLeaf.HashConfiguration();
-            }
-            
-            throw new InvalidOperationException($"Invalid topology, given {GetType()}");
+            return Leaf.HashConfiguration();
         }
         
         public byte[] Encode(bool noChainId, byte[] checkpointerData)
@@ -273,42 +213,22 @@ namespace Sequence.EcosystemWallet.Primitives
                 
                 var isBranching = Node.right.IsNode();
                 if (!isBranching) 
-                    return encoded0.Concat(encoded1).ToArray();
+                    return ByteArrayExtensions.ConcatenateByteArrays(encoded0, encoded1);
                 
                 var encoded1Size = encoded1.Length.MinBytesFor();
                 if (encoded1Size > 15) 
                     throw new Exception("Branch too large");
-
-                int flag = (FlagBranch << 4) | encoded1Size;
-                return encoded0
-                    .Concat(flag.ByteArrayFromNumber())
-                    .Concat(encoded1.Length.ByteArrayFromNumber()
-                        .PadLeft(encoded1Size))
-                    .Concat(encoded1)
-                    .ToArray();
+                
+                var flag = (FlagBranch << 4) | encoded1Size;
+                
+                return ByteArrayExtensions.ConcatenateByteArrays(encoded0, 
+                    flag.ByteArrayFromNumber(),
+                    encoded1.Length.ByteArrayFromNumber()
+                        .PadLeft(encoded1Size),
+                    encoded1);
             }
 
-            if (Leaf is NestedLeaf nestedLeaf)
-            {
-                nestedLeaf.Encode(noChainId, checkpointerData);
-            }
-
-            if (Leaf is NodeLeaf nodeLeaf)
-            {
-                return nodeLeaf.Encode(noChainId, checkpointerData);
-            }
-
-            if (Leaf is SignedSignerLeaf signedSignerLeaf)
-            {
-                signedSignerLeaf.Encode(noChainId, checkpointerData);
-            }
-
-            if (Leaf is RawSignerLeaf rawSignerLeaf)
-            {
-                rawSignerLeaf.Encode(noChainId, checkpointerData);
-            }
-
-            throw new Exception("Unrecognized topology structure.");
+            return Leaf.Encode(noChainId, checkpointerData);
         }
     }
 }
