@@ -38,20 +38,16 @@ namespace Sequence.EcosystemWallet.Primitives
         public static Topology FromLeaves(List<Leaf> leaves)
         {
             if (leaves == null || leaves.Count == 0)
-            {
                 throw new ArgumentException("Cannot create topology from empty leaves");
-            }
 
             if (leaves.Count == 1)
-            {
-                return new Topology(leaves[0]);
-            }
+                return leaves[0].ToTopology();
 
             if (leaves.Count == 2)
             {
                 return new Topology(new Node(
-                    new Topology(leaves[0]),
-                    new Topology(leaves[1])
+                    leaves[0].ToTopology(),
+                    leaves[1].ToTopology()
                 ));
             }
 
@@ -134,63 +130,50 @@ namespace Sequence.EcosystemWallet.Primitives
 
             if (!input.StartsWith("{"))
             {
-                return new Topology(new NodeLeaf
+                return new NodeLeaf
                 {
                     Value = (input).HexStringToByteArray()
-                });
+                }.ToTopology();
             }
 
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(input);
             string type = (string)data["type"];
-            Leaf leaf;
             
             switch (type)
             {
-                case "signer":
-                    leaf = new SignerLeaf
+                case Leaf.Signer:
+                    return new SignerLeaf
                     {
                         address = new Address((string)data["address"]),
                         weight = BigInteger.Parse((string)data["weight"])
-                    };
-
-                    break;
-                case "sapient-signer":
-                    leaf = new SapientSignerLeaf
+                    }.ToTopology();
+                case Leaf.SapientSigner:
+                    return new SapientSignerLeaf
                     {
                         address = new Address((string)data["address"]),
                         weight = BigInteger.Parse((string)data["weight"]),
                         imageHash = (string)data["imageHash"]
-                    };
-
-                    break;
-                case "subdigest":
-                    leaf = new SubdigestLeaf
+                    }.ToTopology();
+                case Leaf.Subdigest:
+                    return new SubdigestLeaf
                     {
                         digest = ((string)data["digest"]).HexStringToByteArray()
-                    };
-                    
-                    break;
-                case "any-address-subdigest":
-                    leaf = new AnyAddressSubdigestLeaf
+                    }.ToTopology();
+                case Leaf.AnyAddressSubdigest:
+                    return new AnyAddressSubdigestLeaf
                     {
                         digest = ((string)data["digest"]).HexStringToByteArray()
-                    };
-
-                    break;
-                case "nested":
-                    leaf = new NestedLeaf
+                    }.ToTopology();
+                case Leaf.Nested:
+                    return new NestedLeaf
                     {
                         tree = Decode(data["tree"].ToString()),
                         weight = BigInteger.Parse((string)data["weight"]),
                         threshold = BigInteger.Parse((string)data["threshold"])
-                    };
-
-                    break;
+                    }.ToTopology();
                 default:
                     throw new Exception("Invalid type in topology JSON");
             }
-
-            return new Topology(leaf);
         }
 
         public byte[] HashConfiguration()
@@ -241,7 +224,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 string firstElement = elements.Split(' ')[0];
                 string firstElementType = firstElement.Split(':')[0];
 
-                if (firstElementType == "signer")
+                if (firstElementType == Leaf.Signer)
                 {
                     var parts = firstElement.Split(':');
                     string address = parts[1];
@@ -255,7 +238,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == "subdigest")
+                else if (firstElementType == Leaf.Subdigest)
                 {
                     var parts = firstElement.Split(':');
                     string digest = parts[1];
@@ -267,7 +250,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == "any-address-subdigest")
+                else if (firstElementType == Leaf.AnyAddressSubdigest)
                 {
                     var parts = firstElement.Split(':');
                     string digest = parts[1];
@@ -279,7 +262,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == "sapient")
+                else if (firstElementType == Leaf.Sapient)
                 {
                     var parts = firstElement.Split(':');
                     string imageHash = parts[1];
@@ -298,7 +281,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == "nested")
+                else if (firstElementType == Leaf.Nested)
                 {
                     var parts = firstElement.Split(':');
                     BigInteger threshold = BigInteger.Parse(parts[1]);
@@ -320,7 +303,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(end + 1).TrimStart();
                 }
-                else if (firstElementType == "node")
+                else if (firstElementType == Leaf.Node)
                 {
                     var parts = firstElement.Split(':');
                     string hash = parts[1];

@@ -6,7 +6,9 @@ using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
+using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Utils
 {
@@ -51,16 +53,15 @@ namespace Sequence.EcosystemWallet.Utils
                 new ABIValue("bytes", signature)
             );
 
-            return ByteArrayExtensions.ConcatenateByteArrays(encoded, MagicBytes.HexToByteArray());
+            return HexUtils.Concat(encoded.ByteArrayToHexString(), MagicBytes).HexStringToByteArray();
         }
 
-        public static (byte[] Signature, (Address To, byte[] Data)? Erc6492) Decode(byte[] signature)
+        public static (byte[] Signature, Erc6492 Erc6492) Decode(byte[] signature)
         {
             var magicBytes = MagicBytes.HexStringToByteArray();
             int magicLength = magicBytes.Length;
-
-            if (signature.Length >= magicLength && 
-                signature[^magicLength..].ByteArrayToHexStringWithPrefix() == MagicBytes)
+            
+            if (signature.Length >= magicLength && signature[^magicLength..].ByteArrayToHexStringWithPrefix() == MagicBytes)
             {
                 var raw = signature[..^magicLength];
 
@@ -80,7 +81,7 @@ namespace Sequence.EcosystemWallet.Utils
                     byte[] data = (byte[])(decoded[1].Result ?? throw new Exception("Missing 'data'"));
                     byte[] unwrappedSignature = (byte[])(decoded[2].Result ?? throw new Exception("Missing 'signature'"));
 
-                    return (unwrappedSignature, (new Address(to), data));
+                    return (unwrappedSignature, new Erc6492(new Address(to), data));
                 }
                 catch
                 {

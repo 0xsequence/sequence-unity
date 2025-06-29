@@ -6,14 +6,13 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SubdigestLeaf : Leaf
     {
-        public const string type = "subdigest";
         public byte[] digest;
         
         public override object Parse()
         {
             return new
             {
-                type = "subdigest",
+                type = Subdigest,
                 digest = digest.ByteArrayToHexString()
             };
         }

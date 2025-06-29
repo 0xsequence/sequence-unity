@@ -9,8 +9,6 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class NestedLeaf : Leaf
     {
-        public const string type = "nested";
-        
         public Topology tree;
         public BigInteger weight;
         public BigInteger threshold;
@@ -19,7 +17,7 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             return new
             {
-                type = "nested",
+                type = Nested,
                 tree = tree.Parse(),
                 weight = weight.ToString(),
                 threshold = threshold.ToString()

@@ -14,12 +14,6 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             return JsonConvert.DeserializeObject<T[]>(inputJson);
         }
         
-        public static Address GetAddress(this Dictionary<string, object> @params, string key)
-        {
-            return @params.TryGetValue(key, out var value) && 
-                   value is string valueStr ? new Address(valueStr) : null;
-        }
-        
         public static Dictionary<string, object> GetNestedObjects(this Dictionary<string, object> dict, string key)
         {
             if (!dict.TryGetValue(key, out var inputObj)) 

@@ -4,9 +4,11 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public class SignatureOfSignerLeafEthSign : RSY
+    public class SignatureOfSignerLeafEthSign : SignatureOfSignerLeaf
     {
         public override string type => "eth_sign";
+        
+        public RSY rsy;
         
         public override byte[] Encode(Leaf leaf)
         {
@@ -23,7 +25,7 @@ namespace Sequence.EcosystemWallet.Primitives
             else
                 throw new Exception("Weight too large");
 
-            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), weightBytes, Pack());
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), weightBytes, rsy.Pack());
         }
     }
 }

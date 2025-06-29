@@ -110,7 +110,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                     Debug.Log($"[{DateTime.UtcNow:O}] Success Response for Method={method} id={id}");
                     if (debug)
                     {
-                        Debug.Log("Response details: " + JsonConvert.SerializeObject(response, Formatting.Indented));
+                        Debug.Log($"Response details for Method={method}: " + JsonConvert.SerializeObject(response, Formatting.Indented) + $", Params used = {JsonConvert.SerializeObject(methodParams)}");
                     }
                 }
                 return response;

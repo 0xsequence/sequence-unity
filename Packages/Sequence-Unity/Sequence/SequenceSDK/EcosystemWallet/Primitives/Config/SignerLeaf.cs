@@ -3,13 +3,12 @@ using System.Numerics;
 using System.Text;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
     public class SignerLeaf : Leaf
     {
-        public const string type = "signer";
-        
         public Address address;
         public BigInteger weight;
         
@@ -17,7 +16,7 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             return new
             {
-                type = type,
+                type = Signer,
                 address = address,
                 weight = weight.ToString()
             };

@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public abstract class SignatureOfSignerLeaf : SignatureType
+    public abstract class SignatureOfSignerLeaf : SignatureOfLeaf
     {
         
     }

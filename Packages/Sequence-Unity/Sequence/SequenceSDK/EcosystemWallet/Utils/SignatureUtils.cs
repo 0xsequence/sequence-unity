@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Utils
 {
@@ -17,6 +18,8 @@ namespace Sequence.EcosystemWallet.Utils
             {
                 byte firstByte = signature[index++];
                 int flag = (firstByte & 0xf0) >> 4;
+                
+                Debug.LogError($"{signature.ByteArrayToHexStringWithPrefix()} {index} {flag}");
 
                 switch (flag)
                 {
@@ -29,19 +32,19 @@ namespace Sequence.EcosystemWallet.Utils
                         if (index + 64 > signature.Length)
                             throw new Exception("Not enough bytes for hash signature");
 
-                        var unpacked = RSY.Unpack(signature[index..(index + 64)]);
+                        var rsy = RSY.Unpack(signature[index..(index + 64)]);
                         index += 64;
 
-                        leafs.Add(new Topology(new RawSignerLeaf
+                        leafs.Add(new Topology(new SignedSignerLeaf
                         {
                             weight = new BigInteger(weight),
                             signature = new SignatureOfSignerLeafHash
                             {
-                                r = unpacked.R,
-                                s = unpacked.S,
-                                yParity = unpacked.YParity
+                                rsy = rsy
                             }
                         }));
+                        
+                        Debug.Log($"##2 {signature.ByteArrayToHexStringWithPrefix()}: {new BigInteger(weight)}, {rsy.r}, {rsy.s}, {rsy.yParity}");
 
                         break;
                     }
@@ -51,6 +54,8 @@ namespace Sequence.EcosystemWallet.Utils
                         int weight = firstByte & 0x0f;
                         if (weight == 0)
                             weight = signature[index++];
+                        
+                        Debug.LogError($"{signature.ByteArrayToHexStringWithPrefix()} {index} {signature.Length}");
 
                         string address = signature[index..(index + 20)].ByteArrayToHexStringWithPrefix();
                         index += 20;
@@ -80,7 +85,7 @@ namespace Sequence.EcosystemWallet.Utils
                         byte[] data = signature[index..(index + dataSize)];
                         index += dataSize;
 
-                        leafs.Add(new Topology(new RawSignerLeaf
+                        leafs.Add(new Topology(new SignedSignerLeaf
                         {
                             weight = new BigInteger(weight),
                             signature = new SignatureOfSignerLeafErc1271
@@ -171,17 +176,15 @@ namespace Sequence.EcosystemWallet.Utils
                         if (weight == 0)
                             weight = signature[index++];
 
-                        var unpacked = RSY.Unpack(signature[index..(index + 64)]);
+                        var rsy = RSY.Unpack(signature[index..(index + 64)]);
                         index += 64;
 
-                        leafs.Add(new Topology(new RawSignerLeaf
+                        leafs.Add(new Topology(new SignedSignerLeaf
                         {
                             weight = new BigInteger(weight),
                             signature = new SignatureOfSignerLeafEthSign
                             {
-                                r = unpacked.R,
-                                s = unpacked.S,
-                                yParity = unpacked.YParity
+                                rsy = rsy
                             }
                         }));
 
@@ -217,7 +220,7 @@ namespace Sequence.EcosystemWallet.Utils
                         byte[] data = signature[index..(index + dataSize)];
                         index += dataSize;
 
-                        leafs.Add(new Topology(new RawSignerLeaf
+                        leafs.Add(new Topology(new SignedSignerLeaf
                         {
                             weight = new BigInteger(weight),
                             signature = new SignatureOfSapientSignerLeaf

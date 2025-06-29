@@ -4,7 +4,7 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public class SignatureOfSapientSignerLeaf : SignatureType
+    public class SignatureOfSapientSignerLeaf : SignatureOfLeaf
     {
         public enum Type
         {

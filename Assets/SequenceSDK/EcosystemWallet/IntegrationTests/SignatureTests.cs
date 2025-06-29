@@ -79,16 +79,22 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                         case "eth_sign":
                             return new SignatureOfSignerLeafEthSign
                             {
-                                r = candidate.Values[0].HexStringToBigInteger(),
-                                s = candidate.Values[1].HexStringToBigInteger(),
-                                yParity = RSY.VToYParity(int.Parse(candidate.Values[2]))
+                                rsy = new RSY
+                                {
+                                    r = candidate.Values[0].HexStringToBigInteger(),
+                                    s = candidate.Values[1].HexStringToBigInteger(),
+                                    yParity = RSY.VToYParity(int.Parse(candidate.Values[2]))
+                                }
                             };
                         case "hash":
                             return new SignatureOfSignerLeafHash
                             {
-                                r = candidate.Values[0].HexStringToBigInteger(),
-                                s = candidate.Values[1].HexStringToBigInteger(),
-                                yParity = RSY.VToYParity(int.Parse(candidate.Values[2]))
+                                rsy = new RSY
+                                {
+                                    r = candidate.Values[0].HexStringToBigInteger(),
+                                    s = candidate.Values[1].HexStringToBigInteger(),
+                                    yParity = RSY.VToYParity(int.Parse(candidate.Values[2]))
+                                }
                             };
                         case "sapient":
                             return new SignatureOfSapientSignerLeaf

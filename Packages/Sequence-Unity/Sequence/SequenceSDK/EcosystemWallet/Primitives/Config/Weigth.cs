@@ -54,10 +54,6 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 return new Weigth { weight = signedSapient.weight, maxWeight = signedSapient.weight };
             }
-            if (leaf is RawSignerLeaf rawSigner)
-            {
-                return new Weigth { weight = rawSigner.weight, maxWeight = rawSigner.weight };
-            }
             if (leaf is SignerLeaf signer)
             {
                 BigInteger maxWeight = canSign(signer) ? signer.weight : 0;

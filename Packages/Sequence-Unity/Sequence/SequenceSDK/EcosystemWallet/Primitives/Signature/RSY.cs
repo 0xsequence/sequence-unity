@@ -5,7 +5,7 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public abstract class RSY : SignatureOfSignerLeaf
+    public class RSY
     {
         public BigInteger r;
         public BigInteger s;
@@ -25,7 +25,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return ByteArrayExtensions.ConcatenateByteArrays(rBytes, sBytes);
         }
 
-        public static (BigInteger R, BigInteger S, int YParity) Unpack(byte[] rsy)
+        public static RSY Unpack(byte[] rsy)
         {
             if (rsy.Length != 64)
                 throw new ArgumentException("RSY must be exactly 64 bytes");
@@ -40,7 +40,12 @@ namespace Sequence.EcosystemWallet.Primitives
 
             var s = sBytes.ToBigInteger();
 
-            return (r, s, yParity);
+            return new RSY
+            {
+                r = r,
+                s = s,
+                yParity = yParity,
+            };
         }
 
         public static int VToYParity(BigInteger v)

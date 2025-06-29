@@ -5,7 +5,7 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SignatureHandler
     {
-        public static Topology FillLeaves(Topology topology, Func<Leaf, SignatureType> signatureFor)
+        public static Topology FillLeaves(Topology topology, Func<Leaf, SignatureOfLeaf> signatureFor)
         {
             if (topology.IsNode())
             {

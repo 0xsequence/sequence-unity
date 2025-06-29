@@ -38,10 +38,6 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] checkpointerBytes = checkpointerAddress.HexStringToByteArray().PadLeft(32);
             root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, checkpointerBytes));
             
-            Debug.Log($"thresholdBytes: {thresholdBytes.ByteArrayToHexStringWithPrefix()}");
-            Debug.Log($"checkpointBytes: {checkpointBytes.ByteArrayToHexStringWithPrefix()}");
-            Debug.Log($"checkpointerBytes: {checkpointerBytes.ByteArrayToHexStringWithPrefix()}");
-            
             return root;
         }
 
@@ -64,8 +60,10 @@ namespace Sequence.EcosystemWallet.Primitives
             
             var threshold = input["threshold"].ToString();
             var checkpoint = input["checkpoint"].ToString();
-            var checkpointer = new Address(input["checkpointer"].ToString());
             var topology = input["topology"].ToString();
+            
+            var checkpointer = input.TryGetValue("checkpointer", out var value) && 
+                               value is string valueStr ? new Address(valueStr) : null;
             
             return new Config
             {

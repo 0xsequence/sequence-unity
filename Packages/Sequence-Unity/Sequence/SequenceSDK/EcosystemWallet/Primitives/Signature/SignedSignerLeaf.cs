@@ -2,7 +2,7 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SignedSignerLeaf : SignerLeaf
     {
-        public SignatureType signature;
+        public SignatureOfLeaf signature;
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
         {

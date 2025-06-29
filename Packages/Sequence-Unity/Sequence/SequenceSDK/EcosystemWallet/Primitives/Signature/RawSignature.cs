@@ -8,12 +8,6 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class RawSignature
     {
-        public class Erc6492
-        {
-            public Address to;
-            public byte[] data;
-        }
-        
         public bool noChainId;
         public byte[] checkpointerData;
         public Config configuration;
@@ -36,7 +30,9 @@ namespace Sequence.EcosystemWallet.Primitives
                 chained.AddRange(suffix);
 
                 var chainedSignature = new ChainedSignature(chained.ToArray());
-                return chainedSignature.Encode();
+                var chainedEncoded = chainedSignature.Encode();
+                
+                return erc6492 != null ? Erc6492Helper.Wrap(chainedEncoded, erc6492.to, erc6492.data) : chainedEncoded;
             }
 
             byte flag = 0;
@@ -75,7 +71,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     if (checkpointerDataSize > 16777215)
                         throw new Exception("Checkpointer data too large");
 
-                    output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointerData ?? new byte[0]);
+                    output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointerDataSize.ByteArrayFromNumber(), checkpointerData ?? Array.Empty<byte>());
                 }
             }
 
@@ -107,39 +103,40 @@ namespace Sequence.EcosystemWallet.Primitives
 
             if ((flag & 0x40) == 0x40)
             {
-                if (index + 20 > signature.Length)
-                    throw new Exception("Not enough bytes for checkpointer address");
-
+                AssertBytes("checkpointer address", index, 20, signature.Length);
+                
                 var checkpointer = signature[index..(index + 20)].ByteArrayToHexStringWithPrefix();
                 checkpointerAddress = new Address(checkpointer);
                 index += 20;
 
-                if (index + 3 > signature.Length)
-                    throw new Exception("Not enough bytes for checkpointer data size");
+                AssertBytes("checkpointerData size", index, 3, signature.Length);
 
                 var dataSize = signature[index..(index + 3)].ToInteger();
                 index += 3;
 
-                if (index + dataSize > signature.Length)
-                    throw new Exception("Not enough bytes for checkpointer data");
+                AssertBytes("checkpointerData", index, dataSize, signature.Length);
 
                 checkpointerData = signature[index..(index + dataSize)];
                 index += dataSize;
             }
 
             int checkpointSize = (flag & 0x1C) >> 2;
-            if (index + checkpointSize > signature.Length)
-                throw new Exception("Not enough bytes for checkpoint");
+            checkpointSize++;
+            
+            AssertBytes("checkpoint", index, checkpointSize, signature.Length);
 
             var checkpoint = signature[index..(index + checkpointSize)].ToBigInteger();
             index += checkpointSize;
 
             int thresholdSize = ((flag & 0x20) >> 5) + 1;
-            if (index + thresholdSize > signature.Length)
-                throw new Exception("Not enough bytes for threshold");
+            
+            AssertBytes("threshold", index, thresholdSize, signature.Length);
 
             var threshold = signature[index..(index + thresholdSize)].ToBigInteger();
             index += thresholdSize;
+            
+            if (signature.ByteArrayToHexStringWithPrefix() == "0x480000000000000000000000000000000000001be9000000005942020213a31d1a2ec622361e3285cc7377bb05ad8a7ee7db48551f9d94e5036a1306de1d615daff8918cd9180a9ac57c6dd590beb8d567b4ad8ecc4ca7b05296895916")
+                Debug.Log($"##4 {checkpoint}, {threshold}");
 
             if ((flag & 0x01) == 0x01)
             {
@@ -147,15 +144,13 @@ namespace Sequence.EcosystemWallet.Primitives
 
                 while (index < signature.Length)
                 {
-                    if (index + 3 > signature.Length)
-                        throw new Exception("Not enough bytes for chained subsignature size");
+                    AssertBytes("chained subsignature size", index, 3, signature.Length);
 
                     int subSize = signature[index..(index + 3)].ToInteger();
                     index += 3;
 
-                    if (index + subSize > signature.Length)
-                        throw new Exception("Not enough bytes for chained subsignature");
-
+                    AssertBytes("chained subsignature", index, subSize, signature.Length);
+                    
                     var subSignature = Decode(signature[index..(index + subSize)]);
                     index += subSize;
 
@@ -175,14 +170,11 @@ namespace Sequence.EcosystemWallet.Primitives
                     checkpointerData = null,
                     configuration = subsignatures[0].configuration,
                     suffix = subsignatures.GetRange(1, subsignatures.Count - 1).ToArray(),
-                    erc6492 = erc6492.HasValue ? new Erc6492
-                    {
-                        to = erc6492.Value.To,
-                        data = erc6492.Value.Data
-                    } : null
+                    erc6492 = erc6492
                 };
             }
 
+            // In case of a SignatureOfSignerLeafHash, the 'index' here is one byte behind
             var (nodes, leftover) = SignatureUtils.ParseBranch(signature[index..]);
             if (leftover.Length != 0)
                 throw new Exception("Leftover bytes in signature");
@@ -200,12 +192,14 @@ namespace Sequence.EcosystemWallet.Primitives
                     topology = topology,
                     checkpointer = checkpointerAddress
                 },
-                erc6492 = erc6492.HasValue ? new Erc6492
-                {
-                    to = erc6492.Value.To,
-                    data = erc6492.Value.Data
-                } : null
+                erc6492 = erc6492
             };
+        }
+
+        private static void AssertBytes(string key, int current, int dataSize, int total)
+        {
+            if (current + dataSize > total)
+                throw new Exception($"Not enough bytes for '{key}'. Current: {current}, DataSize: {dataSize}, Total: {total}");
         }
     }
 }

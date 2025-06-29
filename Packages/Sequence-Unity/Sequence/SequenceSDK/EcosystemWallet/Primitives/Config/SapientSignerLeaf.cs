@@ -7,8 +7,6 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SapientSignerLeaf : Leaf
     {
-        public const string type = "sapient-signer";
-        
         public Address address;
         public BigInteger weight;
         public string imageHash;
@@ -17,7 +15,7 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             return new
             {
-                type = type,
+                type = SapientSigner,
                 address = address,
                 weight = weight.ToString(),
                 imageHash = imageHash
