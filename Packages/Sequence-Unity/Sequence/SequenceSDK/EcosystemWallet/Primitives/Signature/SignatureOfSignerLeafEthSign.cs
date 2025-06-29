@@ -19,11 +19,11 @@ namespace Sequence.EcosystemWallet.Primitives
             if (signerLeaf.weight <= 15 && signerLeaf.weight > 0)
                 flag |= (int)signerLeaf.weight;
             else if (signerLeaf.weight <= 255)
-                weightBytes = signerLeaf.weight.ByteArrayFromNumber();
+                weightBytes = signerLeaf.weight.ByteArrayFromNumber(flag.MinBytesFor());
             else
                 throw new Exception("Weight too large");
 
-            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(), weightBytes, Pack());
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), weightBytes, Pack());
         }
     }
 }

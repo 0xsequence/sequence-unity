@@ -7,9 +7,10 @@ namespace Sequence.EcosystemWallet.Envelope
         public Address address;
         public SignatureOfSignerLeaf signature;
         public override string type { get; }
+        
         public override byte[] Encode(Leaf leaf)
         {
-            throw new System.NotImplementedException();
+            throw new System.NotImplementedException("Signature.Encode");
         }
     }
 }

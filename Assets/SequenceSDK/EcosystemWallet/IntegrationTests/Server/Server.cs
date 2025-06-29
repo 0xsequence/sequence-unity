@@ -26,6 +26,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 ["devTools_randomSessionTopology"] = async (parameters) => await new DevToolsTest().DevToolsRandomSessionTopology(parameters),
                 ["signature_encode"] = async (parameters) => await new SignatureTests().SignatureEncode(parameters),
                 ["signature_concat"] = async (parameters) => await new SignatureTests().SignatureConcat(parameters),
+                ["signature_decode"] = async (parameters) => await new SignatureTests().SignatureDecode(parameters),
             };
 
         public async Task<JsonRpcResponse> HandleSingleRequest(

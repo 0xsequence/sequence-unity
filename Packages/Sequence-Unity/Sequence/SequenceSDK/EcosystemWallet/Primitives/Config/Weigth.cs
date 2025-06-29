@@ -72,7 +72,7 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 return new Weigth { weight = 0, maxWeight = 0 };
             }
-            if (leaf is RawNestedLeaf rawNested)
+            if (leaf is NestedLeaf rawNested)
             {
                 var result = GetWeight(rawNested.tree, canSign);
                 BigInteger weight = result.weight >= rawNested.threshold ? rawNested.weight : 0;

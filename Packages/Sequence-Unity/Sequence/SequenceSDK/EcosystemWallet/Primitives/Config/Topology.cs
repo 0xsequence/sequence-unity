@@ -132,12 +132,13 @@ namespace Sequence.EcosystemWallet.Primitives
                 return new Topology(new Node(Decode(list[0].ToString()), Decode(list[1].ToString())));
             }
 
-            // Case: string → leaf node (digest hash or node ID)
-            /*if (input.IsHexFormat())
+            if (!input.StartsWith("{"))
             {
-                Leaf
-                return hex;
-            }*/
+                return new Topology(new NodeLeaf
+                {
+                    Value = (input).HexStringToByteArray()
+                });
+            }
 
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(input);
             string type = (string)data["type"];
@@ -179,7 +180,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 case "nested":
                     leaf = new NestedLeaf
                     {
-                        tree = FromLeaves(null),
+                        tree = Decode(data["tree"].ToString()),
                         weight = BigInteger.Parse((string)data["weight"]),
                         threshold = BigInteger.Parse((string)data["threshold"])
                     };
@@ -222,13 +223,125 @@ namespace Sequence.EcosystemWallet.Primitives
                 var flag = (FlagBranch << 4) | encoded1Size;
                 
                 return ByteArrayExtensions.ConcatenateByteArrays(encoded0, 
-                    flag.ByteArrayFromNumber(),
-                    encoded1.Length.ByteArrayFromNumber()
+                    flag.ByteArrayFromNumber(flag.MinBytesFor()),
+                    encoded1.Length.ByteArrayFromNumber(encoded1Size)
                         .PadLeft(encoded1Size),
                     encoded1);
             }
 
             return Leaf.Encode(noChainId, checkpointerData);
+        }
+        
+        public static List<Leaf> ParseContentToLeafs(string elements)
+        {
+            var leaves = new List<Leaf>();
+
+            while (!string.IsNullOrWhiteSpace(elements))
+            {
+                string firstElement = elements.Split(' ')[0];
+                string firstElementType = firstElement.Split(':')[0];
+
+                if (firstElementType == "signer")
+                {
+                    var parts = firstElement.Split(':');
+                    string address = parts[1];
+                    BigInteger weight = BigInteger.Parse(parts[2]);
+
+                    leaves.Add(new SignerLeaf
+                    {
+                        address = new  Address(address),
+                        weight = weight
+                    });
+
+                    elements = elements.Substring(firstElement.Length).TrimStart();
+                }
+                else if (firstElementType == "subdigest")
+                {
+                    var parts = firstElement.Split(':');
+                    string digest = parts[1];
+
+                    leaves.Add(new SubdigestLeaf
+                    {
+                        digest = digest.HexStringToByteArray()
+                    });
+
+                    elements = elements.Substring(firstElement.Length).TrimStart();
+                }
+                else if (firstElementType == "any-address-subdigest")
+                {
+                    var parts = firstElement.Split(':');
+                    string digest = parts[1];
+
+                    leaves.Add(new AnyAddressSubdigestLeaf
+                    {
+                        digest = digest.HexStringToByteArray()
+                    });
+
+                    elements = elements.Substring(firstElement.Length).TrimStart();
+                }
+                else if (firstElementType == "sapient")
+                {
+                    var parts = firstElement.Split(':');
+                    string imageHash = parts[1];
+                    string address = parts[2];
+                    BigInteger weight = BigInteger.Parse(parts[3]);
+
+                    if (!imageHash.StartsWith("0x") || imageHash.Length != 66)
+                        throw new Exception($"Invalid image hash: {imageHash}");
+
+                    leaves.Add(new SapientSignerLeaf
+                    {
+                        imageHash = imageHash,
+                        address = new Address(address),
+                        weight = weight
+                    });
+
+                    elements = elements.Substring(firstElement.Length).TrimStart();
+                }
+                else if (firstElementType == "nested")
+                {
+                    var parts = firstElement.Split(':');
+                    BigInteger threshold = BigInteger.Parse(parts[1]);
+                    BigInteger weight = BigInteger.Parse(parts[2]);
+
+                    int start = elements.IndexOf('(');
+                    int end = elements.IndexOf(')');
+                    if (start == -1 || end == -1)
+                        throw new Exception($"Missing ( ) for nested element: {elements}");
+
+                    string inner = elements.Substring(start + 1, end - start - 1);
+
+                    leaves.Add(new NestedLeaf
+                    {
+                        threshold = threshold,
+                        weight = weight,
+                        tree = Topology.FromLeaves(ParseContentToLeafs(inner))
+                    });
+
+                    elements = elements.Substring(end + 1).TrimStart();
+                }
+                else if (firstElementType == "node")
+                {
+                    var parts = firstElement.Split(':');
+                    string hash = parts[1];
+
+                    leaves.Add(new NodeLeaf
+                    {
+                        Value = hash.HexStringToByteArray()
+                    });
+
+                    elements = elements.Substring(firstElement.Length).TrimStart();
+                }
+                else
+                {
+                    throw new Exception($"Invalid element: {firstElement}");
+                }
+            }
+            
+            if (leaves.Count == 0)
+                Debug.LogError($"Topology.FromLeaves resulted in an empty list of leafs: {elements}");
+
+            return leaves;
         }
     }
 }

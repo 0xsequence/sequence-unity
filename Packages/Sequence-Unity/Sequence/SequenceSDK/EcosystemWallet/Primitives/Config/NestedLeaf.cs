@@ -35,7 +35,7 @@ namespace Sequence.EcosystemWallet.Primitives
             if (weight <= 3 && weight > 0)
                 flag |= (int)weight << 2;
             else if (weight <= 255)
-                weightBytes = weight.ByteArrayFromNumber();
+                weightBytes = weight.ByteArrayFromNumber(weight.MinBytesFor());
             else
                 throw new Exception("Weight too large");
 
@@ -43,7 +43,7 @@ namespace Sequence.EcosystemWallet.Primitives
             if (threshold <= 3 && threshold > 0)
                 flag |= (int)threshold;
             else if (threshold <= 65535)
-                thresholdBytes = threshold.ByteArrayFromNumber().PadLeft(2);
+                thresholdBytes = threshold.ByteArrayFromNumber(threshold.MinBytesFor()).PadLeft(2);
             else
                 throw new Exception("Threshold too large");
 
@@ -51,10 +51,10 @@ namespace Sequence.EcosystemWallet.Primitives
                 throw new Exception("Nested tree too large");
 
             return ByteArrayExtensions.ConcatenateByteArrays(
-                flag.ByteArrayFromNumber(),
+                flag.ByteArrayFromNumber(flag.MinBytesFor()),
                 weightBytes,
                 thresholdBytes,
-                nested.Length.ByteArrayFromNumber().PadLeft(3),
+                nested.Length.ByteArrayFromNumber(nested.Length.MinBytesFor()).PadLeft(3),
                 nested);
         }
 

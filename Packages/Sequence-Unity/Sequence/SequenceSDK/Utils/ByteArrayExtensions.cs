@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using UnityEngine;
@@ -31,6 +32,28 @@ namespace Sequence.Utils
                 Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
+        }
+        
+        public static BigInteger ToBigInteger(this byte[] data)
+        {
+            if (data == null || data.Length == 0)
+                return BigInteger.Zero;
+            
+            var unsignedLittleEndian = ConcatenateByteArrays(data.Reverse().ToArray(), new byte[] { 0x00 });
+            return new BigInteger(unsignedLittleEndian);
+        }
+        
+        public static int ToInteger(this byte[] data)
+        {
+            if (data == null || data.Length == 0)
+                return 0;
+
+            if (data.Length > 4)
+                throw new ArgumentOutOfRangeException(nameof(data), "Too many bytes to fit into an int (max 4).");
+
+            byte[] padded = new byte[4];
+            Array.Copy(data.Reverse().ToArray(), 0, padded, 0, data.Length);
+            return BitConverter.ToInt32(padded, 0);
         }
 
         public static bool HasPrefix(this byte[] b, byte[] prefix) {
@@ -130,7 +153,7 @@ namespace Sequence.Utils
             if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), "Value must be non-negative.");
 
-            var hex = value.ToString("X");
+            var hex = value.BigIntegerToHexString().WithoutHexPrefix();
             return (int)Math.Ceiling(hex.Length / 2.0);
         }
         

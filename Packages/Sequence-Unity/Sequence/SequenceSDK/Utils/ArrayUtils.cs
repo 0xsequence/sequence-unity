@@ -114,5 +114,16 @@ namespace Sequence.Utils
             newArr[length] = obj;
             return newArr;
         }
+        
+        public static T[] Slice<T>(this T[] input, int start)
+        {
+            if (input == null || start >= input.Length)
+                return Array.Empty<T>();
+
+            int length = input.Length - start;
+            T[] result = new T[length];
+            Array.Copy(input, start, result, 0, length);
+            return result;
+        }
     }
 }

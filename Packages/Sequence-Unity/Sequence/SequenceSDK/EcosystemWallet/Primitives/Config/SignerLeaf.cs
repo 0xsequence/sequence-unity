@@ -31,11 +31,11 @@ namespace Sequence.EcosystemWallet.Primitives
             if (weight > 0 && weight <= 15)
                 flag |= (int)weight;
             else if (weight <= 255)
-                weightBytes = weight.ByteArrayFromNumber();
+                weightBytes = weight.ByteArrayFromNumber(flag.MinBytesFor());
             else
                 throw new ArgumentException("Weight too large");
-
-            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(), weightBytes,
+            
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), weightBytes,
                 address.Value.HexStringToByteArray().PadLeft(20));
         }
 
@@ -43,7 +43,7 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             byte[] prefix = Encoding.UTF8.GetBytes("Sequence signer:\n");
             byte[] address = this.address.Value.HexStringToByteArray();
-            byte[] weight = this.weight.ByteArrayFromNumber().PadLeft(32);
+            byte[] weight = this.weight.ByteArrayFromNumber(this.weight.MinBytesFor()).PadLeft(32);
                 
             return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, address, weight));
         }

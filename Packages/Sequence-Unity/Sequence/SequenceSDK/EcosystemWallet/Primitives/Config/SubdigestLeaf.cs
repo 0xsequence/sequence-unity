@@ -20,7 +20,8 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
         {
-            throw new System.NotImplementedException();
+            var flag = Topology.FlagSubdigest << 4;
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), digest);
         }
 
         public override byte[] HashConfiguration()

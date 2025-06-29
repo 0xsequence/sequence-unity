@@ -11,7 +11,7 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public override object Parse()
         {
-            throw new System.NotImplementedException();
+            throw new System.NotImplementedException("RawSignerLeaf.Parse");
         }
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
@@ -21,7 +21,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] HashConfiguration()
         {
-            throw new System.NotImplementedException();
+            throw new System.NotImplementedException("RawSignerLeaf.HashConfiguration");
         }
     }
 

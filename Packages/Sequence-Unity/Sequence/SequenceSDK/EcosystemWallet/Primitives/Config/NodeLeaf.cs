@@ -1,4 +1,3 @@
-using System.Linq;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -19,14 +18,15 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
         {
-            return ByteArrayExtensions.ConcatenateByteArrays((Topology.FlagNode << 4).ByteArrayFromNumber(), Value);
+            var flag = Topology.FlagNode << 4;
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), Value);
         }
 
         // In the JS code, this just returns the topology itself, but in C# we need to return bytes
         // Since NodeLeaf doesn't have any properties to hash, we'll return a byte array
         public override byte[] HashConfiguration()
         {
-            return new byte[]{};
+            return new byte[] { };
         }
     }
 }

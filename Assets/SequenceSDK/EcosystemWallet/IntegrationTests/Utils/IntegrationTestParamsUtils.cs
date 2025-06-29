@@ -5,6 +5,15 @@ namespace Sequence.EcosystemWallet.IntegrationTests
 {
     public static class IntegrationTestParamsUtils
     {
+        public static T[] GetArray<T>(this Dictionary<string, object> @params, string key)
+        {
+            if (!@params.TryGetValue(key, out var inputObj)) 
+                return null;
+            
+            var inputJson = inputObj.ToString();
+            return JsonConvert.DeserializeObject<T[]>(inputJson);
+        }
+        
         public static Address GetAddress(this Dictionary<string, object> @params, string key)
         {
             return @params.TryGetValue(key, out var value) && 

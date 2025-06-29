@@ -6,6 +6,7 @@ using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Utils
 {
@@ -50,35 +51,43 @@ namespace Sequence.EcosystemWallet.Utils
                 new ABIValue("bytes", signature)
             );
 
-            return encoded.Concat(MagicBytes.HexToByteArray()).ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays(encoded, MagicBytes.HexToByteArray());
         }
 
-        public static (string Signature, (string To, string Data)? Erc6492) Decode(string signature)
+        public static (byte[] Signature, (Address To, byte[] Data)? Erc6492) Decode(byte[] signature)
         {
-            if (signature.EndsWith(MagicBytes[2..]))
+            var magicBytes = MagicBytes.HexStringToByteArray();
+            int magicLength = magicBytes.Length;
+
+            if (signature.Length >= magicLength && 
+                signature[^magicLength..].ByteArrayToHexStringWithPrefix() == MagicBytes)
             {
+                var raw = signature[..^magicLength];
+
                 try
                 {
-                    var trimmed = signature[..^MagicBytes[2..].Length];
                     var decoder = new ParameterDecoder();
-                    var parameters = new[] {
-                        new Parameter("address", "to"),
-                        new Parameter("bytes", "data"),
-                        new Parameter("bytes", "signature")
+                    var parameters = new Parameter[]
+                    {
+                        new ("address", 1),
+                        new ("bytes", 2),
+                        new ("bytes", 3),
                     };
 
-                    var decoded = decoder.DecodeDefaultData(trimmed, parameters);
-                    var to = (string)decoded[0].Result;
-                    var data = ((byte[])decoded[1].Result).ToHex();
-                    var innerSig = ((byte[])decoded[2].Result).ToHex();
+                    var decoded = decoder.DecodeDefaultData(raw, parameters);
 
-                    return (innerSig, (to, data));
+                    string to = decoded[0].Result?.ToString() ?? throw new Exception("Missing 'to' address");
+                    byte[] data = (byte[])(decoded[1].Result ?? throw new Exception("Missing 'data'"));
+                    byte[] unwrappedSignature = (byte[])(decoded[2].Result ?? throw new Exception("Missing 'signature'"));
+
+                    return (unwrappedSignature, (new Address(to), data));
                 }
                 catch
                 {
-                    // fallback to raw signature
+                    return (signature, null);
                 }
             }
+
             return (signature, null);
         }
 
