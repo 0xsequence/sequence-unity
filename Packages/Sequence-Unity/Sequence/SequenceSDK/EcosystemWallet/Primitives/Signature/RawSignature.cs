@@ -10,7 +10,7 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class RawSignature
     {
-        public bool noChainId;
+        public bool noChainId = true;
         public byte[] checkpointerData;
         public Config configuration;
         public RawSignature[] suffix;

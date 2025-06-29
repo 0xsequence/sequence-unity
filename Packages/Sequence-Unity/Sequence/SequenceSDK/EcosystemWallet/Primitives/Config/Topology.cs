@@ -262,7 +262,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == Leaf.SapientSigner)
+                else if (firstElementType == Leaf.Sapient)
                 {
                     var parts = firstElement.Split(':');
                     string imageHash = parts[1];
