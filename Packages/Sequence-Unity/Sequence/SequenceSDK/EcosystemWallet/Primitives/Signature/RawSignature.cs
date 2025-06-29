@@ -18,19 +18,23 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public string ToJson()
         {
-            var jsonObject = new
+            var jsonObject = new Dictionary<string, object>();
+            
+            jsonObject.Add("noChainId", noChainId);
+            
+            if (checkpointerData != null)
+                jsonObject.Add("checkpointerData", checkpointerData.ByteArrayToHexStringWithPrefix());
+            
+            jsonObject.Add("configuration", new
             {
-                noChainId = noChainId,
-                checkpointerData = checkpointerData == null ? null : checkpointerData.ByteArrayToHexStringWithPrefix(),
-                configuration = new
-                {
-                    threshold = configuration.threshold.ToString(),
-                    checkpoint = configuration.checkpoint.ToString(),
-                    topology = configuration.topology.Parse(),
-                    checkpointer = configuration.checkpointer
-                },
-                suffix = suffix == null ? null : suffix.Select(s => s.ToJson()),
-            };
+                threshold = configuration.threshold.ToString(),
+                checkpoint = configuration.checkpoint.ToString(),
+                topology = configuration.topology.Parse(),
+                checkpointer = configuration.checkpointer
+            });
+            
+            if (suffix is { Length: > 0 })
+                jsonObject.Add("suffix", suffix.Select(s => s.ToJson()));
 
             return JsonConvert.SerializeObject(jsonObject);
         }

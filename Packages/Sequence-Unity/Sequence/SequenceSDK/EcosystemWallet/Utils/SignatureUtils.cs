@@ -215,6 +215,7 @@ namespace Sequence.EcosystemWallet.Utils
                     {
                         byte[] nodeHash = signature[index..(index + 32)];
                         index += 32;
+                        
                         leafs.Add(new Topology(new NodeLeaf
                         {
                             Value = nodeHash
@@ -333,7 +334,7 @@ namespace Sequence.EcosystemWallet.Utils
                         byte[] data = signature[index..(index + dataSize)];
                         index += dataSize;
 
-                        leafs.Add(new Topology(new SignedSignerLeaf
+                        leafs.Add(new Topology(new SignedSapientSignerLeaf
                         {
                             weight = new BigInteger(weight),
                             signature = new SignatureOfSapientSignerLeaf

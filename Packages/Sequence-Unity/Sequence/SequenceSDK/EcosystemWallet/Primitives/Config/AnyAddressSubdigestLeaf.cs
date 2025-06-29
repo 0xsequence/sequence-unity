@@ -6,15 +6,14 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class AnyAddressSubdigestLeaf : Leaf
     {
-        public const string type = "any-address-subdigest";
         public byte[] digest;
         
         public override object Parse()
         {
             return new
             {
-                type = "any-address-subdigest",
-                digest = digest.ByteArrayToHexString()
+                type = AnyAddressSubdigest,
+                digest = digest.ByteArrayToHexStringWithPrefix()
             };
         }
 

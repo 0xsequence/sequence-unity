@@ -13,7 +13,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 type = Subdigest,
-                digest = digest.ByteArrayToHexString()
+                digest = digest.ByteArrayToHexStringWithPrefix()
             };
         }
 

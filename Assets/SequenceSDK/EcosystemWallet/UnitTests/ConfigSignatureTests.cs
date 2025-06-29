@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet.UnitTests
 {
-    public class ConfigSignatureTests
+    public class TConfigSignatureTests
     {
         private const string ConfigInput =
             "{\"input\":{\"threshold\":\"2\",\"checkpoint\":\"22850\",\"topology\":{\"type\":\"signer\",\"address\":\"0xD461055c456f50E9A3B6A497C5AA8027c0e3884D\",\"weight\":\"2\"},\"checkpointer\":\"0x0000000000000000000000000000000000001bE9\"},\"signatures\":\"0xD461055c456f50E9A3B6A497C5AA8027c0e3884D:hash:0x13a31d1a2ec622361e3285cc7377bb05ad8a7ee7db48551f9d94e5036a1306de:0x1d615daff8918cd9180a9ac57c6dd590beb8d567b4ad8ecc4ca7b05296895916:27\",\"chainId\":true,\"checkpointerData\":\"0x000000000000000000000000000000000000000000000000000000000001a12a\"}";
@@ -67,11 +67,20 @@ namespace Sequence.EcosystemWallet.UnitTests
             };
 
             var encodedSignature = signature.Encode();
+            
             Debug.Log($"Encoded Signature {encodedSignature.ByteArrayToHexStringWithPrefix()}");
 
             var decodedSignature = RawSignature.Decode(encodedSignature);
             
             Debug.Log($"Decoded Signature: {decodedSignature.ToJson()}");
+            
+            Assert.AreEqual(
+                encodedSignature.ByteArrayToHexStringWithPrefix(), 
+                decodedSignature.Encode().ByteArrayToHexStringWithPrefix());
+            
+            Assert.AreEqual(
+                config.HashConfiguration().ByteArrayToHexStringWithPrefix(),
+                decodedSignature.configuration.HashConfiguration().ByteArrayToHexStringWithPrefix());
         }
     }
 }

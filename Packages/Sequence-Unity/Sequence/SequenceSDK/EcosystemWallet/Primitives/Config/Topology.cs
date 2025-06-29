@@ -128,11 +128,11 @@ namespace Sequence.EcosystemWallet.Primitives
                 return new Topology(new Node(Decode(list[0].ToString()), Decode(list[1].ToString())));
             }
 
-            if (!input.StartsWith("{"))
+            if (input.StartsWith("0x"))
             {
                 return new NodeLeaf
                 {
-                    Value = (input).HexStringToByteArray()
+                    Value = input.HexStringToByteArray()
                 }.ToTopology();
             }
 
@@ -172,7 +172,7 @@ namespace Sequence.EcosystemWallet.Primitives
                         threshold = BigInteger.Parse((string)data["threshold"])
                     }.ToTopology();
                 default:
-                    throw new Exception("Invalid type in topology JSON");
+                    throw new Exception($"Invalid type {type} in topology JSON");
             }
         }
 
@@ -262,7 +262,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                     elements = elements.Substring(firstElement.Length).TrimStart();
                 }
-                else if (firstElementType == Leaf.Sapient)
+                else if (firstElementType == Leaf.SapientSigner)
                 {
                     var parts = firstElement.Split(':');
                     string imageHash = parts[1];

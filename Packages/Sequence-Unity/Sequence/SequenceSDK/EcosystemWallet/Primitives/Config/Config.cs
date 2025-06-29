@@ -29,8 +29,6 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] thresholdBytes = threshold.ByteArrayFromNumber(threshold.MinBytesFor()).PadLeft(32);
             root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, thresholdBytes));
             
-            Debug.Log($"1 SequenceCoder.KeccakHash: {root.ByteArrayToHexStringWithPrefix()}");
-            
             byte[] checkpointBytes = checkpoint.ByteArrayFromNumber(checkpoint.MinBytesFor()).PadLeft(32);
             root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, checkpointBytes));
             

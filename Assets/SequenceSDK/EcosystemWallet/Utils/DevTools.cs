@@ -11,7 +11,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
     {
         public class RandomOptions
         {
-            public Random random = new ();
+            public Random random = new();
             public Func<double> seededRandom;
             public string checkpointer;
             public BigInteger minThresholdOnNested;

@@ -13,7 +13,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override object Parse()
         {
-            return Value.ByteArrayToHexString();
+            return Value.ByteArrayToHexStringWithPrefix();
         }
 
         public override byte[] Encode(bool noChainId, byte[] checkpointerData)
@@ -26,7 +26,7 @@ namespace Sequence.EcosystemWallet.Primitives
         // Since NodeLeaf doesn't have any properties to hash, we'll return a byte array
         public override byte[] HashConfiguration()
         {
-            return new byte[] { };
+            return Value;
         }
     }
 }
