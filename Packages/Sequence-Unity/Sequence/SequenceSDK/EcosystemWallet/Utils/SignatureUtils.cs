@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
@@ -9,6 +10,124 @@ namespace Sequence.EcosystemWallet.Utils
 {
     public static class SignatureUtils
     { 
+        public static string EncodeSignatureFromInput(string input, string signatures, bool noChainId, byte[] checkpointerData = null)
+        {
+            var parts = string.IsNullOrEmpty(signatures) ? 
+                Array.Empty<string>() : 
+                signatures.Split(' ');
+            
+            var config = Primitives.Config.FromJson(input);
+            
+            var allSignatures = parts.Select(s =>
+            {
+                var values = s.Split(':');
+                
+                return new
+                {
+                    Address = new Address(values[0]),
+                    Type = values[1],
+                    Values = values.Skip(2).ToArray()
+                };
+            }).ToList();
+
+            var fullTopology = SignatureHandler.FillLeaves(config.topology, leaf =>
+            {
+                if (leaf is SignerLeaf signerLeaf)
+                {
+                    var candidate = allSignatures.FirstOrDefault(s => s.Address.Equals(signerLeaf.address));
+                    if (candidate == null) 
+                        return null;
+                    
+                    switch (candidate.Type)
+                    {
+                        case "erc1271":
+                            return new SignatureOfSignerLeafErc1271
+                            {
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray()
+                            };
+                        case "eth_sign":
+                            return new SignatureOfSignerLeafEthSign
+                            {
+                                rsy = new RSY
+                                {
+                                    r = candidate.Values[0].HexStringToBigInteger(),
+                                    s = candidate.Values[1].HexStringToBigInteger(),
+                                    yParity = RSY.VToYParity(int.Parse(candidate.Values[2]))
+                                }
+                            };
+                        case "hash":
+                            return new SignatureOfSignerLeafHash
+                            {
+                                rsy = new RSY
+                                {
+                                    r = candidate.Values[0].HexStringToBigInteger(),
+                                    s = candidate.Values[1].HexStringToBigInteger(),
+                                    yParity = RSY.VToYParity(int.Parse(candidate.Values[2]))
+                                }
+                            };
+                        case "sapient":
+                            return new SignatureOfSapientSignerLeaf
+                            {
+                                curType = SignatureOfSapientSignerLeaf.Type.sapient,
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray()
+                            };
+                        case "sapient_compact":
+                            return new SignatureOfSapientSignerLeaf
+                            {
+                                curType = SignatureOfSapientSignerLeaf.Type.sapient_compact,
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray()
+                            };
+                        default:
+                            throw new Exception($"Unsupported signature type: {candidate.Type}");
+                    }
+                }
+
+                if (leaf is SapientSignerLeaf sapientSignerLeaf)
+                {
+                    var candidate = allSignatures.FirstOrDefault(s => s.Address.Equals(sapientSignerLeaf.address));
+                    if (candidate == null) 
+                        return null;
+
+                    switch (candidate.Type)
+                    {
+                        case "sapient":
+                        case "sapient_compact":
+                            return new SignatureOfSapientSignerLeaf
+                            {
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray(),
+                            };
+                        case "eth_sign":
+                        case "hash":
+                        case "erc1271":
+                            throw new Exception($"Incorrect type for leaf");
+                        default:
+                            throw new Exception($"Unsupported signature type: {candidate.Type}");
+                    }
+                }
+
+                return null;
+            });
+
+            var rawSignature = new RawSignature
+            {
+                noChainId = noChainId,
+                configuration = new Primitives.Config
+                {
+                    threshold = config.threshold,
+                    checkpoint = config.checkpoint,
+                    checkpointer = config.checkpointer,
+                    topology = fullTopology
+                },
+                checkpointerData = checkpointerData
+            };
+
+            return rawSignature.Encode().ByteArrayToHexStringWithPrefix();
+        }
+        
         public static (Topology[] nodes, byte[] Leftover) ParseBranch(byte[] signature)
         {
             var leafs = new List<Topology>();
@@ -19,8 +138,6 @@ namespace Sequence.EcosystemWallet.Utils
                 byte firstByte = signature[index++];
                 int flag = (firstByte & 0xf0) >> 4;
                 
-                Debug.LogError($"{signature.ByteArrayToHexStringWithPrefix()} {index} {flag}");
-
                 switch (flag)
                 {
                     case Topology.FlagSignatureHash:
@@ -44,8 +161,6 @@ namespace Sequence.EcosystemWallet.Utils
                             }
                         }));
                         
-                        Debug.Log($"##2 {signature.ByteArrayToHexStringWithPrefix()}: {new BigInteger(weight)}, {rsy.r}, {rsy.s}, {rsy.yParity}");
-
                         break;
                     }
 
@@ -55,8 +170,6 @@ namespace Sequence.EcosystemWallet.Utils
                         if (weight == 0)
                             weight = signature[index++];
                         
-                        Debug.LogError($"{signature.ByteArrayToHexStringWithPrefix()} {index} {signature.Length}");
-
                         string address = signature[index..(index + 20)].ByteArrayToHexStringWithPrefix();
                         index += 20;
 

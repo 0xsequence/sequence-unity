@@ -60,8 +60,8 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             byte[] prefix = Encoding.UTF8.GetBytes("Sequence nested config:\n");
             byte[] treeHash = tree.HashConfiguration();
-            byte[] threshold = this.threshold.ByteArrayFromNumber().PadLeft(32);
-            byte[] weight = this.weight.ByteArrayFromNumber().PadLeft(32);
+            byte[] threshold = this.threshold.ByteArrayFromNumber(32);
+            byte[] weight = this.weight.ByteArrayFromNumber(32);
                 
             return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, treeHash, threshold, weight));
         }

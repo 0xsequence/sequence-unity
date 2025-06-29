@@ -42,7 +42,7 @@ namespace Sequence.EcosystemWallet.Primitives
             int bytesForCheckpoint = configuration.checkpoint.MinBytesFor();
             if (bytesForCheckpoint > 7)
                 throw new Exception("Checkpoint too large");
-            
+
             flag |= (byte)(bytesForCheckpoint << 2);
 
             int bytesForThreshold = configuration.threshold.MinBytesFor();
@@ -63,15 +63,14 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 var checkpointerBytes = configuration.checkpointer.Value.HexStringToByteArray();
                 output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointerBytes.PadLeft(20));
-                Debug.Log(checkpointerBytes.ByteArrayToHexStringWithPrefix());
                 
                 if (!skipCheckpointerData)
                 {
                     int checkpointerDataSize = checkpointerData?.Length ?? 0;
                     if (checkpointerDataSize > 16777215)
                         throw new Exception("Checkpointer data too large");
-
-                    output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointerDataSize.ByteArrayFromNumber(), checkpointerData ?? Array.Empty<byte>());
+                    
+                    output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointerDataSize.ByteArrayFromNumber(3), checkpointerData ?? Array.Empty<byte>());
                 }
             }
 
@@ -108,12 +107,12 @@ namespace Sequence.EcosystemWallet.Primitives
                 var checkpointer = signature[index..(index + 20)].ByteArrayToHexStringWithPrefix();
                 checkpointerAddress = new Address(checkpointer);
                 index += 20;
-
+                
                 AssertBytes("checkpointerData size", index, 3, signature.Length);
 
                 var dataSize = signature[index..(index + 3)].ToInteger();
                 index += 3;
-
+                
                 AssertBytes("checkpointerData", index, dataSize, signature.Length);
 
                 checkpointerData = signature[index..(index + dataSize)];
@@ -121,22 +120,18 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             int checkpointSize = (flag & 0x1C) >> 2;
-            checkpointSize++;
             
             AssertBytes("checkpoint", index, checkpointSize, signature.Length);
-
+            
             var checkpoint = signature[index..(index + checkpointSize)].ToBigInteger();
             index += checkpointSize;
-
+            
             int thresholdSize = ((flag & 0x20) >> 5) + 1;
             
             AssertBytes("threshold", index, thresholdSize, signature.Length);
 
             var threshold = signature[index..(index + thresholdSize)].ToBigInteger();
             index += thresholdSize;
-            
-            if (signature.ByteArrayToHexStringWithPrefix() == "0x480000000000000000000000000000000000001be9000000005942020213a31d1a2ec622361e3285cc7377bb05ad8a7ee7db48551f9d94e5036a1306de1d615daff8918cd9180a9ac57c6dd590beb8d567b4ad8ecc4ca7b05296895916")
-                Debug.Log($"##4 {checkpoint}, {threshold}");
 
             if ((flag & 0x01) == 0x01)
             {

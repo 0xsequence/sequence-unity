@@ -27,17 +27,15 @@ namespace Sequence.EcosystemWallet.Primitives
             if (signerLeaf.weight <= 3 && signerLeaf.weight > 0)
                 flag |= (int)signerLeaf.weight;
             else if (signerLeaf.weight <= 255)
-                weightBytes = signerLeaf.weight.ByteArrayFromNumber();
+                weightBytes = signerLeaf.weight.ByteArrayFromNumber(signerLeaf.weight.MinBytesFor());
             else
                 throw new Exception("Weight too large");
 
             return ByteArrayExtensions.ConcatenateByteArrays(
-                flag.ByteArrayFromNumber(), 
+                flag.ByteArrayFromNumber(flag.MinBytesFor()), 
                 weightBytes,
-                address.Value.HexStringToByteArray()
-                    .PadLeft(20),
-                data.Length.ByteArrayFromNumber()
-                    .PadLeft(sizeLen),
+                address.Value.HexStringToByteArray(20),
+                data.Length.ByteArrayFromNumber(sizeLen),
                 data);
         }
     }
