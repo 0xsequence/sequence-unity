@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
 using UnityEngine;
@@ -13,6 +15,25 @@ namespace Sequence.EcosystemWallet.Primitives
         public Config configuration;
         public RawSignature[] suffix;
         public Erc6492 erc6492;
+
+        public string ToJson()
+        {
+            var jsonObject = new
+            {
+                noChainId = noChainId,
+                checkpointerData = checkpointerData == null ? null : checkpointerData.ByteArrayToHexStringWithPrefix(),
+                configuration = new
+                {
+                    threshold = configuration.threshold.ToString(),
+                    checkpoint = configuration.checkpoint.ToString(),
+                    topology = configuration.topology.Parse(),
+                    checkpointer = configuration.checkpointer
+                },
+                suffix = suffix == null ? null : suffix.Select(s => s.ToJson()),
+            };
+
+            return JsonConvert.SerializeObject(jsonObject);
+        }
 
         public byte[] Encode(bool skipCheckpointerData = false, bool skipCheckpointerAddress = false)
         {

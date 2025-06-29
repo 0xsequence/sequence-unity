@@ -24,7 +24,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             var encodedSignature = parameters["signature"].ToString().HexStringToByteArray();
             var signature = RawSignature.Decode(encodedSignature);
             
-            return Task.FromResult(JsonConvert.SerializeObject(signature));
+            return Task.FromResult(signature.ToJson());
         }
         
         public Task<string> SignatureConcat(Dictionary<string, object> parameters)
