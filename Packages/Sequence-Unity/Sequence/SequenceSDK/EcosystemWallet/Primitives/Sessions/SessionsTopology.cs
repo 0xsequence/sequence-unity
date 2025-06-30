@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Sequence.Utils;
+using Unity.Plastic.Newtonsoft.Json;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -28,6 +32,17 @@ namespace Sequence.EcosystemWallet.Primitives
             this.Leaf = leaf;
         }
 
+        public object ToJson()
+        {
+            if (IsBranch)
+                return Branch.ToJson();
+
+            if (IsLeaf)
+                return Leaf.ToJson();
+            
+            throw new Exception("Invalid topology.");
+        }
+
         public byte[] Encode()
         {
             if (IsBranch)
@@ -39,9 +54,49 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology.");
         }
 
-        public static SessionsTopology Decode(string input)
+        public static SessionsTopology FromJson(string json)
         {
-            return new SessionsTopology(new IdentitySignerLeaf());
+            if (json.StartsWith("["))
+            {
+                var list = JsonConvert.DeserializeObject<List<object>>(json);
+                if (list.Count < 2)
+                    throw new Exception("Invalid node structure in JSON");
+
+                var children = list.Select(i => FromJson(i.ToString())).ToArray();
+                return new SessionBranch(children).ToTopology();
+            }
+
+            if (json.StartsWith("0x"))
+            {
+                return new SessionNodeLeaf
+                {
+                    Value = json.HexStringToByteArray()
+                }.ToTopology();
+            }
+            
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            var type = (string)data["type"];
+
+            switch (type)
+            {
+                case SessionLeaf.SessionPermissionsType:
+                    return new PermissionLeaf
+                    {
+
+                    }.ToTopology();
+                case SessionLeaf.IdentitySignerType:
+                    return new IdentitySignerLeaf
+                    {
+                        IdentitySigner = new Address("")
+                    }.ToTopology();
+                case SessionLeaf.ImplicitBlacklistType:
+                    return new ImplicitBlacklistLeaf
+                    {
+                        Blacklist = new[] { new Address("") }
+                    }.ToTopology();
+                default:
+                    throw new Exception("Invalid topology.");
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.EcosystemWallet.Primitives;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.IntegrationTests
 {
@@ -15,7 +17,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests
 
         public Task<string> SessionEncodeTopology(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var topologyJson = parameters["sessionTopology"].ToString();
+            var topology = SessionsTopology.FromJson(topologyJson);
+            var encoded = topology.Encode().ByteArrayToHexStringWithPrefix();
+            
+            return Task.FromResult(encoded);
         }
         
         public Task<string> SessionEncodeCallSignatures(Dictionary<string, object> parameters)

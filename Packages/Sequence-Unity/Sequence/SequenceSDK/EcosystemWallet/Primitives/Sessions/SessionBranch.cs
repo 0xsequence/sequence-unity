@@ -1,4 +1,5 @@
 using System.Linq;
+using Newtonsoft.Json;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -17,10 +18,20 @@ namespace Sequence.EcosystemWallet.Primitives
             Children = children;
         }
 
+        public object ToJson()
+        {
+            return Children.Select(child => child.ToJson()).ToArray();
+        }
+
         public byte[] Encode()
         {
             var encodings = Children.Select(child => child.Encode()).ToArray();
             return ByteArrayExtensions.ConcatenateByteArrays(encodings);
+        }
+
+        public SessionsTopology ToTopology()
+        {
+            return new SessionsTopology(this);
         }
     }
 }
