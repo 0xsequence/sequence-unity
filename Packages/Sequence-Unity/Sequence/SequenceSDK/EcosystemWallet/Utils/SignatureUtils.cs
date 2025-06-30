@@ -66,19 +66,8 @@ namespace Sequence.EcosystemWallet.Utils
                                 }
                             };
                         case "sapient":
-                            return new SignatureOfSapientSignerLeaf
-                            {
-                                curType = SignatureOfSapientSignerLeaf.Type.sapient,
-                                address = candidate.Address,
-                                data = candidate.Values[0].HexStringToByteArray()
-                            };
                         case "sapient_compact":
-                            return new SignatureOfSapientSignerLeaf
-                            {
-                                curType = SignatureOfSapientSignerLeaf.Type.sapient_compact,
-                                address = candidate.Address,
-                                data = candidate.Values[0].HexStringToByteArray()
-                            };
+                            throw new Exception($"Incorrect type {candidate.Type} for leaf {leaf.GetType()}");
                         default:
                             throw new Exception($"Unsupported signature type: {candidate.Type}");
                     }
@@ -93,16 +82,23 @@ namespace Sequence.EcosystemWallet.Utils
                     switch (candidate.Type)
                     {
                         case "sapient":
+                            return new SignatureOfSapientSignerLeaf
+                            {
+                                curType = SignatureOfSapientSignerLeaf.Type.sapient,
+                                address = candidate.Address,
+                                data = candidate.Values[0].HexStringToByteArray()
+                            };
                         case "sapient_compact":
                             return new SignatureOfSapientSignerLeaf
                             {
+                                curType = SignatureOfSapientSignerLeaf.Type.sapient_compact,
                                 address = candidate.Address,
-                                data = candidate.Values[0].HexStringToByteArray(),
+                                data = candidate.Values[0].HexStringToByteArray()
                             };
                         case "eth_sign":
                         case "hash":
                         case "erc1271":
-                            throw new Exception($"Incorrect type for leaf");
+                            throw new Exception($"Incorrect type {candidate.Type} for leaf {leaf.GetType()}");
                         default:
                             throw new Exception($"Unsupported signature type: {candidate.Type}");
                     }

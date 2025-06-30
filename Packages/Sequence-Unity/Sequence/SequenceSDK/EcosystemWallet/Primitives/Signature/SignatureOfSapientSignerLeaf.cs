@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -23,19 +22,24 @@ namespace Sequence.EcosystemWallet.Primitives
             if (leaf is not SapientSignerLeaf signerLeaf)
                 throw new Exception();
 
+            var weight = signerLeaf.weight;
             var weightBytes = Array.Empty<byte>();
-            var flag = (type == "sapient" ? Topology.FlagSignatureSapient : Topology.FlagSignatureSapientCompact) << 4;
+            
+            var flag = (type == "sapient" ? 
+                Topology.FlagSignatureSapient : 
+                Topology.FlagSignatureSapientCompact) 
+                       << 4;
 
-            var sizeLen = data.Length.MinBytesFor();
-            if (sizeLen > 3)
+            var bytesForSignatureSize = data.Length.MinBytesFor();
+            if (bytesForSignatureSize > 3)
                 throw new Exception("Signature too large");
 
-            flag |= sizeLen << 2;
+            flag |= bytesForSignatureSize << 2;
 
-            if (signerLeaf.weight <= 3 && signerLeaf.weight > 0)
-                flag |= (int)signerLeaf.weight;
-            else if (signerLeaf.weight <= 255)
-                weightBytes = signerLeaf.weight.ByteArrayFromNumber(signerLeaf.weight.MinBytesFor());
+            if (weight <= 3 && weight > 0)
+                flag |= (int)weight;
+            else if (weight <= 255)
+                weightBytes = weight.ByteArrayFromNumber(weight.MinBytesFor());
             else
                 throw new Exception("Weight too large");
 
@@ -43,7 +47,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 flag.ByteArrayFromNumber(flag.MinBytesFor()), 
                 weightBytes,
                 address.Value.HexStringToByteArray(20),
-                data.Length.ByteArrayFromNumber(sizeLen),
+                data.Length.ByteArrayFromNumber(bytesForSignatureSize),
                 data);
         }
     }
