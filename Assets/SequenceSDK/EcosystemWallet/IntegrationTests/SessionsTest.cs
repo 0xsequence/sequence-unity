@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.EcosystemWallet.UnitTests;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.IntegrationTests
@@ -11,8 +12,9 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         public Task<string> SessionEmpty(Dictionary<string, object> parameters)
         {
             var identitySigner = parameters["identitySigner"].ToString();
+            var topology = SessionsUtils.CreateSessionsTopologyWithSingleIdentity(identitySigner);
 
-            return Task.FromResult(identitySigner);
+            return Task.FromResult(topology.JsonSerialize());
         }
 
         public Task<string> SessionEncodeTopology(Dictionary<string, object> parameters)

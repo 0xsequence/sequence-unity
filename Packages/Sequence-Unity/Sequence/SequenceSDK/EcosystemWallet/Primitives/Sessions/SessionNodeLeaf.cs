@@ -13,7 +13,8 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public override byte[] Encode()
         {
-            return Value;
+            var flag  = SessionsTopology.FlagNode << 4;
+            return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), Value);
         }
     }
 }

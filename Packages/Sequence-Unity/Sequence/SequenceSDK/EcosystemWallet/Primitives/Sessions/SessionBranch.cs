@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Newtonsoft.Json;
 using Sequence.Utils;
@@ -26,7 +27,16 @@ namespace Sequence.EcosystemWallet.Primitives
         public byte[] Encode()
         {
             var encodings = Children.Select(child => child.Encode()).ToArray();
-            return ByteArrayExtensions.ConcatenateByteArrays(encodings);
+            var encoded = ByteArrayExtensions.ConcatenateByteArrays(encodings);
+            var encodedSize = encoded.Length.MinBytesFor();
+            if (encodedSize > 15)
+                throw new Exception("Session Branch is too large.");
+
+            var flag = (SessionsTopology.FlagBranch << 4) | encodedSize;
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                flag.ByteArrayFromNumber(flag.MinBytesFor()), 
+                encodedSize.ByteArrayFromNumber(encodedSize), 
+                encoded);
         }
 
         public SessionsTopology ToTopology()

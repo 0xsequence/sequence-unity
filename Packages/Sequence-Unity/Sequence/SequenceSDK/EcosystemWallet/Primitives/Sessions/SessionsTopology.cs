@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
 
@@ -30,6 +31,11 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             this.Branch = null;
             this.Leaf = leaf;
+        }
+
+        public string JsonSerialize()
+        {
+            return JsonConvert.SerializeObject(ToJson());
         }
 
         public object ToJson()
@@ -82,17 +88,26 @@ namespace Sequence.EcosystemWallet.Primitives
                 case SessionLeaf.SessionPermissionsType:
                     return new PermissionLeaf
                     {
-
+                        permissions =
+                        {
+                            signer = new Address((string)data["signer"]),
+                            valueLimit = (BigInteger)data["valueLimit"],
+                            deadline = (BigInteger)data["deadline"],
+                            permissions = JsonConvert.DeserializeObject<Permission[]>(data["permissions"].ToString())
+                        }
                     }.ToTopology();
                 case SessionLeaf.IdentitySignerType:
+                    var identitySigner = data["identitySigner"].ToString();
                     return new IdentitySignerLeaf
                     {
-                        IdentitySigner = new Address("")
+                        identitySigner = new Address(identitySigner)
                     }.ToTopology();
                 case SessionLeaf.ImplicitBlacklistType:
+                    var blacklistJson = data["blacklist"].ToString();
+                    var blacklist = JsonConvert.DeserializeObject<Address[]>(blacklistJson);
                     return new ImplicitBlacklistLeaf
                     {
-                        Blacklist = new[] { new Address("") }
+                        blacklist = blacklist
                     }.ToTopology();
                 default:
                     throw new Exception("Invalid topology.");

@@ -1,21 +1,44 @@
+using System;
+using System.Linq;
+using Sequence.Utils;
+
 namespace Sequence.EcosystemWallet.Primitives
 {
     public class ImplicitBlacklistLeaf : SessionLeaf
     {
-        public Address[] Blacklist;
+        public Address[] blacklist;
 
         public override object ToJson()
         {
             return new
             {
                 type = ImplicitBlacklistType,
-                blacklist = Blacklist,
+                blacklist = blacklist,
             };
         }
 
         public override byte[] Encode()
         {
-            throw new System.NotImplementedException();
+            var encoded = ByteArrayExtensions.ConcatenateByteArrays(blacklist
+                .Select(hex => hex.Value.HexStringToByteArray())
+                .ToArray());
+
+            var count = blacklist.Length;
+            if (count >= 0x0f)
+            {
+                if (count > 0xffff)
+                    throw new Exception("Blacklist too large");
+
+                var flag = (SessionsTopology.FlagBlacklist << 4) | 0x0f;
+                return ByteArrayExtensions.ConcatenateByteArrays(
+                    flag.ByteArrayFromNumber(flag.MinBytesFor()),
+                    count.ByteArrayFromNumber(2),
+                    encoded
+                );
+            }
+
+            var flagByte = (SessionsTopology.FlagBlacklist << 4) | count;
+            return ByteArrayExtensions.ConcatenateByteArrays(flagByte.ByteArrayFromNumber(flagByte.MinBytesFor()), encoded);
         }
     }
 }
