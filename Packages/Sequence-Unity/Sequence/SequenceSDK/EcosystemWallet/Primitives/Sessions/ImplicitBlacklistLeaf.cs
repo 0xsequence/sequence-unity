@@ -13,7 +13,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 type = ImplicitBlacklistType,
-                blacklist = blacklist,
+                blacklist = blacklist.Select(a => a.Value).ToArray(),
             };
         }
 

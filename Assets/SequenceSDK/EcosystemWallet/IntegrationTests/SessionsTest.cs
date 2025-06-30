@@ -44,7 +44,9 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             var explicitSession = SessionPermissions.FromJson(explicitSessionJson);
             var sessionTopology = SessionsTopology.FromJson(sessionTopologyJson);
 
-            var existingPermission = sessionTopology.FindPermissions(explicitSession.signer);
+            var existingPermission = sessionTopology.FindLeaf<PermissionLeaf>(leaf => 
+                leaf.permissions.signer.Equals(explicitSession.signer));
+            
             if (existingPermission != null)
                 throw new Exception("Session already exists.");
 
@@ -59,7 +61,13 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> SessionImplicitAddBlacklistAddress(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var blacklistAddress = new Address((string)parameters["blacklistAddress"]);
+            var sessionTopologyJson = parameters["sessionTopology"].ToString();
+
+            var sessionsTopology = SessionsTopology.FromJson(sessionTopologyJson);
+            sessionsTopology.AddToImplicitBlacklist(blacklistAddress);
+            
+            return Task.FromResult(sessionsTopology.JsonSerialize());
         }
         
         public Task<string> SessionImplicitRemoveBlacklistAddress(Dictionary<string, object> parameters)

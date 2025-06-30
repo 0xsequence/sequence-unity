@@ -5,6 +5,7 @@ using System.Numerics;
 using NUnit.Framework;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -61,21 +62,26 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology.");
         }
 
-        public SessionPermissions FindPermissions(Address signer)
+        public T FindLeaf<T>(Func<T, bool> check) where T : SessionLeaf
         {
-            if (Leaf is PermissionLeaf permissionLeaf && permissionLeaf.permissions.signer.Equals(signer))
-                return permissionLeaf.permissions;
+            if (Leaf is T leaf && check(leaf))
+            {
+                Debug.Log($"Got leaf {Leaf?.GetType()}");
+                return leaf;
+            }
 
             if (!IsBranch) 
                 return null;
 
-            return Branch.Children.Select(child => 
-                child.FindPermissions(signer)).FirstOrDefault(permissions => permissions != null);
+            return Branch.Children.Select(child => child.FindLeaf(check))
+                .FirstOrDefault(childLeaf => childLeaf != null);
         }
 
         public SessionsTopology AddExplicitSession(SessionPermissions session)
         {
-            var existingPermission = FindPermissions(session.signer);
+            var existingPermission = FindLeaf<PermissionLeaf>(leaf => 
+                leaf.permissions.signer.Equals(session.signer));
+            
             if (existingPermission != null)
                 throw new Exception("Session already exists.");
 
@@ -83,6 +89,30 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 permissions = session
             }.ToTopology());
+        }
+
+        public SessionsTopology RemoveExplicitSession(SessionPermissions session)
+        {
+            throw new Exception("Not implemented.");
+        }
+
+        public void AddToImplicitBlacklist(Address address)
+        {
+            var existingLeaf = FindLeaf<ImplicitBlacklistLeaf>(_ => true);
+            if (existingLeaf == null)
+                throw new Exception("No blacklist found.");
+
+            if (existingLeaf.blacklist.Any(b => b.Equals(address)))
+                return;
+            
+            var blacklist = existingLeaf.blacklist.ToList();
+            blacklist.Add(address);
+            existingLeaf.blacklist = blacklist.ToArray();
+        }
+
+        public SessionsTopology RemoveFromImplicitBlacklist(Address address)
+        {
+            throw new Exception("Not implemented.");
         }
 
         public static SessionsTopology MergeSessionsTopologies(SessionsTopology a, SessionsTopology b)
@@ -136,10 +166,10 @@ namespace Sequence.EcosystemWallet.Primitives
                     }.ToTopology();
                 case SessionLeaf.ImplicitBlacklistType:
                     var blacklistJson = data["blacklist"].ToString();
-                    var blacklist = JsonConvert.DeserializeObject<Address[]>(blacklistJson);
+                    var blacklist = JsonConvert.DeserializeObject<string[]>(blacklistJson);
                     return new ImplicitBlacklistLeaf
                     {
-                        blacklist = blacklist
+                        blacklist = blacklist.Select(b => new Address(b)).ToArray()
                     }.ToTopology();
                 default:
                     throw new Exception("Invalid topology.");
