@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.IntegrationTests
 {
@@ -14,9 +15,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         {
             var input = parameters["input"].ToString();
             var signatures = parameters["signatures"].ToString();
-            var chainId = !parameters.TryGetValue("chainId", out var chainIdValue) || (bool)chainIdValue;
+            var noChainId = !parameters.TryGetValue("chainId", out var chainIdValue) || !(bool)chainIdValue;
+            var checkpointerData = parameters.TryGetValue("checkpointerData", out var checkpointerDataValue) ? 
+                checkpointerDataValue.ToString().HexStringToByteArray() : null;
 
-            return Task.FromResult(SignatureUtils.EncodeSignatureFromInput(input, signatures, !chainId));
+            return Task.FromResult(SignatureUtils.EncodeSignatureFromInput(input, signatures, noChainId, checkpointerData));
         }
 
         public Task<string> SignatureDecode(Dictionary<string, object> parameters)

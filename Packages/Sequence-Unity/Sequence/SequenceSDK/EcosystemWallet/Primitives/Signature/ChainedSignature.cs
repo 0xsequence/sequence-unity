@@ -30,16 +30,15 @@ namespace Sequence.EcosystemWallet.Primitives
 
             if (sigForCheckpointer.configuration.checkpointer != null)
             {
-                output = sigForCheckpointer.configuration.checkpointer.Value.HexStringToByteArray().PadLeft(20).Concat(output).ToArray();
-                output = ByteArrayExtensions.ConcatenateByteArrays(
-                    sigForCheckpointer.configuration.checkpointer.Value.HexStringToByteArray().PadLeft(20),
-                    output);
+                var checkpointer = sigForCheckpointer.configuration.checkpointer.Value.HexStringToByteArray().PadLeft(20);
+                output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointer);
                 
                 var checkpointerDataSize = sigForCheckpointer.checkpointerData?.Length ?? 0;
                 if (checkpointerDataSize > 16777215)
                     throw new Exception("Checkpointer data too large");
 
-                output = ByteArrayExtensions.ConcatenateByteArrays(output,
+                output = ByteArrayExtensions.ConcatenateByteArrays(output, 
+                    checkpointerDataSize.ByteArrayFromNumber(3),
                     sigForCheckpointer.checkpointerData ?? new byte[0]);
             }
 
@@ -52,7 +51,8 @@ namespace Sequence.EcosystemWallet.Primitives
                 if (encoded.Length > 16777215)
                     throw new Exception("Chained signature too large");
 
-                output = ByteArrayExtensions.ConcatenateByteArrays(output, encoded);
+                var encodedSize = encoded.Length.ByteArrayFromNumber(3);
+                output = ByteArrayExtensions.ConcatenateByteArrays(output, encodedSize, encoded);
             }
 
             return output;

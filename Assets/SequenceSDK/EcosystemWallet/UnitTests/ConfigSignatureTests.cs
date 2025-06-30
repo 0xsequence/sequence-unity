@@ -25,9 +25,11 @@ namespace Sequence.EcosystemWallet.UnitTests
             var config = Primitives.Config.FromJson(input);
 
             var signatures = parameters["signatures"].ToString();
-            var chainId = !parameters.TryGetValue("chainId", out var chainIdValue) || (bool)chainIdValue;
+            var noChainId = !parameters.TryGetValue("chainId", out var chainIdValue) || !(bool)chainIdValue;
+            var checkpointerData = parameters.TryGetValue("checkpointerData", out var checkpointerDataValue) ? 
+                checkpointerDataValue.ToString().HexStringToByteArray() : null;
 
-            var encoded = SignatureUtils.EncodeSignatureFromInput(input, signatures, !chainId);
+            var encoded = SignatureUtils.EncodeSignatureFromInput(input, signatures, noChainId, checkpointerData);
             Debug.Log($"Encoded Signature {encoded}");
 
             var encodedSignature = encoded.HexStringToByteArray();

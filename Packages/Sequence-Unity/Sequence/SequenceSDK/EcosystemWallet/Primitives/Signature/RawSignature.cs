@@ -48,7 +48,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     noChainId = this.noChainId,
                     checkpointerData = this.checkpointerData,
                     configuration = this.configuration,
-                    erc6492 = this.erc6492
+                    erc6492 = null
                 };
 
                 var chained = new List<RawSignature> { head };

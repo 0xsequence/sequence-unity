@@ -188,7 +188,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return Leaf.HashConfiguration();
         }
         
-        public byte[] Encode(bool noChainId, byte[] checkpointerData)
+        public byte[] Encode(bool noChainId = true, byte[] checkpointerData = null)
         {
             if (IsNode())
             {

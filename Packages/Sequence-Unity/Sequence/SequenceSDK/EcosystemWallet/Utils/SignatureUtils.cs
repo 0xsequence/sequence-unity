@@ -4,13 +4,12 @@ using System.Linq;
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Utils
 {
     public static class SignatureUtils
     { 
-        public static string EncodeSignatureFromInput(string input, string signatures, bool noChainId, byte[] checkpointerData = null)
+        public static string EncodeSignatureFromInput(string input, string signatures, bool noChainId, byte[] checkpointerData)
         {
             var parts = string.IsNullOrEmpty(signatures) ? 
                 Array.Empty<string>() : 
