@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -12,6 +14,18 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger valueLimit;
         public BigInteger deadline;
         public Permission[] permissions;
+
+        public object ToJson()
+        {
+            return new
+            {
+                type = SessionLeaf.SessionPermissionsType,
+                signer = signer.Value,
+                valueLimit = valueLimit.ToString(),
+                deadline = deadline.ToString(),
+                permissions = permissions.Select(permission => permission.ToJson()).ToArray()
+            };
+        }
 
         public byte[] Encode()
         {
@@ -67,6 +81,11 @@ namespace Sequence.EcosystemWallet.Primitives
                 deadline = deadline,
                 permissions = permissions
             };
+        }
+
+        public static SessionPermissions FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<SessionPermissions>(json);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -8,14 +9,7 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public override object ToJson()
         {
-            return new
-            {
-                type = SessionPermissionsType,
-                signer = permissions.signer,
-                valueLimit = permissions.valueLimit,
-                deadline = permissions.deadline,
-                permissions = permissions.permissions,
-            };
+            return permissions.ToJson();
         }
 
         public override byte[] Encode()

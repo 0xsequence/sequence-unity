@@ -38,7 +38,18 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> SessionExplicitAdd(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var explicitSessionJson = parameters["explicitSession"].ToString();
+            var sessionTopologyJson = parameters["sessionTopology"].ToString();
+
+            var explicitSession = SessionPermissions.FromJson(explicitSessionJson);
+            var sessionTopology = SessionsTopology.FromJson(sessionTopologyJson);
+
+            var existingPermission = sessionTopology.FindPermissions(explicitSession.signer);
+            if (existingPermission != null)
+                throw new Exception("Session already exists.");
+
+            var newTopology = sessionTopology.AddExplicitSession(explicitSession);
+            return Task.FromResult(newTopology.JsonSerialize());
         }
         
         public Task<string> SessionExplicitRemove(Dictionary<string, object> parameters)

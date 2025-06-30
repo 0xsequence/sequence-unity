@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using NUnit.Framework;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
 
@@ -60,6 +61,35 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology.");
         }
 
+        public SessionPermissions FindPermissions(Address signer)
+        {
+            if (Leaf is PermissionLeaf permissionLeaf && permissionLeaf.permissions.signer.Equals(signer))
+                return permissionLeaf.permissions;
+
+            if (!IsBranch) 
+                return null;
+
+            return Branch.Children.Select(child => 
+                child.FindPermissions(signer)).FirstOrDefault(permissions => permissions != null);
+        }
+
+        public SessionsTopology AddExplicitSession(SessionPermissions session)
+        {
+            var existingPermission = FindPermissions(session.signer);
+            if (existingPermission != null)
+                throw new Exception("Session already exists.");
+
+            return MergeSessionsTopologies(this, new PermissionLeaf
+            {
+                permissions = session
+            }.ToTopology());
+        }
+
+        public static SessionsTopology MergeSessionsTopologies(SessionsTopology a, SessionsTopology b)
+        {
+            return new SessionsTopology(new SessionBranch(a, b));
+        }
+
         public static SessionsTopology FromJson(string json)
         {
             if (json.StartsWith("["))
@@ -88,12 +118,14 @@ namespace Sequence.EcosystemWallet.Primitives
                 case SessionLeaf.SessionPermissionsType:
                     return new PermissionLeaf
                     {
-                        permissions =
+                        permissions = new()
                         {
                             signer = new Address((string)data["signer"]),
-                            valueLimit = (BigInteger)data["valueLimit"],
-                            deadline = (BigInteger)data["deadline"],
-                            permissions = JsonConvert.DeserializeObject<Permission[]>(data["permissions"].ToString())
+                            valueLimit = BigInteger.Parse((string)data["valueLimit"]),
+                            deadline = BigInteger.Parse((string)data["deadline"]),
+                            permissions = JsonConvert.DeserializeObject<List<object>>(data["permissions"].ToString())
+                                .Select(i => Permission.FromJson(i.ToString()))
+                                .ToArray()
                         }
                     }.ToTopology();
                 case SessionLeaf.IdentitySignerType:
