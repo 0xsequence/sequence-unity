@@ -15,18 +15,31 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
         public static readonly Dictionary<string, Func<Dictionary<string, object>, Task<object>>> Methods =
             new Dictionary<string, Func<Dictionary<string, object>, Task<object>>>
             {
+                // PAYLOAD
                 ["payload_toAbi"] = async (parameters) => await new PayloadTests().PayloadToAbi(parameters),
                 ["payload_toPacked"] = async (parameters) => await new PayloadTests().PayloadToPacked(parameters),
                 ["payload_toJson"] = async (parameters) => await new PayloadTests().PayloadToJson(parameters),
                 ["payload_hashFor"] = async (parameters) => await new PayloadTests().PayloadHashFor(parameters),
+                // CONFIG
                 ["config_new"] = async (parameters) => await new ConfigTests().ConfigNew(parameters),
                 ["config_encode"] = async (parameters) => await new ConfigTests().ConfigEncode(parameters),
                 ["config_imageHash"] = async (parameters) => await new ConfigTests().ConfigImageHash(parameters),
+                // DEV TOOLS
                 ["devTools_randomConfig"] = async (parameters) => await new DevToolsTest().DevToolsRandomConfig(parameters),
                 ["devTools_randomSessionTopology"] = async (parameters) => await new DevToolsTest().DevToolsRandomSessionTopology(parameters),
+                // SIGNATURE
                 ["signature_encode"] = async (parameters) => await new SignatureTests().SignatureEncode(parameters),
                 ["signature_concat"] = async (parameters) => await new SignatureTests().SignatureConcat(parameters),
                 ["signature_decode"] = async (parameters) => await new SignatureTests().SignatureDecode(parameters),
+                // SESSIONS
+                ["session_empty"] = async (parameters) => await new SessionsTest().SessionEmpty(parameters),
+                ["session_encodeTopology"] = async (parameters) => await new SessionsTest().SessionEncodeTopology(parameters),
+                ["session_encodeCallSignatures"] = async (parameters) => await new SessionsTest().SessionEncodeCallSignatures(parameters),
+                ["session_imageHash"] = async (parameters) => await new SessionsTest().SessionImageHash(parameters),
+                ["session_explicit_add"] = async (parameters) => await new SessionsTest().SessionExplicitAdd(parameters),
+                ["session_explicit_remove"] = async (parameters) => await new SessionsTest().SessionExplicitRemove(parameters),
+                ["session_implicit_addBlacklistAddress"] = async (parameters) => await new SessionsTest().SessionImplicitAddBlacklistAddress(parameters),
+                ["session_implicit_removeBlacklistAddress"] = async (parameters) => await new SessionsTest().SessionImplicitRemoveBlacklistAddress(parameters),
             };
 
         public async Task<JsonRpcResponse> HandleSingleRequest(
