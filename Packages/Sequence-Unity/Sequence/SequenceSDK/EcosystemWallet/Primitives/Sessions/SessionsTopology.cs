@@ -231,9 +231,14 @@ namespace Sequence.EcosystemWallet.Primitives
             existingLeaf.blacklist = blacklist.OrderBy(h => h.Value.HexStringToByteArray(), new ByteArrayComparer()).ToArray();
         }
 
-        public SessionsTopology RemoveFromImplicitBlacklist(Address address)
+        public void RemoveFromImplicitBlacklist(Address address)
         {
-            throw new Exception("Not implemented.");
+            var leaf = FindLeaf<ImplicitBlacklistLeaf>(_ => true);
+            if (leaf == null)
+                throw new Exception("No blacklist found.");
+
+            var newBlacklist = leaf.blacklist.Where(a => !a.Equals(address)).ToArray();
+            leaf.blacklist = newBlacklist;
         }
 
         public static SessionsTopology MergeSessionsTopologies(SessionsTopology a, SessionsTopology b)
