@@ -32,8 +32,8 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         {
             var sessionTopologyJson = parameters["sessionTopology"].ToString();
             
-            var signatures = JsonConvert.DeserializeObject<string[]>(parameters["callSignatures"]
-                .ToString()).Select(SessionCallSignature.FromJson).ToArray();
+            var signatures = JsonConvert.DeserializeObject<object[]>(parameters["callSignatures"]
+                .ToString()).Select(s => SessionCallSignature.FromJson(s.ToString())).ToArray();
             
             var explicitSigners = JsonConvert.DeserializeObject<string[]>(parameters["explicitSigners"]
                 .ToString()).Select(v => new Address(v)).ToArray();

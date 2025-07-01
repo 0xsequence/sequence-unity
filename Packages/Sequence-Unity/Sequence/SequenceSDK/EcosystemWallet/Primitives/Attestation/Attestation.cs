@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
@@ -17,19 +18,6 @@ namespace Sequence.EcosystemWallet.Primitives
         public FixedByte audienceHash;
         public byte[] applicationData;
         public AuthData authData;
-
-        public Attestation(Address approvedSigner, FixedByte identityType, FixedByte issuerHash, FixedByte audienceHash, byte[] applicationData, AuthData authData)
-        {
-            this.approvedSigner = approvedSigner;
-            AssertHasSize(identityType, 4, nameof(identityType));
-            this.identityType = identityType;
-            AssertHasSize(issuerHash, 32, nameof(issuerHash));
-            this.issuerHash = issuerHash;
-            AssertHasSize(audienceHash, 32, nameof(audienceHash));
-            this.audienceHash = audienceHash;
-            this.applicationData = applicationData;
-            this.authData = authData;
-        }
 
         private void AssertHasSize(FixedByte obj, int size, string argumentName)
         {
@@ -58,26 +46,34 @@ namespace Sequence.EcosystemWallet.Primitives
             return SequenceCoder.KeccakHash(encoded);
         }
 
-        public string ToJson() // Todo make this a JsonConverter
+        public object ToJson()
         {
-            JsonAttestation jsonAble = new JsonAttestation(this);
-            return JsonConvert.ToString(jsonAble);
+            return new
+            {
+                approvedSigner = approvedSigner.Value,
+                identityType = identityType.Data.ByteArrayToHexStringWithPrefix(),
+                issuerHash = issuerHash.Data.ByteArrayToHexStringWithPrefix(),
+                audienceHash = audienceHash.Data.ByteArrayToHexStringWithPrefix(),
+                applicationData = applicationData.ByteArrayToHexStringWithPrefix(),
+                authData = new
+                {
+                    redirectUrl = authData.redirectUrl
+                }
+            };
         }
 
-        public Attestation(JsonAttestation jsonAble)
+        public static Attestation FromJson(string json) // Todo make this a JsonConverter
         {
-            this.approvedSigner = jsonAble.approvedSigner;
-            this.identityType = new FixedByte(4, jsonAble.identityType.HexStringToByteArray());
-            this.issuerHash = new FixedByte(32, jsonAble.issuerHash.HexStringToByteArray());
-            this.audienceHash = new FixedByte(32, jsonAble.audienceHash.HexStringToByteArray());
-            this.applicationData = jsonAble.applicationData.HexStringToByteArray();
-            this.authData = jsonAble.authData;
-        }
-
-        public Attestation FromJson(string json) // Todo make this a JsonConverter
-        {
-            JsonAttestation jsonAble = JsonConvert.DeserializeObject<JsonAttestation>(json);
-            return new Attestation(jsonAble);
+            var jsonAble = JsonConvert.DeserializeObject<JsonAttestation>(json);
+            return new Attestation
+            {
+                approvedSigner = jsonAble.approvedSigner,
+                identityType = new FixedByte(4, jsonAble.identityType.HexStringToByteArray()),
+                issuerHash = new FixedByte(32, jsonAble.issuerHash.HexStringToByteArray()),
+                audienceHash = new FixedByte(32, jsonAble.audienceHash.HexStringToByteArray()),
+                applicationData = jsonAble.applicationData.HexStringToByteArray(),
+                authData = jsonAble.authData
+            };
         }
 
         public byte[] GenerateImplicitRequestMagic(Address wallet)

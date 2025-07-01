@@ -25,6 +25,17 @@ namespace Sequence.EcosystemWallet.Primitives
             return ByteArrayExtensions.ConcatenateByteArrays(rBytes, sBytes);
         }
 
+        public static RSY FromString(string input)
+        {
+            var parts = input.Split(':');
+            return new RSY
+            {
+                r = parts[0].HexStringToBigInteger(),
+                s = parts[1].HexStringToBigInteger(),
+                yParity = VToYParity(BigInteger.Parse(parts[2]))
+            };
+        }
+
         public static RSY Unpack(byte[] rsy)
         {
             if (rsy.Length != 64)

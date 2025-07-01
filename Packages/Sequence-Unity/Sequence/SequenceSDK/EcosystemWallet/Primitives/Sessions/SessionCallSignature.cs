@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Sequence.Utils;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -12,7 +14,27 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public static SessionCallSignature FromJson(string json)
         {
-            return null;
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            if (data.TryGetValue("identitySignature", out var identitySignature))
+            {
+                return new ImplicitSessionCallSignature
+                {
+                    attestation = Attestation.FromJson(data["attestation"].ToString()),
+                    sessionSignature = RSY.FromString((string)data["sessionSignature"]),
+                    identitySignature = RSY.FromString((string)identitySignature)
+                };
+            }
+            
+            if (data.TryGetValue("permissionIndex", out var permissionIndex))
+            {
+                return new ExplicitSessionCallSignature
+                {
+                    permissionIndex = BigInteger.Parse((string)permissionIndex),
+                    sessionSignature = new RSY(),
+                };
+            }
+            
+            throw new Exception("Invalid signature");
         }
 
         public static byte[] EncodeSignatures(SessionCallSignature[] signatures, SessionsTopology sessionsTopology,
@@ -44,7 +66,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 
                 if (implicitSignature.attestation != null)
                 {
-                    var attestationStr = implicitSignature.attestation.ToJson();
+                    var attestationStr = JsonConvert.SerializeObject(implicitSignature.attestation.ToJson());
                     if (!attestationMap.ContainsKey(attestationStr))
                     {
                         attestationMap[attestationStr] = encodedAttestations.Count;
@@ -66,7 +88,7 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 if (signature is ImplicitSessionCallSignature implicitCallSignature)
                 {
-                    var attestationStr = implicitCallSignature.attestation.ToJson();
+                    var attestationStr = JsonConvert.SerializeObject(implicitCallSignature.attestation.ToJson());
                     if (!attestationMap.TryGetValue(attestationStr, out var index))
                         throw new Exception("Failed to find attestation index");
 

@@ -47,7 +47,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new()
             {
                 target = new Address((string)data["target"]),
-                rules = JsonConvert.DeserializeObject<List<object>>((string)data["rules"])
+                rules = JsonConvert.DeserializeObject<List<object>>(data["rules"].ToString())
                     .Select(r => ParameterRule.FromJson(r.ToString()))
                     .ToArray(),
             };

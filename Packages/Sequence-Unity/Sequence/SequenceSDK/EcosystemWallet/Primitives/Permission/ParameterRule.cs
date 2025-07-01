@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -43,7 +44,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new()
             {
                 cumulative = (bool)data["cumulative"],
-                operation = (ParameterOperation)data["operation"],
+                operation = (ParameterOperation)Convert.ToInt32(data["operation"]),
                 value = data["value"].ToString().HexStringToByteArray(),
                 offset = BigInteger.Parse(data["offset"].ToString()),
                 mask = data["mask"].ToString().HexStringToByteArray()

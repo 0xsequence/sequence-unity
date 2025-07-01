@@ -86,7 +86,16 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public static SessionPermissions FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<SessionPermissions>(json);
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            return new SessionPermissions
+            {
+                signer = new Address((string)data["signer"]),
+                valueLimit = BigInteger.Parse((string)data["valueLimit"]),
+                deadline = BigInteger.Parse((string)data["deadline"]),
+                permissions = JsonConvert.DeserializeObject<object[]>(data["permissions"].ToString())
+                    .Select(p => Permission.FromJson(p.ToString()))
+                    .ToArray()
+            };
         }
     }
 }
