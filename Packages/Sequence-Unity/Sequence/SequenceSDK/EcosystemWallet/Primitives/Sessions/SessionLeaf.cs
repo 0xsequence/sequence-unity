@@ -8,6 +8,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public abstract object ToJson();
         public abstract byte[] Encode();
+        public abstract byte[] EncodeGeneric();
 
         public SessionsTopology ToTopology()
         {

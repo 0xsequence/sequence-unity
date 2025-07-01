@@ -38,6 +38,13 @@ namespace Sequence.EcosystemWallet.Primitives
             var flagByte = (SessionsTopology.FlagBlacklist << 4) | count;
             return ByteArrayExtensions.ConcatenateByteArrays(flagByte.ByteArrayFromNumber(flagByte.MinBytesFor()), encoded);
         }
+        
+        public override byte[] EncodeGeneric()
+        {
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                SessionsTopology.FlagBlacklist.ByteArrayFromNumber(1), 
+                EncodeBlacklist());
+        }
 
         private byte[] EncodeBlacklist()
         {

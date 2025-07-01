@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
@@ -36,6 +37,7 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] issuerHashBytes = issuerHash.Data.PadLeft(32);
             byte[] audienceHashBytes = audienceHash.Data.PadLeft(32);
             byte[] applicationDataLengthBytes = applicationData.Length.ByteArrayFromNumber(3);
+            
             return ByteArrayExtensions.ConcatenateByteArrays(approvedSignerBytes, identityTypeBytes, issuerHashBytes,
                 audienceHashBytes, applicationDataLengthBytes, applicationData, authDataBytes);
         }
@@ -57,12 +59,13 @@ namespace Sequence.EcosystemWallet.Primitives
                 applicationData = applicationData.ByteArrayToHexStringWithPrefix(),
                 authData = new
                 {
-                    redirectUrl = authData.redirectUrl
+                    redirectUrl = authData.redirectUrl,
+                    issuedAt = authData.issuedAt.ToString()
                 }
             };
         }
 
-        public static Attestation FromJson(string json) // Todo make this a JsonConverter
+        public static Attestation FromJson(string json)
         {
             var jsonAble = JsonConvert.DeserializeObject<JsonAttestation>(json);
             return new Attestation
@@ -72,7 +75,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 issuerHash = new FixedByte(32, jsonAble.issuerHash.HexStringToByteArray()),
                 audienceHash = new FixedByte(32, jsonAble.audienceHash.HexStringToByteArray()),
                 applicationData = jsonAble.applicationData.HexStringToByteArray(),
-                authData = jsonAble.authData
+                authData = new AuthData(jsonAble.authData.redirectUrl, BigInteger.Parse(jsonAble.authData.issuedAt))
             };
         }
 
@@ -91,11 +94,11 @@ namespace Sequence.EcosystemWallet.Primitives
             public string issuerHash;
             public string audienceHash;
             public string applicationData;
-            public AuthData authData;
+            public JsonAuthData authData;
 
             [JsonConstructor]
             [Preserve]
-            public JsonAttestation(Address approvedSigner, string identityType, string issuerHash, string audienceHash, string applicationData, AuthData authData)
+            public JsonAttestation(Address approvedSigner, string identityType, string issuerHash, string audienceHash, string applicationData, JsonAuthData authData)
             {
                 this.approvedSigner = approvedSigner;
                 this.identityType = identityType;
@@ -112,7 +115,19 @@ namespace Sequence.EcosystemWallet.Primitives
                 this.issuerHash = attestation.issuerHash.Data.ByteArrayToHexStringWithPrefix();
                 this.audienceHash = attestation.audienceHash.Data.ByteArrayToHexStringWithPrefix();
                 this.applicationData = attestation.applicationData.ByteArrayToHexStringWithPrefix();
-                this.authData = attestation.authData;
+                this.authData = new JsonAuthData(attestation.authData.redirectUrl, attestation.authData.issuedAt.ToString());
+            }
+        }
+
+        public class JsonAuthData
+        {
+            public string redirectUrl;
+            public string issuedAt;
+            
+            public JsonAuthData(string redirectUrl, string issuedAt)
+            {
+                this.redirectUrl = redirectUrl;
+                this.issuedAt = issuedAt;
             }
         }
     }

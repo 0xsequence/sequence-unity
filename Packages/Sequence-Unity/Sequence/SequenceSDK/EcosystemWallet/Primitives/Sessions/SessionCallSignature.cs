@@ -30,7 +30,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 return new ExplicitSessionCallSignature
                 {
                     permissionIndex = BigInteger.Parse((string)permissionIndex),
-                    sessionSignature = new RSY(),
+                    sessionSignature = RSY.FromString((string)data["sessionSignature"]),
                 };
             }
             

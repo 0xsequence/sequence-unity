@@ -5,6 +5,7 @@ using System.Numerics;
 using Sequence.ABI;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -48,6 +49,11 @@ namespace Sequence.EcosystemWallet.Primitives
                 return Leaf.ToJson();
             
             throw new Exception("Invalid topology.");
+        }
+        
+        public string ImageHash()
+        {
+            return Hash(true);
         }
 
         public byte[] Encode()
@@ -99,7 +105,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 
                 return new SessionNodeLeaf
                 {
-                    Value = Hash().HexStringToByteArray()
+                    Value = Hash(true).HexStringToByteArray()
                 }.ToTopology();
             }
 
@@ -109,7 +115,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 {
                     return new SessionNodeLeaf
                     {
-                        Value = Hash().HexStringToByteArray()
+                        Value = Hash(true).HexStringToByteArray()
                     }.ToTopology();
                 }
 
@@ -122,7 +128,7 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology");
         }
 
-        public string Hash()
+        public string Hash(bool generic = false)
         {
             if (IsBranch)
             {
@@ -130,11 +136,12 @@ namespace Sequence.EcosystemWallet.Primitives
                 if (children.Length == 0)
                     throw new Exception("Empty branch");
 
-                var hashedChildren = children.Select(child => child.Hash()).ToArray();
+                var hashedChildren = children.Select(child => child.Hash(generic)).ToArray();
 
                 var childBytes = hashedChildren[0].HexStringToByteArray();
                 for (var i = 1; i < hashedChildren.Length; i++)
                 {
+                    Debug.Log($"BRANCH Combine {childBytes.ByteArrayToHexStringWithPrefix()}, {hashedChildren[i]}, {SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(childBytes, hashedChildren[i].HexStringToByteArray())).ByteArrayToHexStringWithPrefix()}");
                     var nextBytes = hashedChildren[i].HexStringToByteArray();
                     childBytes = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(childBytes, nextBytes));
                 }
@@ -143,10 +150,15 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             if (IsLeaf && Leaf is SessionNodeLeaf nodeLeaf)
+            {
+                Debug.Log($"Node Leaf");
                 return nodeLeaf.Value.ByteArrayToHexStringWithPrefix();
-
+            }
+            
+            Debug.Log($"Encoded: {Leaf.EncodeGeneric().ByteArrayToHexStringWithPrefix()}, Hashed: {SequenceCoder.KeccakHash(generic ? Leaf.EncodeGeneric() : Leaf.Encode()).ByteArrayToHexStringWithPrefix()}");
+            
             if (IsLeaf)
-                return SequenceCoder.KeccakHash(Leaf.Encode()).ByteArrayToHexStringWithPrefix();
+                return SequenceCoder.KeccakHash(generic ? Leaf.EncodeGeneric() : Leaf.Encode()).ByteArrayToHexStringWithPrefix();
 
             throw new Exception("Invalid tree structure");
         }

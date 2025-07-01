@@ -71,5 +71,17 @@ namespace Sequence.EcosystemWallet.UnitTests
             
             Debug.Log($"{encodedSignatures.ByteArrayToHexStringWithPrefix()}");
         }
+
+        [TestCase("{\"sessionTopology\":[[{\"type\":\"implicit-blacklist\",\"blacklist\":[]},{\"type\":\"identity-signer\",\"identitySigner\":\"0x8312fc6754389018bdD3BDfEFf226DD8eD9EcdB1\"}],[{\"type\":\"session-permissions\",\"signer\":\"0x9ed233eCAE5E093CAff8Ff8E147DdAfc704EC619\",\"valueLimit\":\"1000\",\"deadline\":\"2000\",\"permissions\":[{\"target\":\"0x000000000000000000000000000000000000bEEF\",\"rules\":[{\"cumulative\":false,\"operation\":0,\"value\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"offset\":\"0\",\"mask\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}]}]},{\"type\":\"session-permissions\",\"signer\":\"0xe67ee7a9b12041BdE69ef786fa0431d0d4e59239\",\"valueLimit\":\"1000\",\"deadline\":\"2000\",\"permissions\":[{\"target\":\"0x000000000000000000000000000000000000cafE\",\"rules\":[{\"cumulative\":false,\"operation\":0,\"value\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"offset\":\"0\",\"mask\":\"0x0000000000000000000000000000000000000000000000000000000000000000\"}]}]}]]}")]
+        public void CreateSessionImageHash(string inputJson)
+        {
+            var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(inputJson);
+            var sessionTopology = SessionsTopology.FromJson(input["sessionTopology"].ToString());
+            var imageHash = sessionTopology.ImageHash();
+            
+            Debug.Log($"{imageHash}");
+            
+            Assert.AreEqual(imageHash, "0x0a987248daf9d7b5372a694abfa45390e69a102c1e587c0b6ed9670909213be2");
+        }
     }
 }

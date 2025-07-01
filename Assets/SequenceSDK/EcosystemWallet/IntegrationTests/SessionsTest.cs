@@ -49,7 +49,10 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> SessionImageHash(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var sessionTopologyJson = parameters["sessionTopology"].ToString();
+            var topology = SessionsTopology.FromJson(sessionTopologyJson);
+
+            return Task.FromResult(topology.ImageHash());
         }
         
         public Task<string> SessionExplicitAdd(Dictionary<string, object> parameters)
