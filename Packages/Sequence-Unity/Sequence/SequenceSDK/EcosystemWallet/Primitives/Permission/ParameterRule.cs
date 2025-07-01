@@ -21,7 +21,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 cumulative = cumulative,
-                operation = operation,
+                operation = (int)operation,
                 value = value.ByteArrayToHexStringWithPrefix(),
                 offset = offset.ToString(),
                 mask = mask.ByteArrayToHexStringWithPrefix()

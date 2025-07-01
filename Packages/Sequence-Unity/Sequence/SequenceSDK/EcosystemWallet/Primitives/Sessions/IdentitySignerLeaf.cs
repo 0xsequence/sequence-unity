@@ -22,7 +22,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 identitySigner.Value.HexStringToByteArray());
         }
         
-        public override byte[] EncodeGeneric()
+        public override byte[] EncodeRaw()
         {
             return ByteArrayExtensions.ConcatenateByteArrays(
                 SessionsTopology.FlagIdentitySigner.ByteArrayFromNumber(1), 

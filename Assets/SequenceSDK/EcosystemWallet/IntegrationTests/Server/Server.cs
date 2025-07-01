@@ -40,6 +40,16 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 ["session_explicit_remove"] = async (parameters) => await new SessionsTest().SessionExplicitRemove(parameters),
                 ["session_implicit_addBlacklistAddress"] = async (parameters) => await new SessionsTest().SessionImplicitAddBlacklistAddress(parameters),
                 ["session_implicit_removeBlacklistAddress"] = async (parameters) => await new SessionsTest().SessionImplicitRemoveBlacklistAddress(parameters),
+                // RECOVERY
+                ["recovery_hashFromLeaves"] = async (parameters) => await new RecoveryTests().HashFromLeaves(parameters),
+                ["recovery_encode"] = async (parameters) => await new RecoveryTests().Encode(parameters),
+                ["recovery_trim"] = async (parameters) => await new RecoveryTests().Trim(parameters),
+                ["recovery_hashEncoded"] = async (parameters) => await new RecoveryTests().HashEncoded(parameters),
+                // PASSKEYS
+                ["passkeys_encodeSignature"] = async (parameters) => await new PasskeysTests().EncodeSignature(parameters),
+                ["passkeys_decodeSignature"] = async (parameters) => await new PasskeysTests().DecodeSignature(parameters),
+                ["passkeys_computeRoot"] = async (parameters) => await new PasskeysTests().ComputeRoot(parameters),
+                ["passkeys_validateSignature"] = async (parameters) => await new PasskeysTests().ValidateSignature(parameters),
             };
 
         public async Task<JsonRpcResponse> HandleSingleRequest(

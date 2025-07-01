@@ -9,7 +9,7 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public class SessionsTopology
+    public class SessionsTopology : ITopology
     {
         public const int FlagPermissions = 0;
         public const int FlagNode = 1;
@@ -17,22 +17,23 @@ namespace Sequence.EcosystemWallet.Primitives
         public const int FlagBlacklist = 3;
         public const int FlagIdentitySigner = 4;
 
-        public readonly SessionBranch Branch;
-        public readonly SessionLeaf Leaf;
-
-        public bool IsBranch => Branch != null;
-        public bool IsLeaf => Leaf != null;
+        public IBranch Branch { get; }
+        public ILeaf Leaf { get; }
+        public INode Node { get; }
         
         public SessionsTopology(SessionBranch branch)
         {
             this.Branch = branch;
-            this.Leaf = null;
         }
 
         public SessionsTopology(SessionLeaf leaf)
         {
-            this.Branch = null;
             this.Leaf = leaf;
+        }
+        
+        public SessionsTopology(SessionNodeLeaf node)
+        {
+            this.Node = node;
         }
 
         public string JsonSerialize()
@@ -42,27 +43,33 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public object ToJson()
         {
-            if (IsBranch)
+            if (this.IsBranch())
                 return Branch.ToJson();
 
-            if (IsLeaf)
+            if (this.IsLeaf())
                 return Leaf.ToJson();
+
+            if (this.IsNode())
+                return Node.ToJson();
             
             throw new Exception("Invalid topology.");
         }
         
         public string ImageHash()
         {
-            return Hash(true);
+            return this.Hash(true);
         }
 
         public byte[] Encode()
         {
-            if (IsBranch)
+            if (this.IsBranch())
                 return Branch.Encode();
 
-            if (IsLeaf)
+            if (this.IsLeaf())
                 return Leaf.Encode();
+
+            if (this.IsNode())
+                return Node.Encode();
             
             throw new Exception("Invalid topology.");
         }
@@ -76,16 +83,16 @@ namespace Sequence.EcosystemWallet.Primitives
         /// <exception cref="Exception"></exception>
         public SessionsTopology Minimise(Address[] explicitSigners, Address[] implicitSigners)
         {
-            if (IsBranch)
+            if (this.IsBranch())
             {
-                var branchList = Branch.Children
-                    .Select(branch => branch.Minimise(explicitSigners, implicitSigners))
+                var branchList = ((SessionsTopology[])Branch.Children)
+                    .Select(branch => (ITopology)branch.Minimise(explicitSigners, implicitSigners))
                     .ToArray();
                 
-                if (branchList.All(b => b.IsLeaf && b.Leaf is SessionNodeLeaf))
+                if (branchList.All(b => b.Node is SessionNodeLeaf))
                 {
                     var nodeBytes = branchList
-                        .Select(node => (node.Leaf as SessionNodeLeaf)?.Value)
+                        .Select(node => (node.Node as SessionNodeLeaf)?.Value)
                         .ToArray();
                     
                     var concatenated = ByteArrayExtensions.ConcatenateByteArrays(nodeBytes);
@@ -105,7 +112,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 
                 return new SessionNodeLeaf
                 {
-                    Value = Hash(true).HexStringToByteArray()
+                    Value = this.Hash(true).HexStringToByteArray()
                 }.ToTopology();
             }
 
@@ -115,69 +122,28 @@ namespace Sequence.EcosystemWallet.Primitives
                 {
                     return new SessionNodeLeaf
                     {
-                        Value = Hash(true).HexStringToByteArray()
+                        Value = this.Hash(true).HexStringToByteArray()
                     }.ToTopology();
                 }
 
                 return this;
             }
 
-            if (Leaf is IdentitySignerLeaf or SessionNodeLeaf)
+            if (Leaf is IdentitySignerLeaf || Node is SessionNodeLeaf)
                 return this;
 
             throw new Exception("Invalid topology");
         }
-
-        public string Hash(bool generic = false)
-        {
-            if (IsBranch)
-            {
-                var children = Branch.Children;
-                if (children.Length == 0)
-                    throw new Exception("Empty branch");
-
-                var hashedChildren = children.Select(child => child.Hash(generic)).ToArray();
-
-                var childBytes = hashedChildren[0].HexStringToByteArray();
-                for (var i = 1; i < hashedChildren.Length; i++)
-                {
-                    var nextBytes = hashedChildren[i].HexStringToByteArray();
-                    childBytes = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(childBytes, nextBytes));
-                }
-
-                return childBytes.ByteArrayToHexStringWithPrefix();
-            }
-
-            if (IsLeaf && Leaf is SessionNodeLeaf nodeLeaf)
-                return nodeLeaf.Value.ByteArrayToHexStringWithPrefix();
-            
-            if (IsLeaf)
-                return SequenceCoder.KeccakHash(generic ? Leaf.EncodeGeneric() : Leaf.Encode()).ByteArrayToHexStringWithPrefix();
-
-            throw new Exception("Invalid tree structure");
-        }
         
         public bool IsComplete()
         {
-            return FindLeaf<IdentitySignerLeaf>(_ => true) != null && 
-                   FindLeaf<ImplicitBlacklistLeaf>(_ => true) != null;
-        }
-
-        public T FindLeaf<T>(Func<T, bool> check) where T : SessionLeaf
-        {
-            if (Leaf is T leaf && check(leaf))
-                return leaf;
-
-            if (!IsBranch) 
-                return null;
-
-            return Branch.Children.Select(child => child.FindLeaf(check))
-                .FirstOrDefault(childLeaf => childLeaf != null);
+            return this.FindLeaf<IdentitySignerLeaf>(_ => true) != null && 
+                   this.FindLeaf<ImplicitBlacklistLeaf>(_ => true) != null;
         }
 
         public SessionsTopology AddExplicitSession(SessionPermissions session)
         {
-            var existingPermission = FindLeaf<PermissionLeaf>(leaf => 
+            var existingPermission = this.FindLeaf<PermissionLeaf>(leaf => 
                 leaf.permissions.signer.Equals(session.signer));
             
             if (existingPermission != null)
@@ -192,13 +158,13 @@ namespace Sequence.EcosystemWallet.Primitives
         [CanBeNull]
         public SessionsTopology RemoveExplicitSession(Address address)
         {
-            if (IsLeaf && Leaf is PermissionLeaf permissionLeaf)
+            if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf)
                 return permissionLeaf.permissions.signer.Equals(address) ? null : this;
 
-            if (IsBranch)
+            if (this.IsBranch())
             {
                 var newChildren = new List<SessionsTopology>();
-                foreach (var child in Branch.Children)
+                foreach (var child in (SessionsTopology[])Branch.Children)
                 {
                     var updatedChild = child.RemoveExplicitSession(address);
                     if (updatedChild != null)
@@ -219,7 +185,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public void AddToImplicitBlacklist(Address address)
         {
-            var existingLeaf = FindLeaf<ImplicitBlacklistLeaf>(_ => true);
+            var existingLeaf = this.FindLeaf<ImplicitBlacklistLeaf>(_ => true);
             if (existingLeaf == null)
                 throw new Exception("No blacklist found.");
 
@@ -233,7 +199,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public void RemoveFromImplicitBlacklist(Address address)
         {
-            var leaf = FindLeaf<ImplicitBlacklistLeaf>(_ => true);
+            var leaf = this.FindLeaf<ImplicitBlacklistLeaf>(_ => true);
             if (leaf == null)
                 throw new Exception("No blacklist found.");
 

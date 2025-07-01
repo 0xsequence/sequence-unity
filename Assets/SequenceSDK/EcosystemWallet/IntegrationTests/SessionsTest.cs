@@ -73,6 +73,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             return Task.FromResult(newTopology.JsonSerialize());
         }
         
+        /// <summary>
+        /// This test is not yet used during the tests with forge.
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public Task<string> SessionExplicitRemove(Dictionary<string, object> parameters)
         {
             var explicitSessionAddress = new Address((string)parameters["explicitSession"]);
@@ -93,6 +98,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             return Task.FromResult(sessionsTopology.JsonSerialize());
         }
         
+        /// <summary>
+        /// This test is not yet used during the tests with forge.
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
         public Task<string> SessionImplicitRemoveBlacklistAddress(Dictionary<string, object> parameters)
         {
             var address = new Address((string)parameters["address"]);

@@ -26,7 +26,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> DevToolsRandomSessionTopology(Dictionary<string, object> parameters)
         {
-            throw new System.NotImplementedException("DevToolsTest.DevToolsRandomSessionTopology");
+            throw new System.NotImplementedException("This test is not yet used during the tests with forge.");
         }
     }
 }

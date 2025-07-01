@@ -10,9 +10,9 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             var flattened = FlattenSessionsTopology(topology);
 
-            var blacklist = flattened.FirstOrDefault(l => l.IsLeaf && l.Leaf is ImplicitBlacklistLeaf);
-            var identitySigner = flattened.FirstOrDefault(l => l.IsLeaf && l.Leaf is IdentitySignerLeaf);
-            var leaves = flattened.Where(l => l.IsLeaf && l.Leaf is PermissionLeaf).ToArray();
+            var blacklist = flattened.FirstOrDefault(l => l.IsLeaf() && l.Leaf is ImplicitBlacklistLeaf);
+            var identitySigner = flattened.FirstOrDefault(l => l.IsLeaf() && l.Leaf is IdentitySignerLeaf);
+            var leaves = flattened.Where(l => l.IsLeaf() && l.Leaf is PermissionLeaf).ToArray();
 
             if (blacklist == null || identitySigner == null)
             {
@@ -27,18 +27,17 @@ namespace Sequence.EcosystemWallet.Primitives
 
         private static SessionsTopology[] FlattenSessionsTopology(SessionsTopology topology)
         {
-            if (topology.IsLeaf)
+            if (topology.Leaf != null)
                 return new [] { topology };
 
-            if (!topology.IsBranch)
+            if (topology.Branch == null)
                 throw new Exception("Invalid topology structure");
             
             var result = new List<SessionsTopology>();
             foreach (var child in topology.Branch.Children)
-                result.AddRange(FlattenSessionsTopology(child));
+                result.AddRange(FlattenSessionsTopology(child as SessionsTopology));
                 
             return result.ToArray();
-
         }
 
         private static SessionsTopology BuildBalancedSessionsTopology(SessionsTopology[] topologies)

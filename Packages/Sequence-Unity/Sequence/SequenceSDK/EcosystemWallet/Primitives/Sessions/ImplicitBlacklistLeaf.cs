@@ -39,7 +39,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return ByteArrayExtensions.ConcatenateByteArrays(flagByte.ByteArrayFromNumber(flagByte.MinBytesFor()), encoded);
         }
         
-        public override byte[] EncodeGeneric()
+        public override byte[] EncodeRaw()
         {
             return ByteArrayExtensions.ConcatenateByteArrays(
                 SessionsTopology.FlagBlacklist.ByteArrayFromNumber(1), 

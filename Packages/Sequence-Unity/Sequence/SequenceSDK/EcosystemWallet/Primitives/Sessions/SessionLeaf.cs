@@ -1,6 +1,6 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public abstract class SessionLeaf
+    public abstract class SessionLeaf : ILeaf
     {
         public const string ImplicitBlacklistType = "implicit-blacklist";
         public const string IdentitySignerType = "identity-signer";
@@ -8,7 +8,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public abstract object ToJson();
         public abstract byte[] Encode();
-        public abstract byte[] EncodeGeneric();
+        public abstract byte[] EncodeRaw();
 
         public SessionsTopology ToTopology()
         {

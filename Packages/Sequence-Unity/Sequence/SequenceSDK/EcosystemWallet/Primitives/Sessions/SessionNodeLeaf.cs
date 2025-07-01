@@ -2,24 +2,29 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public class SessionNodeLeaf : SessionLeaf
+    public class SessionNodeLeaf : INode
     {
-        public byte[] Value;
+        public byte[] Value { get; set; }
 
-        public override object ToJson()
+        public object ToJson()
         {
             return Value.ByteArrayToHexStringWithPrefix();
         }
 
-        public override byte[] Encode()
+        public byte[] Encode()
         {
             var flag  = SessionsTopology.FlagNode << 4;
             return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), Value);
         }
 
-        public override byte[] EncodeGeneric()
+        public byte[] EncodeRaw()
         {
             return Value;
+        }
+
+        public SessionsTopology ToTopology()
+        {
+            return new SessionsTopology(this);
         }
     }
 }

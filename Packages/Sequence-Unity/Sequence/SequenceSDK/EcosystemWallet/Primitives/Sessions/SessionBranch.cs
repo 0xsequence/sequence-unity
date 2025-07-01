@@ -6,16 +6,16 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    public class SessionBranch
+    public class SessionBranch : IBranch
     {
-        public SessionsTopology[] Children;
+        public ITopology[] Children { get; set; }
 
         public SessionBranch(SessionsTopology left, SessionsTopology right)
         {
-            Children = new[] { left, right };
+            Children = new ITopology[] { left, right };
         }
 
-        public SessionBranch(SessionsTopology[] children)
+        public SessionBranch(ITopology[] children)
         {
             Children = children;
         }

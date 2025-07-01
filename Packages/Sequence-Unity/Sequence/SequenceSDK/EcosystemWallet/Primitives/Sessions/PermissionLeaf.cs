@@ -17,7 +17,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), permissions.Encode());
         }
 
-        public override byte[] EncodeGeneric()
+        public override byte[] EncodeRaw()
         {
             return ByteArrayExtensions.ConcatenateByteArrays(SessionsTopology.FlagPermissions.ByteArrayFromNumber(1), permissions.Encode());
         }
