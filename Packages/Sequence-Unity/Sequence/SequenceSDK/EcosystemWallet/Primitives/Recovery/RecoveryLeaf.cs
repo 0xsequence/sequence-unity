@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -21,7 +22,11 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public byte[] Encode()
         {
-            throw new NotImplementedException();
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                RecoveryTopology.FlagLeaf.ByteArrayFromNumber(1),
+                signer.Value.HexStringToByteArray(),
+                requiredDeltaTime.ByteArrayFromNumber(32),
+                minTimestamp.ByteArrayFromNumber(32));
         }
 
         public byte[] EncodeRaw()
