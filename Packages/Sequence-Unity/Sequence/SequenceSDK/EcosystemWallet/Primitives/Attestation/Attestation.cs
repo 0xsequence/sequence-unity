@@ -6,7 +6,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class Attestation
+    public class Attestation
     {
         public static readonly byte[] ACCEPT_IMPLICIT_REQUEST_MAGIC_PREFIX =
             SequenceCoder.KeccakHash("acceptImplicitRequest".ToByteArray());
@@ -88,7 +88,7 @@ namespace Sequence.EcosystemWallet.Primitives
         }
 
         [Serializable]
-        internal class JsonAttestation
+        public class JsonAttestation
         {
             public Address approvedSigner;
             public string identityType;

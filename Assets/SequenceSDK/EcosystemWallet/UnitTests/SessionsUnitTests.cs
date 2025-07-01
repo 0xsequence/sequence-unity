@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Sequence.EcosystemWallet.Primitives;
@@ -61,13 +62,21 @@ namespace Sequence.EcosystemWallet.UnitTests
         public void EncodeCallSignatures(string inputJson)
         {
             var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(inputJson);
-            var blacklistAddress = new Address((string)input["blacklistAddress"]);
             var sessionTopologyJson = input["sessionTopology"].ToString();
+            
+            var signatures = JsonConvert.DeserializeObject<string[]>(input["callSignatures"]
+                .ToString()).Select(SessionCallSignature.FromJson).ToArray();
+            
+            var explicitSigners = JsonConvert.DeserializeObject<string[]>(input["explicitSigners"]
+                .ToString()).Select(v => new Address(v)).ToArray();
+            
+            var implicitSigners = JsonConvert.DeserializeObject<string[]>(input["implicitSigners"]
+                .ToString()).Select(v => new Address(v)).ToArray();
 
             var sessionsTopology = SessionsTopology.FromJson(sessionTopologyJson);
-            sessionsTopology.AddToImplicitBlacklist(blacklistAddress);
+            var encodedSignatures = SessionCallSignature.EncodeSignatures(signatures, sessionsTopology, explicitSigners, implicitSigners);
             
-            Debug.Log($"{sessionsTopology.JsonSerialize()}");
+            Debug.Log($"{encodedSignatures.ByteArrayToHexStringWithPrefix()}");
         }
     }
 }

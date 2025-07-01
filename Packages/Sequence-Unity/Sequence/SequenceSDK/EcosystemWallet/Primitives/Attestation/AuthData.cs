@@ -5,7 +5,7 @@ using UnityEngine.Scripting;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
-    internal class AuthData
+    public class AuthData
     {
         public string redirectUrl;
 

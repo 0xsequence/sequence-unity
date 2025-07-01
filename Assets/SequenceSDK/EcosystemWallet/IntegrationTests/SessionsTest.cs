@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.UnitTests;
 using Sequence.Utils;
@@ -28,7 +30,21 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> SessionEncodeCallSignatures(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var sessionTopologyJson = parameters["sessionTopology"].ToString();
+            
+            var signatures = JsonConvert.DeserializeObject<string[]>(parameters["callSignatures"]
+                .ToString()).Select(SessionCallSignature.FromJson).ToArray();
+            
+            var explicitSigners = JsonConvert.DeserializeObject<string[]>(parameters["explicitSigners"]
+                .ToString()).Select(v => new Address(v)).ToArray();
+            
+            var implicitSigners = JsonConvert.DeserializeObject<string[]>(parameters["implicitSigners"]
+                .ToString()).Select(v => new Address(v)).ToArray();
+            
+            var sessionsTopology = SessionsTopology.FromJson(sessionTopologyJson);
+            var encodedSignatures = SessionCallSignature.EncodeSignatures(signatures, sessionsTopology, explicitSigners, implicitSigners);
+            
+            return Task.FromResult(encodedSignatures.ByteArrayToHexStringWithPrefix());
         }
         
         public Task<string> SessionImageHash(Dictionary<string, object> parameters)

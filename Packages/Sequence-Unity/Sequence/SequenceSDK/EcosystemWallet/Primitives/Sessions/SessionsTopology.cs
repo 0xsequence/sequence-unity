@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using NUnit.Framework;
+using Sequence.ABI;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
@@ -62,13 +63,99 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology.");
         }
 
+        public SessionsTopology Minimise(Address[] explicitSigners, Address[] implicitSigners)
+        {
+            if (IsBranch)
+            {
+                var branchList = Branch.Children
+                    .Select(branch => branch.Minimise(explicitSigners, implicitSigners))
+                    .ToArray();
+
+                if (branchList.All(b => b.IsLeaf && b.Leaf is SessionNodeLeaf))
+                {
+                    var nodeBytes = branchList
+                        .Select(node => node.Encode())
+                        .ToArray();
+
+                    var concatenated = ByteArrayExtensions.ConcatenateByteArrays(nodeBytes);
+                    return new SessionNodeLeaf
+                    {
+                        Value = SequenceCoder.KeccakHash(concatenated)
+                    }.ToTopology();
+                }
+
+                return new SessionBranch(branchList).ToTopology();
+            }
+
+            if (Leaf is PermissionLeaf permissionLeaf)
+            {
+                if (explicitSigners.Contains(permissionLeaf.permissions.signer))
+                    return this;
+
+                return new SessionNodeLeaf
+                {
+                    Value = Hash().HexStringToByteArray()
+                }.ToTopology();
+            }
+
+            if (Leaf is ImplicitBlacklistLeaf)
+            {
+                if (implicitSigners.Length == 0)
+                {
+                    return new SessionNodeLeaf
+                    {
+                        Value = Hash().HexStringToByteArray()
+                    }.ToTopology();
+                }
+
+                return this;
+            }
+
+            if (Leaf is IdentitySignerLeaf or SessionNodeLeaf)
+                return this;
+
+            throw new Exception("Invalid topology");
+        }
+
+        public string Hash()
+        {
+            if (IsBranch)
+            {
+                var children = Branch.Children;
+                if (children.Length == 0)
+                    throw new Exception("Empty branch");
+
+                var hashedChildren = children.Select(child => child.Hash()).ToArray();
+
+                var childBytes = hashedChildren[0].HexStringToByteArray();
+                for (var i = 1; i < hashedChildren.Length; i++)
+                {
+                    var nextBytes = hashedChildren[i].HexStringToByteArray();
+                    childBytes = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(childBytes, nextBytes));
+                }
+
+                return childBytes.ByteArrayToHexStringWithPrefix();
+            }
+
+            if (IsLeaf && Leaf is SessionNodeLeaf nodeLeaf)
+                return nodeLeaf.Value.ByteArrayToHexStringWithPrefix();
+
+            if (IsLeaf)
+                return SequenceCoder.KeccakHash(Leaf.Encode()).ByteArrayToHexStringWithPrefix();
+
+            throw new Exception("Invalid tree structure");
+        }
+        
+        public bool IsComplete()
+        {
+            return FindLeaf<IdentitySignerLeaf>(_ => true) != null && 
+                   FindLeaf<ImplicitBlacklistLeaf>(_ => true) != null;
+        }
+
         public T FindLeaf<T>(Func<T, bool> check) where T : SessionLeaf
         {
             if (Leaf is T leaf && check(leaf))
-            {
-                Debug.Log($"Got leaf {Leaf?.GetType()}");
                 return leaf;
-            }
 
             if (!IsBranch) 
                 return null;
