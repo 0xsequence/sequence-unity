@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -141,7 +141,6 @@ namespace Sequence.EcosystemWallet.Primitives
                 var childBytes = hashedChildren[0].HexStringToByteArray();
                 for (var i = 1; i < hashedChildren.Length; i++)
                 {
-                    Debug.Log($"BRANCH Combine {childBytes.ByteArrayToHexStringWithPrefix()}, {hashedChildren[i]}, {SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(childBytes, hashedChildren[i].HexStringToByteArray())).ByteArrayToHexStringWithPrefix()}");
                     var nextBytes = hashedChildren[i].HexStringToByteArray();
                     childBytes = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(childBytes, nextBytes));
                 }
@@ -150,12 +149,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             if (IsLeaf && Leaf is SessionNodeLeaf nodeLeaf)
-            {
-                Debug.Log($"Node Leaf");
                 return nodeLeaf.Value.ByteArrayToHexStringWithPrefix();
-            }
-            
-            Debug.Log($"Encoded: {Leaf.EncodeGeneric().ByteArrayToHexStringWithPrefix()}, Hashed: {SequenceCoder.KeccakHash(generic ? Leaf.EncodeGeneric() : Leaf.Encode()).ByteArrayToHexStringWithPrefix()}");
             
             if (IsLeaf)
                 return SequenceCoder.KeccakHash(generic ? Leaf.EncodeGeneric() : Leaf.Encode()).ByteArrayToHexStringWithPrefix();
@@ -195,9 +189,32 @@ namespace Sequence.EcosystemWallet.Primitives
             }.ToTopology()));
         }
 
-        public SessionsTopology RemoveExplicitSession(SessionPermissions session)
+        [CanBeNull]
+        public SessionsTopology RemoveExplicitSession(Address address)
         {
-            throw new Exception("Not implemented.");
+            if (IsLeaf && Leaf is PermissionLeaf permissionLeaf)
+                return permissionLeaf.permissions.signer.Equals(address) ? null : this;
+
+            if (IsBranch)
+            {
+                var newChildren = new List<SessionsTopology>();
+                foreach (var child in Branch.Children)
+                {
+                    var updatedChild = child.RemoveExplicitSession(address);
+                    if (updatedChild != null)
+                        newChildren.Add(updatedChild);
+                }
+
+                if (newChildren.Count == 0)
+                    return null;
+
+                if (newChildren.Count == 1)
+                    return newChildren[0];
+
+                return new SessionBranch(newChildren.ToArray()).ToTopology();
+            }
+
+            return this;
         }
 
         public void AddToImplicitBlacklist(Address address)

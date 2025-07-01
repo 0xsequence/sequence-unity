@@ -75,7 +75,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> SessionExplicitRemove(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var explicitSessionAddress = new Address((string)parameters["explicitSession"]);
+            var sessionTopology = SessionsTopology.FromJson(parameters["sessionTopology"].ToString());
+            var newTopology = sessionTopology.RemoveExplicitSession(explicitSessionAddress);
+            
+            return Task.FromResult(newTopology.JsonSerialize());
         }
         
         public Task<string> SessionImplicitAddBlacklistAddress(Dictionary<string, object> parameters)

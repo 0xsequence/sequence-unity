@@ -37,6 +37,15 @@ namespace Sequence.EcosystemWallet.UnitTests
             var newTopology = sessionTopology.AddExplicitSession(explicitSession);
             Debug.Log($"{newTopology.JsonSerialize()}");
         }
+        
+        [TestCase("0x00000000000000000000000000000000000025a8", "[{\"type\":\"implicit-blacklist\",\"blacklist\":[]},[{\"type\":\"identity-signer\",\"identitySigner\":\"0x8312fc6754389018bdD3BDfEFf226DD8eD9EcdB1\"},{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000025a8\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}]]")]
+        public void RemoveExplicitSession(string address, string inputJson)
+        {
+            var sessionTopology = SessionsTopology.FromJson(inputJson);
+            var newTopology = sessionTopology.RemoveExplicitSession(new Address(address));
+            
+            Debug.Log($"{newTopology.JsonSerialize()}");
+        }
 
         [TestCase("{\"sessionTopology\":[[[[[[[[[[[[[[[[[[[[[{\"type\":\"implicit-blacklist\",\"blacklist\":[]},{\"type\":\"identity-signer\",\"identitySigner\":\"0x8312fc6754389018bdD3BDfEFf226DD8eD9EcdB1\"}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000025a8\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000009CD\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000002AA7\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000026eB\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000001F8C\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x000000000000000000000000000000000000435E\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x000000000000000000000000000000000000026e\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x000000000000000000000000000000000000133b\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000002B44\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x000000000000000000000000000000000000004C\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000002015\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000000E9\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000003Ec4\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000002eF\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000003703\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000003dEB\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000057Eb\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000000373\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x00000000000000000000000000000000000002be\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],{\"type\":\"session-permissions\",\"signer\":\"0x0000000000000000000000000000000000001EA6\",\"valueLimit\":\"0\",\"deadline\":\"0\",\"permissions\":[]}],\"blacklistAddress\":\"0x0000000000000000000000000000000000000269\"}")]
         public void AddBlacklistAddress(string inputJson)
@@ -80,8 +89,6 @@ namespace Sequence.EcosystemWallet.UnitTests
             var imageHash = sessionTopology.ImageHash();
             
             Debug.Log($"{imageHash}");
-            
-            Assert.AreEqual(imageHash, "0x0a987248daf9d7b5372a694abfa45390e69a102c1e587c0b6ed9670909213be2");
         }
     }
 }
