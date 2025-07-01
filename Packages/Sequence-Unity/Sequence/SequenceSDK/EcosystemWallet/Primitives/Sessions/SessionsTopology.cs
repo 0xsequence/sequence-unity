@@ -63,6 +63,13 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology.");
         }
 
+        /// <summary>
+        /// Optimise the configuration tree by rolling unused signers into nodes.
+        /// </summary>
+        /// <param name="explicitSigners">The list of explicit signers to consider.</param>
+        /// <param name="implicitSigners">The list of implicit signers to consider.</param>
+        /// <returns>New reference to the compromised topology.</returns>
+        /// <exception cref="Exception"></exception>
         public SessionsTopology Minimise(Address[] explicitSigners, Address[] implicitSigners)
         {
             if (IsBranch)
@@ -172,10 +179,10 @@ namespace Sequence.EcosystemWallet.Primitives
             if (existingPermission != null)
                 throw new Exception("Session already exists.");
 
-            return MergeSessionsTopologies(this, new PermissionLeaf
+            return SessionsTopologyUtils.BalanceSessionsTopology(MergeSessionsTopologies(this, new PermissionLeaf
             {
                 permissions = session
-            }.ToTopology());
+            }.ToTopology()));
         }
 
         public SessionsTopology RemoveExplicitSession(SessionPermissions session)
@@ -194,7 +201,7 @@ namespace Sequence.EcosystemWallet.Primitives
             
             var blacklist = existingLeaf.blacklist.ToList();
             blacklist.Add(address);
-            existingLeaf.blacklist = blacklist.ToArray();
+            existingLeaf.blacklist = blacklist.OrderBy(h => h.Value.HexStringToByteArray(), new ByteArrayComparer()).ToArray();
         }
 
         public SessionsTopology RemoveFromImplicitBlacklist(Address address)

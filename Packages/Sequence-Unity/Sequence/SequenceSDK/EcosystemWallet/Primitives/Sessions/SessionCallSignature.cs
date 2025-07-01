@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -22,7 +23,8 @@ namespace Sequence.EcosystemWallet.Primitives
             if (!sessionsTopology.IsComplete())
                 throw new Exception("Incomplete topology");
 
-            sessionsTopology.Minimise(explicitSigners, implicitSigners);
+            sessionsTopology = sessionsTopology.Minimise(explicitSigners, implicitSigners);
+            Debug.Log(sessionsTopology.JsonSerialize());
 
             var encodedTopology = sessionsTopology.Encode();
             if (encodedTopology.Length.MinBytesFor() > 3)
@@ -31,6 +33,8 @@ namespace Sequence.EcosystemWallet.Primitives
             parts.Add(encodedTopology.Length.ByteArrayFromNumber(3));
             parts.Add(encodedTopology);
 
+            Debug.Log($"{encodedTopology.ByteArrayToHexStringWithPrefix()}");
+            
             var attestationMap = new Dictionary<string, int>();
             var encodedAttestations = new List<byte[]>();
 
