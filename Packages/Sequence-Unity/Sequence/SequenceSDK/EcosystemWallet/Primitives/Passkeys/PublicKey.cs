@@ -26,14 +26,5 @@ namespace Sequence.EcosystemWallet.Primitives.Passkeys
                 )
             ).ByteArrayToHexStringWithPrefix();
         }
-
-        private byte[][][] CombineTree(byte[] a, byte[] b, byte[] c, byte[] d)
-        {
-            return new []
-            {
-                new [] { a, b },
-                new [] { c, d }
-            };
-        }
     }
 }

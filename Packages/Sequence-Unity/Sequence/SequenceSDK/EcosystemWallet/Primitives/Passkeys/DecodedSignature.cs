@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives.Passkeys
 {
@@ -18,9 +19,10 @@ namespace Sequence.EcosystemWallet.Primitives.Passkeys
 
         public byte[] Encode()
         {
+            clientDataJson = clientDataJson.Replace("\n", "").Replace(" ", "");
             int challengeIndex = clientDataJson.IndexOf("\"challenge\"");
             int typeIndex = clientDataJson.IndexOf("\"type\"");
-
+            
             int authDataSize = authenticatorData.Length;
             int clientDataJSONSize = clientDataJson.Length;
 
@@ -46,33 +48,33 @@ namespace Sequence.EcosystemWallet.Primitives.Passkeys
             if (embedMetadata)
                 flags |= (1 << 6); // 0x40
 
-            var result = new List<byte> { flags };
+            var result = new List<byte[]> { new [] { flags } };
 
             if (embedMetadata)
             {
                 if (!publicKey.metadata.IsValid)
                     throw new Exception("Metadata is not present in the public key");
 
-                result.AddRange(publicKey.metadata.Encode());
+                result.Add(publicKey.metadata.Encode());
             }
 
-            result.AddRange(authDataSize.ByteArrayFromNumber(bytesAuthDataSize));
-            result.AddRange(authenticatorData);
+            result.Add(authDataSize.ByteArrayFromNumber(bytesAuthDataSize));
+            result.Add(authenticatorData);
 
             var clientDataBytes = Encoding.UTF8.GetBytes(clientDataJson);
-            result.AddRange(clientDataBytes.Length.ByteArrayFromNumber(bytesClientDataJSONSize));
-            result.AddRange(clientDataBytes);
+            result.Add(clientDataBytes.Length.ByteArrayFromNumber(bytesClientDataJSONSize));
+            result.Add(clientDataBytes);
+            
+            result.Add(challengeIndex.ByteArrayFromNumber(bytesChallengeIndex));
+            result.Add(typeIndex.ByteArrayFromNumber(bytesTypeIndex));
 
-            result.AddRange(challengeIndex.ByteArrayFromNumber(bytesChallengeIndex));
-            result.AddRange(typeIndex.ByteArrayFromNumber(bytesTypeIndex));
+            result.Add(r.PadLeft(32));
+            result.Add(s.PadLeft(32));
 
-            result.AddRange(r.PadLeft(32));
-            result.AddRange(s.PadLeft(32));
+            result.Add(publicKey.x.HexStringToByteArray());
+            result.Add(publicKey.y.HexStringToByteArray());
 
-            result.AddRange(publicKey.x.HexStringToByteArray());
-            result.AddRange(publicKey.y.HexStringToByteArray());
-
-            return result.ToArray();
+            return ByteArrayExtensions.ConcatenateByteArrays(result.ToArray());
         }
         
         public static DecodedSignature Decode(byte[] data)
@@ -113,7 +115,7 @@ namespace Sequence.EcosystemWallet.Primitives.Passkeys
             offset += bytesClientDataJSONSize;
             var clientDataJSONBytes = data.SubArray(offset, clientDataJSONSize);
             offset += clientDataJSONSize;
-            string clientDataJSON = Encoding.UTF8.GetString(clientDataJSONBytes);
+            string clientDataJSON = Encoding.UTF8.GetString(clientDataJSONBytes).Replace("\\", "");
 
             int challengeIndex = data.SubArray(offset, bytesChallengeIndex).ToInteger();
             offset += bytesChallengeIndex;
