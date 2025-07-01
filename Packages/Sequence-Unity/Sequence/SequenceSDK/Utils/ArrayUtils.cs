@@ -125,5 +125,22 @@ namespace Sequence.Utils
             Array.Copy(input, start, result, 0, length);
             return result;
         }
+        
+        public static T[] SubArray<T>(this T[] array, int startIndex, int? length = null)
+        {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+            if (startIndex < 0 || startIndex > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+
+            int actualLength = length ?? (array.Length - startIndex);
+
+            if (actualLength < 0 || startIndex + actualLength > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            T[] result = new T[actualLength];
+            Array.Copy(array, startIndex, result, 0, actualLength);
+            return result;
+        }
     }
 }

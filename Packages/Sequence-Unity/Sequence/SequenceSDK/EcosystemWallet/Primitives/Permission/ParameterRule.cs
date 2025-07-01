@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Sequence.Utils;
+using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -14,6 +16,18 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger offset;
         public byte[] mask;
 
+        public object ToJson()
+        {
+            return new
+            {
+                cumulative = cumulative,
+                operation = operation,
+                value = value.ByteArrayToHexStringWithPrefix(),
+                offset = offset.ToString(),
+                mask = mask.ByteArrayToHexStringWithPrefix()
+            };
+        }
+
         public byte[] Encode()
         {
             byte operationCumulative = (byte)(((byte)operation << 1) | (cumulative ? 1 : 0));
@@ -22,6 +36,19 @@ namespace Sequence.EcosystemWallet.Primitives
             result.AddRange(offset.ToByteArray().PadLeft(32));
             result.AddRange(mask.PadLeft(32));
             return result.ToArray();
+        }
+        
+        public static ParameterRule FromJson(string json)
+        {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            return new()
+            {
+                cumulative = (bool)data["cumulative"],
+                operation = (ParameterOperation)Convert.ToInt32(data["operation"]),
+                value = data["value"].ToString().HexStringToByteArray(),
+                offset = BigInteger.Parse(data["offset"].ToString()),
+                mask = data["mask"].ToString().HexStringToByteArray()
+            };
         }
 
         public static ParameterRule Decode(byte[] data)

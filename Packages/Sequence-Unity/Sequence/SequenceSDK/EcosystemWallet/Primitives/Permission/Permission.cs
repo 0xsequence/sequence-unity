@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -12,6 +14,15 @@ namespace Sequence.EcosystemWallet.Primitives
         
         public Address target;
         public ParameterRule[] rules;
+
+        public object ToJson()
+        {
+            return new
+            {
+                target = target.Value,
+                rules = rules.Select(rule => rule.ToJson()).ToArray(),
+            };
+        }
 
         public byte[] Encode()
         {
@@ -28,6 +39,18 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             return result.ToArray();
+        }
+
+        public static Permission FromJson(string json)
+        {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            return new()
+            {
+                target = new Address((string)data["target"]),
+                rules = JsonConvert.DeserializeObject<List<object>>(data["rules"].ToString())
+                    .Select(r => ParameterRule.FromJson(r.ToString()))
+                    .ToArray(),
+            };
         }
 
         public static (Permission Permission, int Consumed) Decode(byte[] data, int offset)
