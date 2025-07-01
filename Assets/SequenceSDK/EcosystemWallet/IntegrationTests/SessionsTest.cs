@@ -95,7 +95,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests
         
         public Task<string> SessionImplicitRemoveBlacklistAddress(Dictionary<string, object> parameters)
         {
-            throw new NotImplementedException();
+            var address = new Address((string)parameters["address"]);
+            var sessionTopology = SessionsTopology.FromJson(parameters["sessionTopology"].ToString());
+            sessionTopology.RemoveFromImplicitBlacklist(address);
+            
+            return Task.FromResult(sessionTopology.JsonSerialize());
         }
     }
 }
