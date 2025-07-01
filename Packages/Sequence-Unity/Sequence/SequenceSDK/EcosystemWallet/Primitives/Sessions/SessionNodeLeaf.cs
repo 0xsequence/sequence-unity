@@ -6,7 +6,7 @@ namespace Sequence.EcosystemWallet.Primitives
     {
         public byte[] Value { get; set; }
 
-        public object ToJson()
+        public object ToJsonObject()
         {
             return Value.ByteArrayToHexStringWithPrefix();
         }

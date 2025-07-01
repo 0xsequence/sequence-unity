@@ -38,40 +38,12 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public string JsonSerialize()
         {
-            return JsonConvert.SerializeObject(ToJson());
-        }
-
-        public object ToJson()
-        {
-            if (this.IsBranch())
-                return Branch.ToJson();
-
-            if (this.IsLeaf())
-                return Leaf.ToJson();
-
-            if (this.IsNode())
-                return Node.ToJson();
-            
-            throw new Exception("Invalid topology.");
+            return JsonConvert.SerializeObject(this.ToJsonObject());
         }
         
         public string ImageHash()
         {
             return this.Hash(true);
-        }
-
-        public byte[] Encode()
-        {
-            if (this.IsBranch())
-                return Branch.Encode();
-
-            if (this.IsLeaf())
-                return Leaf.Encode();
-
-            if (this.IsNode())
-                return Node.Encode();
-            
-            throw new Exception("Invalid topology.");
         }
 
         /// <summary>

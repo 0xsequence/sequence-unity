@@ -8,7 +8,7 @@ namespace Sequence.EcosystemWallet.Primitives
     {
         public Address[] blacklist;
 
-        public override object ToJson()
+        public override object ToJsonObject()
         {
             return new
             {

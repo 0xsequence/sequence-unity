@@ -5,8 +5,5 @@ namespace Sequence.EcosystemWallet.Primitives
         IBranch Branch { get; }
         ILeaf Leaf { get; }
         INode Node { get; }
-
-        object ToJson();
-        byte[] Encode();
     }
 }

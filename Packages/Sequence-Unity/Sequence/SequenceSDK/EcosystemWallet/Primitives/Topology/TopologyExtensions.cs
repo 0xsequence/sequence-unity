@@ -22,6 +22,34 @@ namespace Sequence.EcosystemWallet.Primitives
             return topology.Node != null;
         }
         
+        public static object ToJsonObject(this ITopology topology)
+        {
+            if (topology.IsBranch())
+                return topology.Branch.ToJsonObject();
+
+            if (topology.IsLeaf())
+                return topology.Leaf.ToJsonObject();
+
+            if (topology.IsNode())
+                return topology.Node.ToJsonObject();
+            
+            throw new Exception("Invalid topology.");
+        }
+
+        public static byte[] Encode(this ITopology topology)
+        {
+            if (topology.IsBranch())
+                return topology.Branch.Encode();
+
+            if (topology.IsLeaf())
+                return topology.Leaf.Encode();
+
+            if (topology.IsNode())
+                return topology.Node.Encode();
+            
+            throw new Exception("Invalid topology.");
+        }
+        
         public static string Hash(this ITopology topology, bool raw = false)
         {
             if (topology.IsBranch())

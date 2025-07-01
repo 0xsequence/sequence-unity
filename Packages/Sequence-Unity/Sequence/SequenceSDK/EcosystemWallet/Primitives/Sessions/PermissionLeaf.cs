@@ -6,7 +6,7 @@ namespace Sequence.EcosystemWallet.Primitives
     {
         public SessionPermissions permissions;
         
-        public override object ToJson()
+        public override object ToJsonObject()
         {
             return permissions.ToJson();
         }

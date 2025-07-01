@@ -2,7 +2,7 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public interface ILeaf
     {
-        object ToJson();
+        object ToJsonObject();
         byte[] Encode();
         byte[] EncodeRaw();
     }

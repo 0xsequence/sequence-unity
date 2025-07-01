@@ -4,7 +4,7 @@ namespace Sequence.EcosystemWallet.Primitives
     {
         byte[] Value { get; }
 
-        object ToJson();
+        object ToJsonObject();
         byte[] Encode();
     }
 }
