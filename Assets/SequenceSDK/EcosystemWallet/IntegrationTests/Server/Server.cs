@@ -31,7 +31,9 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 ["signature_encode"] = async (parameters) => await new SignatureTests().SignatureEncode(parameters),
                 ["signature_concat"] = async (parameters) => await new SignatureTests().SignatureConcat(parameters),
                 ["signature_decode"] = async (parameters) => await new SignatureTests().SignatureDecode(parameters),
-                // SESSIONS
+                // ADDRESS
+                ["address_calculate"] = async (parameters) => await new AddressTests().Calculate(parameters),
+                // SESSION
                 ["session_empty"] = async (parameters) => await new SessionsTest().SessionEmpty(parameters),
                 ["session_encodeTopology"] = async (parameters) => await new SessionsTest().SessionEncodeTopology(parameters),
                 ["session_encodeCallSignatures"] = async (parameters) => await new SessionsTest().SessionEncodeCallSignatures(parameters),

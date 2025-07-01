@@ -13,7 +13,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
     {
         public Task<string> SessionEmpty(Dictionary<string, object> parameters)
         {
-            var identitySigner = parameters["identitySigner"].ToString();
+            var identitySigner = (string)parameters["identitySigner"];
             var topology = SessionsUtils.CreateSessionsTopologyWithSingleIdentity(identitySigner);
 
             return Task.FromResult(topology.JsonSerialize());
