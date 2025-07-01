@@ -14,7 +14,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             var leaves = leavesInput.Split(' ').Select(RecoveryLeaf.FromInput).ToArray();
             var topology = RecoveryTopology.FromLeaves(leaves);
 
-            return Task.FromResult(topology.Hash());
+            return Task.FromResult(topology.Hash(true));
         }
         
         public Task<string> Encode(Dictionary<string, object> parameters)
@@ -44,7 +44,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             var encoded = encodedStr.HexStringToByteArray();
             var decoded = RecoveryTopology.Decode(encoded);
             
-            return Task.FromResult(decoded.Hash());
+            return Task.FromResult(decoded.Hash(true));
         }
     }
 }

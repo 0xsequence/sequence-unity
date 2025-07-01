@@ -13,7 +13,9 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public byte[] Encode()
         {
-            return Value;
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                RecoveryTopology.FlagNode.ByteArrayFromNumber(1), 
+                Value);
         }
     }
 }

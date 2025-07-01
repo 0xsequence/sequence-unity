@@ -1,11 +1,14 @@
 using System;
 using System.Numerics;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
     public class RecoveryLeaf : ILeaf
     {
+        private static byte[] HashPrefix = "Sequence recovery leaf:\n".ToByteArray();
+        
         public Address signer;
         public BigInteger requiredDeltaTime;
         public BigInteger minTimestamp;
@@ -24,14 +27,18 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             return ByteArrayExtensions.ConcatenateByteArrays(
                 RecoveryTopology.FlagLeaf.ByteArrayFromNumber(1),
-                signer.Value.HexStringToByteArray(),
-                requiredDeltaTime.ByteArrayFromNumber(32),
-                minTimestamp.ByteArrayFromNumber(32));
+                signer.Value.HexStringToByteArray(20),
+                requiredDeltaTime.ByteArrayFromNumber(3),
+                minTimestamp.ByteArrayFromNumber(8));
         }
 
         public byte[] EncodeRaw()
         {
-            return Encode();
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                HashPrefix,
+                signer.Value.HexStringToByteArray(20),
+                requiredDeltaTime.ByteArrayFromNumber(32),
+                minTimestamp.ByteArrayFromNumber(32));
         }
         
         public static RecoveryLeaf FromInput(string input)
@@ -49,7 +56,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
             return new RecoveryLeaf
             {
-                signer = new Address(address),
+                signer = new Address(address.ToLower()),
                 requiredDeltaTime = BigInteger.Parse(requiredDeltaTimeStr),
                 minTimestamp = BigInteger.Parse(minTimestampStr)
             };

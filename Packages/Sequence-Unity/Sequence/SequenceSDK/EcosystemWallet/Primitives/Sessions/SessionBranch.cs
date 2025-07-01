@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -29,6 +31,22 @@ namespace Sequence.EcosystemWallet.Primitives
             Children = children;
         }
 
+        public byte[] Encode()
+        {
+            var encodings = Children.Select(child => child.Encode()).ToArray();
+            var encoded = ByteArrayExtensions.ConcatenateByteArrays(encodings);
+            var encodedSize = encoded.Length.MinBytesFor();
+            if (encodedSize > 15)
+                throw new Exception("Session Branch is too large.");
+            
+            var flag = (SessionsTopology.FlagBranch << 4) | encodedSize;
+            
+            return ByteArrayExtensions.ConcatenateByteArrays(
+                flag.ByteArrayFromNumber(flag.MinBytesFor()), 
+                encoded.Length.ByteArrayFromNumber(encodedSize), 
+                encoded);
+        }
+        
         public SessionsTopology ToTopology()
         {
             return new SessionsTopology(this);

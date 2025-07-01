@@ -35,7 +35,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 if (leaf.signer.Equals(signer))
                     return this;
 
-                var node = new RecoveryNode { Value = this.Hash().HexStringToByteArray() };
+                var node = new RecoveryNode { Value = this.Hash(true).HexStringToByteArray() };
                 return new RecoveryTopology(node);
             }
 
@@ -49,7 +49,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
                 if (left.IsNode() && right.IsNode())
                 {
-                    var node = new RecoveryNode { Value = this.Hash().HexStringToByteArray() };
+                    var node = new RecoveryNode { Value = this.Hash(true).HexStringToByteArray() };
                     return new RecoveryTopology(node);
                 }
 
