@@ -1,4 +1,3 @@
-using System.Linq;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives

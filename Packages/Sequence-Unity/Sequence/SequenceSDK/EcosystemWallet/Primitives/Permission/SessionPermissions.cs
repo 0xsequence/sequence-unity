@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -35,10 +36,10 @@ namespace Sequence.EcosystemWallet.Primitives
 
             List<byte> result = new();
             result.AddRange(signer.ToString().HexStringToByteArray().PadLeft(20));
-            result.AddRange(valueLimit.ToByteArray().PadLeft(32));
-            result.AddRange(deadline.ToByteArray().PadLeft(32));
+            result.AddRange(valueLimit.ByteArrayFromNumber(32));
+            result.AddRange(deadline.ByteArrayFromNumber(8));
             result.Add((byte)permissions.Length);
-
+            
             foreach (var permission in permissions) {
                 result.AddRange(permission.Encode());
             }

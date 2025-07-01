@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using NUnit.Framework;
 using Sequence.ABI;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -77,13 +75,13 @@ namespace Sequence.EcosystemWallet.Primitives
                 var branchList = Branch.Children
                     .Select(branch => branch.Minimise(explicitSigners, implicitSigners))
                     .ToArray();
-
+                
                 if (branchList.All(b => b.IsLeaf && b.Leaf is SessionNodeLeaf))
                 {
                     var nodeBytes = branchList
-                        .Select(node => node.Encode())
+                        .Select(node => (node.Leaf as SessionNodeLeaf)?.Value)
                         .ToArray();
-
+                    
                     var concatenated = ByteArrayExtensions.ConcatenateByteArrays(nodeBytes);
                     return new SessionNodeLeaf
                     {
@@ -98,7 +96,7 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 if (explicitSigners.Contains(permissionLeaf.permissions.signer))
                     return this;
-
+                
                 return new SessionNodeLeaf
                 {
                     Value = Hash().HexStringToByteArray()

@@ -1,4 +1,5 @@
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -18,6 +19,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public override byte[] Encode()
         {
             var flag = SessionsTopology.FlagIdentitySigner << 4;
+            Debug.Log($"IdentitySignerLeaf {ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()), identitySigner.Value.HexStringToByteArray()).ByteArrayToHexStringWithPrefix()}");
             return ByteArrayExtensions.ConcatenateByteArrays(flag.ByteArrayFromNumber(flag.MinBytesFor()),
                 identitySigner.Value.HexStringToByteArray());
         }

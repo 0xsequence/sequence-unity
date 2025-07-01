@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -31,11 +32,12 @@ namespace Sequence.EcosystemWallet.Primitives
             var encodedSize = encoded.Length.MinBytesFor();
             if (encodedSize > 15)
                 throw new Exception("Session Branch is too large.");
-
+            
             var flag = (SessionsTopology.FlagBranch << 4) | encodedSize;
+            
             return ByteArrayExtensions.ConcatenateByteArrays(
                 flag.ByteArrayFromNumber(flag.MinBytesFor()), 
-                encodedSize.ByteArrayFromNumber(encodedSize), 
+                encoded.Length.ByteArrayFromNumber(encodedSize), 
                 encoded);
         }
 

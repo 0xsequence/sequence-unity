@@ -13,15 +13,13 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 type = ImplicitBlacklistType,
-                blacklist = blacklist.Select(a => a.Value).ToArray(),
+                blacklist = blacklist.Select(a => a.Value).ToArray() ,
             };
         }
 
         public override byte[] Encode()
         {
-            var encoded = ByteArrayExtensions.ConcatenateByteArrays(blacklist
-                .Select(hex => hex.Value.HexStringToByteArray())
-                .ToArray());
+            var encoded = EncodeBlacklist();
 
             var count = blacklist.Length;
             if (count >= 0x0f)
@@ -39,6 +37,13 @@ namespace Sequence.EcosystemWallet.Primitives
 
             var flagByte = (SessionsTopology.FlagBlacklist << 4) | count;
             return ByteArrayExtensions.ConcatenateByteArrays(flagByte.ByteArrayFromNumber(flagByte.MinBytesFor()), encoded);
+        }
+
+        private byte[] EncodeBlacklist()
+        {
+            return ByteArrayExtensions.ConcatenateByteArrays(blacklist
+                .Select(hex => hex.Value.HexStringToByteArray())
+                .ToArray());
         }
     }
 }

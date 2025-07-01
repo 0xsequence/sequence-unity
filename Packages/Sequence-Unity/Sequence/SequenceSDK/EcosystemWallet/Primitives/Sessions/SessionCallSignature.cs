@@ -24,17 +24,16 @@ namespace Sequence.EcosystemWallet.Primitives
                 throw new Exception("Incomplete topology");
 
             sessionsTopology = sessionsTopology.Minimise(explicitSigners, implicitSigners);
-            Debug.Log(sessionsTopology.JsonSerialize());
+            
+            Debug.Log($"{sessionsTopology.JsonSerialize()}");
 
             var encodedTopology = sessionsTopology.Encode();
             if (encodedTopology.Length.MinBytesFor() > 3)
                 throw new Exception("Session topology is too large");
-
+            
             parts.Add(encodedTopology.Length.ByteArrayFromNumber(3));
             parts.Add(encodedTopology);
 
-            Debug.Log($"{encodedTopology.ByteArrayToHexStringWithPrefix()}");
-            
             var attestationMap = new Dictionary<string, int>();
             var encodedAttestations = new List<byte[]>();
 
