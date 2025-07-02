@@ -1,4 +1,3 @@
-using System;
 using Sequence.ABI;
 using Sequence.Utils;
 

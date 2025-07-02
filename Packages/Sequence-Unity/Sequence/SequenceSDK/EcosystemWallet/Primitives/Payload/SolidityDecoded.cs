@@ -37,7 +37,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public static SolidityDecoded FromSolidityEncoding(string solidityEncodedPayload)
         {
-            solidityEncodedPayload = solidityEncodedPayload.Replace("0x", "").Substring(64); // Drop the first 32 bytes; for some reason we include an offset of 32 bytes in all of the encodings - todo ask Agustin why
+            solidityEncodedPayload = solidityEncodedPayload.Replace("0x", "").Substring(64);
             object[] decoded = ABI.ABI.Decode<object[]>(solidityEncodedPayload, DecodedAbi);
             return new SolidityDecoded(
                 kind : ToKind((BigInteger)decoded[0]),
