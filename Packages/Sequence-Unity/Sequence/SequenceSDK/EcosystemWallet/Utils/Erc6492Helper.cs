@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Nethereum.ABI;
 using Nethereum.ABI.FunctionEncoding;
@@ -8,7 +7,6 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Web3;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Utils
 {
