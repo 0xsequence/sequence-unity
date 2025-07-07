@@ -4,8 +4,8 @@ using NUnit.Framework;
 using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Sequence.EmbeddedWallet;
 using Sequence;
+using Sequence.Sidekick;
 public class SidekickERC1155MintTest
 {
     private SequenceSidekickClient sidekick;

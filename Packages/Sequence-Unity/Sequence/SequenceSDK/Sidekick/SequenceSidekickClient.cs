@@ -3,8 +3,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Sequence.Sidekick.Config;
 
-namespace Sequence.EmbeddedWallet
+namespace Sequence.Sidekick
 {
     public class SequenceSidekickClient
     {
@@ -47,7 +48,7 @@ namespace Sequence.EmbeddedWallet
 
             using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url))
             {
-                request.Headers.Add("x-secret-key", Resources.Load<SidekickConfig>("SidekickConfig").secretKey);
+                request.Headers.Add("x-secret-key", Resources.Load<SidekickConfig>("SidekickConfig").SecretKey);
 
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 request.Content = content;

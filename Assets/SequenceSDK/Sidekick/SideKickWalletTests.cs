@@ -2,21 +2,9 @@ using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
-using Sequence;
-using Sequence.EmbeddedWallet;
+using Sequence.Sidekick;
 public class SequenceSidekickTests
 {
-    SequenceSidekickClient sidekick;
-    string chainId;
-
-    [SetUp]
-    public void Setup()
-    {
-        sidekick = new SequenceSidekickClient(Chain.TestnetArbitrumSepolia);
-        chainId = sidekick.Chain.GetChainId();
-
-    }
-
     [Test]
     public async Task TestGetWalletAddress()
     {

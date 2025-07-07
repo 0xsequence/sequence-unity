@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Sequence.Sidekick.Config;
 public static class SidekickDockerUtility
 {
     private static SidekickConfig config;
@@ -20,7 +21,7 @@ public static class SidekickDockerUtility
                     return string.Empty;
                 }
             }
-            return config.sidekickPath;
+            return config.SidekickPath;
         }
     }
 
@@ -37,7 +38,7 @@ public static class SidekickDockerUtility
                     return string.Empty;
                 }
             }
-            return config.dockerDesktopPath;
+            return config.DockerDesktopPath;
         }
     }
 
@@ -112,9 +113,9 @@ public static class SidekickDockerUtility
         {
             if (!Process.GetProcessesByName("Docker Desktop").Any())
             {
-                if (File.Exists(config.dockerDesktopPath))
+                if (File.Exists(config.DockerDesktopPath))
                 {
-                    Process.Start(config.dockerDesktopPath);
+                    Process.Start(config.DockerDesktopPath);
                 }
                 else
                 {
