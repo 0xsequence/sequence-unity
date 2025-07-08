@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Sequence.Utils;
 using Unity.Plastic.Newtonsoft.Json;
@@ -10,6 +11,9 @@ namespace Sequence.EcosystemWallet.Primitives
     [Serializable]
     public class ParameterRule
     {
+        public static readonly byte[] SelectorMask = "0xffffffff".HexStringToByteArray(32);
+        public static readonly byte[] Uint256Mask = Enumerable.Repeat((byte)0xff, 32).ToArray().PadLeft(32);
+        
         public bool cumulative;
         public ParameterOperation operation;
         public byte[] value; 
