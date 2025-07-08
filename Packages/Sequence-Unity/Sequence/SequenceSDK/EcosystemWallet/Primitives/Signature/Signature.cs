@@ -1,7 +1,0 @@
-namespace Sequence.EcosystemWallet.Primitives
-{
-    internal class Signature
-    {
-        
-    }
-}

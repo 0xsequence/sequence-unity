@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -13,6 +16,18 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger deadline;
         public Permission[] permissions;
 
+        public object ToJson()
+        {
+            return new
+            {
+                type = SessionLeaf.SessionPermissionsType,
+                signer = signer.Value,
+                valueLimit = valueLimit.ToString(),
+                deadline = deadline.ToString(),
+                permissions = permissions.Select(permission => permission.ToJson()).ToArray()
+            };
+        }
+
         public byte[] Encode()
         {
             if (permissions.Length > Permission.MAX_PERMISSIONS_COUNT) {
@@ -21,10 +36,10 @@ namespace Sequence.EcosystemWallet.Primitives
 
             List<byte> result = new();
             result.AddRange(signer.ToString().HexStringToByteArray().PadLeft(20));
-            result.AddRange(valueLimit.ToByteArray().PadLeft(32));
-            result.AddRange(deadline.ToByteArray().PadLeft(32));
+            result.AddRange(valueLimit.ByteArrayFromNumber(32));
+            result.AddRange(deadline.ByteArrayFromNumber(8));
             result.Add((byte)permissions.Length);
-
+            
             foreach (var permission in permissions) {
                 result.AddRange(permission.Encode());
             }
@@ -66,6 +81,20 @@ namespace Sequence.EcosystemWallet.Primitives
                 valueLimit = valueLimit,
                 deadline = deadline,
                 permissions = permissions
+            };
+        }
+
+        public static SessionPermissions FromJson(string json)
+        {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            return new SessionPermissions
+            {
+                signer = new Address((string)data["signer"]),
+                valueLimit = BigInteger.Parse((string)data["valueLimit"]),
+                deadline = BigInteger.Parse((string)data["deadline"]),
+                permissions = JsonConvert.DeserializeObject<object[]>(data["permissions"].ToString())
+                    .Select(p => Permission.FromJson(p.ToString()))
+                    .ToArray()
             };
         }
     }

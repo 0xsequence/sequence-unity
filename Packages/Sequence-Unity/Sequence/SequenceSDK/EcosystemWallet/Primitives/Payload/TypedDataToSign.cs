@@ -1,16 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
-using UnityEngine;
 using UnityEngine.Scripting;
 using Nethereum.ABI.EIP712;
-using Nethereum.Util;
 
 namespace Sequence.EcosystemWallet.Primitives
 {

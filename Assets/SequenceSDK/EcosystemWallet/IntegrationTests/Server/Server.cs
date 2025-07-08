@@ -15,10 +15,43 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
         public static readonly Dictionary<string, Func<Dictionary<string, object>, Task<object>>> Methods =
             new Dictionary<string, Func<Dictionary<string, object>, Task<object>>>
             {
+                // PAYLOAD
                 ["payload_toAbi"] = async (parameters) => await new PayloadTests().PayloadToAbi(parameters),
                 ["payload_toPacked"] = async (parameters) => await new PayloadTests().PayloadToPacked(parameters),
                 ["payload_toJson"] = async (parameters) => await new PayloadTests().PayloadToJson(parameters),
                 ["payload_hashFor"] = async (parameters) => await new PayloadTests().PayloadHashFor(parameters),
+                // CONFIG
+                ["config_new"] = async (parameters) => await new ConfigTests().ConfigNew(parameters),
+                ["config_encode"] = async (parameters) => await new ConfigTests().ConfigEncode(parameters),
+                ["config_imageHash"] = async (parameters) => await new ConfigTests().ConfigImageHash(parameters),
+                // DEV TOOLS
+                ["devTools_randomConfig"] = async (parameters) => await new DevToolsTest().DevToolsRandomConfig(parameters),
+                ["devTools_randomSessionTopology"] = async (parameters) => await new DevToolsTest().DevToolsRandomSessionTopology(parameters),
+                // SIGNATURE
+                ["signature_encode"] = async (parameters) => await new SignatureTests().SignatureEncode(parameters),
+                ["signature_concat"] = async (parameters) => await new SignatureTests().SignatureConcat(parameters),
+                ["signature_decode"] = async (parameters) => await new SignatureTests().SignatureDecode(parameters),
+                // ADDRESS
+                ["address_calculate"] = async (parameters) => await new AddressTests().Calculate(parameters),
+                // SESSION
+                ["session_empty"] = async (parameters) => await new SessionsTest().SessionEmpty(parameters),
+                ["session_encodeTopology"] = async (parameters) => await new SessionsTest().SessionEncodeTopology(parameters),
+                ["session_encodeCallSignatures"] = async (parameters) => await new SessionsTest().SessionEncodeCallSignatures(parameters),
+                ["session_imageHash"] = async (parameters) => await new SessionsTest().SessionImageHash(parameters),
+                ["session_explicit_add"] = async (parameters) => await new SessionsTest().SessionExplicitAdd(parameters),
+                ["session_explicit_remove"] = async (parameters) => await new SessionsTest().SessionExplicitRemove(parameters),
+                ["session_implicit_addBlacklistAddress"] = async (parameters) => await new SessionsTest().SessionImplicitAddBlacklistAddress(parameters),
+                ["session_implicit_removeBlacklistAddress"] = async (parameters) => await new SessionsTest().SessionImplicitRemoveBlacklistAddress(parameters),
+                // RECOVERY
+                ["recovery_hashFromLeaves"] = async (parameters) => await new RecoveryTests().HashFromLeaves(parameters),
+                ["recovery_encode"] = async (parameters) => await new RecoveryTests().Encode(parameters),
+                ["recovery_trim"] = async (parameters) => await new RecoveryTests().Trim(parameters),
+                ["recovery_hashEncoded"] = async (parameters) => await new RecoveryTests().HashEncoded(parameters),
+                // PASSKEYS
+                ["passkeys_encodeSignature"] = async (parameters) => await new PasskeysTests().EncodeSignature(parameters),
+                ["passkeys_decodeSignature"] = async (parameters) => await new PasskeysTests().DecodeSignature(parameters),
+                ["passkeys_computeRoot"] = async (parameters) => await new PasskeysTests().ComputeRoot(parameters),
+                ["passkeys_validateSignature"] = async (parameters) => await new PasskeysTests().ValidateSignature(parameters),
             };
 
         public async Task<JsonRpcResponse> HandleSingleRequest(
@@ -33,12 +66,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
 
             if (!silent)
             {
-                Debug.Log($"[{DateTime.UtcNow:O}] Processing request: method={method} id={id}");
-            }
-
-            if (debug && !silent)
-            {
-                Debug.Log("Request details: " + JsonConvert.SerializeObject(rpcRequest, Formatting.Indented));
+                Debug.Log($"Processing request: method={method} id={id} payload={JsonConvert.SerializeObject(rpcRequest, Formatting.Indented)}");
             }
 
             if (jsonrpc != "2.0")
@@ -47,7 +75,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                     new JsonRpcErrorResponse(new JsonRpcErrorResponse.Error(-32600, "Invalid JSON-RPC version"), id);
                 if (!silent)
                 {
-                    Debug.LogError($"[{DateTime.UtcNow:O}] Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)}");
+                    Debug.LogError($"Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)}");
                 }
 
                 return error;
@@ -58,7 +86,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 JsonRpcErrorResponse error = new JsonRpcErrorResponse(new JsonRpcErrorResponse.Error(-32601, $"Method not found: {method}"), id);
                 if (!silent)
                 {
-                    Debug.LogError($"[{DateTime.UtcNow:O}] Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)}");
+                    Debug.LogError($"Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)}");
                 }
                 return error;
             }
@@ -66,13 +94,6 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
             try
             {
                 Dictionary<string, object> methodParams;
-                
-                if (debug && !silent)
-                {
-                    Debug.Log($"[{DateTime.UtcNow:O}] Raw params: {JsonConvert.SerializeObject(@params)}");
-                }
-                
-                // Convert params to JObject for more flexible parsing if needed
                 Newtonsoft.Json.Linq.JObject paramsJObject = null;
                 if (@params is Dictionary<string, object> paramsDict)
                 {
@@ -90,20 +111,11 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                     Debug.LogWarning("No method params");
                 }
                 
-                if (debug && !silent)
-                {
-                    Debug.Log($"[{DateTime.UtcNow:O}] Final methodParams: {JsonConvert.SerializeObject(methodParams)}");
-                }
-                
                 var result = await Methods[method](methodParams);
                 JsonRpcSuccessResponse response = new JsonRpcSuccessResponse(result, id);
                 if (!silent)
                 {
-                    Debug.Log($"[{DateTime.UtcNow:O}] Success Response for Method={method} id={id}");
-                    if (debug)
-                    {
-                        Debug.Log("Response details: " + JsonConvert.SerializeObject(response, Formatting.Indented));
-                    }
+                    Debug.Log($"Response details for Method={method}: " + JsonConvert.SerializeObject(response, Formatting.Indented) + $", Params used = {JsonConvert.SerializeObject(methodParams)}");
                 }
                 return response;
             }
@@ -112,7 +124,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests.Server
                 JsonRpcErrorResponse error = new JsonRpcErrorResponse(new JsonRpcErrorResponse.Error(-32000, $"Unknown error: {ex.Message}"), id);
                 if (!silent)
                 {
-                    Debug.LogError($"[{DateTime.UtcNow:O}] Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)}");
+                    Debug.LogError($"Error response: {(debug ? JsonConvert.SerializeObject(error) : error.error.message)} {ex.StackTrace}");
                 }
                 return error;
             }

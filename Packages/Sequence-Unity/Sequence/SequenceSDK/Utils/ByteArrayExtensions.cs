@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using UnityEngine;
@@ -31,6 +32,28 @@ namespace Sequence.Utils
                 Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
+        }
+        
+        public static BigInteger ToBigInteger(this byte[] data)
+        {
+            if (data == null || data.Length == 0)
+                return BigInteger.Zero;
+            
+            var unsignedLittleEndian = ConcatenateByteArrays(data.Reverse().ToArray(), new byte[] { 0x00 });
+            return new BigInteger(unsignedLittleEndian);
+        }
+        
+        public static int ToInteger(this byte[] data)
+        {
+            if (data == null || data.Length == 0)
+                return 0;
+
+            if (data.Length > 4)
+                throw new ArgumentOutOfRangeException(nameof(data), "Too many bytes to fit into an int (max 4).");
+
+            byte[] padded = new byte[4];
+            Array.Copy(data.Reverse().ToArray(), 0, padded, 0, data.Length);
+            return BitConverter.ToInt32(padded, 0);
         }
 
         public static bool HasPrefix(this byte[] b, byte[] prefix) {
@@ -83,7 +106,9 @@ namespace Sequence.Utils
         public static byte[] PadLeft(this byte[] input, int totalSize)
         {
             if (input.Length > totalSize)
-                throw new ArgumentException("Input is larger than total size");
+            {
+                return input;
+            }
 
             byte[] result = new byte[totalSize];
             Buffer.BlockCopy(input, 0, result, totalSize - input.Length, input.Length);
@@ -116,6 +141,20 @@ namespace Sequence.Utils
             }
 
             return rawBytes;
+        }
+
+        public static int MinBytesFor(this int value)
+        {
+            return MinBytesFor(new BigInteger(value));
+        }
+        
+        public static int MinBytesFor(this BigInteger value)
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Value must be non-negative.");
+
+            var hex = value.BigIntegerToHexString().WithoutHexPrefix();
+            return (int)Math.Ceiling(hex.Length / 2.0);
         }
         
         public static byte[] ByteArrayFromNumber(this int value, int size)

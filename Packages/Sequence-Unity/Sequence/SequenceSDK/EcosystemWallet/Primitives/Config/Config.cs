@@ -1,12 +1,75 @@
+using System.Collections.Generic;
 using System.Numerics;
+using Newtonsoft.Json;
+using Sequence.ABI;
+using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class Config
+    public class Config
     {
         public BigInteger threshold;
         public BigInteger checkpoint;
         public Topology topology;
         public Address checkpointer;
+
+        public Leaf FindSignerLeaf(Address address)
+        {
+            return topology?.FindSignerLeaf(address);
+        }
+
+        public byte[] HashConfiguration()
+        {
+            if (topology == null)
+                return null;
+
+            byte[] root = topology.HashConfiguration();
+            
+            byte[] thresholdBytes = threshold.ByteArrayFromNumber(threshold.MinBytesFor()).PadLeft(32);
+            root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, thresholdBytes));
+            
+            byte[] checkpointBytes = checkpoint.ByteArrayFromNumber(checkpoint.MinBytesFor()).PadLeft(32);
+            root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, checkpointBytes));
+            
+            string checkpointerAddress = checkpointer?.Value ?? "0x0000000000000000000000000000000000000000";
+            byte[] checkpointerBytes = checkpointerAddress.HexStringToByteArray().PadLeft(32);
+            root = SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(root, checkpointerBytes));
+            
+            return root;
+        }
+
+        public string ToJson()
+        {
+            var jsonObject = new
+            {
+                threshold = threshold.ToString(),
+                checkpoint = checkpoint.ToString(),
+                topology = topology?.Parse(),
+                checkpointer = checkpointer?.Value
+            };
+
+            return JsonConvert.SerializeObject(jsonObject);
+        }
+
+        public static Config FromJson(string json)
+        {
+            var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            
+            var threshold = input["threshold"].ToString();
+            var checkpoint = input["checkpoint"].ToString();
+            var topology = input["topology"].ToString();
+            
+            var checkpointer = input.TryGetValue("checkpointer", out var value) && 
+                               value is string valueStr ? new Address(valueStr) : null;
+            
+            return new Config
+            {
+                threshold = BigInteger.Parse(threshold),
+                checkpoint = BigInteger.Parse(checkpoint),
+                checkpointer = checkpointer,
+                topology = Topology.Decode(topology)
+            };
+        }
     }
 }

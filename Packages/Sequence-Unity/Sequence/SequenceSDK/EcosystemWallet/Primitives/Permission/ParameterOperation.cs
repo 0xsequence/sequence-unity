@@ -4,11 +4,11 @@ using Sequence.Utils;
 namespace Sequence.EcosystemWallet.Primitives
 {
     [JsonConverter(typeof(EnumConverter<BehaviourOnError>))]
-    public enum ParameterOperation : byte
+    public enum ParameterOperation
     {
-        equal = 0x00,
-        notEqual = 0x01,
-        greaterThanOrEqual = 0x02,
-        lessThanOrEqual = 0x03
+        equal = 0,
+        notEqual = 1,
+        greaterThanOrEqual = 2,
+        lessThanOrEqual = 3
     }
 }

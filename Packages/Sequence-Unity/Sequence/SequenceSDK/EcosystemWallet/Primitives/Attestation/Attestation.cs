@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
@@ -6,7 +8,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class Attestation
+    public class Attestation
     {
         public static readonly byte[] ACCEPT_IMPLICIT_REQUEST_MAGIC_PREFIX =
             SequenceCoder.KeccakHash("acceptImplicitRequest".ToByteArray());
@@ -17,19 +19,6 @@ namespace Sequence.EcosystemWallet.Primitives
         public FixedByte audienceHash;
         public byte[] applicationData;
         public AuthData authData;
-
-        public Attestation(Address approvedSigner, FixedByte identityType, FixedByte issuerHash, FixedByte audienceHash, byte[] applicationData, AuthData authData)
-        {
-            this.approvedSigner = approvedSigner;
-            AssertHasSize(identityType, 4, nameof(identityType));
-            this.identityType = identityType;
-            AssertHasSize(issuerHash, 32, nameof(issuerHash));
-            this.issuerHash = issuerHash;
-            AssertHasSize(audienceHash, 32, nameof(audienceHash));
-            this.audienceHash = audienceHash;
-            this.applicationData = applicationData;
-            this.authData = authData;
-        }
 
         private void AssertHasSize(FixedByte obj, int size, string argumentName)
         {
@@ -48,6 +37,7 @@ namespace Sequence.EcosystemWallet.Primitives
             byte[] issuerHashBytes = issuerHash.Data.PadLeft(32);
             byte[] audienceHashBytes = audienceHash.Data.PadLeft(32);
             byte[] applicationDataLengthBytes = applicationData.Length.ByteArrayFromNumber(3);
+            
             return ByteArrayExtensions.ConcatenateByteArrays(approvedSignerBytes, identityTypeBytes, issuerHashBytes,
                 audienceHashBytes, applicationDataLengthBytes, applicationData, authDataBytes);
         }
@@ -58,26 +48,35 @@ namespace Sequence.EcosystemWallet.Primitives
             return SequenceCoder.KeccakHash(encoded);
         }
 
-        public string ToJson() // Todo make this a JsonConverter
+        public object ToJson()
         {
-            JsonAttestation jsonAble = new JsonAttestation(this);
-            return JsonConvert.ToString(jsonAble);
+            return new
+            {
+                approvedSigner = approvedSigner.Value,
+                identityType = identityType.Data.ByteArrayToHexStringWithPrefix(),
+                issuerHash = issuerHash.Data.ByteArrayToHexStringWithPrefix(),
+                audienceHash = audienceHash.Data.ByteArrayToHexStringWithPrefix(),
+                applicationData = applicationData.ByteArrayToHexStringWithPrefix(),
+                authData = new
+                {
+                    redirectUrl = authData.redirectUrl,
+                    issuedAt = authData.issuedAt.ToString()
+                }
+            };
         }
 
-        public Attestation(JsonAttestation jsonAble)
+        public static Attestation FromJson(string json)
         {
-            this.approvedSigner = jsonAble.approvedSigner;
-            this.identityType = new FixedByte(4, jsonAble.identityType.HexStringToByteArray());
-            this.issuerHash = new FixedByte(32, jsonAble.issuerHash.HexStringToByteArray());
-            this.audienceHash = new FixedByte(32, jsonAble.audienceHash.HexStringToByteArray());
-            this.applicationData = jsonAble.applicationData.HexStringToByteArray();
-            this.authData = jsonAble.authData;
-        }
-
-        public Attestation FromJson(string json) // Todo make this a JsonConverter
-        {
-            JsonAttestation jsonAble = JsonConvert.DeserializeObject<JsonAttestation>(json);
-            return new Attestation(jsonAble);
+            var jsonAble = JsonConvert.DeserializeObject<JsonAttestation>(json);
+            return new Attestation
+            {
+                approvedSigner = jsonAble.approvedSigner,
+                identityType = new FixedByte(4, jsonAble.identityType.HexStringToByteArray()),
+                issuerHash = new FixedByte(32, jsonAble.issuerHash.HexStringToByteArray()),
+                audienceHash = new FixedByte(32, jsonAble.audienceHash.HexStringToByteArray()),
+                applicationData = jsonAble.applicationData.HexStringToByteArray(),
+                authData = new AuthData(jsonAble.authData.redirectUrl, BigInteger.Parse(jsonAble.authData.issuedAt))
+            };
         }
 
         public byte[] GenerateImplicitRequestMagic(Address wallet)
@@ -88,18 +87,18 @@ namespace Sequence.EcosystemWallet.Primitives
         }
 
         [Serializable]
-        internal class JsonAttestation
+        public class JsonAttestation
         {
             public Address approvedSigner;
             public string identityType;
             public string issuerHash;
             public string audienceHash;
             public string applicationData;
-            public AuthData authData;
+            public JsonAuthData authData;
 
             [JsonConstructor]
             [Preserve]
-            public JsonAttestation(Address approvedSigner, string identityType, string issuerHash, string audienceHash, string applicationData, AuthData authData)
+            public JsonAttestation(Address approvedSigner, string identityType, string issuerHash, string audienceHash, string applicationData, JsonAuthData authData)
             {
                 this.approvedSigner = approvedSigner;
                 this.identityType = identityType;
@@ -116,7 +115,19 @@ namespace Sequence.EcosystemWallet.Primitives
                 this.issuerHash = attestation.issuerHash.Data.ByteArrayToHexStringWithPrefix();
                 this.audienceHash = attestation.audienceHash.Data.ByteArrayToHexStringWithPrefix();
                 this.applicationData = attestation.applicationData.ByteArrayToHexStringWithPrefix();
-                this.authData = attestation.authData;
+                this.authData = new JsonAuthData(attestation.authData.redirectUrl, attestation.authData.issuedAt.ToString());
+            }
+        }
+
+        public class JsonAuthData
+        {
+            public string redirectUrl;
+            public string issuedAt;
+            
+            public JsonAuthData(string redirectUrl, string issuedAt)
+            {
+                this.redirectUrl = redirectUrl;
+                this.issuedAt = issuedAt;
             }
         }
     }

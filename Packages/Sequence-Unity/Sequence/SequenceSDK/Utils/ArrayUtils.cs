@@ -114,5 +114,33 @@ namespace Sequence.Utils
             newArr[length] = obj;
             return newArr;
         }
+        
+        public static T[] Slice<T>(this T[] input, int start)
+        {
+            if (input == null || start >= input.Length)
+                return Array.Empty<T>();
+
+            int length = input.Length - start;
+            T[] result = new T[length];
+            Array.Copy(input, start, result, 0, length);
+            return result;
+        }
+        
+        public static T[] SubArray<T>(this T[] array, int startIndex, int? length = null)
+        {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+            if (startIndex < 0 || startIndex > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+
+            int actualLength = length ?? (array.Length - startIndex);
+
+            if (actualLength < 0 || startIndex + actualLength > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            T[] result = new T[actualLength];
+            Array.Copy(array, startIndex, result, 0, actualLength);
+            return result;
+        }
     }
 }

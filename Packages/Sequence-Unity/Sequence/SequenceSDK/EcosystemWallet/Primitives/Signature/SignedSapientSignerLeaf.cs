@@ -1,7 +1,12 @@
 namespace Sequence.EcosystemWallet.Primitives
 {
-    internal class SignedSapientSignerLeaf : SapientSignerLeaf
+    public class SignedSapientSignerLeaf : SapientSignerLeaf
     {
-        public bool signed = true;
+        public SignatureOfLeaf signature;
+
+        public override byte[] Encode(bool noChainId, byte[] checkpointerData)
+        {
+            return signature.Encode(this);
+        }
     }
 }
