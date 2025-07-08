@@ -54,6 +54,7 @@ namespace Sequence
         }
     }
 
+    [Preserve]
     internal class TokenConverter : JsonConverter<Token>
     {
         public override void WriteJson(JsonWriter writer, Token value, JsonSerializer serializer)
