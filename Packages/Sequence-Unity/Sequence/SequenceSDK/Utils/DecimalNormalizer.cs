@@ -71,7 +71,7 @@ namespace Sequence.Utils
         /// <returns></returns>
         public static float ReturnToNormal(BigInteger x, int decimals = 18)
         {
-            return float.Parse(ReturnToNormalString(x, decimals));
+            return float.Parse(ReturnToNormalString(x, decimals), CultureInfo.InvariantCulture);
         }
         
         /// <summary>
