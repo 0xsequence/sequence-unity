@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Numerics;
 using UnityEngine;
 
@@ -82,7 +83,7 @@ namespace Sequence.Utils
         /// <returns></returns>
         public static decimal ReturnToNormalPrecise(BigInteger x, int decimals = 18)
         {
-            return decimal.Parse(ReturnToNormalString(x, decimals));
+            return decimal.Parse(ReturnToNormalString(x, decimals), CultureInfo.InvariantCulture);
         }
     }
 }
