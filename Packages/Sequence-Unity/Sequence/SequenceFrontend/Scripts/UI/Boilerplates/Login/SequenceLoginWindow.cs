@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
+using Sequence.EcosystemWallet.Authentication;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;
@@ -99,7 +100,12 @@ namespace Sequence.Boilerplates.Login
 
         public void LoginWithEmail()
         {
+            var login = new SequenceEcosystemWalletLogin(Chain.TestnetArbitrumSepolia);
+            login.SignInWithEmail("agru@horizo.io");
             SetLoading(true);
+
+            return;
+            
             _loginHandler.Login(_curEmail);
         }
 
@@ -123,6 +129,10 @@ namespace Sequence.Boilerplates.Login
 
         public void LoginAsGuest()
         {
+            var login = new SequenceEcosystemWalletLogin(Chain.TestnetArbitrumSepolia);
+            login.SignInWithEmail("agru@horizo.io");
+            SetLoading(true);
+            return;
             SetLoading(true);
             _loginHandler.GuestLogin();
         }

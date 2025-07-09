@@ -11,6 +11,7 @@ namespace Sequence.EcosystemWallet.Primitives
     [Serializable]
     public class SessionPermissions
     {
+        public BigInteger chainId;
         public Address signer;
         public BigInteger valueLimit;
         public BigInteger deadline;
@@ -21,9 +22,10 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 type = SessionLeaf.SessionPermissionsType,
+                chainId = chainId,
                 signer = signer.Value,
-                valueLimit = valueLimit.ToString(),
-                deadline = deadline.ToString(),
+                valueLimit = valueLimit,
+                deadline = deadline,
                 permissions = permissions.Select(permission => permission.ToJson()).ToArray()
             };
         }

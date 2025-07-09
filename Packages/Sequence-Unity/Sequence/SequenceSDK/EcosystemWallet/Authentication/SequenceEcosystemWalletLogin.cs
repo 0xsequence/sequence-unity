@@ -1,21 +1,31 @@
 using System;
+using System.Net.Http;
 using System.Numerics;
+using System.Text;
+using System.Web;
 using Nethereum.Util;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using Sequence.Wallet;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
     public class SequenceEcosystemWalletLogin
     {
         private Chain _chain;
+        private string _walletUrl;
         private string _redirectUrl;
+        private string _redirectId;
         private string _emitterAddress;
+        private EOAWallet _sessionWallet;
         
         public SequenceEcosystemWalletLogin(Chain chain)
         {
             _chain = chain;
-            _redirectUrl = "";
+            _walletUrl = "https://v3.sequence-dev.app";
+            _redirectUrl = "http://localhost:8080";
             _emitterAddress = "0xb7bE532959236170064cf099e1a3395aEf228F44";
         }
         
@@ -32,20 +42,56 @@ namespace Sequence.EcosystemWallet.Authentication
         /// <param name="email"></param>
         private void CreateNewSession(SessionPermissions permissions, string preferredLoginMethod, string email)
         {
-            // Create new local signer and private key
+            Debug.Log($"{JsonConvert.SerializeObject(new {test = BigInteger.Parse("123455551234555512345555123455551234555512345555")})}");
+            
+            _sessionWallet = new EOAWallet();
+            var payload = new AuthPayload
+            {
+                sessionAddress = _sessionWallet.GetAddress(),
+                permissions = permissions.ToJson(),
+                preferredLoginMethod = preferredLoginMethod,
+                email = email,
+            };
+
+            var url = ConstructWalletUrl("addExplicitSession", payload, "/request/connect");
+            
+            var editorServer = new EditorServer();
+            editorServer.StartServer("localhost", 8080);
+            
+            Application.OpenURL(url);
+        }
+
+        private string ConstructWalletUrl(string action, AuthPayload payload, string path)
+        {
+            _redirectId = $"sequence:{Guid.NewGuid().ToString()}";
+            var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(payload)));
+                
+            var uriBuilder = new UriBuilder($"{_walletUrl}{path}");
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+            query["action"] = action;
+            query["payload"] = encodedPayload;
+            query["id"] = _redirectId;
+            query["redirectUrl"] = _redirectUrl;
+            query["mode"] = "redirect";
+
+            uriBuilder.Query = query.ToString();
+            return uriBuilder.ToString();
         }
 
         private SessionPermissions GetOpenPermissions()
         {
             return new SessionPermissions
             {
+                chainId = new BigInteger((int)_chain),
+                signer = new Address(_emitterAddress),
                 valueLimit = new BigInteger(0),
-                deadline = new BigInteger(DateTime.UtcNow.Second + 1000 * 60 * 5000),
+                deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000),
                 permissions = new []
                 {
                     new Permission
                     {
-                        target = new Address(_emitterAddress),
+                        target = new Address("0x8F6066bA491b019bAc33407255f3bc5cC684A5a4"),
                         rules = Array.Empty<ParameterRule>()
                     }
                 }
@@ -56,13 +102,15 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             return new SessionPermissions
             {
+                chainId = new BigInteger((int)_chain),
+                signer = new Address(_emitterAddress),
                 valueLimit = new BigInteger(0),
-                deadline = new BigInteger(DateTime.UtcNow.Second + 1000 * 60 * 5000),
+                deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000),
                 permissions = new []
                 {
                     new Permission
                     {
-                        target = new Address(_emitterAddress),
+                        target = new Address("0x8F6066bA491b019bAc33407255f3bc5cC684A5a4"),
                         rules = new []
                         {
                             new ParameterRule
