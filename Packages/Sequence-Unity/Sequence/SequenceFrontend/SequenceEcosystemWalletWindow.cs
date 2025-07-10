@@ -1,0 +1,114 @@
+using Sequence.EcosystemWallet.Authentication;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Sequence.Boilerplates
+{
+    public class SequenceEcosystemWalletWindow : MonoBehaviour
+    {
+        [SerializeField] private Button _emailLoginButton;
+        [SerializeField] private Button _emailContinueButton;
+        [SerializeField] private TMP_InputField _emailInput;
+        [SerializeField] private TMP_Text _walletText;
+        [SerializeField] private GameObject _loginState;
+        [SerializeField] private GameObject _walletState;
+        [SerializeField] private GameObject _loadingOverlay;
+        [SerializeField] private MessagePopup _messagePopup;
+        
+        private SequenceEcosystemWalletLogin _login;
+        private SequenceEcosystemWalletLogin.SessionType _sessionType;
+        private string _curEmail;
+        
+        private void Start()
+        {
+            _login = new(Chain.TestnetArbitrumSepolia);
+            _emailInput.onValueChanged.AddListener(VerifyEmailInput);
+            _messagePopup.gameObject.SetActive(false);
+            _loadingOverlay.SetActive(false);
+
+            OnSessionTypeChanged(0);
+            EnableWalletState(false);
+            EnableEmailButton(true);
+
+            RecoverWalletFromStorage();
+        }
+        
+        public async void SignInWithEmail()
+        {
+            SetLoading(true);
+            var wallet = await _login.SignInWithEmail(_curEmail, _sessionType);
+            ShowWallet(wallet, false);
+        }
+        
+        public async void SignInWithGoogle()
+        {
+            SetLoading(true);
+            var wallet = await _login.SignInWithGoogle(_sessionType);
+            ShowWallet(wallet, false);
+        }
+        
+        public async void SignInWithApple()
+        {
+            SetLoading(true);
+            var wallet = await _login.SignInWithApple(_sessionType);
+            ShowWallet(wallet, false);
+        }
+
+        public void SignOut()
+        {
+            _login.SignOut();
+            EnableWalletState(false);
+        }
+
+        public void OnSessionTypeChanged(int index)
+        {
+            _sessionType = (SequenceEcosystemWalletLogin.SessionType)index;
+        }
+
+        private void RecoverWalletFromStorage()
+        {
+            var wallet = _login.RecoverSessionFromStorage();
+            ShowWallet(wallet, true);
+        }
+
+        private void ShowWallet(SequenceEcosystemWallet wallet, bool recovered)
+        {
+            _walletText.text = wallet.Address;
+            EnableWalletState(true);
+            SetLoading(false);
+            
+            if (!recovered)
+                _messagePopup.Show("Session Created.");
+        }
+
+        public void EnableWalletState(bool enable)
+        {
+            _loginState.SetActive(!enable);
+            _walletState.SetActive(enable);
+        }
+        
+        public void EnableEmailButton(bool enable)
+        {
+            _emailLoginButton.gameObject.SetActive(enable);
+            _emailInput.gameObject.SetActive(!enable);
+        }
+
+        private void SetLoading(bool value)
+        {
+            _loadingOverlay.SetActive(value);
+        }
+        
+        private void VerifyEmailInput(string input)
+        {
+            _curEmail = input;
+            var parts = _curEmail.Split("@");
+            var validEmail = _curEmail.Contains(".") && 
+                             parts.Length == 2 && 
+                             parts[0].Length > 1 && 
+                             parts[1].Length > 1;
+            
+            _emailContinueButton.interactable = validEmail;
+        }
+    }
+}

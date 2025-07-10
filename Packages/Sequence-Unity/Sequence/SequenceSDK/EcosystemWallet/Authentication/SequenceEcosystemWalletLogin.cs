@@ -65,6 +65,11 @@ namespace Sequence.EcosystemWallet.Authentication
 
             return new SequenceEcosystemWallet(new Address(walletAddress));
         }
+
+        public void SignOut()
+        {
+            _sessionStorage.Clear();
+        }
         
         /// <summary>
         /// Create an implicit- or explicit session based on a given set of permissions.
