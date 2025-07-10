@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Nethereum.Util;
 using Newtonsoft.Json;
+using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 using Sequence.Wallet;
@@ -95,8 +96,8 @@ namespace Sequence.EcosystemWallet.Authentication
             
             var action = isImplicitSession ? "addImplicitSession" : "addExplicitSession";
             var url = ConstructWalletUrl(action, payload, "/request/connect");
-            
-            Application.OpenURL(url);
+
+            BrowserFactory.CreateBrowser().Show(url);
             
             var editorServer = new EditorServer();
             var response = await editorServer.WaitForResponse("localhost", 8080);
@@ -123,8 +124,6 @@ namespace Sequence.EcosystemWallet.Authentication
             var encodedResponsePayload = response.QueryString["payload"];
             var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(encodedResponsePayload));
             var responsePayload = JsonConvert.DeserializeObject<AuthResponse>(responsePayloadJson);
-            
-            Debug.Log($"Done: {responsePayload.walletAddress}, {responsePayload.email}, {responsePayload.loginMethod}");
             
             if (responsePayload.attestation != null)
                 Debug.Log($"Attestation approvedSigner: {responsePayload.attestation.approvedSigner}");
