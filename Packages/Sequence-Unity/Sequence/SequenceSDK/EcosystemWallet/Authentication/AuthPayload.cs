@@ -8,6 +8,7 @@ namespace Sequence.EcosystemWallet.Authentication
     {
         public Address sessionAddress;
         public object permissions;
+        public string implicitSessionRedirectUrl;
         public string preferredLoginMethod;
         public string email;
     }

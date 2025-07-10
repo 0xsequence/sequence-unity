@@ -85,6 +85,17 @@ namespace Sequence.Utils
             return newList;
         }
         
+        public static T[] AddToArray<T>(this T[] array, T item)
+        {
+            if (array == null)
+                return new T[] { item };
+
+            T[] result = new T[array.Length + 1];
+            Array.Copy(array, result, array.Length);
+            result[array.Length] = item;
+            return result;
+        }
+        
         public static T[] CombineArrays<T>(T[] arr1, T[] arr2)
         {
             int length1 = arr1.Length;

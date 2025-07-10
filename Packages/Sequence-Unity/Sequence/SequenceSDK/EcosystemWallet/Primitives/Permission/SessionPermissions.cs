@@ -21,9 +21,7 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             return new
             {
-                type = SessionLeaf.SessionPermissionsType,
                 chainId = chainId,
-                signer = signer.Value,
                 valueLimit = valueLimit,
                 deadline = deadline,
                 permissions = permissions.Select(permission => permission.ToJson()).ToArray()

@@ -19,7 +19,7 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 return new ImplicitSessionCallSignature
                 {
-                    attestation = Attestation.FromJson(data["attestation"].ToString()),
+                    attestation = JsonConvert.DeserializeObject<Attestation>(data["attestation"].ToString()),
                     sessionSignature = RSY.FromString((string)data["sessionSignature"]),
                     identitySignature = RSY.FromString((string)identitySignature)
                 };

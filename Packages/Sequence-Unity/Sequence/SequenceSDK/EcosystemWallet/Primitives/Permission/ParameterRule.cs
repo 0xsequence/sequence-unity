@@ -11,7 +11,7 @@ namespace Sequence.EcosystemWallet.Primitives
     [Serializable]
     public class ParameterRule
     {
-        public static readonly byte[] SelectorMask = "0xffffffff".HexStringToByteArray(32);
+        public static readonly byte[] SelectorMask = "0xffffffff".HexStringToByteArray().PadRight(32);
         public static readonly byte[] Uint256Mask = Enumerable.Repeat((byte)0xff, 32).ToArray().PadLeft(32);
         
         public bool cumulative;
@@ -26,9 +26,17 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 cumulative = cumulative,
                 operation = (int)operation,
-                value = value.ByteArrayToHexStringWithPrefix(),
+                value = new Dictionary<string, object>
+                {
+                    {"_isUint8Array", true},
+                    {"data", value.ByteArrayToHexStringWithPrefix()}
+                },
                 offset = offset.ToString(),
-                mask = mask.ByteArrayToHexStringWithPrefix()
+                mask = new Dictionary<string, object>
+                {
+                    {"_isUint8Array", true},
+                    {"data", mask.ByteArrayToHexStringWithPrefix()}
+                }
             };
         }
 

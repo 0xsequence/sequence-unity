@@ -100,12 +100,7 @@ namespace Sequence.Boilerplates.Login
 
         public void LoginWithEmail()
         {
-            var login = new SequenceEcosystemWalletLogin(Chain.TestnetArbitrumSepolia);
-            login.SignInWithEmail("agru@horizo.io");
             SetLoading(true);
-
-            return;
-            
             _loginHandler.Login(_curEmail);
         }
 
@@ -129,10 +124,6 @@ namespace Sequence.Boilerplates.Login
 
         public void LoginAsGuest()
         {
-            var login = new SequenceEcosystemWalletLogin(Chain.TestnetArbitrumSepolia);
-            login.SignInWithEmail("agru@horizo.io");
-            SetLoading(true);
-            return;
             SetLoading(true);
             _loginHandler.GuestLogin();
         }
