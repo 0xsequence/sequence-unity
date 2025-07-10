@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives.Common
 {
@@ -18,6 +19,7 @@ namespace Sequence.EcosystemWallet.Primitives.Common
         public static implicit operator Bytes(byte[] data) => new Bytes(data);
     }
 
+    [Preserve]
     public class BytesConverter : JsonConverter<Bytes>
     {
         public override void WriteJson(JsonWriter writer, Bytes value, JsonSerializer serializer)

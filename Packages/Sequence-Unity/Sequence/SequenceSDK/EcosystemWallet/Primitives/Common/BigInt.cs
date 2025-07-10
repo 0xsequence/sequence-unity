@@ -2,6 +2,7 @@ using System;
 using System.Numerics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives.Common
 {
@@ -24,6 +25,7 @@ namespace Sequence.EcosystemWallet.Primitives.Common
         public static implicit operator BigInt(BigInteger value) => new BigInt(value);
     }
 
+    [Preserve]
     public class BigIntConverter : JsonConverter<BigInt>
     {
         public override void WriteJson(JsonWriter writer, BigInt value, JsonSerializer serializer)

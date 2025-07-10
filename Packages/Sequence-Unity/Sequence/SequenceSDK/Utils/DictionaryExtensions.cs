@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json;
 
 namespace Sequence.Utils
 {

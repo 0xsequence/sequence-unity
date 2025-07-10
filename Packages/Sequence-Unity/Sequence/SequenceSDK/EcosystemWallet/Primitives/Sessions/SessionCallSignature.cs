@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using Sequence.Utils;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
