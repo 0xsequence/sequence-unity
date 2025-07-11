@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Sequence.EcosystemWallet.Browser
 {
-    internal class IosBrowser : IBrowser
+    internal class IosRedirectHandler : IRedirectHandler
     {
 #if UNITY_IOS && !UNITY_EDITOR
         [DllImport("__Internal")]
@@ -19,9 +22,10 @@ namespace Sequence.EcosystemWallet.Browser
         private static void _RemoveWebView() { }
 #endif
 
-        public void Show(string url)
+        public Task<(bool Result, NameValueCollection QueryString)> WaitForResponse(string url, string action, Dictionary<string, object> payload)
         {
             _ShowWebView(url, 0, 0, 375, 667);
+            return Task.FromResult((false, new NameValueCollection()));
         }
 
         public void Hide()

@@ -1,3 +1,4 @@
+using System;
 using Sequence.EcosystemWallet.Authentication;
 using TMPro;
 using UnityEngine;
@@ -37,22 +38,46 @@ namespace Sequence.Boilerplates
         public async void SignInWithEmail()
         {
             SetLoading(true);
-            var wallet = await _login.SignInWithEmail(_curEmail, _sessionType);
-            ShowWallet(wallet, false);
+            
+            try
+            {
+                var wallet = await _login.SignInWithEmail(_curEmail, _sessionType);
+                ShowWallet(wallet, false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
         }
         
         public async void SignInWithGoogle()
         {
             SetLoading(true);
-            var wallet = await _login.SignInWithGoogle(_sessionType);
-            ShowWallet(wallet, false);
+            
+            try
+            {
+                var wallet = await _login.SignInWithGoogle(_sessionType);
+                ShowWallet(wallet, false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
         }
         
         public async void SignInWithApple()
         {
             SetLoading(true);
-            var wallet = await _login.SignInWithApple(_sessionType);
-            ShowWallet(wallet, false);
+
+            try
+            {
+                var wallet = await _login.SignInWithApple(_sessionType);
+                ShowWallet(wallet, false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
         }
 
         public void SignOut()
@@ -64,6 +89,13 @@ namespace Sequence.Boilerplates
         public void OnSessionTypeChanged(int index)
         {
             _sessionType = (SequenceEcosystemWalletLogin.SessionType)index;
+        }
+
+        private void ShowError(string error)
+        {
+            Debug.LogError(error);
+            _messagePopup.Show(error);
+            SetLoading(false);
         }
 
         private void RecoverWalletFromStorage()

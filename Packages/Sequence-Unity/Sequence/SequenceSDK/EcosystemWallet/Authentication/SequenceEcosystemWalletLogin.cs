@@ -26,8 +26,6 @@ namespace Sequence.EcosystemWallet.Authentication
         
         private Chain _chain;
         private string _walletUrl;
-        private string _redirectUrl;
-        private string _redirectId;
         private string _emitterAddress;
         private EOAWallet _sessionWallet;
         private SessionStorage _sessionStorage;
@@ -36,7 +34,6 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             _chain = chain;
             _walletUrl = "https://v3.sequence-dev.app";
-            _redirectUrl = "http://localhost:8080";
             _emitterAddress = "0xb7bE532959236170064cf099e1a3395aEf228F44";
             _sessionStorage = new SessionStorage();
         }
@@ -89,27 +86,19 @@ namespace Sequence.EcosystemWallet.Authentication
             payload.Add("email", email);
             
             if (isImplicitSession)
-                payload.Add("implicitSessionRedirectUrl", _redirectUrl);
+                payload.Add("implicitSessionRedirectUrl", "http://localhost:4444/");
             
             if (!isImplicitSession)
                 payload.Add("permissions", permissions.ToJson());
-            
-            var action = isImplicitSession ? "addImplicitSession" : "addExplicitSession";
-            var url = ConstructWalletUrl(action, payload, "/request/connect");
 
-            BrowserFactory.CreateBrowser().Show(url);
-            
-            var editorServer = new EditorServer();
-            var response = await editorServer.WaitForResponse("localhost", 8080);
+            var action = isImplicitSession ? "addImplicitSession" : "addExplicitSession";
+            var url = $"{_walletUrl}/request/connect";
+
+            var handler = RedirectFactory.CreateHandler();
+            var response = await handler.WaitForResponse(url, action, payload);
             if (!response.Result)
             {
                 throw new Exception("Error during request");
-            }
-            
-            var id = response.QueryString["id"];
-            if (id != _redirectId)
-            {
-                throw new Exception("Incorrect request id");
             }
 
             if (!response.QueryString.AllKeys.Contains("payload"))
@@ -123,6 +112,7 @@ namespace Sequence.EcosystemWallet.Authentication
             
             var encodedResponsePayload = response.QueryString["payload"];
             var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(encodedResponsePayload));
+            Debug.Log(responsePayloadJson);
             var responsePayload = JsonConvert.DeserializeObject<AuthResponse>(responsePayloadJson);
             
             if (responsePayload.attestation != null)
@@ -143,24 +133,6 @@ namespace Sequence.EcosystemWallet.Authentication
                 responsePayload.email));
             
             return new SequenceEcosystemWallet(walletAddress);
-        }
-        
-        private string ConstructWalletUrl(string action, Dictionary<string, object> payload, string path)
-        {
-            _redirectId = $"sequence:{Guid.NewGuid().ToString()}";
-            var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(payload)));
-                
-            var uriBuilder = new UriBuilder($"{_walletUrl}{path}");
-            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
-
-            query["action"] = action;
-            query["payload"] = encodedPayload;
-            query["id"] = _redirectId;
-            query["redirectUrl"] = _redirectUrl;
-            query["mode"] = "redirect";
-
-            uriBuilder.Query = query.ToString();
-            return uriBuilder.ToString();
         }
 
         private SessionPermissions GetPermissionsFromSessionType(SessionType sessionType)
