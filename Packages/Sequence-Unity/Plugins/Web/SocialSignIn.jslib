@@ -8,4 +8,10 @@ mergeInto(LibraryManager.library, {
         window.dispatchReactUnityEvent("OpenWalletApp", UTF8ToString(url));
     },
     
+    GetPageOrigin: function () {
+      var origin = window.location.origin;
+      var buffer = allocate(intArrayFromString(origin), 'i8', ALLOC_STACK);
+      return buffer;
+    }
+    
 });

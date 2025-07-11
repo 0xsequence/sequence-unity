@@ -79,6 +79,36 @@ namespace Sequence.Boilerplates
                 ShowError(e.Message);
             }
         }
+        
+        public async void SignInWithPasskey()
+        {
+            SetLoading(true);
+
+            try
+            {
+                var wallet = await _login.SignInWithPasskey(_sessionType);
+                ShowWallet(wallet, false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
+        }
+        
+        public async void SignInWithMnemonic()
+        {
+            SetLoading(true);
+
+            try
+            {
+                var wallet = await _login.SignInWithMnemonic(_sessionType);
+                ShowWallet(wallet, false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
+        }
 
         public void SignOut()
         {
@@ -94,7 +124,7 @@ namespace Sequence.Boilerplates
         private void ShowError(string error)
         {
             Debug.LogError(error);
-            _messagePopup.Show(error);
+            _messagePopup.Show(error, true);
             SetLoading(false);
         }
 

@@ -32,6 +32,9 @@ namespace Sequence.EcosystemWallet.Browser
                 _receiver = go.AddComponent<NativeReceiver>();
                 
                 var response = await _receiver.WaitForResponse(JsonConvert.SerializeObject(new {url, action, payload}));
+                
+                GameObject.Destroy(_receiver.gameObject);
+                
                 var data = JsonConvert.DeserializeObject<ResponseData>(response);
                 if (data.error != null)
                     throw new Exception(data.error.error);

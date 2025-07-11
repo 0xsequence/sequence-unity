@@ -5,26 +5,25 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.EcosystemWallet.Authentication;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
 {
     public class LocalhostRedirectHandler : IRedirectHandler
     {
-        private const string Listener = "http://localhost:8080";
-        
         public async Task<(bool Result, NameValueCollection QueryString)> WaitForResponse(string url, string action, Dictionary<string, object> payload)
         {
             var redirectId = $"sequence:{Guid.NewGuid().ToString()}";
             var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(payload)));
-            var finalUrl = $"{url}?action={action}&payload={encodedPayload}&id={redirectId}&redirectUrl={Listener}&mode=redirect";
+            var finalUrl = $"{url}?action={action}&payload={encodedPayload}&id={redirectId}&redirectUrl={RedirectOrigin.DefaultOrigin}&mode=redirect";
             
             Application.OpenURL(finalUrl);
             
             try
             {
                 var listener = new HttpListener();
-                listener.Prefixes.Add(Listener);
+                listener.Prefixes.Add(RedirectOrigin.DefaultOrigin);
                 listener.Start();
                 
                 var context = await listener.GetContextAsync();

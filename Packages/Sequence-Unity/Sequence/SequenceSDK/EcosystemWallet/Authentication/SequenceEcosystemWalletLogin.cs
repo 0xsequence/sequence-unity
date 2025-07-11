@@ -52,6 +52,16 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"apple");
         }
+        
+        public async Task<SequenceEcosystemWallet> SignInWithPasskey(SessionType sessionType)
+        {
+            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"passkey");
+        }
+        
+        public async Task<SequenceEcosystemWallet> SignInWithMnemonic(SessionType sessionType)
+        {
+            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"mnemonic");
+        }
 
         public SequenceEcosystemWallet RecoverSessionFromStorage()
         {
@@ -86,7 +96,7 @@ namespace Sequence.EcosystemWallet.Authentication
             payload.Add("email", email);
             
             if (isImplicitSession)
-                payload.Add("implicitSessionRedirectUrl", "http://localhost:4444/");
+                payload.Add("implicitSessionRedirectUrl", RedirectOrigin.GetOriginString());
             
             if (!isImplicitSession)
                 payload.Add("permissions", permissions.ToJson());
@@ -112,7 +122,6 @@ namespace Sequence.EcosystemWallet.Authentication
             
             var encodedResponsePayload = response.QueryString["payload"];
             var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(encodedResponsePayload));
-            Debug.Log(responsePayloadJson);
             var responsePayload = JsonConvert.DeserializeObject<AuthResponse>(responsePayloadJson);
             
             if (responsePayload.attestation != null)
