@@ -1,5 +1,6 @@
 using System;
 using Sequence.EcosystemWallet.Authentication;
+using Sequence.EcosystemWallet.Primitives;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,13 @@ namespace Sequence.Boilerplates
 {
     public class SequenceEcosystemWalletWindow : MonoBehaviour
     {
+        private enum SessionType
+        {
+            Implicit,
+            ExplicitOpen,
+            ExplicitRestrictive
+        }
+        
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
         [SerializeField] private TMP_InputField _emailInput;
@@ -18,7 +26,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private MessagePopup _messagePopup;
         
         private SequenceEcosystemWalletLogin _login;
-        private SequenceEcosystemWalletLogin.SessionType _sessionType;
+        private SessionType _sessionType;
         private string _curEmail;
         
         private void Start()
@@ -41,7 +49,7 @@ namespace Sequence.Boilerplates
             
             try
             {
-                var wallet = await _login.SignInWithEmail(_curEmail, _sessionType);
+                var wallet = await _login.SignInWithEmail(_curEmail, GetPermissionsFromSessionType());
                 ShowWallet(wallet, false);
             }
             catch (Exception e)
@@ -56,7 +64,7 @@ namespace Sequence.Boilerplates
             
             try
             {
-                var wallet = await _login.SignInWithGoogle(_sessionType);
+                var wallet = await _login.SignInWithGoogle(GetPermissionsFromSessionType());
                 ShowWallet(wallet, false);
             }
             catch (Exception e)
@@ -71,7 +79,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var wallet = await _login.SignInWithApple(_sessionType);
+                var wallet = await _login.SignInWithApple(GetPermissionsFromSessionType());
                 ShowWallet(wallet, false);
             }
             catch (Exception e)
@@ -86,7 +94,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var wallet = await _login.SignInWithPasskey(_sessionType);
+                var wallet = await _login.SignInWithPasskey(GetPermissionsFromSessionType());
                 ShowWallet(wallet, false);
             }
             catch (Exception e)
@@ -101,7 +109,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var wallet = await _login.SignInWithMnemonic(_sessionType);
+                var wallet = await _login.SignInWithMnemonic(GetPermissionsFromSessionType());
                 ShowWallet(wallet, false);
             }
             catch (Exception e)
@@ -118,7 +126,7 @@ namespace Sequence.Boilerplates
 
         public void OnSessionTypeChanged(int index)
         {
-            _sessionType = (SequenceEcosystemWalletLogin.SessionType)index;
+            _sessionType = (SessionType)index;
         }
 
         private void ShowError(string error)
@@ -171,6 +179,18 @@ namespace Sequence.Boilerplates
                              parts[1].Length > 1;
             
             _emailContinueButton.interactable = validEmail;
+        }
+        
+        private SessionPermissions GetPermissionsFromSessionType()
+        {
+            var templates = new SessionTemplates(Chain.TestnetArbitrumSepolia);
+            return _sessionType switch
+            {
+                SessionType.Implicit => null,
+                SessionType.ExplicitOpen => templates.BuildUnrestrictivePermissions(),
+                SessionType.ExplicitRestrictive => templates.BuildBasicRestrictivePermissions(),
+                _ => throw new Exception("Unsupported session type")
+            };
         }
     }
 }

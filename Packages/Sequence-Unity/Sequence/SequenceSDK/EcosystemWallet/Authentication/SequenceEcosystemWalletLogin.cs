@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
-using Nethereum.Util;
 using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
-using Sequence.Utils;
 using Sequence.Wallet;
 using UnityEngine;
 
@@ -17,16 +13,8 @@ namespace Sequence.EcosystemWallet.Authentication
 {
     public class SequenceEcosystemWalletLogin
     {
-        public enum SessionType
-        {
-            Implicit,
-            ExplicitOpen,
-            ExplicitRestrictive
-        }
-        
         private Chain _chain;
         private string _walletUrl;
-        private string _emitterAddress;
         private EOAWallet _sessionWallet;
         private SessionStorage _sessionStorage;
         
@@ -34,33 +22,32 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             _chain = chain;
             _walletUrl = "https://v3.sequence-dev.app";
-            _emitterAddress = "0xb7bE532959236170064cf099e1a3395aEf228F44";
             _sessionStorage = new SessionStorage();
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithEmail(string email, SessionType sessionType)
+        public async Task<SequenceEcosystemWallet> SignInWithEmail(string email, SessionPermissions permissions)
         {
-            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"email", email);
+            return await CreateNewSession(permissions,"email", email);
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithGoogle(SessionType sessionType)
+        public async Task<SequenceEcosystemWallet> SignInWithGoogle(SessionPermissions permissions)
         {
-            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"google");
+            return await CreateNewSession(permissions,"google");
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithApple(SessionType sessionType)
+        public async Task<SequenceEcosystemWallet> SignInWithApple(SessionPermissions permissions)
         {
-            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"apple");
+            return await CreateNewSession(permissions,"apple");
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithPasskey(SessionType sessionType)
+        public async Task<SequenceEcosystemWallet> SignInWithPasskey(SessionPermissions permissions)
         {
-            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"passkey");
+            return await CreateNewSession(permissions,"passkey");
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithMnemonic(SessionType sessionType)
+        public async Task<SequenceEcosystemWallet> SignInWithMnemonic(SessionPermissions permissions)
         {
-            return await CreateNewSession(GetPermissionsFromSessionType(sessionType),"mnemonic");
+            return await CreateNewSession(permissions,"mnemonic");
         }
 
         public SequenceEcosystemWallet RecoverSessionFromStorage()
@@ -142,80 +129,6 @@ namespace Sequence.EcosystemWallet.Authentication
                 responsePayload.email));
             
             return new SequenceEcosystemWallet(walletAddress);
-        }
-
-        private SessionPermissions GetPermissionsFromSessionType(SessionType sessionType)
-        {
-            return sessionType switch
-            {
-                SessionType.Implicit => null,
-                SessionType.ExplicitOpen => GetOpenPermissions(),
-                SessionType.ExplicitRestrictive => GetRestrictivePermissions(),
-                _ => throw new Exception("Unsupported session type")
-            };
-        }
-
-        private SessionPermissions GetOpenPermissions()
-        {
-            return new SessionPermissions
-            {
-                chainId = new BigInteger((int)_chain),
-                signer = new Address(_emitterAddress),
-                valueLimit = new BigInteger(0),
-                deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000),
-                permissions = new []
-                {
-                    new Permission
-                    {
-                        target = new Address("0x8F6066bA491b019bAc33407255f3bc5cC684A5a4"),
-                        rules = Array.Empty<ParameterRule>()
-                    }
-                }
-            };
-        }
-
-        private SessionPermissions GetRestrictivePermissions()
-        {
-            return new SessionPermissions
-            {
-                chainId = new BigInteger((int)_chain),
-                signer = new Address(_emitterAddress),
-                valueLimit = new BigInteger(0),
-                deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000),
-                permissions = new []
-                {
-                    new Permission
-                    {
-                        target = new Address("0x8F6066bA491b019bAc33407255f3bc5cC684A5a4"),
-                        rules = new []
-                        {
-                            new ParameterRule
-                            {
-                                cumulative = false,
-                                operation = ParameterOperation.equal,
-                                value = HashFunctionSelector("explicitEmit()").HexStringToByteArray().PadRight(32),
-                                offset = new BigInteger(0),
-                                mask = ParameterRule.SelectorMask
-                            },
-                            new ParameterRule
-                            {
-                                cumulative = true,
-                                operation = ParameterOperation.greaterThanOrEqual,
-                                value = "0x1234567890123456789012345678901234567890".HexStringToByteArray().PadRight(32),
-                                offset = new BigInteger(4),
-                                mask = ParameterRule.Uint256Mask
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        private string HashFunctionSelector(string function)
-        {
-            var sha3 = new Sha3Keccack();
-            var hash = sha3.CalculateHash(function);
-            return "0x" + hash.Substring(0, 8);
         }
     }
 }
