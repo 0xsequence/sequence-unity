@@ -141,15 +141,25 @@ namespace Sequence.Boilerplates
             }
         }
 
+        public void CopyWalletAddress()
+        {
+            CopyText(_wallet.Address.Value);
+        }
+
         public void CopySignature()
         {
-            if (string.IsNullOrEmpty(_curSignature))
+            CopyText(_curSignature);
+        }
+        
+        private void CopyText(string text)
+        {
+            if (string.IsNullOrEmpty(text))
             {
-                _messagePopup.Show("Empty Signature", true);
+                _messagePopup.Show("Empty text", true);
                 return;
             }
             
-            GUIUtility.systemCopyBuffer = _curSignature;
+            GUIUtility.systemCopyBuffer = text;
             _messagePopup.Show("Copied");
         }
 
