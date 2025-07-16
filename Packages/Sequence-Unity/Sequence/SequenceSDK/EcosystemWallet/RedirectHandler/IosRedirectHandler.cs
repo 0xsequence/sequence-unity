@@ -1,39 +1,32 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
 {
-    internal class IosRedirectHandler : IRedirectHandler
+    internal class IosRedirectHandler : RedirectHandler
     {
 #if UNITY_IOS && !UNITY_EDITOR
         [DllImport("__Internal")]
-        private static extern void _ShowWebView(string url, float x, float y, float width, float height);
-
-        [DllImport("__Internal")]
-        private static extern void _HideWebView();
-
-        [DllImport("__Internal")]
-        private static extern void _RemoveWebView();
+        private static extern void _OpenURLInWKWebView(IntPtr urlString);
 #else
-        private static void _ShowWebView(string url, float x, float y, float width, float height) { }
-        private static void _HideWebView() { }
-        private static void _RemoveWebView() { }
+        private static void _OpenURLInWKWebView(IntPtr urlString) { }
 #endif
 
-        public Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
+        public override async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
-            _ShowWebView(url, 0, 0, 375, 667);
-            throw new NotImplementedException();
-        }
+            Application.OpenURL(ConstructUrl(url, action, payload));
+            
+            var utf8Bytes = System.Text.Encoding.UTF8.GetBytes(ConstructUrl(url, action, payload) + '\0');
+            var urlPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
+            Marshal.Copy(utf8Bytes, 0, urlPtr, utf8Bytes.Length);
 
-        public void Hide()
-        {
-            _HideWebView();
-        }
+            _OpenURLInWKWebView(urlPtr);
 
-        public void Remove()
-        {
-            _RemoveWebView();
+            await Task.Yield();
+            
+            return (false, default);
         }
     }
 }

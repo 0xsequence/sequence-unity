@@ -7833,6 +7833,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _emailLoginButton: {fileID: 1459061464521247473}
   _emailContinueButton: {fileID: 2325936309338030303}
+  _signOutButton: {fileID: 906953581}
   _signMessageButton: {fileID: 2082724707}
   _emailInput: {fileID: 1181566138228532167}
   _messageInput: {fileID: 541267865}

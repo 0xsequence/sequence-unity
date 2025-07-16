@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
 {
-    public class BrowserRedirectHandler : IRedirectHandler
+    internal class BrowserRedirectHandler : RedirectHandler
     {
         private class ResponseErrorData
         {
@@ -24,7 +24,7 @@ namespace Sequence.EcosystemWallet.Browser
         
         private NativeReceiver _receiver;
         
-        public async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
+        public override async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
             try
             {

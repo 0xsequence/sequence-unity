@@ -1,8 +1,8 @@
 namespace Sequence.EcosystemWallet.Browser
 {
-    public static class RedirectFactory
+    internal static class RedirectFactory
     {
-        public static IRedirectHandler CreateHandler()
+        public static RedirectHandler CreateHandler()
         {
 #if UNITY_IOS && !UNITY_EDITOR
             return new IosRedirectHandler();

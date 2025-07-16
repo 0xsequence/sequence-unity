@@ -14,6 +14,11 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             return Marshal.PtrToStringAnsi(GetPageOrigin());
         }
+#elif UNITY_IOS && UNITY_EDITOR
+        public static string GetOriginString()
+        {
+            return "sequencedemo://auth/callback";
+        }
 #else
         public static string GetOriginString()
         {

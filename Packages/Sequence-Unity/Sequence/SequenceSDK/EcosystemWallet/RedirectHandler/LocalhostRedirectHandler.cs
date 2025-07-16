@@ -10,16 +10,11 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
 {
-    public class LocalhostRedirectHandler : IRedirectHandler
+    internal class LocalhostRedirectHandler : RedirectHandler
     {
-        public async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
+        public override async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
-            var redirectId = $"sequence:{Guid.NewGuid().ToString()}";
-            var serializedPayload = JsonConvert.SerializeObject(payload);
-            var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(serializedPayload));
-            var finalUrl = $"{url}?action={action}&payload={encodedPayload}&id={redirectId}&redirectUrl={RedirectOrigin.DefaultOrigin}&mode=redirect";
-            
-            Application.OpenURL(finalUrl);
+            Application.OpenURL(ConstructUrl(url, action, payload));
             
             try
             {
@@ -33,7 +28,7 @@ namespace Sequence.EcosystemWallet.Browser
                 var queryString = context.Request.QueryString;
                 
                 var id = queryString["id"];
-                if (id != redirectId)
+                if (id != Id)
                     throw new Exception("Incorrect request id");
 
                 if (queryString["error"] != null)

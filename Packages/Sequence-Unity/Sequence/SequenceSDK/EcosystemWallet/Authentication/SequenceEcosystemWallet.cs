@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Authentication.Requests;
 using Sequence.EcosystemWallet.Browser;
+using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 
 namespace Sequence.EcosystemWallet.Authentication
@@ -37,7 +38,7 @@ namespace Sequence.EcosystemWallet.Authentication
             return response.Data;
         }
         
-        public async Task SendTransaction()
+        public async Task SendTransaction(Call[] calls)
         {
             throw new NotImplementedException();
         }
