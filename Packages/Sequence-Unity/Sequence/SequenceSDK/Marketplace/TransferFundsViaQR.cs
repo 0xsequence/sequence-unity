@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 using Sequence;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
+using Sequence.Utils;
 
 public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
 {
@@ -30,7 +31,7 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
             await SetQrCode((int)_order.order.chainId, _wallet.GetWalletAddress(), PriceValuetoEIP618Standard(float.Parse(_order.order.priceAmount, CultureInfo.InvariantCulture)));
             _qrPanel.SetActive(true);
         }
-        else Debug.LogError("Collectible order not set for checkout option.");
+        else SequenceLog.Error("Collectible order not set for checkout option.");
     }
 
     public void SetWallet(SequenceWallet wallet)
@@ -58,7 +59,7 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
             priceCurrencyAddress = NativeTokenAddress.Get((int)_order.order.chainId);
 
         var url = apiEndpoint + "?color=000000&bgcolor=FFFFFF&data=ethereum:" + priceCurrencyAddress + "@"+ chainId.ToString() + "/transfer%3Faddress%3D"+ destinationAddress+ "%26uint256%3D"+amount+"&qzone=1&margin=0&size=250x250&ecc=L";
-        Debug.Log(url);
+        SequenceLog.Info(url);
         return await UnityWebRequestExtensions.DownloadImage(url);
 
     }
@@ -101,7 +102,7 @@ public static class UnityWebRequestExtensions
             }
             else
             {
-                Debug.LogError($"Failed to download QR code: {request.error}");
+                SequenceLog.Error($"Failed to download QR code: {request.error}");
                 return null;
             }
         }

@@ -46,7 +46,7 @@ namespace Sequence.EmbeddedWallet
             catch (Exception ex)
             {
                 string error = $"Error loading public key from JWKS: {ex.Message}";
-                Debug.LogError(error);
+                SequenceLog.Error(error);
                 throw new Exception(error);
             }
         }

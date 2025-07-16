@@ -112,16 +112,16 @@ namespace Sequence.RLP
             if (type == typeof(string))
             {
                 output = Encoding.UTF8.GetString(input).Substring(offset, dataLen);
-                UnityEngine.Debug.Log("output: " + output);
+                SequenceLog.Info("output: " + output);
                 return output;
             }
             else if (type == typeof(List<object>))
             {
-                UnityEngine.Debug.Log("input length: " + input.Length);
+                SequenceLog.Info("input length: " + input.Length);
                 while (offset<input.Length)
                 {
-                    UnityEngine.Debug.Log("Decode offset: " + offset);
-                    UnityEngine.Debug.Log("Decode dataLen: " + dataLen);
+                    SequenceLog.Info("Decode offset: " + offset);
+                    SequenceLog.Info("Decode dataLen: " + dataLen);
                     //TODO: Optimize 
                     object rtn = new List<object>(); 
                     int _offset= 0, _dataLen = 1;
@@ -131,11 +131,7 @@ namespace Sequence.RLP
                         byte[] restInput = new byte[dataLen];
                         Array.Copy(input, offset, restInput, 0, dataLen);
                         ( _offset, _dataLen,  _type) = DecodeLength(restInput);
-                        UnityEngine.Debug.Log("Decode _offset: " + _offset);
-                        UnityEngine.Debug.Log("Decode _dataLen: " + _dataLen);
-                        UnityEngine.Debug.Log("Decode _type: " + _type);
                         rtn = Decode(restInput);
-                        UnityEngine.Debug.Log("rtn: " + rtn);
 
                        // outputList.Add(rtn);
                         /*offset += _dataLen;
@@ -145,16 +141,12 @@ namespace Sequence.RLP
                     }
                     else
                     {
-                        UnityEngine.Debug.Log("rtn: " + ((List<object>)rtn).Count);
                         //outputList.Add(rtn);
                         return outputList;
                         
 
                     }
                     outputList.Add(rtn);
-                    UnityEngine.Debug.Log("Decode offset!: " + offset);
-                    UnityEngine.Debug.Log("Decode dataLen!: " + dataLen);
-
                 }
                 return outputList;
             }
@@ -173,14 +165,12 @@ namespace Sequence.RLP
         private static (int, int, Type) DecodeLength(byte[] input)
         {
             int length = input.Length;
-            UnityEngine.Debug.Log("Decode input length: " + length);
             if (length == 0)
             {
                 throw new Exception("Input is null");
             }
 
             int firstByte = input[0];
-            UnityEngine.Debug.Log("Decode firstbyte: " + firstByte);
             if (firstByte <= 127)
             {
                 

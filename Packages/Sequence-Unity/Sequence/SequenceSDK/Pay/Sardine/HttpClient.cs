@@ -44,7 +44,7 @@ namespace Sequence.Pay.Sardine
             string headersString = ExtractHeaders(request);
             string method = request.method;
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
-            Debug.Log(curlRequest);
+            SequenceLog.Info(curlRequest);
             try
             {
                 await request.SendWebRequest();

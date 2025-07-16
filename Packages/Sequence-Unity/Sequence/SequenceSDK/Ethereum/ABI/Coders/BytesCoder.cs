@@ -1,4 +1,5 @@
 using System;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -26,7 +27,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding byte array: {ex.Message}");
+                SequenceLog.Error($"Error decoding byte array: {ex.Message}");
                 return null;
             }
         }
@@ -51,7 +52,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding byte array: {ex.Message}");
+                SequenceLog.Error($"Error encoding byte array: {ex.Message}");
                 return null;
             }
         }
@@ -70,7 +71,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding byte array to string: {ex.Message}");
+                SequenceLog.Error($"Error encoding byte array to string: {ex.Message}");
                 return null;
             }
         }
@@ -96,7 +97,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding byte array from string: {ex.Message}");
+                SequenceLog.Error($"Error decoding byte array from string: {ex.Message}");
                 return null;
             }
         }

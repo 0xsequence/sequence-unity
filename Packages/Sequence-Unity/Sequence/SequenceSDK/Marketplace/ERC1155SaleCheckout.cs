@@ -107,7 +107,7 @@ namespace Sequence.Marketplace
             }
             catch (Exception e)
             {
-                Debug.LogError("Encountered error fetching approximate total in USD: " + e.Message);
+                SequenceLog.Error("Encountered error fetching approximate total in USD: " + e.Message);
                 return "";
             }
         }
