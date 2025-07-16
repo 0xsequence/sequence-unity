@@ -18,16 +18,21 @@ namespace Sequence.Boilerplates
         
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
+        [SerializeField] private Button _signMessageButton;
         [SerializeField] private TMP_InputField _emailInput;
+        [SerializeField] private TMP_InputField _messageInput;
         [SerializeField] private TMP_Text _walletText;
+        [SerializeField] private TMP_Text _signatureText;
         [SerializeField] private GameObject _loginState;
         [SerializeField] private GameObject _walletState;
         [SerializeField] private GameObject _loadingOverlay;
         [SerializeField] private MessagePopup _messagePopup;
         
         private SequenceEcosystemWalletLogin _login;
+        private SequenceEcosystemWallet _wallet;
         private SessionType _sessionType;
         private string _curEmail;
+        private string _curSignature;
         
         private void Start()
         {
@@ -39,6 +44,7 @@ namespace Sequence.Boilerplates
             OnSessionTypeChanged(0);
             EnableWalletState(false);
             EnableEmailButton(true);
+            ShowSignature(string.Empty);
 
             RecoverWalletFromStorage();
         }
@@ -118,6 +124,35 @@ namespace Sequence.Boilerplates
             }
         }
 
+        public async void SignMessage()
+        {
+            var message = _messageInput.text;
+            SetLoading(true);
+
+            try
+            {
+                var signature = await _wallet.SignMessage(Chain.TestnetArbitrumSepolia, message);
+                ShowSignature(signature.signature);
+                SetLoading(false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
+        }
+
+        public void CopySignature()
+        {
+            if (string.IsNullOrEmpty(_curSignature))
+            {
+                _messagePopup.Show("Empty Signature", true);
+                return;
+            }
+            
+            GUIUtility.systemCopyBuffer = _curSignature;
+            _messagePopup.Show("Copied");
+        }
+
         public void SignOut()
         {
             _login.SignOut();
@@ -142,9 +177,18 @@ namespace Sequence.Boilerplates
             ShowWallet(wallet, true);
         }
 
+        private void ShowSignature(string signature)
+        {
+            _curSignature = signature;
+            _signatureText.text = signature;
+            _signMessageButton.interactable = !string.IsNullOrEmpty(_curSignature);
+        }
+
         private void ShowWallet(SequenceEcosystemWallet wallet, bool recovered)
         {
+            _wallet = wallet;
             _walletText.text = wallet.Address;
+            
             EnableWalletState(true);
             SetLoading(false);
             

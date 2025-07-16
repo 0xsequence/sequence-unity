@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Runtime.InteropServices;
+using System;
 using System.Threading.Tasks;
 
 namespace Sequence.EcosystemWallet.Browser
@@ -22,10 +20,10 @@ namespace Sequence.EcosystemWallet.Browser
         private static void _RemoveWebView() { }
 #endif
 
-        public Task<(bool Result, NameValueCollection QueryString)> WaitForResponse(string url, string action, Dictionary<string, object> payload)
+        public Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
             _ShowWebView(url, 0, 0, 375, 667);
-            return Task.FromResult((false, new NameValueCollection()));
+            throw new NotImplementedException();
         }
 
         public void Hide()

@@ -24,7 +24,7 @@ namespace Sequence.EcosystemWallet.Browser
         
         private NativeReceiver _receiver;
         
-        public async Task<(bool Result, NameValueCollection QueryString)> WaitForResponse(string url, string action, Dictionary<string, object> payload)
+        public async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
             try
             {
@@ -42,12 +42,12 @@ namespace Sequence.EcosystemWallet.Browser
                 var query = new NameValueCollection();
                 query.Add("payload", data.payload);
 
-                return (true, query);
+                return (true, default);
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                return (false, null);
+                return (false, default);
             }
         }
     }

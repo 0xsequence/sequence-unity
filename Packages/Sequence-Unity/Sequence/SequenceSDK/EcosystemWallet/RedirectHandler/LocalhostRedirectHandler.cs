@@ -12,10 +12,11 @@ namespace Sequence.EcosystemWallet.Browser
 {
     public class LocalhostRedirectHandler : IRedirectHandler
     {
-        public async Task<(bool Result, NameValueCollection QueryString)> WaitForResponse(string url, string action, Dictionary<string, object> payload)
+        public async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
             var redirectId = $"sequence:{Guid.NewGuid().ToString()}";
-            var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(payload)));
+            var serializedPayload = JsonConvert.SerializeObject(payload);
+            var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(serializedPayload));
             var finalUrl = $"{url}?action={action}&payload={encodedPayload}&id={redirectId}&redirectUrl={RedirectOrigin.DefaultOrigin}&mode=redirect";
             
             Application.OpenURL(finalUrl);
@@ -30,19 +31,23 @@ namespace Sequence.EcosystemWallet.Browser
                 listener.Stop();
 
                 var queryString = context.Request.QueryString;
-                foreach (var key in queryString.AllKeys)
-                    Debug.Log($"Key: {key}, Value: {queryString[key]}");
                 
                 var id = queryString["id"];
                 if (id != redirectId)
                     throw new Exception("Incorrect request id");
 
-                return (true, queryString);
+                if (queryString["error"] != null)
+                    throw new Exception($"Error during request: {queryString["error"]}");
+                
+                var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(queryString["payload"]));
+                var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
+                
+                return (true, responsePayload);
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                return (false, null);
+                return (false, default);
             }
         }
     }
