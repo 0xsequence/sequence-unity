@@ -18,6 +18,7 @@ namespace Sequence.Boilerplates
         
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
+        [SerializeField] private Button _signOutButton;
         [SerializeField] private Button _signMessageButton;
         [SerializeField] private TMP_InputField _emailInput;
         [SerializeField] private TMP_InputField _messageInput;
@@ -210,6 +211,7 @@ namespace Sequence.Boilerplates
         {
             _loginState.SetActive(!enable);
             _walletState.SetActive(enable);
+            _signOutButton.gameObject.SetActive(enable);
         }
         
         public void EnableEmailButton(bool enable)
