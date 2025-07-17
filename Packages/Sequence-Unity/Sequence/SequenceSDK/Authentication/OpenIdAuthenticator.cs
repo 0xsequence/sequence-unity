@@ -231,7 +231,8 @@ namespace Sequence.Authentication
 
             string url =
                 $"{baseUrl}?response_type=code+id_token&client_id={clientId}&redirect_uri={_redirectUrl}&scope=openid+email&state={state}/";
-            if (PlayerPrefs.HasKey(LoginEmail))
+            
+            if (PlayerPrefs.HasKey(LoginEmail) && !string.IsNullOrEmpty(PlayerPrefs.GetString(LoginEmail)))
             {
                 url = url.RemoveTrailingSlash() + $"&login_hint={PlayerPrefs.GetString(LoginEmail)}".AppendTrailingSlashIfNeeded();
                 url = url.Replace(" ", "");

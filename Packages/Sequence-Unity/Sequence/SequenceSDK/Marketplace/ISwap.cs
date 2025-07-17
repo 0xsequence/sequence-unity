@@ -13,11 +13,22 @@ namespace Sequence.Marketplace
         /// <summary>
         /// Get the current SwapPrice for a given buyCurrency, sellCurrency, and buyAmount 
         /// </summary>
+        /// <param name="userWallet"></param>
+        /// <param name="buyCurrency"></param>
+        /// <param name="sellCurrency"></param>
+        /// <param name="buyAmount"></param>
+        /// <returns></returns>
+        public Task<SwapPrice> GetSwapPrice(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount);
+        
+        /// <summary>
+        /// Get the current SwapPrice for a given buyCurrency, sellCurrency, and buyAmount 
+        /// </summary>
         /// <param name="buyCurrency"></param>
         /// <param name="sellCurrency"></param>
         /// <param name="buyAmount"></param>
         /// <param name="slippagePercent">the maximum slippage percentage allowed</param>
         /// <returns></returns>
+        [Obsolete("Swap provider no longer supports fetching swap prices without provider the user's wallet address")]
         public Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount, uint slippagePercent = DefaultSlippagePercentage);
 
         public event Action<SwapPrice[]> OnSwapPricesReturn;
@@ -48,5 +59,18 @@ namespace Sequence.Marketplace
         /// <returns></returns>
         public Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency,
             string buyAmount, bool includeApprove, uint slippagePercentage = DefaultSlippagePercentage);
+
+        /// <summary>
+        /// Get a Chain[] of all supported chains for the swap provider
+        /// </summary>
+        /// <returns></returns>
+        public Task<Chain[]> GetSupportedChains();
+
+        /// <summary>
+        /// Get the supported tokens by the swap provider for a given set of chains
+        /// </summary>
+        /// <param name="chains"></param>
+        /// <returns></returns>
+        public Task<Token[]> GetSupportedTokens(Chain[] chains);
     }
 }

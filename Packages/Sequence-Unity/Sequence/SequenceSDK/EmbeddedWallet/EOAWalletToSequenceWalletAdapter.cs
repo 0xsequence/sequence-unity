@@ -324,6 +324,12 @@ namespace Sequence.EmbeddedWallet
         {
             throw new NotSupportedException();
         }
+
+        public event Action<string, bool> OnFederatedAccountRemovedComplete;
+        public Task<bool> RemoveFederatedAccount(Account account)
+        {
+            throw new NotSupportedException();
+        }
     }
     #endregion
 

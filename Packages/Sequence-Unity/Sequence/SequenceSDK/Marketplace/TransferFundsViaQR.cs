@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,7 +27,7 @@ public class TransferFundsViaQR : MonoBehaviour, ICheckoutOption
         if (_order != null)
         {
             //Price must be converted into specific ScientificNotation format following eip-681 standard (see below)
-            await SetQrCode((int)_order.order.chainId, _wallet.GetWalletAddress(), PriceValuetoEIP618Standard(float.Parse(_order.order.priceAmount)));
+            await SetQrCode((int)_order.order.chainId, _wallet.GetWalletAddress(), PriceValuetoEIP618Standard(float.Parse(_order.order.priceAmount, CultureInfo.InvariantCulture)));
             _qrPanel.SetActive(true);
         }
         else Debug.LogError("Collectible order not set for checkout option.");

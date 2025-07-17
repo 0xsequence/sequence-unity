@@ -58,7 +58,8 @@ namespace Sequence
             { Chain.TestnetEtherlink, "Etherlink Testnet" },
             { Chain.TestnetMonad, "Monad Testnet" },
             { Chain.TestnetSomnia, "Somnia Testnet" },
-            
+            { Chain.TestnetFrequency, "Frequency Testnet" },
+            { Chain.TestnetIncentiv, "Incentiv Testnet"},
             { Chain.LocalChain, "Local chain"}
         };
 
@@ -116,8 +117,8 @@ namespace Sequence
             { Chain.TestnetEtherlink, "XTZ" },
             { Chain.TestnetMonad, "MON" },
             { Chain.TestnetSomnia, "STT" },
-            
-            { Chain.LocalChain, "ETH" }
+            { Chain.TestnetFrequency, "BERA" },
+            { Chain.TestnetIncentiv, "CENT"}
         };
 
         public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
@@ -207,8 +208,8 @@ namespace Sequence
             { Chain.TestnetEtherlink, "https://testnet.explorer.etherlink.com/" },
             { Chain.TestnetMonad, "https://testnet.monadexplorer.com/" },
             { Chain.TestnetSomnia, "https://somnia-testnet.socialscan.io/" },
-            
-            { Chain.LocalChain, "https://localhost:3000/" }
+            { Chain.TestnetFrequency, "https://explorer.frequency.zeeve.net/" },
+            { Chain.TestnetIncentiv, "https://explorer.testnet.incentiv.net/"}
         };
 
         public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
@@ -267,8 +268,8 @@ namespace Sequence
             { Chain.TestnetEtherlink, "128123" },
             { Chain.TestnetMonad, "10143" },
             { Chain.TestnetSomnia, "50312" },
-            
-            { Chain.LocalChain, "31337" }
+            { Chain.TestnetFrequency, "53716" },
+            { Chain.TestnetIncentiv, "11690" }
         };
 
         public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
@@ -325,8 +326,8 @@ namespace Sequence
             { "128123", Chain.TestnetEtherlink },
             { "10143", Chain.TestnetMonad },
             { "50312", Chain.TestnetSomnia },
-            
-            { "31337", Chain.LocalChain }
+            { "53716", Chain.TestnetFrequency },
+            { "11690", Chain.TestnetIncentiv }
         };
 
         public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
@@ -383,8 +384,8 @@ namespace Sequence
             { Chain.TestnetEtherlink, "etherlink-testnet" },
             { Chain.TestnetMonad, "monad-testnet" },
             { Chain.TestnetSomnia, "somnia-testnet" },
-            
-            { Chain.LocalChain, "local" }
+            { Chain.TestnetFrequency, "frequency-testnet" },
+            { Chain.TestnetIncentiv, "incentiv-testnet" }
         };
     }
 }
