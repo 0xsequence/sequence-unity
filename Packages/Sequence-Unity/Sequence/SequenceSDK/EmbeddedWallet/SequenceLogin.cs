@@ -72,7 +72,18 @@ namespace Sequence.EmbeddedWallet
         
         public void SetConnectedWalletAddress(Address connectedWalletAddress)
         {
+            if (connectedWalletAddress == null)
+            {
+                Debug.LogError($"The connected wallet address cannot be null or empty.");
+                throw new ArgumentNullException(nameof(connectedWalletAddress));
+            }
+            
             _connectedWalletAddress = connectedWalletAddress;
+        }
+        
+        public void RemoveConnectedWalletAddress()
+        {
+            _connectedWalletAddress = null;
         }
 
         [Obsolete("Use GetInstance() instead.")]
@@ -85,7 +96,11 @@ namespace Sequence.EmbeddedWallet
             _connector = connector;
             
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
-            SetConnectedWalletAddress(connectedWalletAddress);
+
+            if (connectedWalletAddress != null)
+            {
+                SetConnectedWalletAddress(connectedWalletAddress);
+            }
             
             bool storeSessionWallet = SequenceConfig.GetConfig(SequenceService.WaaS).StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
@@ -123,7 +138,7 @@ namespace Sequence.EmbeddedWallet
         public void ResetLoginAfterTest()
         {
             _connector = this;
-            SetConnectedWalletAddress(null);
+            RemoveConnectedWalletAddress();
             SetupAuthenticator();
         }
 
@@ -157,6 +172,48 @@ namespace Sequence.EmbeddedWallet
             _emailConnector = new EmailConnector(_sessionId, _sessionWallet, _connector, _validator);
         }
 
+        /// <summary>
+        /// Recover the current session asynchronously and get the associated wallet.
+        /// </summary>
+        /// <returns>
+        /// Returns StorageEnabled bool indicating if the SDK is configured to store sessions.
+        /// Returns Instance of IWallet if the session was recovered. Returns null if no session was found.
+        /// </returns>
+        public async Task<(bool StorageEnabled, IWallet Wallet)> TryToRestoreSessionAsync()
+        {
+            var config = SequenceConfig.GetConfig();
+            var storeSessionInfoAndSkipLoginWhenPossible = config.StoreSessionKey();
+            if (!SecureStorageFactory.IsSupportedPlatform() || !storeSessionInfoAndSkipLoginWhenPossible)
+                return (false, null);
+            
+            var done = false;
+            SequenceWallet wallet = null;
+            SequenceWallet.OnFailedToRecoverSession += HandleFailedToRecover;
+            SequenceWallet.OnWalletCreated += HandleRecoveredWallet;
+
+            TryToRestoreSession();
+            SetupAuthenticator();
+
+            while (!done)
+                await Task.Yield();
+
+            return (true, wallet);
+            
+            void HandleRecoveredWallet(SequenceWallet newWallet)
+            {
+                wallet = newWallet;
+                done = true;
+                
+                SequenceWallet.OnFailedToRecoverSession -= HandleFailedToRecover;
+                SequenceWallet.OnWalletCreated -= HandleRecoveredWallet;
+            }
+
+            void HandleFailedToRecover(string error)
+            {
+                HandleRecoveredWallet(null);
+            }
+        }
+        
         public void TryToRestoreSession()
         {
             if (!_storeSessionWallet)

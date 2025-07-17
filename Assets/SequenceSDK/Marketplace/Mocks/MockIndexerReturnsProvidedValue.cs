@@ -49,6 +49,11 @@ namespace Sequence.Marketplace.Mocks
             throw new System.NotImplementedException();
         }
 
+        public Task<EtherBalance> GetNativeTokenBalance(string accountAddress)
+        {
+            return GetEtherBalance(accountAddress);
+        }
+
         public async Task<EtherBalance> GetEtherBalance(string accountAddress)
         {
             return new EtherBalance()

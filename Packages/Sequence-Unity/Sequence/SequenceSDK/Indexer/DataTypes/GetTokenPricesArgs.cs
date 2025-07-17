@@ -6,9 +6,9 @@ namespace Sequence
     [Serializable]
     internal class GetTokenPricesArgs
     {
-        public PriceFeed.Token[] tokens;
+        public Token[] tokens;
         
-        public GetTokenPricesArgs(PriceFeed.Token[] tokens)
+        public GetTokenPricesArgs(Token[] tokens)
         {
             this.tokens = tokens;
         }

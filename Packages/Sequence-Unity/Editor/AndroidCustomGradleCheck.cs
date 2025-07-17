@@ -15,7 +15,7 @@ namespace Sequence.Editor
 
         private static List<string> _cachedWarnings;
         
-        private const string _docsUrl = "https://docs.sequence.xyz/sdk/unity/recovering-sessions#android";
+        private const string _docsUrl = "https://docs.sequence.xyz/sdk/unity/onboard/recovering-sessions#android";
 
         public void OnPreprocessBuild(BuildReport report)
         {
@@ -48,7 +48,7 @@ namespace Sequence.Editor
 
                 if (warnings.Count > 0)
                 {
-                    WarningPopup.ShowWindow(warnings);
+                    SequenceWarningPopup.ShowWindow(warnings, _docsUrl);
                 }
             }
         }
@@ -83,45 +83,6 @@ namespace Sequence.Editor
             }
 
             return false;
-        }
-
-        private class WarningPopup : EditorWindow
-        {
-            private static List<string> warnings;
-
-            public static void ShowWindow(List<string> warningsToShow)
-            {
-                if (warningsToShow == null || warningsToShow.Count == 0)
-                {
-                    return;
-                }
-                warnings = warningsToShow;
-                var window = GetWindow<WarningPopup>("Sequence Build Warnings");
-                window.position = new Rect(Screen.width / 2, Screen.height / 2, 400, 200);
-                window.Show();
-            }
-
-            private void OnGUI()
-            {
-                GUILayout.Label("Warnings Detected", EditorStyles.boldLabel);
-
-                foreach (string warning in warnings)
-                {
-                    EditorGUILayout.HelpBox(warning, MessageType.Warning);
-
-                    if (GUILayout.Button("Learn More", GUILayout.Width(100)))
-                    {
-                        Application.OpenURL(_docsUrl);
-                    }
-                }
-
-                GUILayout.FlexibleSpace();
-
-                if (GUILayout.Button("Dismiss", GUILayout.Height(30)))
-                {
-                    Close();
-                }
-            }
         }
     }
 }

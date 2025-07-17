@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -109,7 +110,8 @@ namespace Sequence.EmbeddedWallet
         }
     }
     
-    internal class LinkedWalletsRequestData
+    [Preserve]
+    public class LinkedWalletsRequestData
     {
         public string signatureChainId;
         public string parentWalletAddress;
@@ -118,11 +120,13 @@ namespace Sequence.EmbeddedWallet
         public string linkedWalletAddress;
     }
     
-    internal class LinkedWalletsResponseData
+    [Preserve]
+    public class LinkedWalletsResponseData
     {
         public LinkedWalletData[] linkedWallets;
     }
 
+    [Preserve]
     public class LinkedWalletData
     {
         public int id;
@@ -132,21 +136,23 @@ namespace Sequence.EmbeddedWallet
         public string createdAt;
     }
 
-    internal class NonceRequestData
+    public class NonceRequestData
     {
         public string walletAddress;
         
+        [Preserve]
         public NonceRequestData(string walletAddress)
         {
             this.walletAddress = walletAddress;
         }
     }
 
-    internal class NonceResponseData
+    public class NonceResponseData
     {
         public string nonce;
         public string verificationUrl;
 
+        [Preserve]
         public NonceResponseData(string nonce, string verificationUrl)
         {
             this.nonce = nonce;
