@@ -9,6 +9,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
+    [Preserve]
     public class Attestation
     {
         public static readonly byte[] ACCEPT_IMPLICIT_REQUEST_MAGIC_PREFIX =

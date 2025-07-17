@@ -1,32 +1,40 @@
 using System;
-using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
 {
     internal class IosRedirectHandler : RedirectHandler
     {
-#if UNITY_IOS && !UNITY_EDITOR
-        [DllImport("__Internal")]
-        private static extern void _OpenURLInWKWebView(IntPtr urlString);
-#else
-        private static void _OpenURLInWKWebView(IntPtr urlString) { }
-#endif
+        private NativeReceiver _receiver;
 
         public override async Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload)
         {
-            Application.OpenURL(ConstructUrl(url, action, payload));
+            var go = new GameObject("SequenceNativeReceiver");
+            _receiver = go.AddComponent<NativeReceiver>();
             
-            var utf8Bytes = System.Text.Encoding.UTF8.GetBytes(ConstructUrl(url, action, payload) + '\0');
-            var urlPtr = Marshal.AllocHGlobal(utf8Bytes.Length);
-            Marshal.Copy(utf8Bytes, 0, urlPtr, utf8Bytes.Length);
-
-            _OpenURLInWKWebView(urlPtr);
-
-            await Task.Yield();
+            var response = await _receiver.WaitForResponse(ConstructUrl(url, action, payload));
             
-            return (false, default);
+            GameObject.Destroy(_receiver.gameObject);
+            
+            var data = response.ExtractQueryAndHashParameters();
+            
+            Debug.Log($"Query Data: {JsonConvert.SerializeObject(data)}");
+            
+            var id = data["id"];
+            if (id != Id)
+                throw new Exception("Invalid request id");
+
+            if (data.TryGetValue("error", out var error))
+                throw new Exception(error);
+            
+            var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(Uri.UnescapeDataString(data["payload"])));
+            var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
+
+            return (true, responsePayload);
         }
     }
 }

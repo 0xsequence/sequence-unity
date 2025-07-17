@@ -3,9 +3,11 @@ using System.Linq;
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
+    [Preserve]
     public class RSY
     {
         public BigInt r;

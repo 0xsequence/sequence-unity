@@ -8,7 +8,7 @@ namespace Sequence.EcosystemWallet.Browser
 {
     internal abstract class RedirectHandler
     {
-        protected string Id = $"sequence:{Guid.NewGuid().ToString()}";
+        protected string Id = $"sequence-{Guid.NewGuid().ToString()}";
 
         public abstract Task<(bool Result, TResponse Data)> WaitForResponse<TPayload, TResponse>(string url, string action, TPayload payload);
         

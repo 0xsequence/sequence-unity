@@ -6,6 +6,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
+    [Preserve]
     [Serializable]
     public class AuthData
     {

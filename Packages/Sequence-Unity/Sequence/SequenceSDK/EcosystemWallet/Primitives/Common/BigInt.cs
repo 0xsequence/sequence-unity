@@ -6,6 +6,7 @@ using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives.Common
 {
+    [Preserve]
     [JsonConverter(typeof(BigIntConverter))]
     public class BigInt
     {

@@ -3,8 +3,9 @@ using Newtonsoft.Json;
 using Sequence.Utils;
 using UnityEngine.Scripting;
 
-namespace Sequence {
-    
+namespace Sequence 
+{
+    [Preserve]
     [JsonConverter(typeof(AddressJsonConverter))]
     public class Address {
         public readonly string Value;

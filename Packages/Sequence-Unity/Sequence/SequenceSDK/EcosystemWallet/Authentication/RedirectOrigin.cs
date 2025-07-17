@@ -1,12 +1,13 @@
 using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
-    internal static class RedirectOrigin
+    public static class RedirectOrigin
     {
         public const string DefaultOrigin = "http://localhost:8080/";
         
-#if UNITY_WEBGL &&! UNITY_EDITOR
+#if !UNITY_EDITOR && UNITY_WEBGL
         [DllImport("__Internal")]
         private static extern System.IntPtr GetPageOrigin();
             
@@ -14,10 +15,10 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             return Marshal.PtrToStringAnsi(GetPageOrigin());
         }
-#elif UNITY_IOS && UNITY_EDITOR
+#elif !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
         public static string GetOriginString()
         {
-            return "sequencedemo://auth/callback";
+            return $"{CreateUrlScheme()}://";
         }
 #else
         public static string GetOriginString()
@@ -25,5 +26,10 @@ namespace Sequence.EcosystemWallet.Authentication
             return DefaultOrigin;
         }
 #endif
+
+        public static string CreateUrlScheme()
+        {
+            return Application.identifier.Replace(".", "").ToLower();
+        }
     }
 }

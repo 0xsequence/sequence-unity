@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -39,10 +40,10 @@ namespace Sequence.EcosystemWallet.Browser
                 if (data.error != null)
                     throw new Exception(data.error.error);
 
-                var query = new NameValueCollection();
-                query.Add("payload", data.payload);
+                var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(data.payload));
+                var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
 
-                return (true, default);
+                return (true, responsePayload);
             }
             catch (Exception ex)
             {

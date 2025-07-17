@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -7,6 +7,20 @@ namespace Sequence.EcosystemWallet.Browser
     internal class NativeReceiver : MonoBehaviour
     {
         private string _response;
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            {
+                var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                using (var plugin = new AndroidJavaClass("xyz.sequence.DeeplinkHandler"))
+                {
+                    plugin.CallStatic("checkIntent", activity);
+                }
+            }
+#endif
+        }
 
         public void HandleResponse(string response)
         {
@@ -23,11 +37,14 @@ namespace Sequence.EcosystemWallet.Browser
             return _response;
         }
         
-#if UNITY_WEBGL && !UNITY_EDITOR
-        [DllImport("__Internal")]
+#if !UNITY_EDITOR && (UNITY_WEBGL || UNITY_IOS)
+        [System.Runtime.InteropServices.DllImport("__Internal")]
         private static extern void OpenWalletApp(string url);
 #else
-        private static void OpenWalletApp(string url) { }
+        private static void OpenWalletApp(string url)
+        {
+            Application.OpenURL(url);
+        }
 #endif
     }
 }

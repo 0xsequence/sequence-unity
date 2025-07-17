@@ -2,9 +2,11 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.EcosystemWallet.Primitives;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
+    [Preserve]
     [JsonConverter(typeof(SessionDataConverter))]
     internal class SessionData
     {
@@ -29,6 +31,7 @@ namespace Sequence.EcosystemWallet.Authentication
         }
     }
     
+    [Preserve]
     internal class SessionDataConverter : JsonConverter<SessionData>
     {
         public override void WriteJson(JsonWriter writer, SessionData value, JsonSerializer serializer)
