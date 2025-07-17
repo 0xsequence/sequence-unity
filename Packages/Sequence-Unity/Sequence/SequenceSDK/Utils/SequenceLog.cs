@@ -34,7 +34,7 @@ namespace Sequence.Utils
 
         private static string BuildMessage(string message)
         {
-            return $"<color=#f987ff>[Sequence Dev]</color> {message}";
+            return $"<color=#b142d6>[Sequence Dev]</color> {message}";
         }
     }
 }
