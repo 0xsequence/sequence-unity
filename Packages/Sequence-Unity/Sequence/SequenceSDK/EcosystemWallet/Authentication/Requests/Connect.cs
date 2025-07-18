@@ -8,7 +8,7 @@ namespace Sequence.EcosystemWallet.Authentication
         public string preferredLoginMethod;
         public string email;
         public string implicitSessionRedirectUrl;
-        public object permissions;
+        public SessionPermissions permissions;
     }
     
     public struct ConnectResponse

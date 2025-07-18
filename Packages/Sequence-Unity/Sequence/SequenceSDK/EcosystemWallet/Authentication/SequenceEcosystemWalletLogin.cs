@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet.Authentication
@@ -95,7 +97,7 @@ namespace Sequence.EcosystemWallet.Authentication
                 preferredLoginMethod = preferredLoginMethod,
                 email = email,
                 implicitSessionRedirectUrl = isExplicit ? null : RedirectOrigin.GetOriginString(),
-                permissions = permissions?.ToJson()
+                permissions = permissions
             };
             
             var action = isExplicit ? "addExplicitSession" : "addImplicitSession";

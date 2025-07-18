@@ -33,7 +33,7 @@ namespace Sequence.EcosystemWallet.Authentication
             var rule = new ParameterRule
             {
                 cumulative = cumulative,
-                operation = operation,
+                operation = (int)operation,
                 value = value.HexStringToByteArray().PadRight(32),
                 offset = offset,
                 mask = mask

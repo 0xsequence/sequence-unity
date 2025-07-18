@@ -18,20 +18,6 @@ namespace Sequence.EcosystemWallet.Browser
             Application.deepLinkActivated -= HandleResponse;
         }
 
-        private void OnApplicationFocus(bool hasFocus)
-        {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-            {
-                var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-                using (var plugin = new AndroidJavaClass("xyz.sequence.DeeplinkHandler"))
-                {
-                    plugin.CallStatic("checkIntent", activity);
-                }
-            }
-#endif
-        }
-
         public void HandleResponse(string response)
         {
             _response = response;

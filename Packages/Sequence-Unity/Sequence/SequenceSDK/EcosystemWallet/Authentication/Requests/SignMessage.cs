@@ -2,6 +2,7 @@ using Sequence.EcosystemWallet.Primitives.Common;
 
 namespace Sequence.EcosystemWallet.Authentication.Requests
 {
+    
     public struct SignMessageArgs
     {
         public Address address;

@@ -3,8 +3,8 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
-    [JsonConverter(typeof(EnumConverter<BehaviourOnError>))]
-    public enum ParameterOperation
+    [JsonConverter(typeof(EnumConverter<ParameterOperation>))]
+    public enum ParameterOperation : int
     {
         equal = 0,
         notEqual = 1,

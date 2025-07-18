@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
+using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -14,10 +15,10 @@ namespace Sequence.EcosystemWallet.Primitives
         public static readonly byte[] Uint256Mask = Enumerable.Repeat((byte)0xff, 32).ToArray().PadLeft(32);
         
         public bool cumulative;
-        public ParameterOperation operation;
-        public byte[] value; 
-        public BigInteger offset;
-        public byte[] mask;
+        public int operation;
+        public Bytes value; 
+        public BigInt offset;
+        public Bytes mask;
 
         public object ToJson()
         {
@@ -25,17 +26,9 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 cumulative = cumulative,
                 operation = (int)operation,
-                value = new Dictionary<string, object>
-                {
-                    {"_isUint8Array", true},
-                    {"data", value.ByteArrayToHexStringWithPrefix()}
-                },
-                offset = offset.ToString(),
-                mask = new Dictionary<string, object>
-                {
-                    {"_isUint8Array", true},
-                    {"data", mask.ByteArrayToHexStringWithPrefix()}
-                }
+                value = value,
+                offset = offset,
+                mask = mask
             };
         }
 
@@ -43,9 +36,9 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             byte operationCumulative = (byte)(((byte)operation << 1) | (cumulative ? 1 : 0));
             List<byte> result = new() { operationCumulative };
-            result.AddRange(value.PadLeft(32));
-            result.AddRange(offset.ToByteArray().PadLeft(32));
-            result.AddRange(mask.PadLeft(32));
+            result.AddRange(value.Data.PadLeft(32));
+            result.AddRange(offset.Value.ToByteArray().PadLeft(32));
+            result.AddRange(mask.Data.PadLeft(32));
             return result.ToArray();
         }
         
@@ -55,7 +48,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new()
             {
                 cumulative = (bool)data["cumulative"],
-                operation = (ParameterOperation)Convert.ToInt32(data["operation"]),
+                operation = Convert.ToInt32(data["operation"]),
                 value = data["value"].ToString().HexStringToByteArray(),
                 offset = BigInteger.Parse(data["offset"].ToString()),
                 mask = data["mask"].ToString().HexStringToByteArray()
@@ -78,7 +71,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new ParameterRule
             {
                 cumulative = cumulative,
-                operation = operation,
+                operation = (int)operation,
                 value = value,
                 offset = offset,
                 mask = mask
