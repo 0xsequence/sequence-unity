@@ -3596,7 +3596,7 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: Sequence.Boilerplates.SequenceEcosystemWalletWindow,
           SequenceBoilerplates
         m_MethodName: OnImplicitSessionTypeChanged
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3973,7 +3973,7 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: Sequence.Boilerplates.SequenceEcosystemWalletWindow,
           SequenceBoilerplates
         m_MethodName: OnExplicitSessionTypeChanged
-        m_Mode: 3
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

@@ -26,7 +26,7 @@ namespace Sequence.Editor
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
             _pathToBuiltProject = pathToBuiltProject;
-
+            
             if (string.IsNullOrWhiteSpace(_urlScheme))
             {
                 Debug.LogWarning(SequenceConfig.MissingConfigError("Url Scheme").Message);
@@ -49,51 +49,7 @@ namespace Sequence.Editor
         
         private static void CheckPlistUrlScheme()
         {
-#if UNITY_STANDALONE_OSX
-            PlistDocument plist = new PlistDocument();
-            plist.ReadFromFile(_plistPath);
-
-            PlistElementDict rootDict = plist.root;
-            if (!rootDict.values.ContainsKey("CFBundleURLTypes"))
-            {
-                throw _missingUrlSchemeException;
-            }
-            if (rootDict.values["CFBundleURLTypes"] is PlistElementArray existingArray)
-            {
-                if (existingArray.values.Count == 0)
-                {
-                    throw _missingUrlSchemeException;
-                }
-                if (existingArray.values[0] is PlistElementDict existingDict)
-                {
-                    if (!existingDict.values.ContainsKey("CFBundleURLSchemes"))
-                    {
-                        throw _missingUrlSchemeException;
-                    }
-                    if (existingDict.values["CFBundleURLSchemes"] is PlistElementArray newArray)
-                    {
-                        List<PlistElement> values = newArray.values;
-                        int count = values.Count;
-                        if (count == 0)
-                        {
-                            throw _missingUrlSchemeException;
-                        }
-                        for (int i =0; i < count; i++)
-                        {
-                            PlistElement plistElement = values[i];
-                            if (plistElement is PlistElementString plistElementString)
-                            {
-                                if (plistElementString.value == _urlScheme)
-                                {
-                                    return;
-                                }
-                            }
-                        }
-                        throw _missingUrlSchemeException;
-                    }
-                }
-            }
-#elif UNITY_IOS
+#if UNITY_IOS || UNITY_STANDALONE_OSX
             var plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
 
@@ -111,6 +67,7 @@ namespace Sequence.Editor
 
             plist.WriteToFile(_plistPath);
 
+#if UNITY_IOS
             // Add SafariServices.framework
             var projPath = PBXProject.GetPBXProjectPath(_pathToBuiltProject);
             var proj = new PBXProject();
@@ -119,6 +76,8 @@ namespace Sequence.Editor
             var targetGuid = proj.GetUnityFrameworkTargetGuid();
             proj.AddFrameworkToProject(targetGuid, "SafariServices.framework", false);
             proj.WriteToFile(projPath);
+#endif
+            
 #endif
         }
         

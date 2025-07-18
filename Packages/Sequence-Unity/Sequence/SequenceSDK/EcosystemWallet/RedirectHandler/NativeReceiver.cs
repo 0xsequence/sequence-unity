@@ -8,6 +8,16 @@ namespace Sequence.EcosystemWallet.Browser
     {
         private string _response;
 
+        private void Awake()
+        {
+            Application.deepLinkActivated += HandleResponse;
+        }
+
+        private void OnDestroy()
+        {
+            Application.deepLinkActivated -= HandleResponse;
+        }
+
         private void OnApplicationFocus(bool hasFocus)
         {
 #if UNITY_ANDROID && !UNITY_EDITOR

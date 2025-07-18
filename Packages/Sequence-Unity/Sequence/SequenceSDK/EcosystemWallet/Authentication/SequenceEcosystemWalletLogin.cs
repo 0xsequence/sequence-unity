@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
@@ -14,6 +16,7 @@ namespace Sequence.EcosystemWallet.Authentication
         private Chain _chain;
         private EOAWallet _sessionWallet;
         private SessionStorage _sessionStorage;
+        private List<SessionCredentials> _credentials = new();
         
         public SequenceEcosystemWalletLogin(Chain chain)
         {
@@ -54,13 +57,18 @@ namespace Sequence.EcosystemWallet.Authentication
 
         public SequenceEcosystemWallet[] RecoverSessionsFromStorage()
         {
-            var credentials = _sessionStorage.GetSessions();
-            if (credentials.Length == 0)
+            _credentials = _sessionStorage.GetSessions().ToList();
+            return GetAllSessions();
+        }
+
+        public SequenceEcosystemWallet[] GetAllSessions()
+        {
+            if (_credentials.Count == 0)
                 throw new Exception("No session found in storage.");
 
-            var wallets = new SequenceEcosystemWallet[credentials.Length];
-            for (var i = 0; i < credentials.Length; i++)
-                wallets[i] = new SequenceEcosystemWallet(credentials[i]);
+            var wallets = new SequenceEcosystemWallet[_credentials.Count];
+            for (var i = 0; i < _credentials.Count; i++)
+                wallets[i] = new SequenceEcosystemWallet(_credentials[i]);
 
             return wallets;
         }
@@ -109,6 +117,8 @@ namespace Sequence.EcosystemWallet.Authentication
                 response.Data.email);
             
             _sessionStorage.AddSession(credentials);
+            _credentials.Add(credentials);
+            
             return new SequenceEcosystemWallet(credentials);
         }
     }

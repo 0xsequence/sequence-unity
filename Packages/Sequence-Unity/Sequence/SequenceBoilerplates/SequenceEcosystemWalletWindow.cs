@@ -220,6 +220,7 @@ namespace Sequence.Boilerplates
 
         private void RecoverWalletFromStorage()
         {
+            _login.RecoverSessionsFromStorage();
             ShowWallet(true);
         }
 
@@ -232,7 +233,7 @@ namespace Sequence.Boilerplates
 
         private void ShowWallet(bool recovered)
         {
-            _wallets = _login.RecoverSessionsFromStorage();
+            _wallets = _login.GetAllSessions();
             _walletText.text = _wallets[_selectedWallet].Address.Value;
             
             var addresses = _wallets.Select(w => w.SessionAddress.Value).ToList();
