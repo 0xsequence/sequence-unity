@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Authentication
@@ -15,10 +16,10 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             return Marshal.PtrToStringAnsi(GetPageOrigin());
         }
-#elif !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+#elif !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX)
         public static string GetOriginString()
         {
-            return $"{CreateUrlScheme()}://";
+            return $"{UrlSchemeFactory.CreateFromAppIdentifier()}://";
         }
 #else
         public static string GetOriginString()
@@ -26,10 +27,5 @@ namespace Sequence.EcosystemWallet.Authentication
             return DefaultOrigin;
         }
 #endif
-
-        public static string CreateUrlScheme()
-        {
-            return Application.identifier.Replace(".", "").ToLower();
-        }
     }
 }

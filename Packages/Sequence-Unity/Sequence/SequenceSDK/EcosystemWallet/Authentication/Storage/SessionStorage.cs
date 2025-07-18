@@ -30,25 +30,25 @@ namespace Sequence.EcosystemWallet.Authentication
             return _storage.RetrieveString(WalletAddressKey);
         }
 
-        public void AddSession(SessionData session)
+        public void AddSession(SessionCredentials session)
         {
             var sessions = GetSessions();
             var newSessions = sessions.AddToArray(session);
             StoreSessions(newSessions);
         }
         
-        public void StoreSessions(SessionData[] sessions)
+        public void StoreSessions(SessionCredentials[] sessions)
         {
             var json = JsonConvert.SerializeObject(sessions);
             _storage.StoreString(SessionsKey, json);
         }
         
-        public SessionData[] GetSessions()
+        public SessionCredentials[] GetSessions()
         {
             var json = _storage.RetrieveString(SessionsKey);
             return string.IsNullOrEmpty(json) ? 
-                Array.Empty<SessionData>() : 
-                JsonConvert.DeserializeObject<SessionData[]>(json);
+                Array.Empty<SessionCredentials>() : 
+                JsonConvert.DeserializeObject<SessionCredentials[]>(json);
         }
     }
 }

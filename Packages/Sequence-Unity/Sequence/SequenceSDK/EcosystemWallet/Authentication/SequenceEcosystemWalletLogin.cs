@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
+using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
@@ -19,41 +20,49 @@ namespace Sequence.EcosystemWallet.Authentication
             _chain = chain;
             _sessionStorage = new SessionStorage();
         }
+
+        public async Task<SequenceEcosystemWallet> AddSession(SessionPermissions permissions)
+        {
+            Assert.IsNotNull(permissions);
+            return await CreateNewSession(true, permissions, string.Empty);
+        }
         
         public async Task<SequenceEcosystemWallet> SignInWithEmail(string email, SessionPermissions permissions)
         {
-            return await CreateNewSession(permissions,"email", email);
+            return await CreateNewSession(false, permissions,"email", email);
         }
         
         public async Task<SequenceEcosystemWallet> SignInWithGoogle(SessionPermissions permissions)
         {
-            return await CreateNewSession(permissions,"google");
+            return await CreateNewSession(false, permissions,"google");
         }
         
         public async Task<SequenceEcosystemWallet> SignInWithApple(SessionPermissions permissions)
         {
-            return await CreateNewSession(permissions,"apple");
+            return await CreateNewSession(false, permissions,"apple");
         }
         
         public async Task<SequenceEcosystemWallet> SignInWithPasskey(SessionPermissions permissions)
         {
-            return await CreateNewSession(permissions,"passkey");
+            return await CreateNewSession(false, permissions,"passkey");
         }
         
         public async Task<SequenceEcosystemWallet> SignInWithMnemonic(SessionPermissions permissions)
         {
-            return await CreateNewSession(permissions,"mnemonic");
+            return await CreateNewSession(false, permissions,"mnemonic");
         }
 
-        public SequenceEcosystemWallet RecoverSessionFromStorage()
+        public SequenceEcosystemWallet[] RecoverSessionsFromStorage()
         {
-            var walletAddress = _sessionStorage.GetWalletAddress();
-            var sessions = _sessionStorage.GetSessions();
-
-            if (string.IsNullOrEmpty(walletAddress) || sessions.Length == 0)
+            var credentials = _sessionStorage.GetSessions();
+            if (credentials.Length == 0)
                 throw new Exception("No session found in storage.");
 
-            return new SequenceEcosystemWallet(new Address(walletAddress));
+            var wallets = new SequenceEcosystemWallet[credentials.Length];
+            for (var i = 0; i < credentials.Length; i++)
+                wallets[i] = new SequenceEcosystemWallet(credentials[i]);
+
+            return wallets;
         }
 
         public void SignOut()
@@ -64,24 +73,24 @@ namespace Sequence.EcosystemWallet.Authentication
         /// <summary>
         /// Create an implicit- or explicit session based on a given set of permissions.
         /// </summary>
+        /// <param name="isExplicit">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        private async Task<SequenceEcosystemWallet> CreateNewSession(SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        private async Task<SequenceEcosystemWallet> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             _sessionWallet = new EOAWallet();
             
-            var isImplicitSession = permissions == null;
             var payload = new ConnectArgs
             {
                 sessionAddress = _sessionWallet.GetAddress(),
                 preferredLoginMethod = preferredLoginMethod,
                 email = email,
-                implicitSessionRedirectUrl = isImplicitSession ? RedirectOrigin.GetOriginString() : null,
-                permissions = isImplicitSession ? null : permissions.ToJson()
+                implicitSessionRedirectUrl = isExplicit ? null : RedirectOrigin.GetOriginString(),
+                permissions = permissions?.ToJson()
             };
             
-            var action = isImplicitSession ? "addImplicitSession" : "addExplicitSession";
+            var action = isExplicit ? "addExplicitSession" : "addImplicitSession";
             var url = $"{WalletUrl}/request/connect";
 
             var handler = RedirectFactory.CreateHandler();
@@ -89,18 +98,18 @@ namespace Sequence.EcosystemWallet.Authentication
             if (!response.Result)
                 throw new Exception("Error during request");
             
-            var walletAddress = response.Data.walletAddress;
-            _sessionStorage.StoreWalletAddress(walletAddress);
-            _sessionStorage.AddSession(new SessionData(
-                _sessionWallet.GetPrivateKeyAsHex(), 
-                walletAddress, 
-                response.Data.attestation, 
+            var credentials = new SessionCredentials(
+                isExplicit,
+                _sessionWallet.GetPrivateKeyAsHex(),
+                response.Data.walletAddress,
+                response.Data.attestation,
                 response.Data.signature,
                 ChainDictionaries.ChainIdOf[_chain],
                 response.Data.loginMethod,
-                response.Data.email));
+                response.Data.email);
             
-            return new SequenceEcosystemWallet(walletAddress);
+            _sessionStorage.AddSession(credentials);
+            return new SequenceEcosystemWallet(credentials);
         }
     }
 }

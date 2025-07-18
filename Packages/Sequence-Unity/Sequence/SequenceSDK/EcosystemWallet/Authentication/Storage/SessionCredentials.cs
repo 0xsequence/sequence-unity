@@ -2,14 +2,16 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.EcosystemWallet.Primitives.Common;
 using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
     [Preserve]
-    [JsonConverter(typeof(SessionDataConverter))]
-    internal class SessionData
+    [JsonConverter(typeof(SessionCredentialsConverter))]
+    internal class SessionCredentials
     {
+        public bool isExplicit;
         public string privateKey;
         public Address address;
         public Attestation attestation;
@@ -18,9 +20,10 @@ namespace Sequence.EcosystemWallet.Authentication
         public string loginMethod;
         public string email;
         
-        public SessionData(string privateKey, Address address, Attestation attestation, RSY signature, 
+        public SessionCredentials(bool isExplicit, string privateKey, Address address, Attestation attestation, RSY signature, 
             string chainId, string loginMethod, string email)
         {
+            this.isExplicit = isExplicit;
             this.privateKey = privateKey;
             this.address = address;
             this.attestation = attestation;
@@ -32,11 +35,14 @@ namespace Sequence.EcosystemWallet.Authentication
     }
     
     [Preserve]
-    internal class SessionDataConverter : JsonConverter<SessionData>
+    internal class SessionCredentialsConverter : JsonConverter<SessionCredentials>
     {
-        public override void WriteJson(JsonWriter writer, SessionData value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, SessionCredentials value, JsonSerializer serializer)
         {
             writer.WriteStartObject();
+            
+            writer.WritePropertyName("isExplicit");
+            writer.WriteValue(value.isExplicit);
 
             writer.WritePropertyName("privateKey");
             writer.WriteValue(value.privateKey);
@@ -74,11 +80,12 @@ namespace Sequence.EcosystemWallet.Authentication
             writer.WriteEndObject();
         }
 
-        public override SessionData ReadJson(JsonReader reader, Type objectType, SessionData existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override SessionCredentials ReadJson(JsonReader reader, Type objectType, SessionCredentials existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             JObject obj = JObject.Load(reader);
 
-            string privateKey = obj["privateKey"]?.ToString();
+            var isExplicit = obj["isExplicit"]?.ToObject<bool>() ?? false;
+            var privateKey = obj["privateKey"]?.ToString();
             var address = obj["address"]?.ToObject<Address>(serializer);
             var attestation = obj["attestation"]?.ToObject<Attestation>(serializer);
             var signature = obj["signature"]?.ToObject<RSY>(serializer);
@@ -87,7 +94,7 @@ namespace Sequence.EcosystemWallet.Authentication
             string loginMethod = obj["loginMethod"]?.ToString();
             string email = obj["email"]?.ToString();
 
-            return new SessionData(privateKey, address, attestation, signature, chainId, loginMethod, email);
+            return new SessionCredentials(isExplicit, privateKey, address, attestation, signature, chainId, loginMethod, email);
         }
     }
 }

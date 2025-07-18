@@ -4,6 +4,7 @@ using Sequence.EcosystemWallet.Authentication.Requests;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
+using Sequence.Wallet;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
@@ -12,10 +13,20 @@ namespace Sequence.EcosystemWallet.Authentication
         public static Action<SequenceEcosystemWallet> OnWalletCreated;
         
         public Address Address { get; }
+        public Address SessionAddress { get; }
+        public Chain Chain { get; }
+        public bool IsExplicit { get; }
+
+        private readonly SessionCredentials _credentials;
         
-        public SequenceEcosystemWallet(Address address)
+        internal SequenceEcosystemWallet(SessionCredentials credentials)
         {
-            Address = address;
+            _credentials = credentials;
+            
+            Address = credentials.address;
+            SessionAddress = new EOAWallet(credentials.privateKey).GetAddress();
+            Chain = ChainDictionaries.ChainById[credentials.chainId];
+            IsExplicit = credentials.isExplicit;
             OnWalletCreated?.Invoke(this);
         }
 

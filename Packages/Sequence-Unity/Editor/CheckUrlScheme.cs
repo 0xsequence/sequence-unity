@@ -8,6 +8,7 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Xml;
+using Sequence.Utils;
 #if UNITY_IOS || UNITY_STANDALONE_OSX
 using UnityEditor.iOS.Xcode;
 #endif
@@ -18,13 +19,13 @@ namespace Sequence.Editor
     {
         private static string _plistPath;
         private static string _pathToBuiltProject;
-        private static string _urlScheme;
+        
+        private static string _urlScheme => UrlSchemeFactory.CreateFromAppIdentifier();
         
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
             _pathToBuiltProject = pathToBuiltProject;
-            _urlScheme = Application.identifier.Replace(".", "").ToLower();
 
             if (string.IsNullOrWhiteSpace(_urlScheme))
             {
@@ -125,7 +126,6 @@ namespace Sequence.Editor
         public void OnPreprocessBuild(BuildReport report)
         {
 #if UNITY_ANDROID
-            _urlScheme = Application.identifier.Replace(".", "").ToLower();
             string manifestPath = Path.Combine(Application.dataPath, "Plugins/Android/AndroidManifest.xml");
 
             if (!File.Exists(manifestPath))

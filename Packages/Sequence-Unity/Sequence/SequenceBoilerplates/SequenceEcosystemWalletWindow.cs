@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Sequence.EcosystemWallet.Authentication;
 using Sequence.EcosystemWallet.Primitives;
 using TMPro;
@@ -9,17 +10,24 @@ namespace Sequence.Boilerplates
 {
     public class SequenceEcosystemWalletWindow : MonoBehaviour
     {
-        private enum SessionType
+        private enum ImplicitSessionType
         {
-            Implicit,
-            ExplicitOpen,
-            ExplicitRestrictive
+            None,
+            Unrestrictive,
+            BasicRestrictive
+        }
+        
+        private enum ExplicitSessionType
+        {
+            Unrestrictive,
+            BasicRestrictive
         }
         
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
         [SerializeField] private Button _signOutButton;
         [SerializeField] private Button _signMessageButton;
+        [SerializeField] private TMP_Dropdown _walletDropdown;
         [SerializeField] private TMP_InputField _emailInput;
         [SerializeField] private TMP_InputField _messageInput;
         [SerializeField] private TMP_Text _walletText;
@@ -30,8 +38,10 @@ namespace Sequence.Boilerplates
         [SerializeField] private MessagePopup _messagePopup;
         
         private SequenceEcosystemWalletLogin _login;
-        private SequenceEcosystemWallet _wallet;
-        private SessionType _sessionType;
+        private SequenceEcosystemWallet[] _wallets;
+        private ImplicitSessionType _implicitPermissions;
+        private ExplicitSessionType _explicitPermissions;
+        private int _selectedWallet;
         private string _curEmail;
         private string _curSignature;
         
@@ -42,7 +52,8 @@ namespace Sequence.Boilerplates
             _messagePopup.gameObject.SetActive(false);
             _loadingOverlay.SetActive(false);
 
-            OnSessionTypeChanged(0);
+            OnImplicitSessionTypeChanged(0);
+            OnExplicitSessionTypeChanged(0);
             EnableWalletState(false);
             EnableEmailButton(true);
             ShowSignature(string.Empty);
@@ -56,8 +67,8 @@ namespace Sequence.Boilerplates
             
             try
             {
-                var wallet = await _login.SignInWithEmail(_curEmail, GetPermissionsFromSessionType());
-                ShowWallet(wallet, false);
+                await _login.SignInWithEmail(_curEmail, GetImplicitPermissions());
+                ShowWallet(false);
             }
             catch (Exception e)
             {
@@ -71,8 +82,8 @@ namespace Sequence.Boilerplates
             
             try
             {
-                var wallet = await _login.SignInWithGoogle(GetPermissionsFromSessionType());
-                ShowWallet(wallet, false);
+                await _login.SignInWithGoogle(GetImplicitPermissions());
+                ShowWallet(false);
             }
             catch (Exception e)
             {
@@ -86,8 +97,8 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var wallet = await _login.SignInWithApple(GetPermissionsFromSessionType());
-                ShowWallet(wallet, false);
+                await _login.SignInWithApple(GetImplicitPermissions());
+                ShowWallet(false);
             }
             catch (Exception e)
             {
@@ -101,8 +112,8 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var wallet = await _login.SignInWithPasskey(GetPermissionsFromSessionType());
-                ShowWallet(wallet, false);
+                await _login.SignInWithPasskey(GetImplicitPermissions());
+                ShowWallet(false);
             }
             catch (Exception e)
             {
@@ -116,8 +127,8 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var wallet = await _login.SignInWithMnemonic(GetPermissionsFromSessionType());
-                ShowWallet(wallet, false);
+                await _login.SignInWithMnemonic(GetImplicitPermissions());
+                ShowWallet(false);
             }
             catch (Exception e)
             {
@@ -132,7 +143,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var signature = await _wallet.SignMessage(Chain.TestnetArbitrumSepolia, message);
+                var signature = await _wallets[_selectedWallet].SignMessage(Chain.TestnetArbitrumSepolia, message);
                 ShowSignature(signature.signature);
                 SetLoading(false);
             }
@@ -144,7 +155,7 @@ namespace Sequence.Boilerplates
 
         public void CopyWalletAddress()
         {
-            CopyText(_wallet.Address.Value);
+            CopyText(_wallets[_selectedWallet].Address.Value);
         }
 
         public void CopySignature()
@@ -164,15 +175,40 @@ namespace Sequence.Boilerplates
             _messagePopup.Show("Copied");
         }
 
+        public async void AddExplicitSession()
+        {
+            SetLoading(true);
+
+            try
+            {
+                await _login.AddSession(GetExplicitPermissions());
+                ShowWallet(false);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
+        }
+
         public void SignOut()
         {
             _login.SignOut();
             EnableWalletState(false);
         }
-
-        public void OnSessionTypeChanged(int index)
+        
+        public void OnWalletChanged(int index)
         {
-            _sessionType = (SessionType)index;
+            _selectedWallet = index;
+        }
+
+        public void OnImplicitSessionTypeChanged(int index)
+        {
+            _implicitPermissions = (ImplicitSessionType)index;
+        }
+        
+        public void OnExplicitSessionTypeChanged(int index)
+        {
+            _explicitPermissions = (ExplicitSessionType)index;
         }
 
         private void ShowError(string error)
@@ -184,8 +220,7 @@ namespace Sequence.Boilerplates
 
         private void RecoverWalletFromStorage()
         {
-            var wallet = _login.RecoverSessionFromStorage();
-            ShowWallet(wallet, true);
+            ShowWallet(true);
         }
 
         private void ShowSignature(string signature)
@@ -195,10 +230,16 @@ namespace Sequence.Boilerplates
             _signMessageButton.interactable = !string.IsNullOrEmpty(_curSignature);
         }
 
-        private void ShowWallet(SequenceEcosystemWallet wallet, bool recovered)
+        private void ShowWallet(bool recovered)
         {
-            _wallet = wallet;
-            _walletText.text = wallet.Address;
+            _wallets = _login.RecoverSessionsFromStorage();
+            _walletText.text = _wallets[_selectedWallet].Address.Value;
+            
+            var addresses = _wallets.Select(w => w.SessionAddress.Value).ToList();
+            _walletDropdown.ClearOptions();
+            _walletDropdown.AddOptions(addresses);
+            _walletDropdown.value = 0;
+            _selectedWallet = 0;
             
             EnableWalletState(true);
             SetLoading(false);
@@ -236,15 +277,25 @@ namespace Sequence.Boilerplates
             
             _emailContinueButton.interactable = validEmail;
         }
+
+        private SessionPermissions GetImplicitPermissions()
+        {
+            return GetPermissionsFromSessionType((int)_implicitPermissions);
+        }
         
-        private SessionPermissions GetPermissionsFromSessionType()
+        private SessionPermissions GetExplicitPermissions()
+        {
+            return GetPermissionsFromSessionType((int)_explicitPermissions + 1);
+        }
+        
+        private SessionPermissions GetPermissionsFromSessionType(int type)
         {
             var templates = new SessionTemplates(Chain.TestnetArbitrumSepolia);
-            return _sessionType switch
+            return type switch
             {
-                SessionType.Implicit => null,
-                SessionType.ExplicitOpen => templates.BuildUnrestrictivePermissions(),
-                SessionType.ExplicitRestrictive => templates.BuildBasicRestrictivePermissions(),
+                0 => null,
+                1 => templates.BuildUnrestrictivePermissions(),
+                2 => templates.BuildBasicRestrictivePermissions(),
                 _ => throw new Exception("Unsupported session type")
             };
         }
