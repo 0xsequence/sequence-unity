@@ -14,5 +14,6 @@ namespace Sequence.Marketplace
         expired,
         cancelled,
         filled,
+        decimals_missing,
     }
 }

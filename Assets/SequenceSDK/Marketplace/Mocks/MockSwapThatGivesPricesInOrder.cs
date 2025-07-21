@@ -20,6 +20,11 @@ namespace Sequence.Marketplace.Mocks
         public event Action<SwapPrice> OnSwapPriceReturn;
         public event Action<string> OnSwapPriceError;
 
+        public Task<SwapPrice> GetSwapPrice(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<SwapPrice> GetSwapPrice(Address buyCurrency, Address sellCurrency, string buyAmount,
             uint slippagePercent = ISwap.DefaultSlippagePercentage)
         {
@@ -45,6 +50,21 @@ namespace Sequence.Marketplace.Mocks
 
         public Task<SwapQuote> GetSwapQuote(Address userWallet, Address buyCurrency, Address sellCurrency, string buyAmount, bool includeApprove,
             uint slippagePercentage = ISwap.DefaultSlippagePercentage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Chain[]> GetSupportedChains()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Token[]> GetSupportedTokens(Chain[] chains)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<LifiSwapRoute[]> GetLifiSwapRoutes(Address userWallet, Address buyCurrency, string buyAmount)
         {
             throw new NotImplementedException();
         }

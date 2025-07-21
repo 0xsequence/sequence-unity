@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using NUnit.Framework.Internal.Commands;
 using Sequence.EmbeddedWallet;
-using SequenceExamples.Scripts.Tests.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;

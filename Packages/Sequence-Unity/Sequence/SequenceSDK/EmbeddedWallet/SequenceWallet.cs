@@ -247,7 +247,7 @@ namespace Sequence.EmbeddedWallet
             Session[] results = null;
             try
             {
-                results = await _intentSender.ListSessions();
+                results = await _intentSender.ListSessions(GetWalletAddress());
             }
             catch (Exception e)
             {
@@ -462,6 +462,25 @@ namespace Sequence.EmbeddedWallet
         public string GetEmail()
         {
             return _email;
+        }
+
+        public event Action<string, bool> OnFederatedAccountRemovedComplete;
+        public async Task<bool> RemoveFederatedAccount(Account account)
+        {
+            IntentDataRemoveAccount args = new IntentDataRemoveAccount(account.wallet, account.id);
+            try
+            {
+                var response =
+                    await _intentSender.SendIntent<IntentResponseAccountRemoved, IntentDataRemoveAccount>(args,
+                        IntentType.RemoveAccount);
+                OnFederatedAccountRemovedComplete?.Invoke(account.id, true);
+                return true;
+            }
+            catch (Exception e)
+            {
+                OnFederatedAccountRemovedComplete?.Invoke($"Failed to remove federated account with id {account.id}, reason: {e.Message}", false);
+                return false;
+            }
         }
     }
 }

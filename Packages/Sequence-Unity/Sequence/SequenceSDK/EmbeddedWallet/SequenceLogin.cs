@@ -72,7 +72,18 @@ namespace Sequence.EmbeddedWallet
         
         public void SetConnectedWalletAddress(Address connectedWalletAddress)
         {
+            if (connectedWalletAddress == null)
+            {
+                Debug.LogError($"The connected wallet address cannot be null or empty.");
+                throw new ArgumentNullException(nameof(connectedWalletAddress));
+            }
+            
             _connectedWalletAddress = connectedWalletAddress;
+        }
+        
+        public void RemoveConnectedWalletAddress()
+        {
+            _connectedWalletAddress = null;
         }
 
         [Obsolete("Use GetInstance() instead.")]
@@ -85,7 +96,11 @@ namespace Sequence.EmbeddedWallet
             _connector = connector;
             
             _automaticallyFederateAccountsWhenPossible = automaticallyFederateAccountsWhenPossible;
-            SetConnectedWalletAddress(connectedWalletAddress);
+
+            if (connectedWalletAddress != null)
+            {
+                SetConnectedWalletAddress(connectedWalletAddress);
+            }
             
             bool storeSessionWallet = SequenceConfig.GetConfig(SequenceService.WaaS).StoreSessionKey() && SecureStorageFactory.IsSupportedPlatform() && connectedWalletAddress == null;
             if (storeSessionWallet)
@@ -123,7 +138,7 @@ namespace Sequence.EmbeddedWallet
         public void ResetLoginAfterTest()
         {
             _connector = this;
-            SetConnectedWalletAddress(null);
+            RemoveConnectedWalletAddress();
             SetupAuthenticator();
         }
 
