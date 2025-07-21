@@ -40,8 +40,10 @@ namespace Sequence.EcosystemWallet.Authentication
             };
             var url = $"{SequenceEcosystemWalletLogin.WalletUrl}/request/sign";
 
-            var redirectHandler = RedirectFactory.CreateHandler();
-            var response = await redirectHandler.WaitForResponse<SignMessageArgs, SignMessageResponse>(url, "signMessage", args);
+            var handler = RedirectFactory.CreateHandler();
+            handler.SetRedirectUrl(RedirectOrigin.GetOriginString());
+            
+            var response = await handler.WaitForResponse<SignMessageArgs, SignMessageResponse>(url, "signMessage", args);
             
             if (!response.Result)
                 throw new Exception("Failed to sign message");

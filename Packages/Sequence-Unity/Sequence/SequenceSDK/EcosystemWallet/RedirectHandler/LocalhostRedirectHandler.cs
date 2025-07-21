@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.EcosystemWallet.Authentication;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
@@ -19,7 +16,7 @@ namespace Sequence.EcosystemWallet.Browser
             try
             {
                 var listener = new HttpListener();
-                listener.Prefixes.Add(RedirectOrigin.DefaultOrigin);
+                listener.Prefixes.Add(RedirectUrl);
                 listener.Start();
                 
                 var context = await listener.GetContextAsync();

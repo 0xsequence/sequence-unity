@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet.Authentication
@@ -24,6 +22,7 @@ namespace Sequence.EcosystemWallet.Authentication
         {
             _chain = chain;
             _sessionStorage = new SessionStorage();
+            _credentials = _sessionStorage.GetSessions().ToList();
         }
 
         public async Task<SequenceEcosystemWallet> AddSession(SessionPermissions permissions)
@@ -59,7 +58,6 @@ namespace Sequence.EcosystemWallet.Authentication
 
         public SequenceEcosystemWallet[] RecoverSessionsFromStorage()
         {
-            _credentials = _sessionStorage.GetSessions().ToList();
             return GetAllSessions();
         }
 
@@ -90,13 +88,14 @@ namespace Sequence.EcosystemWallet.Authentication
         private async Task<SequenceEcosystemWallet> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             _sessionWallet = new EOAWallet();
-            
+
+            var redirectUrl = RedirectOrigin.GetOriginString();
             var payload = new ConnectArgs
             {
                 sessionAddress = _sessionWallet.GetAddress(),
                 preferredLoginMethod = preferredLoginMethod,
                 email = email,
-                implicitSessionRedirectUrl = isExplicit ? null : RedirectOrigin.GetOriginString(),
+                implicitSessionRedirectUrl = isExplicit ? null : redirectUrl,
                 permissions = permissions
             };
             
@@ -104,6 +103,8 @@ namespace Sequence.EcosystemWallet.Authentication
             var url = $"{WalletUrl}/request/connect";
 
             var handler = RedirectFactory.CreateHandler();
+            handler.SetRedirectUrl(redirectUrl);
+            
             var response = await handler.WaitForResponse<ConnectArgs, ConnectResponse>(url, action, payload);
             if (!response.Result)
                 throw new Exception("Error during request");

@@ -5,7 +5,7 @@ namespace Sequence.EcosystemWallet.Browser
         public static RedirectHandler CreateHandler()
         {
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX)
-            return new IosRedirectHandler();
+            return new DeeplinkRedirectHandler();
 #elif !UNITY_EDITOR && UNITY_WEBGL
             return new BrowserRedirectHandler();
 #else

@@ -48,6 +48,7 @@ namespace Sequence.Boilerplates
         private void Start()
         {
             _login = new(Chain.TestnetArbitrumSepolia);
+            
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
             _messagePopup.gameObject.SetActive(false);
             _loadingOverlay.SetActive(false);

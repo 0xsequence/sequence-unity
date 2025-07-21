@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
 {
-    internal class IosRedirectHandler : RedirectHandler
+    internal class DeeplinkRedirectHandler : RedirectHandler
     {
         private NativeReceiver _receiver;
 
@@ -21,8 +21,6 @@ namespace Sequence.EcosystemWallet.Browser
             GameObject.Destroy(_receiver.gameObject);
             
             var data = response.ExtractQueryAndHashParameters();
-            
-            Debug.Log($"Query Data: {JsonConvert.SerializeObject(data)}");
             
             var id = data["id"];
             if (id != Id)
