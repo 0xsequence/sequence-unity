@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -22,7 +23,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during Decode: " + ex.Message);
+                SequenceLog.Error("Exception occurred during Decode: " + ex.Message);
                 throw;
             }
         }
@@ -47,7 +48,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during Encode: " + ex.Message);
+                SequenceLog.Error("Exception occurred during Encode: " + ex.Message);
                 throw;
             }
         }
@@ -68,7 +69,7 @@ namespace Sequence.ABI
 
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during EncodeToString: " + ex.Message);
+                SequenceLog.Error("Exception occurred during EncodeToString: " + ex.Message);
                 throw;
             }
         }
@@ -96,7 +97,7 @@ namespace Sequence.ABI
 
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during DecodeFromString: " + ex.Message);
+                SequenceLog.Error("Exception occurred during DecodeFromString: " + ex.Message);
                 throw;
             }
         }

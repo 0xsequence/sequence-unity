@@ -73,18 +73,18 @@ namespace Sequence.Authentication
             }
             catch (HttpRequestException e)
             {
-                Debug.LogError("HTTP Request failed: " + e.Message);
+                SequenceLog.Error("HTTP Request failed: " + e.Message);
             }
             catch (FormatException e)
             {
-                Debug.LogError("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                SequenceLog.Error("Invalid URL format: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (FileLoadException e)
             {
-                Debug.LogError("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                SequenceLog.Error("File load exception: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
             catch (Exception e) {
-                Debug.LogError("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
+                SequenceLog.Error("An unexpected error occurred: " + e.Message + "\nCurl-equivalent request: " + curlRequest);
             }
 
             return false;

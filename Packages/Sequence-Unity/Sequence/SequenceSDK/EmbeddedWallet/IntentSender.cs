@@ -85,12 +85,12 @@ namespace Sequence.EmbeddedWallet
                 }
                 else
                 {
-                    Debug.LogError("Unexpected intent payload type: " + intentPayload.GetType());
+                    SequenceLog.Error("Unexpected intent payload type: " + intentPayload.GetType());
                 }
                 if (currentTimeAccordingToServer > currentTimeAccordingToIntent + 1 ||
                     currentTimeAccordingToServer < currentTimeAccordingToIntent - 1)
                 {
-                    Debug.LogWarning("Time mismatch detected. Retrying with server time.");
+                    SequenceLog.Warning("Time mismatch detected. Retrying with server time.");
                     return await SendIntent<T, T2>(args, type, timeBeforeExpiryInSeconds, (uint)currentTimeAccordingToServer);
                 }
                 else
@@ -162,7 +162,7 @@ namespace Sequence.EmbeddedWallet
 
         public async Task<T> PostIntent<T>(string payload, string path)
         {
-            Debug.Log($"Sending intent: {path} | with payload: {payload}");
+            SequenceLog.Info($"Sending intent: {path} | with payload: {payload}");
             Dictionary<string, string> headers = new Dictionary<string, string>();
             if (typeof(T) == typeof(IntentResponse<TransactionReturn>))
             {

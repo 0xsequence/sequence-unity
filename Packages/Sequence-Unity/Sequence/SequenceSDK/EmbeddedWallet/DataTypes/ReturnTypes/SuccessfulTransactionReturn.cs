@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System;
+using Sequence.Utils;
 using UnityEngine.Scripting;
 
 namespace Sequence.EmbeddedWallet
@@ -65,7 +66,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"Failed to load JSON: {ex.Message}");
+                SequenceLog.Error($"Failed to load JSON: {ex.Message}");
                 throw;
             }
 
@@ -91,7 +92,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"Error during JSON conversion: {ex.Message}");
+                SequenceLog.Error($"Error during JSON conversion: {ex.Message}");
                 throw;
             }
 

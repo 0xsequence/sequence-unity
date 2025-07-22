@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence
@@ -47,7 +48,7 @@ namespace Sequence
             error = "Indexer query failed: " + error;
             if (_logErrors)
             {
-                Debug.LogError(error);
+                SequenceLog.Error(error);
             }
             
             OnQueryError?.Invoke(error);
@@ -58,7 +59,7 @@ namespace Sequence
             string issue = "Indexer query encountered an issue: " + error;
             if (_logWarnings)
             {
-                Debug.LogWarning(issue);
+                SequenceLog.Warning(issue);
             }
 
             OnQueryIssue?.Invoke(issue);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -31,7 +32,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding array: {ex.Message}");
+                SequenceLog.Error($"Error encoding array: {ex.Message}");
                 return null;
             }
         }
@@ -52,7 +53,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding array to string: {ex.Message}");
+                SequenceLog.Error($"Error encoding array to string: {ex.Message}");
                 return null;
             }
         }

@@ -137,7 +137,8 @@ namespace Sequence.EmbeddedWallet
             UnityWebRequest request = newRequest.Item1;
             string curlRequest = newRequest.Item2;
             string url = newRequest.Item3;
-            Debug.Log(curlRequest);
+            
+            SequenceLog.Info($">> {curlRequest}");
 
             try
             {
@@ -174,6 +175,7 @@ namespace Sequence.EmbeddedWallet
                     }
                     try
                     {
+                        SequenceLog.Info($"<< {responseJson} (from {url})");
                         T2 result = JsonConvert.DeserializeObject<T2>(responseJson);
                         return result;
                     }
@@ -254,7 +256,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogError("Error getting time shift: " + e.Message);
+                SequenceLog.Error("Error getting time shift: " + e.Message);
                 return TimeSpan.Zero;
             }
             finally

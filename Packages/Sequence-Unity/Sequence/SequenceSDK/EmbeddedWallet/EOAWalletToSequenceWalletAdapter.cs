@@ -8,6 +8,7 @@ using Sequence.Contracts;
 using Sequence.Provider;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Sequence.Utils;
 using UnityEngine;
 namespace Sequence.EmbeddedWallet
 {
@@ -171,7 +172,7 @@ namespace Sequence.EmbeddedWallet
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("Error while waiting for receipt: " + e.Message);
+                        SequenceLog.Error("Error while waiting for receipt: " + e.Message);
                         string receiptExString = e.Message;
                         var failedReturn = new FailedTransactionReturn(e.Message, null, null);
                         failedTransactionReturns.Add(failedReturn);

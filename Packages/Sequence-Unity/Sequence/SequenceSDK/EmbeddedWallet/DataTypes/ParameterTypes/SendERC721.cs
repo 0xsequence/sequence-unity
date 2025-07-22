@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Scripting;
 
@@ -25,7 +26,7 @@ namespace Sequence.EmbeddedWallet
             this.safe = safe;
             if (!safe && data != null)
             {
-                Debug.LogError($"Error creating {GetType().Name}: {nameof(data)} can only be set when {nameof(safe)} is true.\nUsing null data.");
+                SequenceLog.Error($"Error creating {GetType().Name}: {nameof(data)} can only be set when {nameof(safe)} is true.\nUsing null data.");
                 data = null;
             }
             this.data = data;
