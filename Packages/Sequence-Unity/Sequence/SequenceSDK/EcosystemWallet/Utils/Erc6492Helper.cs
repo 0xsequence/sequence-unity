@@ -4,7 +4,6 @@ using Nethereum.ABI;
 using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
 using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.Web3;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
@@ -88,30 +87,6 @@ namespace Sequence.EcosystemWallet.Utils
             }
 
             return (signature, null);
-        }
-
-        public static async Task<bool> IsValidAsync(
-            string address,
-            string messageHash,
-            string encodedSignature,
-            Web3 web3)
-        {
-            /*var encoder = new ABIEncode();
-            var calldata = encoder.GetABIEncoded(
-                new ABIValue("address", address),
-                new ABIValue("bytes32", messageHash.HexToByteArray()),
-                new ABIValue("bytes", encodedSignature.HexToByteArray())
-            ).ToHex();
-
-            var fullData = DeployCode + calldata[2..];
-
-            var result = await .Transactions.Call.SendRequestAsync(new Nethereum.RPC.Eth.DTOs.CallInput
-            {
-                Data = fullData,
-                To = null // To is null for `eth_call` with deploy bytecode
-            }, Nethereum.RPC.Eth.DTOs.BlockParameter.CreateLatest());*/
-
-            return Convert.ToInt32("result", 16) == 1;
         }
     }
 }

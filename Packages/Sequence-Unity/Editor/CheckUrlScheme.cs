@@ -7,6 +7,8 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Xml;
+using Sequence.Utils;
 #if UNITY_IOS || UNITY_STANDALONE_OSX
 using UnityEditor.iOS.Xcode;
 #endif
@@ -16,14 +18,15 @@ namespace Sequence.Editor
     public class CheckUrlScheme : IPreprocessBuildWithReport
     {
         private static string _plistPath;
-        private static string _urlScheme;
+        private static string _pathToBuiltProject;
+        
+        private static string _urlScheme => UrlSchemeFactory.CreateFromAppIdentifier();
         
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
         {
-            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
-            _urlScheme = config.UrlScheme;
-
+            _pathToBuiltProject = pathToBuiltProject;
+            
             if (string.IsNullOrWhiteSpace(_urlScheme))
             {
                 Debug.LogWarning(SequenceConfig.MissingConfigError("Url Scheme").Message);
@@ -46,80 +49,140 @@ namespace Sequence.Editor
         
         private static void CheckPlistUrlScheme()
         {
-#if UNITY_STANDALONE_OSX
-            PlistDocument plist = new PlistDocument();
+#if UNITY_IOS || UNITY_STANDALONE_OSX
+            var plist = new PlistDocument();
             plist.ReadFromFile(_plistPath);
 
-            PlistElementDict rootDict = plist.root;
-            if (!rootDict.values.ContainsKey("CFBundleURLTypes"))
-            {
-                throw _missingUrlSchemeException;
-            }
-            if (rootDict.values["CFBundleURLTypes"] is PlistElementArray existingArray)
-            {
-                if (existingArray.values.Count == 0)
-                {
-                    throw _missingUrlSchemeException;
-                }
-                if (existingArray.values[0] is PlistElementDict existingDict)
-                {
-                    if (!existingDict.values.ContainsKey("CFBundleURLSchemes"))
-                    {
-                        throw _missingUrlSchemeException;
-                    }
-                    if (existingDict.values["CFBundleURLSchemes"] is PlistElementArray newArray)
-                    {
-                        List<PlistElement> values = newArray.values;
-                        int count = values.Count;
-                        if (count == 0)
-                        {
-                            throw _missingUrlSchemeException;
-                        }
-                        for (int i =0; i < count; i++)
-                        {
-                            PlistElement plistElement = values[i];
-                            if (plistElement is PlistElementString plistElementString)
-                            {
-                                if (plistElementString.value == _urlScheme)
-                                {
-                                    return;
-                                }
-                            }
-                        }
-                        throw _missingUrlSchemeException;
-                    }
-                }
-            }
+            var rootDict = plist.root;
+
+            const string key = "CFBundleURLTypes";
+            var urlTypes = rootDict[key] != null
+                ? rootDict[key].AsArray() 
+                : rootDict.CreateArray(key);
+
+            var dict = urlTypes.AddDict();
+            dict.SetString("CFBundleURLName", Application.identifier);
+            var schemes = dict.CreateArray("CFBundleURLSchemes");
+            schemes.AddString(_urlScheme);
+
+            plist.WriteToFile(_plistPath);
+
+#if UNITY_IOS
+            // Add SafariServices.framework
+            var projPath = PBXProject.GetPBXProjectPath(_pathToBuiltProject);
+            var proj = new PBXProject();
+            proj.ReadFromFile(projPath);
+
+            var targetGuid = proj.GetUnityFrameworkTargetGuid();
+            proj.AddFrameworkToProject(targetGuid, "SafariServices.framework", false);
+            proj.WriteToFile(projPath);
+#endif
+            
 #endif
         }
         
         public int callbackOrder => 0;
         public void OnPreprocessBuild(BuildReport report)
         {
-            SequenceConfig config = SequenceConfig.GetConfig();
-            _urlScheme = config.UrlScheme;
+#if UNITY_ANDROID
+            string manifestPath = Path.Combine(Application.dataPath, "Plugins/Android/AndroidManifest.xml");
 
-            List<string> warnings = new List<string>();
-
-            if (string.IsNullOrWhiteSpace(_urlScheme))
+            if (!File.Exists(manifestPath))
             {
-                warnings.Add(SequenceConfig.MissingConfigError("Url Scheme").Message);
+                Debug.LogWarning("AndroidManifest.xml not found in Plugins/Android. Creating a basic one.");
+                CreateBasicManifest(manifestPath);
             }
 
-            if (_urlScheme.ToLower() != _urlScheme)
+            XmlDocument doc = new XmlDocument();
+            doc.Load(manifestPath);
+
+            XmlNamespaceManager nsMgr = new XmlNamespaceManager(doc.NameTable);
+
+            XmlNode appNode = doc.SelectSingleNode("/manifest/application");
+
+            if (appNode == null)
             {
-                warnings.Add($"{nameof(config.UrlScheme)} should be all lowercase; if uppercase characters are included, you may encounter difficulties with deep-linking on certain platforms.");
+                Debug.LogError("Missing <application> tag in AndroidManifest.xml.");
+                return;
+            }
+
+            if (HasCustomScheme(appNode, nsMgr))
+            {
+                Debug.Log("Custom URL scheme already exists in manifest.");
+                return;
             }
             
-            if (warnings.Count > 0)
+            string androidNs = "http://schemas.android.com/apk/res/android";
+            XmlElement intentFilter = doc.CreateElement("intent-filter");
+            
+            XmlElement action = doc.CreateElement("action");
+            action.SetAttribute("name", androidNs, "android.intent.action.VIEW");
+            intentFilter.AppendChild(action);
+
+            XmlElement category1 = doc.CreateElement("category");
+            category1.SetAttribute("name", androidNs, "android.intent.category.DEFAULT");
+            intentFilter.AppendChild(category1);
+
+            XmlElement category2 = doc.CreateElement("category");
+            category2.SetAttribute("name", androidNs, "android.intent.category.BROWSABLE");
+            intentFilter.AppendChild(category2);
+            
+            XmlElement data = doc.CreateElement("data");
+            data.SetAttribute("scheme", androidNs, _urlScheme);
+            intentFilter.AppendChild(data);
+
+            // Attach to main activity
+            XmlNodeList activities = appNode.SelectNodes("activity");
+            foreach (XmlNode activity in activities)
             {
-                foreach (var warning in warnings)
+                XmlAttribute nameAttr = activity.Attributes["android:name"];
+                if (nameAttr != null && nameAttr.Value == "com.unity3d.player.UnityPlayerActivity")
                 {
-                    Debug.LogWarning(warning);
+                    activity.AppendChild(intentFilter);
+                    Debug.Log($"Added custom URL scheme \"{_urlScheme}\" to AndroidManifest.");
+                    doc.Save(manifestPath);
+                    return;
                 }
-                
-                SequenceWarningPopup.ShowWindow(warnings, "https://docs.sequence.xyz/sdk/unity/onboard/authentication/oidc");
             }
+
+            Debug.LogWarning("UnityPlayerActivity not found. Could not add URL scheme intent filter.");
+#endif
+        }
+        
+        private bool HasCustomScheme(XmlNode appNode, XmlNamespaceManager nsMgr)
+        {
+            var nodes = appNode.SelectNodes("//intent-filter/data", nsMgr);
+            foreach (XmlNode node in nodes)
+            {
+                var schemeAttr = node.Attributes["android:scheme"];
+                if (schemeAttr != null && schemeAttr.Value == _urlScheme)
+                    return true;
+            }
+            return false;
+        }
+        
+        private void CreateBasicManifest(string path)
+        {
+            var manifestContent = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <manifest
+                        xmlns:android=""http://schemas.android.com/apk/res/android""
+                        xmlns:tools=""http://schemas.android.com/tools""
+                >
+                    <application>
+                        <activity
+                                android:name=""com.unity3d.player.UnityPlayerActivity""
+                                android:theme=""@style/UnityThemeSelector""
+                                android:exported=""true"">
+                            <intent-filter>
+                                <action android:name=""android.intent.action.MAIN"" />
+                                <category android:name=""android.intent.category.LAUNCHER"" />
+                            </intent-filter>
+                            <meta-data android:name=""unityplayer.UnityActivity"" android:value=""true"" />
+                        </activity>
+                    </application>
+                </manifest>";
+            
+            File.WriteAllText(path, manifestContent);
         }
     }
 }

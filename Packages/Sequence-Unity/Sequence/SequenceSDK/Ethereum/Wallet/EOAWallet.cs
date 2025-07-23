@@ -64,6 +64,13 @@ namespace Sequence.Wallet
             return address;
         }
 
+        public string GetPrivateKeyAsHex()
+        {
+            byte[] privateKeyBytes = new byte[32];
+            privKey.WriteToSpan(privateKeyBytes);
+            return privateKeyBytes.ByteArrayToHexString();
+        }
+
         public async Task<TransactionReceipt> DeployContract(IEthClient client, string bytecode, ulong value = 0)
         {
             EthTransaction deployTransaction = await new GasLimitEstimator(client, GetAddress()).BuildTransaction(StringExtensions.ZeroAddress, bytecode, value);

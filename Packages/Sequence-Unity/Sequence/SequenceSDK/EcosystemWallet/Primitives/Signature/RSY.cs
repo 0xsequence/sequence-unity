@@ -1,28 +1,36 @@
 using System;
 using System.Linq;
 using System.Numerics;
+using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
+    [Preserve]
     public class RSY
     {
-        public BigInteger r;
-        public BigInteger s;
-        public BigInteger yParity;
+        public BigInt r;
+        public BigInt s;
+        public int yParity;
 
         public byte[] Pack()
         {
             if (yParity != 0 && yParity != 1 && yParity != 27 && yParity != 28)
                 throw new ArgumentException("yParity must be 0, 1, 27, or 28.");
 
-            var rBytes = r.ByteArrayFromNumber(r.MinBytesFor()).PadLeft(32);
-            var sBytes = s.ByteArrayFromNumber(s.MinBytesFor()).PadLeft(32);
+            var rBytes = r.Value.ByteArrayFromNumber(r.Value.MinBytesFor()).PadLeft(32);
+            var sBytes = s.Value.ByteArrayFromNumber(s.Value.MinBytesFor()).PadLeft(32);
             
             if (yParity % 2 == 1)
                 sBytes[0] |= 0x80;
             
             return ByteArrayExtensions.ConcatenateByteArrays(rBytes, sBytes);
+        }
+
+        public override string ToString()
+        {
+            return $"R: {r}, S: {s}, Y: {yParity}";
         }
 
         public static RSY FromString(string input)

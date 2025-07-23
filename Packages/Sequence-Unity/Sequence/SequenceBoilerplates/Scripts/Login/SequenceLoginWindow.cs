@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sequence.Authentication;
+using Sequence.EcosystemWallet.Authentication;
 using Sequence.EmbeddedWallet;
 using TMPro;
 using UnityEngine;

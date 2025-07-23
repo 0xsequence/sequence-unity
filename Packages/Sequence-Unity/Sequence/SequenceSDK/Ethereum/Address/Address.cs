@@ -1,9 +1,11 @@
 using System;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
-namespace Sequence {
-    
+namespace Sequence 
+{
+    [Preserve]
     [JsonConverter(typeof(AddressJsonConverter))]
     public class Address {
         public readonly string Value;
@@ -62,6 +64,7 @@ namespace Sequence {
         }
     }
 
+    [Preserve]
     public class AddressJsonConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

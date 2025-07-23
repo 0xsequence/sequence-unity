@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Newtonsoft.Json;
 using Sequence.Utils;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -19,7 +19,7 @@ namespace Sequence.EcosystemWallet.Primitives
             {
                 return new ImplicitSessionCallSignature
                 {
-                    attestation = Attestation.FromJson(data["attestation"].ToString()),
+                    attestation = JsonConvert.DeserializeObject<Attestation>(data["attestation"].ToString()),
                     sessionSignature = RSY.FromString((string)data["sessionSignature"]),
                     identitySignature = RSY.FromString((string)identitySignature)
                 };
