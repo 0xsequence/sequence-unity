@@ -156,54 +156,57 @@ namespace Sequence.EmbeddedWallet.Tests
         private class MockHttpClientReturnsFailedTransaction : IHttpClient
         {
             public static string error = "Mock failed transaction";
-            public async Task<T2> SendRequest<T, T2>(string path, T args, Dictionary<string, string> headers = null, string overrideUrl = null)
+
+            public async Task<TResponse> SendPostRequest<TArgs, TResponse>(string path, TArgs args, Dictionary<string, string> headers = null)
             {
                 var response = new IntentResponse<FailedTransactionReturn>(new Response<FailedTransactionReturn>(
-                    FailedTransactionReturn.IdentifyingCode,
-                    new FailedTransactionReturn(error, null, null)));
+                    FailedTransactionReturn.IdentifyingCode, new FailedTransactionReturn(error, null, null)));
+                
                 string responseJson = JsonConvert.SerializeObject(response);
-                return JsonConvert.DeserializeObject<T2>(responseJson);
+                return JsonConvert.DeserializeObject<TResponse>(responseJson);
             }
 
-            public async Task<TimeSpan> GetTimeShift()
+            public Task<TResponse> SendGetRequest<TResponse>(string path, Dictionary<string, string> headers = null)
             {
-                return TimeSpan.Zero;
+                throw new NotImplementedException();
             }
         }
 
         private class MockHttpClientReturnsUnknownCode : IHttpClient
         {
             public static string code = "some unrecognized code";
-            public async Task<T2> SendRequest<T, T2>(string path, T args, Dictionary<string, string> headers = null, string overrideUrl = null)
+
+            public async Task<TResponse> SendPostRequest<TArgs, TResponse>(string path, TArgs args, Dictionary<string, string> headers = null)
             {
                 var response = new IntentResponse<FailedTransactionReturn>(new Response<FailedTransactionReturn>(
-                    code,
-                    new FailedTransactionReturn("", null, null)));
+                    code, new FailedTransactionReturn("", null, null)));
+                
                 string responseJson = JsonConvert.SerializeObject(response);
-                return JsonConvert.DeserializeObject<T2>(responseJson);
+                return JsonConvert.DeserializeObject<TResponse>(responseJson);
             }
 
-            public async Task<TimeSpan> GetTimeShift()
+            public Task<TResponse> SendGetRequest<TResponse>(string path, Dictionary<string, string> headers = null)
             {
-                return TimeSpan.Zero;
+                throw new NotImplementedException();
             }
         }
 
         private class MockHttpClientReturnsSuccessfulTransaction : IHttpClient
         {
             public static string txHash = "txhash";
-            public async Task<T2> SendRequest<T, T2>(string path, T args, Dictionary<string, string> headers = null, string overrideUrl = null)
+
+            public async Task<TResponse> SendPostRequest<TArgs, TResponse>(string path, TArgs args, Dictionary<string, string> headers = null)
             {
                 var response = new IntentResponse<SuccessfulTransactionReturn>(new Response<SuccessfulTransactionReturn>(
-                    SuccessfulTransactionReturn.IdentifyingCode,
-                    new SuccessfulTransactionReturn(txHash, "", null, null)));
+                    SuccessfulTransactionReturn.IdentifyingCode, new SuccessfulTransactionReturn(txHash, "", null, null)));
+                
                 string responseJson = JsonConvert.SerializeObject(response);
-                return JsonConvert.DeserializeObject<T2>(responseJson);
+                return JsonConvert.DeserializeObject<TResponse>(responseJson);
             }
 
-            public async Task<TimeSpan> GetTimeShift()
+            public Task<TResponse> SendGetRequest<TResponse>(string path, Dictionary<string, string> headers = null)
             {
-                return TimeSpan.Zero;
+                throw new NotImplementedException();
             }
         }
 

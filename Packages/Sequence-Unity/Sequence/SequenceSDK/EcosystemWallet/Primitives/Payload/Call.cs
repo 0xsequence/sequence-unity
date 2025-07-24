@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
@@ -23,6 +24,15 @@ namespace Sequence.EcosystemWallet.Primitives
         public BehaviourOnError behaviorOnError;
 
         [Preserve]
+        public Call(Address to, BigInteger value, byte[] data)
+        {
+            this.to = to;
+            this.value = value;
+            this.data = data;
+        }
+        
+        [Preserve]
+        [JsonConstructor]
         public Call(Address to, BigInteger value, byte[] data, BigInteger gasLimit, bool delegateCall, bool onlyFallback, BehaviourOnError behaviorOnError)
         {
             this.to = to;

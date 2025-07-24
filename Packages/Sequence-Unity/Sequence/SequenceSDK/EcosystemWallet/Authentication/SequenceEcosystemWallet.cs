@@ -4,6 +4,7 @@ using Sequence.EcosystemWallet.Authentication.Requests;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
+using Sequence.Relayer;
 using Sequence.Wallet;
 
 namespace Sequence.EcosystemWallet.Authentication
@@ -51,7 +52,19 @@ namespace Sequence.EcosystemWallet.Authentication
             return response.Data;
         }
         
-        public async Task SendTransaction(Call[] calls)
+        public async Task SendTransaction(Call[] calls, FeeOption feeOption = null)
+        {
+            var signedCalls = await SignCalls(calls);
+            throw new NotImplementedException();
+        }
+
+        public async Task<FeeOption[]> GetFeeOption(Call[] calls)
+        {
+            var signedCalls = await SignCalls(calls);
+            throw new NotImplementedException();
+        }
+
+        private async Task<(Address To, byte[] Data)> SignCalls(Call[] calls)
         {
             throw new NotImplementedException();
         }
