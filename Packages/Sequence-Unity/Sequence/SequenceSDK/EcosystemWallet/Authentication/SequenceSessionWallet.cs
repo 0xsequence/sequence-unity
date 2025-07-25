@@ -4,6 +4,7 @@ using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
+using Sequence.Utils;
 using Sequence.Wallet;
 
 namespace Sequence.EcosystemWallet
@@ -59,9 +60,27 @@ namespace Sequence.EcosystemWallet
             return response.options;
         }
 
-        public Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
+        public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
-            throw new System.NotImplementedException();
+            var signedCalls = await SignCalls(calls);
+            
+            var relayer = new SequenceRelayer(Chain);
+            var hash = await relayer.Relay(signedCalls.To, signedCalls.Data.ByteArrayToHexStringWithPrefix());
+
+            MetaTxnReceipt receipt = null;
+            var status = OperationStatus.Pending;
+            
+            while (status != OperationStatus.Confirmed && status != OperationStatus.Failed)
+            {
+                var receiptResponse = await relayer.GetMetaTxnReceipt(hash);
+                receipt = receiptResponse.receipt;
+                status = receipt?.EvaluateStatus() ?? OperationStatus.Unknown;
+            }
+            
+            if (receipt == null)
+                throw new Exception("receipt is null");
+
+            return receipt.txnReceipt;
         }
         
         private async Task<(Address To, byte[] Data)> SignCalls(Call[] calls)

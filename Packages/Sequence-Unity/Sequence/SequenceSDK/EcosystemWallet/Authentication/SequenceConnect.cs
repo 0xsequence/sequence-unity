@@ -13,7 +13,8 @@ namespace Sequence.EcosystemWallet
     {
         public static Action<SequenceSessionWallet[]> SessionsChanged;
         
-        private Chain _chain;
+        public Chain Chain { get; private set; }
+        
         private EcosystemType _ecosystem;
         private EOAWallet _sessionWallet;
         private SessionStorage _sessionStorage;
@@ -22,10 +23,15 @@ namespace Sequence.EcosystemWallet
         
         public SequenceConnect(Chain chain, EcosystemType ecosystem)
         {
-            _chain = chain;
+            SetChain(chain);
             _ecosystem = ecosystem;
             _sessionStorage = new SessionStorage();
             _credentials = _sessionStorage.GetSessions().ToList();
+        }
+
+        public void SetChain(Chain chain)
+        {
+            Chain = chain;
         }
 
         public async Task<SequenceSessionWallet> AddSession(SessionPermissions permissions)
@@ -133,7 +139,7 @@ namespace Sequence.EcosystemWallet
                 response.Data.attestation,
                 response.Data.signature,
                 (int)_ecosystem,
-                ChainDictionaries.ChainIdOf[_chain],
+                ChainDictionaries.ChainIdOf[Chain],
                 response.Data.loginMethod,
                 response.Data.email);
             

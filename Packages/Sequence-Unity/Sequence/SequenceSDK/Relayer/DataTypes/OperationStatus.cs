@@ -1,8 +1,10 @@
 namespace Sequence.Relayer
 {
-    public class OperationStatus
+    public enum OperationStatus
     {
-        public string status;
-        public string reason;
+        Unknown,
+        Pending,
+        Confirmed,
+        Failed
     }
 }

@@ -27,7 +27,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private Button _emailContinueButton;
         [SerializeField] private Button _signOutButton;
         [SerializeField] private Button _signMessageButton;
-        [SerializeField] private TMP_Dropdown _walletDropdown;
+        [SerializeField] private TMP_Dropdown _chainDropdown;
         [SerializeField] private TMP_InputField _emailInput;
         [SerializeField] private TMP_InputField _messageInput;
         [SerializeField] private TMP_Text _walletText;
@@ -36,6 +36,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private GameObject _walletState;
         [SerializeField] private GameObject _loadingOverlay;
         [SerializeField] private MessagePopup _messagePopup;
+        [SerializeField] private GenericObjectPool<SessionWalletTile> _sessionPool;
         
         private SequenceConnect _login;
         private SequenceWallet _wallet;
@@ -44,6 +45,12 @@ namespace Sequence.Boilerplates
         private int _selectedWallet;
         private string _curEmail;
         private string _curSignature;
+        
+        private Chain[] _chains =
+        {
+            Chain.TestnetArbitrumSepolia,
+            Chain.ArbitrumOne
+        };
         
         private void Start()
         {
@@ -61,6 +68,9 @@ namespace Sequence.Boilerplates
             
             if (_login.GetAllSessionWallets().Length > 0)
                 ShowWallet(true);
+            
+            _chainDropdown.ClearOptions();
+            _chainDropdown.AddOptions(_chains.Select(c => c.ToString()).ToList());
         }
         
         public async void SignInWithEmail()
@@ -145,7 +155,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var signature = await _wallet.SignMessage(Chain.TestnetArbitrumSepolia, message);
+                var signature = await _wallet.SignMessage(_login.Chain, message);
                 ShowSignature(signature.signature);
                 SetLoading(false);
             }
@@ -198,9 +208,9 @@ namespace Sequence.Boilerplates
             EnableWalletState(false);
         }
         
-        public void OnWalletChanged(int index)
+        public void OnChainChanged(int index)
         {
-            _selectedWallet = index;
+            _login.SetChain(_chains[index]);
         }
 
         public void OnImplicitSessionTypeChanged(int index)
@@ -231,13 +241,8 @@ namespace Sequence.Boilerplates
         {
             _wallet = _login.GetWallet();
             _walletText.text = _wallet.Address.Value;
-            
-            var addresses = _wallet.SessionWallets.Select(w => w.Address.Value).ToList();
-            _walletDropdown.ClearOptions();
-            _walletDropdown.AddOptions(addresses);
-            _walletDropdown.value = 0;
-            _selectedWallet = 0;
-            
+
+            LoadSessions();
             EnableWalletState(true);
             SetLoading(false);
             
@@ -245,11 +250,29 @@ namespace Sequence.Boilerplates
                 _messagePopup.Show("Session Created.");
         }
 
+        private void RemoveSession(Address address)
+        {
+            _login.RemoveSession(address);
+            LoadSessions();
+        }
+
+        private void LoadSessions()
+        {
+            _sessionPool.Cleanup();
+            foreach (var wallet in _wallet.SessionWallets)
+                _sessionPool.GetObject().Apply(wallet, RemoveSession);
+        }
+
         public void EnableWalletState(bool enable)
         {
             _loginState.SetActive(!enable);
             _walletState.SetActive(enable);
             _signOutButton.gameObject.SetActive(enable);
+
+            var rect = transform as RectTransform;
+            var size = rect.sizeDelta;
+            size.y = enable ? 315 : 290;
+            rect.sizeDelta = size;
         }
         
         public void EnableEmailButton(bool enable)
@@ -287,7 +310,7 @@ namespace Sequence.Boilerplates
         
         private SessionPermissions GetPermissionsFromSessionType(int type)
         {
-            var templates = new SessionTemplates(Chain.TestnetArbitrumSepolia);
+            var templates = new SessionTemplates(_login.Chain);
             return type switch
             {
                 0 => null,

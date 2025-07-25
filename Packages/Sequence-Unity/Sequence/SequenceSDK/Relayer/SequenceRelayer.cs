@@ -26,15 +26,16 @@ namespace Sequence.Relayer
             var response = await SendMetaTxn(new SendMetaTxnArgs(new MetaTxn(to, to.Value, data), quote, -1, preconditions));
             return response.txnHash;
         }
-
-        public async Task<OperationStatus> Status(string opHash, BigInteger chainId)
-        {
-            return await _httpClient.SendPostRequest<string, OperationStatus>("FeeOptions", opHash);
-        }
         
         public async Task<FeeOptionsReturn> GetFeeOptions(FeeOptionsArgs args)
         {
             return await _httpClient.SendPostRequest<FeeOptionsArgs, FeeOptionsReturn>("FeeOptions", args);
+        }
+
+        public async Task<GetMetaTxnReceiptReturn> GetMetaTxnReceipt(string metaTxnID)
+        {
+            var args = new GetMetaTxnReceiptArgs { metaTxnID = metaTxnID };
+            return await _httpClient.SendPostRequest<GetMetaTxnReceiptArgs, GetMetaTxnReceiptReturn>("GetMetaTxnReceipt", args);
         }
 
         public async Task<SendMetaTxnReturn> SendMetaTxn(SendMetaTxnArgs args)
