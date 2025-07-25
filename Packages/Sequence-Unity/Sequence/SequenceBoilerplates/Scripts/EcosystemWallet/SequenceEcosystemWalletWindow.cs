@@ -79,7 +79,7 @@ namespace Sequence.Boilerplates
             
             try
             {
-                await _login.SignInWithEmail(_curEmail, GetImplicitPermissions());
+                SequenceSessionWallet wallet = await _login.SignInWithEmail(_curEmail, null);
                 ShowWallet(false);
             }
             catch (Exception e)
@@ -155,7 +155,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var signature = await _wallet.SignMessage(_login.Chain, message);
+                var signature = await _wallet.SignMessage(message);
                 ShowSignature(signature.signature);
                 SetLoading(false);
             }

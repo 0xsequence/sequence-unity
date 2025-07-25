@@ -1,6 +1,6 @@
 {
   "name": "xyz.0xsequence.waas-unity",
-  "version": "4.3.1",
+  "version": "5.0.0",
   "displayName": "Sequence Embedded Wallet SDK",
   "description": "A Unity SDK for Sequence APIs",
   "unity": "2021.3",
@@ -39,6 +39,11 @@
       "displayName": "Demo",
       "description": "Basic demo scene showcasing the SDK functionality using Sequence's boilerplates.",
       "path": "Sequence/Samples~/Demo"
+    },
+    {
+      "displayName": "Ecosystem Wallet Demo",
+      "description": "Basic Ecosystem Wallet Demo showcasing the SDK functionality.",
+      "path": "Sequence/Samples~/Demo V3"
     },
     {
       "displayName": "Android Secure Storage",

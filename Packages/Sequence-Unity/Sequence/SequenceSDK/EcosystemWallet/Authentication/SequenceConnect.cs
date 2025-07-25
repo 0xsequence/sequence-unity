@@ -40,27 +40,27 @@ namespace Sequence.EcosystemWallet
             return await CreateNewSession(true, permissions, string.Empty);
         }
         
-        public async Task<SequenceSessionWallet> SignInWithEmail(string email, SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithEmail(string email, SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"email", email);
         }
         
-        public async Task<SequenceSessionWallet> SignInWithGoogle(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithGoogle(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"google");
         }
         
-        public async Task<SequenceSessionWallet> SignInWithApple(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithApple(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"apple");
         }
         
-        public async Task<SequenceSessionWallet> SignInWithPasskey(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithPasskey(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"passkey");
         }
         
-        public async Task<SequenceSessionWallet> SignInWithMnemonic(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithMnemonic(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"mnemonic");
         }

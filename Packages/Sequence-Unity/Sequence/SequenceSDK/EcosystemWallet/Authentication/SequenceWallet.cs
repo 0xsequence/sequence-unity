@@ -31,9 +31,9 @@ namespace Sequence.EcosystemWallet
             SessionWallets = sessionWallets;
         }
 
-        public async Task<SignMessageResponse> SignMessage(Chain chain, string message)
+        public async Task<SignMessageResponse> SignMessage(string message)
         {
-            return await SessionWallets[0].SignMessage(chain, message);
+            return await SessionWallets[0].SignMessage(message);
         }
         
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)

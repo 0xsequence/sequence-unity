@@ -26,12 +26,12 @@ namespace Sequence.EcosystemWallet
             IsExplicit = credentials.isExplicit;
         }
         
-        public async Task<SignMessageResponse> SignMessage(Chain chain, string message)
+        public async Task<SignMessageResponse> SignMessage(string message)
         {
             var args = new SignMessageArgs 
             { 
                 address = Address, 
-                chainId = new BigInt((int)chain), 
+                chainId = new BigInt((int)Chain), 
                 message = message
             };
 
