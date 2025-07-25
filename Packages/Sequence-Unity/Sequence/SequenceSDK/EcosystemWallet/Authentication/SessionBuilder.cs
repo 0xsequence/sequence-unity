@@ -3,7 +3,7 @@ using System.Numerics;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     public class SessionBuilder
     {

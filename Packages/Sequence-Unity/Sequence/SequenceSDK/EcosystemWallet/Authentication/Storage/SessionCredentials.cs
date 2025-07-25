@@ -2,10 +2,10 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.EcosystemWallet.Primitives;
-using Sequence.EcosystemWallet.Primitives.Common;
+using Sequence.Wallet;
 using UnityEngine.Scripting;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     [Preserve]
     [JsonConverter(typeof(SessionCredentialsConverter))]
@@ -14,6 +14,7 @@ namespace Sequence.EcosystemWallet.Authentication
         public bool isExplicit;
         public string privateKey;
         public Address address;
+        public Address sessionAddress;
         public Attestation attestation;
         public RSY signature;
         public string chainId;
@@ -31,6 +32,8 @@ namespace Sequence.EcosystemWallet.Authentication
             this.chainId = chainId;
             this.loginMethod = loginMethod;
             this.email = email;
+            
+            sessionAddress = new EOAWallet(privateKey).GetAddress();
         }
     }
     

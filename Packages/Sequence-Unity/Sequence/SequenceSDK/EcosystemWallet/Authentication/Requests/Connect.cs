@@ -1,6 +1,6 @@
 using Sequence.EcosystemWallet.Primitives;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     public struct ConnectArgs
     {

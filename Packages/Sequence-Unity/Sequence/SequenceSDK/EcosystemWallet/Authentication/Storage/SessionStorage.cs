@@ -5,7 +5,7 @@ using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
 using UnityEngine;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     internal class SessionStorage
     {

@@ -9,73 +9,89 @@ using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet.Authentication
 {
-    public class SequenceEcosystemWalletLogin
+    public class SequenceConnect
     {
-        internal const string WalletUrl = "https://v3.sequence-dev.app"; 
+        internal const string WalletUrl = "https://v3.sequence-dev.app";
+
+        public static Action<SequenceSessionWallet[]> SessionsChanged;
         
         private Chain _chain;
         private EOAWallet _sessionWallet;
         private SessionStorage _sessionStorage;
-        private List<SessionCredentials> _credentials = new();
+        private List<SessionCredentials> _credentials;
+        private SequenceWallet _wallet;
         
-        public SequenceEcosystemWalletLogin(Chain chain)
+        public SequenceConnect(Chain chain)
         {
             _chain = chain;
             _sessionStorage = new SessionStorage();
             _credentials = _sessionStorage.GetSessions().ToList();
         }
 
-        public async Task<SequenceEcosystemWallet> AddSession(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> AddSession(SessionPermissions permissions)
         {
             Assert.IsNotNull(permissions);
             return await CreateNewSession(true, permissions, string.Empty);
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithEmail(string email, SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithEmail(string email, SessionPermissions permissions)
         {
             return await CreateNewSession(false, permissions,"email", email);
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithGoogle(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithGoogle(SessionPermissions permissions)
         {
             return await CreateNewSession(false, permissions,"google");
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithApple(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithApple(SessionPermissions permissions)
         {
             return await CreateNewSession(false, permissions,"apple");
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithPasskey(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithPasskey(SessionPermissions permissions)
         {
             return await CreateNewSession(false, permissions,"passkey");
         }
         
-        public async Task<SequenceEcosystemWallet> SignInWithMnemonic(SessionPermissions permissions)
+        public async Task<SequenceSessionWallet> SignInWithMnemonic(SessionPermissions permissions)
         {
             return await CreateNewSession(false, permissions,"mnemonic");
         }
 
-        public SequenceEcosystemWallet[] RecoverSessionsFromStorage()
+        public SequenceWallet GetWallet()
         {
-            return GetAllSessions();
+            _wallet ??= new SequenceWallet(GetAllSessionWallets());
+            return _wallet;
         }
 
-        public SequenceEcosystemWallet[] GetAllSessions()
+        public SequenceSessionWallet[] GetAllSessionWallets()
         {
             if (_credentials.Count == 0)
                 throw new Exception("No session found in storage.");
 
-            var wallets = new SequenceEcosystemWallet[_credentials.Count];
+            var sessionWallets = new SequenceSessionWallet[_credentials.Count];
             for (var i = 0; i < _credentials.Count; i++)
-                wallets[i] = new SequenceEcosystemWallet(_credentials[i]);
+                sessionWallets[i] = new SequenceSessionWallet(_credentials[i]);
 
-            return wallets;
+            return sessionWallets;
         }
 
         public void SignOut()
         {
             _sessionStorage.Clear();
+            _credentials.Clear();
+        }
+
+        public void RemoveSession(Address sessionAddress)
+        {
+            var index = _credentials.FindIndex(c => c.sessionAddress.Equals(sessionAddress));
+            if (index == -1)
+                throw new Exception("");
+            
+            _credentials.RemoveAt(index);
+            _sessionStorage.StoreSessions(_credentials.ToArray());
+            SessionsChanged?.Invoke(GetAllSessionWallets());
         }
         
         /// <summary>
@@ -85,7 +101,7 @@ namespace Sequence.EcosystemWallet.Authentication
         /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        private async Task<SequenceEcosystemWallet> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        private async Task<SequenceSessionWallet> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             _sessionWallet = new EOAWallet();
 
@@ -122,7 +138,8 @@ namespace Sequence.EcosystemWallet.Authentication
             _sessionStorage.AddSession(credentials);
             _credentials.Add(credentials);
             
-            return new SequenceEcosystemWallet(credentials);
+            SessionsChanged?.Invoke(GetAllSessionWallets());
+            return new SequenceSessionWallet(credentials);
         }
     }
 }

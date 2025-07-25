@@ -1,36 +1,31 @@
 using System;
 using System.Threading.Tasks;
-using Sequence.EcosystemWallet.Authentication.Requests;
+using Sequence.EcosystemWallet.Authentication;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Wallet;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
-    public class SequenceEcosystemWallet
+    public class SequenceSessionWallet : IWallet
     {
-        public static Action<SequenceEcosystemWallet> OnWalletCreated;
-        
         public Address Address { get; }
-        public Address SessionAddress { get; }
         public Chain Chain { get; }
         public bool IsExplicit { get; }
 
         private readonly SessionCredentials _credentials;
         
-        internal SequenceEcosystemWallet(SessionCredentials credentials)
+        internal SequenceSessionWallet(SessionCredentials credentials)
         {
             _credentials = credentials;
             
-            Address = credentials.address;
-            SessionAddress = new EOAWallet(credentials.privateKey).GetAddress();
+            Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = ChainDictionaries.ChainById[credentials.chainId];
             IsExplicit = credentials.isExplicit;
-            OnWalletCreated?.Invoke(this);
         }
-
+        
         public async Task<SignMessageResponse> SignMessage(Chain chain, string message)
         {
             var args = new SignMessageArgs 
@@ -39,7 +34,8 @@ namespace Sequence.EcosystemWallet.Authentication
                 chainId = new BigInt((int)chain), 
                 message = message
             };
-            var url = $"{SequenceEcosystemWalletLogin.WalletUrl}/request/sign";
+            
+            var url = $"{SequenceConnect.WalletUrl}/request/sign";
 
             var handler = RedirectFactory.CreateHandler();
             handler.SetRedirectUrl(RedirectOrigin.GetOriginString());
@@ -51,22 +47,26 @@ namespace Sequence.EcosystemWallet.Authentication
             
             return response.Data;
         }
-        
-        public async Task SendTransaction(Call[] calls, FeeOption feeOption = null)
-        {
-            var signedCalls = await SignCalls(calls);
-            throw new NotImplementedException();
-        }
 
         public async Task<FeeOption[]> GetFeeOption(Call[] calls)
         {
             var signedCalls = await SignCalls(calls);
-            throw new NotImplementedException();
+            var relayer = new SequenceRelayer(Chain.TestnetArbitrumSepolia);
+
+            var args = new FeeOptionsArgs(Address, signedCalls.To, signedCalls.Data);
+            var response = await relayer.GetFeeOptions(args);
+
+            return response.options;
         }
 
+        public Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
+        {
+            throw new System.NotImplementedException();
+        }
+        
         private async Task<(Address To, byte[] Data)> SignCalls(Call[] calls)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Sequence.Utils;
 using UnityEngine;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     public static class RedirectOrigin
     {

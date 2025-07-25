@@ -3,7 +3,7 @@ using System.Numerics;
 using Nethereum.Util;
 using Sequence.EcosystemWallet.Primitives;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     public class SessionTemplates
     {

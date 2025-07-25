@@ -1,6 +1,6 @@
 using Sequence.EcosystemWallet.Primitives.Common;
 
-namespace Sequence.EcosystemWallet.Authentication.Requests
+namespace Sequence.EcosystemWallet
 {
     
     public struct SignMessageArgs

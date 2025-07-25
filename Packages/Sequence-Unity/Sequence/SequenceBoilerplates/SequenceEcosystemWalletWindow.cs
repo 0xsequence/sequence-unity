@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Sequence.EcosystemWallet;
 using Sequence.EcosystemWallet.Authentication;
 using Sequence.EcosystemWallet.Primitives;
 using TMPro;
@@ -37,8 +38,8 @@ namespace Sequence.Boilerplates
         [SerializeField] private GameObject _loadingOverlay;
         [SerializeField] private MessagePopup _messagePopup;
         
-        private SequenceEcosystemWalletLogin _login;
-        private SequenceEcosystemWallet[] _wallets;
+        private SequenceConnect _login;
+        private SequenceWallet _wallet;
         private ImplicitSessionType _implicitPermissions;
         private ExplicitSessionType _explicitPermissions;
         private int _selectedWallet;
@@ -58,8 +59,9 @@ namespace Sequence.Boilerplates
             EnableWalletState(false);
             EnableEmailButton(true);
             ShowSignature(string.Empty);
-
-            RecoverWalletFromStorage();
+            
+            if (_login.GetAllSessionWallets().Length > 0)
+                ShowWallet(true);
         }
         
         public async void SignInWithEmail()
@@ -144,7 +146,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var signature = await _wallets[_selectedWallet].SignMessage(Chain.TestnetArbitrumSepolia, message);
+                var signature = await _wallet.SignMessage(Chain.TestnetArbitrumSepolia, message);
                 ShowSignature(signature.signature);
                 SetLoading(false);
             }
@@ -156,7 +158,7 @@ namespace Sequence.Boilerplates
 
         public void CopyWalletAddress()
         {
-            CopyText(_wallets[_selectedWallet].Address.Value);
+            CopyText(_wallet.Address.Value);
         }
 
         public void CopySignature()
@@ -219,12 +221,6 @@ namespace Sequence.Boilerplates
             SetLoading(false);
         }
 
-        private void RecoverWalletFromStorage()
-        {
-            _login.RecoverSessionsFromStorage();
-            ShowWallet(true);
-        }
-
         private void ShowSignature(string signature)
         {
             _curSignature = signature;
@@ -234,10 +230,10 @@ namespace Sequence.Boilerplates
 
         private void ShowWallet(bool recovered)
         {
-            _wallets = _login.GetAllSessions();
-            _walletText.text = _wallets[_selectedWallet].Address.Value;
+            _wallet = _login.GetWallet();
+            _walletText.text = _wallet.Address.Value;
             
-            var addresses = _wallets.Select(w => w.SessionAddress.Value).ToList();
+            var addresses = _wallet.SessionWallets.Select(w => w.Address.Value).ToList();
             _walletDropdown.ClearOptions();
             _walletDropdown.AddOptions(addresses);
             _walletDropdown.value = 0;
