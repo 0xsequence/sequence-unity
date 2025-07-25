@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.EcosystemWallet.Authentication;
 
 namespace Sequence.EcosystemWallet.Browser
 {

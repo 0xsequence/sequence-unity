@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Sequence.EcosystemWallet.Authentication;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
@@ -34,8 +33,9 @@ namespace Sequence.EcosystemWallet
                 chainId = new BigInt((int)chain), 
                 message = message
             };
-            
-            var url = $"{SequenceConnect.WalletUrl}/request/sign";
+
+            var ecosystem = (EcosystemType)_credentials.ecosystemId;
+            var url = $"{EcosystemBindings.GetUrl(ecosystem)}/request/sign";
 
             var handler = RedirectFactory.CreateHandler();
             handler.SetRedirectUrl(RedirectOrigin.GetOriginString());

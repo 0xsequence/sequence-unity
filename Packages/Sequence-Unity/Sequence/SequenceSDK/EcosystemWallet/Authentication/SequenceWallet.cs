@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Sequence.EcosystemWallet.Authentication;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Relayer;
 

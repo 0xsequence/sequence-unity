@@ -7,23 +7,23 @@ using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
 using UnityEngine.Assertions;
 
-namespace Sequence.EcosystemWallet.Authentication
+namespace Sequence.EcosystemWallet
 {
     public class SequenceConnect
     {
-        internal const string WalletUrl = "https://v3.sequence-dev.app";
-
         public static Action<SequenceSessionWallet[]> SessionsChanged;
         
         private Chain _chain;
+        private EcosystemType _ecosystem;
         private EOAWallet _sessionWallet;
         private SessionStorage _sessionStorage;
         private List<SessionCredentials> _credentials;
         private SequenceWallet _wallet;
         
-        public SequenceConnect(Chain chain)
+        public SequenceConnect(Chain chain, EcosystemType ecosystem)
         {
             _chain = chain;
+            _ecosystem = ecosystem;
             _sessionStorage = new SessionStorage();
             _credentials = _sessionStorage.GetSessions().ToList();
         }
@@ -116,7 +116,8 @@ namespace Sequence.EcosystemWallet.Authentication
             };
             
             var action = isExplicit ? "addExplicitSession" : "addImplicitSession";
-            var url = $"{WalletUrl}/request/connect";
+            var ecosystemUrl = EcosystemBindings.GetUrl(_ecosystem);
+            var url = $"{ecosystemUrl}/request/connect";
 
             var handler = RedirectFactory.CreateHandler();
             handler.SetRedirectUrl(redirectUrl);
@@ -131,6 +132,7 @@ namespace Sequence.EcosystemWallet.Authentication
                 response.Data.walletAddress,
                 response.Data.attestation,
                 response.Data.signature,
+                (int)_ecosystem,
                 ChainDictionaries.ChainIdOf[_chain],
                 response.Data.loginMethod,
                 response.Data.email);

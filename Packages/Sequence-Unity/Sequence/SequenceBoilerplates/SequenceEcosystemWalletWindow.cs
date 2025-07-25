@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Sequence.EcosystemWallet;
-using Sequence.EcosystemWallet.Authentication;
 using Sequence.EcosystemWallet.Primitives;
 using TMPro;
 using UnityEngine;
@@ -48,7 +47,7 @@ namespace Sequence.Boilerplates
         
         private void Start()
         {
-            _login = new(Chain.TestnetArbitrumSepolia);
+            _login = new(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
             
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
             _messagePopup.gameObject.SetActive(false);
