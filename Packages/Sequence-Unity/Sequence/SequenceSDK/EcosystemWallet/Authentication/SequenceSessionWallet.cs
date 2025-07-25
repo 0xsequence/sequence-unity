@@ -11,6 +11,7 @@ namespace Sequence.EcosystemWallet
 {
     public class SequenceSessionWallet : IWallet
     {
+        public Address ParentAddress { get; }
         public Address Address { get; }
         public Chain Chain { get; }
         public bool IsExplicit { get; }
@@ -20,7 +21,8 @@ namespace Sequence.EcosystemWallet
         internal SequenceSessionWallet(SessionCredentials credentials)
         {
             _credentials = credentials;
-            
+
+            ParentAddress = credentials.address;
             Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = ChainDictionaries.ChainById[credentials.chainId];
             IsExplicit = credentials.isExplicit;

@@ -66,11 +66,11 @@ namespace Sequence.Boilerplates
             EnableEmailButton(true);
             ShowSignature(string.Empty);
             
-            if (_login.GetAllSessionWallets().Length > 0)
-                ShowWallet(true);
-            
             _chainDropdown.ClearOptions();
             _chainDropdown.AddOptions(_chains.Select(c => c.ToString()).ToList());
+            
+            if (_login.GetAllSessionWallets().Length > 0)
+                ShowWallet(true);
         }
         
         public async void SignInWithEmail()

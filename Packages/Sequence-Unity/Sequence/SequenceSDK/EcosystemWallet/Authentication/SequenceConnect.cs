@@ -74,7 +74,7 @@ namespace Sequence.EcosystemWallet
         public SequenceSessionWallet[] GetAllSessionWallets()
         {
             if (_credentials.Count == 0)
-                throw new Exception("No session found in storage.");
+                return Array.Empty<SequenceSessionWallet>();
 
             var sessionWallets = new SequenceSessionWallet[_credentials.Count];
             for (var i = 0; i < _credentials.Count; i++)
@@ -87,6 +87,7 @@ namespace Sequence.EcosystemWallet
         {
             _sessionStorage.Clear();
             _credentials.Clear();
+            SessionsChanged?.Invoke(GetAllSessionWallets());
         }
 
         public void RemoveSession(Address sessionAddress)

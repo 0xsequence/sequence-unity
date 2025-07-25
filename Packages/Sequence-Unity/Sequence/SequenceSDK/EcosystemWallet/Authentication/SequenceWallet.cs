@@ -15,7 +15,7 @@ namespace Sequence.EcosystemWallet
         internal SequenceWallet(SequenceSessionWallet[] sessionWallets)
         {
             SessionWallets = sessionWallets;
-            Address = sessionWallets[0].Address;
+            Address = sessionWallets[0].ParentAddress;
             OnWalletCreated?.Invoke(this);
             
             SequenceConnect.SessionsChanged += SessionsChanged;
