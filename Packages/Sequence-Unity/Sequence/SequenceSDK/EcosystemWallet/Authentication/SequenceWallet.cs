@@ -10,12 +10,12 @@ namespace Sequence.EcosystemWallet
         public static Action<SequenceWallet> OnWalletCreated;
         
         public Address Address { get; }
-        public SessionSigner[] SessionWallets { get; private set; }
+        public SessionSigner[] SessionSigners { get; private set; }
         
-        internal SequenceWallet(SessionSigner[] sessionWallets)
+        internal SequenceWallet(SessionSigner[] sessionSigners)
         {
-            SessionWallets = sessionWallets;
-            Address = sessionWallets[0].ParentAddress;
+            SessionSigners = sessionSigners;
+            Address = sessionSigners[0].ParentAddress;
             OnWalletCreated?.Invoke(this);
             
             SequenceConnect.SessionsChanged += SessionsChanged;
@@ -28,22 +28,27 @@ namespace Sequence.EcosystemWallet
 
         private void SessionsChanged(SessionSigner[] sessionWallets)
         {
-            SessionWallets = sessionWallets;
+            SessionSigners = sessionWallets;
         }
 
         public async Task<SignMessageResponse> SignMessage(string message)
         {
-            return await SessionWallets[0].SignMessage(message);
+            return await FindSessionSigner().SignMessage(message);
         }
         
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
-            return await SessionWallets[0].SendTransaction(calls, feeOption);
+            return await FindSessionSigner().SendTransaction(calls, feeOption);
         }
 
         public async Task<FeeOption[]> GetFeeOption(Call[] calls)
         {
-            return await SessionWallets[0].GetFeeOption(calls);
+            return await FindSessionSigner().GetFeeOption(calls);
+        }
+
+        private SessionSigner FindSessionSigner()
+        {
+            return SessionSigners[0];
         }
     }
 }

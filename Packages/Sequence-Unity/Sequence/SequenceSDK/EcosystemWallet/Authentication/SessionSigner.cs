@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
+using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
@@ -87,7 +88,39 @@ namespace Sequence.EcosystemWallet
         
         private async Task<(Address To, byte[] Data)> SignCalls(Call[] calls)
         {
+            /*
+             * 1. Prepare Increment, add the increment to the calls array
+             * 2. 
+             */
+
+            var preparedIncrement = PrepareIncrement();
+            if (preparedIncrement != null)
+                calls.AddToArray(preparedIncrement);
+
+            var envelope = PrepareTransaction(calls);
+            var parentedEnvelope = new Parented(new [] { Address }, envelope.payload);
+            
+            // Get Image hash
+            
+            // sign sapient
+            
             throw new System.NotImplementedException();
+        }
+
+        private Call PrepareIncrement()
+        {
+            return null;
+        }
+
+        private Envelope<Calls> PrepareTransaction(Call[] calls)
+        {
+            var space = 0;
+            var nonce = 0;
+            return new Envelope<Calls>
+            {
+                wallet = null,
+                payload = new Calls(space, nonce, calls)
+            };
         }
     }
 }
