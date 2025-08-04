@@ -15,6 +15,14 @@ extern "C" {
 
         UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
         safariVC = [[SFSafariViewController alloc] initWithURL:url];
+        
+        if (@available(iOS 11.0, *)) {
+            safariVC.dismissButtonStyle = SFSafariViewControllerDismissButtonStyleCancel;
+        }
+        
+        if (@available(iOS 13.0, *)) {
+            safariVC.modalInPresentation = YES;
+        }
 
         NSLog(@"[SafariPlugin] Presenting SFSafariViewController with URL: %@", urlString);
 

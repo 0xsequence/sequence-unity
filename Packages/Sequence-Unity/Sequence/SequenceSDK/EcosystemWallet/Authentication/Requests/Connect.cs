@@ -7,7 +7,7 @@ namespace Sequence.EcosystemWallet
         public Address sessionAddress;
         public string preferredLoginMethod;
         public string email;
-        public string implicitSessionRedirectUrl;
+        public string origin;
         public SessionPermissions permissions;
     }
     

@@ -11,7 +11,7 @@ namespace Sequence.EcosystemWallet
 {
     public class SequenceConnect
     {
-        public static Action<SequenceSessionWallet[]> SessionsChanged;
+        public static Action<SessionSigner[]> SessionsChanged;
         
         public Chain Chain { get; private set; }
         
@@ -34,33 +34,33 @@ namespace Sequence.EcosystemWallet
             Chain = chain;
         }
 
-        public async Task<SequenceSessionWallet> AddSession(SessionPermissions permissions)
+        public async Task<SessionSigner> AddSession(SessionPermissions permissions)
         {
             Assert.IsNotNull(permissions);
             return await CreateNewSession(true, permissions, string.Empty);
         }
         
-        public async Task<SequenceSessionWallet> SignInWithEmail(string email, SessionPermissions permissions = null)
+        public async Task<SessionSigner> SignInWithEmail(string email, SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"email", email);
         }
         
-        public async Task<SequenceSessionWallet> SignInWithGoogle(SessionPermissions permissions = null)
+        public async Task<SessionSigner> SignInWithGoogle(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"google");
         }
         
-        public async Task<SequenceSessionWallet> SignInWithApple(SessionPermissions permissions = null)
+        public async Task<SessionSigner> SignInWithApple(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"apple");
         }
         
-        public async Task<SequenceSessionWallet> SignInWithPasskey(SessionPermissions permissions = null)
+        public async Task<SessionSigner> SignInWithPasskey(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"passkey");
         }
         
-        public async Task<SequenceSessionWallet> SignInWithMnemonic(SessionPermissions permissions = null)
+        public async Task<SessionSigner> SignInWithMnemonic(SessionPermissions permissions = null)
         {
             return await CreateNewSession(false, permissions,"mnemonic");
         }
@@ -71,14 +71,14 @@ namespace Sequence.EcosystemWallet
             return _wallet;
         }
 
-        public SequenceSessionWallet[] GetAllSessionWallets()
+        public SessionSigner[] GetAllSessionWallets()
         {
             if (_credentials.Count == 0)
-                return Array.Empty<SequenceSessionWallet>();
+                return Array.Empty<SessionSigner>();
 
-            var sessionWallets = new SequenceSessionWallet[_credentials.Count];
+            var sessionWallets = new SessionSigner[_credentials.Count];
             for (var i = 0; i < _credentials.Count; i++)
-                sessionWallets[i] = new SequenceSessionWallet(_credentials[i]);
+                sessionWallets[i] = new SessionSigner(_credentials[i]);
 
             return sessionWallets;
         }
@@ -108,17 +108,17 @@ namespace Sequence.EcosystemWallet
         /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        private async Task<SequenceSessionWallet> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        private async Task<SessionSigner> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             _sessionWallet = new EOAWallet();
 
-            var redirectUrl = RedirectOrigin.GetOriginString();
+            var origin = RedirectOrigin.GetOriginString();
             var payload = new ConnectArgs
             {
                 sessionAddress = _sessionWallet.GetAddress(),
                 preferredLoginMethod = preferredLoginMethod,
                 email = email,
-                implicitSessionRedirectUrl = isExplicit ? null : redirectUrl,
+                origin = origin,
                 permissions = permissions
             };
             
@@ -127,7 +127,7 @@ namespace Sequence.EcosystemWallet
             var url = $"{ecosystemUrl}/request/connect";
 
             var handler = RedirectFactory.CreateHandler();
-            handler.SetRedirectUrl(redirectUrl);
+            handler.SetRedirectUrl(origin);
             
             var response = await handler.WaitForResponse<ConnectArgs, ConnectResponse>(url, action, payload);
             if (!response.Result)
@@ -148,7 +148,7 @@ namespace Sequence.EcosystemWallet
             _credentials.Add(credentials);
             
             SessionsChanged?.Invoke(GetAllSessionWallets());
-            return new SequenceSessionWallet(credentials);
+            return new SessionSigner(credentials);
         }
     }
 }

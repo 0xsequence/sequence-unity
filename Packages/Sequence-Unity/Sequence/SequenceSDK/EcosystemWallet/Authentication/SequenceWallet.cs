@@ -10,9 +10,9 @@ namespace Sequence.EcosystemWallet
         public static Action<SequenceWallet> OnWalletCreated;
         
         public Address Address { get; }
-        public SequenceSessionWallet[] SessionWallets { get; private set; }
+        public SessionSigner[] SessionWallets { get; private set; }
         
-        internal SequenceWallet(SequenceSessionWallet[] sessionWallets)
+        internal SequenceWallet(SessionSigner[] sessionWallets)
         {
             SessionWallets = sessionWallets;
             Address = sessionWallets[0].ParentAddress;
@@ -26,7 +26,7 @@ namespace Sequence.EcosystemWallet
             SequenceConnect.SessionsChanged -= SessionsChanged;
         }
 
-        private void SessionsChanged(SequenceSessionWallet[] sessionWallets)
+        private void SessionsChanged(SessionSigner[] sessionWallets)
         {
             SessionWallets = sessionWallets;
         }

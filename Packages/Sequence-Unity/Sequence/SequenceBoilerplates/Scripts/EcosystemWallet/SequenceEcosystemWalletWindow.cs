@@ -79,7 +79,7 @@ namespace Sequence.Boilerplates
             
             try
             {
-                SequenceSessionWallet wallet = await _login.SignInWithEmail(_curEmail, null);
+                SessionSigner signer = await _login.SignInWithEmail(_curEmail, null);
                 ShowWallet(false);
             }
             catch (Exception e)

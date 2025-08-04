@@ -1,5 +1,4 @@
 using System;
-using System.Numerics;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Utils;
 using UnityEngine.Scripting;

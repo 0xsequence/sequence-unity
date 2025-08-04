@@ -9,7 +9,7 @@ using Sequence.Wallet;
 
 namespace Sequence.EcosystemWallet
 {
-    public class SequenceSessionWallet : IWallet
+    public class SessionSigner : IWallet
     {
         public Address ParentAddress { get; }
         public Address Address { get; }
@@ -18,7 +18,7 @@ namespace Sequence.EcosystemWallet
 
         private readonly SessionCredentials _credentials;
         
-        internal SequenceSessionWallet(SessionCredentials credentials)
+        internal SessionSigner(SessionCredentials credentials)
         {
             _credentials = credentials;
 
