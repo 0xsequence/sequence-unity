@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities.Encoders;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine;

@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet
@@ -134,8 +137,10 @@ namespace Sequence.EcosystemWallet
                 throw new Exception("Error during request");
             
             var keyMachine = new KeyMachineApi();
-            var deployResponse = await keyMachine.GetDeploy(response.Data.walletAddress);
-            var configResponse = await keyMachine.GetConfiguration(deployResponse.deployHash);
+            var deployResponse = await keyMachine.GetDeployHash(response.Data.walletAddress);
+            var config = await keyMachine.GetConfiguration(deployResponse.deployHash);
+            
+            Debug.Log($"Config: {config.ToJson()}");
             
             var credentials = new SessionCredentials(
                 isExplicit,

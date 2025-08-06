@@ -13,6 +13,13 @@ namespace Sequence.EcosystemWallet.KeyMachine.Models
     internal struct ConfigReturn
     {
         public int version;
-        public object config;
+        public ConfigContext config;
+    }
+
+    internal struct ConfigContext
+    {
+        public string checkpoint;
+        public int threshold;
+        public object tree;
     }
 }

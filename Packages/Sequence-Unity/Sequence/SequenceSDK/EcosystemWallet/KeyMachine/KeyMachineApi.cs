@@ -1,5 +1,7 @@
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.KeyMachine.Models;
+using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet
@@ -17,16 +19,24 @@ namespace Sequence.EcosystemWallet
             _httpClient = new HttpClient(_host);
         }
         
-        public async Task<DeployHashReturn> GetDeploy(Address walletAddress)
+        public async Task<DeployHashReturn> GetDeployHash(Address walletAddress)
         {
             var args = new DeployHashArgs(walletAddress);
             return await _httpClient.SendPostRequest<DeployHashArgs, DeployHashReturn>("rpc/Sessions/DeployHash", args);
         }
         
-        public async Task<ConfigReturn> GetConfiguration(string imageHash)
+        public async Task<Primitives.Config> GetConfiguration(string imageHash)
         {
             var args = new ConfigArgs(imageHash);
-            return await _httpClient.SendPostRequest<ConfigArgs, ConfigReturn>("rpc/Sessions/Config", args);
+            var response = await _httpClient.SendPostRequest<ConfigArgs, ConfigReturn>("rpc/Sessions/Config", args);
+            
+            var topology = Topology.FromServiceConfigTree(response.config.tree.ToString());
+            return new Primitives.Config
+            {
+                threshold = new BigInteger(response.config.threshold),
+                checkpoint = BigInteger.Parse(response.config.checkpoint),
+                topology = topology,
+            };
         } 
     }
 }
