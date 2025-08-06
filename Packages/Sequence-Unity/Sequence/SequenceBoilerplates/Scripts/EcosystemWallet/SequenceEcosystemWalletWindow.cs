@@ -259,7 +259,7 @@ namespace Sequence.Boilerplates
         private void LoadSessions()
         {
             _sessionPool.Cleanup();
-            foreach (var wallet in _wallet.SessionWallets)
+            foreach (var wallet in _wallet.SessionSigners)
                 _sessionPool.GetObject().Apply(wallet, RemoveSession);
         }
 

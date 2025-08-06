@@ -133,6 +133,10 @@ namespace Sequence.EcosystemWallet
             if (!response.Result)
                 throw new Exception("Error during request");
             
+            var keyMachine = new KeyMachineApi();
+            var deployResponse = await keyMachine.GetDeploy(response.Data.walletAddress);
+            var configResponse = await keyMachine.GetConfiguration(deployResponse.deployHash);
+            
             var credentials = new SessionCredentials(
                 isExplicit,
                 _sessionWallet.GetPrivateKeyAsHex(),

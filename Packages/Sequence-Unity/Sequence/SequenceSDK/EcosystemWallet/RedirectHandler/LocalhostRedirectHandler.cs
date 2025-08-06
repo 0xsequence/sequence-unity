@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
@@ -16,7 +17,7 @@ namespace Sequence.EcosystemWallet.Browser
             try
             {
                 var listener = new HttpListener();
-                listener.Prefixes.Add(RedirectUrl);
+                listener.Prefixes.Add(RedirectUrl.AppendTrailingSlashIfNeeded());
                 listener.Start();
                 
                 var context = await listener.GetContextAsync();
@@ -33,6 +34,8 @@ namespace Sequence.EcosystemWallet.Browser
                 
                 var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(queryString["payload"]));
                 var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
+                
+                Debug.Log($"{responsePayloadJson}");
                 
                 return (true, responsePayload);
             }

@@ -24,7 +24,7 @@ namespace Sequence.EcosystemWallet
 #else
         public static string GetOriginString()
         {
-            return $"http://localhost:{GetAvailablePort()}/";
+            return $"http://localhost:{GetAvailablePort()}";
         }
         
         private static int GetAvailablePort()
