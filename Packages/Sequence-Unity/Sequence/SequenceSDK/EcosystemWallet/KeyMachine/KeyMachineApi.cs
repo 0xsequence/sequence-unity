@@ -22,13 +22,19 @@ namespace Sequence.EcosystemWallet
         public async Task<DeployHashReturn> GetDeployHash(Address walletAddress)
         {
             var args = new DeployHashArgs(walletAddress);
-            return await _httpClient.SendPostRequest<DeployHashArgs, DeployHashReturn>("rpc/Sessions/DeployHash", args);
+            return await SendRequest<DeployHashArgs, DeployHashReturn>("DeployHash", args);
+        }
+
+        public async Task<TreeReturn> GetTree(string imageHash)
+        {
+            var args = new TreeArgs(imageHash);
+            return await SendRequest<TreeArgs, TreeReturn>("Tree", args);
         }
         
         public async Task<Primitives.Config> GetConfiguration(string imageHash)
         {
             var args = new ConfigArgs(imageHash);
-            var response = await _httpClient.SendPostRequest<ConfigArgs, ConfigReturn>("rpc/Sessions/Config", args);
+            var response = await SendRequest<ConfigArgs, ConfigReturn>("Config", args);
             
             var topology = Topology.FromServiceConfigTree(response.config.tree.ToString());
             return new Primitives.Config
@@ -37,6 +43,11 @@ namespace Sequence.EcosystemWallet
                 checkpoint = BigInteger.Parse(response.config.checkpoint),
                 topology = topology,
             };
-        } 
+        }
+
+        private async Task<TReturn> SendRequest<TArgs, TReturn>(string endpoint, TArgs args)
+        {
+            return await _httpClient.SendPostRequest<TArgs, TReturn>("rpc/Sessions/" + endpoint, args);
+        }
     }
 }

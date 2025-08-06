@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
@@ -7,6 +8,7 @@ using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -71,6 +73,20 @@ namespace Sequence.EcosystemWallet
 
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
+            var keyMachine = new KeyMachineApi();
+            var deployResponse = await keyMachine.GetDeployHash(Address);
+            var config = await keyMachine.GetConfiguration(deployResponse.deployHash);
+            
+            Debug.Log($"Config: {config.ToJson()}");
+
+            var signerLeaf = config.topology.FindSignerLeaf(new Address("0x23c2eB9958BcAC9E531E785c4f65e91F1F426142")) as SapientSignerLeaf;
+            var treeReturn = await keyMachine.GetTree(signerLeaf.imageHash);
+            var sessionsTopology = SessionsTopology.FromTree(treeReturn.tree.ToString());
+            
+            Debug.Log($"Sessions Topology {sessionsTopology.JsonSerialize()}");
+            
+            return "";
+            
             var signedCalls = await SignCalls(calls);
             
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);
@@ -133,10 +149,44 @@ namespace Sequence.EcosystemWallet
         private void BuildTransaction(SignedEnvelope<Calls> envelope)
         {
         }
-        
-        private SessionSigner FindSignersForCalls(Calls calls)
+
+        private async Task<SignatureOfSapientSignerLeaf> SignSapient(Calls calls)
         {
-            return SessionSigners[0];
+            if (!calls.isCalls || calls.calls.Length == 0)
+                throw new Exception("calls is empty");
+
+            var deployHashReturn = await new KeyMachineApi().GetDeployHash(Address);
+            var imageHash = deployHashReturn.deployHash;
+
+            var implicitSigners = new List<Address>();
+            var explicitSigners = new List<Address>();
+
+            var signers = FindSignersForCalls(calls);
+            foreach (var signer in signers)
+            {
+                if (signer.IsExplicit)
+                    explicitSigners.Add(signer.Address);
+                else
+                    implicitSigners.Add(signer.Address);
+            }
+
+            var sessionSignatures = SessionCallSignature.EncodeSignatures(
+                null,
+                null, 
+                explicitSigners.ToArray(), 
+                implicitSigners.ToArray());
+            
+            return new SignatureOfSapientSignerLeaf
+            {
+                curType = SignatureOfSapientSignerLeaf.Type.sapient,
+                address = Address,
+                data = sessionSignatures
+            };
+        }
+        
+        private SessionSigner[] FindSignersForCalls(Calls calls)
+        {
+            return SessionSigners;
         }
     }
 }

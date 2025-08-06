@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -179,9 +180,78 @@ namespace Sequence.EcosystemWallet.Primitives
             leaf.blacklist = newBlacklist;
         }
 
+        public static SessionLeaf DecodeLeaf(string value)
+        {
+            var data = value.HexStringToByteArray();
+            if (data.Length == 0)
+                throw new ArgumentException("Bytes array is empty");
+
+            var flagBytes = new[] { data[0] };
+            var flag = flagBytes.ToInteger();
+            
+            if (flag == FlagBlacklist)
+            {
+                var blacklist = new Address[data.Length - 1];
+                var index = 0;
+                
+                for (int i = 1; i < data.Length; i += 20)
+                {
+                    byte[] slice = data.Skip(i).Take(20).ToArray();
+                    blacklist[index] = new Address(slice.ByteArrayToHexStringWithPrefix());
+                }
+                
+                return new ImplicitBlacklistLeaf
+                {
+                    blacklist = blacklist
+                };
+            }
+
+            if (flag == FlagIdentitySigner)
+            {
+                string identitySigner = data.Skip(1).Take(20).ToArray().ByteArrayToHexStringWithPrefix();
+                
+                return new IdentitySignerLeaf
+                {
+                    identitySigner = new Address(identitySigner)
+                };
+            }
+
+            if (flag == FlagPermissions)
+            {
+                byte[] slice = data.Skip(1).ToArray();
+                var permissions = SessionPermissions.Decode(slice);
+                
+                return new PermissionLeaf
+                {
+                    permissions = permissions
+                };
+            }
+
+            throw new Exception("Invalid leaf");
+        }
+        
         public static SessionsTopology MergeSessionsTopologies(SessionsTopology a, SessionsTopology b)
         {
             return new SessionsTopology(new SessionBranch(a, b));
+        }
+
+        public static SessionsTopology FromTree(string tree)
+        {
+            if (tree.StartsWith("["))
+            {
+                var list = JsonConvert.DeserializeObject<List<object>>(tree);
+                if (list.Count < 2)
+                    throw new Exception("Invalid node structure in JSON");
+
+                var children = list.Select(i => FromTree(i.ToString())).ToArray();
+                return new SessionBranch(children).ToTopology();
+            }
+            
+            if (tree.StartsWith("0x"))
+                throw new Exception("Unknown in configuration tree");
+            
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(tree)["data"];
+            return DecodeLeaf(data).ToTopology();
         }
 
         public static SessionsTopology FromJson(string json)
