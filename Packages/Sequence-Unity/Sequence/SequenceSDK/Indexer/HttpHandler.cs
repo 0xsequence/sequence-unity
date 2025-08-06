@@ -32,8 +32,10 @@ namespace Sequence
         
         public async Task<string> HttpPost(string chainID, string endPoint, object args, int retries = 0)
         {
-            string requestJson = JsonConvert.SerializeObject(args, serializerSettings);
-            using var req = UnityWebRequest.Put(Url(chainID, endPoint), requestJson);
+            var url = Url(chainID, endPoint);
+            var requestJson = JsonConvert.SerializeObject(args, serializerSettings);
+            
+            using var req = UnityWebRequest.Put(url, requestJson);
             req.SetRequestHeader("Content-Type", "application/json");
             req.SetRequestHeader("Accept", "application/json");
             req.SetRequestHeader("X-Access-Key", _builderApiKey); 
@@ -41,7 +43,10 @@ namespace Sequence
             req.timeout = 10; // Request will timeout after 10 seconds
             
             string curlRequest = 
-                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {Url(chainID, endPoint)}";
+                $"curl -X POST -H \"Content-Type: application/json\" -H \"Accept: application/json\" -H \"X-Access-Key: {req.GetRequestHeader("X-Access-Key")}\" -d '{requestJson}' {url}";
+            
+            SequenceLog.Info($">> {curlRequest}");
+            
             try
             {
                 await req.SendWebRequest();
@@ -54,6 +59,8 @@ namespace Sequence
                 }
 
                 string returnText = req.downloadHandler.text;
+                SequenceLog.Info($"<< {returnText} (from {url})");
+                
                 req.Dispose();
                 return returnText;
             }

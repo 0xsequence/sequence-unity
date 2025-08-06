@@ -52,7 +52,7 @@ namespace Sequence.Utils
         {
             if (!Enum.TryParse<T>(enumString, ignoreCase: true, out var parsed))
             {
-                Debug.LogWarning($"Unknown enum value '{enumString}' for type {typeof(T).Name}. Returning default.");
+                SequenceLog.Warning($"Unknown enum value '{enumString}' for type {typeof(T).Name}. Returning default.");
                 return default(T);
             }
 

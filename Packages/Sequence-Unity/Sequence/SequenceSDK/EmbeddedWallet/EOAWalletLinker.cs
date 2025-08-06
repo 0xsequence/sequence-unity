@@ -44,7 +44,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogException(e);
+                SequenceLog.Exception(e);
                 return Array.Empty<LinkedWalletData>();
             }
         }
@@ -72,7 +72,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogException(e);
+                SequenceLog.Exception(e);
                 return false;
             }
         }
@@ -99,7 +99,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Failed to generate EOA Wallet Link: {e}");
+                SequenceLog.Error($"Failed to generate EOA Wallet Link: {e}");
                 return null;
             }
         }

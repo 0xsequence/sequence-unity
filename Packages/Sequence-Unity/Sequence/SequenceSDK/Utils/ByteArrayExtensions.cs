@@ -29,7 +29,7 @@ namespace Sequence.Utils
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error converting byte array to hexadecimal string: {ex.Message}");
+                SequenceLog.Error($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
         }

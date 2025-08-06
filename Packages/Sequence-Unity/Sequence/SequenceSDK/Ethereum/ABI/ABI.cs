@@ -274,7 +274,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error generating function selector: {ex.Message}");
+                SequenceLog.Error($"Error generating function selector: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -354,7 +354,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error determining parameter type: {ex.Message}");
+                SequenceLog.Error($"Error determining parameter type: {ex.Message}");
             }
 
             return ABIType.NONE;

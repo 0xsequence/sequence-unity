@@ -42,7 +42,7 @@ namespace Sequence.Utils
 
                 if (imageRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogWarning($"Error fetching image at url: {url}\nError: {imageRequest.error}\nDownload Handler error: {imageRequest.downloadHandler.error}\nReturning default");
+                    SequenceLog.Warning($"Error fetching image at url: {url}\nError: {imageRequest.error}\nDownload Handler error: {imageRequest.downloadHandler.error}\nReturning default");
                 }
                 else
                 {
@@ -51,17 +51,17 @@ namespace Sequence.Utils
                     FileStorage.Save(data, cacheKey, Directory);
                 }
             } catch (HttpRequestException e) {
-                Debug.LogWarning("HTTP Request failed: " + e.Message);
+                SequenceLog.Warning("HTTP Request failed: " + e.Message);
             } catch (FormatException e) {
-                Debug.LogWarning("Invalid URL format: " + e.Message);
+                SequenceLog.Warning("Invalid URL format: " + e.Message);
             } catch (Exception e) {
                 if (e.Message.Contains($"{(int)HttpStatusCode.Gone}"))
                 {
-                    Debug.LogWarning($"Error fetching image at url: {url}\nError: {e.Message}\nReturning default");
+                    SequenceLog.Warning($"Error fetching image at url: {url}\nError: {e.Message}\nReturning default");
                 }
                 else
                 {
-                    Debug.LogWarning("An unexpected error occurred: " + e.Message + $"\nUrl: {url}\nReturning default");
+                    SequenceLog.Warning("An unexpected error occurred: " + e.Message + $"\nUrl: {url}\nReturning default");
                 }
             }
 

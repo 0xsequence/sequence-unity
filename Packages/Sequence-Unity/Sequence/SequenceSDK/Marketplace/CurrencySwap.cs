@@ -232,7 +232,7 @@ namespace Sequence.Marketplace
                 {
                     LifiSwapRoutesResponse response = new LifiSwapRoutesResponse(routes);
                     string responseJson = JsonConvert.ToString(response);
-                    Debug.LogError($"Received multiple {nameof(route.toTokens)} in response from Lifi: {responseJson}");
+                    SequenceLog.Info($"Received multiple {nameof(route.toTokens)} in response from Lifi: {responseJson}");
                 }
             }
         }

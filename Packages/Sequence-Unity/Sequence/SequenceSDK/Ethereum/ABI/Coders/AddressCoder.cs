@@ -25,7 +25,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to decode address: {ex.Message}");
+                SequenceLog.Error($"Failed to decode address: {ex.Message}");
                 return null;
             }
         }
@@ -46,7 +46,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to encode address: {ex.Message}");
+                SequenceLog.Error($"Failed to encode address: {ex.Message}");
                 return new byte[0];
             }
         }
@@ -80,7 +80,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to encode address to string: {ex.Message}");
+                SequenceLog.Error($"Failed to encode address to string: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -104,7 +104,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to decode address from string: {ex.Message}");
+                SequenceLog.Error($"Failed to decode address from string: {ex.Message}");
                 return string.Empty;
             }
         }
@@ -124,7 +124,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to decode address: {ex.Message}");
+                SequenceLog.Error($"Failed to decode address: {ex.Message}");
                 return null;
             }
         }

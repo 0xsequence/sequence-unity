@@ -127,7 +127,7 @@ namespace Sequence.EmbeddedWallet
                         }
                         catch (Exception e)
                         {
-                            Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                            SequenceLog.Error("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
                             OnSendTransactionComplete?.Invoke(successfulTransactionReturn);
                             return result;
                         }
@@ -231,7 +231,7 @@ namespace Sequence.EmbeddedWallet
             }
             else
             {
-                Debug.LogError("Failed to drop sessionId: " + dropSessionId);
+                SequenceLog.Error("Failed to drop sessionId: " + dropSessionId);
             }
             return result;
         }
@@ -251,7 +251,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogWarning("Failed to list sessions: " + e.Message);
+                SequenceLog.Warning("Failed to list sessions: " + e.Message);
             }
             OnSessionsFound?.Invoke(results);
             return results;
@@ -267,7 +267,7 @@ namespace Sequence.EmbeddedWallet
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
+                    SequenceLog.Error("Transaction was successful, but we're unable to obtain the transaction hash. Reason: " + e.Message);
                     return successfulTransactionReturn;
                 }
             }

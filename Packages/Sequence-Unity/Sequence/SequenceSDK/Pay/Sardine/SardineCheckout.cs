@@ -107,8 +107,8 @@ namespace Sequence.Pay.Sardine
                     return false;
                 }
 
-                Debug.LogWarning("Error fetching Sardine whitelist status: " + e.Message +
-                                 "\nThe contract has most likely been whitelisted as we didn't receive an error indicating otherwise");
+                SequenceLog.Warning("Error fetching Sardine whitelist status: " + e.Message +
+                                  "\nThe contract has most likely been whitelisted as we didn't receive an error indicating otherwise");
                 return true;
             }
         }
@@ -278,7 +278,7 @@ namespace Sequence.Pay.Sardine
             
             if (amount > saleDetails.SupplyCap)
             {
-                Debug.LogWarning($"Requested amount exceeds the supply cap; requested: {amount}, supply cap: {saleDetails.SupplyCap}. Requesting the supply cap instead");
+                SequenceLog.Warning($"Requested amount exceeds the supply cap; requested: {amount}, supply cap: {saleDetails.SupplyCap}. Requesting the supply cap instead");
                 amount = saleDetails.SupplyCap;
             }
             
@@ -333,7 +333,7 @@ namespace Sequence.Pay.Sardine
             
             if (amount > saleDetails.SupplyCap)
             {
-                Debug.LogWarning($"Requested amount exceeds the supply cap; requested: {amount}, supply cap: {saleDetails.SupplyCap}. Requesting the supply cap instead");
+                SequenceLog.Warning($"Requested amount exceeds the supply cap; requested: {amount}, supply cap: {saleDetails.SupplyCap}. Requesting the supply cap instead");
                 amount = saleDetails.SupplyCap;
             }
             

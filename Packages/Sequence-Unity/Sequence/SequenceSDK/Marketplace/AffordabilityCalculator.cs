@@ -105,7 +105,7 @@ namespace Sequence.Marketplace
             int decimals = 18;
             if (balance.contractInfo == null && balance.tokenMetadata == null) 
             {
-                Debug.LogWarning($"No contract info or metadata found for {balance.contractAddress}, attempting to fetch from contract...");
+                SequenceLog.Warning($"No contract info or metadata found for {balance.contractAddress}, attempting to fetch from contract...");
                 try
                 {
                     var decimalsFromContract = await new ERC20(currencyContractAddress).Decimals(_client);
@@ -113,7 +113,7 @@ namespace Sequence.Marketplace
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Error fetching decimals from contract for {currencyContractAddress}: {e.Message}\nUsing default of 18 decimals");
+                    SequenceLog.Error($"Error fetching decimals from contract for {currencyContractAddress}: {e.Message}\nUsing default of 18 decimals");
                 }
             }
             else

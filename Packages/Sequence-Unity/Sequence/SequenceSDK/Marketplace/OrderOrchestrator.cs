@@ -35,7 +35,7 @@ namespace Sequence.Marketplace
             {
                 string error =
                     $"Error fetching other listings for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}): {e.Message}";
-                Debug.LogError(error);
+                SequenceLog.Error(error);
                 Initialized = true;
                 throw new Exception(error);
             }
@@ -45,7 +45,7 @@ namespace Sequence.Marketplace
             if (remaining > 0)
             {
                 ulong requested = _amountRequested + remaining; // We should already revert _amountRequested to the max available in SetAmountsByOrder
-                Debug.LogError($"Amount requested exceeds what is available in the marketplace for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}), amount requested: {requested} available: {_amountRequested}. Setting requested amount to the available amount: {_amountRequested}");
+                SequenceLog.Error($"Amount requested exceeds what is available in the marketplace for collectible (contract: {_listing.order.collectionContractAddress}, tokenId: {_listing.order.tokenId}), amount requested: {requested} available: {_amountRequested}. Setting requested amount to the available amount: {_amountRequested}");
             }
             
             Initialized = true;

@@ -1,3 +1,4 @@
 ﻿{
-	"name": "AppleAuth"
+	"name": "AppleAuth",
+	"references":[ "GUID:b4f9c0f8f363f439b9e337f79050f189" ]
 }

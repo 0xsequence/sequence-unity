@@ -812,11 +812,11 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 1
   scriptingDefineSymbols:
-    Android: ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE
+    Android: SEQUENCE_DEBUG
     Server: 
-    Standalone: UNITY_ASTOOLS_EXPERIMENTAL
-    WebGL: VUPLEX_CCU;VUPLEX_STANDALONE
-    iPhone: APPLE_AUTH_MANAGER_NATIVE_IMPLEMENTATION_AVAILABLE
+    Standalone: UNITY_ASTOOLS_EXPERIMENTAL;SEQUENCE_DEBUG
+    WebGL: VUPLEX_CCU;VUPLEX_STANDALONE;SEQUENCE_DEBUG
+    iPhone: APPLE_AUTH_MANAGER_NATIVE_IMPLEMENTATION_AVAILABLE;SEQUENCE_DEBUG
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
