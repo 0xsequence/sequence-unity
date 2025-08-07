@@ -82,6 +82,11 @@ namespace Sequence.EcosystemWallet.Primitives
 
             throw new Exception("Invalid tree structure");
         }
+
+        public static T FindLeaf<T>(this ITopology topology) where T : ILeaf
+        {
+            return topology.FindLeaf<T>(_ => true);
+        }
         
         public static T FindLeaf<T>(this ITopology topology, Func<T, bool> check) where T : ILeaf
         {

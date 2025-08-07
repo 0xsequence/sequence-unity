@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
@@ -18,12 +19,15 @@ namespace Sequence.EcosystemWallet
         
         public Address Address { get; }
         public SessionSigner[] SessionSigners { get; private set; }
+
+        private WalletState _state;
         
         internal SequenceWallet(SessionSigner[] sessionSigners)
         {
             SessionSigners = sessionSigners;
             Address = sessionSigners[0].ParentAddress;
             OnWalletCreated?.Invoke(this);
+            _state = new WalletState(Address);
             
             SequenceConnect.SessionsChanged += SessionsChanged;
         }
@@ -73,17 +77,7 @@ namespace Sequence.EcosystemWallet
 
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
-            var keyMachine = new KeyMachineApi();
-            var deployResponse = await keyMachine.GetDeployHash(Address);
-            var config = await keyMachine.GetConfiguration(deployResponse.deployHash);
-            
-            Debug.Log($"Config: {config.ToJson()}");
-
-            var signerLeaf = config.topology.FindSignerLeaf(new Address("0x23c2eB9958BcAC9E531E785c4f65e91F1F426142")) as SapientSignerLeaf;
-            var treeReturn = await keyMachine.GetTree(signerLeaf.imageHash);
-            var sessionsTopology = SessionsTopology.FromTree(treeReturn.tree.ToString());
-            
-            Debug.Log($"Sessions Topology {sessionsTopology.JsonSerialize()}");
+            await _state.Update();
             
             return "";
             
@@ -150,18 +144,23 @@ namespace Sequence.EcosystemWallet
         {
         }
 
-        private async Task<SignatureOfSapientSignerLeaf> SignSapient(Calls calls)
+        private SignatureOfSapientSignerLeaf SignSapient(Calls calls)
         {
             if (!calls.isCalls || calls.calls.Length == 0)
                 throw new Exception("calls is empty");
-
-            var deployHashReturn = await new KeyMachineApi().GetDeployHash(Address);
-            var imageHash = deployHashReturn.deployHash;
 
             var implicitSigners = new List<Address>();
             var explicitSigners = new List<Address>();
 
             var signers = FindSignersForCalls(calls);
+            
+            var signatures = new SessionCallSignature[signers.Length];
+            for (var i = 0; i < signers.Length; i++)
+            {
+                var signature = signers[i].SignCall(calls.calls[i], calls.space, calls.nonce);
+                signatures[i] = signature;
+            }
+
             foreach (var signer in signers)
             {
                 if (signer.IsExplicit)
@@ -171,8 +170,8 @@ namespace Sequence.EcosystemWallet
             }
 
             var sessionSignatures = SessionCallSignature.EncodeSignatures(
-                null,
-                null, 
+                signatures,
+                _state.SessionsTopology, 
                 explicitSigners.ToArray(), 
                 implicitSigners.ToArray());
             
@@ -186,7 +185,40 @@ namespace Sequence.EcosystemWallet
         
         private SessionSigner[] FindSignersForCalls(Calls calls)
         {
-            return SessionSigners;
+            var identitySigner = _state.SessionsTopology.GetIdentitySigner();
+            if (identitySigner == null)
+                throw new Exception("identitySigner is null");
+
+            var blacklist = _state.SessionsTopology.GetImplicitBlacklist();
+            if (blacklist == null)
+                throw new Exception("blacklist is null");
+            
+            var validImplicitSigners = SessionSigners.Where(s => 
+                !s.IsExplicit &&
+                s.IdentitySigner.Equals(identitySigner) &&
+                !blacklist.Contains(s.Address)
+                ).ToArray();
+
+            var explicitSigners = _state.SessionsTopology.GetExplicitSigners();
+            var validExplicitSigners = SessionSigners
+                .Where(s => s.IsExplicit && 
+                            Array.Exists(explicitSigners, es => es.Equals(s.Address))).ToArray();
+
+            var availableSigners = ArrayUtils.CombineArrays(validImplicitSigners, validExplicitSigners);
+            if (availableSigners.Length == 0)
+                throw new Exception("no valid signers found");
+            
+            var signers = new List<SessionSigner>();
+            foreach (var call in calls.calls)
+            {
+                foreach (var signer in availableSigners)
+                {
+                    if (signer.IsSupportedCall(call))
+                        signers.Add(signer);
+                }
+            }
+            
+            return signers.ToArray();
         }
     }
 }

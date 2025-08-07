@@ -156,9 +156,39 @@ namespace Sequence.EcosystemWallet.Primitives
             return this;
         }
 
+        public Address GetIdentitySigner()
+        {
+            return this.FindLeaf<IdentitySignerLeaf>()?.identitySigner;
+        }
+
+        public Address[] GetImplicitBlacklist()
+        {
+            return this.FindLeaf<ImplicitBlacklistLeaf>().blacklist;
+        }
+
+        public Address[] GetExplicitSigners()
+        {
+            return GetExplicitSigners(Array.Empty<Address>());
+        }
+        
+        public Address[] GetExplicitSigners(Address[] current)
+        {
+            if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf)
+                return current.AddToArray(permissionLeaf.permissions.signer);
+
+            if (this.IsBranch())
+            {
+                var children = (SessionsTopology[])Branch.Children;
+                foreach (var child in children)
+                    current = child.GetExplicitSigners(current);
+            }
+            
+            return current;
+        }
+        
         public void AddToImplicitBlacklist(Address address)
         {
-            var existingLeaf = this.FindLeaf<ImplicitBlacklistLeaf>(_ => true);
+            var existingLeaf = this.FindLeaf<ImplicitBlacklistLeaf>();
             if (existingLeaf == null)
                 throw new Exception("No blacklist found.");
 
