@@ -12,7 +12,13 @@ namespace Sequence.EcosystemWallet.UnitTests
         {
             var connect = new SequenceConnect(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
             var wallet = connect.GetWallet();
-            await wallet.SendTransaction(Array.Empty<Call>());
+
+            var calls = new Call[]
+            {
+                new (wallet.Address, 1000, Array.Empty<byte>())
+            };
+            
+            await wallet.SendTransaction(calls);
         }
     }
 }

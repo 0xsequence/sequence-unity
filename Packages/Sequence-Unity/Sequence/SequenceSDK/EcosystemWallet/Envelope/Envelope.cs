@@ -9,5 +9,17 @@ namespace Sequence.EcosystemWallet.Envelope
         public BigInteger chainId;
         public Primitives.Config configuration;
         public T payload;
+
+        public SignedEnvelope<T> ToSigned(EnvelopeSignature signature)
+        {
+            return new SignedEnvelope<T>
+            {
+                wallet = wallet,
+                chainId = chainId,
+                configuration = configuration,
+                payload = payload,
+                signatures = new[] { signature },
+            };
+        }
     }
 }

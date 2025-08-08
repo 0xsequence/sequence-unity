@@ -21,12 +21,7 @@ namespace Sequence.EcosystemWallet.Browser
         {
             var serializedPayload = JsonConvert.SerializeObject(payload);
             var encodedPayload = Convert.ToBase64String(Encoding.UTF8.GetBytes(serializedPayload));
-            var finalUrl = $"{url}?action={action}&payload={encodedPayload}&id={Id}&mode=redirect";
-            
-            if (!string.IsNullOrEmpty(RedirectUrl))
-                finalUrl += $"&redirectUrl={RedirectUrl}";
-            
-            return finalUrl;
+            return $"{url}?action={action}&payload={encodedPayload}&id={Id}&mode=redirect&redirectUrl={RedirectUrl}";
         }
     }
 }

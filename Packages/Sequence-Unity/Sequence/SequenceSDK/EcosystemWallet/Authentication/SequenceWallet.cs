@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Nethereum.ABI.FunctionEncoding;
+using Nethereum.ABI.Model;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
     public class SequenceWallet : IWallet, IDisposable
     {
+        private const string ExecuteAbiSelector =
+            "function execute(bytes calldata _payload, bytes calldata _signature) external";
+        
         public static Action<SequenceWallet> OnWalletCreated;
         
         public Address Address { get; }
@@ -66,7 +70,7 @@ namespace Sequence.EcosystemWallet
 
         public async Task<FeeOption[]> GetFeeOption(Call[] calls)
         {
-            var signedCalls = await SignCalls(calls);
+            var signedCalls = SignCalls(calls);
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);
 
             var args = new FeeOptionsArgs(Address, signedCalls.To, signedCalls.Data);
@@ -78,13 +82,10 @@ namespace Sequence.EcosystemWallet
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
             await _state.Update();
-            
-            return "";
-            
-            var signedCalls = await SignCalls(calls);
+            var transactionData = SignCalls(calls);
             
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);
-            var hash = await relayer.Relay(signedCalls.To, signedCalls.Data.ByteArrayToHexStringWithPrefix());
+            var hash = await relayer.Relay(transactionData.To, transactionData.Data.ByteArrayToHexStringWithPrefix());
 
             MetaTxnReceipt receipt = null;
             var status = OperationStatus.Pending;
@@ -102,25 +103,47 @@ namespace Sequence.EcosystemWallet
             return receipt.txnReceipt;
         }
         
-        private async Task<(Address To, byte[] Data)> SignCalls(Call[] calls)
+        private TransactionData SignCalls(Call[] calls)
         {
-            /*
-             * 1. Prepare Increment, add the increment to the calls array
-             * 2. 
-             */
-
             var preparedIncrement = PrepareIncrement(null, 2, null);
             if (preparedIncrement != null)
                 calls.AddToArray(preparedIncrement);
 
             var envelope = PrepareTransaction(calls);
-            var parentedEnvelope = new Parented(new [] { Address }, envelope.payload);
             
-            // Get Image hash
+            var signature = SignSapient(envelope);
+            var sapientSignature = new SapientSignature
+            {
+                imageHash = _state.ImageHash,
+                signature = signature
+            };
+
+            var signedEnvelope = envelope.ToSigned(sapientSignature);
+
+            var rawSignature = SignatureHandler.EncodeSignature(signedEnvelope);
+
+            var deployed = true;
+            if (deployed)
+            {
+                var function = new FunctionABI("deploy", false);
+                function.InputParameters = new[]
+                {
+                    new Parameter("bytes", "_payload"),
+                    new Parameter("bytes", "_signature")
+                };
+                
+                var encoder = new FunctionCallEncoder();
+                
+                return new TransactionData
+                {
+                    To = Address,
+                    Data = encoder.EncodeRequest(function.Sha3Signature, Array.Empty<Parameter>(), 
+                        envelope.payload.Encode(), 
+                        rawSignature.Encode()).HexStringToByteArray()
+                };
+            }
             
-            // sign sapient
-            
-            throw new System.NotImplementedException();
+            return new TransactionData(new Address(""), envelope.payload.Encode());
         }
 
         private Call PrepareIncrement(Address wallet, BigInteger chainId, Calls calls)
@@ -135,18 +158,15 @@ namespace Sequence.EcosystemWallet
             
             return new Envelope<Calls>
             {
-                wallet = null,
+                wallet = Address,
                 payload = new Calls(space, nonce, calls)
             };
         }
 
-        private void BuildTransaction(SignedEnvelope<Calls> envelope)
+        private SignatureOfSapientSignerLeaf SignSapient(Envelope<Calls> envelope)
         {
-        }
-
-        private SignatureOfSapientSignerLeaf SignSapient(Calls calls)
-        {
-            if (!calls.isCalls || calls.calls.Length == 0)
+            var calls = envelope.payload.calls;
+            if (calls.Length == 0)
                 throw new Exception("calls is empty");
 
             var implicitSigners = new List<Address>();
@@ -157,7 +177,7 @@ namespace Sequence.EcosystemWallet
             var signatures = new SessionCallSignature[signers.Length];
             for (var i = 0; i < signers.Length; i++)
             {
-                var signature = signers[i].SignCall(calls.calls[i], calls.space, calls.nonce);
+                var signature = signers[i].SignCall(calls[i], envelope.payload.space, envelope.payload.nonce);
                 signatures[i] = signature;
             }
 
@@ -183,7 +203,7 @@ namespace Sequence.EcosystemWallet
             };
         }
         
-        private SessionSigner[] FindSignersForCalls(Calls calls)
+        private SessionSigner[] FindSignersForCalls(Call[] calls)
         {
             var identitySigner = _state.SessionsTopology.GetIdentitySigner();
             if (identitySigner == null)
@@ -209,11 +229,11 @@ namespace Sequence.EcosystemWallet
                 throw new Exception("no valid signers found");
             
             var signers = new List<SessionSigner>();
-            foreach (var call in calls.calls)
+            foreach (var call in calls)
             {
                 foreach (var signer in availableSigners)
                 {
-                    if (signer.IsSupportedCall(call))
+                    if (signer.IsSupportedCall(call, _state.SessionsTopology))
                         signers.Add(signer);
                 }
             }

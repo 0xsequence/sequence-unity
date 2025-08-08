@@ -165,6 +165,11 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             return this.FindLeaf<ImplicitBlacklistLeaf>().blacklist;
         }
+        
+        public SessionPermissions GetPermissions()
+        {
+            return this.FindLeaf<PermissionLeaf>().permissions;
+        }
 
         public Address[] GetExplicitSigners()
         {

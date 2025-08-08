@@ -44,7 +44,7 @@ namespace Sequence.EcosystemWallet
             IsExplicit = credentials.isExplicit;
         }
 
-        public bool IsSupportedCall(Call call)
+        public bool IsSupportedCall(Call call, SessionsTopology topology)
         {
             if (IsExplicit)
             {
@@ -54,14 +54,18 @@ namespace Sequence.EcosystemWallet
                 {
                     return true;
                 }
+
+                var permission = FindSupportedPermission(call, topology);
+                return true;
             }
             
             return true;
         }
 
-        public Permission FindSupportedPermission(Call call)
+        public Permission FindSupportedPermission(Call call, SessionsTopology topology)
         {
-            
+            var permissions = topology.GetPermissions()?.permissions;
+            return permissions is {Length: > 0} ? permissions[0] : null;
         }
         
         public string GetIncrementUsageLimitSelector()

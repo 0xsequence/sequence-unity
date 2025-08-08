@@ -65,7 +65,7 @@ namespace Sequence.EcosystemWallet.Primitives
             throw new Exception("Invalid topology");
         }
 
-        public static RawSignature EncodeSignature(SignedEnvelope<Payload> envelope)
+        public static RawSignature EncodeSignature(SignedEnvelope<Calls> envelope)
         {
             var topology = FillLeaves(envelope.configuration.topology, 
                 leaf => SignatureForLeaf(envelope, leaf));
@@ -83,7 +83,7 @@ namespace Sequence.EcosystemWallet.Primitives
             };
         }
 
-        public static EnvelopeSignature SignatureForLeaf(SignedEnvelope<Payload> envelope, Leaf leaf)
+        public static EnvelopeSignature SignatureForLeaf(SignedEnvelope<Calls> envelope, Leaf leaf)
         {
             if (leaf is SignerLeaf signerLeaf)
             {
