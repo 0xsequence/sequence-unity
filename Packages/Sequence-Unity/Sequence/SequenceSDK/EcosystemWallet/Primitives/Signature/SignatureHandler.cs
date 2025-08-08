@@ -78,7 +78,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     threshold = envelope.configuration.threshold,
                     checkpoint = envelope.configuration.checkpoint,
                     checkpointer = envelope.configuration.checkpointer,
-                    topology = null,
+                    topology = topology,
                 }
             };
         }

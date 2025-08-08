@@ -137,7 +137,7 @@ namespace Sequence.EcosystemWallet
                 return new TransactionData
                 {
                     To = Address,
-                    Data = encoder.EncodeRequest(function.Sha3Signature, Array.Empty<Parameter>(), 
+                    Data = encoder.EncodeRequest(function.Sha3Signature, function.InputParameters, 
                         envelope.payload.Encode(), 
                         rawSignature.Encode()).HexStringToByteArray()
                 };
@@ -159,6 +159,7 @@ namespace Sequence.EcosystemWallet
             return new Envelope<Calls>
             {
                 wallet = Address,
+                configuration = _state.Config,
                 payload = new Calls(space, nonce, calls)
             };
         }

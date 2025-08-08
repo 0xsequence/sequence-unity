@@ -47,7 +47,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public static RSY Unpack(byte[] rsy)
         {
             if (rsy.Length != 64)
-                throw new ArgumentException("RSY must be exactly 64 bytes");
+                throw new ArgumentException($"RSY must be exactly 64 bytes ({rsy.Length})");
 
             var r = rsy[..32].ToBigInteger();
 
@@ -64,6 +64,20 @@ namespace Sequence.EcosystemWallet.Primitives
                 r = r,
                 s = s,
                 yParity = yParity,
+            };
+        }
+
+        public static RSY UnpackFrom65(byte[] sig65)
+        {
+            var r = sig65.AsSpan(0, 32).ToArray();
+            var s = sig65.AsSpan(32, 32).ToArray();
+            var v = sig65[64];
+            
+            return new RSY
+            {
+                r = r.ToBigInteger(),
+                s = s.ToBigInteger(),
+                yParity = VToYParity(v)
             };
         }
 

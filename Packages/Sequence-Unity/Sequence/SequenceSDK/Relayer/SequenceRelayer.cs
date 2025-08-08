@@ -14,6 +14,7 @@ namespace Sequence.Relayer
             var name = chain switch
             {
                 Chain.ArbitrumOne => "v3-arbitrum",
+                Chain.TestnetArbitrumSepolia => "v3-arbitrum-sepolia",
                 _ => throw new NotSupportedException($"Chain {chain} not supported.")
             };
 

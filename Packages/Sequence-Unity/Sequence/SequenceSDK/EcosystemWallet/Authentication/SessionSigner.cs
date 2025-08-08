@@ -28,7 +28,12 @@ namespace Sequence.EcosystemWallet
                 if (IsExplicit)
                     throw new Exception("no identity signer for explicit sessions");
 
-                return Address;
+                var attestationHash = _credentials.attestation.Hash();
+                var pub = EthCrypto.RecoverPublicKey(_credentials.signature.Pack(), attestationHash);
+                var pubXY = EthCrypto.PublicKeyXY(pub);
+                var address = EthCrypto.AddressFromPublicKey(pubXY);
+                
+                return new Address(address);
             }
         }
         
@@ -86,7 +91,7 @@ namespace Sequence.EcosystemWallet
             var hashedCall = HashCallWithReplayProtection(call, space, nonce);
             var signedCall = EthSignature.Sign(hashedCall, eoaWallet.privKey);
 
-            var rsy = RSY.Unpack(signedCall.HexStringToByteArray());
+            var rsy = RSY.UnpackFrom65(signedCall.HexStringToByteArray());
 
             if (IsExplicit)
             {
