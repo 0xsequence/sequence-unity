@@ -55,7 +55,7 @@ namespace Sequence.EcosystemWallet
             {
                 if (call.data.Length > 4 &&
                     ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
-                    GetIncrementUsageLimitSelector())
+                    EthCrypto.HashFunctionSelector("incrementUsageLimit((bytes32,uint256)[])"))
                 {
                     return true;
                 }
@@ -71,16 +71,6 @@ namespace Sequence.EcosystemWallet
         {
             var permissions = topology.GetPermissions()?.permissions;
             return permissions is {Length: > 0} ? permissions[0] : null;
-        }
-        
-        public string GetIncrementUsageLimitSelector()
-        {
-            string signature = "incrementUsageLimit((bytes32,uint256)[])";
-        
-            var sha3 = new Sha3Keccack();
-            var hash = sha3.CalculateHash(Encoding.UTF8.GetBytes(signature));
-        
-            return "0x" + BitConverter.ToString(hash.Take(4).ToArray()).Replace("-", "").ToLowerInvariant();
         }
 
         public SessionCallSignature SignCall(Call call, BigInteger space, BigInteger nonce)

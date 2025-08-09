@@ -4,10 +4,10 @@ namespace Sequence.Relayer
     {
         public Address wallet;
         public string to;
-        public byte[] data;
+        public string data;
         public bool simulate;
 
-        public FeeOptionsArgs(Address wallet, string to, byte[] data, bool simulate = false)
+        public FeeOptionsArgs(Address wallet, string to, string data, bool simulate = false)
         {
             this.wallet = wallet;
             this.to = to;

@@ -38,7 +38,7 @@ namespace Sequence.EcosystemWallet.Utils
             };
 
             var encoder = new FunctionCallEncoder();
-            return encoder.EncodeRequest(function.Sha3Signature, Array.Empty<Parameter>(), stage1, deployHash.HexToByteArray());
+            return encoder.EncodeRequest(function.Sha3Signature, function.InputParameters, stage1, deployHash.HexToByteArray());
         }
 
         public static byte[] Wrap(byte[] signature, Address to, byte[] data)

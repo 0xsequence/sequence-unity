@@ -29,7 +29,7 @@ namespace Sequence.EcosystemWallet
         
         private static int GetAvailablePort()
         {
-            var tcpListener = new TcpListener(IPAddress.Loopback, 0);
+            var tcpListener = new TcpListener(IPAddress.Loopback, 4444);
             tcpListener.Start();
             var port = ((IPEndPoint)tcpListener.LocalEndpoint).Port;
             tcpListener.Stop();

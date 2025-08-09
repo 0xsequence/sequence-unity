@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using Org.BouncyCastle.Crypto.Digests;
 using NBitcoin.Secp256k1;
+using Nethereum.Util;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
@@ -10,7 +11,14 @@ namespace Sequence.EcosystemWallet
 {
     public static class EthCrypto
     {
-            /// <summary>
+        public static string HashFunctionSelector(string function)
+        {
+            var sha3 = new Sha3Keccack();
+            var hash = sha3.CalculateHash(function);
+            return "0x" + hash.Substring(0, 8);
+        }
+        
+        /// <summary>
         /// Recover an ECPubKey from (r,s,yParity) and a 32-byte payload hash.
         /// - r, s: 32-byte big-endian
         /// - yParity: 0 or 1 (normalize 27/28 or EIP-155 before calling)

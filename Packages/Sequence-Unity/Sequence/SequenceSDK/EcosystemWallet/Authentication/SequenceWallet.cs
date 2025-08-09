@@ -70,10 +70,11 @@ namespace Sequence.EcosystemWallet
 
         public async Task<FeeOption[]> GetFeeOption(Call[] calls)
         {
-            var signedCalls = SignCalls(calls);
+            await _state.Update();
+            var transactionData = SignCalls(calls);
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);
 
-            var args = new FeeOptionsArgs(Address, signedCalls.To, signedCalls.Data);
+            var args = new FeeOptionsArgs(Address, transactionData.To, transactionData.Data.ByteArrayToHexStringWithPrefix());
             var response = await relayer.GetFeeOptions(args);
 
             return response.options;
@@ -122,10 +123,9 @@ namespace Sequence.EcosystemWallet
 
             var rawSignature = SignatureHandler.EncodeSignature(signedEnvelope);
 
-            var deployed = true;
-            if (deployed)
+            if (_state.IsDeployed)
             {
-                var function = new FunctionABI("deploy", false);
+                var function = new FunctionABI("execute", false);
                 function.InputParameters = new[]
                 {
                     new Parameter("bytes", "_payload"),
@@ -143,7 +143,7 @@ namespace Sequence.EcosystemWallet
                 };
             }
             
-            return new TransactionData(new Address(""), envelope.payload.Encode());
+            throw new Exception("wallet status is not deployed");
         }
 
         private Call PrepareIncrement(Address wallet, BigInteger chainId, Calls calls)
@@ -153,14 +153,11 @@ namespace Sequence.EcosystemWallet
 
         private Envelope<Calls> PrepareTransaction(Call[] calls)
         {
-            var space = 0;
-            var nonce = 0;
-            
             return new Envelope<Calls>
             {
                 wallet = Address,
                 configuration = _state.Config,
-                payload = new Calls(space, nonce, calls)
+                payload = new Calls(0, _state.Nonce, calls)
             };
         }
 

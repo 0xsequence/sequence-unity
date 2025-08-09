@@ -34,19 +34,12 @@ namespace Sequence.EcosystemWallet
             
             var sessionBuilder = new SessionBuilder(_chain, signer, 0, deadline);
             sessionBuilder.AddPermission(target, false, ParameterOperation.equal, 
-                HashFunctionSelector("explicitEmit()"), 0, ParameterRule.SelectorMask);
+                EthCrypto.HashFunctionSelector("explicitEmit()"), 0, ParameterRule.SelectorMask);
             
             sessionBuilder.AddPermission(target, true, ParameterOperation.greaterThanOrEqual, 
                 "0x1234567890123456789012345678901234567890", 4, ParameterRule.Uint256Mask);
             
             return sessionBuilder.GetPermissions();
-        }
-
-        private string HashFunctionSelector(string function)
-        {
-            var sha3 = new Sha3Keccack();
-            var hash = sha3.CalculateHash(function);
-            return "0x" + hash.Substring(0, 8);
         }
     }
 }

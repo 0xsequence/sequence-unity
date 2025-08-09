@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Config;
 using Sequence.Utils;
 
 namespace Sequence.Relayer
@@ -8,6 +10,7 @@ namespace Sequence.Relayer
     public class SequenceRelayer : IRelayer
     {
         private readonly IHttpClient _httpClient;
+        private readonly Dictionary<string, string> _headers = new();
 
         public SequenceRelayer(Chain chain)
         {
@@ -30,18 +33,18 @@ namespace Sequence.Relayer
         
         public async Task<FeeOptionsReturn> GetFeeOptions(FeeOptionsArgs args)
         {
-            return await _httpClient.SendPostRequest<FeeOptionsArgs, FeeOptionsReturn>("FeeOptions", args);
+            return await _httpClient.SendPostRequest<FeeOptionsArgs, FeeOptionsReturn>("FeeOptions", args, _headers);
         }
 
         public async Task<GetMetaTxnReceiptReturn> GetMetaTxnReceipt(string metaTxnID)
         {
             var args = new GetMetaTxnReceiptArgs { metaTxnID = metaTxnID };
-            return await _httpClient.SendPostRequest<GetMetaTxnReceiptArgs, GetMetaTxnReceiptReturn>("GetMetaTxnReceipt", args);
+            return await _httpClient.SendPostRequest<GetMetaTxnReceiptArgs, GetMetaTxnReceiptReturn>("GetMetaTxnReceipt", args, _headers);
         }
 
         public async Task<SendMetaTxnReturn> SendMetaTxn(SendMetaTxnArgs args)
         {
-            return await _httpClient.SendPostRequest<SendMetaTxnArgs, SendMetaTxnReturn>("SendMetaTxn", args);
+            return await _httpClient.SendPostRequest<SendMetaTxnArgs, SendMetaTxnReturn>("SendMetaTxn", args, _headers);
         }
     }
 }

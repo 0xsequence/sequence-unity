@@ -1,5 +1,11 @@
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
+
 namespace Sequence.Relayer
 {
+    [JsonConverter(typeof(SessionCredentialsConverter))]
     public class SendMetaTxnArgs
     {
         public MetaTxn call;
@@ -13,6 +19,43 @@ namespace Sequence.Relayer
             this.quote = quote;
             this.projectID = projectID;
             this.preconditions = preconditions;
+        }
+    }
+    
+    [Preserve]
+    internal class SessionCredentialsConverter : JsonConverter<SendMetaTxnArgs>
+    {
+        public override void WriteJson(JsonWriter writer, SendMetaTxnArgs value, JsonSerializer serializer)
+        {
+            writer.WriteStartObject();
+            
+            writer.WritePropertyName("call");
+            serializer.Serialize(writer, value.call);
+
+            if (!string.IsNullOrEmpty(value.quote))
+            {
+                writer.WritePropertyName("quote");
+                writer.WriteValue(value.quote);
+            }
+
+            if (value.projectID != -1)
+            {
+                writer.WritePropertyName("projectID");
+                writer.WriteValue(value.quote);
+            }
+            
+            if (value.preconditions != null)
+            {
+                writer.WritePropertyName("preconditions");
+                serializer.Serialize(writer, value.preconditions);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        public override SendMetaTxnArgs ReadJson(JsonReader reader, Type objectType, SendMetaTxnArgs existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            return null;
         }
     }
 }
