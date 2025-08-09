@@ -8,6 +8,7 @@ using Sequence.EcosystemWallet.Primitives;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -47,6 +48,8 @@ namespace Sequence.EcosystemWallet
             Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = ChainDictionaries.ChainById[credentials.chainId];
             IsExplicit = credentials.isExplicit;
+            
+            Debug.Log($"IdentitySigner: {IdentitySigner}, Address: {Address}");
         }
 
         public bool IsSupportedCall(Call call, SessionsTopology topology)

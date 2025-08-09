@@ -5,12 +5,14 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -82,6 +84,8 @@ namespace Sequence.EcosystemWallet
 
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
+            Debug.Log($"{calls[0].ToString()}");
+            
             await _state.Update();
             var transactionData = SignCalls(calls);
             
@@ -115,11 +119,19 @@ namespace Sequence.EcosystemWallet
             var signature = SignSapient(envelope);
             var sapientSignature = new SapientSignature
             {
-                imageHash = _state.ImageHash,
+                imageHash = _state.SessionsImageHash,
                 signature = signature
             };
 
             var signedEnvelope = envelope.ToSigned(sapientSignature);
+            
+            foreach (var sig in signedEnvelope.signatures)
+            {
+                if (sig is Signature regSig)
+                    Debug.Log($"Signature '{sig.type}' '{regSig.address}'");
+                else if (sig is SapientSignature sapientSig)
+                    Debug.Log($"SapientSignature '{sig.type}' '{sapientSig.imageHash}' '{sapientSig.signature.address}'");
+            }
 
             var rawSignature = SignatureHandler.EncodeSignature(signedEnvelope);
 
@@ -196,7 +208,7 @@ namespace Sequence.EcosystemWallet
             return new SignatureOfSapientSignerLeaf
             {
                 curType = SignatureOfSapientSignerLeaf.Type.sapient,
-                address = Address,
+                address = _state.Sessions,
                 data = sessionSignatures
             };
         }

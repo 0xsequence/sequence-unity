@@ -37,5 +37,10 @@ namespace Sequence.EcosystemWallet.Primitives
                 
             return SequenceCoder.KeccakHash(ByteArrayExtensions.ConcatenateByteArrays(prefix, address, weight, imageHash));
         }
+
+        public string ToString()
+        {
+            return $"Address: {address}, Weight:{weight.ToString()}, Image Hash: {imageHash}";
+        }
     }
 }

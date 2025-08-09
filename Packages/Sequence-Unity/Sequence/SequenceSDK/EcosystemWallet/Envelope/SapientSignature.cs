@@ -1,4 +1,5 @@
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Envelope
 {
@@ -10,7 +11,12 @@ namespace Sequence.EcosystemWallet.Envelope
         
         public override byte[] Encode(Leaf leaf)
         {
-            throw new System.NotImplementedException("SapientSignature.Encode");
+            return signature.Encode(leaf);
+        }
+
+        public string ToString()
+        {
+            return $"Envelope SapientSignature, Image Hash: {imageHash}, Address: {signature.address}, Type: {signature.type}, Data: {signature.data.ByteArrayToHexStringWithPrefix()}";
         }
     }
 }

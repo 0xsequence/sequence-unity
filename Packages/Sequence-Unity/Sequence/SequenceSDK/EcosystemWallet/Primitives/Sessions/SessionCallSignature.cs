@@ -47,8 +47,6 @@ namespace Sequence.EcosystemWallet.Primitives
 
             sessionsTopology = sessionsTopology.Minimise(explicitSigners, implicitSigners);
             
-            Debug.Log($"{sessionsTopology.JsonSerialize()}");
-
             var encodedTopology = sessionsTopology.Encode();
             if (encodedTopology.Length.MinBytesFor() > 3)
                 throw new Exception("Session topology is too large");

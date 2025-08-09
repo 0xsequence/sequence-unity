@@ -10,7 +10,7 @@ namespace Sequence.EcosystemWallet.Envelope
         
         public override byte[] Encode(Leaf leaf)
         {
-            throw new System.NotImplementedException("Signature.Encode");
+            return signature.Encode(leaf);
         }
     }
 }

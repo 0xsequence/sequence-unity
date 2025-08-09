@@ -72,9 +72,6 @@ namespace Sequence.EcosystemWallet.Primitives
                 ptr += consumed;
             }
 
-            if (permissions.Length == 0)
-                throw new Exception("No permissions");
-
             return new SessionPermissions {
                 signer = signer,
                 valueLimit = valueLimit,

@@ -1,5 +1,6 @@
 using System;
 using Sequence.EcosystemWallet.Envelope;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -21,6 +22,7 @@ namespace Sequence.EcosystemWallet.Primitives
             if (leaf is SignerLeaf signerLeaf)
             {
                 var signature = signatureFor(signerLeaf);
+                Debug.Log($"SignerLeaf Signature {signature?.type}");
                 var newLeaf = signature != null ? new SignedSignerLeaf
                 {
                     address = signerLeaf.address,
@@ -34,6 +36,7 @@ namespace Sequence.EcosystemWallet.Primitives
             if (leaf is SapientSignerLeaf sapientSignerLeaf)
             {
                 var signature = signatureFor(sapientSignerLeaf);
+                Debug.Log($"SapientSignerLeaf Signature {signature?.type}");
                 var newLeaf = signature != null ? new SignedSapientSignerLeaf
                 {
                     address = sapientSignerLeaf.address,
@@ -94,6 +97,9 @@ namespace Sequence.EcosystemWallet.Primitives
             
             if (leaf is SapientSignerLeaf sapientSignerLeaf)
             {
+                Debug.Log("1:: " + sapientSignerLeaf.ToString());
+                Debug.Log("2:: " + (envelope.signatures[0] as SapientSignature)?.ToString());
+                
                 return Array.Find(envelope.signatures, sig =>
                     sig is SapientSignature sapient &&
                     sapient.imageHash == sapientSignerLeaf.imageHash &&

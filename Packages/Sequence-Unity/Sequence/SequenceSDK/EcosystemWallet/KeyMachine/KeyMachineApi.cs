@@ -31,6 +31,12 @@ namespace Sequence.EcosystemWallet
             return await SendRequest<TreeArgs, TreeReturn>("Tree", args);
         }
         
+        public async Task<ConfigUpdatesReturn> GetConfigUpdates(string wallet, string fromImageHash)
+        {
+            var args = new ConfigUpdatesArgs(wallet, fromImageHash);
+            return await SendRequest<ConfigUpdatesArgs, ConfigUpdatesReturn>("ConfigUpdates", args);
+        }
+        
         public async Task<Primitives.Config> GetConfiguration(string imageHash)
         {
             var args = new ConfigArgs(imageHash);
