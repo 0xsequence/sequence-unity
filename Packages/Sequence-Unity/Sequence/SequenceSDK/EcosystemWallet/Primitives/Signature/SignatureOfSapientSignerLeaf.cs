@@ -1,5 +1,6 @@
 using System;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -42,6 +43,12 @@ namespace Sequence.EcosystemWallet.Primitives
                 weightBytes = weight.ByteArrayFromNumber(weight.MinBytesFor());
             else
                 throw new Exception("Weight too large");
+            
+            Debug.Log($"SignatureOfSapientSignerLeaf flag {flag.ByteArrayFromNumber(flag.MinBytesFor()).ByteArrayToHexString()}");
+            Debug.Log($"SignatureOfSapientSignerLeaf weight {weightBytes.ByteArrayToHexString()}");
+            Debug.Log($"SignatureOfSapientSignerLeaf address {address.Value.HexStringToByteArray(20).ByteArrayToHexString()}");
+            Debug.Log($"SignatureOfSapientSignerLeaf dataLength {data.Length.ByteArrayFromNumber(bytesForSignatureSize).ByteArrayToHexString()}");
+            Debug.Log($"SignatureOfSapientSignerLeaf data {data.ByteArrayToHexString()}");
 
             return ByteArrayExtensions.ConcatenateByteArrays(
                 flag.ByteArrayFromNumber(flag.MinBytesFor()), 

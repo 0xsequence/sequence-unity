@@ -9,7 +9,7 @@ namespace Sequence.EcosystemWallet.UnitTests
     {
         private static readonly Call[] ImplicitCalls = new Call[]
         {
-            new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, EthCrypto.HashFunctionSelector("implicitEmit()").HexStringToByteArray())
+            new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
         };
         
         [Test]

@@ -34,7 +34,7 @@ namespace Sequence.EcosystemWallet
             
             var sessionBuilder = new SessionBuilder(_chain, signer, 0, deadline);
             sessionBuilder.AddPermission(target, false, ParameterOperation.equal, 
-                EthCrypto.HashFunctionSelector("explicitEmit()"), 0, ParameterRule.SelectorMask);
+                ABI.ABI.FunctionSelector("explicitEmit()"), 0, ParameterRule.SelectorMask);
             
             sessionBuilder.AddPermission(target, true, ParameterOperation.greaterThanOrEqual, 
                 "0x1234567890123456789012345678901234567890", 4, ParameterRule.Uint256Mask);

@@ -21,7 +21,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public BigInteger gasLimit;
         public bool delegateCall;
         public bool onlyFallback;
-        public BehaviourOnError behaviorOnError;
+        public BehaviourOnError behaviorOnError = BehaviourOnError.revert;
 
         [Preserve]
         public Call(Address to, BigInteger value, byte[] data)

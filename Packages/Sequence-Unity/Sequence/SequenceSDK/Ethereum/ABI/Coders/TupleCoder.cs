@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System;
 using Sequence.Utils;
+using UnityEngine;
 
 
 namespace Sequence.ABI
@@ -110,7 +111,6 @@ namespace Sequence.ABI
                         break;
                     //Dynamics: head(X(i)) = enc(len( head(X(1)) ... head(X(k)) tail(X(1)) ... tail(X(i-1)) )) tail(X(i)) = enc(X(i))
                     case ABIType.BYTES:
-                        SequenceLog.Info("object in tuple array: bytes");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = _fixedBytesCoder.EncodeToString(valueTuple[i]);
                         break;

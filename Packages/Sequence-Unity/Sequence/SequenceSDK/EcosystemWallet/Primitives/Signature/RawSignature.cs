@@ -83,7 +83,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             byte[] output = new byte[] { flag };
-
+            
             if (configuration.checkpointer != null && !skipCheckpointerAddress)
             {
                 var checkpointerBytes = configuration.checkpointer.Value.HexStringToByteArray();
@@ -107,7 +107,7 @@ namespace Sequence.EcosystemWallet.Primitives
             
             var topologyBytes = configuration.topology.Encode(noChainId, checkpointerData);
             output = ByteArrayExtensions.ConcatenateByteArrays(output, topologyBytes);
-
+            
             return erc6492 != null ? Erc6492Helper.Wrap(output, erc6492.to, erc6492.data) : output;
         }
 

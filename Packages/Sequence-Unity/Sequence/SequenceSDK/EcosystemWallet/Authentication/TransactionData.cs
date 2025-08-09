@@ -3,9 +3,9 @@ namespace Sequence.EcosystemWallet
     public struct TransactionData
     {
         public Address To;
-        public byte[] Data;
+        public string Data;
 
-        public TransactionData(Address to, byte[] data)
+        public TransactionData(Address to, string data)
         {
             To = to;
             Data = data;

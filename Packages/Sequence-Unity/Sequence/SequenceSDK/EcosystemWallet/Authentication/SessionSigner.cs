@@ -58,7 +58,7 @@ namespace Sequence.EcosystemWallet
             {
                 if (call.data.Length > 4 &&
                     ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
-                    EthCrypto.HashFunctionSelector("incrementUsageLimit((bytes32,uint256)[])"))
+                    ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])"))
                 {
                     return true;
                 }

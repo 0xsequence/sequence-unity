@@ -3,24 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using Nethereum.ABI.FunctionEncoding;
-using Nethereum.ABI.Model;
-using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
     public class SequenceWallet : IWallet, IDisposable
     {
-        private const string ExecuteAbiSelector =
-            "function execute(bytes calldata _payload, bytes calldata _signature) external";
-        
         public static Action<SequenceWallet> OnWalletCreated;
         
         public Address Address { get; }
@@ -76,7 +69,7 @@ namespace Sequence.EcosystemWallet
             var transactionData = SignCalls(calls);
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);
 
-            var args = new FeeOptionsArgs(Address, transactionData.To, transactionData.Data.ByteArrayToHexStringWithPrefix());
+            var args = new FeeOptionsArgs(Address, transactionData.To, transactionData.Data);
             var response = await relayer.GetFeeOptions(args);
 
             return response.options;
@@ -84,13 +77,11 @@ namespace Sequence.EcosystemWallet
 
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
-            Debug.Log($"{calls[0].ToString()}");
-            
             await _state.Update();
             var transactionData = SignCalls(calls);
             
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);
-            var hash = await relayer.Relay(transactionData.To, transactionData.Data.ByteArrayToHexStringWithPrefix());
+            var hash = await relayer.Relay(transactionData.To, transactionData.Data);
 
             MetaTxnReceipt receipt = null;
             var status = OperationStatus.Pending;
@@ -110,7 +101,7 @@ namespace Sequence.EcosystemWallet
         
         private TransactionData SignCalls(Call[] calls)
         {
-            var preparedIncrement = PrepareIncrement(null, 2, null);
+            var preparedIncrement = PrepareIncrement(null, 0, null);
             if (preparedIncrement != null)
                 calls.AddToArray(preparedIncrement);
 
@@ -124,34 +115,19 @@ namespace Sequence.EcosystemWallet
             };
 
             var signedEnvelope = envelope.ToSigned(sapientSignature);
-            
-            foreach (var sig in signedEnvelope.signatures)
-            {
-                if (sig is Signature regSig)
-                    Debug.Log($"Signature '{sig.type}' '{regSig.address}'");
-                else if (sig is SapientSignature sapientSig)
-                    Debug.Log($"SapientSignature '{sig.type}' '{sapientSig.imageHash}' '{sapientSig.signature.address}'");
-            }
-
             var rawSignature = SignatureHandler.EncodeSignature(signedEnvelope);
+            
+            rawSignature.suffix = _state.ConfigUpdates
+                .Select(u => RawSignature.Decode(u.signature.HexStringToByteArray())).ToArray();
 
             if (_state.IsDeployed)
             {
-                var function = new FunctionABI("execute", false);
-                function.InputParameters = new[]
-                {
-                    new Parameter("bytes", "_payload"),
-                    new Parameter("bytes", "_signature")
-                };
-                
-                var encoder = new FunctionCallEncoder();
-                
                 return new TransactionData
                 {
                     To = Address,
-                    Data = encoder.EncodeRequest(function.Sha3Signature, function.InputParameters, 
+                    Data = ABI.ABI.Pack("execute(bytes,bytes)", 
                         envelope.payload.Encode(), 
-                        rawSignature.Encode()).HexStringToByteArray()
+                        rawSignature.Encode())
                 };
             }
             
@@ -167,6 +143,7 @@ namespace Sequence.EcosystemWallet
         {
             return new Envelope<Calls>
             {
+                chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[SessionSigners[0].Chain]),
                 wallet = Address,
                 configuration = _state.Config,
                 payload = new Calls(0, _state.Nonce, calls)
@@ -198,7 +175,7 @@ namespace Sequence.EcosystemWallet
                 else
                     implicitSigners.Add(signer.Address);
             }
-
+            
             var sessionSignatures = SessionCallSignature.EncodeSignatures(
                 signatures,
                 _state.SessionsTopology, 

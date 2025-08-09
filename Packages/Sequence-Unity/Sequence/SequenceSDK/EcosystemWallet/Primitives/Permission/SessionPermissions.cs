@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -35,6 +36,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
             List<byte> result = new();
             result.AddRange(signer.ToString().HexStringToByteArray().PadLeft(20));
+            result.AddRange(chainId.ByteArrayFromNumber().PadLeft(32));
             result.AddRange(valueLimit.ByteArrayFromNumber(32));
             result.AddRange(deadline.ByteArrayFromNumber(8));
             result.Add((byte)permissions.Length);
@@ -50,30 +52,28 @@ namespace Sequence.EcosystemWallet.Primitives
         {
             if (data.Length < 85)
                 throw new Exception("Data too short");
+            
+            Debug.Log($"{data.Length}");
 
-            var ptr = 0;
+            var signer = new Address(data.AsSpan(0, 20).ToArray());
+            var chainId = new BigInteger(data.AsSpan(20, 32).ToArray(), isUnsigned: true, isBigEndian: true);
+            var valueLimit = new BigInteger(data.AsSpan(52, 32).ToArray(), isUnsigned: true, isBigEndian: true);
+            var deadline = new BigInteger(data.AsSpan(84, 8).ToArray(), isUnsigned: true, isBigEndian: true);
 
-            var signer = new Address(data.AsSpan(ptr, 20).ToArray());
-            ptr += 20;
-
-            var valueLimit = new BigInteger(data.AsSpan(ptr, 32).ToArray(), isUnsigned: true, isBigEndian: true);
-            ptr += 32;
-
-            var deadline = new BigInteger(data.AsSpan(ptr, 32).ToArray(), isUnsigned: true, isBigEndian: true);
-            ptr += 32;
-
-            var permissionsLength = data[ptr];
-            ptr += 1;
-
+            var permissionsLength = data[92];
+            
+            var pointer = 93;
             var permissions = new Permission[permissionsLength];
+            
             for (var i = 0; i < permissionsLength; i++) {
-                var (permission, consumed) = Permission.Decode(data, ptr);
+                var (permission, consumed) = Permission.Decode(data, pointer);
                 permissions[i] = permission;
-                ptr += consumed;
+                pointer += consumed;
             }
-
+            
             return new SessionPermissions {
                 signer = signer,
+                chainId = chainId,
                 valueLimit = valueLimit,
                 deadline = deadline,
                 permissions = permissions

@@ -7,6 +7,7 @@ using Sequence.EcosystemWallet.Primitives;
 using Sequence.Provider;
 using Sequence.Utils;
 using UnityEngine;
+using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
 {
@@ -22,6 +23,7 @@ namespace Sequence.EcosystemWallet
         public BigInteger Nonce { get; private set; }
         public Primitives.Config Config { get; private set; }
         public SessionsTopology SessionsTopology { get; private set; }
+        public ConfigUpdate[] ConfigUpdates { get; private set; }
         
         private readonly KeyMachineApi _keyMachine = new();
 
@@ -46,6 +48,7 @@ namespace Sequence.EcosystemWallet
             var treeReturn = await _keyMachine.GetTree(SessionsImageHash);
             var sessionsTopology = SessionsTopology.FromTree(treeReturn.tree.ToString());
             
+            ConfigUpdates = configUpdates.updates;
             ImageHash = imageHash;
             Config = config;
             SessionsTopology = sessionsTopology;

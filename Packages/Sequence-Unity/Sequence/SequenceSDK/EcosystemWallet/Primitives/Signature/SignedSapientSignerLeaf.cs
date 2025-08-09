@@ -1,3 +1,6 @@
+using Sequence.Utils;
+using UnityEngine;
+
 namespace Sequence.EcosystemWallet.Primitives
 {
     public class SignedSapientSignerLeaf : SapientSignerLeaf

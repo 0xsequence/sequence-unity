@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -31,6 +32,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public byte[] Encode(Address self)
         {
             flags = SetFlags(self);
+            Debug.Log($"Call flags {flags.ByteArrayFromNumber(1).ByteArrayToHexString()}");
             outBytes = ByteArrayExtensions.ConcatenateByteArrays(outBytes, flags.ByteArrayFromNumber(1));
             outBytes = AddToAddress(outBytes);
             outBytes = AddValue(outBytes);

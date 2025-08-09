@@ -11,13 +11,6 @@ namespace Sequence.EcosystemWallet
 {
     public static class EthCrypto
     {
-        public static string HashFunctionSelector(string function)
-        {
-            var sha3 = new Sha3Keccack();
-            var hash = sha3.CalculateHash(function);
-            return "0x" + hash.Substring(0, 8);
-        }
-        
         /// <summary>
         /// Recover an ECPubKey from (r,s,yParity) and a 32-byte payload hash.
         /// - r, s: 32-byte big-endian

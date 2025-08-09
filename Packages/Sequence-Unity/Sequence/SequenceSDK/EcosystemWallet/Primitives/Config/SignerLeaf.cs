@@ -3,7 +3,6 @@ using System.Numerics;
 using System.Text;
 using Sequence.ABI;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {

@@ -17,7 +17,7 @@ namespace Sequence.Relayer
             var name = chain switch
             {
                 Chain.ArbitrumOne => "v3-arbitrum",
-                Chain.TestnetArbitrumSepolia => "v3-arbitrum-sepolia",
+                Chain.TestnetArbitrumSepolia => "dev-arbitrum-sepolia",
                 _ => throw new NotSupportedException($"Chain {chain} not supported.")
             };
 
@@ -36,9 +36,9 @@ namespace Sequence.Relayer
             return await _httpClient.SendPostRequest<FeeOptionsArgs, FeeOptionsReturn>("FeeOptions", args, _headers);
         }
 
-        public async Task<GetMetaTxnReceiptReturn> GetMetaTxnReceipt(string metaTxnID)
+        public async Task<GetMetaTxnReceiptReturn> GetMetaTxnReceipt(string metaTxID)
         {
-            var args = new GetMetaTxnReceiptArgs { metaTxnID = metaTxnID };
+            var args = new GetMetaTxnReceiptArgs { metaTxID = metaTxID.EnsureHexPrefix() };
             return await _httpClient.SendPostRequest<GetMetaTxnReceiptArgs, GetMetaTxnReceiptReturn>("GetMetaTxnReceipt", args, _headers);
         }
 
