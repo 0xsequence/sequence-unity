@@ -12,22 +12,42 @@ namespace Sequence.EcosystemWallet.UnitTests
             new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
         };
         
-        [Test]
-        public async Task SendTransaction()
+        private static readonly Call[] ExplicitCalls = new Call[]
         {
-            var connect = new SequenceConnect(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
-            var wallet = connect.GetWallet();
+            new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
+        };
 
-            await wallet.SendTransaction(ImplicitCalls);
+        private static SequenceWallet Wallet
+        {
+            get
+            {
+                var connect = new SequenceConnect(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
+                return connect.GetWallet();
+            }
         }
         
         [Test]
-        public async Task GetFeeOptions()
+        public async Task SendImplicitTransaction()
         {
-            var connect = new SequenceConnect(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
-            var wallet = connect.GetWallet();
-
-            await wallet.GetFeeOption(ImplicitCalls);
+            await Wallet.SendTransaction(ImplicitCalls);
+        }
+        
+        [Test]
+        public async Task SendExplicitTransaction()
+        {
+            await Wallet.SendTransaction(ExplicitCalls);
+        }
+        
+        [Test]
+        public async Task GetFeeOptionsForImplicitCalls()
+        {
+            await Wallet.GetFeeOption(ImplicitCalls);
+        }
+        
+        [Test]
+        public async Task GetFeeOptionsForExplicitCalls()
+        {
+            await Wallet.GetFeeOption(ExplicitCalls);
         }
     }
 }
