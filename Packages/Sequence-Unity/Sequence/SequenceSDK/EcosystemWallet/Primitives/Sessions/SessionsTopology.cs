@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -254,10 +253,7 @@ namespace Sequence.EcosystemWallet.Primitives
             if (flag == FlagPermissions)
             {
                 byte[] slice = data.Skip(1).ToArray();
-                Debug.Log($"SessesionPermissions.Start {slice.ByteArrayToHexString()}");
                 var permissions = SessionPermissions.Decode(slice);
-                
-                Debug.Log($"SessesionPermissions.Decode {JsonConvert.SerializeObject(permissions.ToJson())}");
                 
                 return new PermissionLeaf
                 {

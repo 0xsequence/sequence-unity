@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using NUnit.Framework;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine.Scripting;
-using StringExtensions = Sequence.Utils.StringExtensions;
 
 namespace Sequence.EcosystemWallet.Primitives
 {

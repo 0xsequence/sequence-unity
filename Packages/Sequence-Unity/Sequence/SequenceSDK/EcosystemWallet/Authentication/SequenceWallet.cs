@@ -164,7 +164,7 @@ namespace Sequence.EcosystemWallet
             var signatures = new SessionCallSignature[signers.Length];
             for (var i = 0; i < signers.Length; i++)
             {
-                var signature = signers[i].SignCall(calls[i], envelope.payload.space, envelope.payload.nonce);
+                var signature = signers[i].SignCall(calls[i], _state.SessionsTopology, envelope.payload.space, envelope.payload.nonce);
                 signatures[i] = signature;
             }
 

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -322,7 +321,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
             
             if (leaves.Count == 0)
-                Debug.LogError($"Topology.FromLeaves resulted in an empty list of leafs: {elements}");
+                throw new Exception($"Topology.FromLeaves resulted in an empty list of leafs: {elements}");
 
             return leaves;
         }

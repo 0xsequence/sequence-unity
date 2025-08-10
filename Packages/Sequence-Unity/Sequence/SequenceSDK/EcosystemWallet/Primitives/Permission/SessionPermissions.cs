@@ -4,7 +4,6 @@ using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -53,8 +52,6 @@ namespace Sequence.EcosystemWallet.Primitives
             if (data.Length < 85)
                 throw new Exception("Data too short");
             
-            Debug.Log($"{data.Length}");
-
             var signer = new Address(data.AsSpan(0, 20).ToArray());
             var chainId = new BigInteger(data.AsSpan(20, 32).ToArray(), isUnsigned: true, isBigEndian: true);
             var valueLimit = new BigInteger(data.AsSpan(52, 32).ToArray(), isUnsigned: true, isBigEndian: true);

@@ -1,7 +1,5 @@
 using System;
-using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Envelope;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {

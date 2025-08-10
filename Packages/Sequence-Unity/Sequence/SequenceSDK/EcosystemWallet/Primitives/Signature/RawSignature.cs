@@ -4,7 +4,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {

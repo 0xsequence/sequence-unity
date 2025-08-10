@@ -1,22 +1,15 @@
 using System;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using Nethereum.Util;
 using Sequence.ABI;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
     public class SessionSigner
     {
-        private const string IncrementUsageLimit =
-            "{\n    type: 'function',\n    name: 'incrementUsageLimit',\n    inputs: [\n      {\n        name: 'limits',\n        type: 'tuple[]',\n        internalType: 'struct UsageLimit[]',\n        components: [\n          { name: 'usageHash', type: 'bytes32', internalType: 'bytes32' },\n          { name: 'usageAmount', type: 'uint256', internalType: 'uint256' },\n        ],\n      },\n    ],\n    outputs: [],\n    stateMutability: 'nonpayable',\n  }";
-        
         public Address ParentAddress { get; }
         public Address Address { get; }
         public Chain Chain { get; }
@@ -48,8 +41,6 @@ namespace Sequence.EcosystemWallet
             Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = ChainDictionaries.ChainById[credentials.chainId];
             IsExplicit = credentials.isExplicit;
-            
-            Debug.Log($"IdentitySigner: {IdentitySigner}, Address: {Address}");
         }
 
         public bool IsSupportedCall(Call call, SessionsTopology topology)
@@ -69,14 +60,20 @@ namespace Sequence.EcosystemWallet
             
             return true;
         }
-
+        
         public Permission FindSupportedPermission(Call call, SessionsTopology topology)
         {
             var permissions = topology.GetPermissions()?.permissions;
             return permissions is {Length: > 0} ? permissions[0] : null;
         }
 
-        public SessionCallSignature SignCall(Call call, BigInteger space, BigInteger nonce)
+        public int FindSupportedPermissionIndex(Call call, SessionsTopology topology)
+        {
+            var permissions = topology.GetPermissions()?.permissions;
+            return permissions is {Length: > 0} ? 0 : -1;
+        }
+
+        public SessionCallSignature SignCall(Call call, SessionsTopology topology, BigInteger space, BigInteger nonce)
         {
             var pvKey = _credentials.privateKey;
             var eoaWallet = new EOAWallet(pvKey);
@@ -88,9 +85,18 @@ namespace Sequence.EcosystemWallet
 
             if (IsExplicit)
             {
+                var permissionIndex = 0;
+                if (!(call.data.Length > 4 && call.data.Slice(4).ByteArrayToHexStringWithPrefix() ==
+                    ABI.ABI.FunctionSelector("incrementUsageLimit")))
+                {
+                    permissionIndex = FindSupportedPermissionIndex(call, topology);
+                    if (permissionIndex == -1)
+                        throw new Exception("Invalid permission");
+                }
+                
                 return new ExplicitSessionCallSignature
                 {
-                    permissionIndex = 0,
+                    permissionIndex = permissionIndex,
                     sessionSignature = rsy
                 };
             }

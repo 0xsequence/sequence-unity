@@ -1,9 +1,7 @@
 using System;
-using System.Linq;
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Utils;
-using UnityEngine;
 using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -26,7 +24,6 @@ namespace Sequence.EcosystemWallet.Primitives
             if (yParity % 2 == 1)
                 sBytes[0] |= 0x80;
             
-            Debug.Log($"RSY Pack {ByteArrayExtensions.ConcatenateByteArrays(rBytes, sBytes).ByteArrayToHexString()}");
             return ByteArrayExtensions.ConcatenateByteArrays(rBytes, sBytes);
         }
 
