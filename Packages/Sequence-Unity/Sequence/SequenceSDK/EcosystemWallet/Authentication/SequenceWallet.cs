@@ -78,6 +78,24 @@ namespace Sequence.EcosystemWallet
         public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
         {
             await _state.Update();
+
+            if (feeOption != null)
+            {
+                var encodedFeeOptionData = ABI.ABI.Pack("transfer(address,uint256)",
+                    feeOption.to, feeOption.value).HexStringToByteArray();
+                
+                var feeOptionCall = new Call(
+                    feeOption.token, 
+                    0, 
+                    encodedFeeOptionData, 
+                    feeOption.gasLimit, 
+                    false, 
+                    false,
+                    BehaviourOnError.revert);
+
+                calls = calls.Unshift(feeOptionCall);
+            }
+            
             var transactionData = SignCalls(calls);
             
             var relayer = new SequenceRelayer(SessionSigners[0].Chain);

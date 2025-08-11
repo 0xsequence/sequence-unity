@@ -7,6 +7,14 @@ namespace Sequence.Utils
 {
     public static class ArrayUtils
     {
+        public static T[] Unshift<T>(this T[] array, T newItem)
+        {
+            T[] newArray = new T[array.Length + 1];
+            newArray[0] = newItem;
+            Array.Copy(array, 0, newArray, 1, array.Length);
+            return newArray;
+        }
+        
         public static T[] ConvertToTArray<T,T2>(this T2 value)
         {
             if (value is Array array)
