@@ -53,5 +53,13 @@ namespace Sequence.EcosystemWallet
         /// <param name="feeOption"></param>
         /// <returns></returns>
         Task<string> SendTransaction(Chain chain, Call[] calls, FeeOption feeOption = null);
+
+        /// <summary>
+        /// Checks whether this wallet is capable of signing the given calls.
+        /// </summary>
+        /// <param name="chain"></param>
+        /// <param name="calls"></param>
+        /// <returns>False if no local signer could be found.</returns>
+        Task<bool> IsSupportedCalls(Chain chain, Call[] calls);
     }
 }

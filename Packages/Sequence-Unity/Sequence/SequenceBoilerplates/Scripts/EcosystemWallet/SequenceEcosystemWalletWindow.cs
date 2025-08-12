@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Numerics;
+using NBitcoin;
 using Sequence.EcosystemWallet;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
@@ -278,7 +280,7 @@ namespace Sequence.Boilerplates
 
             var rect = transform as RectTransform;
             var size = rect.sizeDelta;
-            size.y = enable ? 315 : 290;
+            size.y = enable ? 420 : 290;
             rect.sizeDelta = size;
         }
         
@@ -292,8 +294,8 @@ namespace Sequence.Boilerplates
         {
             await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new Call[]
             {
-                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, 
-                    ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
+                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray()),
+                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
             });
         }
         
@@ -319,6 +321,7 @@ namespace Sequence.Boilerplates
             if (feeOption == null)
                 throw new Exception($"Fee option 'USDC' not available");
             
+            Debug.Log($"{feeOption.to} {feeOption.token.contractAddress} {feeOption.value}");
             await _wallet.SendTransaction(Chain.Optimism, calls, feeOption);
         }
 
@@ -351,6 +354,19 @@ namespace Sequence.Boilerplates
         
         private SessionPermissions GetPermissionsFromSessionType(int type)
         {
+            if (type == 0)
+                return null;
+            
+            var deadline = new BigInteger(1955010532000);
+            
+            Debug.Log($"deadline {deadline}");
+            
+            var sessionBuilder = new SessionBuilder(_chain, 0, deadline);
+            sessionBuilder.AddPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"));
+            sessionBuilder.AddPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"));
+            
+            return sessionBuilder.GetPermissions();
+            
             var templates = new SessionTemplates(_chain);
             return type switch
             {

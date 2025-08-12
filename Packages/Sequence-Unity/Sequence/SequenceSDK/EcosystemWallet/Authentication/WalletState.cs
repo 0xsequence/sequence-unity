@@ -13,9 +13,6 @@ namespace Sequence.EcosystemWallet
 {
     internal class WalletState
     {
-        // Why this signer leaf?
-        public Address Sessions = new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29");
-        
         public Address Address { get; }
         public string ImageHash { get; private set; }
         public string SessionsImageHash { get; private set; }
@@ -47,7 +44,7 @@ namespace Sequence.EcosystemWallet
             
             Debug.Log($"Config: {config.ToJson()}");
             
-            var signerLeaf = config.topology.FindSignerLeaf(Sessions) as SapientSignerLeaf;
+            var signerLeaf = config.topology.FindSignerLeaf(new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29")) as SapientSignerLeaf;
             SessionsImageHash = signerLeaf.imageHash;
             
             var treeReturn = await _keyMachine.GetTree(SessionsImageHash);

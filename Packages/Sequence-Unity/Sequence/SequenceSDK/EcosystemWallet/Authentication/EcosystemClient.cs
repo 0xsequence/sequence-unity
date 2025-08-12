@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Sequence.Config;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;

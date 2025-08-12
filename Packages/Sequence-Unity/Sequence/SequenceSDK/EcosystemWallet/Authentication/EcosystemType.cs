@@ -2,6 +2,7 @@ namespace Sequence.EcosystemWallet
 {
     public enum EcosystemType
     {
-        Sequence = 0
+        Dev = 0,
+        Sequence = 1
     }
 }

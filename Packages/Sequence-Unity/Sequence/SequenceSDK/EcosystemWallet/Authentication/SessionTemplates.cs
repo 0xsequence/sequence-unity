@@ -18,7 +18,7 @@ namespace Sequence.EcosystemWallet
         {
             var deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000);
             
-            var sessionBuilder = new SessionBuilder(_chain, 0, deadline);
+            var sessionBuilder = new SessionBuilder(_chain, 1000000000, deadline);
             sessionBuilder.AddPermission(target);
             
             return sessionBuilder.GetPermissions();

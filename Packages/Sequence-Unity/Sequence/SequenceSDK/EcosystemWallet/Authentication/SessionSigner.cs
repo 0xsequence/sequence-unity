@@ -91,14 +91,19 @@ namespace Sequence.EcosystemWallet
             if (exceededLimit)
                 return (-1, null);
 
-            var permissionIndex = 0;
-            foreach (var permission in sessionPermissions.permissions)
+            var permissionIndex = -1;
+            for (var i = 0; i < sessionPermissions.permissions.Length; i++)
             {
-                if (permission.target.Equals(call.to))
-                    break;
+                var permission = sessionPermissions.permissions[i];
+                if (!permission.target.Equals(call.to)) 
+                    continue;
                 
-                permissionIndex++;
+                permissionIndex = i;
+                break;
             }
+            
+            if (permissionIndex < 0)
+                return (-1, null);
 
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }

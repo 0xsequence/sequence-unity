@@ -6,6 +6,7 @@ namespace Sequence.EcosystemWallet
     {
         private static Dictionary<EcosystemType, string> UrlBindings = new ()
         {
+            { EcosystemType.Dev, "http://localhost:5173/" },
             { EcosystemType.Sequence, "https://v3.sequence-dev.app" }
         };
         

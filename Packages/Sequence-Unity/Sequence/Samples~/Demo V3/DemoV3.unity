@@ -10628,7 +10628,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 240, y: 290}
+  m_SizeDelta: {x: 240, y: 420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2325936309338030303
 MonoBehaviour:
@@ -12369,7 +12369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a76f3494846944de2a0d1694eeb60856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ecosystem: 0
+  _ecosystem: 1
   _chain: 421614
   _emailLoginButton: {fileID: 1459061464521247473}
   _emailContinueButton: {fileID: 2325936309338030303}
