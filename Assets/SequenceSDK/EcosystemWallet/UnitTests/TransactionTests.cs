@@ -22,7 +22,7 @@ namespace Sequence.EcosystemWallet.UnitTests
             new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
         };
 
-        private static SequenceWallet Wallet => SequenceWallet.RecoverFromStorage();
+        private static IWallet Wallet => SequenceWallet.RecoverFromStorage();
         
         [Test]
         public async Task AddPermissionForUsdcTransfer()

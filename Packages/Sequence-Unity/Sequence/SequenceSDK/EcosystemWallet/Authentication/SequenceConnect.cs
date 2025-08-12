@@ -3,7 +3,7 @@ using Sequence.EcosystemWallet.Primitives;
 
 namespace Sequence.EcosystemWallet
 {
-    public class SequenceConnect
+    public class SequenceConnect : IConnect
     {
         private EcosystemClient _client;
         

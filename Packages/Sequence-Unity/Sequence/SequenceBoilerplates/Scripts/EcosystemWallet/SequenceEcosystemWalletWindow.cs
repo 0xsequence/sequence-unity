@@ -44,8 +44,8 @@ namespace Sequence.Boilerplates
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GenericObjectPool<SessionWalletTile> _sessionPool;
         
-        private SequenceWallet _wallet;
-        private SequenceConnect _connect;
+        private IWallet _wallet;
+        private IConnect _connect;
         private ImplicitSessionType _implicitPermissions;
         private ExplicitSessionType _explicitPermissions;
         private int _selectedWallet;
@@ -212,7 +212,7 @@ namespace Sequence.Boilerplates
 
         public void SignOut()
         {
-            _wallet.SignOut();
+            _wallet.Disconnect();
             EnableWalletState(false);
         }
         

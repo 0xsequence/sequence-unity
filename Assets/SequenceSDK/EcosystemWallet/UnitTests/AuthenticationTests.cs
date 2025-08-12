@@ -9,9 +9,9 @@ namespace Sequence.EcosystemWallet.UnitTests
         private static readonly EcosystemType Ecosystem = EcosystemType.Sequence;
         
         [Test]
-        public void SignOut()
+        public void Disconnect()
         {
-            SequenceWallet.RecoverFromStorage().SignOut();
+            SequenceWallet.RecoverFromStorage().Disconnect();
         }
         
         [Test]

@@ -30,7 +30,7 @@ namespace Sequence.EcosystemWallet
             _state = new WalletState(Address);
         }
 
-        public static SequenceWallet RecoverFromStorage()
+        public static IWallet RecoverFromStorage()
         {
             var credentials = SessionStorage.GetSessions();
             var sessionWallets = new SessionSigner[credentials.Length];
@@ -56,7 +56,7 @@ namespace Sequence.EcosystemWallet
             _sessionSigners.AddToArray(sessionSigner);
         }
         
-        public void SignOut()
+        public void Disconnect()
         {
             SessionStorage.Clear();
             _sessionSigners = Array.Empty<SessionSigner>();
