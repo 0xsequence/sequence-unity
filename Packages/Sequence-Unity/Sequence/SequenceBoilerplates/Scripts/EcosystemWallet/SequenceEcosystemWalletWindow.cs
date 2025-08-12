@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Sequence.EcosystemWallet;
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,11 @@ namespace Sequence.Boilerplates
             BasicRestrictive
         }
         
+        [Header("Config")]
+        [SerializeField] private EcosystemType _ecosystem;
+        [SerializeField] private Chain _chain;
+        
+        [Header("Components")]
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
         [SerializeField] private Button _signOutButton;
@@ -38,24 +44,24 @@ namespace Sequence.Boilerplates
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GenericObjectPool<SessionWalletTile> _sessionPool;
         
-        private SequenceConnect _login;
         private SequenceWallet _wallet;
+        private SequenceConnect _connect;
         private ImplicitSessionType _implicitPermissions;
         private ExplicitSessionType _explicitPermissions;
         private int _selectedWallet;
         private string _curEmail;
         private string _curSignature;
         
-        private Chain[] _chains =
+        private readonly Chain[] _chains =
         {
             Chain.TestnetArbitrumSepolia,
-            Chain.ArbitrumOne
+            Chain.ArbitrumOne,
+            Chain.Optimism,
         };
         
         private void Start()
         {
-            _login = new(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
-            
+            _connect = new SequenceConnect(_ecosystem, _chain);
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
             _messagePopup.gameObject.SetActive(false);
             _loadingOverlay.SetActive(false);
@@ -68,8 +74,9 @@ namespace Sequence.Boilerplates
             
             _chainDropdown.ClearOptions();
             _chainDropdown.AddOptions(_chains.Select(c => c.ToString()).ToList());
-            
-            if (_login.GetAllSessionWallets().Length > 0)
+
+            _wallet = SequenceWallet.RecoverFromStorage();
+            if (_wallet != null)
                 ShowWallet(true);
         }
         
@@ -79,7 +86,7 @@ namespace Sequence.Boilerplates
             
             try
             {
-                SessionSigner signer = await _login.SignInWithEmail(_curEmail, null);
+                _wallet = await _connect.SignInWithEmail(_curEmail);
                 ShowWallet(false);
             }
             catch (Exception e)
@@ -94,7 +101,7 @@ namespace Sequence.Boilerplates
             
             try
             {
-                await _login.SignInWithGoogle(GetImplicitPermissions());
+                _wallet = await _connect.SignInWithGoogle(GetImplicitPermissions());
                 ShowWallet(false);
             }
             catch (Exception e)
@@ -109,7 +116,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                await _login.SignInWithApple(GetImplicitPermissions());
+                _wallet = await _connect.SignInWithApple(GetImplicitPermissions());
                 ShowWallet(false);
             }
             catch (Exception e)
@@ -124,7 +131,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                await _login.SignInWithPasskey(GetImplicitPermissions());
+                _wallet = await _connect.SignInWithPasskey(GetImplicitPermissions());
                 ShowWallet(false);
             }
             catch (Exception e)
@@ -139,7 +146,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                await _login.SignInWithMnemonic(GetImplicitPermissions());
+                _wallet = await _connect.SignInWithMnemonic(GetImplicitPermissions());
                 ShowWallet(false);
             }
             catch (Exception e)
@@ -193,8 +200,9 @@ namespace Sequence.Boilerplates
 
             try
             {
-                await _login.AddSession(GetExplicitPermissions());
-                ShowWallet(false);
+                await _wallet.AddSession(_chain, GetExplicitPermissions());
+                SetLoading(false);
+                LoadSessions();
             }
             catch (Exception e)
             {
@@ -204,13 +212,14 @@ namespace Sequence.Boilerplates
 
         public void SignOut()
         {
-            _login.SignOut();
+            _wallet.SignOut();
             EnableWalletState(false);
         }
         
         public void OnChainChanged(int index)
         {
-            _login.SetChain(_chains[index]);
+            _chain = _chains[index];
+            _connect = new SequenceConnect(_ecosystem, _chain);
         }
 
         public void OnImplicitSessionTypeChanged(int index)
@@ -239,7 +248,6 @@ namespace Sequence.Boilerplates
 
         private void ShowWallet(bool recovered)
         {
-            _wallet = _login.GetWallet();
             _walletText.text = _wallet.Address.Value;
 
             LoadSessions();
@@ -252,14 +260,13 @@ namespace Sequence.Boilerplates
 
         private void RemoveSession(Address address)
         {
-            _login.RemoveSession(address);
             LoadSessions();
         }
 
         private void LoadSessions()
         {
             _sessionPool.Cleanup();
-            foreach (var wallet in _wallet.SessionSigners)
+            foreach (var wallet in _wallet.GetAllSigners())
                 _sessionPool.GetObject().Apply(wallet, RemoveSession);
         }
 
@@ -279,6 +286,40 @@ namespace Sequence.Boilerplates
         {
             _emailLoginButton.gameObject.SetActive(enable);
             _emailInput.gameObject.SetActive(!enable);
+        }
+
+        public async void SendImplicitTransaction()
+        {
+            await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new Call[]
+            {
+                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, 
+                    ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
+            });
+        }
+        
+        public async void SendExplicitTransaction()
+        {
+            await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new Call[]
+            {
+                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, 
+                    ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
+            });
+        }
+        
+        public async void SendExplicitTransactionWithUsdc()
+        {
+            var calls = new Call[]
+            {
+                new(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0,
+                    ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
+            };
+            
+            var feeOptions = await _wallet.GetFeeOption(Chain.Optimism, calls);
+            var feeOption = feeOptions.First(o => o.token.symbol == "USDC");
+            if (feeOption == null)
+                throw new Exception($"Fee option 'USDC' not available");
+            
+            await _wallet.SendTransaction(Chain.Optimism, calls, feeOption);
         }
 
         private void SetLoading(bool value)
@@ -310,7 +351,7 @@ namespace Sequence.Boilerplates
         
         private SessionPermissions GetPermissionsFromSessionType(int type)
         {
-            var templates = new SessionTemplates(_login.Chain);
+            var templates = new SessionTemplates(_chain);
             return type switch
             {
                 0 => null,

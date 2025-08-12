@@ -5,11 +5,34 @@ namespace Sequence.EcosystemWallet.UnitTests
 {
     public class AuthenticationTests
     {
+        private static readonly Chain Chain = Chain.TestnetArbitrumSepolia;
+        private static readonly EcosystemType Ecosystem = EcosystemType.Sequence;
+        
+        [Test]
+        public void SignOut()
+        {
+            SequenceWallet.RecoverFromStorage().SignOut();
+        }
+        
         [Test]
         public async Task SignInWithGoogle()
         {
-            var connect = new SequenceConnect(Chain.TestnetArbitrumSepolia, EcosystemType.Sequence);
+            var connect = new SequenceConnect(Ecosystem, Chain);
             await connect.SignInWithGoogle();
+        }
+        
+        [Test]
+        public async Task AddUnrestrictiveExplicitSession()
+        {
+            var wallet = SequenceWallet.RecoverFromStorage();
+            await wallet.AddSession(Chain, new SessionTemplates(Chain).BuildUnrestrictivePermissions());
+        }
+        
+        [Test]
+        public async Task AddRestrictiveExplicitSession()
+        {
+            var wallet = SequenceWallet.RecoverFromStorage();
+            await wallet.AddSession(Chain, new SessionTemplates(Chain).BuildBasicRestrictivePermissions());
         }
     }
 }

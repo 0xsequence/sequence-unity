@@ -16,11 +16,10 @@ namespace Sequence.EcosystemWallet
 
         public SessionPermissions BuildUnrestrictivePermissions()
         {
-            var signer = new Address("0xb7bE532959236170064cf099e1a3395aEf228F44");
+            var target = new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA");
             var deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000);
-            var target = new Address("0x8F6066bA491b019bAc33407255f3bc5cC684A5a4");
             
-            var sessionBuilder = new SessionBuilder(_chain, signer, 0, deadline);
+            var sessionBuilder = new SessionBuilder(_chain, 0, deadline);
             sessionBuilder.AddPermission(target);
             
             return sessionBuilder.GetPermissions();
@@ -28,11 +27,10 @@ namespace Sequence.EcosystemWallet
 
         public SessionPermissions BuildBasicRestrictivePermissions()
         {
-            var signer = new Address("0xb7bE532959236170064cf099e1a3395aEf228F44");
             var deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000);
-            var target = new Address("0x8F6066bA491b019bAc33407255f3bc5cC684A5a4");
+            var target = new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA");
             
-            var sessionBuilder = new SessionBuilder(_chain, signer, 0, deadline);
+            var sessionBuilder = new SessionBuilder(_chain, 0, deadline);
             sessionBuilder.AddPermission(target, false, ParameterOperation.equal, 
                 ABI.ABI.FunctionSelector("explicitEmit()"), 0, ParameterRule.SelectorMask);
             

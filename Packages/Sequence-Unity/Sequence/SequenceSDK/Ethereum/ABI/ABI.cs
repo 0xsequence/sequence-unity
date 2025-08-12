@@ -345,7 +345,8 @@ namespace Sequence.ABI
                                 break;
                             }
 
-                            return ABIType.FIXEDARRAY;
+                            // TODO: Change back to FIXEDBYTES
+                            return ABIType.BYTES;
                         }
                     }
 

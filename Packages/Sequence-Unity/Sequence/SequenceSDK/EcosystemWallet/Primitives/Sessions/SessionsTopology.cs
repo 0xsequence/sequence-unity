@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -165,9 +166,25 @@ namespace Sequence.EcosystemWallet.Primitives
             return this.FindLeaf<ImplicitBlacklistLeaf>().blacklist;
         }
         
-        public SessionPermissions GetPermissions()
+        public SessionPermissions GetPermissions(Address signer)
         {
-            return this.FindLeaf<PermissionLeaf>().permissions;
+            if (this.IsBranch())
+            {
+                var sessionChildren = Branch.Children as SessionsTopology[];
+                foreach (var child in sessionChildren)
+                {
+                    var permissions = child.GetPermissions(signer);
+                    if (permissions != null)
+                        return permissions;
+                }
+
+                return null;
+            }
+            
+            if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf && permissionLeaf.permissions.signer.Equals(signer))
+                return permissionLeaf.permissions;
+
+            return null;
         }
 
         public Address[] GetExplicitSigners()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -21,6 +22,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 chainId = chainId,
+                signer = signer,
                 valueLimit = valueLimit,
                 deadline = deadline,
                 permissions = permissions.Select(permission => permission.ToJson()).ToArray()
@@ -56,7 +58,7 @@ namespace Sequence.EcosystemWallet.Primitives
             var chainId = new BigInteger(data.AsSpan(20, 32).ToArray(), isUnsigned: true, isBigEndian: true);
             var valueLimit = new BigInteger(data.AsSpan(52, 32).ToArray(), isUnsigned: true, isBigEndian: true);
             var deadline = new BigInteger(data.AsSpan(84, 8).ToArray(), isUnsigned: true, isBigEndian: true);
-
+            
             var permissionsLength = data[92];
             
             var pointer = 93;

@@ -11,20 +11,19 @@ namespace Sequence.Boilerplates
         [SerializeField] private TMP_Text _addressText;
         [SerializeField] private Button _removeButton;
         
-        private SessionSigner _signer;
+        private Address _signer;
         private Action<Address> _onRemove;
         
-        public void Apply(SessionSigner signer, Action<Address> onRemove)
+        public void Apply(Address signer, Action<Address> onRemove)
         {
             _signer = signer;
             _onRemove = onRemove;
-            _addressText.text = $"({(signer.IsExplicit ? "E" : "I")}) {signer.Address}";
-            _removeButton.gameObject.SetActive(signer.IsExplicit);
+            _addressText.text = $"{_signer}";
         }
 
         public void Remove()
         {
-            _onRemove?.Invoke(_signer.Address);
+            _onRemove?.Invoke(_signer);
         }
     }
 }

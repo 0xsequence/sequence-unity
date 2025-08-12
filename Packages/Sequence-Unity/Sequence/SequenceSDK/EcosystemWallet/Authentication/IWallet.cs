@@ -8,7 +8,7 @@ namespace Sequence.EcosystemWallet
     {
         Address Address { get; }
         Task<SignMessageResponse> SignMessage(string message);
-        Task<FeeOption[]> GetFeeOption(Call[] calls);
-        Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null);
+        Task<FeeOption[]> GetFeeOption(Chain chain, Call[] calls);
+        Task<string> SendTransaction(Chain chain, Call[] calls, FeeOption feeOption = null);
     }
 }

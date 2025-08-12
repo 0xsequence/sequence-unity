@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
+using Sequence.EcosystemWallet.KeyMachine.Models;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Provider;
 using Sequence.Utils;
@@ -18,7 +19,9 @@ namespace Sequence.EcosystemWallet
         public Address Address { get; }
         public string ImageHash { get; private set; }
         public string SessionsImageHash { get; private set; }
-        public bool IsDeployed { get; private set; } = true; // At what condition is this false?
+        public bool IsDeployed { get; private set; }
+        public string DeployHash { get; private set; }
+        public DeployHashContext DeployContext { get; private set; }
         public BigInteger Nonce { get; private set; }
         public Primitives.Config Config { get; private set; }
         public SessionsTopology SessionsTopology { get; private set; }
@@ -28,12 +31,15 @@ namespace Sequence.EcosystemWallet
 
         public WalletState(Address address)
         {
-            this.Address = address;
+            Address = address;
         }
 
-        public async Task Update()
+        public async Task Update(Chain chain)
         {
             var deployResponse = await _keyMachine.GetDeployHash(Address);
+            DeployHash = deployResponse.deployHash;
+            DeployContext = deployResponse.context;
+            
             var configUpdates = await _keyMachine.GetConfigUpdates(Address, deployResponse.deployHash);
             var imageHash = configUpdates.updates.Length > 0 ? configUpdates.updates[^1].toImageHash : deployResponse.deployHash;
             
@@ -54,10 +60,16 @@ namespace Sequence.EcosystemWallet
             
             Debug.Log($"Sessions Topology {sessionsTopology.JsonSerialize()}");
 
-            await UpdateNonce(0);
+            await UpdateNonce(chain, 0);
+
+            var ethClient = new SequenceEthClient(chain);
+            var response = await ethClient.CodeAt(Address, "pending");
+            IsDeployed = response != "0x";
+            
+            Debug.Log($"Is deployed: {IsDeployed}");
         }
 
-        public async Task UpdateNonce(BigInteger space)
+        public async Task UpdateNonce(Chain chain, BigInteger space)
         {
             var function = new FunctionABI("readNonce", false)
             {
@@ -70,7 +82,7 @@ namespace Sequence.EcosystemWallet
             var encoder = new FunctionCallEncoder();
             var data = encoder.EncodeRequest(function.Sha3Signature, function.InputParameters, space);
             
-            var response = await new SequenceEthClient(Chain.TestnetArbitrumSepolia).CallContract(new object[] {
+            var response = await new SequenceEthClient(chain).CallContract(new object[] {
                 new
                 {
                     to = Address,

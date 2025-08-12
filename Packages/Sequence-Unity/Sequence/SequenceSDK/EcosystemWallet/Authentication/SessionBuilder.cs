@@ -8,16 +8,14 @@ namespace Sequence.EcosystemWallet
     public class SessionBuilder
     {
         public Chain Chain;
-        public Address Signer;
         public BigInteger ValueLimit;
         public BigInteger Deadline;
 
         private Dictionary<Address, List<ParameterRule>> _permissions = new();
 
-        public SessionBuilder(Chain chain, Address signer, BigInteger valueLimit, BigInteger deadline)
+        public SessionBuilder(Chain chain, BigInteger valueLimit, BigInteger deadline)
         {
             this.Chain = chain;
-            this.Signer = signer;
             this.ValueLimit = valueLimit;
             this.Deadline = deadline;
         }
@@ -61,8 +59,8 @@ namespace Sequence.EcosystemWallet
             
             return new SessionPermissions
             {
+                signer = new Address("0xb7bE532959236170064cf099e1a3395aEf228F44"),
                 chainId = new BigInteger((int)Chain),
-                signer = new Address(Signer),
                 valueLimit = ValueLimit,
                 deadline = Deadline,
                 permissions = permissions

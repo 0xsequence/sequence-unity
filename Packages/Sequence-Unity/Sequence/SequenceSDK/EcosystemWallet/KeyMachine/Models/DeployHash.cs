@@ -19,10 +19,10 @@ namespace Sequence.EcosystemWallet.KeyMachine.Models
     internal struct DeployHashContext
     {
         public int version;
-        public string factory;
+        public Address factory;
         public string guestModule;
-        public string mainModule;
-        public string mainModuleUpgradable;
+        public Address mainModule;
+        public Address mainModuleUpgradable;
         public string walletCreationCode;
     }
 }

@@ -7,38 +7,59 @@ using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
+using Sequence.EcosystemWallet.Utils;
 using Sequence.Relayer;
 using Sequence.Utils;
+using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet
 {
-    public class SequenceWallet : IWallet, IDisposable
+    public class SequenceWallet : IWallet
     {
-        public static Action<SequenceWallet> OnWalletCreated;
-        
         public Address Address { get; }
-        public SessionSigner[] SessionSigners { get; private set; }
-
+        
+        private SessionSigner[] _sessionSigners;
         private WalletState _state;
         
         internal SequenceWallet(SessionSigner[] sessionSigners)
         {
-            SessionSigners = sessionSigners;
             Address = sessionSigners[0].ParentAddress;
-            OnWalletCreated?.Invoke(this);
-            _state = new WalletState(Address);
             
-            SequenceConnect.SessionsChanged += SessionsChanged;
+            _sessionSigners = sessionSigners;
+            _state = new WalletState(Address);
         }
 
-        public void Dispose()
+        public static SequenceWallet RecoverFromStorage()
         {
-            SequenceConnect.SessionsChanged -= SessionsChanged;
+            var credentials = SessionStorage.GetSessions();
+            var sessionWallets = new SessionSigner[credentials.Length];
+            for (var i = 0; i < credentials.Length; i++)
+                sessionWallets[i] = new SessionSigner(credentials[i]);
+
+            return new SequenceWallet(sessionWallets);
         }
 
-        private void SessionsChanged(SessionSigner[] sessionWallets)
+        public Address[] GetAllSigners()
         {
-            SessionSigners = sessionWallets;
+            return _sessionSigners.Select(x => x.Address).ToArray();
+        }
+        
+        public async Task AddSession(Chain chain, SessionPermissions permissions)
+        {
+            Assert.IsNotNull(permissions);
+            
+            var ecosystem = _sessionSigners[0].Ecosystem;
+            var client = new EcosystemClient(ecosystem, chain);
+            
+            var sessionSigner = await client.CreateNewSession(true, permissions, string.Empty);
+            _sessionSigners.AddToArray(sessionSigner);
+        }
+        
+        public void SignOut()
+        {
+            SessionStorage.Clear();
+            _sessionSigners = Array.Empty<SessionSigner>();
         }
         
         public async Task<SignMessageResponse> SignMessage(string message)
@@ -46,7 +67,7 @@ namespace Sequence.EcosystemWallet
             var args = new SignMessageArgs 
             { 
                 address = Address, 
-                chainId = new BigInt((int)SessionSigners[0].Chain), 
+                chainId = new BigInt((int)_sessionSigners[0].Chain), 
                 message = message
             };
 
@@ -63,29 +84,30 @@ namespace Sequence.EcosystemWallet
             return response.Data;
         }
 
-        public async Task<FeeOption[]> GetFeeOption(Call[] calls)
+        public async Task<FeeOption[]> GetFeeOption(Chain chain, Call[] calls)
         {
-            await _state.Update();
-            var transactionData = SignCalls(calls);
-            var relayer = new SequenceRelayer(SessionSigners[0].Chain);
+            await _state.Update(chain);
+            
+            var transactionData = await SignCalls(chain, calls, false);
+            var relayer = new SequenceRelayer(chain);
 
-            var args = new FeeOptionsArgs(Address, transactionData.To, transactionData.Data);
+            var args = new FeeOptionsArgs(transactionData.To, transactionData.To, transactionData.Data);
             var response = await relayer.GetFeeOptions(args);
 
             return response.options;
         }
 
-        public async Task<string> SendTransaction(Call[] calls, FeeOption feeOption = null)
+        public async Task<string> SendTransaction(Chain chain, Call[] calls, FeeOption feeOption = null)
         {
-            await _state.Update();
+            await _state.Update(chain);
 
             if (feeOption != null)
             {
                 var encodedFeeOptionData = ABI.ABI.Pack("transfer(address,uint256)",
-                    feeOption.to, feeOption.value).HexStringToByteArray();
+                    feeOption.to, BigInteger.Parse(feeOption.value)).HexStringToByteArray();
                 
                 var feeOptionCall = new Call(
-                    feeOption.token, 
+                    feeOption.token.contractAddress, 
                     0, 
                     encodedFeeOptionData, 
                     feeOption.gasLimit, 
@@ -96,9 +118,9 @@ namespace Sequence.EcosystemWallet
                 calls = calls.Unshift(feeOptionCall);
             }
             
-            var transactionData = SignCalls(calls);
+            var transactionData = await SignCalls(chain, calls, true);
             
-            var relayer = new SequenceRelayer(SessionSigners[0].Chain);
+            var relayer = new SequenceRelayer(chain);
             var hash = await relayer.Relay(transactionData.To, transactionData.Data);
 
             MetaTxnReceipt receipt = null;
@@ -117,15 +139,15 @@ namespace Sequence.EcosystemWallet
             return receipt.txnReceipt;
         }
         
-        private TransactionData SignCalls(Call[] calls)
+        private async Task<TransactionData> SignCalls(Chain chain, Call[] calls, bool checkDeployed)
         {
             var preparedIncrement = PrepareIncrement(null, 0, null);
             if (preparedIncrement != null)
                 calls.AddToArray(preparedIncrement);
 
-            var envelope = PrepareTransaction(calls);
+            var envelope = PrepareTransaction(chain, calls);
             
-            var signature = SignSapient(envelope);
+            var signature = await SignSapient(chain, envelope);
             var sapientSignature = new SapientSignature
             {
                 imageHash = _state.SessionsImageHash,
@@ -138,18 +160,46 @@ namespace Sequence.EcosystemWallet
             rawSignature.suffix = _state.ConfigUpdates
                 .Select(u => RawSignature.Decode(u.signature.HexStringToByteArray())).ToArray();
 
-            if (_state.IsDeployed)
+            var callsData = ABI.ABI.Pack("execute(bytes,bytes)",
+                envelope.payload.Encode(),
+                rawSignature.Encode());
+            
+            if (!checkDeployed || _state.IsDeployed)
             {
                 return new TransactionData
                 {
                     To = Address,
-                    Data = ABI.ABI.Pack("execute(bytes,bytes)", 
-                        envelope.payload.Encode(), 
-                        rawSignature.Encode())
+                    Data = callsData
                 };
             }
-            
-            throw new Exception("wallet status is not deployed");
+
+            var deployTransaction = BuildDeployTransaction();
+            return new TransactionData
+            {
+                To = new Address("0xf3c7175460BeD3340A1c4dc700fD6C8Cd3F56250"),
+                Data = new Calls(0, 0, new Call[]
+                {
+                    new (deployTransaction.To, 0, deployTransaction.Data.HexStringToByteArray()),
+                    new (Address, 0, callsData.HexStringToByteArray())
+                }).Encode().ByteArrayToHexStringWithPrefix()
+            };
+        }
+
+        private TransactionData BuildDeployTransaction()
+        {
+            var deployTransaction = Erc6492Helper.Deploy(_state.DeployHash, new Erc6492Helper.Context
+            {
+                creationCode = _state.DeployContext.walletCreationCode,
+                factory = _state.DeployContext.factory,
+                stage1 = _state.DeployContext.mainModule,
+                stage2 = _state.DeployContext.mainModuleUpgradable
+            });
+
+            return new TransactionData
+            {
+                To = new Address(deployTransaction.To),
+                Data = deployTransaction.Data
+            };
         }
 
         private Call PrepareIncrement(Address wallet, BigInteger chainId, Calls calls)
@@ -157,18 +207,18 @@ namespace Sequence.EcosystemWallet
             return null;
         }
 
-        private Envelope<Calls> PrepareTransaction(Call[] calls)
+        private Envelope<Calls> PrepareTransaction(Chain chain, Call[] calls)
         {
             return new Envelope<Calls>
             {
-                chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[SessionSigners[0].Chain]),
+                chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[chain]),
                 wallet = Address,
                 configuration = _state.Config,
                 payload = new Calls(0, _state.Nonce, calls)
             };
         }
 
-        private SignatureOfSapientSignerLeaf SignSapient(Envelope<Calls> envelope)
+        private async Task<SignatureOfSapientSignerLeaf> SignSapient(Chain chain, Envelope<Calls> envelope)
         {
             var calls = envelope.payload.calls;
             if (calls.Length == 0)
@@ -177,7 +227,7 @@ namespace Sequence.EcosystemWallet
             var implicitSigners = new List<Address>();
             var explicitSigners = new List<Address>();
 
-            var signers = FindSignersForCalls(calls);
+            var signers = await FindSignersForCalls(chain, calls);
             
             var signatures = new SessionCallSignature[signers.Length];
             for (var i = 0; i < signers.Length; i++)
@@ -208,7 +258,7 @@ namespace Sequence.EcosystemWallet
             };
         }
         
-        private SessionSigner[] FindSignersForCalls(Call[] calls)
+        private async Task<SessionSigner[]> FindSignersForCalls(Chain chain, Call[] calls)
         {
             var identitySigner = _state.SessionsTopology.GetIdentitySigner();
             if (identitySigner == null)
@@ -218,14 +268,14 @@ namespace Sequence.EcosystemWallet
             if (blacklist == null)
                 throw new Exception("blacklist is null");
             
-            var validImplicitSigners = SessionSigners.Where(s => 
+            var validImplicitSigners = _sessionSigners.Where(s => 
                 !s.IsExplicit &&
                 s.IdentitySigner.Equals(identitySigner) &&
                 !blacklist.Contains(s.Address)
                 ).ToArray();
 
             var explicitSigners = _state.SessionsTopology.GetExplicitSigners();
-            var validExplicitSigners = SessionSigners
+            var validExplicitSigners = _sessionSigners
                 .Where(s => s.IsExplicit && 
                             Array.Exists(explicitSigners, es => es.Equals(s.Address))).ToArray();
 
@@ -238,8 +288,14 @@ namespace Sequence.EcosystemWallet
             {
                 foreach (var signer in availableSigners)
                 {
-                    if (signer.IsSupportedCall(call, _state.SessionsTopology))
+                    Debug.Log($"Checking signer {signer.Address}");
+                    var supported = await signer.IsSupportedCall(call, chain, _state.SessionsTopology);
+                    if (supported)
+                    {
                         signers.Add(signer);
+                        Debug.Log($"Using signer {signer.Address}");
+                        break;
+                    }
                 }
             }
             

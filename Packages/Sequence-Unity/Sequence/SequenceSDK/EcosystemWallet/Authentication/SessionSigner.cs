@@ -1,18 +1,23 @@
 using System;
 using System.Numerics;
+using System.Threading.Tasks;
 using Sequence.ABI;
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
 
 namespace Sequence.EcosystemWallet
 {
-    public class SessionSigner
+    internal class SessionSigner
     {
+        private static readonly Address ValueTrackingAddress = new ("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+        
         public Address ParentAddress { get; }
         public Address Address { get; }
         public Chain Chain { get; }
+        public EcosystemType Ecosystem { get; }
         public bool IsExplicit { get; }
 
         public Address IdentitySigner
@@ -40,11 +45,15 @@ namespace Sequence.EcosystemWallet
             ParentAddress = credentials.address;
             Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = ChainDictionaries.ChainById[credentials.chainId];
+            Ecosystem = (EcosystemType)credentials.ecosystemId;
             IsExplicit = credentials.isExplicit;
         }
 
-        public bool IsSupportedCall(Call call, SessionsTopology topology)
+        public async Task<bool> IsSupportedCall(Call call, Chain chain, SessionsTopology topology)
         {
+            if (Chain != chain)
+                return false;
+            
             if (IsExplicit)
             {
                 if (call.data.Length > 4 &&
@@ -54,23 +63,43 @@ namespace Sequence.EcosystemWallet
                     return true;
                 }
 
-                var permission = FindSupportedPermission(call, topology);
-                return true;
+                var supportedPermission = FindSupportedPermission(call, topology);
+                return supportedPermission.Index >= 0;
             }
-            
-            return true;
+
+            var response = await new SequenceEthClient(chain).CallContract(new object[] {
+                new
+                {
+                    to = call.to,
+                    data = GetAcceptImplicitRequestFunctionAbi(call)
+                }
+            });
+
+            var expectedResult = GenerateImplicitRequestMagic(ParentAddress, _credentials.attestation);
+            return response == expectedResult;
         }
         
-        public Permission FindSupportedPermission(Call call, SessionsTopology topology)
+        private (int Index, Permission Permission) FindSupportedPermission(Call call, SessionsTopology topology)
         {
-            var permissions = topology.GetPermissions()?.permissions;
-            return permissions is {Length: > 0} ? permissions[0] : null;
-        }
+            var sessionPermissions = topology.GetPermissions(Address);
+            if (sessionPermissions == null || ChainDictionaries.ChainById[sessionPermissions.chainId.ToString()] != Chain)
+                return (-1, null);
 
-        public int FindSupportedPermissionIndex(Call call, SessionsTopology topology)
-        {
-            var permissions = topology.GetPermissions()?.permissions;
-            return permissions is {Length: > 0} ? 0 : -1;
+            // TODO: Read current usage limit, use ValueTrackingAddress
+            var exceededLimit = call.value > 0 && call.value > sessionPermissions.valueLimit;
+            if (exceededLimit)
+                return (-1, null);
+
+            var permissionIndex = 0;
+            foreach (var permission in sessionPermissions.permissions)
+            {
+                if (permission.target.Equals(call.to))
+                    break;
+                
+                permissionIndex++;
+            }
+
+            return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
         public SessionCallSignature SignCall(Call call, SessionsTopology topology, BigInteger space, BigInteger nonce)
@@ -89,7 +118,7 @@ namespace Sequence.EcosystemWallet
                 if (!(call.data.Length > 4 && call.data.Slice(4).ByteArrayToHexStringWithPrefix() ==
                     ABI.ABI.FunctionSelector("incrementUsageLimit")))
                 {
-                    permissionIndex = FindSupportedPermissionIndex(call, topology);
+                    permissionIndex = FindSupportedPermission(call, topology).Index;
                     if (permissionIndex == -1)
                         throw new Exception("Invalid permission");
                 }
@@ -118,6 +147,33 @@ namespace Sequence.EcosystemWallet
 
             var concatenated = ByteArrayExtensions.ConcatenateByteArrays(chainBytes, spaceBytes, nonceBytes, callHashBytes);
             return SequenceCoder.KeccakHash(concatenated);
+        }
+        
+        private string GetAcceptImplicitRequestFunctionAbi(Call call)
+        {
+            var attestation = _credentials.attestation;
+            var attestationData = new Tuple<Address, FixedByte, FixedByte, FixedByte, Byte[], Tuple<string, BigInteger>>(
+                attestation.approvedSigner,
+                new FixedByte(4, attestation.identityType.Data), new FixedByte(32, attestation.issuerHash.Data), new FixedByte(32, attestation.audienceHash.Data), attestation.applicationData.Data,
+                new Tuple<string, BigInteger>(attestation.authData.redirectUrl, attestation.authData.issuedAt));
+
+            var callData = new Tuple<Address, BigInteger, Byte[], BigInteger, bool, bool, BigInteger>(call.to, call.value, 
+                call.data, call.gasLimit, call.delegateCall, call.onlyFallback, (int)call.behaviorOnError);
+            
+            return ABI.ABI.Pack(
+                "acceptImplicitRequest(address,(address,bytes4,bytes32,bytes32,bytes,(string,uint64)),(address,uint256,bytes,uint256,bool,bool,uint256))",
+                ParentAddress, attestationData, callData);
+        }
+
+        private string GenerateImplicitRequestMagic(Address address, Attestation attestation)
+        {
+            return SequenceCoder.KeccakHash(
+                ByteArrayExtensions.ConcatenateByteArrays(
+                    SequenceCoder.KeccakHash("acceptImplicitRequest".ToByteArray()),
+                    address.Value.HexStringToByteArray(20),
+                    attestation.audienceHash.Data,
+                    attestation.issuerHash.Data))
+                .ByteArrayToHexStringWithPrefix();
         }
     }
 }

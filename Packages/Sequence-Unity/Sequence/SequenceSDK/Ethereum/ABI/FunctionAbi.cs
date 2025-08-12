@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Sequence.Utils;
 using UnityEditor;
+using UnityEngine;
 
 namespace Sequence.ABI
 {
@@ -186,6 +187,7 @@ namespace Sequence.ABI
         private string GetReturnType(string functionName, params object[] args)
         {
             int index = GetFunctionAbiIndex(functionName, args);
+            Debug.Log($"ReturnType Index {this.Abi[functionName][index].Item2}");
             return this.Abi[functionName][index].Item2;
         }
     }
