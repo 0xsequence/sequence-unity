@@ -8,7 +8,7 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.UnitTests
 {
-    public class TransactionTests
+    public class RawTransactionTests
     {
         private static readonly EcosystemType Ecosystem = EcosystemType.Sequence;
         
@@ -31,7 +31,7 @@ namespace Sequence.EcosystemWallet.UnitTests
             var target = new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA");
             var deadline = new BigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds() * 1000 + 1000 * 60 * 5000);
             
-            var sessionBuilder = new SessionBuilder(Chain.Optimism, 1000000, deadline);
+            var sessionBuilder = new TransactionsPermissionBuilder(Chain.Optimism, 1000000, deadline);
             sessionBuilder.AddPermission(usdcAddress);
             sessionBuilder.AddPermission(target);
             

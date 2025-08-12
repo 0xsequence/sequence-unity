@@ -8,6 +8,7 @@ using Sequence.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Transaction = Sequence.EcosystemWallet.Transaction;
 
 namespace Sequence.Boilerplates
 {
@@ -310,10 +311,9 @@ namespace Sequence.Boilerplates
         
         public async void SendExplicitTransactionWithUsdc()
         {
-            var calls = new Call[]
+            var calls = new ITransaction[]
             {
-                new(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0,
-                    ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
+                new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "explicitEmit()")
             };
             
             var feeOptions = await _wallet.GetFeeOption(Chain.Optimism, calls);
@@ -361,7 +361,7 @@ namespace Sequence.Boilerplates
             
             Debug.Log($"deadline {deadline}");
             
-            var sessionBuilder = new SessionBuilder(_chain, 0, deadline);
+            var sessionBuilder = new TransactionsPermissionBuilder(_chain, 0, deadline);
             sessionBuilder.AddPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"));
             sessionBuilder.AddPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"));
             

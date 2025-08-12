@@ -7,6 +7,8 @@ namespace Sequence.EcosystemWallet
 {
     internal class FeeOptionService
     {
+        private static readonly Address ValueForwarder = new ("0xABAAd93EeE2a569cF0632f39B10A9f5D734777ca");
+        
         private readonly FeeOption _feeOption;
         
         public FeeOptionService(FeeOption feeOption)
@@ -20,7 +22,7 @@ namespace Sequence.EcosystemWallet
                 _feeOption.to, BigInteger.Parse(_feeOption.value)).HexStringToByteArray();
             
             return new Call(
-                new Address("0xABAAd93EeE2a569cF0632f39B10A9f5D734777ca"), // Value forwarder address
+                ValueForwarder,
                 BigInteger.Parse(_feeOption.value),
                 encodedFeeOptionData,
                 _feeOption.gasLimit,

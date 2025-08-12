@@ -5,7 +5,7 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet
 {
-    public class SessionBuilder
+    public class TransactionsPermissionBuilder : IPermissionBuilder
     {
         public Chain Chain;
         public BigInteger ValueLimit;
@@ -13,7 +13,7 @@ namespace Sequence.EcosystemWallet
 
         private Dictionary<Address, List<ParameterRule>> _permissions = new();
 
-        public SessionBuilder(Chain chain, BigInteger valueLimit, BigInteger deadline)
+        public TransactionsPermissionBuilder(ITransaction[] calls, Chain chain, int deadline)
         {
             this.Chain = chain;
             this.ValueLimit = valueLimit;

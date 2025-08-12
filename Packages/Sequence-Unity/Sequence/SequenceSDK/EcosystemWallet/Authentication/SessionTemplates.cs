@@ -18,7 +18,7 @@ namespace Sequence.EcosystemWallet
         {
             var deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000);
             
-            var sessionBuilder = new SessionBuilder(_chain, 1000000000, deadline);
+            var sessionBuilder = new TransactionsPermissionBuilder(_chain, 1000000000, deadline);
             sessionBuilder.AddPermission(target);
             
             return sessionBuilder.GetPermissions();
@@ -29,7 +29,7 @@ namespace Sequence.EcosystemWallet
             var deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000);
             var target = new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA");
             
-            var sessionBuilder = new SessionBuilder(_chain, 0, deadline);
+            var sessionBuilder = new TransactionsPermissionBuilder(_chain, 0, deadline);
             sessionBuilder.AddPermission(target, false, ParameterOperation.equal, 
                 ABI.ABI.FunctionSelector("explicitEmit()"), 0, ParameterRule.SelectorMask);
             

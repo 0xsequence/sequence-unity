@@ -82,10 +82,11 @@ namespace Sequence.EcosystemWallet
             return response.Data;
         }
 
-        public async Task<FeeOption[]> GetFeeOption(Chain chain, Call[] calls)
+        public async Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction[] transactions)
         {
             await _state.Update(chain);
             
+            var calls = transactions.GetCalls();
             var txnService = new TransactionService(_sessionSigners, _state);
             var transactionData = await txnService.SignAndBuild(chain, calls, false);
             var relayer = new SequenceRelayer(chain);
@@ -96,9 +97,11 @@ namespace Sequence.EcosystemWallet
             return response.options;
         }
 
-        public async Task<string> SendTransaction(Chain chain, Call[] calls, FeeOption feeOption = null)
+        public async Task<string> SendTransaction(Chain chain, ITransaction[] transactions, FeeOption feeOption = null)
         {
             await _state.Update(chain);
+            
+            var calls = transactions.GetCalls();
 
             if (feeOption != null)
             {
@@ -133,12 +136,13 @@ namespace Sequence.EcosystemWallet
             return receipt.txnReceipt;
         }
 
-        public async Task<bool> IsSupportedCalls(Chain chain, Call[] calls)
+        public async Task<bool> IsSupportedCalls(Chain chain, ITransaction[] transactions)
         {
             try
             {
                 await _state.Update(chain);
 
+                var calls = transactions.GetCalls();
                 var signerService = new SignerService(_sessionSigners, _state.SessionsTopology);
                 var signers = await signerService.FindSignersForCalls(chain, calls);
                 

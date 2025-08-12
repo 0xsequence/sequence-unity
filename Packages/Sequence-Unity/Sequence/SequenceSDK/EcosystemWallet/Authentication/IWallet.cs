@@ -41,25 +41,25 @@ namespace Sequence.EcosystemWallet
         /// Get fee options for your calls. Only required for mainnets, if you don't have gas sponsorship configured.
         /// </summary>
         /// <param name="chain"></param>
-        /// <param name="calls"></param>
+        /// <param name="transactions"></param>
         /// <returns></returns>
-        Task<FeeOption[]> GetFeeOption(Chain chain, Call[] calls);
+        Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction[] transactions);
         
         /// <summary>
         /// Send a transaction.
         /// </summary>
         /// <param name="chain"></param>
-        /// <param name="calls"></param>
+        /// <param name="transactions"></param>
         /// <param name="feeOption"></param>
         /// <returns></returns>
-        Task<string> SendTransaction(Chain chain, Call[] calls, FeeOption feeOption = null);
+        Task<string> SendTransaction(Chain chain, ITransaction[] transactions, FeeOption feeOption = null);
 
         /// <summary>
         /// Checks whether this wallet is capable of signing the given calls.
         /// </summary>
         /// <param name="chain"></param>
-        /// <param name="calls"></param>
+        /// <param name="transactions"></param>
         /// <returns>False if no local signer could be found.</returns>
-        Task<bool> IsSupportedCalls(Chain chain, Call[] calls);
+        Task<bool> IsSupportedCalls(Chain chain, ITransaction[] transactions);
     }
 }
