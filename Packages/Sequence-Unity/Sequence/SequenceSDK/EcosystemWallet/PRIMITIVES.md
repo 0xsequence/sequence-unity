@@ -1,4 +1,4 @@
-# Sequence Wallets v3 - Primitives
+# Sequence Ecosystem Wallets - Primitives
 
 The goal of this Technical Design Document (TDD) is to document the architecture for each primitive.
 The integration of v3 primitives in C# is fully encapsulated from Unity and aims to be an object-oriented library for 
