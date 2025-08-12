@@ -4,6 +4,7 @@ using Nethereum.ABI;
 using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
 using Nethereum.Hex.HexConvertors.Extensions;
+using Sequence.ABI;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
@@ -30,15 +31,7 @@ namespace Sequence.EcosystemWallet.Utils
 
         private static string EncodeDeploy(string stage1, string deployHash)
         {
-            var function = new FunctionABI("deploy", false);
-            function.InputParameters = new[]
-            {
-                new Parameter("address", "stage1"),
-                new Parameter("bytes", "hash")
-            };
-
-            var encoder = new FunctionCallEncoder();
-            return encoder.EncodeRequest(function.Sha3Signature, function.InputParameters, stage1, deployHash.HexToByteArray());
+            return ABI.ABI.Pack("deploy(address,bytes32)", stage1, new FixedByte(32, deployHash.HexStringToByteArray()));
         }
 
         public static byte[] Wrap(byte[] signature, Address to, byte[] data)

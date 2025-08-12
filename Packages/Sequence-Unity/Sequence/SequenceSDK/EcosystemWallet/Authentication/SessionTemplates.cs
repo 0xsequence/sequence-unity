@@ -14,9 +14,8 @@ namespace Sequence.EcosystemWallet
             _chain = chain;
         }
 
-        public SessionPermissions BuildUnrestrictivePermissions()
+        public SessionPermissions BuildUnrestrictivePermissions(Address target)
         {
-            var target = new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA");
             var deadline = new BigInteger(DateTime.UtcNow.ToUnixTimestamp() * 1000 + 1000 * 60 * 5000);
             
             var sessionBuilder = new SessionBuilder(_chain, 0, deadline);

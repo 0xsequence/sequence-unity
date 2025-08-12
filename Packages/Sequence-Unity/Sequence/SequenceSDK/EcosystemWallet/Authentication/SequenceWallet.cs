@@ -176,7 +176,7 @@ namespace Sequence.EcosystemWallet
             var deployTransaction = BuildDeployTransaction();
             return new TransactionData
             {
-                To = new Address("0xf3c7175460BeD3340A1c4dc700fD6C8Cd3F56250"),
+                To = new Address(_state.DeployContext.guestModule),
                 Data = new Calls(0, 0, new Call[]
                 {
                     new (deployTransaction.To, 0, deployTransaction.Data.HexStringToByteArray()),

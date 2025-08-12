@@ -4,6 +4,7 @@ using Sequence.Config;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -51,7 +52,9 @@ namespace Sequence.EcosystemWallet
             var response = await handler.WaitForResponse<ConnectArgs, ConnectResponse>(url, action, payload);
             if (!response.Result)
                 throw new Exception("Error during request");
-            
+
+            var chainId = ChainDictionaries.ChainIdOf[_chain];
+            Debug.Log($"chainId {chainId}");
             var credentials = new SessionCredentials(
                 isExplicit,
                 sessionWallet.GetPrivateKeyAsHex(),
@@ -59,7 +62,7 @@ namespace Sequence.EcosystemWallet
                 response.Data.attestation,
                 response.Data.signature,
                 (int)_ecosystem,
-                ChainDictionaries.ChainIdOf[_chain],
+                chainId,
                 response.Data.loginMethod,
                 response.Data.email);
 

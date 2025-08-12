@@ -355,8 +355,9 @@ namespace Sequence.Boilerplates
             return type switch
             {
                 0 => null,
-                1 => templates.BuildUnrestrictivePermissions(),
-                2 => templates.BuildBasicRestrictivePermissions(),
+                1 => templates.BuildUnrestrictivePermissions(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA")),
+                2 => templates.BuildUnrestrictivePermissions(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607")),
+                3 => templates.BuildBasicRestrictivePermissions(),
                 _ => throw new Exception("Unsupported session type")
             };
         }

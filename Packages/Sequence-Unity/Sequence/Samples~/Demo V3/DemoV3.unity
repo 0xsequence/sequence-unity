@@ -4712,6 +4712,8 @@ MonoBehaviour:
     m_Options:
     - m_Text: Unrestrictive
       m_Image: {fileID: 0}
+    - m_Text: Unrestrictive (USDC)
+      m_Image: {fileID: 0}
     - m_Text: Basic Restrictive
       m_Image: {fileID: 0}
   m_OnValueChanged:
@@ -12367,6 +12369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a76f3494846944de2a0d1694eeb60856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ecosystem: 0
+  _chain: 421614
   _emailLoginButton: {fileID: 1459061464521247473}
   _emailContinueButton: {fileID: 2325936309338030303}
   _signOutButton: {fileID: 906953581}

@@ -5,7 +5,7 @@ namespace Sequence.EcosystemWallet
 {
     public class SequenceConnect : IConnect
     {
-        private EcosystemClient _client;
+        private readonly EcosystemClient _client;
         
         public SequenceConnect(EcosystemType ecosystem, Chain chain)
         {

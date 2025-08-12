@@ -7,6 +7,7 @@ using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {

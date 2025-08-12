@@ -20,15 +20,14 @@ namespace Sequence.EcosystemWallet.Browser
                 listener.Prefixes.Add(RedirectUrl.AppendTrailingSlashIfNeeded());
                 listener.Start();
 
-                var result = await Task.WhenAny(listener.GetContextAsync(), WaitDelay());
-                var context = result.Result;
+                var result = await listener.GetContextAsync();
                 
                 listener.Stop();
 
-                if (context == null)
+                if (result == null)
                     throw new Exception("Request timed out.");
                 
-                var queryString = context.Request.QueryString;
+                var queryString = result.Request.QueryString;
                 
                 var id = queryString["id"];
                 if (id != Id)
@@ -49,12 +48,6 @@ namespace Sequence.EcosystemWallet.Browser
                 Debug.LogException(ex);
                 return (false, default);
             }
-        }
-
-        private async Task<HttpListenerContext> WaitDelay()
-        {
-            await Task.Delay(10000);
-            return null;
         }
     }
 }

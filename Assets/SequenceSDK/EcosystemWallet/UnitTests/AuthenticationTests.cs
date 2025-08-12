@@ -25,7 +25,7 @@ namespace Sequence.EcosystemWallet.UnitTests
         public async Task AddUnrestrictiveExplicitSession()
         {
             var wallet = SequenceWallet.RecoverFromStorage();
-            await wallet.AddSession(Chain, new SessionTemplates(Chain).BuildUnrestrictivePermissions());
+            await wallet.AddSession(Chain, new SessionTemplates(Chain).BuildUnrestrictivePermissions(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA")));
         }
         
         [Test]
