@@ -18,7 +18,7 @@ namespace Sequence.EcosystemWallet
             _state = state;
         }
         
-        public async Task<TransactionData> SignAndBuild(Chain chain, Call[] calls, bool checkDeployed)
+        public async Task<(Address To, string Data)> SignAndBuild(Chain chain, Call[] calls, bool checkDeployed)
         {
             var preparedIncrement = PrepareIncrement(null, 0, null);
             if (preparedIncrement != null)
@@ -35,36 +35,12 @@ namespace Sequence.EcosystemWallet
             
             if (!checkDeployed || _state.IsDeployed)
             {
-                return new TransactionData
-                {
-                    To = _state.Address,
-                    Data = callsData
-                };
+                return (_state.Address, callsData);
             }
 
             // Not relevant for signing calls for getting fee options
             // If the wallet was not yet deployed onchain, let's make a deploy transaction first
             
-            var deployTransaction = BuildDeployTransaction();
-            return new TransactionData
-            {
-                To = new Address(_state.DeployContext.guestModule),
-                Data = new Calls(0, 0, new Call[]
-                {
-                    new (deployTransaction.To, 0, deployTransaction.Data.HexStringToByteArray()),
-                    new (_state.Address, 0, callsData.HexStringToByteArray())
-                }).Encode().ByteArrayToHexStringWithPrefix()
-            };
-        }
-        
-        private Call PrepareIncrement(Address wallet, BigInteger chainId, Calls calls)
-        {
-            // TODO: Integrate increments
-            return null;
-        }
-
-        private TransactionData BuildDeployTransaction()
-        {
             var deployTransaction = Erc6492Helper.Deploy(_state.DeployHash, new Erc6492Helper.Context
             {
                 creationCode = _state.DeployContext.walletCreationCode,
@@ -72,12 +48,18 @@ namespace Sequence.EcosystemWallet
                 stage1 = _state.DeployContext.mainModule,
                 stage2 = _state.DeployContext.mainModuleUpgradable
             });
-
-            return new TransactionData
+            
+            return (new Address(_state.DeployContext.guestModule), new Calls(0, 0, new Call[]
             {
-                To = new Address(deployTransaction.To),
-                Data = deployTransaction.Data
-            };
+                new (deployTransaction.To, 0, deployTransaction.Data.HexStringToByteArray()),
+                new (_state.Address, 0, callsData.HexStringToByteArray())
+            }).Encode().ByteArrayToHexStringWithPrefix());
+        }
+        
+        private Call PrepareIncrement(Address wallet, BigInteger chainId, Calls calls)
+        {
+            // TODO: Integrate increments
+            return null;
         }
 
         private Envelope<Calls> PrepareTransaction(Chain chain, Call[] calls)

@@ -23,7 +23,7 @@ namespace Sequence.EcosystemWallet.Utils
             public string creationCode;
         }
         
-        public static (string To, string Data) Deploy(string deployHash, Context context)
+        public static (Address To, string Data) Deploy(string deployHash, Context context)
         {
             var encoded = EncodeDeploy(context.stage1, deployHash);
             return (context.factory, encoded);
