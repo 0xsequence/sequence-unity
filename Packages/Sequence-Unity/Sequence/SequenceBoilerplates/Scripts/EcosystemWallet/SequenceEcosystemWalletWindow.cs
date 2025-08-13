@@ -64,7 +64,7 @@ namespace Sequence.Boilerplates
         
         private void Start()
         {
-            _connect = new SequenceConnect(_ecosystem, _chain);
+            _connect = new SequenceConnect(_ecosystem);
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
             _messagePopup.gameObject.SetActive(false);
             _loadingOverlay.SetActive(false);
@@ -165,7 +165,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                var signature = await _wallet.SignMessage(message);
+                var signature = await _wallet.SignMessage(_chain, message);
                 ShowSignature(signature.signature);
                 SetLoading(false);
             }
@@ -203,7 +203,7 @@ namespace Sequence.Boilerplates
 
             try
             {
-                await _wallet.AddSession(_chain, GetExplicitPermissions());
+                await _wallet.AddSession(GetExplicitPermissions());
                 SetLoading(false);
                 LoadSessions();
             }
@@ -222,7 +222,6 @@ namespace Sequence.Boilerplates
         public void OnChainChanged(int index)
         {
             _chain = _chains[index];
-            _connect = new SequenceConnect(_ecosystem, _chain);
         }
 
         public void OnImplicitSessionTypeChanged(int index)
@@ -351,13 +350,14 @@ namespace Sequence.Boilerplates
         
         private IPermissions GetPermissionsFromSessionType(int type)
         {
-            var deadline = new BigInteger(1955010532000);
+            if (type == 0)
+                return null;
             
-            Debug.Log($"deadline {deadline}");
+            var deadline = DateTimeOffset.UtcNow.ToUnixTimeSeconds() * 1000 + 60 * 60 * 24 * 1000;
             
-            var permissions = new Permissions(
-                new ContractPermission(Chain.Optimism, new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 0),
-                new ContractPermission(Chain.Optimism, new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
+            var permissions = new Permissions(Chain.Optimism,
+                new ContractPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 0),
+                new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
 
             return permissions;
         }

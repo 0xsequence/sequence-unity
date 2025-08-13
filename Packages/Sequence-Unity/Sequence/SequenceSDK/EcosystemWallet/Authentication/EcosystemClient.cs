@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
@@ -10,12 +11,10 @@ namespace Sequence.EcosystemWallet
     internal class EcosystemClient
     {
         private readonly EcosystemType _ecosystem;
-        private readonly Chain _chain;
         
-        public EcosystemClient(EcosystemType ecosystem, Chain chain)
+        public EcosystemClient(EcosystemType ecosystem)
         {
             _ecosystem = ecosystem;
-            _chain = chain;
         }
         
         /// <summary>
@@ -31,6 +30,10 @@ namespace Sequence.EcosystemWallet
         {
             var sessionWallet = new EOAWallet();
 
+            var chainId = string.Empty;
+            if (permissions != null)
+                chainId = permissions.chainId.ToString();
+            
             var origin = RedirectOrigin.GetOriginString();
             var payload = new ConnectArgs
             {
@@ -52,8 +55,6 @@ namespace Sequence.EcosystemWallet
             if (!response.Result)
                 throw new Exception("Error during request");
 
-            var chainId = ChainDictionaries.ChainIdOf[_chain];
-            Debug.Log($"chainId {chainId}");
             var credentials = new SessionCredentials(
                 isExplicit,
                 sessionWallet.GetPrivateKeyAsHex(),

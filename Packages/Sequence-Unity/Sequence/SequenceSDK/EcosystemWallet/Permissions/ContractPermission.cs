@@ -11,6 +11,13 @@ namespace Sequence.EcosystemWallet
         private readonly BigInteger _deadline;
         private readonly BigInteger _valueLimit;
         
+        public ContractPermission(Address contract, BigInteger deadline, BigInteger valueLimit)
+        {
+            _contract = contract;
+            _deadline = deadline;
+            _valueLimit = valueLimit;
+        }
+        
         public ContractPermission(Chain chain, Address contract, BigInteger deadline, BigInteger valueLimit)
         {
             _chain = chain;
@@ -25,7 +32,7 @@ namespace Sequence.EcosystemWallet
 
             return new SessionPermissions
             {
-                chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[_chain]),
+                chainId = _chain.IsActive() ? _chain.AsBigInteger() : 0,
                 deadline = _deadline,
                 valueLimit = _valueLimit,
                 signer = new Address("0x1234567890123456789012345678901234567890"),

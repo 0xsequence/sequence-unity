@@ -42,15 +42,15 @@ namespace Sequence.EcosystemWallet
             return _sessionSigners.Select(x => x.Address).ToArray();
         }
         
-        public async Task AddSession(Chain chain, IPermissions permissions)
+        public async Task AddSession(IPermissions permissions)
         {
             Assert.IsNotNull(permissions);
             
             var ecosystem = _sessionSigners[0].Ecosystem;
-            var client = new EcosystemClient(ecosystem, chain);
+            var client = new EcosystemClient(ecosystem);
             
             var sessionSigner = await client.CreateNewSession(true, permissions.GetPermissions(), string.Empty);
-            _sessionSigners.AddToArray(sessionSigner);
+            _sessionSigners = _sessionSigners.AddToArray(sessionSigner);
         }
         
         public void Disconnect()
@@ -59,12 +59,12 @@ namespace Sequence.EcosystemWallet
             _sessionSigners = Array.Empty<SessionSigner>();
         }
         
-        public async Task<SignMessageResponse> SignMessage(string message)
+        public async Task<SignMessageResponse> SignMessage(Chain chain, string message)
         {
             var args = new SignMessageArgs 
             { 
                 address = Address, 
-                chainId = new BigInt((int)_sessionSigners[0].Chain), 
+                chainId = new BigInt((int)chain), 
                 message = message
             };
 
@@ -96,6 +96,11 @@ namespace Sequence.EcosystemWallet
             return response.options;
         }
 
+        public async Task<string> SendTransaction(Chain chain, ITransaction transaction, FeeOption feeOption = null)
+        {
+            return await SendTransaction(chain, new[] { transaction }, feeOption);
+        }
+        
         public async Task<string> SendTransaction(Chain chain, ITransaction[] transactions, FeeOption feeOption = null)
         {
             await _state.Update(chain);
@@ -134,8 +139,13 @@ namespace Sequence.EcosystemWallet
 
             return receipt.txnReceipt;
         }
+        
+        public async Task<bool> SupportsTransaction(Chain chain, ITransaction transaction)
+        {
+            return await SupportsTransaction(chain, new[] { transaction });
+        }
 
-        public async Task<bool> IsSupportedCalls(Chain chain, ITransaction[] transactions)
+        public async Task<bool> SupportsTransaction(Chain chain, ITransaction[] transactions)
         {
             try
             {

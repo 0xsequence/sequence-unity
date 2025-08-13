@@ -29,11 +29,11 @@ namespace Sequence.EcosystemWallet.UnitTests
         {
             var deadline = new BigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds() * 1000 + 1000 * 60 * 5000);
             
-            var permissions = new Permissions(
-                new ContractPermission(Chain.Optimism, new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 1000000),
-                new ContractPermission(Chain.Optimism, new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
+            var permissions = new Permissions(Chain.Optimism,
+                new ContractPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 1000000),
+                new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
             
-            await Wallet.AddSession(Chain.Optimism, permissions);
+            await Wallet.AddSession(permissions);
         }
         
         [Test]

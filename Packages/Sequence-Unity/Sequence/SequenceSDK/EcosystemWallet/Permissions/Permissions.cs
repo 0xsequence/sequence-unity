@@ -6,16 +6,17 @@ namespace Sequence.EcosystemWallet
 {
     public class Permissions : IPermissions
     {
+        private readonly Chain _chain;
         private readonly IPermissions[] _permissions;
         
-        public Permissions(params IPermissions[] permissions)
+        public Permissions(Chain chain, params IPermissions[] permissions)
         {
+            _chain = chain;
             _permissions = permissions;
         }
         
         public SessionPermissions GetPermissions()
         {
-            BigInteger chain = 0;
             BigInteger deadline = 0;
             BigInteger valueLimit = 0;
             
@@ -24,7 +25,6 @@ namespace Sequence.EcosystemWallet
             foreach (var currentPermissions in _permissions)
             {
                 var permissions = currentPermissions.GetPermissions();
-                chain = permissions.chainId;
 
                 if (permissions.deadline > deadline)
                     deadline = permissions.deadline;
@@ -36,7 +36,7 @@ namespace Sequence.EcosystemWallet
 
             return new SessionPermissions
             {
-                chainId = chain,
+                chainId = _chain.AsBigInteger(),
                 deadline = deadline,
                 valueLimit = valueLimit,
                 signer = new Address("0x1234567890123456789012345678901234567890"),
