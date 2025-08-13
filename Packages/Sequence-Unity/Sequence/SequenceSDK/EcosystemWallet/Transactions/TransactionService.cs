@@ -9,8 +9,8 @@ namespace Sequence.EcosystemWallet
 {
     internal class TransactionService
     {
-        private readonly SessionSigner[] _sessionSigners;
-        private readonly WalletState _state;
+        private SessionSigner[] _sessionSigners;
+        private WalletState _state;
         
         public TransactionService(SessionSigner[] sessionSigners, WalletState state)
         {

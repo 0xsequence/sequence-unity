@@ -12,18 +12,11 @@ namespace Sequence.Boilerplates
         [SerializeField] private Button _removeButton;
         
         private Address _signer;
-        private Action<Address> _onRemove;
         
-        public void Apply(Address signer, Action<Address> onRemove)
+        public void Apply(Address signer)
         {
             _signer = signer;
-            _onRemove = onRemove;
             _addressText.text = $"{_signer}";
-        }
-
-        public void Remove()
-        {
-            _onRemove?.Invoke(_signer);
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -16,6 +18,9 @@ namespace Sequence.EcosystemWallet
         {
             _sessionSigners = sessionSigners;
             _sessions = sessions;
+            Debug.Log($"_sessionSigners == null {_sessionSigners == null}");
+            Debug.Log($"_sessions == null {_sessions == null}");
+            Debug.Log($"{JsonConvert.SerializeObject(_sessions.JsonSerialize())}");
         }
         
         public async Task<SessionSigner[]> FindSignersForCalls(Chain chain, Call[] calls)

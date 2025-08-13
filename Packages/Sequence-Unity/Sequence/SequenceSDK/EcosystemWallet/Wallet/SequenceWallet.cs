@@ -5,12 +5,17 @@ using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
+using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet
 {
     public class SequenceWallet : IWallet
     {
+        public static Action<IWallet> WalletCreated;
+        public static Action Disconnected;
+        
         public Address Address { get; }
         
         private readonly WalletState _state;
@@ -22,6 +27,8 @@ namespace Sequence.EcosystemWallet
             
             _state = new WalletState(Address);
             _sessionSigners = sessionSigners;
+            
+            WalletCreated?.Invoke(this);
         }
 
         public static IWallet RecoverFromStorage()
@@ -58,6 +65,7 @@ namespace Sequence.EcosystemWallet
         {
             SessionStorage.Clear();
             _sessionSigners = Array.Empty<SessionSigner>();
+            Disconnected?.Invoke();
         }
         
         public async Task<SignMessageResponse> SignMessage(Chain chain, string message)
@@ -90,8 +98,10 @@ namespace Sequence.EcosystemWallet
             AssertSessionSigners();
             
             await _state.Update(chain);
+            Debug.Log($"{JsonConvert.SerializeObject(_state.SessionsTopology.JsonSerialize())}");
             
             var calls = transactions.GetCalls();
+            Debug.Log($"_state == null {_state == null}");
             var txnService = new TransactionService(_sessionSigners, _state);
             var transactionData = await txnService.SignAndBuild(chain, calls, false);
             var relayer = new SequenceRelayer(chain);
@@ -145,7 +155,7 @@ namespace Sequence.EcosystemWallet
             if (receipt == null)
                 throw new Exception("receipt is null");
 
-            return receipt.txnReceipt;
+            return receipt.txnHash;
         }
         
         public async Task<bool> SupportsTransaction(Chain chain, ITransaction transaction)

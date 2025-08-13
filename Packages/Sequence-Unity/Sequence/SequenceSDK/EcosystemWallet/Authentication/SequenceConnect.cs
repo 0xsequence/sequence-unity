@@ -39,7 +39,7 @@ namespace Sequence.EcosystemWallet
 
         private async Task<IWallet> SignIn(IPermissions permissions, string preferredLoginMethod, string email)
         {
-            var signer = await _client.CreateNewSession(false, permissions.GetPermissions(), preferredLoginMethod, email);
+            var signer = await _client.CreateNewSession(false, permissions?.GetPermissions(), preferredLoginMethod, email);
             return new SequenceWallet(new [] { signer });
         }
     }

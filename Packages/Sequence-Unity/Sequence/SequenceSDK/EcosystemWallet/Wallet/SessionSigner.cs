@@ -63,21 +63,12 @@ namespace Sequence.EcosystemWallet
                 {
                     return true;
                 }
-
+                
                 var supportedPermission = FindSupportedPermission(call, topology);
                 return supportedPermission.Index >= 0;
             }
 
-            var response = await new SequenceEthClient(chain).CallContract(new object[] {
-                new
-                {
-                    to = call.to,
-                    data = GetAcceptImplicitRequestFunctionAbi(call)
-                }
-            });
-
-            var expectedResult = GenerateImplicitRequestMagic(ParentAddress, _credentials.attestation);
-            return response == expectedResult;
+            return await CheckAcceptImplicitRequest(chain, call);
         }
         
         private (int Index, Permission Permission) FindSupportedPermission(Call call, SessionsTopology topology)
@@ -108,12 +99,12 @@ namespace Sequence.EcosystemWallet
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
-        public SessionCallSignature SignCall(Call call, SessionsTopology topology, BigInteger space, BigInteger nonce)
+        public SessionCallSignature SignCall(Chain chain, Call call, SessionsTopology topology, BigInteger space, BigInteger nonce)
         {
             var pvKey = _credentials.privateKey;
             var eoaWallet = new EOAWallet(pvKey);
             
-            var hashedCall = HashCallWithReplayProtection(call, space, nonce);
+            var hashedCall = HashCallWithReplayProtection(chain, call, space, nonce);
             var signedCall = EthSignature.Sign(hashedCall, eoaWallet.privKey);
 
             var rsy = RSY.UnpackFrom65(signedCall.HexStringToByteArray());
@@ -144,15 +135,37 @@ namespace Sequence.EcosystemWallet
             };
         }
 
-        private byte[] HashCallWithReplayProtection(Call call, BigInteger space, BigInteger nonce)
+        private byte[] HashCallWithReplayProtection(Chain chain, Call call, BigInteger space, BigInteger nonce)
         {
-            var chainBytes = BigInteger.Parse(Chain.GetChainId()).ByteArrayFromNumber(32);
+            var chainBytes = BigInteger.Parse(chain.GetChainId()).ByteArrayFromNumber(32);
             var spaceBytes = space.ByteArrayFromNumber(32);
             var nonceBytes = nonce.ByteArrayFromNumber(32);
             var callHashBytes = call.Hash().HexStringToByteArray();
 
             var concatenated = ByteArrayExtensions.ConcatenateByteArrays(chainBytes, spaceBytes, nonceBytes, callHashBytes);
             return SequenceCoder.KeccakHash(concatenated);
+        }
+
+        private async Task<bool> CheckAcceptImplicitRequest(Chain chain, Call call)
+        {
+            try
+            {
+                var response = await new SequenceEthClient(chain).CallContract(new object[]
+                {
+                    new
+                    {
+                        to = call.to,
+                        data = GetAcceptImplicitRequestFunctionAbi(call)
+                    }
+                });
+                
+                var expectedResult = GenerateImplicitRequestMagic(ParentAddress, _credentials.attestation);
+                return response == expectedResult;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
         
         private string GetAcceptImplicitRequestFunctionAbi(Call call)

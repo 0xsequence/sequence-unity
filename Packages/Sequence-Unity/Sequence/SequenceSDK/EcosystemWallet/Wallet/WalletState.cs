@@ -55,7 +55,7 @@ namespace Sequence.EcosystemWallet
             Config = config;
             SessionsTopology = sessionsTopology;
             
-            Debug.Log($"Sessions Topology {sessionsTopology.JsonSerialize()}");
+            Debug.Log($"Sessions Topology {SessionsTopology.JsonSerialize()}");
 
             await UpdateNonce(chain, 0);
 

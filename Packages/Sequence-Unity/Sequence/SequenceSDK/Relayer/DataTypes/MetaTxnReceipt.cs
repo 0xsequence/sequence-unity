@@ -9,6 +9,8 @@ namespace Sequence.Relayer
         public string revertReason;
         public int index;
         public string txnReceipt;
+        public string txnHash;
+        public string blockNumber;
         public MetaTxnReceipt[] receipts;
         public MetaTxnReceiptLog[] logs;
         

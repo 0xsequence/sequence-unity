@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
@@ -16,6 +18,7 @@ namespace Sequence.EcosystemWallet
 
         public SignatureService(SessionSigner[] sessionSigners, SessionsTopology sessions)
         {
+            _sessions = sessions;
             _signerService = new SignerService(sessionSigners, sessions);
         }
 
@@ -51,7 +54,7 @@ namespace Sequence.EcosystemWallet
             var signatures = new SessionCallSignature[signers.Length];
             for (var i = 0; i < signers.Length; i++)
             {
-                var signature = signers[i].SignCall(calls[i], _sessions, envelope.payload.space, envelope.payload.nonce);
+                var signature = signers[i].SignCall(chain, calls[i], _sessions, envelope.payload.space, envelope.payload.nonce);
                 signatures[i] = signature;
             }
 
