@@ -2,7 +2,7 @@ using Sequence.EcosystemWallet.Primitives;
 
 namespace Sequence.EcosystemWallet
 {
-    public interface IPermissionBuilder
+    public interface IPermissions
     {
         SessionPermissions GetPermissions();
     }

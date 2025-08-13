@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
-using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
@@ -43,14 +42,14 @@ namespace Sequence.EcosystemWallet
             return _sessionSigners.Select(x => x.Address).ToArray();
         }
         
-        public async Task AddSession(Chain chain, SessionPermissions permissions)
+        public async Task AddSession(Chain chain, IPermissions permissions)
         {
             Assert.IsNotNull(permissions);
             
             var ecosystem = _sessionSigners[0].Ecosystem;
             var client = new EcosystemClient(ecosystem, chain);
             
-            var sessionSigner = await client.CreateNewSession(true, permissions, string.Empty);
+            var sessionSigner = await client.CreateNewSession(true, permissions.GetPermissions(), string.Empty);
             _sessionSigners.AddToArray(sessionSigner);
         }
         

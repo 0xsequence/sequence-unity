@@ -12,14 +12,14 @@ namespace Sequence.EcosystemWallet.UnitTests
     {
         private static readonly EcosystemType Ecosystem = EcosystemType.Sequence;
         
-        private static readonly Call[] ImplicitCalls = new Call[]
+        private static readonly ITransaction[] ImplicitCalls = new []
         {
-            new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
+            new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "implicitEmit()")
         };
         
-        private static readonly Call[] ExplicitCalls = new Call[]
+        private static readonly ITransaction[] ExplicitCalls = new []
         {
-            new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
+            new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "explicitEmit()")
         };
 
         private static IWallet Wallet => SequenceWallet.RecoverFromStorage();
@@ -27,16 +27,12 @@ namespace Sequence.EcosystemWallet.UnitTests
         [Test]
         public async Task AddPermissionForUsdcTransfer()
         {
-            var usdcAddress = new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607");
-            var target = new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA");
             var deadline = new BigInteger(DateTimeOffset.UtcNow.ToUnixTimeSeconds() * 1000 + 1000 * 60 * 5000);
             
-            var sessionBuilder = new TransactionsPermissionBuilder(Chain.Optimism, 1000000, deadline);
-            sessionBuilder.AddPermission(usdcAddress);
-            sessionBuilder.AddPermission(target);
+            var permissions = new Permissions(
+                new ContractPermission(Chain.Optimism, new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 1000000),
+                new ContractPermission(Chain.Optimism, new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
             
-            var permissions = sessionBuilder.GetPermissions();
-
             await Wallet.AddSession(Chain.Optimism, permissions);
         }
         

@@ -23,7 +23,7 @@ namespace Sequence.EcosystemWallet
         /// <param name="chain"></param>
         /// <param name="permissions"></param>
         /// <returns></returns>
-        Task AddSession(Chain chain, SessionPermissions permissions);
+        Task AddSession(Chain chain, IPermissions permissions);
         
         /// <summary>
         /// Clear all session signers from storage. This requires you to re-connect using the SequenceConnect object.

@@ -293,36 +293,33 @@ namespace Sequence.Boilerplates
 
         public async void SendImplicitTransaction()
         {
-            await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new Call[]
+            await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new ITransaction[]
             {
-                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray()),
-                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, ABI.ABI.FunctionSelector("implicitEmit()").HexStringToByteArray())
+                new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "implicitEmit()")
             });
         }
         
         public async void SendExplicitTransaction()
         {
-            await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new Call[]
+            await _wallet.SendTransaction(Chain.TestnetArbitrumSepolia, new ITransaction[]
             {
-                new (new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, 
-                    ABI.ABI.FunctionSelector("explicitEmit()").HexStringToByteArray())
+                new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "explicitEmit()")
             });
         }
         
         public async void SendExplicitTransactionWithUsdc()
         {
-            var calls = new ITransaction[]
+            var txn = new ITransaction[]
             {
                 new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "explicitEmit()")
             };
             
-            var feeOptions = await _wallet.GetFeeOption(Chain.Optimism, calls);
+            var feeOptions = await _wallet.GetFeeOption(Chain.Optimism, txn);
             var feeOption = feeOptions.First(o => o.token.symbol == "USDC");
             if (feeOption == null)
                 throw new Exception($"Fee option 'USDC' not available");
             
-            Debug.Log($"{feeOption.to} {feeOption.token.contractAddress} {feeOption.value}");
-            await _wallet.SendTransaction(Chain.Optimism, calls, feeOption);
+            await _wallet.SendTransaction(Chain.Optimism, txn, feeOption);
         }
 
         private void SetLoading(bool value)
@@ -342,40 +339,27 @@ namespace Sequence.Boilerplates
             _emailContinueButton.interactable = validEmail;
         }
 
-        private SessionPermissions GetImplicitPermissions()
+        private IPermissions GetImplicitPermissions()
         {
             return GetPermissionsFromSessionType((int)_implicitPermissions);
         }
         
-        private SessionPermissions GetExplicitPermissions()
+        private IPermissions GetExplicitPermissions()
         {
             return GetPermissionsFromSessionType((int)_explicitPermissions + 1);
         }
         
-        private SessionPermissions GetPermissionsFromSessionType(int type)
+        private IPermissions GetPermissionsFromSessionType(int type)
         {
-            if (type == 0)
-                return null;
-            
             var deadline = new BigInteger(1955010532000);
             
             Debug.Log($"deadline {deadline}");
             
-            var sessionBuilder = new TransactionsPermissionBuilder(_chain, 0, deadline);
-            sessionBuilder.AddPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"));
-            sessionBuilder.AddPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"));
-            
-            return sessionBuilder.GetPermissions();
-            
-            var templates = new SessionTemplates(_chain);
-            return type switch
-            {
-                0 => null,
-                1 => templates.BuildUnrestrictivePermissions(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA")),
-                2 => templates.BuildUnrestrictivePermissions(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607")),
-                3 => templates.BuildBasicRestrictivePermissions(),
-                _ => throw new Exception("Unsupported session type")
-            };
+            var permissions = new Permissions(
+                new ContractPermission(Chain.Optimism, new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 0),
+                new ContractPermission(Chain.Optimism, new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
+
+            return permissions;
         }
     }
 }
