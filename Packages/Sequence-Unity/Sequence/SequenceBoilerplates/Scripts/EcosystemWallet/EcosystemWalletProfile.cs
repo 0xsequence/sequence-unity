@@ -1,4 +1,3 @@
-using System;
 using Sequence.EcosystemWallet;
 using UnityEngine;
 

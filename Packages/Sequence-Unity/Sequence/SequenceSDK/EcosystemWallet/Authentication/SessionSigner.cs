@@ -45,18 +45,18 @@ namespace Sequence.EcosystemWallet
 
             ParentAddress = credentials.address;
             Address = new EOAWallet(credentials.privateKey).GetAddress();
-            Chain = ChainDictionaries.ChainById[credentials.chainId];
+            Chain = string.IsNullOrEmpty(credentials.chainId) ? Chain.None : ChainDictionaries.ChainById[credentials.chainId];
             Ecosystem = (EcosystemType)credentials.ecosystemId;
             IsExplicit = credentials.isExplicit;
         }
 
         public async Task<bool> IsSupportedCall(Call call, Chain chain, SessionsTopology topology)
         {
-            if (Chain != chain)
-                return false;
-            
             if (IsExplicit)
             {
+                if (Chain != chain)
+                    return false;
+                
                 if (call.data.Length > 4 &&
                     ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
                     ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])"))

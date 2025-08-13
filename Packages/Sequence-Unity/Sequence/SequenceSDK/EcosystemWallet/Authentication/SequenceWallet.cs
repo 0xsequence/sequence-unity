@@ -44,6 +44,7 @@ namespace Sequence.EcosystemWallet
         
         public async Task AddSession(IPermissions permissions)
         {
+            AssertSessionSigners();
             Assert.IsNotNull(permissions);
             
             var ecosystem = _sessionSigners[0].Ecosystem;
@@ -61,14 +62,17 @@ namespace Sequence.EcosystemWallet
         
         public async Task<SignMessageResponse> SignMessage(Chain chain, string message)
         {
-            var args = new SignMessageArgs 
+            AssertSessionSigners();
+            
+            var args = new SignMessageArgs
             { 
                 address = Address, 
                 chainId = new BigInt((int)chain), 
                 message = message
             };
 
-            var url = $"{EcosystemBindings.GetUrl(EcosystemType.Dev)}/request/sign";
+            var ecosystem = _sessionSigners[0].Ecosystem;
+            var url = $"{EcosystemBindings.GetUrl(ecosystem)}/request/sign";
 
             var handler = RedirectFactory.CreateHandler();
             handler.SetRedirectUrl(RedirectOrigin.GetOriginString());
@@ -83,6 +87,8 @@ namespace Sequence.EcosystemWallet
 
         public async Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction[] transactions)
         {
+            AssertSessionSigners();
+            
             await _state.Update(chain);
             
             var calls = transactions.GetCalls();
@@ -103,6 +109,8 @@ namespace Sequence.EcosystemWallet
         
         public async Task<string> SendTransaction(Chain chain, ITransaction[] transactions, FeeOption feeOption = null)
         {
+            AssertSessionSigners();
+            
             await _state.Update(chain);
             
             var calls = transactions.GetCalls();
@@ -147,6 +155,8 @@ namespace Sequence.EcosystemWallet
 
         public async Task<bool> SupportsTransaction(Chain chain, ITransaction[] transactions)
         {
+            AssertSessionSigners();
+            
             try
             {
                 await _state.Update(chain);
@@ -161,6 +171,12 @@ namespace Sequence.EcosystemWallet
             {
                 return false;
             }
+        }
+
+        private void AssertSessionSigners()
+        {
+            if (_sessionSigners.Length == 0) 
+                throw new Exception("No session signers available. Please sign in again.");
         }
     }
 }
