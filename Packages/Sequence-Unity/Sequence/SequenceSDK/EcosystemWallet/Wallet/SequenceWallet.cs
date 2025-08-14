@@ -93,15 +93,18 @@ namespace Sequence.EcosystemWallet
             return response.Data;
         }
 
+        public async Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction transaction)
+        {
+            return await GetFeeOption(chain, new [] { transaction });
+        }
+        
         public async Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction[] transactions)
         {
             AssertSessionSigners();
             
             await _state.Update(chain);
-            Debug.Log($"{JsonConvert.SerializeObject(_state.SessionsTopology.JsonSerialize())}");
             
             var calls = transactions.GetCalls();
-            Debug.Log($"_state == null {_state == null}");
             var txnService = new TransactionService(_sessionSigners, _state);
             var transactionData = await txnService.SignAndBuild(chain, calls, false);
             var relayer = new SequenceRelayer(chain);

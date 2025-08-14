@@ -41,6 +41,14 @@ namespace Sequence.EcosystemWallet
         /// Get fee options for your calls. Only required for mainnets, if you don't have gas sponsorship configured.
         /// </summary>
         /// <param name="chain"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction transaction);
+        
+        /// <summary>
+        /// Get fee options for your calls. Only required for mainnets, if you don't have gas sponsorship configured.
+        /// </summary>
+        /// <param name="chain"></param>
         /// <param name="transactions"></param>
         /// <returns></returns>
         Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction[] transactions);

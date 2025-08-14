@@ -18,9 +18,6 @@ namespace Sequence.EcosystemWallet
         {
             _sessionSigners = sessionSigners;
             _sessions = sessions;
-            Debug.Log($"_sessionSigners == null {_sessionSigners == null}");
-            Debug.Log($"_sessions == null {_sessions == null}");
-            Debug.Log($"{JsonConvert.SerializeObject(_sessions.JsonSerialize())}");
         }
         
         public async Task<SessionSigner[]> FindSignersForCalls(Chain chain, Call[] calls)
@@ -59,6 +56,7 @@ namespace Sequence.EcosystemWallet
                     if (supported)
                     {
                         signers.Add(signer);
+                        Debug.Log($"Signer address {signer.Address}");
                         break;
                     }
                 }

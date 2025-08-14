@@ -42,7 +42,6 @@ namespace Sequence.EcosystemWallet
         internal SessionSigner(SessionCredentials credentials)
         {
             _credentials = credentials;
-
             ParentAddress = credentials.address;
             Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = string.IsNullOrEmpty(credentials.chainId) ? Chain.None : ChainDictionaries.ChainById[credentials.chainId];

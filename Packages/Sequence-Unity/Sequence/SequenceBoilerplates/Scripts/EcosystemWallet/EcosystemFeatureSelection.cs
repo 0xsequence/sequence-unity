@@ -1,25 +1,31 @@
+using System;
 using Sequence.EcosystemWallet;
+using Sequence.Relayer;
 using UnityEngine;
 
 namespace Sequence.Boilerplates
 {
     public class EcosystemFeatureSelection : MonoBehaviour
     {
+        public static EcosystemFeatureSelection Instance;
+        
         [SerializeField] private SequenceEcosystemWalletWindow _login;
         [SerializeField] private GameObject _featureSelection;
         [SerializeField] private EcosystemWalletProfile _profile;
         [SerializeField] private EcosystemWalletTransactions _transactions;
+        [SerializeField] private FeeOptionWindow _feeOptionWindow;
 
         private IWallet _wallet;
-        
+
+        private void Awake()
+        {
+            Instance = this;
+        }
+
         private void Start()
         {
             SequenceWallet.Disconnected += OpenLogin;
-            SequenceWallet.WalletCreated += wallet =>
-            {
-                _wallet = wallet;
-                OpenFeatureSelection();
-            };
+            SequenceWallet.WalletCreated += UpdateWallet;
 
             _login.gameObject.SetActive(false);
             _featureSelection.SetActive(false);
@@ -31,6 +37,18 @@ namespace Sequence.Boilerplates
                 OpenLogin();
             else
                 OpenFeatureSelection();
+        }
+
+        private void OnDestroy()
+        {
+            SequenceWallet.Disconnected -= OpenLogin;
+            SequenceWallet.WalletCreated -= UpdateWallet;
+        }
+
+        private void UpdateWallet(IWallet wallet)
+        {
+            _wallet = wallet;
+            OpenFeatureSelection();
         }
 
         public void OpenLogin()
@@ -54,6 +72,11 @@ namespace Sequence.Boilerplates
         {
             _featureSelection.SetActive(false);
             _transactions.Load(_wallet, OpenFeatureSelection);
+        }
+
+        public void OpenFeeOptionWindow(FeeOption[] feeOptions, Action<FeeOption> onSelected)
+        {
+            _feeOptionWindow.WaitForSelection(feeOptions, onSelected);
         }
     }
 }

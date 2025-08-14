@@ -6,6 +6,8 @@ namespace Sequence.Boilerplates
 {
     public class EcosystemWalletTransactions : MonoBehaviour
     {
+        [SerializeField] private MessagePopup _messagePopup;
+        [SerializeField] private TransactionResultPopup _transactionResult;
         [SerializeField] private TransactionButton[] _transactionButtons;
         
         private IWallet _wallet;
@@ -23,6 +25,8 @@ namespace Sequence.Boilerplates
             _onClose = onClose;
             
             gameObject.SetActive(true);
+            _messagePopup.gameObject.SetActive(false);
+            _transactionResult.gameObject.SetActive(false);
             
             foreach (var button in _transactionButtons)
                 button.Load(wallet);

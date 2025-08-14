@@ -2,10 +2,12 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding;
 using Nethereum.ABI.Model;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.KeyMachine.Models;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Provider;
 using Sequence.Utils;
+using Sequence.Utils.SecureStorage;
 using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
@@ -25,6 +27,7 @@ namespace Sequence.EcosystemWallet
         public ConfigUpdate[] ConfigUpdates { get; private set; }
         
         private readonly KeyMachineApi _keyMachine = new();
+        private readonly ISecureStorage _secureStorage = SecureStorageFactory.CreateSecureStorage();
 
         public WalletState(Address address)
         {
@@ -33,37 +36,86 @@ namespace Sequence.EcosystemWallet
 
         public async Task Update(Chain chain)
         {
-            var deployResponse = await _keyMachine.GetDeployHash(Address);
+            var deployResponse = await GetDeployHash(Address);
             DeployHash = deployResponse.deployHash;
             DeployContext = deployResponse.context;
             
-            var configUpdates = await _keyMachine.GetConfigUpdates(Address, deployResponse.deployHash);
-            var imageHash = configUpdates.updates.Length > 0 ? configUpdates.updates[^1].toImageHash : deployResponse.deployHash;
+            var configUpdates = await _keyMachine.GetConfigUpdates(Address, DeployHash);
+            var imageHash = configUpdates.updates.Length > 0 ? configUpdates.updates[^1].toImageHash : DeployHash;
             
-            var config = await _keyMachine.GetConfiguration(imageHash);
-            
-            Debug.Log($"Config: {config.ToJson()}");
+            var config = await GetConfig(imageHash);
             
             var signerLeaf = config.topology.FindSignerLeaf(new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29")) as SapientSignerLeaf;
             SessionsImageHash = signerLeaf.imageHash;
             
-            var treeReturn = await _keyMachine.GetTree(SessionsImageHash);
-            var sessionsTopology = SessionsTopology.FromTree(treeReturn.tree.ToString());
+            var sessionsTopology = await GetSessionsTopology(SessionsImageHash);
             
             ConfigUpdates = configUpdates.updates;
             ImageHash = imageHash;
             Config = config;
             SessionsTopology = sessionsTopology;
             
-            Debug.Log($"Sessions Topology {SessionsTopology.JsonSerialize()}");
-
             await UpdateNonce(chain, 0);
 
-            var ethClient = new SequenceEthClient(chain);
-            var response = await ethClient.CodeAt(Address, "pending");
-            IsDeployed = response != "0x";
+            IsDeployed = await CheckDeployed(chain, Address);
+        }
+
+        private async Task<DeployHashReturn> GetDeployHash(Address address)
+        {
+            var storageKey = $"sequence-deploy-hash-{address}";
+            var cached = _secureStorage.RetrieveString(storageKey);
+            if (!string.IsNullOrEmpty(cached))
+                return JsonConvert.DeserializeObject<DeployHashReturn>(cached);
+                
+            var deployResponse = await _keyMachine.GetDeployHash(address);
+            _secureStorage.StoreString(storageKey, JsonConvert.SerializeObject(deployResponse));
             
-            Debug.Log($"Is deployed: {IsDeployed}");
+            return deployResponse;
+        }
+
+        private async Task<Primitives.Config> GetConfig(string imageHash)
+        {
+            var storageKey = $"sequence-config-{imageHash}";
+            var cached = _secureStorage.RetrieveString(storageKey);
+            if (!string.IsNullOrEmpty(cached))
+                return Primitives.Config.FromJson(cached);
+            
+            var config = await _keyMachine.GetConfiguration(imageHash);
+            _secureStorage.StoreString(storageKey, config.ToJson());
+            
+            return config;
+        }
+
+        private async Task<SessionsTopology> GetSessionsTopology(string imageHash)
+        {
+            var storageKey = $"sequence-sessions-tree-{imageHash}";
+            var cached = _secureStorage.RetrieveString(storageKey);
+            if (!string.IsNullOrEmpty(cached))
+                return SessionsTopology.FromTree(cached);
+            
+            var treeReturn = await _keyMachine.GetTree(SessionsImageHash);
+            var tree = treeReturn.tree.ToString();
+            var sessionsTopology = SessionsTopology.FromTree(tree);
+            _secureStorage.StoreString(storageKey, tree);
+            
+            return sessionsTopology;
+        }
+
+        private async Task<bool> CheckDeployed(Chain chain, Address address)
+        {
+            var storageKey = $"sequence-deployed-{chain.ToString()}-{address}";
+            var cached = _secureStorage.RetrieveString(storageKey);
+            if (!string.IsNullOrEmpty(cached))
+                return false;
+            
+            var ethClient = new SequenceEthClient(chain);
+            var response = await ethClient.CodeAt(address, "pending");
+            var isDeployed = response != "0x";
+            
+            if (isDeployed)
+                _secureStorage.StoreString(storageKey, "true");
+            
+            return isDeployed;
         }
 
         public async Task UpdateNonce(Chain chain, BigInteger space)
@@ -88,7 +140,6 @@ namespace Sequence.EcosystemWallet
             });
             
             Nonce = response == "0x" ? 0 : response.HexStringToBigInteger();
-            Debug.Log($"Nonce: {Nonce}");
         }
     }
 }

@@ -28,11 +28,16 @@ namespace Sequence.EcosystemWallet
         /// <param name="email"></param>
         public async Task<SessionSigner> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
-            var sessionWallet = new EOAWallet();
-
             var chainId = string.Empty;
             if (permissions != null)
+            {
+                if (permissions.chainId <= 0)
+                    throw new Exception("Invalid chainId.");
+                
                 chainId = permissions.chainId.ToString();
+            }
+            
+            var sessionWallet = new EOAWallet();
             
             var origin = RedirectOrigin.GetOriginString();
             var payload = new ConnectArgs
