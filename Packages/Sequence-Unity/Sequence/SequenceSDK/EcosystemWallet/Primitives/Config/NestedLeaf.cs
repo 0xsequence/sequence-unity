@@ -9,13 +9,21 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class NestedLeaf : Leaf
     {
+        private struct NestedLeafJson
+        {
+            public string type;
+            public object tree;
+            public string weight;
+            public string threshold;
+        }
+        
         public Topology tree;
         public BigInteger weight;
         public BigInteger threshold;
         
         public override object Parse()
         {
-            return new
+            return new NestedLeafJson
             {
                 type = Nested,
                 tree = tree.Parse(),

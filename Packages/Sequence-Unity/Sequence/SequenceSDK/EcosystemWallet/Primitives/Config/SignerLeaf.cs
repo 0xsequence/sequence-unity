@@ -8,12 +8,19 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SignerLeaf : Leaf
     {
+        private struct SignerLeafJson
+        {
+            public string type;
+            public string address;
+            public string weight;
+        }
+        
         public Address address;
         public BigInteger weight;
         
         public override object Parse()
         {
-            return new
+            return new SignerLeafJson
             {
                 type = Signer,
                 address = address,

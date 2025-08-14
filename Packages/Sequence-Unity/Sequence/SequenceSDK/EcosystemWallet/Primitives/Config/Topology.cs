@@ -352,53 +352,53 @@ namespace Sequence.EcosystemWallet.Primitives
             var obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(input);
             if (obj.ContainsKey("weight"))
             {
-                        if (obj.ContainsKey("address"))
+                if (obj.ContainsKey("address"))
+                {
+                    if (obj.ContainsKey("imageHash"))
+                    {
+                        return new SapientSignerLeaf
                         {
-                            if (obj.ContainsKey("imageHash"))
-                            {
-                                return new SapientSignerLeaf
-                                {
-                                    address = new Address(obj["address"] as string),
-                                    weight = BigInteger.Parse(obj["weight"].ToString()),
-                                    imageHash = obj["imageHash"] as string
-                                }.ToTopology();
-                            }
+                            address = new Address(obj["address"] as string),
+                            weight = BigInteger.Parse(obj["weight"].ToString()),
+                            imageHash = obj["imageHash"] as string
+                        }.ToTopology();
+                    }
 
-                            return new SignerLeaf
-                            {
-                                address = new Address(obj["address"] as string),
-                                weight = BigInteger.Parse(obj["weight"].ToString())
-                            }.ToTopology();
-                        }
+                    return new SignerLeaf
+                    {
+                        address = new Address(obj["address"] as string),
+                        weight = BigInteger.Parse(obj["weight"].ToString())
+                    }.ToTopology();
+                }
 
-                        if (obj.ContainsKey("tree"))
-                        {
-                            return new NestedLeaf
-                            {
-                                weight = BigInteger.Parse(obj["weight"].ToString()),
-                                threshold = BigInteger.Parse(obj["threshold"].ToString()),
-                                tree = FromServiceConfigTree(obj["tree"].ToString())
-                            }.ToTopology();
-                        }
+                if (obj.ContainsKey("tree"))
+                {
+                    return new NestedLeaf
+                    {
+                        weight = BigInteger.Parse(obj["weight"].ToString()),
+                        threshold = BigInteger.Parse(obj["threshold"].ToString()),
+                        tree = FromServiceConfigTree(obj["tree"].ToString())
+                    }.ToTopology();
+                }
             }
 
             if (obj.ContainsKey("subdigest"))
             {
-                        var subdigest = obj["subdigest"].ToString().HexStringToByteArray();
-                        var isAny = obj.ContainsKey("isAnyAddress") && (bool)obj["isAnyAddress"];
+                var subdigest = obj["subdigest"].ToString().HexStringToByteArray();
+                var isAny = obj.ContainsKey("isAnyAddress") && (bool)obj["isAnyAddress"];
 
-                        if (isAny)
-                        {
-                            return new AnyAddressSubdigestLeaf
-                            {
-                                digest = subdigest
-                            }.ToTopology();
-                        }
+                if (isAny)
+                {
+                    return new AnyAddressSubdigestLeaf
+                    {
+                        digest = subdigest
+                    }.ToTopology();
+                }
                         
-                        return new SubdigestLeaf
-                        {
-                            digest = subdigest
-                        }.ToTopology();
+                return new SubdigestLeaf
+                {
+                    digest = subdigest
+                }.ToTopology();
             }
 
             throw new Exception($"Unknown config tree '{input}'");

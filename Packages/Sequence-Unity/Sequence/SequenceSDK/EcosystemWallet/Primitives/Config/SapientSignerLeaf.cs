@@ -7,13 +7,21 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SapientSignerLeaf : Leaf
     {
+        private struct SapientSignerLeafJson
+        {
+            public string type;
+            public string address;
+            public string weight;
+            public string imageHash;
+        }
+        
         public Address address;
         public BigInteger weight;
         public string imageHash;
         
         public override object Parse()
         {
-            return new
+            return new SapientSignerLeafJson
             {
                 type = SapientSigner,
                 address = address,

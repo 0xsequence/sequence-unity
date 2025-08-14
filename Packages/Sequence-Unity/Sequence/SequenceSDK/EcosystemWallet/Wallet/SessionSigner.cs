@@ -12,6 +12,12 @@ namespace Sequence.EcosystemWallet
 {
     internal class SessionSigner
     {
+        public struct CallContractData
+        {
+            public Address to;
+            public string data;
+        }
+        
         private static readonly Address ValueTrackingAddress = new ("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
         
         public Address ParentAddress { get; }
@@ -150,7 +156,7 @@ namespace Sequence.EcosystemWallet
             {
                 var response = await new SequenceEthClient(chain).CallContract(new object[]
                 {
-                    new
+                    new CallContractData
                     {
                         to = call.to,
                         data = GetAcceptImplicitRequestFunctionAbi(call)

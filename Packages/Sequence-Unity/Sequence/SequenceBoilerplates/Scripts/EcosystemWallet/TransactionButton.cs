@@ -136,8 +136,16 @@ namespace Sequence.Boilerplates
         private async Task CheckSupportedTransaction()
         {
             SetState(State.Loading);
-            var supported = await _wallet.SupportsTransaction(_chain, _transaction.BuildTransaction());
-            SetState(supported ? State.Transaction : State.Session);
+            
+            try
+            {
+                var supported = await _wallet.SupportsTransaction(_chain, _transaction.BuildTransaction());
+                SetState(supported ? State.Transaction : State.Session);
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
         }
 
         private void SetState(State state)

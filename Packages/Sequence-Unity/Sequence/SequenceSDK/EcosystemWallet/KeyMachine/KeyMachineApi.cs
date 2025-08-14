@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Sequence.EcosystemWallet.KeyMachine.Models;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -37,18 +38,10 @@ namespace Sequence.EcosystemWallet
             return await SendRequest<ConfigUpdatesArgs, ConfigUpdatesReturn>("ConfigUpdates", args);
         }
         
-        public async Task<Primitives.Config> GetConfiguration(string imageHash)
+        public async Task<ConfigReturn> GetConfiguration(string imageHash)
         {
             var args = new ConfigArgs(imageHash);
-            var response = await SendRequest<ConfigArgs, ConfigReturn>("Config", args);
-            
-            var topology = Topology.FromServiceConfigTree(response.config.tree.ToString());
-            return new Primitives.Config
-            {
-                threshold = new BigInteger(response.config.threshold),
-                checkpoint = BigInteger.Parse(response.config.checkpoint),
-                topology = topology,
-            };
+            return await SendRequest<ConfigArgs, ConfigReturn>("Config", args);
         }
 
         private async Task<TReturn> SendRequest<TArgs, TReturn>(string endpoint, TArgs args)

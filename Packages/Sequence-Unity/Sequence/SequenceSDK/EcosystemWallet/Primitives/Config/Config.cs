@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Utilities.Encoders;
 using Sequence.ABI;
 using Sequence.Utils;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
+    [JsonConverter(typeof(ConfigJsonConverter))]
     public class Config
     {
         public BigInteger threshold;
@@ -41,19 +44,6 @@ namespace Sequence.EcosystemWallet.Primitives
             return root;
         }
 
-        public string ToJson()
-        {
-            var jsonObject = new
-            {
-                threshold = threshold.ToString(),
-                checkpoint = checkpoint.ToString(),
-                topology = topology?.Parse(),
-                checkpointer = checkpointer?.Value
-            };
-
-            return JsonConvert.SerializeObject(jsonObject);
-        }
-
         public static Config FromJson(string json)
         {
             var input = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
@@ -71,6 +61,35 @@ namespace Sequence.EcosystemWallet.Primitives
                 checkpoint = BigInteger.Parse(checkpoint),
                 checkpointer = checkpointer,
                 topology = Topology.Decode(topology)
+            };
+        }
+    }
+    
+    [Preserve]
+    public class ConfigJsonConverter : JsonConverter<Config>
+    {
+        public override void WriteJson(JsonWriter writer, Config value, JsonSerializer serializer)
+        {
+            var obj = new JObject
+            {
+                ["threshold"] = value.threshold.ToString(),
+                ["checkpoint"] = value.checkpoint.ToString(),
+                ["topology"] = JToken.FromObject(value.topology.Parse(), serializer),
+                ["checkpointer"] = value.checkpointer?.Value
+            };
+
+            obj.WriteTo(writer);
+        }
+
+        public override Config ReadJson(JsonReader reader, Type objectType, Config existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            var obj = JObject.Load(reader);
+            return new Config
+            {
+                threshold = BigInteger.Parse((string)obj["threshold"]),
+                checkpoint = BigInteger.Parse((string)obj["checkpoint"]),
+                topology = Topology.Decode(obj["topology"].ToString()),
+                checkpointer = obj["checkpointer"] != null ? new Address((string)obj["checkpointer"]) : null
             };
         }
     }

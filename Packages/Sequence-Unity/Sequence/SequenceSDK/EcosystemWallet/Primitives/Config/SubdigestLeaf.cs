@@ -6,11 +6,17 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class SubdigestLeaf : Leaf
     {
+        private struct SubdigestLeafJson
+        {
+            public string type;
+            public string digest;
+        }
+        
         public byte[] digest;
         
         public override object Parse()
         {
-            return new
+            return new SubdigestLeafJson
             {
                 type = Subdigest,
                 digest = digest.ByteArrayToHexStringWithPrefix()

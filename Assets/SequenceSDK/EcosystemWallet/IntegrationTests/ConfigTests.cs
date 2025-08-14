@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
 
@@ -25,7 +26,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 checkpointer = checkpointer
             };
 
-            return Task.FromResult(config.ToJson());
+            return Task.FromResult(JsonConvert.SerializeObject(config));
         }
         
         public Task<string> ConfigEncode(Dictionary<string, object> parameters)

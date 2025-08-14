@@ -65,6 +65,7 @@ namespace Sequence.EcosystemWallet
         {
             var storageKey = $"sequence-deploy-hash-{address}";
             var cached = _secureStorage.RetrieveString(storageKey);
+            
             if (!string.IsNullOrEmpty(cached))
                 return JsonConvert.DeserializeObject<DeployHashReturn>(cached);
                 
@@ -76,21 +77,36 @@ namespace Sequence.EcosystemWallet
 
         private async Task<Primitives.Config> GetConfig(string imageHash)
         {
-            var storageKey = $"sequence-config-{imageHash}";
+            var storageKey = $"sequence-config-tree-{imageHash}";
             var cached = _secureStorage.RetrieveString(storageKey);
+            
             if (!string.IsNullOrEmpty(cached))
-                return Primitives.Config.FromJson(cached);
+                return ConfigFromServiceTree(JsonConvert.DeserializeObject<ConfigReturn>(cached));
             
-            var config = await _keyMachine.GetConfiguration(imageHash);
-            _secureStorage.StoreString(storageKey, config.ToJson());
+            var response = await _keyMachine.GetConfiguration(imageHash);
+            _secureStorage.StoreString(storageKey, JsonConvert.SerializeObject(response));
             
-            return config;
+            return ConfigFromServiceTree(response);
+        }
+
+        private Primitives.Config ConfigFromServiceTree(ConfigReturn configReturn)
+        {
+            var tree = configReturn.config.tree.ToString();
+            var topology = Topology.FromServiceConfigTree(tree);
+            
+            return new Primitives.Config
+            {
+                threshold = new BigInteger(configReturn.config.threshold),
+                checkpoint = BigInteger.Parse(configReturn.config.checkpoint),
+                topology = topology,
+            };
         }
 
         private async Task<SessionsTopology> GetSessionsTopology(string imageHash)
         {
             var storageKey = $"sequence-sessions-tree-{imageHash}";
             var cached = _secureStorage.RetrieveString(storageKey);
+            
             if (!string.IsNullOrEmpty(cached))
                 return SessionsTopology.FromTree(cached);
             
@@ -105,7 +121,7 @@ namespace Sequence.EcosystemWallet
         private async Task GetImplementation(Chain chain)
         {
             var response = await new SequenceEthClient(chain).CallContract(new object[] {
-                new
+                new CallContractData
                 {
                     to = Address,
                     data = ABI.ABI.Pack("getImplementation()")
@@ -125,7 +141,7 @@ namespace Sequence.EcosystemWallet
         private async Task GetOnChainImageHash(Chain chain)
         {
             var response = await new SequenceEthClient(chain).CallContract(new object[] {
-                new
+                new CallContractData
                 {
                     to = Address,
                     data = ABI.ABI.Pack("imageHash()")
@@ -166,10 +182,10 @@ namespace Sequence.EcosystemWallet
             var data = encoder.EncodeRequest(function.Sha3Signature, function.InputParameters, space);
             
             var response = await new SequenceEthClient(chain).CallContract(new object[] {
-                new
+                new CallContractData
                 {
                     to = Address,
-                    data
+                    data = data
                 }
             });
             

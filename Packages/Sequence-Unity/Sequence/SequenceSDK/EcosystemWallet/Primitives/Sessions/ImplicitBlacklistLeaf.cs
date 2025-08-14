@@ -6,11 +6,17 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class ImplicitBlacklistLeaf : SessionLeaf
     {
+        private struct Json
+        {
+            public string type;
+            public string[] blacklist;
+        }
+        
         public Address[] blacklist;
 
         public override object ToJsonObject()
         {
-            return new
+            return new Json
             {
                 type = ImplicitBlacklistType,
                 blacklist = blacklist is { Length: <= 0 } ? 

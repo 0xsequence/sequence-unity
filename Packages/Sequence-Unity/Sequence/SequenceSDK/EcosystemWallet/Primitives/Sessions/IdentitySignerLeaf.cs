@@ -4,11 +4,17 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public class IdentitySignerLeaf : SessionLeaf
     {
+        private struct Json
+        {
+            public string type;
+            public string identitySigner;
+        }
+        
         public Address identitySigner;
 
         public override object ToJsonObject()
         {
-            return new
+            return new Json
             {
                 type = IdentitySignerType,
                 identitySigner = identitySigner.Value,

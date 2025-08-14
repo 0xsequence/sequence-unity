@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Sequence.EcosystemWallet.IntegrationTests
 {
@@ -21,7 +22,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
                 skewed = skewed
             };
             
-            return Task.FromResult(DevTools.CreateRandomConfig(maxDepth, options).ToJson());
+            return Task.FromResult(JsonConvert.SerializeObject(DevTools.CreateRandomConfig(maxDepth, options)));
         }
         
         public Task<string> DevToolsRandomSessionTopology(Dictionary<string, object> parameters)

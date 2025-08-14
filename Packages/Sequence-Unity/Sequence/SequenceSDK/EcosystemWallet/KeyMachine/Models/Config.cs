@@ -1,5 +1,8 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.EcosystemWallet.KeyMachine.Models
 {
+    [Preserve]
     internal struct ConfigArgs
     {
         public string imageHash;
@@ -10,12 +13,14 @@ namespace Sequence.EcosystemWallet.KeyMachine.Models
         }
     }
 
+    [Preserve]
     internal struct ConfigReturn
     {
         public int version;
         public ConfigContext config;
     }
 
+    [Preserve]
     internal struct ConfigContext
     {
         public string checkpoint;
