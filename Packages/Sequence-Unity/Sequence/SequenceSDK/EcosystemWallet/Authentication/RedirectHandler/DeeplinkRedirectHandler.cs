@@ -16,7 +16,7 @@ namespace Sequence.EcosystemWallet.Browser
             var go = new GameObject("SequenceNativeReceiver");
             _receiver = go.AddComponent<NativeReceiver>();
             
-            var response = await _receiver.WaitForResponse(ConstructUrl(url, action, payload), RedirectUrl);
+            var response = await _receiver.WaitForResponse(ConstructUrl(url, action, payload));
             
             GameObject.Destroy(_receiver.gameObject);
 

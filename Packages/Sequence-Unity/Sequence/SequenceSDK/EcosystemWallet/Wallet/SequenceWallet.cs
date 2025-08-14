@@ -5,8 +5,6 @@ using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet

@@ -24,12 +24,10 @@ namespace Sequence.Boilerplates
         
         [Header("Config")]
         [SerializeField] private EcosystemType _ecosystem;
-        [SerializeField] private Chain _chain;
         
         [Header("Components")]
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
-        [SerializeField] private TMP_Dropdown _chainDropdown;
         [SerializeField] private TMP_InputField _emailInput;
         [SerializeField] private GameObject _loginState;
         [SerializeField] private GameObject _loadingOverlay;
@@ -65,9 +63,6 @@ namespace Sequence.Boilerplates
             OnImplicitSessionTypeChanged(0);
             OnExplicitSessionTypeChanged(0);
             EnableEmailButton(true);
-            
-            _chainDropdown.ClearOptions();
-            _chainDropdown.AddOptions(_chains.Select(c => c.ToString()).ToList());
         }
         
         public async void SignInWithEmail()
@@ -139,11 +134,6 @@ namespace Sequence.Boilerplates
                 ShowError(e.Message);
             }
         }
-        
-        public void OnChainChanged(int index)
-        {
-            _chain = _chains[index];
-        }
 
         public void OnImplicitSessionTypeChanged(int index)
         {
@@ -196,12 +186,16 @@ namespace Sequence.Boilerplates
                 return null;
             
             var deadline = DateTimeOffset.UtcNow.ToUnixTimeSeconds() * 1000 + 60 * 60 * 24 * 1000;
-            
-            var permissions = new Permissions(Chain.Optimism,
-                new ContractPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 0),
-                new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0));
 
-            return permissions;
+            return type switch
+            {
+                1 => new Permissions(Chain.TestnetArbitrumSepolia,
+                    new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0)),
+                2 => new Permissions(Chain.Optimism,
+                    new ContractPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 0),
+                    new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0)),
+                _ => throw new Exception("invalid session type")
+            };
         }
     }
 }

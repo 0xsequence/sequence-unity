@@ -72,8 +72,15 @@ namespace Sequence.Boilerplates
             else
                 permissions = new ContractPermission(_chain, new Address(_transaction.To), deadline, 0);
             
-            await _wallet.AddSession(permissions);
-            await CheckSupportedTransaction();
+            try
+            {
+                await _wallet.AddSession(permissions);
+                await CheckSupportedTransaction();
+            }
+            catch (Exception e)
+            {
+                ShowError(e.Message);
+            }
         }
 
         public async void SendTransaction()
@@ -84,14 +91,21 @@ namespace Sequence.Boilerplates
 
             if (_useFeeOptions)
             {
-                var feeOptions = await _wallet.GetFeeOption(_chain, transaction);
-                EcosystemFeatureSelection.Instance.OpenFeeOptionWindow(feeOptions, async feeOption =>
+                try
                 {
-                    if (feeOption != null)
-                        await TrySendTransaction(transaction, feeOption);
+                    var feeOptions = await _wallet.GetFeeOption(_chain, transaction);
+                    EcosystemFeatureSelection.Instance.OpenFeeOptionWindow(feeOptions, async feeOption =>
+                    {
+                        if (feeOption != null)
+                            await TrySendTransaction(transaction, feeOption);
                     
-                    SetState(State.Transaction);
-                });
+                        SetState(State.Transaction);
+                    });
+                }
+                catch (Exception e)
+                {
+                    ShowError(e.Message);
+                }
 
                 return;
             }
@@ -109,9 +123,14 @@ namespace Sequence.Boilerplates
             }
             catch (Exception e)
             {
-                _messagePopup.Show(e.Message, true);
-                Debug.LogError($"{e.Message}");
+                ShowError(e.Message);
             }
+        }
+
+        private void ShowError(string message)
+        {
+            _messagePopup.Show(message, true);
+            Debug.LogError($"{message}");
         }
 
         private async Task CheckSupportedTransaction()

@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {

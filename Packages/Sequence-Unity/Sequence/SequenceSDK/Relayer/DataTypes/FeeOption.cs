@@ -1,7 +1,9 @@
 using System.Numerics;
+using UnityEngine.Scripting;
 
 namespace Sequence.Relayer
 {
+    [Preserve]
     public class FeeOption
     {
         public FeeToken token;
@@ -10,6 +12,7 @@ namespace Sequence.Relayer
         public int gasLimit;
     }
 
+    [Preserve]
     public class FeeToken
     {
         public BigInteger chainId;
