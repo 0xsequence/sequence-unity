@@ -44,8 +44,9 @@ namespace Sequence.EcosystemWallet
             var imageHash = configUpdates.updates.Length > 0 ? configUpdates.updates[^1].toImageHash : DeployHash;
             
             var config = await GetConfig(imageHash);
-            
-            var signerLeaf = config.topology.FindSignerLeaf(new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29")) as SapientSignerLeaf;
+
+            var sessionsManager = new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29");
+            var signerLeaf = config.topology.FindSignerLeaf(sessionsManager) as SapientSignerLeaf;
             SessionsImageHash = signerLeaf.imageHash;
             
             var sessionsTopology = await GetSessionsTopology(SessionsImageHash);
@@ -101,12 +102,45 @@ namespace Sequence.EcosystemWallet
             return sessionsTopology;
         }
 
+        private async Task GetImplementation(Chain chain)
+        {
+            var response = await new SequenceEthClient(chain).CallContract(new object[] {
+                new
+                {
+                    to = Address,
+                    data = ABI.ABI.Pack("getImplementation()")
+                }
+            });
+
+            var data = response.HexStringToByteArray();
+            var addressData = data.Slice(data.Length - 20);
+            
+            // If this equals 0x2a4fB19F66F1427A5E363Bf1bB3be27b9A9ACC39, then this is a stage1 wallet
+            // stage2 wallets need to get their image hashes from the on chain configuration
+            var address = new Address(addressData.ByteArrayToHexStringWithPrefix());
+            
+            Debug.Log($"Get Implementation {address}");
+        }
+        
+        private async Task GetOnChainImageHash(Chain chain)
+        {
+            var response = await new SequenceEthClient(chain).CallContract(new object[] {
+                new
+                {
+                    to = Address,
+                    data = ABI.ABI.Pack("imageHash()")
+                }
+            });
+
+            Debug.Log($"Onchain image hash {response}");
+        }
+
         private async Task<bool> CheckDeployed(Chain chain, Address address)
         {
             var storageKey = $"sequence-deployed-{chain.ToString()}-{address}";
             var cached = _secureStorage.RetrieveString(storageKey);
             if (!string.IsNullOrEmpty(cached))
-                return false;
+                return true;
             
             var ethClient = new SequenceEthClient(chain);
             var response = await ethClient.CodeAt(address, "pending");

@@ -24,16 +24,7 @@ namespace Sequence.EcosystemWallet
 #else
         public static string GetOriginString()
         {
-            return $"http://localhost:{GetAvailablePort()}";
-        }
-        
-        private static int GetAvailablePort()
-        {
-            var tcpListener = new TcpListener(IPAddress.Loopback, 4444);
-            tcpListener.Start();
-            var port = ((IPEndPoint)tcpListener.LocalEndpoint).Port;
-            tcpListener.Stop();
-            return port;
+            return $"http://localhost:4444";
         }
 #endif
     }

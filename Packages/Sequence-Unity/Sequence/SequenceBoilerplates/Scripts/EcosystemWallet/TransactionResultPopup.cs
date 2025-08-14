@@ -29,7 +29,7 @@ namespace Sequence.Boilerplates
         public void OpenExplorer()
         {
             var explorer = ChainDictionaries.BlockExplorerOf[_chain];
-            Application.OpenURL($"{explorer}txn/{_txnHash}");
+            Application.OpenURL($"{explorer}tx/{_txnHash}");
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives;
 
@@ -10,6 +11,7 @@ namespace Sequence.EcosystemWallet
         private readonly Address _contract;
         private readonly BigInteger _deadline;
         private readonly BigInteger _valueLimit;
+        private readonly List<ParameterRule> _rules = new();
         
         public ContractPermission(Address contract, BigInteger deadline, BigInteger valueLimit)
         {
@@ -25,10 +27,15 @@ namespace Sequence.EcosystemWallet
             _deadline = deadline;
             _valueLimit = valueLimit;
         }
+
+        public void AddRule(ParameterRule rule)
+        {
+            _rules.Add(rule);
+        }
         
         public SessionPermissions GetPermissions()
         {
-            var permissions = new[] { new Permission { target = _contract, rules = Array.Empty<ParameterRule>() } };
+            var permissions = new[] { new Permission { target = _contract, rules = _rules.ToArray() } };
 
             return new SessionPermissions
             {

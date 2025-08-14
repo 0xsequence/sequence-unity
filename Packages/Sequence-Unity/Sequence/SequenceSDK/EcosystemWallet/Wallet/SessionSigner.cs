@@ -7,7 +7,9 @@ using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Sequence.EcosystemWallet
 {
@@ -94,7 +96,7 @@ namespace Sequence.EcosystemWallet
             
             if (permissionIndex < 0)
                 return (-1, null);
-
+            
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
@@ -119,13 +121,15 @@ namespace Sequence.EcosystemWallet
                         throw new Exception("Invalid permission");
                 }
                 
+                
+                Debug.Log($"ExplicitSessionCallSignature {permissionIndex}");
                 return new ExplicitSessionCallSignature
                 {
                     permissionIndex = permissionIndex,
                     sessionSignature = rsy
                 };
             }
-            
+            Debug.Log($"ImplicitSessionCallSignature");
             return new ImplicitSessionCallSignature
             {
                 attestation = _credentials.attestation,

@@ -56,7 +56,6 @@ namespace Sequence.EcosystemWallet
                     if (supported)
                     {
                         signers.Add(signer);
-                        Debug.Log($"Signer address {signer.Address}");
                         break;
                     }
                 }

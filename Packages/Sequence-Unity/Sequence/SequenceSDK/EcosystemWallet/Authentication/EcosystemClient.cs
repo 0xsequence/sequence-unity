@@ -26,7 +26,7 @@ namespace Sequence.EcosystemWallet
         /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        public async Task<SessionSigner> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        public async Task<SessionSigner[]> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             var chainId = string.Empty;
             if (permissions != null)
@@ -60,7 +60,11 @@ namespace Sequence.EcosystemWallet
             if (!response.Result)
                 throw new Exception("Error during request");
 
-            var credentials = new SessionCredentials(
+            var isImplicitWithPermissions = !isExplicit && permissions != null;
+            var credentialsLen = isImplicitWithPermissions ? 2 : 1;
+            var credentials = new SessionCredentials[credentialsLen];
+            
+            credentials[0] = new SessionCredentials(
                 isExplicit,
                 sessionWallet.GetPrivateKeyAsHex(),
                 response.Data.walletAddress,
@@ -71,8 +75,29 @@ namespace Sequence.EcosystemWallet
                 response.Data.loginMethod,
                 response.Data.email);
 
-            SessionStorage.AddSession(credentials);
-            return new SessionSigner(credentials);
+            if (isImplicitWithPermissions)
+            {
+                credentials[1] = new SessionCredentials(
+                    true,
+                    sessionWallet.GetPrivateKeyAsHex(),
+                    response.Data.walletAddress,
+                    null,
+                    null,
+                    (int)_ecosystem,
+                    chainId,
+                    response.Data.loginMethod,
+                    response.Data.email);
+            }
+            
+            var signers = new SessionSigner[credentials.Length];
+            for (var i = 0; i < credentials.Length; i++)
+            {
+                var credential = credentials[i];
+                signers[i] = new SessionSigner(credential);
+                SessionStorage.AddSession(credential);
+            }
+
+            return signers;
         }
     }
 }

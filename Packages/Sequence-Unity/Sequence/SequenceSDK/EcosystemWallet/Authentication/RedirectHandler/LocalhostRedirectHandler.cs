@@ -1,9 +1,7 @@
 using System;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
@@ -16,19 +14,14 @@ namespace Sequence.EcosystemWallet.Browser
             
             try
             {
-                var listener = new HttpListener();
-                listener.Prefixes.Add(RedirectUrl.AppendTrailingSlashIfNeeded());
-                listener.Start();
+                var server = GameObject.FindObjectOfType<LocalhostServer>();
+                if (!server)
+                {
+                    server = new GameObject("LocalhostServer").AddComponent<LocalhostServer>();
+                }
+                
+                var queryString = await server.Run(RedirectUrl);
 
-                var result = await listener.GetContextAsync();
-                
-                listener.Stop();
-
-                if (result == null)
-                    throw new Exception("Request timed out.");
-                
-                var queryString = result.Request.QueryString;
-                
                 var id = queryString["id"];
                 if (id != Id)
                     throw new Exception("Incorrect request id");
@@ -38,8 +31,6 @@ namespace Sequence.EcosystemWallet.Browser
                 
                 var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(queryString["payload"]));
                 var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
-                
-                Debug.Log($"{responsePayloadJson}");
                 
                 return (true, responsePayload);
             }

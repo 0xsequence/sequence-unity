@@ -64,7 +64,6 @@ namespace Sequence.Boilerplates
 
             OnImplicitSessionTypeChanged(0);
             OnExplicitSessionTypeChanged(0);
-            EnableWalletState(false);
             EnableEmailButton(true);
             
             _chainDropdown.ClearOptions();
@@ -162,16 +161,6 @@ namespace Sequence.Boilerplates
             _messagePopup.Show(error, true);
             SetLoading(false);
         }
-
-        public void EnableWalletState(bool enable)
-        {
-            _loginState.SetActive(!enable);
-
-            var rect = transform as RectTransform;
-            var size = rect.sizeDelta;
-            size.y = enable ? 420 : 290;
-            rect.sizeDelta = size;
-        }
         
         public void EnableEmailButton(bool enable)
         {
@@ -199,11 +188,6 @@ namespace Sequence.Boilerplates
         private IPermissions GetImplicitPermissions()
         {
             return GetPermissionsFromSessionType((int)_implicitPermissions);
-        }
-        
-        private IPermissions GetExplicitPermissions()
-        {
-            return GetPermissionsFromSessionType((int)_explicitPermissions + 1);
         }
         
         private IPermissions GetPermissionsFromSessionType(int type)

@@ -34,7 +34,7 @@ namespace Sequence.EcosystemWallet
             var signedEnvelope = envelope.ToSigned(sapientSignature);
             var rawSignature = SignatureHandler.EncodeSignature(signedEnvelope);
             
-            rawSignature.suffix = configUpdates.Select(u => 
+            rawSignature.suffix = configUpdates.Reverse().Select(u => 
                 RawSignature.Decode(u.signature.HexStringToByteArray())).ToArray();
 
             return rawSignature;
