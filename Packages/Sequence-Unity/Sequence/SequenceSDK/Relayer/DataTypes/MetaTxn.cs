@@ -1,5 +1,8 @@
+using UnityEngine.Scripting;
+
 namespace Sequence.Relayer
 {
+    [Preserve]
     public class MetaTxn
     {
         public Address walletAddress;

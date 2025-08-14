@@ -1,7 +1,9 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence.Relayer
 {
+    [Preserve]
     public class MetaTxnReceipt
     {
         public string id;
