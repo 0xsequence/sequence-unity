@@ -4742,7 +4742,7 @@ MonoBehaviour:
   _sessionButtonObject: {fileID: 1329197014}
   _transactionButtonObject: {fileID: 659355501}
   _messagePopup: {fileID: 1397315415}
-  _transactionResult: {fileID: 0}
+  _transactionResult: {fileID: 6440605247847260042}
 --- !u!114 &696230466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8578,7 +8578,7 @@ MonoBehaviour:
   _sessionButtonObject: {fileID: 215461105}
   _transactionButtonObject: {fileID: 965900426}
   _messagePopup: {fileID: 1397315415}
-  _transactionResult: {fileID: 0}
+  _transactionResult: {fileID: 6440605247847260042}
 --- !u!114 &1242786029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14453,7 +14453,7 @@ MonoBehaviour:
   _sessionButtonObject: {fileID: 1853883865}
   _transactionButtonObject: {fileID: 1280987657}
   _messagePopup: {fileID: 1397315415}
-  _transactionResult: {fileID: 0}
+  _transactionResult: {fileID: 6440605247847260042}
 --- !u!114 &2097849103
 MonoBehaviour:
   m_ObjectHideFlags: 0
