@@ -1,21 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Numerics;
 using Sequence.ABI;
 using Sequence.Provider;
-using Sequence.Transactions;
-using System.Text;
-using System.Text.RegularExpressions;
 using Sequence.Utils;
-using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.Contracts
 {
     public class Contract
     {
+        private struct QueryParameters
+        {
+            public Address to;
+            public string data;
+        }
+        
         Address address;
         public delegate Task<T> QueryContractMessageSender<T>(IEthClient client);
 
@@ -156,12 +155,11 @@ namespace Sequence.Contracts
         private object[] CreateParams(string functionName, params object[] args)
         {
             string data = GetData(functionName, args);
-            string to = address;
             object[] toSendParams = new object[] {
-                new
+                new QueryParameters
                 {
-                    to,
-                    data
+                    to = address,
+                    data = data
                 }
             };
             return toSendParams;
