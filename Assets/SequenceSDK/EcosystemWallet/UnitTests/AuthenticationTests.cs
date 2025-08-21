@@ -18,7 +18,7 @@ namespace Sequence.EcosystemWallet.UnitTests
         public async Task SignInWithGoogle()
         {
             var connect = new SequenceConnect(Ecosystem);
-            await connect.SignInWithGoogle();
+            await connect.SignInWithGoogle(null);
         }
         
         [Test]

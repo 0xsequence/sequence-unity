@@ -26,22 +26,25 @@ namespace Sequence.EcosystemWallet.Browser
                     _listener.Start();
                 }
 
-                var result = await _listener.GetContextAsync();
+
+                HttpListenerContext context = null;
+                while (context == null || !context.Request.RawUrl.Contains("?id"))
+                    context = await _listener.GetContextAsync();
 
                 var responseString = "{}";
                 var buffer = Encoding.UTF8.GetBytes(responseString);
 
-                result.Response.StatusCode = 200;
-                result.Response.ContentType = "application/json";
-                result.Response.ContentLength64 = buffer.Length;
-                result.Response.KeepAlive = true;
+                context.Response.StatusCode = 200;
+                context.Response.ContentType = "application/json";
+                context.Response.ContentLength64 = buffer.Length;
+                context.Response.KeepAlive = true;
 
-                await result.Response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                await context.Response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
 
-                result.Response.OutputStream.Close();
-                result.Response.Close();
+                context.Response.OutputStream.Close();
+                context.Response.Close();
 
-                return result.Request.QueryString;
+                return context.Request.QueryString;
             }
             catch (System.Exception e)
             {

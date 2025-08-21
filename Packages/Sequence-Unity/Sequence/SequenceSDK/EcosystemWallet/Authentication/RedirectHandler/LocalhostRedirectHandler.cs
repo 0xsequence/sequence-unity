@@ -25,7 +25,7 @@ namespace Sequence.EcosystemWallet.Browser
 
                 var id = queryString["id"];
                 if (id != Id)
-                    throw new Exception("Incorrect request id");
+                    throw new Exception($"Incoming request id '{id}' does not match id '{Id}'");
 
                 if (queryString["error"] != null)
                     throw new Exception($"Error during request: {queryString["error"]}");

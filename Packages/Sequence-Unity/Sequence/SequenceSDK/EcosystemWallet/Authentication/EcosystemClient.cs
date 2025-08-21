@@ -25,11 +25,11 @@ namespace Sequence.EcosystemWallet
         /// <summary>
         /// Create an implicit- or explicit session based on a given set of permissions.
         /// </summary>
-        /// <param name="type">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
+        /// <param name="addExplicit">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        public async Task<SessionSigner[]> CreateNewSession(SessionCreationType type, SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        public async Task<SessionSigner[]> CreateNewSession(bool addExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             var chainId = string.Empty;
             if (permissions != null)
@@ -39,7 +39,8 @@ namespace Sequence.EcosystemWallet
                 
                 chainId = permissions.chainId.ToString();
             }
-            
+
+            var type = DetermineSessionCreationType(addExplicit, permissions);
             var sessionWallet = new EOAWallet();
             
             var origin = RedirectOrigin.GetOriginString();
@@ -104,6 +105,14 @@ namespace Sequence.EcosystemWallet
             }
 
             return signers;
+        }
+
+        private SessionCreationType DetermineSessionCreationType(bool addExplicit, SessionPermissions permissions)
+        {
+            if (addExplicit)
+                return SessionCreationType.AddExplicit;
+            
+            return permissions == null ? SessionCreationType.IncludeImplicit : SessionCreationType.CreateNewSession;
         }
     }
 }

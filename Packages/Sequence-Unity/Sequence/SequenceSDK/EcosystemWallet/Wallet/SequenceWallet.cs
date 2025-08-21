@@ -55,7 +55,7 @@ namespace Sequence.EcosystemWallet
             var ecosystem = _sessionSigners[0].Ecosystem;
             var client = new EcosystemClient(ecosystem);
             
-            var sessionSigners = await client.CreateNewSession(SessionCreationType.AddExplicit, 
+            var sessionSigners = await client.CreateNewSession(true, 
                 permissions.GetPermissions(), string.Empty);
             
             foreach (var sessionSigner in sessionSigners)
