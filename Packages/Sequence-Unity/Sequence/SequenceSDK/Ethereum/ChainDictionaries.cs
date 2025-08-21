@@ -60,6 +60,7 @@ namespace Sequence
             { Chain.TestnetSomnia, "Somnia Testnet" },
             { Chain.TestnetFrequency, "Frequency Testnet" },
             { Chain.TestnetIncentiv, "Incentiv Testnet"},
+            { Chain.LocalChain, "Local chain"}
         };
 
         public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()

@@ -9,13 +9,10 @@ namespace Sequence.Boilerplates
         private TextMeshProUGUI _text;
         private SequenceWallet _wallet;
 
-        private void Awake()
-        {
-            SequenceWallet.OnWalletCreated += OnWalletCreated;
-        }
-
         private void Start()
         {
+            SequenceWallet.OnWalletCreated += OnWalletCreated;
+            
             _text = GetComponent<TextMeshProUGUI>();
             OnWalletCreated(null);
         }

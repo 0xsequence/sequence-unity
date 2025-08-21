@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Sequence.ABI;
+using Sequence.Config;
 using Sequence.Utils;
 using Sequence.WaaS.DataTypes;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Sequence.EmbeddedWallet
 {
@@ -38,10 +40,34 @@ namespace Sequence.EmbeddedWallet
             GetTimeShift().ConfigureAwait(false);
         }
         
-        private async Task GetTimeShift()
+        public async Task GetTimeShift()
         {
-            _timeshift = await _httpClient.GetTimeShift();
-            _ready = true;
+            var config = SequenceConfig.GetConfig(SequenceService.WaaS);
+            var configJwt = SequenceConfig.GetConfigJwt(config);
+            var rpcUrl = configJwt.rpcServer;
+            
+            if (string.IsNullOrWhiteSpace(rpcUrl))
+                throw SequenceConfig.MissingConfigError("RPC Server");
+            
+            UnityWebRequest request = UnityWebRequest.Get(rpcUrl.AppendTrailingSlashIfNeeded() + "status");
+            request.method = UnityWebRequest.kHttpVerbGET;
+
+            try
+            {
+                await request.SendWebRequest();
+                DateTime serverTime = DateTime.Parse(request.GetResponseHeader("date")).ToUniversalTime();
+                DateTime localTime = DateTime.UtcNow;
+                _timeshift = serverTime - localTime;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error getting time shift: " + e.Message);
+                _timeshift = TimeSpan.Zero;
+            }
+            finally
+            {
+                request.Dispose();
+            }
         }
 
         public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
@@ -103,7 +129,7 @@ namespace Sequence.EmbeddedWallet
         private async Task<IntentResponse<TransactionReturn>> SendTransactionIntent(string intent,
             Dictionary<string, string> headers)
         {
-            IntentResponse<JObject> result = await _httpClient.SendRequest<string, IntentResponse<JObject>>("SendIntent", intent, headers);
+            IntentResponse<JObject> result = await _httpClient.SendPostRequest<string, IntentResponse<JObject>>("SendIntent", intent, headers);
             if (result.response.code == SuccessfulTransactionReturn.IdentifyingCode)
             {
                 SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.response.data.ToString());
@@ -169,7 +195,7 @@ namespace Sequence.EmbeddedWallet
                 var transactionReturn = await SendTransactionIntent(payload, headers);
                 return (T)(object)transactionReturn;
             }
-            T result = await _httpClient.SendRequest<string, T>(path, payload, headers);
+            T result = await _httpClient.SendPostRequest<string, T>(path, payload, headers);
             return result;
         }
 

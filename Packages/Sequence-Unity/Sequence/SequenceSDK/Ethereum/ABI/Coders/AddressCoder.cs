@@ -119,6 +119,7 @@ namespace Sequence.ABI
             try
             {
                 string decoded = SequenceCoder.AddressChecksum(_addressCoder.DecodeFromString(encodedString));
+                decoded = decoded.Replace("0x", "").PadLeft(40, '0').EnsureHexPrefix();
                 return decoded;
             }
             catch (Exception ex)

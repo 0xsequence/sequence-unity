@@ -1,9 +1,11 @@
 using System;
 using Newtonsoft.Json;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
-namespace Sequence {
-    
+namespace Sequence 
+{
+    [Preserve]
     [JsonConverter(typeof(AddressJsonConverter))]
     public class Address {
         public readonly string Value;
@@ -15,10 +17,22 @@ namespace Sequence {
         /// </summary>
         /// <param name="value"></param>
         public Address(string value) {
+            ValidateIsAddress(value);
+            Value = value;
+        }
+
+        private void ValidateIsAddress(string value)
+        {
             if (!value.IsAddress())
             {
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
+        }
+
+        public Address(byte[] bytes)
+        {
+            string value = bytes.ByteArrayToHexStringWithPrefix();
+            ValidateIsAddress(value);
             Value = value;
         }
 
@@ -40,7 +54,8 @@ namespace Sequence {
             }
 
             Address address = (Address)obj;
-            return Value.Equals(address.Value, StringComparison.OrdinalIgnoreCase);
+            return Value.Equals(address.Value, StringComparison.OrdinalIgnoreCase) ||
+                   (this.Value.IsZeroAddress() && address.Value.IsZeroAddress());
         }
 
         public override int GetHashCode()
@@ -49,6 +64,7 @@ namespace Sequence {
         }
     }
 
+    [Preserve]
     public class AddressJsonConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
