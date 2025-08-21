@@ -1,13 +1,18 @@
 using System;
-using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Wallet;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
+    public enum SessionCreationType
+    {
+        CreateNewSession,
+        IncludeImplicit,
+        AddExplicit
+    }
+    
     internal class EcosystemClient
     {
         private readonly EcosystemType _ecosystem;
@@ -20,13 +25,11 @@ namespace Sequence.EcosystemWallet
         /// <summary>
         /// Create an implicit- or explicit session based on a given set of permissions.
         /// </summary>
-        /// <param name="ecosystem">The ecosystem you want to connect with.</param>
-        /// <param name="chain">The chain you want to connect with.</param>
-        /// <param name="isExplicit">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
+        /// <param name="type">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        public async Task<SessionSigner[]> CreateNewSession(bool isExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        public async Task<SessionSigner[]> CreateNewSession(SessionCreationType type, SessionPermissions permissions, string preferredLoginMethod, string email = null)
         {
             var chainId = string.Empty;
             if (permissions != null)
@@ -40,16 +43,19 @@ namespace Sequence.EcosystemWallet
             var sessionWallet = new EOAWallet();
             
             var origin = RedirectOrigin.GetOriginString();
+            var includeImplicitSession = type == SessionCreationType.IncludeImplicit;
+            
             var payload = new ConnectArgs
             {
                 sessionAddress = sessionWallet.GetAddress(),
                 preferredLoginMethod = preferredLoginMethod,
                 email = email,
                 origin = origin,
+                includeImplicitSession = includeImplicitSession,
                 permissions = permissions
             };
             
-            var action = isExplicit ? "addExplicitSession" : "addImplicitSession";
+            var action = type == SessionCreationType.AddExplicit ? "addExplicitSession" : "createNewSession";
             var ecosystemUrl = EcosystemBindings.GetUrl(_ecosystem);
             var url = $"{ecosystemUrl}/request/connect";
 
@@ -60,12 +66,12 @@ namespace Sequence.EcosystemWallet
             if (!response.Result)
                 throw new Exception("Error during request");
 
-            var isImplicitWithPermissions = !isExplicit && permissions != null;
+            var isImplicitWithPermissions = includeImplicitSession && permissions != null;
             var credentialsLen = isImplicitWithPermissions ? 2 : 1;
             var credentials = new SessionCredentials[credentialsLen];
             
             credentials[0] = new SessionCredentials(
-                isExplicit,
+                !includeImplicitSession,
                 sessionWallet.GetPrivateKeyAsHex(),
                 response.Data.walletAddress,
                 response.Data.attestation,

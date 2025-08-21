@@ -8,6 +8,7 @@ namespace Sequence.EcosystemWallet
         public string preferredLoginMethod;
         public string email;
         public string origin;
+        public bool includeImplicitSession;
         public SessionPermissions permissions;
     }
     

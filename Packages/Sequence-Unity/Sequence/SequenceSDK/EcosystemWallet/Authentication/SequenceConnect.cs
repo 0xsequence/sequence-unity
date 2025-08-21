@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Primitives;
+using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet
 {
@@ -27,8 +28,9 @@ namespace Sequence.EcosystemWallet
             return await SignIn(permissions, "apple", null);
         }
         
-        public async Task<IWallet> SignInWithPasskey(IPermissions permissions = null)
+        public async Task<IWallet> SignInWithPasskey(IPermissions permissions)
         {
+            Assert.IsNotNull(permissions, "Permissions cannot be null when you sign in with passkey.");
             return await SignIn(permissions, "passkey", null);
         }
         
@@ -39,7 +41,7 @@ namespace Sequence.EcosystemWallet
 
         private async Task<IWallet> SignIn(IPermissions permissions, string preferredLoginMethod, string email)
         {
-            var signers = await _client.CreateNewSession(false, permissions?.GetPermissions(), preferredLoginMethod, email);
+            var signers = await _client.CreateNewSession(SessionCreationType.CreateNewSession, permissions?.GetPermissions(), preferredLoginMethod, email);
             return new SequenceWallet(signers);
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Browser
@@ -31,6 +32,8 @@ namespace Sequence.EcosystemWallet.Browser
                 
                 var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(queryString["payload"]));
                 var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
+                
+                SequenceLog.Info(responsePayloadJson);
                 
                 return (true, responsePayload);
             }
