@@ -31,6 +31,7 @@ namespace Sequence
             { Chain.Moonbeam, "Moonbeam"},
             { Chain.Etherlink, "Etherlink" },
             { Chain.XR1, "XR1" },
+            { Chain.Somnia, "Somnia" },
 
             { Chain.TestnetSepolia, "Sepolia" },
             { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
@@ -89,6 +90,7 @@ namespace Sequence
             { Chain.Moonbeam, "GLMR" },
             { Chain.Etherlink, "XTZ" },
             { Chain.XR1, "XR1" },
+            { Chain.Somnia, "STT" },
 
             { Chain.TestnetSepolia, "ETH" },
             { Chain.TestnetArbitrumSepolia, "AETH" },
@@ -180,6 +182,7 @@ namespace Sequence
             { Chain.Moonbeam, "https://moonscan.io/"},
             { Chain.Etherlink, "https://explorer.etherlink.com/"},
             { Chain.XR1, ""}, // TDB
+            { Chain.Somnia, "https://mainnet.somnia.w3us.site/"},
 
             { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
             { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
@@ -240,6 +243,7 @@ namespace Sequence
             { Chain.Moonbeam, "1284" },
             { Chain.Etherlink, "42793" },
             { Chain.XR1, "273" },
+            { Chain.Somnia, "5031" },
             
             { Chain.TestnetSepolia, "11155111" },
             { Chain.TestnetPolygonAmoy, "80002" },
@@ -298,6 +302,7 @@ namespace Sequence
             { "1284", Chain.Moonbeam },
             { "42793", Chain.Etherlink },
             { "273", Chain.XR1 },
+            { "5031", Chain.Somnia },
             
             { "11155111", Chain.TestnetSepolia },
             { "80002", Chain.TestnetPolygonAmoy },
@@ -356,6 +361,7 @@ namespace Sequence
             { Chain.Moonbeam, "moonbeam" },
             { Chain.Etherlink, "etherlink" },
             { Chain.XR1, "xr1" },
+            { Chain.Somnia, "somnia" },
 
             { Chain.TestnetSepolia, "sepolia" },
             { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
