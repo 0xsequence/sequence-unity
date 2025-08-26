@@ -33,6 +33,7 @@ namespace Sequence
         Etherlink = 42793,
         [Obsolete("Chain is not currently supported")]
         XR1 = 273,
+        Somnia = 5031,
 
         // Testnets
         TestnetSepolia = 11155111,
