@@ -1,4 +1,5 @@
 using System;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -21,7 +22,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding boolean: {ex.Message}");
+                SequenceLog.Error($"Error decoding boolean: {ex.Message}");
                 return null;
             }
         }
@@ -42,7 +43,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding boolean: {ex.Message}");
+                SequenceLog.Error($"Error encoding boolean: {ex.Message}");
                 return null;
             }
         }
@@ -64,7 +65,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding boolean to string: {ex.Message}");
+                SequenceLog.Error($"Error encoding boolean to string: {ex.Message}");
                 return null;
             }
         }
@@ -84,7 +85,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding boolean from string: {ex.Message}");
+                SequenceLog.Error($"Error decoding boolean from string: {ex.Message}");
                 return false;
             }
         }

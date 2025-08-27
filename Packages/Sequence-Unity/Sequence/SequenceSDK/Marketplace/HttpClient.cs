@@ -87,7 +87,7 @@ namespace Sequence.Marketplace
             string method = request.method;
             string curlRequest = $"curl -X {method} '{url}' {headersString} -d '{requestJson}'";
 
-            UnityEngine.Debug.Log(curlRequest);
+            SequenceLog.Info(curlRequest);
 
             try
             {

@@ -22,7 +22,7 @@ namespace Sequence.Relayer
 
         private void HandleMintTokenFailed(string error)
         {
-            Debug.LogError(error);
+            SequenceLog.Error(error);
         }
 
         private void OnDestroy()

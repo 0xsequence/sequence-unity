@@ -1,20 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Numerics;
 using Sequence.ABI;
 using Sequence.Provider;
-using Sequence.Transactions;
-using System.Text;
-using System.Text.RegularExpressions;
-using Sequence.Wallet;
-using UnityEngine;
+using Sequence.Utils;
 
 namespace Sequence.Contracts
 {
     public class Contract
     {
+        private struct QueryParameters
+        {
+            public Address to;
+            public string data;
+        }
+        
         Address address;
         public delegate Task<T> QueryContractMessageSender<T>(IEthClient client);
 
@@ -35,7 +35,7 @@ namespace Sequence.Contracts
             this._abi = abi;
             if (abi == null)
             {
-                Debug.LogWarning("Creating a contract with a null ABI is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
+                SequenceLog.Warning("Creating a contract with a null ABI is not recommended. Note: Using a null abi will require you to provide the full function signature when transacting/querying the contract. Using a null abi will cause all query responses to return as a string.");
                 this._functionAbi = null;
             }
             else
@@ -79,7 +79,7 @@ namespace Sequence.Contracts
                 {
                     string message =
                         $"Given invalid {nameof(functionName)}, given: {functionName}; expected to regex match {ABIRegex.FunctionABIRegex} - for example: \"mint(uint256,uint256)\"";
-                    Debug.LogWarning(message + "\nAttempting to recover and parse anyways");
+                    SequenceLog.Warning(message + "\nAttempting to recover and parse anyways");
                     functionName = EventParser.ParseEventDef(functionName).ToString();
                     if (!ABIRegex.MatchesFunctionABI(functionName))
                     {
@@ -155,12 +155,11 @@ namespace Sequence.Contracts
         private object[] CreateParams(string functionName, params object[] args)
         {
             string data = GetData(functionName, args);
-            string to = address;
             object[] toSendParams = new object[] {
-                new
+                new QueryParameters
                 {
-                    to,
-                    data
+                    to = address,
+                    data = data
                 }
             };
             return toSendParams;

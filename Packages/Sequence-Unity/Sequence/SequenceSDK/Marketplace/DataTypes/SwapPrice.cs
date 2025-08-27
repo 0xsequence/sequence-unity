@@ -15,6 +15,7 @@ namespace Sequence.Marketplace
         [Obsolete("To retrieve the transaction value, please request a Swap Quote instead")]
         public string transactionValue;
         
+        [Preserve]
         public SwapPrice(Address currencyAddress, string currencyBalance, string price, string maxPrice, string transactionValue)
         {
             this.currencyAddress = currencyAddress;

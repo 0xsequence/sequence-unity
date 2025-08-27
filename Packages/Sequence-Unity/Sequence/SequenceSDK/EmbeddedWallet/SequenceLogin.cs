@@ -74,7 +74,7 @@ namespace Sequence.EmbeddedWallet
         {
             if (connectedWalletAddress == null)
             {
-                Debug.LogError($"The connected wallet address cannot be null or empty.");
+                SequenceLog.Error($"The connected wallet address cannot be null or empty.");
                 throw new ArgumentNullException(nameof(connectedWalletAddress));
             }
             
@@ -240,7 +240,7 @@ namespace Sequence.EmbeddedWallet
                 _authenticator.PlatformSpecificSetup();
             }
             catch (Exception e) {
-                Debug.LogError($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
+                SequenceLog.Error($"Error encountered during PlatformSpecificSetup: {e.Message}\nSocial sign in will not work.");
             }
             Application.deepLinkActivated += _authenticator.HandleDeepLink;
             _authenticator.SignedIn += OnSocialLogin;
@@ -486,7 +486,7 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                Debug.LogError("Error storing session wallet securely: " + e.Message);
+                SequenceLog.Error("Error storing session wallet securely: " + e.Message);
             }
         }
 
@@ -516,7 +516,7 @@ namespace Sequence.EmbeddedWallet
                     case IdentityType.OIDC:
                         if (components.Length < 3)
                         {
-                            Debug.LogError(
+                            SequenceLog.Error(
                                 "Invalid response from WaaS server, expected at least 3 components in OIDC login method string");
                         }
 
@@ -538,7 +538,7 @@ namespace Sequence.EmbeddedWallet
                         }
                         else
                         {
-                            Debug.LogError("Unexpected OIDC login method string: " + components[2]);
+                            SequenceLog.Error("Unexpected OIDC login method string: " + components[2]);
                         }
                         break;
                     case IdentityType.Email:
@@ -551,7 +551,7 @@ namespace Sequence.EmbeddedWallet
                         methods.Add(LoginMethod.PlayFab);
                         break;
                     default:
-                        Debug.LogError("Unexpected identity type " + identityType);
+                        SequenceLog.Error("Unexpected identity type " + identityType);
                         break;
                 }
             }

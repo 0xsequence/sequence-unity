@@ -51,7 +51,7 @@ namespace Sequence.Contracts
             byte[] hashed = SequenceCoder.KeccakHash(encoded);
             string hashedString = SequenceCoder.ByteArrayToHexString(hashed).EnsureHexPrefix();
             string address = hashedString.Substring(hashedString.Length - 40, 40).EnsureHexPrefix();
-            Debug.Log($"Deployer {senderAddress}, nonce {nonce} - deployed to {address}");
+            SequenceLog.Info($"Deployer {senderAddress}, nonce {nonce} - deployed to {address}");
             return address;
         }
     }

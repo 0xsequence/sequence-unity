@@ -6,6 +6,7 @@ using Sequence.ABI;
 using Sequence.Contracts;
 using Sequence.Marketplace;
 using Sequence.Pay.Sardine;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.Pay.Transak
@@ -49,7 +50,7 @@ namespace Sequence.Pay.Transak
                 {
                     return;
                 }
-                Debug.LogWarning($"{nameof(_contractIds)} already contains a different {nameof(TransakContractId)} for {contractId.ContractAddress}. Replacing existing instance with provided...");
+                SequenceLog.Warning($"{nameof(_contractIds)} already contains a different {nameof(TransakContractId)} for {contractId.ContractAddress}. Replacing existing instance with provided...");
             }
             _contractIds[contractId.ContractAddress] = contractId;
         }

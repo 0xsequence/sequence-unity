@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Sequence.Utils;
 using UnityEngine;
 
 namespace Sequence.ABI
@@ -41,7 +42,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding number: {ex.Message}");
+                SequenceLog.Error($"Error decoding number: {ex.Message}");
                 return null;
             }
         }
@@ -75,7 +76,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding number: {ex.Message}");
+                SequenceLog.Error($"Error encoding number: {ex.Message}");
                 return null;
             }
         }
@@ -108,7 +109,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error encoding number to string: {ex.Message}");
+                SequenceLog.Error($"Error encoding number to string: {ex.Message}");
                 return null;
             }
         }
@@ -127,7 +128,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Error decoding number from string: {ex.Message}");
+                SequenceLog.Error($"Error decoding number from string: {ex.Message}");
                 return null;
             }
         }
@@ -149,7 +150,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during EncodeSignedInt: " + ex.Message);
+                SequenceLog.Error("Exception occurred during EncodeSignedInt: " + ex.Message);
                 throw;
             }
         }
@@ -179,7 +180,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during EncodeSignedIntString: " + ex.Message);
+                SequenceLog.Error("Exception occurred during EncodeSignedIntString: " + ex.Message);
                 throw;
             }
         }
@@ -201,7 +202,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during EncodeUnsignedInt: " + ex.Message);
+                SequenceLog.Error("Exception occurred during EncodeUnsignedInt: " + ex.Message);
                 throw;
             }
         }
@@ -223,7 +224,7 @@ namespace Sequence.ABI
             }
             catch (Exception ex)
             {
-                Debug.LogError("Exception occurred during EncodeUnsignedIntString: " + ex.Message);
+                SequenceLog.Error("Exception occurred during EncodeUnsignedIntString: " + ex.Message);
                 throw;
             }
         }

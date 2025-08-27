@@ -282,7 +282,7 @@ namespace Sequence.Authentication
             catch (Exception ex)
             {
                 string message = $"Failed to register URL scheme '{_urlScheme}': {ex.Message}" + "\nSocial sign in is not currently supported on IL2CPP";
-                Debug.LogWarning(message);
+                SequenceLog.Warning(message);
                 throw new Exception(message);
             }
 #endif

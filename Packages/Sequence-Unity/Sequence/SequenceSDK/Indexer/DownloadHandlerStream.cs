@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Newtonsoft.Json;
+using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -47,7 +48,7 @@ namespace Sequence
                     msg = e.Message
                 });
                 
-                Debug.LogException(e);
+                SequenceLog.Exception(e);
                 return false;
             }
         }

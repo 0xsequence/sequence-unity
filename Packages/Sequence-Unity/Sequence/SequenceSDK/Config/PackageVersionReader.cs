@@ -19,12 +19,15 @@ namespace Sequence.Config
             return ExtractVersionFromJson(json);
         }
 
+
         private static string FindPackageJsonPath()
         {
-            string packagesPath = "Packages/Sequence-Unity/package.json";
-            if (File.Exists(packagesPath))
+            if (CheckDirectories(new[] {
+                    "Packages/Sequence-Unity/package.json",
+                    "Packages/xyz.0xsequence.waas-unity/package.json"
+                }, out var availableFile))
             {
-                return packagesPath;
+                return availableFile;
             }
 
             string[] directories = Directory.GetDirectories("Library/PackageCache/", "xyz.0xsequence.waas-unity*", SearchOption.TopDirectoryOnly);
@@ -40,6 +43,21 @@ namespace Sequence.Config
             }
 
             return null;
+        }
+
+        private static bool CheckDirectories(string[] files, out string availableFile)
+        {
+            foreach (var file in files)
+            {
+                if (File.Exists(file))
+                {
+                    availableFile = file;
+                    return true;
+                }   
+            }
+
+            availableFile = null;
+            return false;
         }
 
         private static string ExtractVersionFromJson(string json)
