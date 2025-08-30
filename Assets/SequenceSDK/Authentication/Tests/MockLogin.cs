@@ -91,7 +91,7 @@ namespace Sequence.Authentication
             
         }
 
-        public void GuestLogin()
+        public Task GuestLogin()
         {
             throw new System.NotImplementedException();
         }
