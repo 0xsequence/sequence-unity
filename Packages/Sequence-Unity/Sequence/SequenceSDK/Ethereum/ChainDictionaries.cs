@@ -85,6 +85,7 @@ namespace Sequence
             new (Chain.TestnetSomnia, "50312", "Somnia Testnet", "somnia-testnet", "https://somnia-testnet.socialscan.io/", "STT", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetFrequency, "53716", "Frequency Testnet", "frequency-testnet", "https://explorer.frequency.zeeve.net/", "BERA", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetIncentiv, "11690", "Incentiv Testnet", "incentiv-testnet", "https://explorer.testnet.incentiv.net/", "CENT", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetIncentiv, "28802", "Incentiv Testnet v2", "incentiv-testnet-v2", "https://explorer.testnet.incentiv.net/", "TCENT", "0x0000000000000000000000000000000000000000"),
         };
 
         public static Dictionary<Chain, string> NameOf;
