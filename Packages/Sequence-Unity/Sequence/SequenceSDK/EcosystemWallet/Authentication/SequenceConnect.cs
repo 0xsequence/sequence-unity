@@ -6,12 +6,7 @@ namespace Sequence.EcosystemWallet
 {
     public class SequenceConnect : IConnect
     {
-        private readonly EcosystemClient _client;
-        
-        public SequenceConnect(EcosystemType ecosystem)
-        {
-            _client = new EcosystemClient(ecosystem);
-        }
+        private readonly EcosystemClient _client = new();
         
         public async Task<IWallet> SignInWithEmail(string email, IPermissions permissions)
         {

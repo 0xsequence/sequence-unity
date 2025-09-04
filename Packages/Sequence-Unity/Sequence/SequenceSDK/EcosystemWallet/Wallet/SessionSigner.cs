@@ -23,7 +23,6 @@ namespace Sequence.EcosystemWallet
         public Address ParentAddress { get; }
         public Address Address { get; }
         public Chain Chain { get; }
-        public EcosystemType Ecosystem { get; }
         public bool IsExplicit { get; }
 
         public Address IdentitySigner
@@ -50,7 +49,6 @@ namespace Sequence.EcosystemWallet
             ParentAddress = credentials.address;
             Address = new EOAWallet(credentials.privateKey).GetAddress();
             Chain = string.IsNullOrEmpty(credentials.chainId) ? Chain.None : ChainDictionaries.ChainById[credentials.chainId];
-            Ecosystem = (EcosystemType)credentials.ecosystemId;
             IsExplicit = credentials.isExplicit;
         }
 

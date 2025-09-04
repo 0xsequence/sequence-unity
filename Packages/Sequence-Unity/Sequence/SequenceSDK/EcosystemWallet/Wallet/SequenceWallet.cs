@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Config;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
@@ -53,8 +54,7 @@ namespace Sequence.EcosystemWallet
             AssertSessionSigners();
             Assert.IsNotNull(permissions);
             
-            var ecosystem = _sessionSigners[0].Ecosystem;
-            var client = new EcosystemClient(ecosystem);
+            var client = new EcosystemClient();
             
             var sessionSigners = await client.CreateNewSession(true, 
                 permissions.GetPermissions(), string.Empty);
@@ -80,19 +80,9 @@ namespace Sequence.EcosystemWallet
                 chainId = new BigInt((int)chain), 
                 message = message
             };
-
-            var ecosystem = _sessionSigners[0].Ecosystem;
-            var url = $"{EcosystemBindings.GetUrl(ecosystem)}/request/sign";
-
-            var handler = RedirectFactory.CreateHandler();
-            handler.SetRedirectUrl(RedirectOrigin.GetOriginString());
             
-            var response = await handler.WaitForResponse<SignMessageArgs, SignMessageResponse>(url, "signMessage", args);
-            
-            if (!response.Result)
-                throw new Exception("Failed to sign message");
-            
-            return response.Data;
+            var client = new EcosystemClient();
+            return await client.SendRequest<SignMessageArgs, SignMessageResponse>("sign", "signMessage", args);
         }
 
         public async Task<FeeOption[]> GetFeeOption(Chain chain, ITransaction transaction)
@@ -207,7 +197,7 @@ namespace Sequence.EcosystemWallet
                 }
             };
             
-            var client = new EcosystemClient(EcosystemType.Sequence);
+            var client = new EcosystemClient();
             var response = await client.SendRequest<SendWalletTransactionArgs, SendWalletTransactionResponse>("transaction",
                 "sendWalletTransaction", args);
 

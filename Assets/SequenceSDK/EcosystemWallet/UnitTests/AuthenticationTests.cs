@@ -6,7 +6,6 @@ namespace Sequence.EcosystemWallet.UnitTests
     public class AuthenticationTests
     {
         private static readonly Chain Chain = Chain.TestnetArbitrumSepolia;
-        private static readonly EcosystemType Ecosystem = EcosystemType.Sequence;
         
         [Test]
         public void Disconnect()
@@ -17,7 +16,7 @@ namespace Sequence.EcosystemWallet.UnitTests
         [Test]
         public async Task SignInWithGoogle()
         {
-            var connect = new SequenceConnect(Ecosystem);
+            var connect = new SequenceConnect();
             await connect.SignInWithGoogle(null);
         }
         

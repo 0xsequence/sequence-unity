@@ -22,9 +22,6 @@ namespace Sequence.Boilerplates
             BasicRestrictive
         }
         
-        [Header("Config")]
-        [SerializeField] private EcosystemType _ecosystem;
-        
         [Header("Components")]
         [SerializeField] private Button _emailLoginButton;
         [SerializeField] private Button _emailContinueButton;
@@ -49,7 +46,7 @@ namespace Sequence.Boilerplates
         
         private void Start()
         {
-            _connect = new SequenceConnect(_ecosystem);
+            _connect = new SequenceConnect();
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
             Open();
         }

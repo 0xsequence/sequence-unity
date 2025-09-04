@@ -1,7 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using Sequence.Config;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.Utils;
 using Sequence.Wallet;
 
 namespace Sequence.EcosystemWallet
@@ -15,11 +17,12 @@ namespace Sequence.EcosystemWallet
     
     internal class EcosystemClient
     {
-        private readonly EcosystemType _ecosystem;
+        private readonly string _walletUrl;
         
-        public EcosystemClient(EcosystemType ecosystem)
+        public EcosystemClient()
         {
-            _ecosystem = ecosystem;
+            _walletUrl = SequenceConfig.GetConfig().WalletAppUrl;
+            _walletUrl = _walletUrl.RemoveTrailingSlash();
         }
         
         /// <summary>
@@ -70,7 +73,7 @@ namespace Sequence.EcosystemWallet
                 response.walletAddress,
                 response.attestation,
                 response.signature,
-                (int)_ecosystem,
+                _walletUrl,
                 chainId,
                 response.loginMethod,
                 response.email);
@@ -83,7 +86,7 @@ namespace Sequence.EcosystemWallet
                     response.walletAddress,
                     null,
                     null,
-                    (int)_ecosystem,
+                    _walletUrl,
                     chainId,
                     response.loginMethod,
                     response.email);
@@ -103,8 +106,11 @@ namespace Sequence.EcosystemWallet
         public async Task<TResponse> SendRequest<TArgs, TResponse>(string path, string action, TArgs args)
         {
             var origin = RedirectOrigin.GetOriginString();
-            var ecosystemUrl = EcosystemBindings.GetUrl(_ecosystem);
-            var url = $"{ecosystemUrl}/request/{path}";
+            
+            var walletUrl = SequenceConfig.GetConfig().WalletAppUrl;
+            walletUrl = walletUrl.RemoveTrailingSlash();
+            
+            var url = $"{walletUrl}/request/{path}";
 
             var handler = RedirectFactory.CreateHandler();
             handler.SetRedirectUrl(origin);

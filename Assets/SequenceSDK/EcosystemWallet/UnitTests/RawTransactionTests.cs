@@ -10,8 +10,6 @@ namespace Sequence.EcosystemWallet.UnitTests
 {
     public class RawTransactionTests
     {
-        private static readonly EcosystemType Ecosystem = EcosystemType.Sequence;
-        
         private static readonly ITransaction[] ImplicitCalls = new []
         {
             new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "implicitEmit()")

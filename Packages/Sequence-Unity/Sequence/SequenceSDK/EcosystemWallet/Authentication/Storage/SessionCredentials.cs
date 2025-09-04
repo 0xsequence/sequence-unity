@@ -17,20 +17,20 @@ namespace Sequence.EcosystemWallet
         public Address sessionAddress;
         public Attestation attestation;
         public RSY signature;
-        public int ecosystemId;
+        public string walletUrl;
         public string chainId;
         public string loginMethod;
         public string email;
         
         public SessionCredentials(bool isExplicit, string privateKey, Address address, Attestation attestation, RSY signature, 
-            int ecosystemId, string chainId, string loginMethod, string email)
+            string walletUrl, string chainId, string loginMethod, string email)
         {
             this.isExplicit = isExplicit;
             this.privateKey = privateKey;
             this.address = address;
             this.attestation = attestation;
             this.signature = signature;
-            this.ecosystemId = ecosystemId;
+            this.walletUrl = walletUrl;
             this.chainId = chainId;
             this.loginMethod = loginMethod;
             this.email = email;
@@ -55,8 +55,8 @@ namespace Sequence.EcosystemWallet
             writer.WritePropertyName("address");
             serializer.Serialize(writer, value.address);
             
-            writer.WritePropertyName("ecosystemId");
-            writer.WriteValue(value.ecosystemId);
+            writer.WritePropertyName("walletUrl");
+            writer.WriteValue(value.walletUrl);
 
             writer.WritePropertyName("chainId");
             writer.WriteValue(value.chainId.ToString());
@@ -98,12 +98,12 @@ namespace Sequence.EcosystemWallet
             var attestation = obj["attestation"]?.ToObject<Attestation>(serializer);
             var signature = obj["signature"]?.ToObject<RSY>(serializer);
 
-            var ecosystemId = obj["ecosystemId"]?.ToObject<int>() ?? -1;
+            var walletUrl = obj["walletUrl"]?.ToString();
             var chainId = obj["chainId"]?.ToString();
             var loginMethod = obj["loginMethod"]?.ToString();
             var email = obj["email"]?.ToString();
 
-            return new SessionCredentials(isExplicit, privateKey, address, attestation, signature, ecosystemId, chainId, loginMethod, email);
+            return new SessionCredentials(isExplicit, privateKey, address, attestation, signature, walletUrl, chainId, loginMethod, email);
         }
     }
 }
