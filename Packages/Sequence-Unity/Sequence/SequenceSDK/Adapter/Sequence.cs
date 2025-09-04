@@ -9,6 +9,8 @@ namespace Sequence.Adapter
 {
     public class Sequence : ISequence, IDisposable
     {
+        private static Sequence _instance;
+        
         private IWallet _wallet;
         public IWallet Wallet
         {
@@ -30,19 +32,37 @@ namespace Sequence.Adapter
             }
         }
 
-        private readonly Chain _chain;
-        private readonly ChainIndexer _indexer;
-        private readonly CurrencySwap _swap;
-        private readonly MarketplaceReader _marketplace;
+        private Chain _chain;
+        public Chain Chain
+        {
+            get => _chain;
+            set
+            {
+                _chain = value;
+                _indexer = new ChainIndexer(_chain);
+                _swap = new CurrencySwap(_chain);
+                _marketplace = new MarketplaceReader(_chain);
+            }
+        }
+        
+        private ChainIndexer _indexer;
+        private CurrencySwap _swap;
+        private MarketplaceReader _marketplace;
         private Checkout _checkout;
 
-        public Sequence(Chain chain)
+        public static Sequence GetInstance()
         {
-            _chain = chain;
-            _indexer = new ChainIndexer(_chain);
-            _swap = new CurrencySwap(_chain);
-            _marketplace = new MarketplaceReader(_chain);
+            if (_instance != null) 
+                return _instance;
+            
+            _instance = new Sequence();
+            _instance.Chain = Chain.TestnetArbitrumSepolia;
 
+            return _instance;
+        }
+
+        public Sequence()
+        {
             SequenceWallet.OnWalletCreated += UpdateWallet;
         }
         
@@ -76,16 +96,27 @@ namespace Sequence.Adapter
             await LoginHandler.GuestLogin();
         }
         
-        public void GoogleLogin()
+        public async Task GoogleLogin()
         {
             LoginHandler.GoogleLogin();
+            await WaitForLoginProcess();
         }
         
-        public void AppleLogin()
+        public async Task AppleLogin()
         {
             LoginHandler.AppleLogin();
+            await WaitForLoginProcess();
         }
 
+        public async Task<bool> SignOut()
+        {
+            var result = await _wallet.DropThisSession();
+            if (result)
+                _loginHandler.RemoveConnectedWalletAddress();
+            
+            return result;
+        }
+        
         public async Task<string> GetIdToken()
         {
             var response = await Wallet.GetIdToken();
@@ -130,13 +161,13 @@ namespace Sequence.Adapter
             return await SendTransaction(new[] { transaction });
         }
         
-        public async Task SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount)
+        public async Task<string> SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount)
         {
             var walletAddress = Wallet.GetWalletAddress();
             var quote = await _swap.GetSwapQuote(walletAddress, buyToken, 
                 sellToken, buyAmount.ToString(), true);
             
-            await SendTransaction(new Transaction[]
+            return await SendTransaction(new Transaction[]
                 { 
                     new RawTransaction(sellToken, string.Empty, quote.approveData),
                     new RawTransaction(quote.to, quote.transactionValue, quote.transactionData),
@@ -179,10 +210,17 @@ namespace Sequence.Adapter
             };
         }
 
+        private async Task WaitForLoginProcess()
+        {
+            while (_loginHandler.IsLoggingIn())
+                await Task.Yield();
+        }
+
         private void UpdateWallet(IWallet wallet)
         {
             Wallet = wallet;
             _checkout = new Checkout(wallet, _chain);
+            _loginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());
         }
         
         private void EnsureWalletReferenceExists()

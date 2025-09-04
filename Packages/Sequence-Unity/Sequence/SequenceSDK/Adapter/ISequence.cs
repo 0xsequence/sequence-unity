@@ -8,6 +8,8 @@ namespace Sequence.Adapter
 {
     public interface ISequence
     {
+        public Chain Chain { get; }
+        
         /// <summary>
         /// The underlying Sequence Embedded Wallet reference. Use it for more control, such as transaction batches. 
         /// </summary>
@@ -45,12 +47,14 @@ namespace Sequence.Adapter
         /// <summary>
         /// Sign In with Google. The user is redirected to an external browser.
         /// </summary>
-        void GoogleLogin();
+        Task GoogleLogin();
 
         /// <summary>
         /// Sign In with Apple. The user is redirected to an external browser. On iOS, this function uses the native Sign In SDK.
         /// </summary>
-        void AppleLogin();
+        Task AppleLogin();
+
+        Task<bool> SignOut();
 
         /// <summary>
         /// Get an id token as a JWT you can use to verify the user on your backend. Use any JWKS library to verify this token.
@@ -100,7 +104,7 @@ namespace Sequence.Adapter
         /// <param name="buyToken"></param>
         /// <param name="buyAmount"></param>
         /// <returns></returns>
-        Task SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount);
+        Task<string> SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount);
 
         /// <summary>
         /// Get all listings from your Marketplace on a given collection. Please make sure you have configured your Marketplace on https://sequence.build/
