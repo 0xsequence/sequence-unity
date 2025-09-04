@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives.Common;
@@ -139,10 +140,10 @@ namespace Sequence.EcosystemWallet
                 
                 calls = calls.Unshift(feeOptionCall);
             }
-
+            
             var txnService = new TransactionService(_sessionSigners, _state);
             var transactionData = await txnService.SignAndBuild(chain, calls, true);
-            
+                
             var relayer = new SequenceRelayer(chain);
             var hash = await relayer.Relay(transactionData.To, transactionData.Data);
 
@@ -186,6 +187,31 @@ namespace Sequence.EcosystemWallet
                 SequenceLog.Exception(e);
                 return false;
             }
+        }
+
+        public async Task<string> SendTransactionThroughEcosystem(Chain chain, ITransaction transaction)
+        {
+            var chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[chain]);
+            var call = transaction.GetCall();
+            
+            var args = new SendWalletTransactionArgs
+            {
+                chainId = chainId,
+                address = Address,
+                transactionRequest = new TransactionRequest
+                {
+                    to = call.to,
+                    value = call.value,
+                    gasLimit = call.gasLimit,
+                    data = call.data.ByteArrayToHexStringWithPrefix()
+                }
+            };
+            
+            var client = new EcosystemClient(EcosystemType.Sequence);
+            var response = await client.SendRequest<SendWalletTransactionArgs, SendWalletTransactionResponse>("transaction",
+                "sendWalletTransaction", args);
+
+            return response.transactionHash;
         }
 
         private void AssertSessionSigners()

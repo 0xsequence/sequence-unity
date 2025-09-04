@@ -4059,6 +4059,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chain: 10
+  _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 1
   _feeOptionAddress:
   - 0x7F5c764cBc14f9669B88837ca1490cCa17c31607
@@ -7556,6 +7557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chain: 421614
+  _allowTransactionThroughEcosystem: 1
   _useFeeOptions: 0
   _feeOptionAddress: []
   _transaction:
@@ -13158,6 +13160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chain: 421614
+  _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 0
   _feeOptionAddress: []
   _transaction:

@@ -70,6 +70,14 @@ namespace Sequence.EcosystemWallet
         /// <param name="feeOption"></param>
         /// <returns></returns>
         Task<string> SendTransaction(Chain chain, ITransaction[] transactions, FeeOption feeOption = null);
+        
+        /// <summary>
+        /// Send a transaction by opening the ecosystems wallet app.
+        /// </summary>
+        /// <param name="chain"></param>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        Task<string> SendTransactionThroughEcosystem(Chain chain, ITransaction transaction);
 
         /// <summary>
         /// Checks whether this wallet is capable of signing the given calls.

@@ -34,6 +34,7 @@ namespace Sequence.Boilerplates
         
         [Header("Transactions")]
         [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
+        [SerializeField] private bool _allowTransactionThroughEcosystem;
         [SerializeField] private bool _useFeeOptions;
         [SerializeField] private string[] _feeOptionAddress;
         [SerializeField] private SerializableTransaction _transaction;
@@ -118,7 +119,12 @@ namespace Sequence.Boilerplates
         {
             try
             {
-                var txnHash = await _wallet.SendTransaction(_chain, transaction, feeOption);
+                string txnHash;
+                if (_allowTransactionThroughEcosystem)
+                    txnHash = await _wallet.SendTransactionThroughEcosystem(_chain, transaction);
+                else
+                    txnHash = await _wallet.SendTransaction(_chain, transaction, feeOption);
+                
                 _transactionResult.Show(_chain, txnHash);
             }
             catch (Exception e)
@@ -140,6 +146,8 @@ namespace Sequence.Boilerplates
             try
             {
                 var supported = await _wallet.SupportsTransaction(_chain, _transaction.BuildTransaction());
+                supported |= _allowTransactionThroughEcosystem;
+                
                 SetState(supported ? State.Transaction : State.Session);
             }
             catch (Exception e)

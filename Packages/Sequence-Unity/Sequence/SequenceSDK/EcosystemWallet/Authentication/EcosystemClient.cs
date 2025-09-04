@@ -57,16 +57,9 @@ namespace Sequence.EcosystemWallet
             };
             
             var action = type == SessionCreationType.AddExplicit ? "addExplicitSession" : "createNewSession";
-            var ecosystemUrl = EcosystemBindings.GetUrl(_ecosystem);
-            var url = $"{ecosystemUrl}/request/connect";
-
-            var handler = RedirectFactory.CreateHandler();
-            handler.SetRedirectUrl(origin);
             
-            var response = await handler.WaitForResponse<ConnectArgs, ConnectResponse>(url, action, payload);
-            if (!response.Result)
-                throw new Exception("Error during request");
-
+            var response = await SendRequest<ConnectArgs, ConnectResponse>("connect", action, payload);
+            
             var isImplicitWithPermissions = includeImplicitSession && permissions != null;
             var credentialsLen = isImplicitWithPermissions ? 2 : 1;
             var credentials = new SessionCredentials[credentialsLen];
@@ -74,26 +67,26 @@ namespace Sequence.EcosystemWallet
             credentials[0] = new SessionCredentials(
                 !includeImplicitSession,
                 sessionWallet.GetPrivateKeyAsHex(),
-                response.Data.walletAddress,
-                response.Data.attestation,
-                response.Data.signature,
+                response.walletAddress,
+                response.attestation,
+                response.signature,
                 (int)_ecosystem,
                 chainId,
-                response.Data.loginMethod,
-                response.Data.email);
+                response.loginMethod,
+                response.email);
 
             if (isImplicitWithPermissions)
             {
                 credentials[1] = new SessionCredentials(
                     true,
                     sessionWallet.GetPrivateKeyAsHex(),
-                    response.Data.walletAddress,
+                    response.walletAddress,
                     null,
                     null,
                     (int)_ecosystem,
                     chainId,
-                    response.Data.loginMethod,
-                    response.Data.email);
+                    response.loginMethod,
+                    response.email);
             }
             
             var signers = new SessionSigner[credentials.Length];
@@ -105,6 +98,22 @@ namespace Sequence.EcosystemWallet
             }
 
             return signers;
+        }
+
+        public async Task<TResponse> SendRequest<TArgs, TResponse>(string path, string action, TArgs args)
+        {
+            var origin = RedirectOrigin.GetOriginString();
+            var ecosystemUrl = EcosystemBindings.GetUrl(_ecosystem);
+            var url = $"{ecosystemUrl}/request/{path}";
+
+            var handler = RedirectFactory.CreateHandler();
+            handler.SetRedirectUrl(origin);
+            
+            var response = await handler.WaitForResponse<TArgs, TResponse>(url, action, args);
+            if (!response.Result)
+                throw new Exception("Error during request");
+            
+            return response.Data;
         }
 
         private SessionCreationType DetermineSessionCreationType(bool addExplicit, SessionPermissions permissions)

@@ -7,6 +7,11 @@ using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet
 {
+    public class SignerException : Exception
+    {
+        public SignerException(string message) : base(message) { }
+    }
+    
     internal class SignerService
     {
         private readonly SessionSigner[] _sessionSigners;
@@ -33,12 +38,12 @@ namespace Sequence.EcosystemWallet
 
             var availableSigners = ArrayUtils.CombineArrays(validImplicitSigners, validExplicitSigners);
             if (availableSigners.Length == 0)
-                throw new Exception("no valid signers found");
+                throw new SignerException("no valid signers found");
             
             var supportedSignersForCalls = await FindSignerForEachCall(chain, availableSigners, calls);
             
             if (supportedSignersForCalls.Length != calls.Length)
-                throw new Exception("Unable to find a signer for one of the given calls.");
+                throw new SignerException("Unable to find a signer for one of the given calls.");
             
             return supportedSignersForCalls;
         }
