@@ -4,393 +4,125 @@ namespace Sequence
 {
     public static class ChainDictionaries
     {
-        public static Dictionary<Chain, string> NameOf = new Dictionary<Chain, string>()
+        private struct ChainConfig
         {
-            { Chain.Ethereum, "Ethereum" },
-            { Chain.Polygon, "Polygon" },
-            { Chain.PolygonZkEvm, "Polygon zkEvm"},
-            { Chain.BNBSmartChain, "BNB Smart Chain" },
-            { Chain.ArbitrumOne, "Arbitrum One" },
-            { Chain.ArbitrumNova, "Arbitrum Nova" },
-            { Chain.Optimism, "Optimism" },
-            { Chain.Avalanche, "Avalanche" },
-            { Chain.Gnosis, "Gnosis" },
-            { Chain.Base, "Base" },
-            { Chain.OasysHomeverse, "Oasys Homeverse" },
-            { Chain.Xai, "Xai" },
-            { Chain.AstarZKEvm, "Astar zkEVM" },
-            { Chain.Blast, "Blast" },
-            { Chain.B3, "B3" },
-            { Chain.APEChain, "APE Chain" },
-            { Chain.ImmutableZkEvm, "Immutable zkEVM"},
-            { Chain.SkaleNebula, "Skale Nebula" },
-            { Chain.Root, "Root" },
-            { Chain.LAOS, "LAOS" },
-            { Chain.Soneium, "Soneium" },
-            { Chain.Telos, "Telos" },
-            { Chain.Moonbeam, "Moonbeam"},
-            { Chain.Etherlink, "Etherlink" },
-            { Chain.XR1, "XR1" },
-            { Chain.Somnia, "Somnia" },
+            public readonly Chain Chain;
+            public readonly string ChainId;
+            public readonly string Name;
+            public readonly string Path;
+            public readonly string BlockExplorerUrl;
+            public readonly string GasCurrency;
+            public readonly string NativeTokenAddress;
 
-            { Chain.TestnetSepolia, "Sepolia" },
-            { Chain.TestnetArbitrumSepolia, "Arbitrum Sepolia" },
-            { Chain.TestnetBNBSmartChain, "BNB Smart Chain Testnet" },
-            { Chain.TestnetBaseSepolia, "Base Sepolia" },
-            { Chain.TestnetOasysHomeverse, "Testnet Oasys Homeverse"},
-            { Chain.TestnetAvalanche, "Testnet Avalanche"},
-            { Chain.TestnetOptimisticSepolia, "Optimistic Sepolia"},
-            { Chain.TestnetPolygonAmoy, "Polygon Amoy" },
-            { Chain.TestnetAstarZKyoto, "Astar zKyoto Testnet"},
-            { Chain.TestnetXrSepolia, "XR Sepolia" },
-            { Chain.TestnetXaiSepolia, "Xai Sepolia" },
-            { Chain.TestnetB3Sepolia, "B3 Sepolia" },
-            { Chain.TestnetAPEChain, "APE Chain Testnet" },
-            { Chain.TestnetBlastSepolia, "Blast Sepolia" },
-            { Chain.TestnetBorne, "Borne Testnet" },
-            { Chain.TestnetSkaleNebulaGamingHub, "Skale Nebula Gaming Hub Testnet" },
-            { Chain.TestnetSoneiumMinato, "Soneium Minato Testnet" },
-            { Chain.TestnetToy, "TOY Testnet" },
-            { Chain.TestnetImmutableZkEvm, "Immutable zkEVM Testnet" },
-            { Chain.TestnetRootPorcini, "Root Porcini Testnet" },
-            { Chain.TestnetLAOSSigma, "LAOS Sigma Testnet" },
-            { Chain.TestnetTelos, "Telos Testnet" },
-            { Chain.TestnetMoonbaseAlpha, "Moonbase Alpha" },
-            { Chain.TestnetEtherlink, "Etherlink Testnet" },
-            { Chain.TestnetMonad, "Monad Testnet" },
-            { Chain.TestnetSomnia, "Somnia Testnet" },
-            { Chain.TestnetFrequency, "Frequency Testnet" },
-            { Chain.TestnetIncentiv, "Incentiv Testnet"},
+            public ChainConfig(Chain chain, string chainId, string name, string path, string blockExplorerUrl, 
+                string gasCurrency, string nativeTokenAddress)
+            {
+                Chain = chain;
+                ChainId = chainId;
+                Name = name;
+                Path = path;
+                BlockExplorerUrl = blockExplorerUrl;
+                GasCurrency = gasCurrency;
+                NativeTokenAddress = nativeTokenAddress;
+            }
+        }
+
+        private static ChainConfig[] ChainConfigs = new ChainConfig[]
+        {
+            new (Chain.Ethereum, "1", "Ethereum", "mainnet", "https://etherscan.io/", "ETH", "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2"),
+            new (Chain.Polygon, "137", "Polygon", "polygon", "https://polygonscan.com/", "POL", "0x0000000000000000000000000000000000001010"),
+            new (Chain.PolygonZkEvm, "1101", "Polygon zkEvm", "polygon-zkevm", "https://zkevm.polygonscan.com/", "POL", "0xa2036f0538221a77A3937F1379699f44945018d0"),
+            new (Chain.BNBSmartChain, "56", "BNB Smart Chain", "bsc", "https://bscscan.com/", "BNB", "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"),
+            new (Chain.ArbitrumOne, "42161", "Arbitrum One", "arbitrum", "https://arbiscan.io/", "AETH", "0x912CE59144191C1204E64559FE8253a0e49E6548"),
+            new (Chain.ArbitrumNova, "42170", "Arbitrum Nova", "arbitrum-nova", "https://nova.arbiscan.io/", "AETH", "0xf823c3cd3cebe0a1fa952ba88dc9eef8e0bf46ad"),
+            new (Chain.Optimism, "10", "Optimism", "optimism", "https://optimistic.etherscan.io/", "OP", "0x4200000000000000000000000000000000000042"),
+            new (Chain.Avalanche, "43114", "Avalanche", "avalanche", "https://subnets.avax.network/c-chain/", "AVAX", "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7"),
+            new (Chain.Gnosis, "100", "Gnosis", "gnosis", "https://gnosisscan.io/", "xDai", "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb"),
+            new (Chain.Base, "8453", "Base", "base", "https://basescan.org/", "ETH", "0x4200000000000000000000000000000000000006"),
+            new (Chain.OasysHomeverse, "19011", "Oasys Homeverse", "homeverse", "https://explorer.oasys.homeverse.games/", "OAS", "0xd07df0da6e67b31db33cde4a6893e06bd87f8a08"),
+            new (Chain.AstarZKEvm, "3776", "Astar zkEVM", "astar-zkevm", "https://astar-zkevm.explorer.startale.com/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Xai, "660279", "Xai", "xai", "https://explorer.xai-chain.net/", "XAI", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Blast, "81457", "Blast", "blast", "https://blastscan.io/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.B3, "8333", "B3", "b3", "https://explorer.b3.fun/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.APEChain, "33139", "APE Chain", "apechain", "https://apescan.io/", "APE", "0x0000000000000000000000000000000000000000"),
+            new (Chain.ImmutableZkEvm, "13371", "Immutable zkEVM", "immutable-zkevm", "https://explorer.immutable.com/", "IMX", "0x0000000000000000000000000000000000000000"),
+            new (Chain.SkaleNebula, "1482601649", "Skale Nebula", "skale-nebula", "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/", "sFUEL", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Root, "7668", "Root", "rootnet", "https://rootscan.io/", "XRP", "0x0000000000000000000000000000000000000000"),
+            new (Chain.LAOS, "6283", "LAOS", "laos", "https://blockscout.laos.laosfoundation.io/", "LAOS", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Soneium, "1868", "Soneium", "soneium", "https://vk9a3tgpne6qmub8.blockscout.com/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Telos, "40", "Telos", "telos", "https://www.teloscan.io/", "TLOS", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Moonbeam, "1284", "Moonbeam", "moonbeam", "https://moonscan.io/", "GLMR", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Etherlink, "42793", "Etherlink", "etherlink", "https://explorer.etherlink.com/", "XTZ", "0x0000000000000000000000000000000000000000"),
+            new (Chain.XR1, "273", "XR1", "xr1", "", "XR1", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Somnia, "5031", "Somnia", "somnia", "https://mainnet.somnia.w3us.site/", "STT", "0x0000000000000000000000000000000000000000"),
+
+            // --- TESTNETS ---
+            new (Chain.TestnetSepolia, "11155111", "Sepolia", "sepolia", "https://sepolia.etherscan.io/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetArbitrumSepolia, "421614", "Arbitrum Sepolia", "arbitrum-sepolia", "https://sepolia.arbiscan.io/", "AETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetBNBSmartChain, "97", "BNB Smart Chain Testnet", "bsc-testnet", "https://testnet.bscscan.com/", "BNB", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetBaseSepolia, "84532", "Base Sepolia", "base-sepolia", "https://sepolia.basescan.org/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetOasysHomeverse, "40875", "Testnet Oasys Homeverse", "homeverse-testnet", "https://explorer.testnet.oasys.games/", "OAS", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetAvalanche, "43113", "Testnet Avalanche", "avalanche-testnet", "https://testnet.snowtrace.io/", "AVAX", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetOptimisticSepolia, "11155420", "Optimistic Sepolia", "optimism-sepolia", "https://sepolia-optimism.etherscan.io/", "OP", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetPolygonAmoy, "80002", "Polygon Amoy", "amoy", "https://amoy.polygonscan.com/", "POL", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetAstarZKyoto, "6038361", "Astar zKyoto Testnet", "astar-zkyoto", "https://astar-zkyoto.blockscout.com/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetXrSepolia, "2730", "XR Sepolia", "xr-sepolia", "https://xr-sepolia-testnet.explorer.caldera.xyz/", "tXR", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetXaiSepolia, "37714555429", "Xai Sepolia", "xai-sepolia", "https://testnet-explorer-v2.xai-chain.net/", "sXAI", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetB3Sepolia, "1993", "B3 Sepolia", "b3-sepolia", "https://sepolia.explorer.b3.fun/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetAPEChain, "33111", "APE Chain Testnet", "apechain-testnet", "https://curtis.explorer.caldera.xyz/", "APE", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetBlastSepolia, "168587773", "Blast Sepolia", "blast-sepolia", "https://testnet.blastscan.io/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetBorne, "94984", "Borne Testnet", "borne-testnet", "https://subnets-test.avax.network/bornegfdn", "BORNE", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetSkaleNebulaGamingHub, "37084624", "Skale Nebula Gaming Hub Testnet", "skale-nebula-testnet", "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/", "sFUEL", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetSoneiumMinato, "1946", "Soneium Minato Testnet", "soneium-minato", "https://explorer-testnet.soneium.org/", "ETH", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetToy, "21000000", "TOY Testnet", "toy-testnet", "https://toy-chain-testnet.explorer.caldera.xyz/", "TOY", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetImmutableZkEvm, "13473", "Immutable zkEVM Testnet", "immutable-zkevm-testnet", "https://explorer.testnet.immutable.com/", "IMX", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetRootPorcini, "7672", "Root Porcini Testnet", "rootnet-porcini", "https://porcini.rootscan.io/", "XRP", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetLAOSSigma, "62850", "LAOS Sigma Testnet", "laos-sigma-testnet", "https://sigma.explorer.laosnetwork.io/", "SIGMA", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetTelos, "41", "Telos Testnet", "telos-testnet", "https://testnet.teloscan.io/", "TLOS", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetMoonbaseAlpha, "1287", "Moonbase Alpha", "moonbase-alpha", "https://moonbase.moonscan.io/", "DEV", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetEtherlink, "128123", "Etherlink Testnet", "etherlink-testnet", "https://testnet.explorer.etherlink.com/", "XTZ", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetMonad, "10143", "Monad Testnet", "monad-testnet", "https://testnet.monadexplorer.com/", "MON", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetSomnia, "50312", "Somnia Testnet", "somnia-testnet", "https://somnia-testnet.socialscan.io/", "STT", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetFrequency, "53716", "Frequency Testnet", "frequency-testnet", "https://explorer.frequency.zeeve.net/", "BERA", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetIncentiv, "11690", "Incentiv Testnet", "incentiv-testnet", "https://explorer.testnet.incentiv.net/", "CENT", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetIncentiv, "28802", "Incentiv Testnet v2", "incentiv-testnet-v2", "https://explorer.testnet.incentiv.net/", "TCENT", "0x0000000000000000000000000000000000000000"),
         };
 
-        public static Dictionary<Chain, string> GasCurrencyOf = new Dictionary<Chain, string>()
+        public static Dictionary<Chain, string> NameOf;
+        public static Dictionary<Chain, string> GasCurrencyOf;
+        public static Dictionary<Chain, string> NativeTokenAddressOf;
+        public static Dictionary<Chain, string> BlockExplorerOf;
+        public static Dictionary<Chain, string> ChainIdOf;
+        public static Dictionary<string, Chain> ChainById;
+        public static Dictionary<Chain, string> PathOf;
+
+        /// <summary>
+        /// Initialize the dictionaries once the domain reloads, ensuring they always reflect the latest chains from
+        /// the ChainConfig array.
+        /// </summary>
+        static ChainDictionaries() 
+            => InitializeDictionaries();
+
+        private static void InitializeDictionaries()
         {
-            { Chain.Ethereum, "ETH" },
-            { Chain.Polygon, "POL" },
-            { Chain.PolygonZkEvm, "POL" },
-            { Chain.BNBSmartChain, "BNB" },
-            { Chain.ArbitrumOne, "AETH" },
-            { Chain.ArbitrumNova, "AETH" },
-            { Chain.Optimism, "OP" },
-            { Chain.Avalanche, "AVAX" },
-            { Chain.Gnosis, "xDai" },
-            { Chain.Base, "ETH" },
-            { Chain.OasysHomeverse, "OAS"},
-            { Chain.AstarZKEvm, "ETH" },
-            { Chain.Xai, "XAI" },
-            { Chain.Blast, "ETH" },
-            { Chain.B3, "ETH" },
-            { Chain.APEChain, "APE" },
-            { Chain.ImmutableZkEvm, "IMX" },
-            { Chain.SkaleNebula, "sFUEL" },
-            { Chain.Root, "XRP" },
-            { Chain.LAOS, "LAOS" },
-            { Chain.Soneium, "ETH" },
-            { Chain.Telos, "TLOS" },
-            { Chain.Moonbeam, "GLMR" },
-            { Chain.Etherlink, "XTZ" },
-            { Chain.XR1, "XR1" },
-            { Chain.Somnia, "STT" },
+            NameOf = new Dictionary<Chain, string>();
+            GasCurrencyOf = new Dictionary<Chain, string>();
+            NativeTokenAddressOf = new Dictionary<Chain, string>();
+            BlockExplorerOf = new Dictionary<Chain, string>();
+            ChainIdOf = new Dictionary<Chain, string>();
+            ChainById = new Dictionary<string, Chain>();
+            PathOf = new Dictionary<Chain, string>();
 
-            { Chain.TestnetSepolia, "ETH" },
-            { Chain.TestnetArbitrumSepolia, "AETH" },
-            { Chain.TestnetBNBSmartChain, "BNB" },
-            { Chain.TestnetBaseSepolia, "ETH" },
-            { Chain.TestnetOasysHomeverse, "OAS"},
-            { Chain.TestnetAvalanche, "AVAX"},
-            { Chain.TestnetOptimisticSepolia, "OP"},
-            { Chain.TestnetPolygonAmoy, "POL" },
-            { Chain.TestnetAstarZKyoto, "ETH"},
-            { Chain.TestnetXrSepolia, "tXR" },
-            { Chain.TestnetXaiSepolia, "sXAI" },
-            { Chain.TestnetB3Sepolia, "ETH" },
-            { Chain.TestnetAPEChain, "APE" },
-            { Chain.TestnetBlastSepolia, "ETH" },
-            { Chain.TestnetBorne, "BORNE" },
-            { Chain.TestnetSkaleNebulaGamingHub, "sFUEL" },
-            { Chain.TestnetSoneiumMinato, "ETH" },
-            { Chain.TestnetToy, "TOY" },
-            { Chain.TestnetImmutableZkEvm, "IMX" },
-            { Chain.TestnetRootPorcini, "XRP" },
-            { Chain.TestnetLAOSSigma, "SIGMA" },
-            { Chain.TestnetTelos, "TLOS" },
-            { Chain.TestnetMoonbaseAlpha, "DEV" },
-            { Chain.TestnetEtherlink, "XTZ" },
-            { Chain.TestnetMonad, "MON" },
-            { Chain.TestnetSomnia, "STT" },
-            { Chain.TestnetFrequency, "BERA" },
-            { Chain.TestnetIncentiv, "CENT"}
-        };
-
-        public static Dictionary<Chain, string> NativeTokenAddressOf = new Dictionary<Chain, string>()
-        {
-            { Chain.Ethereum, "0xC02aaA39b223FE8D0A0E5C4F27eAD9083C756Cc2" }, // WETH
-            { Chain.Polygon, "0x0000000000000000000000000000000000001010" }, // MATIC on Polygon
-            { Chain.PolygonZkEvm, "0xa2036f0538221a77A3937F1379699f44945018d0" }, // MATIC on zkEvm
-            { Chain.BNBSmartChain, "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" }, // WBNB on BNB SmartChain
-            { Chain.ArbitrumOne, "0x912CE59144191C1204E64559FE8253a0e49E6548" }, // ARB on Arbitrum
-            { Chain.ArbitrumNova, "0xf823c3cd3cebe0a1fa952ba88dc9eef8e0bf46ad" }, // ARB on Arbitrum Nova
-            { Chain.Optimism, "0x4200000000000000000000000000000000000042" }, // OP
-            { Chain.Avalanche, "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7" }, // AVAX
-            { Chain.Gnosis, "0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb" }, // xDai 
-            { Chain.Base, "0x4200000000000000000000000000000000000006" }, // WETH9 on Base
-            { Chain.OasysHomeverse, "0xd07df0da6e67b31db33cde4a6893e06bd87f8a08" }, // Placeholder for OAS token (0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000 explorers OAS token page)
-            { Chain.AstarZKEvm, "0x0000000000000000000000000000000000000000" }, // Placeholder for Astar token
-            { Chain.Xai, "0x0000000000000000000000000000000000000000" }, // Placeholder for XAI token
-            { Chain.Blast, "0x0000000000000000000000000000000000000000" }, // Placeholder for Blast token
-            
-            { Chain.TestnetSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Sepolia ETH
-            { Chain.TestnetArbitrumSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Arbitrum Sepolia ETH
-            { Chain.TestnetBNBSmartChain, "0x0000000000000000000000000000000000000000" }, // Placeholder for BNB Testnet
-            { Chain.TestnetBaseSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Base Sepolia ETH
-            { Chain.TestnetOasysHomeverse, "0x0000000000000000000000000000000000000000" }, // Placeholder for Oasys Testnet token
-            { Chain.TestnetAvalanche, "0x0000000000000000000000000000000000000000" }, // Placeholder for Avalanche Testnet token
-            { Chain.TestnetOptimisticSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Optimism Sepolia ETH
-            { Chain.TestnetPolygonAmoy, "0x0000000000000000000000000000000000000000" }, // Placeholder for Polygon Amoy Testnet token
-            { Chain.TestnetAstarZKyoto, "0x0000000000000000000000000000000000000000" }, // Placeholder for Astar zKyoto token
-            { Chain.TestnetXrSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for XR Sepolia token
-            { Chain.TestnetXaiSepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for Xai Sepolia token
-            { Chain.TestnetB3Sepolia, "0x0000000000000000000000000000000000000000" }, // Placeholder for B3 Sepolia token
-            { Chain.TestnetAPEChain, "0x0000000000000000000000000000000000000000" }, // Placeholder for APE Chain Testnet token
-            { Chain.TestnetBlastSepolia, "0x0000000000000000000000000000000000000000" }  // Placeholder for Blast Sepolia token
-        };
-
-        public static Dictionary<Chain, string> BlockExplorerOf = new Dictionary<Chain, string>()
-        {
-            { Chain.Ethereum, "https://etherscan.io/" },
-            { Chain.Polygon, "https://polygonscan.com/" },
-            { Chain.PolygonZkEvm, "https://zkevm.polygonscan.com/" },
-            { Chain.BNBSmartChain, "https://bscscan.com/" },
-            { Chain.ArbitrumOne, "https://arbiscan.io/" },
-            { Chain.ArbitrumNova, "https://nova.arbiscan.io/" },
-            { Chain.Optimism, "https://optimistic.etherscan.io/" },
-            { Chain.Avalanche, "https://subnets.avax.network/c-chain/" },
-            { Chain.Gnosis, "https://gnosisscan.io/" },
-            { Chain.Base, "https://basescan.org/" },
-            { Chain.OasysHomeverse, "https://explorer.oasys.homeverse.games/" },
-            { Chain.AstarZKEvm, "https://astar-zkevm.explorer.startale.com/" },
-            { Chain.Xai, "https://explorer.xai-chain.net/" },
-            { Chain.Blast, "https://blastscan.io/" },
-            { Chain.B3, "https://explorer.b3.fun/" },
-            { Chain.APEChain, "https://apescan.io/" },
-            { Chain.ImmutableZkEvm, "https://explorer.immutable.com/" },
-            { Chain.SkaleNebula, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
-            { Chain.Root, "https://rootscan.io/" },
-            { Chain.LAOS, "https://blockscout.laos.laosfoundation.io/" },
-            { Chain.Soneium, "https://vk9a3tgpne6qmub8.blockscout.com/" },
-            { Chain.Telos, "https://www.teloscan.io/" },
-            { Chain.Moonbeam, "https://moonscan.io/"},
-            { Chain.Etherlink, "https://explorer.etherlink.com/"},
-            { Chain.XR1, ""}, // TDB
-            { Chain.Somnia, "https://mainnet.somnia.w3us.site/"},
-
-            { Chain.TestnetSepolia, "https://sepolia.etherscan.io/" },
-            { Chain.TestnetArbitrumSepolia, "https://sepolia.arbiscan.io/" },
-            { Chain.TestnetBNBSmartChain, "https://testnet.bscscan.com/" },
-            { Chain.TestnetBaseSepolia, "https://sepolia.basescan.org/" },
-            { Chain.TestnetOasysHomeverse, "https://explorer.testnet.oasys.games/" },
-            { Chain.TestnetAvalanche, "https://testnet.snowtrace.io/" },
-            { Chain.TestnetOptimisticSepolia, "https://sepolia-optimism.etherscan.io/" },
-            { Chain.TestnetPolygonAmoy, "https://amoy.polygonscan.com/" },
-            { Chain.TestnetAstarZKyoto, "https://astar-zkyoto.blockscout.com/" },
-            { Chain.TestnetXrSepolia, "https://xr-sepolia-testnet.explorer.caldera.xyz/" },
-            { Chain.TestnetXaiSepolia, "https://testnet-explorer-v2.xai-chain.net/" },
-            { Chain.TestnetB3Sepolia, "https://sepolia.explorer.b3.fun/" },
-            { Chain.TestnetAPEChain, "https://curtis.explorer.caldera.xyz/" }, 
-            { Chain.TestnetBlastSepolia, "https://testnet.blastscan.io/" },
-            { Chain.TestnetBorne, "https://subnets-test.avax.network/bornegfdn" },
-            { Chain.TestnetSkaleNebulaGamingHub, "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/" },
-            { Chain.TestnetSoneiumMinato, "https://explorer-testnet.soneium.org/" },
-            { Chain.TestnetToy, "https://toy-chain-testnet.explorer.caldera.xyz/" },
-            { Chain.TestnetImmutableZkEvm, "https://explorer.testnet.immutable.com/" },
-            { Chain.TestnetRootPorcini, "https://porcini.rootscan.io/" },
-            { Chain.TestnetLAOSSigma, "https://sigma.explorer.laosnetwork.io/" },
-            { Chain.TestnetTelos, "https://testnet.teloscan.io/" },
-            { Chain.TestnetMoonbaseAlpha, "https://moonbase.moonscan.io/" },
-            { Chain.TestnetEtherlink, "https://testnet.explorer.etherlink.com/" },
-            { Chain.TestnetMonad, "https://testnet.monadexplorer.com/" },
-            { Chain.TestnetSomnia, "https://somnia-testnet.socialscan.io/" },
-            { Chain.TestnetFrequency, "https://explorer.frequency.zeeve.net/" },
-            { Chain.TestnetIncentiv, "https://explorer.testnet.incentiv.net/"}
-        };
-
-        public static Dictionary<Chain, string> ChainIdOf = new Dictionary<Chain, string>()
-        {
-            { Chain.None, ""},
-
-            { Chain.Ethereum, "1" },
-            { Chain.Polygon, "137" },
-            { Chain.PolygonZkEvm, "1101" },
-            { Chain.BNBSmartChain, "56" },
-            { Chain.ArbitrumOne, "42161" },
-            { Chain.ArbitrumNova, "42170" },
-            { Chain.Optimism, "10" },
-            { Chain.Avalanche, "43114" },
-            { Chain.Gnosis, "100" },
-            { Chain.Base, "8453" },
-            { Chain.OasysHomeverse, "19011" },
-            { Chain.AstarZKEvm, "3776" },
-            { Chain.Xai, "660279" },
-            { Chain.Blast, "81457" },
-            { Chain.B3, "8333" },
-            { Chain.APEChain, "33139" },
-            { Chain.ImmutableZkEvm, "13371" },
-            { Chain.SkaleNebula, "1482601649" },
-            { Chain.Root, "7668" },
-            { Chain.LAOS, "6283" },
-            { Chain.Soneium, "1868" },
-            { Chain.Telos, "40" },
-            { Chain.Moonbeam, "1284" },
-            { Chain.Etherlink, "42793" },
-            { Chain.XR1, "273" },
-            { Chain.Somnia, "5031" },
-            
-            { Chain.TestnetSepolia, "11155111" },
-            { Chain.TestnetPolygonAmoy, "80002" },
-            { Chain.TestnetArbitrumSepolia, "421614" },
-            { Chain.TestnetBNBSmartChain, "97" },
-            { Chain.TestnetBaseSepolia, "84532" },
-            { Chain.TestnetAvalanche, "43113" },
-            { Chain.TestnetOasysHomeverse, "40875" },
-            { Chain.TestnetOptimisticSepolia, "11155420" },
-            { Chain.TestnetAstarZKyoto, "6038361" },
-            { Chain.TestnetXrSepolia, "2730" },
-            { Chain.TestnetXaiSepolia, "37714555429" },
-            { Chain.TestnetB3Sepolia, "1993" },
-            { Chain.TestnetAPEChain, "33111" },
-            { Chain.TestnetBlastSepolia, "168587773" },
-            { Chain.TestnetBorne, "94984" },
-            { Chain.TestnetSkaleNebulaGamingHub, "37084624" },
-            { Chain.TestnetSoneiumMinato, "1946" },
-            { Chain.TestnetToy, "21000000" },
-            { Chain.TestnetImmutableZkEvm, "13473" },
-            { Chain.TestnetRootPorcini, "7672" },
-            { Chain.TestnetLAOSSigma, "62850" },
-            { Chain.TestnetTelos, "41" },
-            { Chain.TestnetMoonbaseAlpha, "1287" },
-            { Chain.TestnetEtherlink, "128123" },
-            { Chain.TestnetMonad, "10143" },
-            { Chain.TestnetSomnia, "50312" },
-            { Chain.TestnetFrequency, "53716" },
-            { Chain.TestnetIncentiv, "11690" }
-        };
-
-        public static Dictionary<string, Chain> ChainById = new Dictionary<string, Chain>()
-        {
-            { "1", Chain.Ethereum },
-            { "137", Chain.Polygon },
-            { "1101", Chain.PolygonZkEvm },
-            { "56", Chain.BNBSmartChain },
-            { "42161", Chain.ArbitrumOne },
-            { "42170", Chain.ArbitrumNova },
-            { "10", Chain.Optimism },
-            { "43114", Chain.Avalanche },
-            { "100", Chain.Gnosis },
-            { "8453", Chain.Base },
-            { "19011", Chain.OasysHomeverse },
-            { "3776", Chain.AstarZKEvm },
-            { "660279", Chain.Xai },
-            { "81457", Chain.Blast },
-            { "8333", Chain.B3 },
-            { "33139", Chain.APEChain },
-            { "13371", Chain.ImmutableZkEvm },
-            { "1482601649", Chain.SkaleNebula },
-            { "7668", Chain.Root },
-            { "6283", Chain.LAOS },
-            { "1868", Chain.Soneium },
-            { "40", Chain.Telos },
-            { "1284", Chain.Moonbeam },
-            { "42793", Chain.Etherlink },
-            { "273", Chain.XR1 },
-            { "5031", Chain.Somnia },
-            
-            { "11155111", Chain.TestnetSepolia },
-            { "80002", Chain.TestnetPolygonAmoy },
-            { "421614", Chain.TestnetArbitrumSepolia },
-            { "97", Chain.TestnetBNBSmartChain },
-            { "84532", Chain.TestnetBaseSepolia },
-            { "43113", Chain.TestnetAvalanche },
-            { "40875", Chain.TestnetOasysHomeverse },
-            { "11155420", Chain.TestnetOptimisticSepolia },
-            { "6038361", Chain.TestnetAstarZKyoto },
-            { "2730", Chain.TestnetXrSepolia },
-            { "37714555429", Chain.TestnetXaiSepolia },
-            { "1993", Chain.TestnetB3Sepolia },
-            { "33111", Chain.TestnetAPEChain },
-            { "168587773", Chain.TestnetBlastSepolia },
-            { "94984", Chain.TestnetBorne },
-            { "37084624", Chain.TestnetSkaleNebulaGamingHub },
-            { "1946", Chain.TestnetSoneiumMinato },
-            { "21000000", Chain.TestnetToy },
-            { "13473", Chain.TestnetImmutableZkEvm },
-            { "7672", Chain.TestnetRootPorcini },
-            { "62850", Chain.TestnetLAOSSigma },
-            { "41", Chain.TestnetTelos },
-            { "1287", Chain.TestnetMoonbaseAlpha },
-            { "128123", Chain.TestnetEtherlink },
-            { "10143", Chain.TestnetMonad },
-            { "50312", Chain.TestnetSomnia },
-            { "53716", Chain.TestnetFrequency },
-            { "11690", Chain.TestnetIncentiv }
-        };
-
-        public static Dictionary<Chain, string> PathOf = new Dictionary<Chain, string>()
-        {
-            { Chain.Ethereum, "mainnet" },
-            { Chain.Polygon, "polygon" },
-            { Chain.BNBSmartChain, "bsc" },
-            { Chain.PolygonZkEvm, "polygon-zkevm" },
-            { Chain.ArbitrumOne, "arbitrum" },
-            { Chain.ArbitrumNova, "arbitrum-nova" },
-            { Chain.Optimism, "optimism" },
-            { Chain.Avalanche, "avalanche" },
-            { Chain.Gnosis, "gnosis" },
-            { Chain.Base, "base" },
-            { Chain.OasysHomeverse, "homeverse" },
-            { Chain.AstarZKEvm, "astar-zkevm" },
-            { Chain.Xai, "xai" },
-            { Chain.Blast, "blast" },
-            { Chain.B3, "b3" },
-            { Chain.APEChain, "apechain" },
-            { Chain.ImmutableZkEvm, "immutable-zkevm" },
-            { Chain.SkaleNebula, "skale-nebula" },
-            { Chain.Root, "rootnet" },
-            { Chain.LAOS, "laos" },
-            { Chain.Soneium, "soneium" },
-            { Chain.Telos, "telos" },
-            { Chain.Moonbeam, "moonbeam" },
-            { Chain.Etherlink, "etherlink" },
-            { Chain.XR1, "xr1" },
-            { Chain.Somnia, "somnia" },
-
-            { Chain.TestnetSepolia, "sepolia" },
-            { Chain.TestnetArbitrumSepolia, "arbitrum-sepolia" },
-            { Chain.TestnetBNBSmartChain, "bsc-testnet" },
-            { Chain.TestnetBaseSepolia, "base-sepolia" },
-            { Chain.TestnetOasysHomeverse, "homeverse-testnet" },
-            { Chain.TestnetAvalanche, "avalanche-testnet" },
-            { Chain.TestnetOptimisticSepolia, "optimism-sepolia" },
-            { Chain.TestnetPolygonAmoy, "amoy" },
-            { Chain.TestnetAstarZKyoto, "astar-zkyoto" },
-            { Chain.TestnetXrSepolia, "xr-sepolia" },
-            { Chain.TestnetXaiSepolia, "xai-sepolia" },
-            { Chain.TestnetB3Sepolia, "b3-sepolia" },
-            { Chain.TestnetAPEChain, "apechain-testnet" },
-            { Chain.TestnetBlastSepolia, "blast-sepolia" },
-            { Chain.TestnetBorne, "borne-testnet" },
-            { Chain.TestnetSkaleNebulaGamingHub, "skale-nebula-testnet" },
-            { Chain.TestnetSoneiumMinato, "soneium-minato" },
-            { Chain.TestnetToy, "toy-testnet" },
-            { Chain.TestnetImmutableZkEvm, "immutable-zkevm-testnet" },
-            { Chain.TestnetRootPorcini, "rootnet-porcini" },
-            { Chain.TestnetLAOSSigma, "laos-sigma-testnet" },
-            { Chain.TestnetTelos, "telos-testnet" },
-            { Chain.TestnetMoonbaseAlpha, "moonbase-alpha" },
-            { Chain.TestnetEtherlink, "etherlink-testnet" },
-            { Chain.TestnetMonad, "monad-testnet" },
-            { Chain.TestnetSomnia, "somnia-testnet" },
-            { Chain.TestnetFrequency, "frequency-testnet" },
-            { Chain.TestnetIncentiv, "incentiv-testnet" }
-        };
+            foreach (var config in ChainConfigs)
+            {
+                NameOf.Add(config.Chain, config.Name);
+                GasCurrencyOf.Add(config.Chain, config.GasCurrency);
+                NativeTokenAddressOf.Add(config.Chain, config.NativeTokenAddress);
+                BlockExplorerOf.Add(config.Chain, config.BlockExplorerUrl);
+                ChainIdOf.Add(config.Chain, config.ChainId);
+                ChainById.Add(config.ChainId, config.Chain);
+                PathOf.Add(config.Chain, config.Path);
+            }
+        }
     }
 }
