@@ -25,9 +25,10 @@ namespace Sequence.Boilerplates.Login
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject[] _socialTexts;
 
+        private readonly Adapter.Sequence _adapter = Adapter.Sequence.GetInstance();
+        
         private IWallet _wallet;
         private Action _onClose;
-        private SequenceLogin _loginHandler;
         private string _curEmail;
         
         private void Start()
@@ -97,34 +98,34 @@ namespace Sequence.Boilerplates.Login
             SetLoading(false);
         }
 
-        public void LoginWithEmail()
+        public async void LoginWithEmail()
         {
             SetLoading(true);
-            _loginHandler.Login(_curEmail);
+            await _adapter.EmailLogin(_curEmail);
         }
 
-        public void VerifyEmailCode()
+        public async void VerifyEmailCode()
         {
             SetLoading(true);
-            _loginHandler.Login(_curEmail, _emailCodeInput.text);
+            await _adapter.ConfirmEmailCode(_curEmail, _emailCodeInput.text);
         }
 
         public void LoginWithGoogle()
         {
             SetLoading(true);
-            _loginHandler.GoogleLogin();
+            _adapter.GoogleLogin();
         }
 
         public void LoginWithApple()
         {
             SetLoading(true);
-            _loginHandler.AppleLogin();
+            _adapter.AppleLogin();
         }
 
-        public void LoginAsGuest()
+        public async void LoginAsGuest()
         {
             SetLoading(true);
-            _loginHandler.GuestLogin();
+            await _adapter.GuestLogin();
         }
 
         public void EnableEmailButton(bool enable)
