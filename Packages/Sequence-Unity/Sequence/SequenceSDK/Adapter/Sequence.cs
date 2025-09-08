@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 
@@ -27,7 +29,15 @@ namespace Sequence.Adapter
         {
             get
             {
-                _loginHandler ??= SequenceLogin.GetInstance();
+                if (_loginHandler != null) 
+                    return _loginHandler;
+                
+                _loginHandler = SequenceLogin.GetInstance();
+                _loginHandler.OnLoginSuccess += OnOnLoginSuccess;
+                _loginHandler.OnMFAEmailSent += OnOnMFAEmailSent;
+                _loginHandler.OnLoginFailed += OnLoginFailed;
+                _loginHandler.OnMFAEmailFailedToSend += OnOnMFAEmailFailedToSend;
+
                 return _loginHandler;
             }
         }
@@ -49,6 +59,8 @@ namespace Sequence.Adapter
         private CurrencySwap _swap;
         private MarketplaceReader _marketplace;
         private Checkout _checkout;
+        private bool _isLoggingIn;
+        private bool _isError;
 
         public static Sequence GetInstance()
         {
@@ -64,13 +76,17 @@ namespace Sequence.Adapter
         public Sequence()
         {
             SequenceWallet.OnWalletCreated += UpdateWallet;
+            SequenceWallet.OnAccountFederated += AccountFederated;
+            SequenceWallet.OnAccountFederationFailed += AccountFederationFailed;
         }
         
         public void Dispose()
         {
             SequenceWallet.OnWalletCreated -= UpdateWallet;
+            SequenceWallet.OnAccountFederated -= AccountFederated;
+            SequenceWallet.OnAccountFederationFailed -= AccountFederationFailed;
         }
-        
+
         public async Task<bool> TryRecoverWalletFromStorage()
         {
             var result = await _loginHandler.TryToRestoreSessionAsync();
@@ -81,31 +97,41 @@ namespace Sequence.Adapter
             return true;
         }
 
-        public async Task EmailLogin(string email)
+        public async Task<bool> EmailLogin(string email)
         {
+            SetLoginResult(true, false);
             await _loginHandler.Login(email);
+            return !_isError;
         }
 
-        public async Task ConfirmEmailCode(string email, string code)
+        public async Task<bool> ConfirmEmailCode(string email, string code)
         {
+            SetLoginResult(true, false);
             await _loginHandler.Login(email, code);
+            return !_isError;
         }
 
-        public async Task GuestLogin()
+        public async Task<bool> GuestLogin()
         {
+            SetLoginResult(true, false);
             await LoginHandler.GuestLogin();
+            return !_isError;
         }
         
-        public async Task GoogleLogin()
+        public async Task<bool> GoogleLogin()
         {
+            SetLoginResult(true, false);
             LoginHandler.GoogleLogin();
             await WaitForLoginProcess();
+            return !_isError;
         }
         
-        public async Task AppleLogin()
+        public async Task<bool> AppleLogin()
         {
+            SetLoginResult(true, false);
             LoginHandler.AppleLogin();
             await WaitForLoginProcess();
+            return !_isError;
         }
 
         public async Task<bool> SignOut()
@@ -212,8 +238,45 @@ namespace Sequence.Adapter
 
         private async Task WaitForLoginProcess()
         {
-            while (_loginHandler.IsLoggingIn())
+            while (_isLoggingIn)
                 await Task.Yield();
+        }
+        
+        private void OnLoginFailed(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
+        {
+            SetLoginResult(false, true);
+        }
+        
+        private void OnOnMFAEmailFailedToSend(string email, string error)
+        {
+            SetLoginResult(false, true);
+            
+        }
+
+        private void OnOnMFAEmailSent(string email)
+        {
+            SetLoginResult(false, false);
+        }
+
+        private void OnOnLoginSuccess(string sessionId, string walletAddress)
+        {
+            SetLoginResult(false, false);
+        }
+        
+        private void AccountFederated(Account obj)
+        {
+            SetLoginResult(false, false);
+        }
+        
+        private void AccountFederationFailed(string obj)
+        {
+            SetLoginResult(false, true);
+        }
+        
+        private void SetLoginResult(bool isLoggingIn, bool isError)
+        {
+            _isError = isError;
+            _isLoggingIn = isLoggingIn;
         }
 
         private void UpdateWallet(IWallet wallet)

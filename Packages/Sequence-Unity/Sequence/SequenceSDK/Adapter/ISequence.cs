@@ -28,7 +28,7 @@ namespace Sequence.Adapter
         /// </summary>
         /// <param name="email">Email of the given user.</param>
         /// <returns></returns>
-        Task EmailLogin(string email);
+        Task<bool> EmailLogin(string email);
 
         /// <summary>
         /// You receive a code after calling 'EmailLogin'. Use it with this function to complete the login process.
@@ -36,23 +36,23 @@ namespace Sequence.Adapter
         /// <param name="email"></param>
         /// <param name="code"></param>
         /// <returns></returns>
-        Task ConfirmEmailCode(string email, string code);
+        Task<bool> ConfirmEmailCode(string email, string code);
 
         /// <summary>
         /// Login as a guest. When the user uninstall the application, they lose access to a guest wallet, unless they use our Account Federation feature to link the guest wallet to another login option.
         /// </summary>
         /// <returns></returns>
-        Task GuestLogin();
+        Task<bool> GuestLogin();
 
         /// <summary>
         /// Sign In with Google. The user is redirected to an external browser.
         /// </summary>
-        Task GoogleLogin();
+        Task<bool> GoogleLogin();
 
         /// <summary>
         /// Sign In with Apple. The user is redirected to an external browser. On iOS, this function uses the native Sign In SDK.
         /// </summary>
-        Task AppleLogin();
+        Task<bool> AppleLogin();
 
         Task<bool> SignOut();
 
