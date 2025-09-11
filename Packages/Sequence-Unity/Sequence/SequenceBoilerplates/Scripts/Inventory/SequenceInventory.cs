@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Sequence.Adapter;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using TMPro;
@@ -27,8 +28,8 @@ namespace Sequence.Boilerplates.Inventory
         [SerializeField] private GenericObjectPool<Component> _messagePool;
         [SerializeField] private GenericObjectPool<SequenceInventoryTile> _tilePool;
 
-        private IWallet _wallet;
-        private Chain _chain;
+        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        
         private string[] _collections;
         private Action _onClose;
         private TokenBalance _selectedBalance;
@@ -49,10 +50,8 @@ namespace Sequence.Boilerplates.Inventory
         /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="collections">The inventory will show items from these contracts.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public void Show(IWallet wallet, Chain chain, string[] collections, Action onClose = null)
+        public void Show(string[] collections, Action onClose = null)
         {
-            _wallet = wallet;
-            _chain = chain;
             _collections = collections;
             _onClose = onClose;
             gameObject.SetActive(true);
@@ -74,7 +73,7 @@ namespace Sequence.Boilerplates.Inventory
 
         public void OpenListingPanel()
         {
-            BoilerplateFactory.OpenListItemPanel(transform, new Sequence.Marketplace.Checkout(_wallet, _chain), _selectedBalance);
+            BoilerplateFactory.OpenListItemPanel(transform, new Sequence.Marketplace.Checkout(_adapter.Wallet, _adapter.Chain), _selectedBalance);
         }
         
         public async void SendToken()
@@ -102,19 +101,21 @@ namespace Sequence.Boilerplates.Inventory
             _loadingScreen.SetActive(true);
 
             var metadata = _selectedBalance.tokenMetadata;
-            var response = await _wallet.SendTransaction(_chain, new Transaction[] {
-                new SendERC1155(metadata.contractAddress, recipient, new []
-                {
-                    new SendERC1155Values(metadata.tokenId.ToString(), amountInput)
-                })
-            });
+            var recipientAddress = new Address(recipient);
+            var contractAddress = new Address(metadata.contractAddress);
+            var tokenId = metadata.tokenId.ToString();
+
+            try
+            {
+                await _adapter.SendToken(recipientAddress, amount, contractAddress, tokenId);
+                _messagePopup.Show("Sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                _messagePopup.Show(ex.Message, true);
+            }
             
             _loadingScreen.SetActive(false);
-            
-            if (response is FailedTransactionReturn failed)
-                _messagePopup.Show(failed.error, true);
-            else if (response is SuccessfulTransactionReturn)
-                _messagePopup.Show("Sent successfully.");
         }
         
         private async void LoadAllCollections()
@@ -123,7 +124,7 @@ namespace Sequence.Boilerplates.Inventory
             _tilePool.Cleanup();
             
             foreach (var collection in _collections)
-                await LoadCollection(collection);
+                await LoadCollection(new Address(collection));
             
             var empty = _tilePool.Parent.childCount == 0;
             _messageList.SetActive(empty);
@@ -134,13 +135,11 @@ namespace Sequence.Boilerplates.Inventory
                 _messagePool.GetObject();
         }
 
-        private async Task LoadCollection(string collection)
+        private async Task LoadCollection(Address collection)
         {
-            var indexer = new ChainIndexer(_chain);
-            var args = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), collection, true);
-            var response = await indexer.GetTokenBalances(args);
+            var balances = await _adapter.GetMyTokenBalances(collection);
             
-            foreach (var balance in response.balances)
+            foreach (var balance in balances)
                 _tilePool.GetObject().Load(balance, () => ShowToken(balance));
         }
 

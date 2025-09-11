@@ -229,9 +229,9 @@ namespace Sequence.EmbeddedWallet
             TryToLoginWithStoredSessionWallet();
         }
 
-        public void GuestLogin()
+        public async Task GuestLogin()
         {
-            ConnectToWaaSAsGuest();
+            await ConnectToWaaSAsGuest();
         }
 
         private void SetupAuthenticatorAndListeners()

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
+using Sequence.Adapter;
 using Sequence.Boilerplates.Login;
 using Sequence.Boilerplates.PlayerProfile;
 using Sequence.Contracts;
@@ -30,7 +31,8 @@ namespace Sequence.Boilerplates
         [SerializeField] private string _marketplaceDescription = "Browse and interact with listings on a Peer-to-Peer, Secondary Sales marketplace.";
         [SerializeField] private string _checkoutDescription = "Buy an ERC1155 token via a Primary Sales contract using the Checkout Panel - pay with crypto or fiat.";
 
-        private IWallet _wallet;
+        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        
         private SequenceLoginWindow _loginWindow;
         private SequencePlayerProfile _playerProfile;
         private Chain _chain;
@@ -40,10 +42,8 @@ namespace Sequence.Boilerplates
         
         private void Awake()
         {
-            SequenceWallet.OnFailedToRecoverSession += OnFailedToRecoverSession;
             SequenceWallet.OnWalletCreated += wallet =>
             {
-                _wallet = wallet;
                 ShowDefaultWindow();
                 
                 if (_loginWindow)
@@ -100,9 +100,8 @@ namespace Sequence.Boilerplates
         {
             HideFeatureSelection();
             
-            var loginHandler = SequenceLogin.GetInstance();
-            var (storageEnabled, wallet) = await loginHandler.TryToRestoreSessionAsync();
-            if (!storageEnabled)
+            var recovered = await _adapter.TryRecoverWalletFromStorage();
+            if (!recovered)
                 OnFailedToRecoverSession("Secure storage is disabled");
         }
 
@@ -211,32 +210,32 @@ namespace Sequence.Boilerplates
         private void OpenPlayerProfilePanel()
         {
             HideFeatureSelection();
-            _playerProfile = BoilerplateFactory.OpenSequencePlayerProfile(transform, _wallet, _chain, new Address("0x85acb5646a9d73952347174ef928c2c9a174156f"), "STB", ShowDefaultWindow);
+            _playerProfile = BoilerplateFactory.OpenSequencePlayerProfile(transform, new Address("0x85acb5646a9d73952347174ef928c2c9a174156f"), "STB", ShowDefaultWindow);
         }
         
         private void OpenDailyRewardsPanel()
         {
             HideFeatureSelection();
-            BoilerplateFactory.OpenSequenceDailyRewards(transform, _wallet, _chain, _config.rewardsApi, ShowDefaultWindow);
+            BoilerplateFactory.OpenSequenceDailyRewards(transform, _config.rewardsApi, ShowDefaultWindow);
         }
         
         private void OpenInventoryPanel()
         {
             HideFeatureSelection();
-            BoilerplateFactory.OpenSequenceInventory(transform, _wallet, _chain, _config.collections, ShowDefaultWindow);
+            BoilerplateFactory.OpenSequenceInventory(transform, _config.collections, ShowDefaultWindow);
         }
         
         private void OpenInGameShopPanel(PrimarySaleConfig sale)
         {
             HideFeatureSelection();
-            BoilerplateFactory.OpenSequenceInGameShop(transform, _wallet, _chain, sale.collectionAddress,
+            BoilerplateFactory.OpenSequenceInGameShop(transform, sale.collectionAddress,
                 sale.saleAddress, sale.itemsForSale, ShowDefaultWindow);
         }
 
         private void OpenSignMessage()
         {
             HideFeatureSelection();
-            BoilerplateFactory.OpenSequenceSignMessage(transform, _wallet, _chain, ShowDefaultWindow);
+            BoilerplateFactory.OpenSequenceSignMessage(transform, ShowDefaultWindow);
         }
 
         public void OpenCheckoutPanel(ICheckoutHelper checkoutHelper, IFiatCheckout fiatCheckout)
@@ -248,7 +247,7 @@ namespace Sequence.Boilerplates
         public void OpenViewMarketplaceListingsPage()
         {
             HideFeatureSelection();
-            BoilerplateFactory.OpenViewMarketplaceListingsPanel(transform, _wallet, _marketplaceChain, new Address(_marketplaceCollectionAddress), ShowDefaultWindow);
+            BoilerplateFactory.OpenViewMarketplaceListingsPanel(transform, _adapter.Wallet, _marketplaceChain, new Address(_marketplaceCollectionAddress), ShowDefaultWindow);
         }
 
         public void OpenCheckoutPanel()
@@ -288,13 +287,13 @@ namespace Sequence.Boilerplates
             string imageUrl = metadata.image.Replace(".webp", ".png");
             Sprite collectibleImage = await AssetHandler.GetSpriteAsync(imageUrl);
             ICheckoutHelper checkoutHelper = await ERC1155SaleCheckout.Create(saleContract, collection, "1", 1, Chain.Polygon,
-                _wallet, "Demo Token Sale",
+                _adapter.Wallet, "Demo Token Sale",
                 "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
                 collectibleImage);
             
             HideLoadingScreen();
             BoilerplateFactory.OpenCheckoutPanel(transform, _chain, checkoutHelper,
-                new SequenceCheckout(_wallet, Chain.Polygon, saleContract, collection, "1", 1), ShowDefaultWindow);
+                new SequenceCheckout(_adapter.Wallet, Chain.Polygon, saleContract, collection, "1", 1), ShowDefaultWindow);
         }
     }
 }
