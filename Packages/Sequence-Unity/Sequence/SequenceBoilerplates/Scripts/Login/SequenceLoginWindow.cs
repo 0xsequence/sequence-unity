@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Sequence.Adapter;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using TMPro;
@@ -24,9 +25,8 @@ namespace Sequence.Boilerplates.Login
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject[] _socialTexts;
 
-        private readonly Adapter.Sequence _adapter = Adapter.Sequence.GetInstance();
+        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
         
-        private IWallet _wallet;
         private Action _onClose;
         private string _curEmail;
         
@@ -59,12 +59,11 @@ namespace Sequence.Boilerplates.Login
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        public void Show(IWallet wallet = null, Action onClose = null)
+        public void Show(Action onClose = null)
         {
-            _wallet = wallet;
             _onClose = onClose;
-            
-            var isFederating = _wallet != null;
+
+            var isFederating = _adapter.Wallet != null;
             _closeButton.gameObject.SetActive(isFederating);
             _guestLoginButton.gameObject.SetActive(!isFederating);
             
@@ -197,6 +196,12 @@ namespace Sequence.Boilerplates.Login
         {
             Debug.Log($"Account federated, email: {account.email}");
             Hide();
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus)
+                SetLoading(false);
         }
     }
 }

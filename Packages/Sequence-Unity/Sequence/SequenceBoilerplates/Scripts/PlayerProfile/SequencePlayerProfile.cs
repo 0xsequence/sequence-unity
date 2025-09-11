@@ -1,5 +1,6 @@
 using System;
 using System.Numerics;
+using Sequence.Adapter;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using TMPro;
@@ -23,9 +24,10 @@ namespace Sequence.Boilerplates.PlayerProfile
         [SerializeField] private GenericObjectPool<TransactionHistoryTile> _transactionPool;
         [SerializeField] private GenericObjectPool<LinkedWalletTile> _walletsPool;
         
-        private IWallet _wallet;
-        private Chain _chain;
+        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        
         private Action _onClose;
+        private Address _currency;
         private EOAWalletLinker _walletLinker;
 
         /// <summary>
@@ -44,21 +46,20 @@ namespace Sequence.Boilerplates.PlayerProfile
         /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public async void Show(IWallet wallet, Chain chain, Address currency = null, string currencySymbol = null, Action onClose = null)
+        public async void Show(Address currency = null, string currencySymbol = null, Action onClose = null)
         {
-            _wallet = wallet;
-            _chain = chain;
             _onClose = onClose;
+            _currency = currency ?? Address.ZeroAddress;
             gameObject.SetActive(true);
             _transactionPool.Cleanup();
             
             SetOverviewState();
             SetBalance(0, string.Empty);
 
-            var indexer = new ChainIndexer(_chain);
-            var walletAddress = _wallet.GetWalletAddress();
+            var indexer = new ChainIndexer(_adapter.Chain);
+            var walletAddress = _adapter.WalletAddress;
             
-            if (currency == null)
+            if (_currency.IsZeroAddress())
             {
                 var balanceResponse = await indexer.GetNativeTokenBalance(walletAddress);
                 SetNativeBalance(balanceResponse.balanceWei);
@@ -80,21 +81,21 @@ namespace Sequence.Boilerplates.PlayerProfile
 
         public void CopyWalletAddress()
         {
-            GUIUtility.systemCopyBuffer = _wallet.GetWalletAddress();
+            GUIUtility.systemCopyBuffer = _adapter.WalletAddress;
             _messagePopup.Show("Copied");
         }
 
         public async void SignOut()
         {
             EnableLoading(true);
-            await _wallet.DropThisSession();
+            await _adapter.SignOut();
             EnableLoading(false);
         }
 
         public void OpenLoginWindowForFederation()
         {
             gameObject.SetActive(false);
-            BoilerplateFactory.OpenSequenceLoginWindow(transform.parent, _wallet, 
+            BoilerplateFactory.OpenSequenceLoginWindow(transform.parent, 
                 () => gameObject.SetActive(true));
         }
 
@@ -102,6 +103,7 @@ namespace Sequence.Boilerplates.PlayerProfile
         {
             var recipient = _recipientInput.text;
             var input = _tokenAmountInput.text;
+            
             if (!uint.TryParse(input, out uint t))
             {
                 _messagePopup.Show("Invalid amount.", true);
@@ -109,21 +111,23 @@ namespace Sequence.Boilerplates.PlayerProfile
             }
 
             EnableLoading(true);
-            var response = await _wallet.SendTransaction(_chain, new Transaction[] {
-                new RawTransaction(recipient, t.ToString())
-            });
+
+            try
+            {
+                await _adapter.SendToken(recipient, t, _currency);
+                _messagePopup.Show("Sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                _messagePopup.Show(ex.Message, true);
+            }
             
             EnableLoading(false);
-
-            if (response is FailedTransactionReturn failed)
-                _messagePopup.Show(failed.error, true);
-            else if (response is SuccessfulTransactionReturn)
-                _messagePopup.Show("Sent successfully.");
         }
 
         public async void LinkExternalWallet()
         {
-            await new EOAWalletLinker(_wallet, _chain).OpenEoaWalletLink();
+            await new EOAWalletLinker(_adapter.Wallet, _adapter.Chain).OpenEoaWalletLink();
         }
 
         public void SetOverviewState()
@@ -137,7 +141,7 @@ namespace Sequence.Boilerplates.PlayerProfile
         public async void SetReceiveState()
         {
             _receiveState.SetActive(true);
-            await _qrImage.Show(_wallet.GetWalletAddress());
+            await _qrImage.Show(_adapter.WalletAddress);
         }
 
         private void EnableLoading(bool enable)
@@ -147,8 +151,8 @@ namespace Sequence.Boilerplates.PlayerProfile
 
         private async void LoadTransactionHistory()
         {
-            var walletAddress = _wallet.GetWalletAddress();
-            var indexer = new ChainIndexer(_chain);
+            var walletAddress = _adapter.WalletAddress;
+            var indexer = new ChainIndexer(_adapter.Chain);
             var filter = new TransactionHistoryFilter {accountAddress = walletAddress};
             var response = await indexer.GetTransactionHistory(new GetTransactionHistoryArgs(filter));
             
@@ -163,7 +167,7 @@ namespace Sequence.Boilerplates.PlayerProfile
         private async void LoadLinkedWallets()
         {
             _walletsPool.Cleanup();
-            _walletLinker = new EOAWalletLinker(_wallet, _chain);
+            _walletLinker = new EOAWalletLinker(_adapter.Wallet, _adapter.Chain);
             var linkedWallets = await _walletLinker.GetLinkedWallets();
             
             if (linkedWallets.Length == 0)
@@ -181,7 +185,7 @@ namespace Sequence.Boilerplates.PlayerProfile
 
         private void SetNativeBalance(BigInteger balance)
         {
-            var symbol = ChainDictionaries.GasCurrencyOf[_chain];
+            var symbol = ChainDictionaries.GasCurrencyOf[_adapter.Chain];
             SetBalance(balance, symbol);
         }
 

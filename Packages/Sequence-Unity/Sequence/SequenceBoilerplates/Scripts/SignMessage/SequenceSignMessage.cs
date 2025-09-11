@@ -1,5 +1,5 @@
 using System;
-using Sequence.EmbeddedWallet;
+using Sequence.Adapter;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +16,8 @@ namespace Sequence.Boilerplates.SignMessage
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private string _initSignatureText;
         
-        private IWallet _wallet;
-        private Chain _chain;
+        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        
         private Action _onClose;
         private string _curInput;
         private string _curSignature;
@@ -41,15 +41,10 @@ namespace Sequence.Boilerplates.SignMessage
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public void Show(IWallet wallet, Chain chain, Action onClose = null)
+        public void Show(Action onClose = null)
         {
-            _wallet = wallet;
-            _chain = chain;
             _onClose = onClose;
-            
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             _messageInput.text = string.Empty;
@@ -58,7 +53,7 @@ namespace Sequence.Boilerplates.SignMessage
 
         private async void SignMessage()
         {
-            _curSignature = await _wallet.SignMessage(_chain, _curInput);
+            _curSignature = await _adapter.SignMessage(_curInput);
             _signatureText.text = _curSignature;
             _copyButton.interactable = true;
         }

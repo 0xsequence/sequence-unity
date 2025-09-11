@@ -6,12 +6,13 @@ using NUnit.Framework;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
+using Sequence.Utils;
 
 namespace Sequence.Adapter
 {
-    public class Sequence : ISequence, IDisposable
+    public class EmbeddedWalletAdapter : IEmbeddedWalletAdapter, IDisposable
     {
-        private static Sequence _instance;
+        private static EmbeddedWalletAdapter _instance;
         
         private IWallet _wallet;
         public IWallet Wallet
@@ -23,6 +24,8 @@ namespace Sequence.Adapter
             }
             set => _wallet = value;
         }
+
+        public Address WalletAddress { get; private set; }
 
         private SequenceLogin _loginHandler;
         private SequenceLogin LoginHandler
@@ -62,18 +65,18 @@ namespace Sequence.Adapter
         private bool _isLoggingIn;
         private bool _isError;
 
-        public static Sequence GetInstance()
+        public static EmbeddedWalletAdapter GetInstance()
         {
             if (_instance != null) 
                 return _instance;
             
-            _instance = new Sequence();
+            _instance = new EmbeddedWalletAdapter();
             _instance.Chain = Chain.TestnetArbitrumSepolia;
 
             return _instance;
         }
 
-        public Sequence()
+        public EmbeddedWalletAdapter()
         {
             SequenceWallet.OnWalletCreated += UpdateWallet;
             SequenceWallet.OnAccountFederated += AccountFederated;
@@ -89,7 +92,7 @@ namespace Sequence.Adapter
 
         public async Task<bool> TryRecoverWalletFromStorage()
         {
-            var result = await _loginHandler.TryToRestoreSessionAsync();
+            var result = await LoginHandler.TryToRestoreSessionAsync();
             if (!result.StorageEnabled || result.Wallet == null)
                 return false;
             
@@ -100,14 +103,14 @@ namespace Sequence.Adapter
         public async Task<bool> EmailLogin(string email)
         {
             SetLoginResult(true, false);
-            await _loginHandler.Login(email);
+            await LoginHandler.Login(email);
             return !_isError;
         }
 
         public async Task<bool> ConfirmEmailCode(string email, string code)
         {
             SetLoginResult(true, false);
-            await _loginHandler.Login(email, code);
+            await LoginHandler.Login(email, code);
             return !_isError;
         }
 
@@ -138,7 +141,7 @@ namespace Sequence.Adapter
         {
             var result = await _wallet.DropThisSession();
             if (result)
-                _loginHandler.RemoveConnectedWalletAddress();
+                LoginHandler.RemoveConnectedWalletAddress();
             
             return result;
         }
@@ -148,6 +151,11 @@ namespace Sequence.Adapter
             var response = await Wallet.GetIdToken();
             return response.IdToken;
         }
+
+        public Task<string> SignMessage(string message)
+        {
+            return _wallet.SignMessage(_chain, message);
+        }
         
         public async Task<BigInteger> GetMyNativeTokenBalance()
         {
@@ -155,43 +163,52 @@ namespace Sequence.Adapter
             return result.balanceWei;
         }
 
-        public async Task<(BigInteger Balance, TokenMetadata TokenMetadata)> GetMyTokenBalance(Address tokenAddress)
+        public async Task<TokenBalance[]> GetMyTokenBalances(string tokenAddress)
         {
             var args = new GetTokenBalancesArgs(Wallet.GetWalletAddress(), tokenAddress, true);
             var result = await _indexer.GetTokenBalances(args);
-            var balance = result.balances[0];
-            return (balance.balance, balance.tokenMetadata);
+            return result.balances;
         }
 
-        public async Task<TokenSupply[]> GetTokenSupplies(Address tokenAddress)
+        public async Task<TokenSupply[]> GetTokenSupplies(string tokenAddress)
         {
             var args = new GetTokenSuppliesArgs(tokenAddress, true);
             var result = await _indexer.GetTokenSupplies(args);
             return result.tokenIDs;
         }
         
-        public async Task<string> SendToken(Address recipientAddress, Address tokenAddress, string tokenId, BigInteger amount)
+        public async Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, string tokenId = null)
         {
             EnsureWalletReferenceExists();
-            var supplies = await _indexer.GetTokenSupplies(new GetTokenSuppliesArgs(tokenAddress, true));
 
-            Transaction transaction = supplies.contractType switch
+            Transaction transaction = null;
+            if (tokenAddress == null || (tokenAddress.IsAddress() && tokenAddress.IsZeroAddress()))
             {
-                ContractType.ERC20 => new SendERC20(tokenAddress, recipientAddress, amount.ToString()),
-                ContractType.ERC1155 => new SendERC1155(tokenAddress, recipientAddress,
-                    new SendERC1155Values[] { new(tokenId, amount.ToString()) }),
-                ContractType.ERC721 => new SendERC721(tokenAddress, recipientAddress, tokenId),
-                _ => throw new Exception("Unknown contract type")
-            };
+                transaction = new RawTransaction(recipientAddress, amount.ToString());
+            }
+            else
+            {
+                var suppliesArgs = new GetTokenSuppliesArgs(tokenAddress, true);
+                var supplies = await _indexer.GetTokenSupplies(suppliesArgs);
+                
+                transaction = supplies.contractType switch
+                {
+                    ContractType.ERC20 => new SendERC20(tokenAddress, recipientAddress, amount.ToString()),
+                    ContractType.ERC1155 => new SendERC1155(tokenAddress, recipientAddress,
+                        new SendERC1155Values[] { new(tokenId, amount.ToString()) }),
+                    ContractType.ERC721 => new SendERC721(tokenAddress, recipientAddress, tokenId),
+                    _ => throw new Exception("Unknown contract type")
+                };
+            }
 
             return await SendTransaction(new[] { transaction });
         }
         
-        public async Task<string> SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount)
+        public async Task<string> SwapToken(string sellToken, string buyToken, BigInteger buyAmount)
         {
             var walletAddress = Wallet.GetWalletAddress();
-            var quote = await _swap.GetSwapQuote(walletAddress, buyToken, 
-                sellToken, buyAmount.ToString(), true);
+            var quote = await _swap.GetSwapQuote(walletAddress, new Address(buyToken),
+                new Address(sellToken), buyAmount.ToString(), true);
             
             return await SendTransaction(new Transaction[]
                 { 
@@ -200,18 +217,18 @@ namespace Sequence.Adapter
                 }
             );
         }
-        
-        public async Task<CollectibleOrder[]> GetAllListingsFromMarketplace(Address collectionAddress)
+
+        public async Task<CollectibleOrder[]> GetAllListingsFromMarketplace(string collectionAddress)
         {
             return await _marketplace.ListAllCollectibleListingsWithLowestPricedListingsFirst(collectionAddress);
         }
         
-        public async Task<string> CreateListingOnMarketplace(Address contractAddress, Address currencyAddress, 
+        public async Task<string> CreateListingOnMarketplace(string contractAddress, string currencyAddress, 
             string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry)
         {
             EnsureWalletReferenceExists();
-            var steps = await _checkout.GenerateListingTransaction(contractAddress, tokenId, amount, 
-                Marketplace.ContractType.ERC20, currencyAddress, pricePerToken, expiry);
+            var steps = await _checkout.GenerateListingTransaction(new Address(contractAddress), tokenId, amount, 
+                Marketplace.ContractType.ERC20, new Address(currencyAddress), pricePerToken, expiry);
             
             var transactions = steps.AsTransactionArray();
             return await SendTransaction(transactions);
@@ -282,8 +299,10 @@ namespace Sequence.Adapter
         private void UpdateWallet(IWallet wallet)
         {
             Wallet = wallet;
+            WalletAddress = wallet.GetWalletAddress();
+            
             _checkout = new Checkout(wallet, _chain);
-            _loginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());
+            LoginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());
         }
         
         private void EnsureWalletReferenceExists()

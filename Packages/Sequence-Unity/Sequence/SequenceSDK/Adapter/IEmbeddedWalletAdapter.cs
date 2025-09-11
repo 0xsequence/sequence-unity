@@ -6,7 +6,7 @@ using Sequence.Marketplace;
 
 namespace Sequence.Adapter
 {
-    public interface ISequence
+    public interface IEmbeddedWalletAdapter
     {
         public Chain Chain { get; }
         
@@ -14,6 +14,11 @@ namespace Sequence.Adapter
         /// The underlying Sequence Embedded Wallet reference. Use it for more control, such as transaction batches. 
         /// </summary>
         public IWallet Wallet { get; }
+        
+        /// <summary>
+        /// Address of the current wallet. Returns a Zero Address if not wallet is available.
+        /// </summary>
+        public Address WalletAddress { get; }
         
         // ONBOARDING
         
@@ -63,6 +68,13 @@ namespace Sequence.Adapter
         Task<string> GetIdToken();
         
         // POWER
+        
+        /// <summary>
+        /// Signs a given message.
+        /// </summary>
+        /// <param name="message">Message string to sign</param>
+        /// <returns>Signature of the given message</returns>
+        Task<string> SignMessage(string message);
 
         /// <summary>
         /// Get the native token balance for your local user. For example, the native token on the Ethereum Mainnet is the amount of 'ETH'
@@ -71,18 +83,18 @@ namespace Sequence.Adapter
         Task<BigInteger> GetMyNativeTokenBalance();
 
         /// <summary>
-        /// Get the token balance for your local user.
+        /// Get the token balances for your local user.
         /// </summary>
         /// <param name="tokenAddress">Address of your token contract. This could be an ERC20, ERC1155, or ERC721 contract you deployed on https//sequence.build/</param>
         /// <returns>Balance in wei and the token metadata.</returns>
-        Task<(BigInteger Balance, TokenMetadata TokenMetadata)> GetMyTokenBalance(Address tokenAddress);
+        Task<TokenBalance[]> GetMyTokenBalances(string tokenAddress);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="tokenAddress"></param>
         /// <returns></returns>
-        Task<TokenSupply[]> GetTokenSupplies(Address tokenAddress);
+        Task<TokenSupply[]> GetTokenSupplies(string tokenAddress);
 
         /// <summary>
         /// Send any ERC20, ERC1155 or ERC721 token to another wallet.
@@ -93,7 +105,7 @@ namespace Sequence.Adapter
         /// <param name="amount">Leave it blank for ERC721 contracts.</param>
         /// <returns>Transaction receipt used to check transaction information onchain.</returns>
         /// <exception cref="Exception"></exception>
-        Task<string> SendToken(Address recipientAddress, Address tokenAddress, string tokenId, BigInteger amount);
+        Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, string tokenId = null);
         
         // MONETIZATION
 
@@ -104,14 +116,14 @@ namespace Sequence.Adapter
         /// <param name="buyToken"></param>
         /// <param name="buyAmount"></param>
         /// <returns></returns>
-        Task<string> SwapToken(Address sellToken, Address buyToken, BigInteger buyAmount);
+        Task<string> SwapToken(string sellToken, string buyToken, BigInteger buyAmount);
 
         /// <summary>
         /// Get all listings from your Marketplace on a given collection. Please make sure you have configured your Marketplace on https://sequence.build/
         /// </summary>
         /// <param name="collectionAddress"></param>
         /// <returns></returns>
-        Task<CollectibleOrder[]> GetAllListingsFromMarketplace(Address collectionAddress);
+        Task<CollectibleOrder[]> GetAllListingsFromMarketplace(string collectionAddress);
 
         /// <summary>
         /// Create a listing for a given token you own. Please make sure you have configured your Marketplace on https://sequence.build/
@@ -123,7 +135,7 @@ namespace Sequence.Adapter
         /// <param name="pricePerToken"></param>
         /// <param name="expiry"></param>
         /// <returns></returns>
-        Task<string> CreateListingOnMarketplace(Address contractAddress, Address currencyAddress,
+        Task<string> CreateListingOnMarketplace(string contractAddress, string currencyAddress,
             string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry);
 
         /// <summary>
