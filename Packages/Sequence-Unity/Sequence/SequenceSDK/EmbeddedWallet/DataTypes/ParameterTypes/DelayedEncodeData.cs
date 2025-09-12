@@ -25,6 +25,7 @@ namespace Sequence.EmbeddedWallet
         }
     }
 
+    [Preserve]
     public class DelayedEncodeDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

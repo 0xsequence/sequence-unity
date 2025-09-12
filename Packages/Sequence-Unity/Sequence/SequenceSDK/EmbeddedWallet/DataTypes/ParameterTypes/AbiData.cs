@@ -23,6 +23,7 @@ namespace Sequence.EmbeddedWallet
         }
     }
 
+    [Preserve]
     public class AbiDataConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
