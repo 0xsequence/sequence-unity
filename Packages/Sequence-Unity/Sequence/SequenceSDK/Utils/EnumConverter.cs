@@ -2,9 +2,11 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Sequence.Utils
 {
+    [Preserve]
     public class EnumConverter<T> : JsonConverter where T : struct, Enum
     {
         public override bool CanConvert(Type objectType)

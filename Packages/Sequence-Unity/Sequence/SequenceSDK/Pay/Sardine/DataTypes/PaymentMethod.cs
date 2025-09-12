@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.Scripting;
 
 namespace Sequence.Pay.Sardine
 {
@@ -22,6 +23,7 @@ namespace Sequence.Pay.Sardine
         }
     }
     
+    [Preserve]
     public class PaymentMethodConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)

@@ -50,6 +50,7 @@ namespace Sequence.EmbeddedWallet
         }
     }
 
+    [Preserve]
     public class TransactionReceiptConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
