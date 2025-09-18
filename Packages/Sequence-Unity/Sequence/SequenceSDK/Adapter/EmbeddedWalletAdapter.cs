@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -177,7 +178,8 @@ namespace Sequence.Adapter
             return result.tokenIDs;
         }
         
-        public async Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, string tokenId = null)
+        public async Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, 
+            string tokenId = null, Func<FeeOption[], Task<FeeOption>> selectFee = null)
         {
             EnsureWalletReferenceExists();
 
@@ -201,10 +203,11 @@ namespace Sequence.Adapter
                 };
             }
 
-            return await SendTransaction(new[] { transaction });
+            return await SendTransaction(new[] { transaction }, selectFee);
         }
         
-        public async Task<string> SwapToken(string sellToken, string buyToken, BigInteger buyAmount)
+        public async Task<string> SwapToken(string sellToken, string buyToken, BigInteger buyAmount
+            , Func<FeeOption[], Task<FeeOption>> selectFee = null)
         {
             var walletAddress = Wallet.GetWalletAddress();
             var quote = await _swap.GetSwapQuote(walletAddress, new Address(buyToken),
@@ -214,7 +217,7 @@ namespace Sequence.Adapter
                 { 
                     new RawTransaction(sellToken, string.Empty, quote.approveData),
                     new RawTransaction(quote.to, quote.transactionValue, quote.transactionData),
-                }
+                }, selectFee
             );
         }
 
@@ -224,28 +227,46 @@ namespace Sequence.Adapter
         }
         
         public async Task<string> CreateListingOnMarketplace(string contractAddress, string currencyAddress, 
-            string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry)
+            string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry, Func<FeeOption[], Task<FeeOption>> selectFee = null)
         {
             EnsureWalletReferenceExists();
             var steps = await _checkout.GenerateListingTransaction(new Address(contractAddress), tokenId, amount, 
                 Marketplace.ContractType.ERC20, new Address(currencyAddress), pricePerToken, expiry);
             
             var transactions = steps.AsTransactionArray();
-            return await SendTransaction(transactions);
+            return await SendTransaction(transactions, selectFee);
         }
         
-        public async Task<string> PurchaseOrderFromMarketplace(Order order, BigInteger amount)
+        public async Task<string> PurchaseOrderFromMarketplace(Order order, BigInteger amount
+            , Func<FeeOption[], Task<FeeOption>> selectFee = null)
         {
             EnsureWalletReferenceExists();
             var steps = await _checkout.GenerateBuyTransaction(order, amount);
             var transactions = steps.AsTransactionArray();
-            return await SendTransaction(transactions);
+            return await SendTransaction(transactions, selectFee);
         }
 
-        private async Task<string> SendTransaction(Transaction[] transactions)
+        private async Task<string> SendTransaction(Transaction[] transactions, Func<FeeOption[], Task<FeeOption>> selectFee)
         {
-            var transactionResult = await Wallet.SendTransaction(_chain, transactions);
-            return transactionResult switch
+            TransactionReturn transactionReturn = null;
+            
+            if (selectFee != null)
+            {
+                var feeOptionsResponse = await Wallet.GetFeeOptions(Chain, transactions);
+                var feeOptions = feeOptionsResponse.FeeOptions
+                    .Where(f => f.InWallet)
+                    .Select(f => f.FeeOption)
+                    .ToArray();
+                
+                var feeOption = await selectFee(feeOptions);
+                transactionReturn = await Wallet.SendTransactionWithFeeOptions(_chain, transactions, feeOption, feeOptionsResponse.FeeQuote);
+            }
+            else
+            {
+                transactionReturn = await Wallet.SendTransaction(_chain, transactions);
+            }
+            
+            return transactionReturn switch
             {
                 SuccessfulTransactionReturn success => success.receipt.txnReceipt,
                 FailedTransactionReturn failed => throw new Exception($"Failed transaction {failed.error}"),

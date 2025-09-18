@@ -103,9 +103,10 @@ namespace Sequence.Adapter
         /// <param name="tokenAddress">The address of your token. For example one you have deployed through https://sequence.build/</param>
         /// <param name="tokenId">Leave it blank for ERC20 contracts.</param>
         /// <param name="amount">Leave it blank for ERC721 contracts.</param>
+        /// <param name="selectFee">Leave it blank for ERC721 contracts.</param>
         /// <returns>Transaction receipt used to check transaction information onchain.</returns>
         /// <exception cref="Exception"></exception>
-        Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, string tokenId = null);
+        Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, string tokenId = null, Func<FeeOption[], Task<FeeOption>> selectFee = null);
         
         // MONETIZATION
 
@@ -115,8 +116,9 @@ namespace Sequence.Adapter
         /// <param name="sellToken"></param>
         /// <param name="buyToken"></param>
         /// <param name="buyAmount"></param>
+        /// <param name="selectFee"></param>
         /// <returns></returns>
-        Task<string> SwapToken(string sellToken, string buyToken, BigInteger buyAmount);
+        Task<string> SwapToken(string sellToken, string buyToken, BigInteger buyAmount, Func<FeeOption[], Task<FeeOption>> selectFee = null);
 
         /// <summary>
         /// Get all listings from your Marketplace on a given collection. Please make sure you have configured your Marketplace on https://sequence.build/
@@ -134,16 +136,18 @@ namespace Sequence.Adapter
         /// <param name="amount"></param>
         /// <param name="pricePerToken"></param>
         /// <param name="expiry"></param>
+        /// <param name="selectFee"></param>
         /// <returns></returns>
         Task<string> CreateListingOnMarketplace(string contractAddress, string currencyAddress,
-            string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry);
+            string tokenId, BigInteger amount, BigInteger pricePerToken, DateTime expiry, Func<FeeOption[], Task<FeeOption>> selectFee = null);
 
         /// <summary>
         /// Purchase an order from your Marketplace. Please make sure you have configured your Marketplace on https://sequence.build/
         /// </summary>
         /// <param name="order">The order as returned from the 'GetAllListingsFromMarketplace' function.</param>
         /// <param name="amount">The amount of orders you wish to purchase.</param>
+        /// <param name="selectFee">The amount of orders you wish to purchase.</param>
         /// <returns></returns>
-        Task<string> PurchaseOrderFromMarketplace(Order order, BigInteger amount);
+        Task<string> PurchaseOrderFromMarketplace(Order order, BigInteger amount, Func<FeeOption[], Task<FeeOption>> selectFee = null);
     }
 }

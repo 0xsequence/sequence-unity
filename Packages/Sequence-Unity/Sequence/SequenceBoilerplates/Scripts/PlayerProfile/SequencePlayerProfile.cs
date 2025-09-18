@@ -56,18 +56,14 @@ namespace Sequence.Boilerplates.PlayerProfile
             SetOverviewState();
             SetBalance(0, string.Empty);
 
-            var indexer = new ChainIndexer(_adapter.Chain);
-            var walletAddress = _adapter.WalletAddress;
-            
             if (_currency.IsZeroAddress())
             {
-                var balanceResponse = await indexer.GetNativeTokenBalance(walletAddress);
-                SetNativeBalance(balanceResponse.balanceWei);
+                var balance = await _adapter.GetMyNativeTokenBalance();
+                SetNativeBalance(balance);
             }
             else
             {
-                var response = await indexer.GetTokenBalances(new GetTokenBalancesArgs(walletAddress, currency, true));
-                var balances = response.balances;
+                var balances = await _adapter.GetMyTokenBalances(currency);
                 var balance = balances.Length > 0 ? balances[0].balance : 0;
                 SetBalance(balance, currencySymbol);
             }
