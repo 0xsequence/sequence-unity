@@ -8,6 +8,7 @@ using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.Adapter
 {
@@ -15,16 +16,7 @@ namespace Sequence.Adapter
     {
         private static EmbeddedWalletAdapter _instance;
         
-        private IWallet _wallet;
-        public IWallet Wallet
-        {
-            get
-            {
-                EnsureWalletReferenceExists();
-                return _wallet;
-            }
-            set => _wallet = value;
-        }
+        public IWallet Wallet { get; private set; }
 
         public Address WalletAddress { get; private set; }
 
@@ -140,7 +132,8 @@ namespace Sequence.Adapter
 
         public async Task<bool> SignOut()
         {
-            var result = await _wallet.DropThisSession();
+            EnsureWalletReferenceExists();
+            var result = await Wallet.DropThisSession();
             if (result)
                 LoginHandler.RemoveConnectedWalletAddress();
             
@@ -149,17 +142,20 @@ namespace Sequence.Adapter
         
         public async Task<string> GetIdToken()
         {
+            EnsureWalletReferenceExists();
             var response = await Wallet.GetIdToken();
             return response.IdToken;
         }
 
         public Task<string> SignMessage(string message)
         {
-            return _wallet.SignMessage(_chain, message);
+            EnsureWalletReferenceExists();
+            return Wallet.SignMessage(_chain, message);
         }
         
         public async Task<BigInteger> GetMyNativeTokenBalance()
         {
+            EnsureWalletReferenceExists();
             var result = await _indexer.GetNativeTokenBalance(Wallet.GetWalletAddress());
             return result.balanceWei;
         }
@@ -181,6 +177,7 @@ namespace Sequence.Adapter
         public async Task<string> SendToken(string recipientAddress, BigInteger amount, string tokenAddress = null, 
             string tokenId = null, Func<FeeOption[], Task<FeeOption>> selectFee = null)
         {
+            Debug.Log($"sending to {recipientAddress} amount: {amount} token: {tokenAddress} tokenId: {tokenId}");
             EnsureWalletReferenceExists();
 
             Transaction transaction = null;
@@ -321,6 +318,11 @@ namespace Sequence.Adapter
         {
             Wallet = wallet;
             WalletAddress = wallet.GetWalletAddress();
+
+            Wallet.OnDropSessionComplete += sessionId =>
+            {
+                Wallet = null;
+            };
             
             _checkout = new Checkout(wallet, _chain);
             LoginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());

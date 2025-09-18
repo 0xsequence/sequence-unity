@@ -30,7 +30,6 @@ namespace Sequence.Boilerplates
         /// Open the Login UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">Wallet to use for account federation.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window or when an account was successfully federated.</param>
         /// <returns></returns>
         public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent, Action onClose = null)
@@ -43,8 +42,6 @@ namespace Sequence.Boilerplates
         /// Open the Player Profile UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <param name="currencySymbol">The symbol of your custom currency, such as 'ETH'.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
@@ -59,8 +56,6 @@ namespace Sequence.Boilerplates
         /// Open the Daily Rewards UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="apiUrl">API Url you deployed using the server boilerplate.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceDailyRewards which was instantiated as a child of <paramref name="parent"/></returns>
@@ -74,8 +69,6 @@ namespace Sequence.Boilerplates
         /// Open the Inventory UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="collections">The inventory will show items from these contracts.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceInventory which was instantiated as a child of <paramref name="parent"/></returns>
@@ -89,8 +82,6 @@ namespace Sequence.Boilerplates
         /// Open the In-Game Shop UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="tokenContractAddress">ERC1155 Contract you deployed on Sequence's Builder.</param>
         /// <param name="saleContractAddress">ERC1155 Sale Contract you deployed on Sequence's Builder.</param>
         /// <param name="itemsForSale">Define the token Ids you want to sell from your collection.</param>

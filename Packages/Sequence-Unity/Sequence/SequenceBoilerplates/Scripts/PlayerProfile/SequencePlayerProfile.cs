@@ -42,21 +42,20 @@ namespace Sequence.Boilerplates.PlayerProfile
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
+        /// <param name="currencySymbol">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         public async void Show(Address currency = null, string currencySymbol = null, Action onClose = null)
         {
             _onClose = onClose;
-            _currency = currency ?? Address.ZeroAddress;
+            _currency = currency;
             gameObject.SetActive(true);
             _transactionPool.Cleanup();
             
             SetOverviewState();
             SetBalance(0, string.Empty);
 
-            if (_currency.IsZeroAddress())
+            if (_currency == null || _currency.IsZeroAddress())
             {
                 var balance = await _adapter.GetMyNativeTokenBalance();
                 SetNativeBalance(balance);

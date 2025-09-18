@@ -46,8 +46,6 @@ namespace Sequence.Boilerplates.Inventory
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="collections">The inventory will show items from these contracts.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         public void Show(string[] collections, Action onClose = null)
@@ -101,13 +99,11 @@ namespace Sequence.Boilerplates.Inventory
             _loadingScreen.SetActive(true);
 
             var metadata = _selectedBalance.tokenMetadata;
-            var recipientAddress = new Address(recipient);
-            var contractAddress = new Address(metadata.contractAddress);
             var tokenId = metadata.tokenId.ToString();
 
             try
             {
-                await _adapter.SendToken(recipientAddress, amount, contractAddress, tokenId);
+                await _adapter.SendToken(recipient, amount, _selectedBalance.contractAddress, tokenId);
                 _messagePopup.Show("Sent successfully.");
             }
             catch (Exception ex)
