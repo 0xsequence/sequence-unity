@@ -98,8 +98,6 @@ namespace Sequence.Boilerplates.InGameShop
             await _saleState.Construct(
                 new Address(_saleContractAddress), 
                 new Address(_tokenContractAddress), 
-                _adapter.Wallet, 
-                _adapter.Chain,
                 _itemsForSale);
 
             SetLoading(false);
