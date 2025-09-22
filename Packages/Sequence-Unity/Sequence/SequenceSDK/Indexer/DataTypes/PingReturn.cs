@@ -1,3 +1,5 @@
+using UnityEngine.Scripting;
+
 namespace Sequence
 {
     [System.Serializable]
@@ -5,6 +7,7 @@ namespace Sequence
     {
         public bool status;
 
+        [Preserve]
         public PingReturn(bool status)
         {
             this.status = status;
