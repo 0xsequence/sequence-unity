@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Sequence.Adapter;
-using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using TMPro;
 using UnityEngine;
@@ -28,12 +27,17 @@ namespace Sequence.Boilerplates.Inventory
         [SerializeField] private GenericObjectPool<Component> _messagePool;
         [SerializeField] private GenericObjectPool<SequenceInventoryTile> _tilePool;
 
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private string[] _collections;
         private Action _onClose;
         private TokenBalance _selectedBalance;
-        
+
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
+
         /// <summary>
         /// This function is called when the user clicks the close button.
         /// </summary>

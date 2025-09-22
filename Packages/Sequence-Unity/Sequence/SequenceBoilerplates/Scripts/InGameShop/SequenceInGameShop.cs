@@ -26,13 +26,18 @@ namespace Sequence.Boilerplates.InGameShop
         [Header("Tile Object Pool")]
         [SerializeField] private GenericObjectPool<SequenceInGameShopTile> _tilePool;
 
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private string _tokenContractAddress;
         private string _saleContractAddress;
         private int[] _itemsForSale;
         private Action _onClose;
         private SequenceInGameShopState _saleState;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
 
         /// <summary>
         /// This function is called when the user clicks the close button.

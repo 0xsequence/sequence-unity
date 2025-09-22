@@ -31,7 +31,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private string _marketplaceDescription = "Browse and interact with listings on a Peer-to-Peer, Secondary Sales marketplace.";
         [SerializeField] private string _checkoutDescription = "Buy an ERC1155 token via a Primary Sales contract using the Checkout Panel - pay with crypto or fiat.";
 
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private SequenceLoginWindow _loginWindow;
         private SequencePlayerProfile _playerProfile;
@@ -60,6 +60,8 @@ namespace Sequence.Boilerplates
                     }
                 };
             };
+            
+            _adapter = EmbeddedWalletAdapter.GetInstance();
         }
 
         private void Start()

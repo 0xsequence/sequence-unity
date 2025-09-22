@@ -16,11 +16,16 @@ namespace Sequence.Boilerplates.SignMessage
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private string _initSignatureText;
         
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private Action _onClose;
         private string _curInput;
         private string _curSignature;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
 
         private void Start()
         {

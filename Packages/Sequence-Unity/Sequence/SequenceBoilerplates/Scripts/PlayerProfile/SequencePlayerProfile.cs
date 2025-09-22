@@ -24,11 +24,16 @@ namespace Sequence.Boilerplates.PlayerProfile
         [SerializeField] private GenericObjectPool<TransactionHistoryTile> _transactionPool;
         [SerializeField] private GenericObjectPool<LinkedWalletTile> _walletsPool;
         
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private Action _onClose;
         private Address _currency;
         private EOAWalletLinker _walletLinker;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
 
         /// <summary>
         /// This function is called when the user clicks the close button.

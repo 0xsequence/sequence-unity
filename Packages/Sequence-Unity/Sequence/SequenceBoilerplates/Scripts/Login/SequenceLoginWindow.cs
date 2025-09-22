@@ -25,10 +25,15 @@ namespace Sequence.Boilerplates.Login
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject[] _socialTexts;
 
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private Action _onClose;
         private string _curEmail;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
         
         private void Start()
         {

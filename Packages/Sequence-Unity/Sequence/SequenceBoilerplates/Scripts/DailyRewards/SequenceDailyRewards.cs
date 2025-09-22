@@ -19,12 +19,17 @@ namespace Sequence.Boilerplates.DailyRewards
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GenericObjectPool<SequenceDailyRewardTile> _tilePool;
         
-        private readonly EmbeddedWalletAdapter _adapter = EmbeddedWalletAdapter.GetInstance();
+        private EmbeddedWalletAdapter _adapter;
         
         private string _apiUrl;
         private Action _onClose;
         private DailyRewardsStatusData _rewardsData;
         private Dictionary<string, TokenSupply[]> _supplies;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
         
         /// <summary>
         /// This function is called when the user clicks the close button.
