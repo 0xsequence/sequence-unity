@@ -45,9 +45,14 @@ namespace Sequence.EcosystemWallet
 
             var type = DetermineSessionCreationType(addExplicit, session);
             var sessionWallet = new EOAWallet();
-
+            var sessionAddress = sessionWallet.GetAddress();
+            
             if (session != null)
-                session.sessionAddress = sessionWallet.GetAddress();
+                session.sessionAddress = sessionAddress;
+            
+            var sessionArgs = session == null ? 
+                new SessionArgs(sessionAddress) : 
+                new ExplicitSessionArgs(session);
             
             var origin = RedirectOrigin.GetOriginString();
             var includeImplicitSession = type == SessionCreationType.IncludeImplicit;
@@ -58,7 +63,7 @@ namespace Sequence.EcosystemWallet
                 email = email,
                 origin = origin,
                 includeImplicitSession = includeImplicitSession,
-                session = session
+                session = sessionArgs
             };
             
             var action = type == SessionCreationType.AddExplicit ? "addExplicitSession" : "createNewSession";

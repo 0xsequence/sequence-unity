@@ -75,7 +75,7 @@ namespace Sequence.EcosystemWallet
             return new SignatureOfSapientSignerLeaf
             {
                 curType = SignatureOfSapientSignerLeaf.Type.sapient,
-                address = new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29"), // Session manager address
+                address = ExtensionsFactory.Rc3.Sessions,
                 data = sessionSignatures
             };
         }
