@@ -64,7 +64,7 @@ namespace Sequence.EcosystemWallet.IntegrationTests
             var sessionTopology = SessionsTopology.FromJson(sessionTopologyJson);
 
             var existingPermission = sessionTopology.FindLeaf<PermissionLeaf>(leaf => 
-                leaf.permissions.signer.Equals(explicitSession.signer));
+                leaf.permissions.sessionAddress.Equals(explicitSession.sessionAddress));
             
             if (existingPermission != null)
                 throw new Exception("Session already exists.");

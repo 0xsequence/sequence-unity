@@ -11,8 +11,8 @@ namespace Sequence.EcosystemWallet.Primitives
     [Serializable]
     public class SessionPermissions
     {
+        public Address sessionAddress;
         public BigInteger chainId;
-        public Address signer;
         public BigInteger valueLimit;
         public BigInteger deadline;
         public Permission[] permissions;
@@ -22,7 +22,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new
             {
                 chainId = chainId,
-                signer = signer,
+                sessionAddress = sessionAddress,
                 valueLimit = valueLimit,
                 deadline = deadline,
                 permissions = permissions.Select(permission => permission.ToJson()).ToArray()
@@ -36,7 +36,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             List<byte> result = new();
-            result.AddRange(signer.ToString().HexStringToByteArray().PadLeft(20));
+            result.AddRange(sessionAddress.ToString().HexStringToByteArray().PadLeft(20));
             result.AddRange(chainId.ByteArrayFromNumber().PadLeft(32));
             result.AddRange(valueLimit.ByteArrayFromNumber(32));
             result.AddRange(deadline.ByteArrayFromNumber(8));
@@ -71,7 +71,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
             
             return new SessionPermissions {
-                signer = signer,
+                sessionAddress = signer,
                 chainId = chainId,
                 valueLimit = valueLimit,
                 deadline = deadline,
@@ -84,7 +84,7 @@ namespace Sequence.EcosystemWallet.Primitives
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
             return new SessionPermissions
             {
-                signer = new Address((string)data["signer"]),
+                sessionAddress = new Address((string)data["signer"]),
                 valueLimit = BigInteger.Parse((string)data["valueLimit"]),
                 deadline = BigInteger.Parse((string)data["deadline"]),
                 permissions = JsonConvert.DeserializeObject<object[]>(data["permissions"].ToString())

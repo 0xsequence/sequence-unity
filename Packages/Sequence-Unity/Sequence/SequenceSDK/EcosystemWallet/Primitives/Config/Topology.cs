@@ -81,6 +81,11 @@ namespace Sequence.EcosystemWallet.Primitives
             
             if (IsLeaf())
             {
+                if (Leaf is NestedLeaf nestedLeaf)
+                {
+                    return nestedLeaf.tree.FindSignerLeaf(address);
+                }
+                
                 if (Leaf is SignerLeaf signerLeaf)
                 {
                     if (signerLeaf.address.Equals(address))

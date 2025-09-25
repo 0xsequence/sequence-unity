@@ -4,18 +4,17 @@ namespace Sequence.EcosystemWallet
 {
     public struct ConnectArgs
     {
-        public Address sessionAddress;
         public string preferredLoginMethod;
         public string email;
         public string origin;
         public bool includeImplicitSession;
-        public SessionPermissions permissions;
+        public SessionPermissions session;
     }
     
     public struct ConnectResponse
     {
         public Address walletAddress;
-        public string email;
+        public string userEmail;
         public string loginMethod;
         public Attestation attestation;
         public RSY signature;

@@ -20,10 +20,10 @@ namespace Sequence.EcosystemWallet
         public string walletUrl;
         public string chainId;
         public string loginMethod;
-        public string email;
+        public string userEmail;
         
         public SessionCredentials(bool isExplicit, string privateKey, Address address, Attestation attestation, RSY signature, 
-            string walletUrl, string chainId, string loginMethod, string email)
+            string walletUrl, string chainId, string loginMethod, string userEmail)
         {
             this.isExplicit = isExplicit;
             this.privateKey = privateKey;
@@ -33,7 +33,7 @@ namespace Sequence.EcosystemWallet
             this.walletUrl = walletUrl;
             this.chainId = chainId;
             this.loginMethod = loginMethod;
-            this.email = email;
+            this.userEmail = userEmail;
             
             sessionAddress = new EOAWallet(privateKey).GetAddress();
         }
@@ -79,10 +79,10 @@ namespace Sequence.EcosystemWallet
                 serializer.Serialize(writer, value.loginMethod);
             }
             
-            if (value.email != null)
+            if (value.userEmail != null)
             {
-                writer.WritePropertyName("email");
-                serializer.Serialize(writer, value.email);
+                writer.WritePropertyName("userEmail");
+                serializer.Serialize(writer, value.userEmail);
             }
 
             writer.WriteEndObject();
@@ -101,9 +101,9 @@ namespace Sequence.EcosystemWallet
             var walletUrl = obj["walletUrl"]?.ToString();
             var chainId = obj["chainId"]?.ToString();
             var loginMethod = obj["loginMethod"]?.ToString();
-            var email = obj["email"]?.ToString();
+            var userEmail = obj["userEmail"]?.ToString();
 
-            return new SessionCredentials(isExplicit, privateKey, address, attestation, signature, walletUrl, chainId, loginMethod, email);
+            return new SessionCredentials(isExplicit, privateKey, address, attestation, signature, walletUrl, chainId, loginMethod, userEmail);
         }
     }
 }

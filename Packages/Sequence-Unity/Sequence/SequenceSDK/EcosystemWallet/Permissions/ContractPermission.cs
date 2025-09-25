@@ -42,7 +42,6 @@ namespace Sequence.EcosystemWallet
                 chainId = _chain.IsActive() ? _chain.AsBigInteger() : 0,
                 deadline = _deadline,
                 valueLimit = _valueLimit,
-                signer = new Address("0x1234567890123456789012345678901234567890"),
                 permissions = permissions
             };
         }

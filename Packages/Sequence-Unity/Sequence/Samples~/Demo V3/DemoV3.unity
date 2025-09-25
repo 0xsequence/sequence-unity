@@ -7557,7 +7557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _chain: 421614
-  _allowTransactionThroughEcosystem: 1
+  _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 0
   _feeOptionAddress: []
   _transaction:
@@ -16682,7 +16682,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a76f3494846944de2a0d1694eeb60856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ecosystem: 1
   _emailLoginButton: {fileID: 1459061464521247473}
   _emailContinueButton: {fileID: 2325936309338030303}
   _emailInput: {fileID: 1181566138228532167}

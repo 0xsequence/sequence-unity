@@ -45,7 +45,7 @@ namespace Sequence.EcosystemWallet
             
             var config = await GetConfig(imageHash);
 
-            var sessionsManager = new Address("0x06aa3a8F781F2be39b888Ac8a639c754aEe9dA29");
+            var sessionsManager = new Address("0x0000000000CC58810c33F3a0D78aA1Ed80FaDcD8");
             var signerLeaf = config.topology.FindSignerLeaf(sessionsManager) as SapientSignerLeaf;
             SessionsImageHash = signerLeaf.imageHash;
             

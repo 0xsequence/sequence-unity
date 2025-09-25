@@ -80,7 +80,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
             if (Leaf is PermissionLeaf permissionLeaf)
             {
-                if (explicitSigners.Contains(permissionLeaf.permissions.signer))
+                if (explicitSigners.Contains(permissionLeaf.permissions.sessionAddress))
                     return this;
                 
                 return new SessionNodeLeaf
@@ -117,7 +117,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public SessionsTopology AddExplicitSession(SessionPermissions session)
         {
             var existingPermission = this.FindLeaf<PermissionLeaf>(leaf => 
-                leaf.permissions.signer.Equals(session.signer));
+                leaf.permissions.sessionAddress.Equals(session.sessionAddress));
             
             if (existingPermission != null)
                 throw new Exception("Session already exists.");
@@ -132,7 +132,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public SessionsTopology RemoveExplicitSession(Address address)
         {
             if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf)
-                return permissionLeaf.permissions.signer.Equals(address) ? null : this;
+                return permissionLeaf.permissions.sessionAddress.Equals(address) ? null : this;
 
             if (this.IsBranch())
             {
@@ -181,7 +181,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 return null;
             }
             
-            if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf && permissionLeaf.permissions.signer.Equals(signer))
+            if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf && permissionLeaf.permissions.sessionAddress.Equals(signer))
                 return permissionLeaf.permissions;
 
             return null;
@@ -195,7 +195,7 @@ namespace Sequence.EcosystemWallet.Primitives
         public Address[] GetExplicitSigners(Address[] current)
         {
             if (this.IsLeaf() && Leaf is PermissionLeaf permissionLeaf)
-                return current.AddToArray(permissionLeaf.permissions.signer);
+                return current.AddToArray(permissionLeaf.permissions.sessionAddress);
 
             if (this.IsBranch())
             {
@@ -335,7 +335,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     {
                         permissions = new()
                         {
-                            signer = new Address((string)data["signer"]),
+                            sessionAddress = new Address((string)data["sessionAddress"]),
                             valueLimit = BigInteger.Parse((string)data["valueLimit"]),
                             deadline = BigInteger.Parse((string)data["deadline"]),
                             permissions = JsonConvert.DeserializeObject<List<object>>(data["permissions"].ToString())

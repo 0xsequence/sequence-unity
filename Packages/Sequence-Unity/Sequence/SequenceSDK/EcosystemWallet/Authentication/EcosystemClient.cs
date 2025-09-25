@@ -29,41 +29,43 @@ namespace Sequence.EcosystemWallet
         /// Create an implicit- or explicit session based on a given set of permissions.
         /// </summary>
         /// <param name="addExplicit">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
-        /// <param name="permissions">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
+        /// <param name="session">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        public async Task<SessionSigner[]> CreateNewSession(bool addExplicit, SessionPermissions permissions, string preferredLoginMethod, string email = null)
+        public async Task<SessionSigner[]> CreateNewSession(bool addExplicit, SessionPermissions session, string preferredLoginMethod, string email = null)
         {
             var chainId = string.Empty;
-            if (permissions != null)
+            if (session != null)
             {
-                if (permissions.chainId <= 0)
+                if (session.chainId <= 0)
                     throw new Exception("Invalid chainId.");
                 
-                chainId = permissions.chainId.ToString();
+                chainId = session.chainId.ToString();
             }
 
-            var type = DetermineSessionCreationType(addExplicit, permissions);
+            var type = DetermineSessionCreationType(addExplicit, session);
             var sessionWallet = new EOAWallet();
+
+            if (session != null)
+                session.sessionAddress = sessionWallet.GetAddress();
             
             var origin = RedirectOrigin.GetOriginString();
             var includeImplicitSession = type == SessionCreationType.IncludeImplicit;
             
             var payload = new ConnectArgs
             {
-                sessionAddress = sessionWallet.GetAddress(),
                 preferredLoginMethod = preferredLoginMethod,
                 email = email,
                 origin = origin,
                 includeImplicitSession = includeImplicitSession,
-                permissions = permissions
+                session = session
             };
             
             var action = type == SessionCreationType.AddExplicit ? "addExplicitSession" : "createNewSession";
             
             var response = await SendRequest<ConnectArgs, ConnectResponse>("connect", action, payload);
             
-            var isImplicitWithPermissions = includeImplicitSession && permissions != null;
+            var isImplicitWithPermissions = includeImplicitSession && session != null;
             var credentialsLen = isImplicitWithPermissions ? 2 : 1;
             var credentials = new SessionCredentials[credentialsLen];
             
@@ -76,7 +78,7 @@ namespace Sequence.EcosystemWallet
                 _walletUrl,
                 chainId,
                 response.loginMethod,
-                response.email);
+                response.userEmail);
 
             if (isImplicitWithPermissions)
             {
@@ -89,7 +91,7 @@ namespace Sequence.EcosystemWallet
                     _walletUrl,
                     chainId,
                     response.loginMethod,
-                    response.email);
+                    response.userEmail);
             }
             
             var signers = new SessionSigner[credentials.Length];

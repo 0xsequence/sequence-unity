@@ -51,7 +51,7 @@ namespace Sequence.Utils
                 var results = request.downloadHandler.data;
                 var responseJson = Encoding.UTF8.GetString(results);
                 
-                SequenceLog.Info($"<< {responseJson}");
+                SequenceLog.Info($"<< {request.responseCode} {responseJson}");
                 
                 return JsonConvert.DeserializeObject<TResponse>(responseJson, _serializerSettings);
             }
