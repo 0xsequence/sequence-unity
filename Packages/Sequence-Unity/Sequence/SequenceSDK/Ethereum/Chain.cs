@@ -33,6 +33,7 @@ namespace Sequence
         Etherlink = 42793,
         [Obsolete("Chain is not currently supported")]
         XR1 = 273,
+        Somnia = 5031,
 
         // Testnets
         TestnetSepolia = 11155111,
@@ -65,6 +66,7 @@ namespace Sequence
         TestnetSomnia = 50312,
         TestnetFrequency = 53716,
         TestnetIncentiv = 11690,
+        TestnetIncentivV2 = 28802,
         
         LocalChain = 31337, // A chain running locally on your system
 
