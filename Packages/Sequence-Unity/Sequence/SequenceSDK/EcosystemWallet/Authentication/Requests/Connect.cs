@@ -15,12 +15,25 @@ namespace Sequence.EcosystemWallet
     public struct ConnectResponse
     {
         public Address walletAddress;
+        public GuardConfig guard;
         public string userEmail;
         public string loginMethod;
         public Attestation attestation;
         public RSY signature;
     }
 
+    public class GuardConfig
+    {
+        public string url;
+        public ModuleAddresses moduleAddresses;  
+    }
+
+    public class ModuleAddresses
+    {
+        public bool isMap;
+        public string[][] data;
+    }
+    
     public class SessionArgs
     {
         public Address sessionAddress;

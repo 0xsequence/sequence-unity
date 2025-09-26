@@ -32,7 +32,8 @@ namespace Sequence.EcosystemWallet
         /// <param name="session">Leave it null to create an implicit session. Otherwise, we create an explicit session.</param>
         /// <param name="preferredLoginMethod"></param>
         /// <param name="email"></param>
-        public async Task<SessionSigner[]> CreateNewSession(bool addExplicit, SessionPermissions session, string preferredLoginMethod, string email = null)
+        public async Task<SessionSigner[]> CreateNewSession(bool addExplicit, SessionPermissions session, 
+            string preferredLoginMethod, string email = null)
         {
             var chainId = string.Empty;
             if (session != null)
@@ -73,11 +74,16 @@ namespace Sequence.EcosystemWallet
             var isImplicitWithPermissions = includeImplicitSession && session != null;
             var credentialsLen = isImplicitWithPermissions ? 2 : 1;
             var credentials = new SessionCredentials[credentialsLen];
+
+            var walletAddress = response.walletAddress;
+            var guardConfig = response.guard;
+            if (guardConfig != null)
+                new GuardStorage().SaveConfig(walletAddress, guardConfig);
             
             credentials[0] = new SessionCredentials(
                 !includeImplicitSession,
                 sessionWallet.GetPrivateKeyAsHex(),
-                response.walletAddress,
+                walletAddress,
                 response.attestation,
                 response.signature,
                 _walletUrl,

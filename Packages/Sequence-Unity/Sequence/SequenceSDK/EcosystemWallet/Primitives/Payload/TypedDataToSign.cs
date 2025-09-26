@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using Sequence.ABI;
@@ -212,10 +213,13 @@ namespace Sequence.EcosystemWallet.Primitives
             }
         }
 
-        public TypedDataToSign(Address wallet, Chain chain, Parented payload)
+        public TypedDataToSign(Address wallet, Chain chainId, Parented payload) : this(wallet, 
+            BigInteger.Parse(ChainDictionaries.ChainIdOf[chainId]), payload) { }
+            
+        public TypedDataToSign(Address wallet, BigInteger chainId, Parented payload)
         {
             _payload = payload;
-            this.domain = new Domain("Sequence Wallet", "3", chain, wallet);
+            this.domain = new Domain("Sequence Wallet", "3", chainId, wallet);
             switch (payload.payload.type)
             {
                 case PayloadType.Call:

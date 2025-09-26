@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -90,6 +91,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 {
                     if (signerLeaf.address.Equals(address))
                     {
+                        Debug.Log($"return signer leaf {signerLeaf.address}");
                         return signerLeaf;
                     }
                 }

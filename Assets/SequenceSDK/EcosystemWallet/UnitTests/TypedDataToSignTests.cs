@@ -217,7 +217,7 @@ namespace Sequence.EcosystemWallet.UnitTests
         public void TestGetSignedPayload()
         {
             TypedDataToSign toSign = new TypedDataToSign(new Address("0x4caf9086ccf2e486f331Bde537A559d9Be7D2fc4"),
-                Chain.LocalChain,
+                (int)Chain.LocalChain,
                 new Parented(_otherAddressArray,
                     new ConfigUpdate("0x6810c263f45be5dc8e8e6ffd2ab9bd6f152412edb66111b6f56e39a42c694405")));
 

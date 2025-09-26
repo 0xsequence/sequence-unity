@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Nethereum.ABI.FunctionEncoding;
@@ -45,7 +46,13 @@ namespace Sequence.EcosystemWallet
             
             var config = await GetConfig(imageHash);
             
-            var signerLeaf = config.topology.FindSignerLeaf(ExtensionsFactory.Rc3.Sessions) as SapientSignerLeaf;
+            Debug.Log($"Config {JsonConvert.SerializeObject(config)}");
+
+            var signerAddress = ExtensionsFactory.Current.Sessions;
+            var signerLeaf = config.topology.FindSignerLeaf(signerAddress) as SapientSignerLeaf;
+            if (signerLeaf == null)
+                throw new Exception($"Could not find signer {signerAddress}");
+            
             SessionsImageHash = signerLeaf.imageHash;
             
             var sessionsTopology = await GetSessionsTopology(SessionsImageHash);

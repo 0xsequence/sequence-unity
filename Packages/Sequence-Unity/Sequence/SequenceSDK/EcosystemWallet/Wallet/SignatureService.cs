@@ -32,6 +32,15 @@ namespace Sequence.EcosystemWallet
             };
 
             var signedEnvelope = envelope.ToSigned(sapientSignature);
+            
+            var guardConfig = new GuardStorage().GetConfig(envelope.wallet);
+            if (guardConfig != null)
+            {
+                var guardSigner = new GuardSigner(ExtensionsFactory.Current.Guard, guardConfig);
+                var guardSignature = await guardSigner.SignEnvelope(signedEnvelope);
+                signedEnvelope.signatures = signedEnvelope.signatures.AddToArray(guardSignature);   
+            }
+            
             var rawSignature = SignatureHandler.EncodeSignature(signedEnvelope);
             
             rawSignature.suffix = configUpdates.Reverse().Select(u => 
@@ -75,7 +84,7 @@ namespace Sequence.EcosystemWallet
             return new SignatureOfSapientSignerLeaf
             {
                 curType = SignatureOfSapientSignerLeaf.Type.sapient,
-                address = ExtensionsFactory.Rc3.Sessions,
+                address = ExtensionsFactory.Current.Sessions,
                 data = sessionSignatures
             };
         }
