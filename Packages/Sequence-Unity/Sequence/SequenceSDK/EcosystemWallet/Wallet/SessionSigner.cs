@@ -24,6 +24,7 @@ namespace Sequence.EcosystemWallet
         public Address Address { get; }
         public Chain Chain { get; }
         public bool IsExplicit { get; }
+        public Attestation Attestation => _credentials.attestation;
 
         public Address IdentitySigner
         {

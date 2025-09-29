@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
@@ -15,6 +13,7 @@ namespace Sequence.EcosystemWallet
     {
         private readonly SessionsTopology _sessions;
         private readonly SignerService _signerService;
+        private SessionSigner[] _currentSigners;
 
         public SignatureService(SessionSigner[] sessionSigners, SessionsTopology sessions)
         {
@@ -36,7 +35,14 @@ namespace Sequence.EcosystemWallet
             var guardConfig = new GuardStorage().GetConfig(envelope.wallet);
             if (guardConfig != null)
             {
-                var guardSigner = new GuardSigner(ExtensionsFactory.Current.Guard, guardConfig);
+                Attestation attestation = null;
+                foreach (var signer in _currentSigners)
+                {
+                    if (!signer.IsExplicit)
+                        attestation = signer.Attestation;
+                }
+                
+                var guardSigner = new GuardSigner(guardConfig, attestation);
                 var guardSignature = await guardSigner.SignEnvelope(signedEnvelope);
                 signedEnvelope.signatures = signedEnvelope.signatures.AddToArray(guardSignature);   
             }
@@ -58,16 +64,16 @@ namespace Sequence.EcosystemWallet
             var implicitSigners = new List<Address>();
             var explicitSigners = new List<Address>();
 
-            var signers = await _signerService.FindSignersForCalls(chain, calls);
+            _currentSigners = await _signerService.FindSignersForCalls(chain, calls);
             
-            var signatures = new SessionCallSignature[signers.Length];
-            for (var i = 0; i < signers.Length; i++)
+            var signatures = new SessionCallSignature[_currentSigners.Length];
+            for (var i = 0; i < _currentSigners.Length; i++)
             {
-                var signature = signers[i].SignCall(chain, calls[i], _sessions, envelope.payload.space, envelope.payload.nonce);
+                var signature = _currentSigners[i].SignCall(chain, calls[i], _sessions, envelope.payload.space, envelope.payload.nonce);
                 signatures[i] = signature;
             }
 
-            foreach (var signer in signers)
+            foreach (var signer in _currentSigners)
             {
                 if (signer.IsExplicit)
                     explicitSigners.Add(signer.Address);

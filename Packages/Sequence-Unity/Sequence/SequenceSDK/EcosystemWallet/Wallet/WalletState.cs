@@ -46,8 +46,6 @@ namespace Sequence.EcosystemWallet
             
             var config = await GetConfig(imageHash);
             
-            Debug.Log($"Config {JsonConvert.SerializeObject(config)}");
-
             var signerAddress = ExtensionsFactory.Current.Sessions;
             var signerLeaf = config.topology.FindSignerLeaf(signerAddress) as SapientSignerLeaf;
             if (signerLeaf == null)

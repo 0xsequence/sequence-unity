@@ -1,11 +1,15 @@
 using System;
 using System.Numerics;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
     [Serializable]
+    [JsonConverter(typeof(DomainConverter))]
     public class Domain
     {
         public string name;
@@ -96,6 +100,42 @@ namespace Sequence.EcosystemWallet.Primitives
         public bool HasSalt()
         {
             return salt?.Data != null && salt.Data.Length > 0;
+        }
+    }
+    
+    [Preserve]
+    internal class DomainConverter : JsonConverter<Domain>
+    {
+        public override void WriteJson(JsonWriter writer, Domain value, JsonSerializer serializer)
+        {
+            var jsonObject = new JObject
+            {
+                ["name"] = value.name,
+                ["version"] = value.version,
+                ["chainId"] = ulong.Parse(value.chainId.ToString()),
+                ["verifyingContract"] = value.verifyingContract.ToString(),
+            };
+            
+            if (value.salt != null)
+            {
+                jsonObject["salt"] = value.salt.Data.ByteArrayToHexStringWithPrefix();
+            }
+
+            jsonObject.WriteTo(writer);
+        }
+
+        public override Domain ReadJson(JsonReader reader, Type objectType, Domain existingValue, bool hasExistingValue,
+            JsonSerializer serializer)
+        {
+            var jsonObject = JObject.Load(reader);
+
+            BigInteger chainId = jsonObject["chainId"]?.Value<ulong>() ?? 0;
+            string name = jsonObject["name"]?.Value<string>();
+            string version = jsonObject["version"]?.Value<string>();
+            Address verifyingContract = new Address(jsonObject["verifyingContract"]?.Value<string>());
+            string salt = new Address(jsonObject["salt"]?.Value<string>());
+            
+            return new Domain(name, version, chainId, verifyingContract, null);
         }
     }
 }
