@@ -1,18 +1,12 @@
 using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Nethereum.ABI.FunctionEncoding;
-using Nethereum.ABI.Model;
-using Nethereum.Util;
 using Newtonsoft.Json;
-using Sequence.ABI;
 using Sequence.EcosystemWallet.KeyMachine.Models;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Provider;
 using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
-using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
@@ -32,7 +26,7 @@ namespace Sequence.EcosystemWallet
         
         private readonly KeyMachineApi _keyMachine = new();
         private readonly ISecureStorage _secureStorage = SecureStorageFactory.CreateSecureStorage();
-        private readonly bool _enableStorage;
+        private readonly bool _enableStorage = true;
 
         public WalletState(Address address)
         {
@@ -49,7 +43,6 @@ namespace Sequence.EcosystemWallet
             if (IsDeployed && implementation.Equals(ExtensionsFactory.Current.Stage2))
             {
                 imageHash = await GetOnChainImageHash(chain);
-                Debug.Log($"onchain image hash {imageHash}");
             }
             else
             {
@@ -74,12 +67,7 @@ namespace Sequence.EcosystemWallet
             
             SessionsImageHash = signerLeaf.imageHash;
             
-            Debug.Log($"Config image hash {imageHash}");
-            Debug.Log($"SessionsImageHash {SessionsImageHash}");
-            Debug.Log($"{JsonConvert.SerializeObject(config.topology.Parse())}");
-            
             var sessionsTopology = await GetSessionsTopology(SessionsImageHash);
-            Debug.Log($"sessionsTopology {sessionsTopology.JsonSerialize()}");
             
             ConfigUpdates = configUpdates.updates;
             ImageHash = imageHash;
@@ -105,7 +93,6 @@ namespace Sequence.EcosystemWallet
 
         private async Task<Primitives.Config> GetConfig(string imageHash)
         {
-            Debug.Log($"Get config for image hash {imageHash}");
             var storageKey = $"sequence-config-tree-{imageHash}";
             var cached = RetrieveString(storageKey);
             
