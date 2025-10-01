@@ -100,7 +100,7 @@ namespace Sequence.EcosystemWallet.Primitives
 
             var checkpointBytes = configuration.checkpoint.ByteArrayFromNumber(bytesForCheckpoint);
             output = ByteArrayExtensions.ConcatenateByteArrays(output, checkpointBytes);
-
+            
             var thresholdBytes = configuration.threshold.ByteArrayFromNumber(bytesForThreshold);
             output = ByteArrayExtensions.ConcatenateByteArrays(output, thresholdBytes);
             
@@ -186,7 +186,7 @@ namespace Sequence.EcosystemWallet.Primitives
                 return new RawSignature
                 {
                     noChainId = subsignatures[0].noChainId,
-                    checkpointerData = null,
+                    checkpointerData = subsignatures[0].checkpointerData,
                     configuration = subsignatures[0].configuration,
                     suffix = subsignatures.GetRange(1, subsignatures.Count - 1).ToArray(),
                     erc6492 = erc6492

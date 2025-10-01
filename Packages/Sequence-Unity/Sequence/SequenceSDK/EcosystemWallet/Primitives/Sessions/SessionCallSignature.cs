@@ -9,8 +9,6 @@ namespace Sequence.EcosystemWallet.Primitives
 {
     public abstract class SessionCallSignature
     {
-        public abstract byte[] Encode();
-
         public static SessionCallSignature FromJson(string json)
         {
             var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
@@ -44,7 +42,8 @@ namespace Sequence.EcosystemWallet.Primitives
             if (!sessionsTopology.IsComplete())
                 throw new Exception("Incomplete topology");
 
-            sessionsTopology = sessionsTopology.Minimise(explicitSigners, implicitSigners);
+            var identitySigner = sessionsTopology.GetIdentitySigner();
+            sessionsTopology = sessionsTopology.Minimise(explicitSigners, implicitSigners, identitySigner);
             
             var encodedTopology = sessionsTopology.Encode();
             if (encodedTopology.Length.MinBytesFor() > 3)
@@ -52,7 +51,7 @@ namespace Sequence.EcosystemWallet.Primitives
             
             parts.Add(encodedTopology.Length.ByteArrayFromNumber(3));
             parts.Add(encodedTopology);
-
+            
             var attestationMap = new Dictionary<string, int>();
             var encodedAttestations = new List<byte[]>();
 
@@ -107,7 +106,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     throw new Exception("Invalid call signature");
                 }
             }
-
+            
             return ByteArrayExtensions.ConcatenateByteArrays(parts.ToArray());
         }
     }

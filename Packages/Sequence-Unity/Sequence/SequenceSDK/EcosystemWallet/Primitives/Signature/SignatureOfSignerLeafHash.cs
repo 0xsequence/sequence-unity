@@ -1,6 +1,5 @@
 using System;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {

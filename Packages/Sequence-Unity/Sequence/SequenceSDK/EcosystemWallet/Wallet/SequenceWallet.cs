@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using Sequence.Config;
-using Sequence.EcosystemWallet.Browser;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Relayer;
 using Sequence.Utils;

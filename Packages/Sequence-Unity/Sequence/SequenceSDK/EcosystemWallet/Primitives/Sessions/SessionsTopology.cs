@@ -52,14 +52,15 @@ namespace Sequence.EcosystemWallet.Primitives
         /// </summary>
         /// <param name="explicitSigners">The list of explicit signers to consider.</param>
         /// <param name="implicitSigners">The list of implicit signers to consider.</param>
+        /// <param name="identitySigner">The list of implicit signers to consider.</param>
         /// <returns>New reference to the compromised topology.</returns>
         /// <exception cref="Exception"></exception>
-        public SessionsTopology Minimise(Address[] explicitSigners, Address[] implicitSigners)
+        public SessionsTopology Minimise(Address[] explicitSigners, Address[] implicitSigners, Address identitySigner)
         {
             if (this.IsBranch())
             {
                 var branchList = ((SessionsTopology[])Branch.Children)
-                    .Select(branch => (ITopology)branch.Minimise(explicitSigners, implicitSigners))
+                    .Select(branch => (ITopology)branch.Minimise(explicitSigners, implicitSigners, identitySigner))
                     .ToArray();
                 
                 if (branchList.All(b => b.Node is SessionNodeLeaf))
@@ -102,7 +103,18 @@ namespace Sequence.EcosystemWallet.Primitives
                 return this;
             }
 
-            if (Leaf is IdentitySignerLeaf || Node is SessionNodeLeaf)
+            if (Leaf is IdentitySignerLeaf identitySignerLeaf)
+            {
+                if (identitySignerLeaf.identitySigner.Equals(identitySigner))
+                    return this;
+                
+                return new SessionNodeLeaf
+                {
+                    Value = this.Hash(true).HexStringToByteArray()
+                }.ToTopology();
+            }
+
+            if (Node is SessionNodeLeaf)
                 return this;
 
             throw new Exception("Invalid topology");

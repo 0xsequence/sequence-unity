@@ -5,10 +5,5 @@ namespace Sequence.EcosystemWallet.Primitives
         public Attestation attestation;
         public RSY identitySignature;
         public RSY sessionSignature;
-        
-        public override byte[] Encode()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

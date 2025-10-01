@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet.Primitives
@@ -27,7 +26,7 @@ namespace Sequence.EcosystemWallet.Primitives
             }
 
             byte[] output = new byte[] { flag };
-
+            
             if (sigForCheckpointer.configuration.checkpointer != null)
             {
                 var checkpointer = sigForCheckpointer.configuration.checkpointer.Value.HexStringToByteArray().PadLeft(20);

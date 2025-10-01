@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
@@ -34,7 +33,7 @@ namespace Sequence.EcosystemWallet
             var signedEnvelope = envelope.ToSigned(sapientSignature);
             
             var guardConfig = new GuardStorage().GetConfig(envelope.wallet);
-            if (guardConfig != null)
+            if (signedEnvelope.ReachedThreshold() && guardConfig != null)
             {
                 var guardSigner = new GuardSigner(guardConfig);
                 var guardSignature = await guardSigner.SignEnvelope(signedEnvelope);
@@ -46,9 +45,6 @@ namespace Sequence.EcosystemWallet
             rawSignature.suffix = configUpdates.Reverse().Select(u => 
                 RawSignature.Decode(u.signature.HexStringToByteArray())).ToArray();
             
-            foreach (var s in rawSignature.suffix)
-                Debug.Log($"suffix {s.Encode().ByteArrayToHexString()}");
-
             return rawSignature;
         }
         
@@ -66,7 +62,7 @@ namespace Sequence.EcosystemWallet
             var signatures = new SessionCallSignature[_currentSigners.Length];
             for (var i = 0; i < _currentSigners.Length; i++)
             {
-                var signature = _currentSigners[i].SignCall(chain, calls[i], _sessions, envelope.payload.space, envelope.payload.nonce);
+                var signature = _currentSigners[i].SignCall(chain, calls[i], i, _sessions, envelope.payload.space, envelope.payload.nonce);
                 signatures[i] = signature;
             }
 

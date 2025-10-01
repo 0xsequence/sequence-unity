@@ -105,12 +105,12 @@ namespace Sequence.EcosystemWallet
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
-        public SessionCallSignature SignCall(Chain chain, Call call, SessionsTopology topology, BigInteger space, BigInteger nonce)
+        public SessionCallSignature SignCall(Chain chain, Call call, int callIdx, SessionsTopology topology, BigInteger space, BigInteger nonce)
         {
             var pvKey = _credentials.privateKey;
             var eoaWallet = new EOAWallet(pvKey);
             
-            var hashedCall = HashCallWithReplayProtection(chain, call, space, nonce);
+            var hashedCall = HashCallWithReplayProtection(chain, call, callIdx, space, nonce);
             var signedCall = EthSignature.Sign(hashedCall, eoaWallet.privKey);
 
             var rsy = RSY.UnpackFrom65(signedCall.HexStringToByteArray());
@@ -141,14 +141,15 @@ namespace Sequence.EcosystemWallet
             };
         }
 
-        private byte[] HashCallWithReplayProtection(Chain chain, Call call, BigInteger space, BigInteger nonce)
+        private byte[] HashCallWithReplayProtection(Chain chain, Call call, BigInteger callIdx, BigInteger space, BigInteger nonce)
         {
             var chainBytes = BigInteger.Parse(chain.GetChainId()).ByteArrayFromNumber(32);
             var spaceBytes = space.ByteArrayFromNumber(32);
             var nonceBytes = nonce.ByteArrayFromNumber(32);
+            var callIdxBytes = callIdx.ByteArrayFromNumber(32);
             var callHashBytes = call.Hash().HexStringToByteArray();
 
-            var concatenated = ByteArrayExtensions.ConcatenateByteArrays(chainBytes, spaceBytes, nonceBytes, callHashBytes);
+            var concatenated = ByteArrayExtensions.ConcatenateByteArrays(chainBytes, spaceBytes, nonceBytes, callIdxBytes, callHashBytes);
             return SequenceCoder.KeccakHash(concatenated);
         }
 

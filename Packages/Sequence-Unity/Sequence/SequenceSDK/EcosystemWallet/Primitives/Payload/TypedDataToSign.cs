@@ -231,7 +231,7 @@ namespace Sequence.EcosystemWallet.Primitives
                     {
                         ["space"] = callPayload.space.ToString(),
                         ["nonce"] = callPayload.nonce.ToString(),
-                        ["wallets"] = payload.parentWallets
+                        ["wallets"] = payload.parentWallets ?? Array.Empty<Address>()
                     };
                     int callsLength = callPayload.calls.Length;
                     EncodeSapient.EncodedCall[] encoded = new EncodeSapient.EncodedCall[callsLength];

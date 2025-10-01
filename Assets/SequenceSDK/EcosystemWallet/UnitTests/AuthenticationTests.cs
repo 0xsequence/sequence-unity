@@ -53,7 +53,7 @@ namespace Sequence.EcosystemWallet.UnitTests
         public async Task CallExplicitEmit()
         {
             var wallet = SequenceWallet.RecoverFromStorage();
-            await wallet.SendTransaction(Chain.TestnetArbitrumSepolia,
+            await wallet.SendTransaction(Chain,
                 new Transaction(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), 0, "explicitEmit()"));
         }
         
@@ -61,7 +61,7 @@ namespace Sequence.EcosystemWallet.UnitTests
         public async Task CallSafeMint()
         {
             var wallet = SequenceWallet.RecoverFromStorage();
-            await wallet.SendTransaction(Chain.TestnetArbitrumSepolia,
+            await wallet.SendTransaction(Chain,
                 new Transaction(new Address("0xd25b37e2fb07f85e9eca9d40fe3bcf60ba2dc57b"), 0, "safeMint(address)", wallet.Address));
         }
         

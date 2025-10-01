@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Text;
 using Sequence.ABI;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.Primitives
 {
@@ -23,7 +24,7 @@ namespace Sequence.EcosystemWallet.Primitives
             return new SignerLeafJson
             {
                 type = Signer,
-                address = address,
+                address = address ?? string.Empty,
                 weight = weight.ToString()
             };
         }

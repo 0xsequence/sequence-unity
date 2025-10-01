@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
+using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
 using UnityEngine;
@@ -29,9 +30,6 @@ namespace Sequence.EcosystemWallet
 
             var signatureService = new SignatureService(_sessionSigners, _state.SessionsTopology);
             var signature = await signatureService.SignCalls(chain, _state.SessionsImageHash, envelope, _state.ConfigUpdates);
-            
-            Debug.Log($"Raw signature {signature.ToJson()}");
-            Debug.Log($"Encoded signature {signature.Encode().ByteArrayToHexString()}");
 
             var callsData = ABI.ABI.Pack("execute(bytes,bytes)",
                 envelope.payload.Encode(),

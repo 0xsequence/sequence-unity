@@ -21,5 +21,16 @@ namespace Sequence.EcosystemWallet.Envelope
                 signatures = new[] { signature },
             };
         }
+
+        public bool ReachedThreshold()
+        {
+            var result = WeightOf();
+            return result.weight >= result.maxWeight;
+        }
+
+        public WeightCalculator.WeightResult WeightOf()
+        {
+            return WeightCalculator.GetWeight(configuration, (_) => false);
+        }
     }
 }

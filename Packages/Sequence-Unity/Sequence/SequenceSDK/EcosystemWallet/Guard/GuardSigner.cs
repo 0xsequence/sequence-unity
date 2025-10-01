@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
-using Nethereum.Hex.HexConvertors.Extensions;
 using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -31,13 +27,7 @@ namespace Sequence.EcosystemWallet
             var signatures = envelope.signatures;
             var guardSignatures = new GuardSignatureArgs[signatures.Length];
             for (var i = 0; i < signatures.Length; i++)
-            {
                 guardSignatures[i] = ToGuardSignature(signatures[i]);
-                Debug.Log($"Guard sig {JsonConvert.SerializeObject(guardSignatures[i])}");
-            }
-
-            Debug.Log($"Nethereum TypedData Raw {Encoding.UTF8.GetString(payload.Message)}");
-            Debug.Log($"Nethereum TypedData Hashed {payload.Digest.ByteArrayToHexStringWithPrefix()}");
 
             var rsy = await SignPayload(envelope.wallet, envelope.chainId, 
                 payload.Digest, payload.Message, guardSignatures);
