@@ -18,7 +18,7 @@ namespace Sequence.Relayer
             {
                 Chain.Optimism => "v3-optimism",
                 Chain.ArbitrumOne => "dev-arbitrum",
-                Chain.TestnetArbitrumSepolia => "dev-arbitrum-sepolia",
+                Chain.TestnetArbitrumSepolia => "v3-arbitrum-sepolia",
                 _ => throw new NotSupportedException($"Chain {chain} not supported.")
             };
 

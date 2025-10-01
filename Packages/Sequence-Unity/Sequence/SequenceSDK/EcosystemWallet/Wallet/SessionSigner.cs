@@ -1,12 +1,15 @@
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using Nethereum.ABI.FunctionEncoding;
+using Nethereum.ABI.Model;
 using Sequence.ABI;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -59,7 +62,7 @@ namespace Sequence.EcosystemWallet
             {
                 if (Chain != chain)
                     return false;
-                
+
                 if (call.data.Length > 4 &&
                     ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
                     ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])"))
@@ -196,6 +199,34 @@ namespace Sequence.EcosystemWallet
                     attestation.audienceHash.Data,
                     attestation.issuerHash.Data))
                 .ByteArrayToHexStringWithPrefix();
+        }
+        
+        private async Task GetCurrentUsageLimit(Chain chain)
+        {
+            var response = await new SequenceEthClient(chain).CallContract(new object[] {
+                new CallContractData
+                {
+                    to = ExtensionsFactory.Current.Sessions,
+                    data = ABI.ABI.Pack("getLimitUsage(address,bytes32)", 
+                        ParentAddress, 
+                        new FixedByte(32, GetValueUsageHash(Address, "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE")))
+                }
+            });
+
+            var usageLimit = ABI.ABI.Decode<BigInteger>(response, "uint256");
+            
+            Debug.Log($"GetCurrentUsageLimit: {usageLimit}");
+        }
+        
+        private byte[] GetValueUsageHash(Address signerAddress, string valueTrackingAddress)
+        {
+            var encoder = new ParametersEncoder();
+            var encoded = encoder.EncodeParameters(
+                new Parameter[] { new Parameter("address"), new Parameter("address") }, 
+                new object[] { signerAddress.Value, valueTrackingAddress }
+            );
+
+            return SequenceCoder.KeccakHash(encoded);
         }
     }
 }

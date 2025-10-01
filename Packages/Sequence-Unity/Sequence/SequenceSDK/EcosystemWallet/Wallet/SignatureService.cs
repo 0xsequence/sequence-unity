@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
@@ -35,14 +36,7 @@ namespace Sequence.EcosystemWallet
             var guardConfig = new GuardStorage().GetConfig(envelope.wallet);
             if (guardConfig != null)
             {
-                Attestation attestation = null;
-                foreach (var signer in _currentSigners)
-                {
-                    if (!signer.IsExplicit)
-                        attestation = signer.Attestation;
-                }
-                
-                var guardSigner = new GuardSigner(guardConfig, attestation);
+                var guardSigner = new GuardSigner(guardConfig);
                 var guardSignature = await guardSigner.SignEnvelope(signedEnvelope);
                 signedEnvelope.signatures = signedEnvelope.signatures.AddToArray(guardSignature);   
             }
@@ -51,6 +45,9 @@ namespace Sequence.EcosystemWallet
             
             rawSignature.suffix = configUpdates.Reverse().Select(u => 
                 RawSignature.Decode(u.signature.HexStringToByteArray())).ToArray();
+            
+            foreach (var s in rawSignature.suffix)
+                Debug.Log($"suffix {s.Encode().ByteArrayToHexString()}");
 
             return rawSignature;
         }

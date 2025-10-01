@@ -15,11 +15,11 @@ namespace Sequence.EcosystemWallet.Primitives
 
         public byte[] Pack()
         {
-            if (yParity != 0 && yParity != 1 && yParity != 27 && yParity != 28)
-                throw new ArgumentException("yParity must be 0, 1, 27, or 28.");
+            if (yParity != 0 && yParity != 1)
+                throw new ArgumentException("yParity must be 0, 1");
 
-            var rBytes = r.Value.ByteArrayFromNumber(r.Value.MinBytesFor()).PadLeft(32);
-            var sBytes = s.Value.ByteArrayFromNumber(s.Value.MinBytesFor()).PadLeft(32);
+            var rBytes = r.Value.ByteArrayFromNumber(32);
+            var sBytes = s.Value.ByteArrayFromNumber(32);
             
             if (yParity % 2 == 1)
                 sBytes[0] |= 0x80;

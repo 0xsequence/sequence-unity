@@ -4,6 +4,7 @@ using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -28,6 +29,9 @@ namespace Sequence.EcosystemWallet
 
             var signatureService = new SignatureService(_sessionSigners, _state.SessionsTopology);
             var signature = await signatureService.SignCalls(chain, _state.SessionsImageHash, envelope, _state.ConfigUpdates);
+            
+            Debug.Log($"Raw signature {signature.ToJson()}");
+            Debug.Log($"Encoded signature {signature.Encode().ByteArrayToHexString()}");
 
             var callsData = ABI.ABI.Pack("execute(bytes,bytes)",
                 envelope.payload.Encode(),
@@ -40,16 +44,17 @@ namespace Sequence.EcosystemWallet
 
             // Not relevant for signing calls for getting fee options
             // If the wallet was not yet deployed onchain, let's make a deploy transaction first
-            
+
+            var deployContext = _state.DeployContext;
             var deployTransaction = Erc6492Helper.Deploy(_state.DeployHash, new Erc6492Helper.Context
             {
-                creationCode = _state.DeployContext.walletCreationCode,
-                factory = _state.DeployContext.factory,
-                stage1 = _state.DeployContext.mainModule,
-                stage2 = _state.DeployContext.mainModuleUpgradable
+                creationCode = deployContext.walletCreationCode,
+                factory = deployContext.factory,
+                stage1 = deployContext.mainModule,
+                stage2 = deployContext.mainModuleUpgradable
             });
             
-            return (new Address(_state.DeployContext.guestModule), new Calls(0, 0, new Call[]
+            return (new Address(deployContext.guestModule), new Calls(0, 0, new Call[]
             {
                 new (deployTransaction.To, 0, deployTransaction.Data.HexStringToByteArray()),
                 new (_state.Address, 0, callsData.HexStringToByteArray())

@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 using System.Threading.Tasks;
+using Nethereum.Hex.HexConvertors.Extensions;
 using Newtonsoft.Json;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -12,27 +16,30 @@ namespace Sequence.EcosystemWallet
     {
         private readonly Address _guardSigner = ExtensionsFactory.Current.Guard;
         private readonly GuardService _service;
-        private readonly Attestation _attestation;
         
-        public GuardSigner(GuardConfig config, Attestation attestation)
+        public GuardSigner(GuardConfig config)
         {
             _service = new GuardService(config.url);
-            _attestation = attestation;
         }
         
         public async Task<Signature> SignEnvelope(SignedEnvelope<Calls> envelope)
         {
             var unparentedPayload = new Parented(Array.Empty<Address>(), envelope.payload);
             
-            var payloadType = ToGuardPayloadType();
             var payload = ToGuardPayload(envelope.wallet, envelope.chainId, unparentedPayload);
             
             var signatures = envelope.signatures;
             var guardSignatures = new GuardSignatureArgs[signatures.Length];
             for (var i = 0; i < signatures.Length; i++)
+            {
                 guardSignatures[i] = ToGuardSignature(signatures[i]);
+                Debug.Log($"Guard sig {JsonConvert.SerializeObject(guardSignatures[i])}");
+            }
 
-            var rsy = await SignPayload(envelope.wallet, envelope.chainId, payloadType, 
+            Debug.Log($"Nethereum TypedData Raw {Encoding.UTF8.GetString(payload.Message)}");
+            Debug.Log($"Nethereum TypedData Hashed {payload.Digest.ByteArrayToHexStringWithPrefix()}");
+
+            var rsy = await SignPayload(envelope.wallet, envelope.chainId, 
                 payload.Digest, payload.Message, guardSignatures);
             
             return new Signature
@@ -45,7 +52,7 @@ namespace Sequence.EcosystemWallet
             };
         }
 
-        private async Task<RSY> SignPayload(Address wallet, BigInteger chainId, GuardPayloadType payloadType, 
+        private async Task<RSY> SignPayload(Address wallet, BigInteger chainId, 
             byte[] digest, byte[] message, GuardSignatureArgs[] signatures)
         {
             var args = new SignWithArgs
@@ -56,7 +63,7 @@ namespace Sequence.EcosystemWallet
                     chainId = chainId,
                     msg = digest.ByteArrayToHexStringWithPrefix(),
                     wallet = wallet,
-                    payloadType = payloadType,
+                    payloadType = GuardPayloadType.Calls,
                     payloadData = message.ByteArrayToHexStringWithPrefix(),
                     signatures = signatures
                 }
@@ -66,22 +73,9 @@ namespace Sequence.EcosystemWallet
             return RSY.UnpackFrom65(response.sig.HexStringToByteArray());
         }
 
-        private GuardPayloadType ToGuardPayloadType()
-        {
-            return GuardPayloadType.Calls;
-        }
-
         private (byte[] Message, byte[] Digest) ToGuardPayload(Address wallet, BigInteger chainId, Parented payload)
         {
-            if (_attestation != null)
-            {
-                return (
-                    Message: JsonConvert.SerializeObject(_attestation.ToJson()).ToByteArray(), 
-                    Digest: _attestation.Encode());
-            }
-
             var typedData = new TypedDataToSign(wallet, chainId, payload);
-            
             return (
                 Message: JsonConvert.SerializeObject(typedData).ToByteArray(), 
                 Digest: typedData.GetSignPayload());
