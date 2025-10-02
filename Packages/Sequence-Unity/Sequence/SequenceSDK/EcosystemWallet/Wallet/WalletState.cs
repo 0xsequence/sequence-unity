@@ -40,7 +40,7 @@ namespace Sequence.EcosystemWallet
             var implementation = await GetImplementation(chain);
 
             string imageHash;
-            if (IsDeployed && implementation.Equals(ExtensionsFactory.Current.Stage2))
+            if (IsDeployed && implementation != null && implementation.Equals(ExtensionsFactory.Current.Stage2))
             {
                 imageHash = await GetOnChainImageHash(chain);
             }
@@ -145,6 +145,9 @@ namespace Sequence.EcosystemWallet
             });
 
             var data = response.HexStringToByteArray();
+            if (data == null || data.Length < 20)
+                return null;
+            
             var addressData = data.Slice(data.Length - 20);
             
             var addressStr = addressData.ByteArrayToHexStringWithPrefix();
