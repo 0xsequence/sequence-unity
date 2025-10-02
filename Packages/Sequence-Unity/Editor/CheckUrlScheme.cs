@@ -20,7 +20,7 @@ namespace Sequence.Editor
         private static string _plistPath;
         private static string _pathToBuiltProject;
         
-        private static string _urlScheme => UrlSchemeFactory.CreateFromAppIdentifier();
+        private static string _urlScheme => GetUrlScheme();
         
         [PostProcessBuild]
         public static void OnPostProcessBuild(BuildTarget target, string pathToBuiltProject)
@@ -183,6 +183,13 @@ namespace Sequence.Editor
                 </manifest>";
             
             File.WriteAllText(path, manifestContent);
+        }
+
+        // Check if a custom url scheme is defined in the config file. If not, generate a scheme from the app identifier.
+        private static string GetUrlScheme()
+        {
+            var configUrlScheme = SequenceConfig.GetConfig().UrlScheme;
+            return string.IsNullOrEmpty(configUrlScheme) ? UrlSchemeFactory.CreateFromAppIdentifier() : configUrlScheme;
         }
     }
 }
