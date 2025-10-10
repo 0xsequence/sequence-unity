@@ -316,15 +316,15 @@ namespace Sequence.EmbeddedWallet
                                 requiredBalance <= etherBalance.balanceWei);
                             break;
                         case FeeTokenType.erc20Token:
+                            var erc20Address = new Address(token.contractAddress);
                             GetTokenBalancesReturn tokenBalances = await indexer.GetTokenBalances(new GetTokenBalancesArgs(
-                                _address, token.contractAddress));
+                                _address, erc20Address));
+                            
                             if (tokenBalances.balances.Length > 0)
                             {
-                                if (tokenBalances.balances[0].contractAddress != token.contractAddress)
-                                {
-                                    throw new Exception(
-                                        $"Expected contract address from indexer response ({tokenBalances.balances[0].contractAddress}) to match contract address we queried ({token.contractAddress})");
-                                }
+                                var balanceAddress = new Address(tokenBalances.balances[0].contractAddress);
+                                if (!balanceAddress.Equals(erc20Address))
+                                    break;
 
                                 decoratedFeeOptions[i] = new FeeOptionReturn(feeOptions.feeOptions[i],
                                     requiredBalance <= tokenBalances.balances[0].balance);
