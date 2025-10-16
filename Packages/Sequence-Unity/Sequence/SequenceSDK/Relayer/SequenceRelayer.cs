@@ -14,15 +14,8 @@ namespace Sequence.Relayer
 
         public SequenceRelayer(Chain chain)
         {
-            var name = chain switch
-            {
-                Chain.Optimism => "v3-optimism",
-                Chain.ArbitrumOne => "v3-arbitrum",
-                Chain.TestnetArbitrumSepolia => "v3-arbitrum-sepolia",
-                _ => throw new NotSupportedException($"Chain {chain} not supported.")
-            };
-
-            var relayerUrl = $"https://{name}-relayer.sequence.app/rpc/Relayer";
+            var path = ChainDictionaries.PathOf[chain];
+            var relayerUrl = $"https://dev-{path}-relayer.sequence.app/rpc/Relayer";
             _httpClient = new HttpClient(relayerUrl);
         }
 

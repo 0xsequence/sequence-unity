@@ -120,9 +120,11 @@ namespace Sequence.EcosystemWallet
 
             if (feeOption != null)
             {
+                var feeAddress = feeOption.token.contractAddress;
+                var isNative = feeAddress == null || feeAddress.Equals(Address.ZeroAddress);
+                
                 var feeOptionService = new FeeOptionService(feeOption);
-                var isNativeTokenOption = feeOption.token.contractAddress.Equals(Address.ZeroAddress);
-                var feeOptionCall = isNativeTokenOption
+                var feeOptionCall = isNative
                     ? feeOptionService.BuildCallForNativeTokenOption()
                     : feeOptionService.BuildCallForCustomTokenOption();
                 

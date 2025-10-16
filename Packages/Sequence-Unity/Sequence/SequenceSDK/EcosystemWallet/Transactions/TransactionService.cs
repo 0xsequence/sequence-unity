@@ -1,11 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.ABI;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
-using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -22,12 +23,12 @@ namespace Sequence.EcosystemWallet
         
         public async Task<(Address To, string Data)> SignAndBuild(Chain chain, Call[] calls, bool checkDeployed)
         {
-            var preparedIncrement = PrepareIncrement(null, 0, null);
+            var preparedIncrement = await PrepareIncrement(null, chain, calls);
             if (preparedIncrement != null)
-                calls.AddToArray(preparedIncrement);
+                calls = calls.Unshift(preparedIncrement);
 
             var envelope = PrepareTransaction(chain, calls);
-
+            
             var signatureService = new SignatureService(_sessionSigners, _state.SessionsTopology);
             var signature = await signatureService.SignCalls(chain, _state.SessionsImageHash, envelope, _state.ConfigUpdates);
 
@@ -59,10 +60,50 @@ namespace Sequence.EcosystemWallet
             }).Encode().ByteArrayToHexStringWithPrefix());
         }
         
-        private Call PrepareIncrement(Address wallet, BigInteger chainId, Calls calls)
+        private async Task<Call> PrepareIncrement(Address wallet, Chain chain, Call[] calls)
         {
-            // TODO: Integrate increments
-            return null;
+            var signers = await new SignerService(_sessionSigners, _state.SessionsTopology).FindSignersForCalls(
+                chain, calls);
+
+            var signersToCallsMap = new Dictionary<SessionSigner, List<Call>>();
+            for (var i = 0; i < signers.Length; i++)
+            {
+                var signer = signers[i];
+                if (signersToCallsMap.ContainsKey(signer))
+                    signersToCallsMap[signer].Add(calls[i]);
+                else
+                    signersToCallsMap[signer] = new List<Call> { calls[i] };
+            }
+
+            var increments = new List<UsageLimit>();
+            foreach (var kvPair in signersToCallsMap)
+            {
+                var increment = kvPair.Key.PrepareIncrements(kvPair.Value.ToArray());
+                if (increment != null)
+                    increments.Add(increment);
+            }
+            
+            if (increments.Count == 0)
+                return null;
+
+            for (var i = 0; i < calls.Length; i++)
+            {
+                if (!signers[i].IsExplicit)
+                    continue;
+
+                signers[i].PrepareIncrements(calls);
+            }
+
+            var args = new List<Tuple<FixedByte, BigInteger>>();
+            for (var i = 0; i < increments.Count; i++)
+            {
+                args.Add(new Tuple<FixedByte, BigInteger>(
+                    new FixedByte(32, increments[i].UsageHash.HexStringToByteArray()), 
+                    increments[i].UsageAmount));
+            }
+            
+            var incrementData = ABI.ABI.Pack("incrementUsageLimit((bytes32,uint256)[])", args);
+            return new Call(ExtensionsFactory.Current.Sessions, 0, incrementData.HexStringToByteArray());
         }
 
         private Envelope<Calls> PrepareTransaction(Chain chain, Call[] calls)

@@ -13,6 +13,12 @@ using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
+    internal class UsageLimit
+    {
+        public string UsageHash;
+        public BigInteger UsageAmount;
+    }
+    
     internal class SessionSigner
     {
         public struct CallContractData
@@ -63,12 +69,8 @@ namespace Sequence.EcosystemWallet
                 if (Chain != chain)
                     return false;
 
-                if (call.data.Length > 4 &&
-                    ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
-                    ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])"))
-                {
+                if (CheckCallForIncrementUsageLimit(call))
                     return true;
-                }
                 
                 var supportedPermission = FindSupportedPermission(call, topology);
                 return supportedPermission.Index >= 0;
@@ -118,8 +120,7 @@ namespace Sequence.EcosystemWallet
             if (IsExplicit)
             {
                 var permissionIndex = 0;
-                if (!(call.data.Length > 4 && call.data.Slice(4).ByteArrayToHexStringWithPrefix() ==
-                    ABI.ABI.FunctionSelector("incrementUsageLimit")))
+                if (!CheckCallForIncrementUsageLimit(call))
                 {
                     permissionIndex = FindSupportedPermission(call, topology).Index;
                     if (permissionIndex == -1)
@@ -141,6 +142,31 @@ namespace Sequence.EcosystemWallet
             };
         }
 
+        public UsageLimit PrepareIncrements(Call[] calls)
+        {
+            BigInteger valueUsed = 0;
+            foreach (var call in calls)
+            {
+                valueUsed += call.value;
+            }
+
+            if (valueUsed == 0)
+                return null;
+
+            return new UsageLimit
+            {
+                UsageHash = GetValueUsageHash().ByteArrayToHexStringWithPrefix(),
+                UsageAmount = valueUsed
+            };
+        }
+
+        private bool CheckCallForIncrementUsageLimit(Call call)
+        {
+            return call.data.Length > 4 &&
+                   ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
+                   ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])");
+        }
+        
         private byte[] HashCallWithReplayProtection(Chain chain, Call call, BigInteger callIdx, BigInteger space, BigInteger nonce)
         {
             var chainBytes = BigInteger.Parse(chain.GetChainId()).ByteArrayFromNumber(32);
@@ -210,7 +236,7 @@ namespace Sequence.EcosystemWallet
                     to = ExtensionsFactory.Current.Sessions,
                     data = ABI.ABI.Pack("getLimitUsage(address,bytes32)", 
                         ParentAddress, 
-                        new FixedByte(32, GetValueUsageHash(Address, "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE")))
+                        new FixedByte(32, GetValueUsageHash()))
                 }
             });
 
@@ -219,12 +245,12 @@ namespace Sequence.EcosystemWallet
             Debug.Log($"GetCurrentUsageLimit: {usageLimit}");
         }
         
-        private byte[] GetValueUsageHash(Address signerAddress, string valueTrackingAddress)
+        private byte[] GetValueUsageHash()
         {
             var encoder = new ParametersEncoder();
             var encoded = encoder.EncodeParameters(
                 new Parameter[] { new Parameter("address"), new Parameter("address") }, 
-                new object[] { signerAddress.Value, valueTrackingAddress }
+                new object[] { Address.Value, "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" }
             );
 
             return SequenceCoder.KeccakHash(encoded);
