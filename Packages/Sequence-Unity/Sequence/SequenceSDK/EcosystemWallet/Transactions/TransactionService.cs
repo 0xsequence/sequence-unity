@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Nethereum.ABI.FunctionEncoding;
+using Nethereum.ABI.Model;
 using Sequence.ABI;
 using Sequence.EcosystemWallet.Envelope;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Utils;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -78,21 +81,17 @@ namespace Sequence.EcosystemWallet
             var increments = new List<UsageLimit>();
             foreach (var kvPair in signersToCallsMap)
             {
-                var increment = kvPair.Key.PrepareIncrements(kvPair.Value.ToArray());
+                if (!kvPair.Key.IsExplicit)
+                    continue;
+                
+                var increment = await kvPair.Key.PrepareIncrements(chain, kvPair.Value.ToArray(), _state.SessionsTopology);
+                Debug.Log($"Increment {increment?.UsageHash}, {increment?.UsageAmount}");
                 if (increment != null)
                     increments.Add(increment);
             }
             
             if (increments.Count == 0)
                 return null;
-
-            for (var i = 0; i < calls.Length; i++)
-            {
-                if (!signers[i].IsExplicit)
-                    continue;
-
-                signers[i].PrepareIncrements(calls);
-            }
 
             var args = new List<Tuple<FixedByte, BigInteger>>();
             for (var i = 0; i < increments.Count; i++)

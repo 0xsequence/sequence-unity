@@ -104,6 +104,7 @@ namespace Sequence.EcosystemWallet
             if (permissionIndex < 0)
                 return (-1, null);
             
+            Debug.Log($"permissionIndex {permissionIndex}");
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
@@ -142,26 +143,35 @@ namespace Sequence.EcosystemWallet
             };
         }
 
-        public UsageLimit PrepareIncrements(Call[] calls)
+        public async Task<UsageLimit> PrepareIncrements(Chain chain, Call[] calls, SessionsTopology topology)
         {
-            BigInteger valueUsed = 0;
+            var usageValueHash = GetValueUsageHash();
+            var currentUsage = await GetCurrentUsageLimit(chain, usageValueHash);
+            
+            BigInteger valueUsed = currentUsage;
             foreach (var call in calls)
             {
+                var permission = FindSupportedPermission(call, topology);
+                if (permission.Index < 0)
+                    continue;
+                
                 valueUsed += call.value;
             }
 
+            return null;
             if (valueUsed == 0)
                 return null;
 
             return new UsageLimit
             {
-                UsageHash = GetValueUsageHash().ByteArrayToHexStringWithPrefix(),
+                UsageHash = usageValueHash.ByteArrayToHexStringWithPrefix(),
                 UsageAmount = valueUsed
             };
         }
 
         private bool CheckCallForIncrementUsageLimit(Call call)
         {
+            Debug.Log($"{ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])")}");
             return call.data.Length > 4 &&
                    ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
                    ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])");
@@ -228,7 +238,7 @@ namespace Sequence.EcosystemWallet
                 .ByteArrayToHexStringWithPrefix();
         }
         
-        private async Task GetCurrentUsageLimit(Chain chain)
+        private async Task<BigInteger> GetCurrentUsageLimit(Chain chain, byte[] valueUsageHash)
         {
             var response = await new SequenceEthClient(chain).CallContract(new object[] {
                 new CallContractData
@@ -236,13 +246,15 @@ namespace Sequence.EcosystemWallet
                     to = ExtensionsFactory.Current.Sessions,
                     data = ABI.ABI.Pack("getLimitUsage(address,bytes32)", 
                         ParentAddress, 
-                        new FixedByte(32, GetValueUsageHash()))
+                        new FixedByte(32, valueUsageHash))
                 }
             });
 
             var usageLimit = ABI.ABI.Decode<BigInteger>(response, "uint256");
             
             Debug.Log($"GetCurrentUsageLimit: {usageLimit}");
+            
+            return usageLimit;
         }
         
         private byte[] GetValueUsageHash()
@@ -252,7 +264,7 @@ namespace Sequence.EcosystemWallet
                 new Parameter[] { new Parameter("address"), new Parameter("address") }, 
                 new object[] { Address.Value, "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" }
             );
-
+            
             return SequenceCoder.KeccakHash(encoded);
         }
     }

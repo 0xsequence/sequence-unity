@@ -43,7 +43,7 @@ namespace Sequence.ABI
             throw new System.NotImplementedException();
         }
         
-        public string EncodeToString(object value, string[] evmTypes)
+        public string EncodeToString(object value, string[] evmTypes, bool parentIsArray = false)
         {
             if (evmTypes == null)
             {
@@ -126,17 +126,21 @@ namespace Sequence.ABI
 
                         string numberCountEncoded = _numberCoder.EncodeToString(numberCount);
                         tail_i = numberCountEncoded + EncodeToString(valueTuple[i], 
-                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount));
+                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount),true);
+                        
+                        Debug.Log($"DYNAMICARRAY tail_i {tail_i} head_i {head_i}");
 
                         break;
                     case ABIType.FIXEDARRAY:
                         numberCount = ABI.GetInnerValue(evmTypes[i]);
                         head_i = EncodeToString(valueTuple[i], 
-                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount));
+                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount), true);
                         break;
                     case ABIType.TUPLE:
-                        head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
+                        head_i = parentIsArray ? "" : _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = EncodeToString(valueTuple[i], ABI.GetTupleTypes(evmTypes[i]));
+                        
+                        Debug.Log($"TUPLE tail_i {tail_i} head_i {head_i}");
                         break;
                     case ABIType.NONE:
                         throw new ArgumentException(
