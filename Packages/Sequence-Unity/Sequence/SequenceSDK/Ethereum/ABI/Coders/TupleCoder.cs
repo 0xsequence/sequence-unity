@@ -128,8 +128,6 @@ namespace Sequence.ABI
                         tail_i = numberCountEncoded + EncodeToString(valueTuple[i], 
                             ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount),true);
                         
-                        Debug.Log($"DYNAMICARRAY tail_i {tail_i} head_i {head_i}");
-
                         break;
                     case ABIType.FIXEDARRAY:
                         numberCount = ABI.GetInnerValue(evmTypes[i]);
@@ -139,8 +137,6 @@ namespace Sequence.ABI
                     case ABIType.TUPLE:
                         head_i = parentIsArray ? "" : _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = EncodeToString(valueTuple[i], ABI.GetTupleTypes(evmTypes[i]));
-                        
-                        Debug.Log($"TUPLE tail_i {tail_i} head_i {head_i}");
                         break;
                     case ABIType.NONE:
                         throw new ArgumentException(

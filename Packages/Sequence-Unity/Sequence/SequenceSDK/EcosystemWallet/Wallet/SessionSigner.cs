@@ -158,7 +158,6 @@ namespace Sequence.EcosystemWallet
                 valueUsed += call.value;
             }
 
-            return null;
             if (valueUsed == 0)
                 return null;
 
