@@ -690,7 +690,7 @@ and in that case, my mission will be complete.";
                     Assert.AreEqual(expectedArray.Length, length);
                     for (int i = 0; i < length; i++)
                     {
-                        Assert.AreEqual(expectedArray[i].ToString(), resultArray[i].ToString());
+                        Assert.AreEqual(expectedArray[i], resultArray[i]);
                     }
                 }
                 else

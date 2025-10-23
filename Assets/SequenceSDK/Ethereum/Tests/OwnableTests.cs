@@ -65,7 +65,10 @@ namespace Sequence.Ethereum.Tests
                 receipt = await ownable.RenounceOwnership()
                     .SendTransactionMethodAndWaitForReceipt(wallet1, client);
                 owner = await ownable.Owner(client);
-                Assert.AreEqual(StringExtensions.ZeroAddress, owner);
+
+                Address expectedOwner = new Address(StringExtensions.ZeroAddress);
+                Address ownerAddress = new Address(owner);
+                Assert.AreEqual(expectedOwner, ownerAddress);
             }
             catch (Exception ex)
             {

@@ -21,7 +21,7 @@ namespace Sequence.Utils
             webReqOp.completed += obj =>
             {
                 {
-                    if (webReqOp.webRequest.responseCode != 200)
+                    if (webReqOp.webRequest.responseCode >= 300)
                     {
                         tcs.SetException(new FileLoadException(webReqOp.webRequest.error));
                     }

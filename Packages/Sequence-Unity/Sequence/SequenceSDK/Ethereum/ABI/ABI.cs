@@ -111,18 +111,13 @@ namespace Sequence.ABI
         /// <returns></returns>
         private static bool IsFixedArray(string value)
         {
-            if (value.StartsWith('('))
-            {
-                return false; // this is a tuple
-            }
-            
             int start = value.IndexOf('[');
             if (start <= 0)
             {
                 return false;
             }
 
-            return GetInnerValue(value) > 0;
+            return GetInnerValue(value) > 0 && value.EndsWith(']');
         }
 
         /// <summary>
@@ -350,7 +345,8 @@ namespace Sequence.ABI
                                 break;
                             }
 
-                            return ABIType.FIXEDARRAY;
+                            // TODO: Change back to FIXEDBYTES
+                            return ABIType.BYTES;
                         }
                     }
 

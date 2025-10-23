@@ -20,6 +20,7 @@ namespace Sequence.Editor
         
             // Adds entitlement depending on the Unity version used
 #if UNITY_2019_3_OR_NEWER
+            return;
             var project = new PBXProject();
             project.ReadFromString(System.IO.File.ReadAllText(projectPath));
             var manager = new ProjectCapabilityManager(projectPath, "Entitlements.entitlements", null, project.GetUnityMainTargetGuid());

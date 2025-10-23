@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 
 namespace Sequence.Utils
@@ -12,6 +13,14 @@ namespace Sequence.Utils
                 result = "0";
             }
             return "0x" + result;
+        }
+        
+        public static int MinimumBytesNeeded(this BigInteger value)
+        {
+            if (value == 0) return 1;
+
+            byte[] bytes = value.ByteArrayFromNumber();
+            return bytes.Length;
         }
     }
 }

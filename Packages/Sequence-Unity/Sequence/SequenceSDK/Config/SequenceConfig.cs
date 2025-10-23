@@ -11,6 +11,13 @@ namespace Sequence.Config
     [CreateAssetMenu(fileName = "SequenceConfig", menuName = "Sequence/SequenceConfig", order = 1)]
     public class SequenceConfig : ScriptableObject
     {
+        [Header("General Settings")] 
+        public string BuilderAPIKey;
+        
+        [Header("Ecosystem Wallet")]
+        public string WalletAppUrl;
+        
+        [Header("Embedded Wallet")]
         [Header("Social Sign In Configuration - Standalone, Android & Web Platforms")]
         public string UrlScheme;
         public string GoogleClientId;
@@ -26,13 +33,12 @@ namespace Sequence.Config
 
         [Header("WaaS Configuration")]
         public string WaaSConfigKey;
-        [FormerlySerializedAs("EnableAccountOverride")] public bool EnableMultipleAccountsPerEmail = false;
         public string WaaSVersion { get; private set; }
 
-        [Header("Sequence SDK Configuration")] 
-        public string BuilderAPIKey;
+        [Header("Sequence SDK Configuration")]
         public bool StoreSessionPrivateKeyInSecureStorage = false;
         public bool EditorStoreSessionPrivateKeyInSecureStorage = false;
+        [FormerlySerializedAs("EnableAccountOverride")] public bool EnableMultipleAccountsPerEmail = false;
         
         private static Dictionary<SequenceService, SequenceConfig> _configs = new Dictionary<SequenceService, SequenceConfig>();
         public static SequenceConfig GetConfig(SequenceService sequenceService = SequenceService.Unspecified)

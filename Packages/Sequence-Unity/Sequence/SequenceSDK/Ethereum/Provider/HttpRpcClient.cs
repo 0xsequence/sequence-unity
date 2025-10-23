@@ -52,7 +52,7 @@ namespace Sequence.Provider
             
             string curlRequest = $"curl -X {request.method} '{_url}' -H 'Content-Type: {request.GetRequestHeader("Content-Type")}' -H 'Accept: {request.GetRequestHeader("Accept")}' -H 'X-Access-Key: {request.GetRequestHeader("X-Access-Key")}' -d '{requestJson}'";
 
-            SequenceLog.Info(curlRequest);
+            SequenceLog.Info($">> {curlRequest}");
             
             try
             {
@@ -67,6 +67,8 @@ namespace Sequence.Provider
                     byte[] results = request.downloadHandler.data;
                     request.Dispose();
                     var responseJson = Encoding.UTF8.GetString(results);
+                    
+                    SequenceLog.Info($"<< {responseJson}");
 
                     try
                     {
