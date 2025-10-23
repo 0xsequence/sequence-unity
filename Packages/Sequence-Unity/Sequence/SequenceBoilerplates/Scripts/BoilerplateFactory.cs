@@ -30,77 +30,68 @@ namespace Sequence.Boilerplates
         /// Open the Login UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">Wallet to use for account federation.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window or when an account was successfully federated.</param>
         /// <returns></returns>
-        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent, IWallet wallet = null, Action onClose = null)
+        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceLoginWindow>("Login/SequenceLoginWindow", parent, 
-                b => b.Show(wallet, onClose));
+                b => b.Show(onClose));
         }
 
         /// <summary>
         /// Open the Player Profile UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="currency">Define a custom ERC20 currency. Leave it null to use the chains native token.</param>
         /// <param name="currencySymbol">The symbol of your custom currency, such as 'ETH'.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequencePlayerProfile which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequencePlayerProfile OpenSequencePlayerProfile(Transform parent, IWallet wallet, Chain chain, Address currency = null, string currencySymbol = null, Action onClose = null)
+        public static SequencePlayerProfile OpenSequencePlayerProfile(Transform parent, Address currency = null, string currencySymbol = null, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequencePlayerProfile>("PlayerProfile/SequencePlayerProfile", parent, 
-                b => b.Show(wallet, chain, currency, currencySymbol, onClose));
+                b => b.Show(currency, currencySymbol, onClose));
         }
 
         /// <summary>
         /// Open the Daily Rewards UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="apiUrl">API Url you deployed using the server boilerplate.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceDailyRewards which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequenceDailyRewards OpenSequenceDailyRewards(Transform parent, IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
+        public static SequenceDailyRewards OpenSequenceDailyRewards(Transform parent, string apiUrl, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceDailyRewards>("DailyRewards/SequenceDailyRewards", parent, 
-                b => b.Show(wallet, chain, apiUrl, onClose));
+                b => b.Show(apiUrl, onClose));
         }
         
         /// <summary>
         /// Open the Inventory UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="collections">The inventory will show items from these contracts.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceInventory which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequenceInventory OpenSequenceInventory(Transform parent, IWallet wallet, Chain chain, string[] collections, Action onClose = null)
+        public static SequenceInventory OpenSequenceInventory(Transform parent, string[] collections, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceInventory>("Inventory/SequenceInventory", parent, 
-                b => b.Show(wallet, chain, collections, onClose));
+                b => b.Show(collections, onClose));
         }
         
         /// <summary>
         /// Open the In-Game Shop UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>
         /// <param name="parent">Transform inside of a Canvas object.</param>
-        /// <param name="wallet">This Wallet instance will perform transactions.</param>
-        /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="tokenContractAddress">ERC1155 Contract you deployed on Sequence's Builder.</param>
         /// <param name="saleContractAddress">ERC1155 Sale Contract you deployed on Sequence's Builder.</param>
         /// <param name="itemsForSale">Define the token Ids you want to sell from your collection.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceInGameShop which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequenceInGameShop OpenSequenceInGameShop(Transform parent, IWallet wallet, Chain chain, 
-            string tokenContractAddress, string saleContractAddress, int[] itemsForSale, Action onClose = null)
+        public static SequenceInGameShop OpenSequenceInGameShop(Transform parent, string tokenContractAddress, 
+            string saleContractAddress, int[] itemsForSale, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceInGameShop>("InGameShop/SequenceInGameShop", parent, 
-                b => b.Show(wallet, chain, tokenContractAddress, saleContractAddress, itemsForSale, onClose));
+                b => b.Show(tokenContractAddress, saleContractAddress, itemsForSale, onClose));
         }
         
         /// <summary>
@@ -138,9 +129,7 @@ namespace Sequence.Boilerplates
         {
             return GetOrSpawnBoilerplate<ListItemPage>("Checkout/ListItemPanel", parent, b => b.Open(checkout, item));
         }
-
-
-
+        
         public static CreateOfferPage OpenCreateOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<CreateOfferPage>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
@@ -162,10 +151,10 @@ namespace Sequence.Boilerplates
         /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
         /// <returns>Instance of SequenceSignMessage which was instantiated as a child of <paramref name="parent"/></returns>
-        public static SequenceSignMessage OpenSequenceSignMessage(Transform parent, IWallet wallet, Chain chain, Action onClose = null)
+        public static SequenceSignMessage OpenSequenceSignMessage(Transform parent, Action onClose = null)
         {
             return GetOrSpawnBoilerplate<SequenceSignMessage>("SignMessage/SequenceSignMessage", parent, 
-                b => b.Show(wallet, chain, onClose));
+                b => b.Show(onClose));
         }
         
         private static T GetOrSpawnBoilerplate<T>(string path, Transform parent, Action<T> show) where T : MonoBehaviour

@@ -2,15 +2,13 @@ using System;
 using System.Collections;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Adapter;
 using Sequence.Contracts;
-using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Pay;
 using Sequence.Provider;
-using Sequence.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace Sequence.Boilerplates.InGameShop
 {
@@ -28,13 +26,18 @@ namespace Sequence.Boilerplates.InGameShop
         [Header("Tile Object Pool")]
         [SerializeField] private GenericObjectPool<SequenceInGameShopTile> _tilePool;
 
-        private IWallet _wallet;
-        private Chain _chain;
+        private EmbeddedWalletAdapter _adapter;
+        
         private string _tokenContractAddress;
         private string _saleContractAddress;
         private int[] _itemsForSale;
         private Action _onClose;
         private SequenceInGameShopState _saleState;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
 
         /// <summary>
         /// This function is called when the user clicks the close button.
@@ -54,11 +57,9 @@ namespace Sequence.Boilerplates.InGameShop
         /// <param name="saleContractAddress">ERC1155 Sale Contract you deployed on Sequence's Builder.</param>
         /// <param name="itemsForSale">Define the token Ids you want to sell from your collection.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public void Show(IWallet wallet, Chain chain, string tokenContractAddress, string saleContractAddress, 
+        public void Show(string tokenContractAddress, string saleContractAddress, 
             int[] itemsForSale, Action onClose = null)
         {
-            _wallet = wallet;
-            _chain = chain;
             _tokenContractAddress = tokenContractAddress;
             _saleContractAddress = saleContractAddress;
             _itemsForSale = itemsForSale;
@@ -69,23 +70,22 @@ namespace Sequence.Boilerplates.InGameShop
             _messagePopup.gameObject.SetActive(false);
             _qrCodeView.gameObject.SetActive(false);
             
-            Assert.IsNotNull(_wallet, "Could not get a SequenceWallet reference from the UIPage.Open() arguments.");
-            
             RefreshState();
         }
 
         public async void OpenQrCodeView()
         {
             _qrCodeView.gameObject.SetActive(true);
-            var destinationAddress = _wallet.GetWalletAddress();
+            var destinationAddress = _adapter.Wallet.GetWalletAddress();
             await _qrCodeView.Show(_saleState.PaymentToken, destinationAddress, "1e2");
         }
 
         public void OpenInventory()
         {
             SetLoading(true);
-            BoilerplateFactory.OpenSequenceInventory(transform.parent, _wallet, _chain, 
-                new [] {_tokenContractAddress}, () => SetLoading(false));
+
+            var collections = new[] { _tokenContractAddress };
+            BoilerplateFactory.OpenSequenceInventory(transform.parent, collections, () => SetLoading(false));
         }
         
         public async void RefreshState()
@@ -98,8 +98,6 @@ namespace Sequence.Boilerplates.InGameShop
             await _saleState.Construct(
                 new Address(_saleContractAddress), 
                 new Address(_tokenContractAddress), 
-                _wallet, 
-                _chain,
                 _itemsForSale);
 
             SetLoading(false);
@@ -150,17 +148,18 @@ namespace Sequence.Boilerplates.InGameShop
 
         private async Task AdditionalCheckoutOptions(BigInteger tokenId, ulong amount)
         {
+            var chain = _adapter.Chain;
             ERC1155 collection = new ERC1155(_tokenContractAddress);
-            string uri = await collection.URI(new SequenceEthClient(_chain), tokenId);
+            string uri = await collection.URI(new SequenceEthClient(chain), tokenId);
             Sprite collectibleImage = await AssetHandler.GetSpriteAsync(uri);
             ERC1155Sale sale = new ERC1155Sale(_saleContractAddress);
             
             ICheckoutHelper checkoutHelper = await ERC1155SaleCheckout.Create(sale,
-                new ERC1155(_tokenContractAddress), tokenId.ToString(), amount, _chain, _wallet,
+                new ERC1155(_tokenContractAddress), tokenId.ToString(), amount, chain, _adapter.Wallet,
                 "Demo Primary Sale Checkout", _paymentTokenIconUrl, collectibleImage);
             
-            BoilerplateFactory.OpenCheckoutPanel(transform.parent, _chain, checkoutHelper,
-                new SequenceCheckout(_wallet, _chain, sale, collection, tokenId.ToString(), amount));
+            BoilerplateFactory.OpenCheckoutPanel(transform.parent, chain, checkoutHelper,
+                new SequenceCheckout(_adapter.Wallet, chain, sale, collection, tokenId.ToString(), amount));
         }
 
         private void SetLoading(bool loading)
