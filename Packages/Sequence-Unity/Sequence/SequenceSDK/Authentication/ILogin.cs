@@ -95,7 +95,7 @@ namespace Sequence.Authentication
         /// <summary>
         /// Login as a guest
         /// </summary>
-        public void GuestLogin();
+        public Task GuestLogin();
 
         /// <summary>
         /// Login with PlayFab

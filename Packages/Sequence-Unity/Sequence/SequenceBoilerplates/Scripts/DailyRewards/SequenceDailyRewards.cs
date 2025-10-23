@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.Adapter;
 using Sequence.EmbeddedWallet;
 using Sequence.Utils;
 using UnityEngine;
@@ -18,12 +19,17 @@ namespace Sequence.Boilerplates.DailyRewards
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GenericObjectPool<SequenceDailyRewardTile> _tilePool;
         
-        private IWallet _wallet;
-        private Chain _chain;
+        private EmbeddedWalletAdapter _adapter;
+        
         private string _apiUrl;
         private Action _onClose;
         private DailyRewardsStatusData _rewardsData;
         private Dictionary<string, TokenSupply[]> _supplies;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
         
         /// <summary>
         /// This function is called when the user clicks the close button.
@@ -41,10 +47,8 @@ namespace Sequence.Boilerplates.DailyRewards
         /// <param name="chain">Chain used to get balances and send transactions.</param>
         /// <param name="apiUrl">API Url you deployed using the server boilerplate.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window.</param>
-        public void Show(IWallet wallet, Chain chain, string apiUrl, Action onClose = null)
+        public void Show(string apiUrl, Action onClose = null)
         {
-            _wallet = wallet;
-            _chain = chain;
             _apiUrl = apiUrl;
             _onClose = onClose;
             gameObject.SetActive(true);
@@ -98,8 +102,8 @@ namespace Sequence.Boilerplates.DailyRewards
             var request = UnityWebRequest.Get(_apiUrl);
             request.method = method;
             
-            var idToken = await _wallet.GetIdToken();
-            request.SetRequestHeader("Authorization", $"Bearer {idToken.IdToken}");
+            var idToken = await _adapter.GetIdToken();
+            request.SetRequestHeader("Authorization", $"Bearer {idToken}");
             
             try
             {
@@ -127,7 +131,7 @@ namespace Sequence.Boilerplates.DailyRewards
                         .Distinct()
                         .ToArray());
 
-            var indexer = new ChainIndexer(_chain);
+            var indexer = new ChainIndexer(_adapter.Chain);
             var args = new GetTokenSuppliesMapArgs
             {
                 tokenMap = dict,

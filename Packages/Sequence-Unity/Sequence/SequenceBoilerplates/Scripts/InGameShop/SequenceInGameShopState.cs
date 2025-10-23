@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
+using Sequence.Adapter;
 using Sequence.Contracts;
 using Sequence.EmbeddedWallet;
 using Sequence.Provider;
@@ -23,21 +24,20 @@ namespace Sequence.Boilerplates.InGameShop
         public int TotalMinted { get; private set; }
         public Dictionary<BigInteger, TokenSupply> TokenSupplies { get; private set; }
 
+        private EmbeddedWalletAdapter _adapter;
         private Address _tokenContractAddress;
         private ERC1155Sale _saleContract;
         private IEthClient _client;
-        private IWallet _wallet;
         private Chain _chain;
         private int[] _itemsForSale;
 
-        public async Task Construct(Address saleContractAddress, Address tokenContractAddress, 
-            IWallet wallet, Chain chain, int[] itemsForSale)
+        public async Task Construct(Address saleContractAddress, Address tokenContractAddress, int[] itemsForSale)
         {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
             _tokenContractAddress = tokenContractAddress;
             _saleContract = new ERC1155Sale(saleContractAddress);
-            _client = new SequenceEthClient(chain);
-            _wallet = wallet;
-            _chain = chain;
+            _client = new SequenceEthClient(_adapter.Chain);
+            _chain = _adapter.Chain;
             _itemsForSale = itemsForSale;
             
             await Task.WhenAll(
@@ -55,7 +55,7 @@ namespace Sequence.Boilerplates.InGameShop
                 return false;
             }
 
-            var to = _wallet.GetWalletAddress();
+            var to = _adapter.WalletAddress;
 
             var fn = _saleContract.Mint(to, new[] {tokenId},
                 new[] {new BigInteger(amount)}, null, PaymentToken, new BigInteger(1));
@@ -63,7 +63,7 @@ namespace Sequence.Boilerplates.InGameShop
             Assert.IsNotNull(fn, "Failed to create mint function in ERC1155Sale.cs");
 
             var transactions = new Transaction[] { new RawTransaction(fn) };
-            var result = await _wallet.SendTransaction(_chain, transactions);
+            var result = await _adapter.Wallet.SendTransaction(_chain, transactions);
             
             if (result is FailedTransactionReturn failed)
             {
@@ -97,7 +97,7 @@ namespace Sequence.Boilerplates.InGameShop
 
         private async Task UserPaymentTokenBalanceAsync()
         {
-            var balancesArgs = new GetTokenBalancesArgs(_wallet.GetWalletAddress(), PaymentToken);
+            var balancesArgs = new GetTokenBalancesArgs(_adapter.WalletAddress, PaymentToken);
             var result = await Indexer.GetTokenBalances(_chain.GetChainId(), balancesArgs);
 
             var balances = result.balances;

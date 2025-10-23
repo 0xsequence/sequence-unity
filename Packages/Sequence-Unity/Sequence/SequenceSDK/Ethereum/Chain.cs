@@ -67,6 +67,7 @@ namespace Sequence
         TestnetFrequency = 53716,
         TestnetIncentiv = 11690,
         TestnetIncentivV2 = 28802,
+        TestnetSandbox = 6252,
         
         LocalChain = 31337, // A chain running locally on your system
 

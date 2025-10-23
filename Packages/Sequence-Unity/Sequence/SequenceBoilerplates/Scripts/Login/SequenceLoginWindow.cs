@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Sequence.Adapter;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using TMPro;
@@ -25,10 +25,15 @@ namespace Sequence.Boilerplates.Login
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GameObject[] _socialTexts;
 
-        private IWallet _wallet;
+        private EmbeddedWalletAdapter _adapter;
+        
         private Action _onClose;
-        private SequenceLogin _loginHandler;
         private string _curEmail;
+        
+        private void Awake()
+        {
+            _adapter = EmbeddedWalletAdapter.GetInstance();
+        }
         
         private void Start()
         {
@@ -47,13 +52,6 @@ namespace Sequence.Boilerplates.Login
             SequenceWallet.OnAccountFederationFailed -= AccountFederationFailed;
         }
 
-        private void OnDestroy()
-        {
-            _loginHandler.OnLoginSuccess -= LoginHandlerOnOnLoginSuccess;
-            _loginHandler.OnLoginFailed -= LoginHandlerOnOnLoginFailed;
-            _loginHandler.OnMFAEmailSent -= LoginHandlerOnOnMFAEmailSent;
-        }
-
         /// <summary>
         /// This function is called when the user clicks the close button.
         /// </summary>
@@ -66,22 +64,11 @@ namespace Sequence.Boilerplates.Login
         /// <summary>
         /// Required function to configure this Boilerplate.
         /// </summary>
-        public void Show(IWallet wallet = null, Action onClose = null)
+        public void Show(Action onClose = null)
         {
-            _wallet = wallet;
             _onClose = onClose;
-            if (_loginHandler == null)
-            {
-                _loginHandler = SequenceLogin.GetInstance();
-                _loginHandler.OnLoginSuccess += LoginHandlerOnOnLoginSuccess;
-                _loginHandler.OnLoginFailed += LoginHandlerOnOnLoginFailed;
-                _loginHandler.OnMFAEmailSent += LoginHandlerOnOnMFAEmailSent;
-            }
-            
-            if (wallet != null)
-                _loginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());
 
-            var isFederating = _wallet != null;
+            var isFederating = _adapter.Wallet != null;
             _closeButton.gameObject.SetActive(isFederating);
             _guestLoginButton.gameObject.SetActive(!isFederating);
             
@@ -91,6 +78,7 @@ namespace Sequence.Boilerplates.Login
             _emailCodeState.SetActive(false);
             _emailInput.text = string.Empty;
             _emailCodeErrorText.text = string.Empty;
+            
             EnableEmailButton(true);
             VerifyEmailInput(string.Empty);
             HandleSocialIconState();
@@ -99,32 +87,49 @@ namespace Sequence.Boilerplates.Login
 
         public void LoginWithEmail()
         {
-            SetLoading(true);
-            _loginHandler.Login(_curEmail);
+            HandleAsyncLogin(_adapter.EmailLogin(_curEmail), 
+                () => LoginHandlerOnOnMFAEmailSent(), 
+                () => SetLoading(false));
         }
 
         public void VerifyEmailCode()
         {
-            SetLoading(true);
-            _loginHandler.Login(_curEmail, _emailCodeInput.text);
+            HandleAsyncLogin(_adapter.ConfirmEmailCode(_curEmail, _emailCodeInput.text), 
+                () => LoginHandlerOnOnLoginSuccess(), 
+                () => LoginHandlerOnOnLoginFailed(LoginMethod.Email));
         }
 
         public void LoginWithGoogle()
         {
-            SetLoading(true);
-            _loginHandler.GoogleLogin();
+            HandleAsyncLogin(_adapter.GoogleLogin(), 
+                () => LoginHandlerOnOnLoginSuccess(), 
+                () => LoginHandlerOnOnLoginFailed(LoginMethod.Google));
         }
 
         public void LoginWithApple()
         {
-            SetLoading(true);
-            _loginHandler.AppleLogin();
+            HandleAsyncLogin(_adapter.AppleLogin(), 
+                () => LoginHandlerOnOnLoginSuccess(), 
+                () => LoginHandlerOnOnLoginFailed(LoginMethod.Apple));
         }
 
         public void LoginAsGuest()
         {
+            HandleAsyncLogin(_adapter.GuestLogin(), 
+                () => LoginHandlerOnOnLoginSuccess(), 
+                () => LoginHandlerOnOnLoginFailed(LoginMethod.Guest));
+        }
+
+        private async void HandleAsyncLogin(Task<bool> task, Action onSuccess, Action onFailure)
+        {
             SetLoading(true);
-            _loginHandler.GuestLogin();
+            var result = await task;
+            SetLoading(false);
+
+            if (result)
+                onSuccess?.Invoke();
+            else
+                onFailure?.Invoke();
         }
 
         public void EnableEmailButton(bool enable)
@@ -162,28 +167,27 @@ namespace Sequence.Boilerplates.Login
             _loadingOverlay.SetActive(loading);
         }
         
-        private void LoginHandlerOnOnMFAEmailSent(string email)
+        private void LoginHandlerOnOnMFAEmailSent()
         {
             SetLoading(false);
             _loginState.SetActive(false);
             _emailCodeState.SetActive(true);
         }
         
-        private void LoginHandlerOnOnLoginSuccess(string sessionid, string walletaddress)
+        private void LoginHandlerOnOnLoginSuccess()
         {
             SetLoading(false);
         }
         
-        private void LoginHandlerOnOnLoginFailed(string error, LoginMethod method, string email, List<LoginMethod> loginmethods)
+        private void LoginHandlerOnOnLoginFailed(LoginMethod method)
         {
-            Debug.LogError($"Error during login: {error}");
             SetLoading(false);
             _emailCodeInput.text = string.Empty;
 
             if (method == LoginMethod.Email)
                 _emailCodeErrorText.text = "Invalid code.";
             else
-                _messagePopup.Show(error, true);
+                _messagePopup.Show($"Failed to login.", true);
         }
         
         private void AccountFederationFailed(string error)
@@ -198,21 +202,10 @@ namespace Sequence.Boilerplates.Login
             Debug.Log($"Account federated, email: {account.email}");
             Hide();
         }
-        
+
         private void OnApplicationFocus(bool hasFocus)
         {
-#if !UNITY_IOS
             if (hasFocus)
-            {
-                StartCoroutine(DisableLoadingScreenIfNotLoggingIn());
-            }
-#endif
-        }
-
-        private IEnumerator DisableLoadingScreenIfNotLoggingIn()
-        {
-            yield return new WaitForSecondsRealtime(0.1f);
-            if (!_loginHandler.IsLoggingIn())
                 SetLoading(false);
         }
     }
