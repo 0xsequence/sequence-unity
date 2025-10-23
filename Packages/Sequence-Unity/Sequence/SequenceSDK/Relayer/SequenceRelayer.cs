@@ -10,7 +10,11 @@ namespace Sequence.Relayer
     public class SequenceRelayer : IRelayer
     {
         private readonly IHttpClient _httpClient;
-        private readonly Dictionary<string, string> _headers = new();
+
+        private readonly Dictionary<string, string> _headers = new()
+        {
+            { "X-Access-Key", SequenceConfig.GetConfig().BuilderAPIKey }
+        };
 
         public SequenceRelayer(Chain chain)
         {

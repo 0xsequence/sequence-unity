@@ -16,6 +16,11 @@ namespace Sequence.EmbeddedWallet
     {
         public string SessionId { get; private set; }
         
+        private readonly Dictionary<string, string> _headers = new()
+        {
+            { "X-Access-Key", SequenceConfig.GetConfig().BuilderAPIKey }
+        };
+        
         private IHttpClient _httpClient;
         private Sequence.Wallet.IWallet _sessionWallet;
         private int _waasProjectId;
@@ -128,10 +133,9 @@ namespace Sequence.EmbeddedWallet
             }
         }
 
-        private async Task<IntentResponse<TransactionReturn>> SendTransactionIntent(string intent,
-            Dictionary<string, string> headers)
+        private async Task<IntentResponse<TransactionReturn>> SendTransactionIntent(string intent)
         {
-            IntentResponse<JObject> result = await _httpClient.SendPostRequest<string, IntentResponse<JObject>>("SendIntent", intent, headers);
+            IntentResponse<JObject> result = await _httpClient.SendPostRequest<string, IntentResponse<JObject>>("SendIntent", intent, _headers);
             if (result.response.code == SuccessfulTransactionReturn.IdentifyingCode)
             {
                 SuccessfulTransactionReturn successfulTransactionReturn = JsonConvert.DeserializeObject<SuccessfulTransactionReturn>(result.response.data.ToString());
@@ -191,13 +195,12 @@ namespace Sequence.EmbeddedWallet
         public async Task<T> PostIntent<T>(string payload, string path)
         {
             SequenceLog.Info($"Sending intent: {path} | with payload: {payload}");
-            Dictionary<string, string> headers = new Dictionary<string, string>();
             if (typeof(T) == typeof(IntentResponse<TransactionReturn>))
             {
-                var transactionReturn = await SendTransactionIntent(payload, headers);
+                var transactionReturn = await SendTransactionIntent(payload);
                 return (T)(object)transactionReturn;
             }
-            T result = await _httpClient.SendPostRequest<string, T>(path, payload, headers);
+            T result = await _httpClient.SendPostRequest<string, T>(path, payload, _headers);
             return result;
         }
 
