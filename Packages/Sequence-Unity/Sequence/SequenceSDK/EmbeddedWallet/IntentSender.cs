@@ -68,6 +68,8 @@ namespace Sequence.EmbeddedWallet
             {
                 request.Dispose();
             }
+
+            _ready = true;
         }
 
         public async Task<T> SendIntent<T, T2>(T2 args, IntentType type, uint timeBeforeExpiryInSeconds = 30, uint currentTime = 0)
