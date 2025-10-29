@@ -1,4 +1,5 @@
 using System;
+using UnityEngine.Scripting;
 
 namespace Sequence
 {
@@ -8,6 +9,7 @@ namespace Sequence
         public decimal value;
         public string currency;
         
+        [Preserve]
         public Price(decimal value, string currency)
         {
             this.value = value;
