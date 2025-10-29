@@ -976,11 +976,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: a584d9b7-8f0e-4ca7-a3c3-6cd6ce8c0352
+  cloudProjectId: 5fac262b-e52e-42f7-a9d6-d4464b2ff80e
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: demo-unity-game
-  organizationId: sequence-as-publisher
+  projectName: Sequence
+  organizationId: tpin_unity
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
