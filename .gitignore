@@ -20,12 +20,13 @@
 
 # Package Manager formatting
 /[Aa]ssets/TextMesh Pro
-/[Aa]ssets/Resources
+#/[Aa]ssets/Resources
 /[Aa]ssets/Resources.meta
 /[Aa]ssets/Samples
 /[Aa]ssets/Samples~/Setup/Resources/SequenceConfig.asset
 /[Aa]ssets/Samples.meta
 !/Packages/Sequence-Unity/Sequence/Samples~/
+!/[Aa]ssets/Resources/SequenceConfig.asset
 
 # Recordings can get excessive in size
 /[Rr]ecordings/
