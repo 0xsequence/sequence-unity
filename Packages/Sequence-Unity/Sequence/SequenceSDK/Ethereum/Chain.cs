@@ -68,6 +68,7 @@ namespace Sequence
         TestnetIncentiv = 11690,
         TestnetIncentivV2 = 28802,
         TestnetSandbox = 6252,
+        TestnetArc = 5042002,
         
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         

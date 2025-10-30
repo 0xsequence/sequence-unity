@@ -87,6 +87,7 @@ namespace Sequence
             new (Chain.TestnetIncentiv, "11690", "Incentiv Testnet", "incentiv-testnet", "https://explorer.testnet.incentiv.net/", "CENT", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetIncentivV2, "28802", "Incentiv Testnet v2", "incentiv-testnet-v2", "https://explorer.testnet.incentiv.net/", "TCENT", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetSandbox, "6252", "Sandbox Testnet", "sandbox-testnet", "https://sandbox-testnet.explorer.caldera.xyz/", "SAND", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetArc, "5042002", "Arc Testnet", "arc-testnet", "https://arc-testnet-explorer.stg.blockchain.circle.com/", "USDC", "0x0000000000000000000000000000000000000000"),
         };
 
         public static Dictionary<Chain, string> NameOf;
