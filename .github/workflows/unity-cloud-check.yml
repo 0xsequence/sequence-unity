@@ -2,7 +2,7 @@ name: Unity CI Matrix
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened]
 
 jobs:
   test-and-build:
@@ -24,7 +24,7 @@ jobs:
         run: |
           build_number=$(curl -s -X POST \
             -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
-            https://build-api.cloud.unity3d.com/api/v1/orgs/<ORG_ID>/projects/<PROJECT_ID>/buildtargets/${{ matrix.target }}/builds \
+            https://build-api.cloud.unity3d.com/api/v1/orgs/6872789246035/projects/5fac262b-e52e-42f7-a9d6-d4464b2ff80e/buildtargets/${{ matrix.target }}/builds \
             | jq '.build' )
 
           echo "build_number=$build_number" >> $GITHUB_OUTPUT
@@ -35,7 +35,7 @@ jobs:
           for i in {1..60}; do
             status=$(curl -s \
               -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
-              https://build-api.cloud.unity3d.com/api/v1/orgs/<ORG_ID>/projects/<PROJECT_ID>/buildtargets/${{ matrix.target }}/builds/${{ steps.trigger.outputs.build_number }} | jq -r '.buildStatus')
+              https://build-api.cloud.unity3d.com/api/v1/orgs/6872789246035/projects/5fac262b-e52e-42f7-a9d6-d4464b2ff80e/buildtargets/${{ matrix.target }}/builds/${{ steps.trigger.outputs.build_number }} | jq -r '.buildStatus')
 
             echo "Status: $status"
 
