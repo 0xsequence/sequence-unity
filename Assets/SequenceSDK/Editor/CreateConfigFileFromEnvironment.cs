@@ -32,8 +32,10 @@ namespace Sequence.Editor
             asset.BuilderAPIKey = accessKey;
             asset.WaaSConfigKey = Environment.GetEnvironmentVariable("WAAS_KEY");
             asset.UrlScheme = Environment.GetEnvironmentVariable("URL_SCHEME");
-            asset.UrlScheme = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
-            asset.UrlScheme = Environment.GetEnvironmentVariable("APPLE_CLIENT_ID");
+            asset.GoogleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            asset.GoogleClientIdIOS = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            asset.AppleClientId = Environment.GetEnvironmentVariable("APPLE_CLIENT_ID");
+            asset.AppleClientIdIOS = Environment.GetEnvironmentVariable("APPLE_CLIENT_ID");
             asset.EditorStoreSessionPrivateKeyInSecureStorage = true;
             asset.StoreSessionPrivateKeyInSecureStorage = true;
 
