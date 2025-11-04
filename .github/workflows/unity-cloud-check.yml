@@ -1,0 +1,57 @@
+name: Unity CI Matrix
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - mac-desktop
+          - windows-desktop
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # 🧪 Step 1 — Run N test suites for this target
+      - name: Run Unity Tests
+        uses: game-ci/unity-test-runner@v4
+        with:
+          unityVersion: 2022.3.10f1
+          testMode: playmode
+          customParameters: -targetPlatform ${{ matrix.target }}
+
+      # ✅ Step 2 — Trigger Cloud Build for this target
+      - name: Trigger Cloud Build
+        id: trigger
+        run: |
+          build_number=$(curl -s -X POST \
+            -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
+            https://build-api.cloud.unity3d.com/api/v1/orgs/<ORG_ID>/projects/<PROJECT_ID>/buildtargets/${{ matrix.target }}/builds \
+            | jq '.build' )
+
+          echo "build_number=$build_number" >> $GITHUB_OUTPUT
+
+      # 📡 Step 3 — Poll Cloud Build result
+      - name: Poll Build Status
+        run: |
+          for i in {1..60}; do
+            status=$(curl -s \
+              -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
+              https://build-api.cloud.unity3d.com/api/v1/orgs/<ORG_ID>/projects/<PROJECT_ID>/buildtargets/${{ matrix.target }}/builds/${{ steps.trigger.outputs.build_number }} | jq -r '.buildStatus')
+
+            echo "Status: $status"
+
+            if [ "$status" = "success" ]; then exit 0; fi
+            if [ "$status" = "failed" ]; then exit 1; fi
+
+            sleep 60
+          done
+
+          echo "Build timed out"
+          exit 1
