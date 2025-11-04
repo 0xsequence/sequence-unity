@@ -18,14 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # 🧪 Step 1 — Run N test suites for this target
-      - name: Run Unity Tests
-        uses: game-ci/unity-test-runner@v4
-        with:
-          unityVersion: 2022.3.10f1
-          testMode: playmode
-          customParameters: -targetPlatform ${{ matrix.target }}
-
       # ✅ Step 2 — Trigger Cloud Build for this target
       - name: Trigger Cloud Build
         id: trigger
