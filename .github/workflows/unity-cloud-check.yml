@@ -2,7 +2,7 @@ name: Unity CI Matrix
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize, reopened]
 
 jobs:
   test-and-build:
