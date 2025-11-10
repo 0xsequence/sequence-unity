@@ -1,8 +1,10 @@
 using System.Numerics;
 using Sequence.EcosystemWallet.Primitives;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet
 {
+    [Preserve]
     public struct ConnectArgs
     {
         public string preferredLoginMethod;
@@ -12,6 +14,7 @@ namespace Sequence.EcosystemWallet
         public SessionArgs session;
     }
     
+    [Preserve]
     public struct ConnectResponse
     {
         public Address walletAddress;
@@ -22,18 +25,21 @@ namespace Sequence.EcosystemWallet
         public RSY signature;
     }
 
+    [Preserve]
     public class GuardConfig
     {
         public string url;
         public ModuleAddresses moduleAddresses;  
     }
 
+    [Preserve]
     public class ModuleAddresses
     {
         public bool isMap;
         public string[][] data;
     }
     
+    [Preserve]
     public class SessionArgs
     {
         public Address sessionAddress;
