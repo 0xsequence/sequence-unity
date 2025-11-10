@@ -47,8 +47,6 @@ namespace Sequence
             new (Chain.APEChain, "33139", "APE Chain", "apechain", "https://apescan.io/", "APE", "0x0000000000000000000000000000000000000000"),
             new (Chain.ImmutableZkEvm, "13371", "Immutable zkEVM", "immutable-zkevm", "https://explorer.immutable.com/", "IMX", "0x0000000000000000000000000000000000000000"),
             new (Chain.SkaleNebula, "1482601649", "Skale Nebula", "skale-nebula", "https://green-giddy-denebola.explorer.mainnet.skalenodes.com/", "sFUEL", "0x0000000000000000000000000000000000000000"),
-            new (Chain.Root, "7668", "Root", "rootnet", "https://rootscan.io/", "XRP", "0x0000000000000000000000000000000000000000"),
-            new (Chain.LAOS, "6283", "LAOS", "laos", "https://blockscout.laos.laosfoundation.io/", "LAOS", "0x0000000000000000000000000000000000000000"),
             new (Chain.Soneium, "1868", "Soneium", "soneium", "https://vk9a3tgpne6qmub8.blockscout.com/", "ETH", "0x0000000000000000000000000000000000000000"),
             new (Chain.Telos, "40", "Telos", "telos", "https://www.teloscan.io/", "TLOS", "0x0000000000000000000000000000000000000000"),
             new (Chain.Moonbeam, "1284", "Moonbeam", "moonbeam", "https://moonscan.io/", "GLMR", "0x0000000000000000000000000000000000000000"),
@@ -76,17 +74,14 @@ namespace Sequence
             new (Chain.TestnetSoneiumMinato, "1946", "Soneium Minato Testnet", "soneium-minato", "https://explorer-testnet.soneium.org/", "ETH", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetToy, "21000000", "TOY Testnet", "toy-testnet", "https://toy-chain-testnet.explorer.caldera.xyz/", "TOY", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetImmutableZkEvm, "13473", "Immutable zkEVM Testnet", "immutable-zkevm-testnet", "https://explorer.testnet.immutable.com/", "IMX", "0x0000000000000000000000000000000000000000"),
-            new (Chain.TestnetRootPorcini, "7672", "Root Porcini Testnet", "rootnet-porcini", "https://porcini.rootscan.io/", "XRP", "0x0000000000000000000000000000000000000000"),
-            new (Chain.TestnetLAOSSigma, "62850", "LAOS Sigma Testnet", "laos-sigma-testnet", "https://sigma.explorer.laosnetwork.io/", "SIGMA", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetTelos, "41", "Telos Testnet", "telos-testnet", "https://testnet.teloscan.io/", "TLOS", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetMoonbaseAlpha, "1287", "Moonbase Alpha", "moonbase-alpha", "https://moonbase.moonscan.io/", "DEV", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetEtherlink, "128123", "Etherlink Testnet", "etherlink-testnet", "https://testnet.explorer.etherlink.com/", "XTZ", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetMonad, "10143", "Monad Testnet", "monad-testnet", "https://testnet.monadexplorer.com/", "MON", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetSomnia, "50312", "Somnia Testnet", "somnia-testnet", "https://somnia-testnet.socialscan.io/", "STT", "0x0000000000000000000000000000000000000000"),
-            new (Chain.TestnetFrequency, "53716", "Frequency Testnet", "frequency-testnet", "https://explorer.frequency.zeeve.net/", "BERA", "0x0000000000000000000000000000000000000000"),
-            new (Chain.TestnetIncentiv, "11690", "Incentiv Testnet", "incentiv-testnet", "https://explorer.testnet.incentiv.net/", "CENT", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetIncentivV2, "28802", "Incentiv Testnet v2", "incentiv-testnet-v2", "https://explorer.testnet.incentiv.net/", "TCENT", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetSandbox, "6252", "Sandbox Testnet", "sandbox-testnet", "https://sandbox-testnet.explorer.caldera.xyz/", "SAND", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetArc, "5042002", "Arc Testnet", "arc-testnet", "https://arc-testnet-explorer.stg.blockchain.circle.com/", "USDC", "0x0000000000000000000000000000000000000000"),
         };
 
         public static Dictionary<Chain, string> NameOf;

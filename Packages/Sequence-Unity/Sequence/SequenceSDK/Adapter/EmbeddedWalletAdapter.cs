@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using Sequence.Authentication;
 using Sequence.EmbeddedWallet;
 using Sequence.Marketplace;
 using Sequence.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Sequence.Adapter
 {

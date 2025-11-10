@@ -25,8 +25,6 @@ namespace Sequence
         APEChain = 33139,
         ImmutableZkEvm = 13371,
         SkaleNebula = 1482601649,
-        Root = 7668,
-        LAOS = 6283,
         Soneium = 1868,
         Telos = 40,
         Moonbeam = 1284,
@@ -57,17 +55,14 @@ namespace Sequence
         TestnetSoneiumMinato = 1946,
         TestnetToy = 21000000,
         TestnetImmutableZkEvm = 13473,
-        TestnetRootPorcini = 7672,
-        TestnetLAOSSigma = 62850,
         TestnetTelos = 41,
         TestnetMoonbaseAlpha = 1287,
         TestnetEtherlink = 128123,
         TestnetMonad = 10143,
         TestnetSomnia = 50312,
-        TestnetFrequency = 53716,
-        TestnetIncentiv = 11690,
         TestnetIncentivV2 = 28802,
         TestnetSandbox = 6252,
+        TestnetArc = 5042002,
         
         LocalChain = 31337, // A chain running locally on your system
 
