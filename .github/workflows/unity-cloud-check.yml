@@ -7,7 +7,7 @@ on:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
-    environment: production
+    environment: github-pages
 
     strategy:
       fail-fast: false
