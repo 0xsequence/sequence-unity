@@ -167,7 +167,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.HorizonGames.demounitygame
     Standalone: com.HorizonGames.demo-unity-game
-    iPhone: app.sequence.unrealsdkdemo
+    iPhone: app.sequence.unitysdkdemo
   buildNumber:
     Standalone: 0
     VisionOS: 0

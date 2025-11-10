@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using Sequence.Config;
 using Sequence.Utils;
 using UnityEngine;
 
@@ -19,7 +20,12 @@ namespace Sequence.EcosystemWallet
 #elif !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID || UNITY_STANDALONE_OSX)
         public static string GetOriginString()
         {
-            return $"{UrlSchemeFactory.CreateFromAppIdentifier()}://";
+            SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
+            var urlScheme = string.IsNullOrEmpty(config.UrlScheme)
+                ? UrlSchemeFactory.CreateFromAppIdentifier()
+                : config.UrlScheme;
+            
+            return $"{urlScheme}://";
         }
 #else
         public static string GetOriginString()
