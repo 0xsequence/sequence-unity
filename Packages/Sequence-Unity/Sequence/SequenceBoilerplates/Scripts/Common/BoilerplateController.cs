@@ -73,6 +73,7 @@ namespace Sequence.Boilerplates
         private void Start()
         {
             SetupScene();
+            Application.targetFrameRate = 60;
             
             _featureSelection.SetActive(false);
             var ecosystemWallet = EcosystemWallet.SequenceWallet.RecoverFromStorage();
