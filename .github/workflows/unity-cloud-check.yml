@@ -23,8 +23,12 @@ jobs:
       - name: Trigger Cloud Build
         id: trigger
         run: |
+          branch_name="${{ github.head_ref || github.ref_name }}"
+          
           build_number=$(curl -s -X POST \
             -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"clean\": true, \"delay\": 0, \"commit\": null, \"headless\": true, \"branch\": \"$branch_name\"}" \
             https://build-api.cloud.unity3d.com/api/v1/orgs/6872789246035/projects/5fac262b-e52e-42f7-a9d6-d4464b2ff80e/buildtargets/${{ matrix.target }}/builds \
             | jq '.[0].build' )
 
