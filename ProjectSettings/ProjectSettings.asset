@@ -853,7 +853,7 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: SEQUENCE_DEBUG
+    Android: SEQUENCE_DEBUG;ENABLE_SEQUENCE_ANDROID_SECURE_STORAGE
     Server: 
     Standalone: UNITY_ASTOOLS_EXPERIMENTAL;SEQUENCE_DEBUG
     WebGL: VUPLEX_CCU;VUPLEX_STANDALONE;SEQUENCE_DEBUG
