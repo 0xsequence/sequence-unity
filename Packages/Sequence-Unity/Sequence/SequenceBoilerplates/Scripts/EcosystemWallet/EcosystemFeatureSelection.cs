@@ -24,36 +24,10 @@ namespace Sequence.Boilerplates
 
         private void Start()
         {
-            SequenceWallet.Disconnected += OpenLogin;
-            SequenceWallet.WalletCreated += UpdateWallet;
-
             _login.gameObject.SetActive(false);
             _featureSelection.SetActive(false);
             _profile.gameObject.SetActive(false);
             _transactions.gameObject.SetActive(false);
-
-            _wallet = SequenceWallet.RecoverFromStorage();
-            if (_wallet == null)
-                OpenLogin();
-            else
-                OpenFeatureSelection();
-        }
-
-        private void OnDestroy()
-        {
-            SequenceWallet.Disconnected -= OpenLogin;
-            SequenceWallet.WalletCreated -= UpdateWallet;
-        }
-
-        private void UpdateWallet(IWallet wallet)
-        {
-            _wallet = wallet;
-            OpenFeatureSelection();
-        }
-
-        public void OpenLogin()
-        {
-            _login.Open();
         }
         
         public void OpenFeatureSelection()
@@ -65,13 +39,13 @@ namespace Sequence.Boilerplates
         public void OpenProfile()
         {
             _featureSelection.SetActive(false);
-            _profile.Load(_wallet, OpenFeatureSelection);
+            _profile.Show(_wallet, OpenFeatureSelection);
         }
 
         public void OpenTransactions()
         {
             _featureSelection.SetActive(false);
-            _transactions.Load(_wallet, OpenFeatureSelection);
+            _transactions.Show(_wallet, OpenFeatureSelection);
         }
 
         public void OpenFeeOptionWindow(FeeOption[] feeOptions, Action<FeeOption> onSelected)

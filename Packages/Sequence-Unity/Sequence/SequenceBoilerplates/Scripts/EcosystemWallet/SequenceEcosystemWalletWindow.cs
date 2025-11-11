@@ -30,7 +30,8 @@ namespace Sequence.Boilerplates
         [SerializeField] private GameObject _loadingOverlay;
         [SerializeField] private MessagePopup _messagePopup;
         [SerializeField] private GenericObjectPool<SessionWalletTile> _sessionPool;
-        
+
+        private Action _onClose;
         private IConnect _connect;
         private ImplicitSessionType _implicitPermissions;
         private ExplicitSessionType _explicitPermissions;
@@ -48,11 +49,17 @@ namespace Sequence.Boilerplates
         {
             _connect = new SequenceConnect();
             _emailInput.onValueChanged.AddListener(VerifyEmailInput);
-            Open();
         }
 
-        public void Open()
+        public void Hide()
         {
+            gameObject.SetActive(false);
+            _onClose?.Invoke();
+        }
+
+        public void Show(Action onClose = null)
+        {
+            _onClose = onClose;
             gameObject.SetActive(true);
             _messagePopup.gameObject.SetActive(false);
             _loadingOverlay.SetActive(false);

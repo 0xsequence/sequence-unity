@@ -1,6 +1,6 @@
+using System;
 using Sequence.EcosystemWallet;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Sequence.Boilerplates
 {
@@ -11,7 +11,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private TransactionButton[] _transactionButtons;
         
         private IWallet _wallet;
-        private UnityAction _onClose;
+        private Action _onClose;
 
         public void Close()
         {
@@ -19,7 +19,7 @@ namespace Sequence.Boilerplates
             _onClose?.Invoke();
         }
         
-        public void Load(IWallet wallet, UnityAction onClose)
+        public void Show(IWallet wallet, Action onClose)
         {
             _wallet = wallet;
             _onClose = onClose;

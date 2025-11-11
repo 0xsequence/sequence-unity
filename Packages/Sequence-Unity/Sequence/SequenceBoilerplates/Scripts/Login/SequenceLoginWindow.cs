@@ -69,7 +69,7 @@ namespace Sequence.Boilerplates.Login
             _onClose = onClose;
 
             var isFederating = _adapter.Wallet != null;
-            _closeButton.gameObject.SetActive(isFederating);
+            _closeButton.gameObject.SetActive(onClose != null || isFederating);
             _guestLoginButton.gameObject.SetActive(!isFederating);
             
             gameObject.SetActive(true);

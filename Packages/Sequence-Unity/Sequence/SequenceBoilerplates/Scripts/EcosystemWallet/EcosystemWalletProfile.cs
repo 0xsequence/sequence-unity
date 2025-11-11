@@ -19,7 +19,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private GenericObjectPool<SessionWalletTile> _sessionPool;
 
         private IWallet _wallet;
-        private UnityAction _onClose;
+        private Action _onClose;
         private string _curSignature;
         
         public void Close()
@@ -28,7 +28,7 @@ namespace Sequence.Boilerplates
             _onClose?.Invoke();
         }
         
-        public void Load(IWallet wallet, UnityAction onClose)
+        public void Show(IWallet wallet, Action onClose)
         {
             _wallet = wallet;
             _onClose = onClose;
