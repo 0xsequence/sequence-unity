@@ -15,6 +15,7 @@ namespace Sequence.Boilerplates
         public void Show(IWallet wallet)
         {
             _wallet = wallet;
+            gameObject.SetActive(true);
         }
         
         public void OpenProfile()

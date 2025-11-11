@@ -1816,7 +1816,7 @@ GameObject:
   - component: {fileID: 4317787887416255343}
   - component: {fileID: 6041227408087359440}
   m_Layer: 5
-  m_Name: PlayerProfile
+  m_Name: EcosystemWalletProfile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

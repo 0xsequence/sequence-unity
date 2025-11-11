@@ -26,9 +26,20 @@ namespace Sequence.Boilerplates
             _objects.Clear();
         }
 
+        public static void CloseWindow<T>() where T : MonoBehaviour
+        {
+            var type = typeof(T);
+            if (!_objects.ContainsKey(type))
+                return;
+            
+            var cachedBoilerplate = _objects[type].GetComponent<T>();
+            cachedBoilerplate.gameObject.SetActive(false);
+        }
+
         public static WalletSelection OpenWalletSelection(Transform parent)
         {
-            return GetOrSpawnBoilerplate<WalletSelection>("WalletSelection", parent, null);
+            return GetOrSpawnBoilerplate<WalletSelection>("WalletSelection", parent, 
+                b => b.Show());
         }
         
         public static SequenceEcosystemWalletWindow OpenEcosystemWalletLogin(Transform parent, Action onClose = null)
@@ -192,11 +203,11 @@ namespace Sequence.Boilerplates
             if (_objects.ContainsKey(type))
             {
                 var cachedBoilerplate = _objects[type].GetComponent<T>();
-                show.Invoke(cachedBoilerplate);
+                show?.Invoke(cachedBoilerplate);
                 return cachedBoilerplate;
             }
             
-            var prefab = ((GameObject)Resources.Load($"Prefabs/{path}")).GetComponent<T>();
+            var prefab = ((GameObject)Resources.Load($"Prefabs/{path}"))?.GetComponent<T>();
             if (prefab == null)
                 throw new Exception($"Prefab at {path} not found in Resources folder");
             

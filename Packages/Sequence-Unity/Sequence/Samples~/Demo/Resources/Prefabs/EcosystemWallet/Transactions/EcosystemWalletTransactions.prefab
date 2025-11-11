@@ -729,7 +729,7 @@ GameObject:
   - component: {fileID: 3958160912066706640}
   - component: {fileID: 3067201564598026102}
   m_Layer: 5
-  m_Name: Transactions
+  m_Name: EcosystemWalletTransactions
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

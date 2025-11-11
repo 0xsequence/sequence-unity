@@ -45,9 +45,8 @@ namespace Sequence.Boilerplates
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 ShowDefaultWindow();
-                
-                if (_walletSelection)
-                    _walletSelection.gameObject.SetActive(false);
+                BoilerplateFactory.CloseWindow<SequenceLoginWindow>();
+                _walletSelection?.gameObject.SetActive(false);
                 
                 wallet.OnDropSessionComplete += s =>
                 {
@@ -56,7 +55,7 @@ namespace Sequence.Boilerplates
                         if (_playerProfile)
                             _playerProfile.gameObject.SetActive(false);
                         
-                        TryRecoverSessionToOpenLoginWindow();
+                        OpenWalletSelection();
                     }
                 };
             };
@@ -64,14 +63,9 @@ namespace Sequence.Boilerplates
             EcosystemWallet.SequenceWallet.Disconnected += OpenWalletSelection;
             EcosystemWallet.SequenceWallet.WalletCreated += wallet =>
             {
+                BoilerplateFactory.CloseWindow<SequenceEcosystemWalletWindow>();
                 BoilerplateFactory.OpenEcosystemWalletHome(transform, wallet);
             };
-            
-            var ecosystemWallet = EcosystemWallet.SequenceWallet.RecoverFromStorage();
-            if (ecosystemWallet == null)
-                OpenWalletSelection();
-            else
-                BoilerplateFactory.OpenEcosystemWalletHome(transform, ecosystemWallet);
             
             _adapter = EmbeddedWalletAdapter.GetInstance();
         }
@@ -79,7 +73,13 @@ namespace Sequence.Boilerplates
         private void Start()
         {
             SetupScene();
-            TryRecoverSessionToOpenLoginWindow();
+            
+            _featureSelection.SetActive(false);
+            var ecosystemWallet = EcosystemWallet.SequenceWallet.RecoverFromStorage();
+            if (ecosystemWallet == null)
+                TryRecoverSessionToOpenLoginWindow();
+            else
+                BoilerplateFactory.OpenEcosystemWalletHome(transform, ecosystemWallet);
         }
 
 #if UNITY_EDITOR
