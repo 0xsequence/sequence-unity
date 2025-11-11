@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641263, b: 0.57481724, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3403,7 +3402,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sponsored, without fee options.
+  m_text: Sponsored, without fee options on Arb sepolia.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
   m_sharedMaterial: {fileID: 1471415949496392458, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
@@ -4058,11 +4057,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa388a969190426facba008de2b8c43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _chain: 10
+  _chain: 42161
   _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 1
   _feeOptionAddress:
-  - 0x7F5c764cBc14f9669B88837ca1490cCa17c31607
+  - 0xABAAd93EeE2a569cF0632f39B10A9f5D734777ca
   _transaction:
     <To>k__BackingField: 0x33985d320809E26274a72E03268c8a29927Bc6dA
     <FunctionSelector>k__BackingField: explicitEmit()
@@ -4247,7 +4246,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: explicitEmit() & fee (mainnet)
+  m_text: Fee call using native token
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
   m_sharedMaterial: {fileID: 1471415949496392458, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
@@ -4419,7 +4418,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Explicit (Arb Sepolia)
       m_Image: {fileID: 0}
-    - m_Text: Explicit + USDC (OP Mainnet)
+    - m_Text: Explicit + Native Tokens (Arb One)
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8055,7 +8054,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: implicitEmit() (testnet)
+  m_text: Implicit call
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
   m_sharedMaterial: {fileID: 1471415949496392458, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
@@ -8855,7 +8854,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sponsored, without fee options.
+  m_text: Sponsored, without fee options on Arb sepolia.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
   m_sharedMaterial: {fileID: 1471415949496392458, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
@@ -11278,7 +11277,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Select a fee option.
+  m_text: Select a fee option on Arbitrum.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
   m_sharedMaterial: {fileID: 1471415949496392458, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
@@ -13027,7 +13026,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: explicitEmit() (testnet)
+  m_text: Explicit call
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}
   m_sharedMaterial: {fileID: 1471415949496392458, guid: 3b399a2d8fd4949958a248da594a7b27, type: 2}

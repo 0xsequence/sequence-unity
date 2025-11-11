@@ -53,14 +53,14 @@ namespace Sequence.EcosystemWallet
     public class ExplicitSessionArgs : SessionArgs
     {
         public BigInteger chainId;
-        public BigInteger valueLimit;
+        public string valueLimit;
         public BigInteger deadline;
         public Permission[] permissions;
 
         public ExplicitSessionArgs(SessionPermissions sessionPermissions) : base(sessionPermissions.sessionAddress)
         {
             chainId = sessionPermissions.chainId;
-            valueLimit = sessionPermissions.valueLimit;
+            valueLimit = sessionPermissions.valueLimit.ToString();
             deadline = sessionPermissions.deadline;
             permissions = sessionPermissions.permissions;
         }

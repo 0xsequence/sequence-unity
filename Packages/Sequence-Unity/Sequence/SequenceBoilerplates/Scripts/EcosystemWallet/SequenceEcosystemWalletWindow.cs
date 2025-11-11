@@ -188,8 +188,8 @@ namespace Sequence.Boilerplates
             {
                 1 => new Permissions(Chain.TestnetArbitrumSepolia,
                     new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0)),
-                2 => new Permissions(Chain.Optimism,
-                    new ContractPermission(new Address("0x7F5c764cBc14f9669B88837ca1490cCa17c31607"), deadline, 0),
+                2 => new Permissions(Chain.ArbitrumOne,
+                    new ContractPermission(new Address("0xABAAd93EeE2a569cF0632f39B10A9f5D734777ca"), deadline, 1000000000000000000),
                     new ContractPermission(new Address("0x33985d320809E26274a72E03268c8a29927Bc6dA"), deadline, 0)),
                 _ => throw new Exception("invalid session type")
             };

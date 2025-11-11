@@ -65,7 +65,7 @@ namespace Sequence.Boilerplates
             {
                 var feeOptionsPermissions = new Permissions(_chain,
                     _feeOptionAddress
-                        .Select(address => new ContractPermission(new Address(address), deadline, 0)).ToArray<IPermissions>());
+                        .Select(address => new ContractPermission(new Address(address), deadline, 1000000000000000000)).ToArray<IPermissions>());
                 
                 permissions = new Permissions(_chain, feeOptionsPermissions,
                     new ContractPermission(new Address(_transaction.To), deadline, 0));

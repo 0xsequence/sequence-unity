@@ -9,7 +9,7 @@ using Sequence.Provider;
 using Sequence.Signer;
 using Sequence.Utils;
 using Sequence.Wallet;
-using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet
 {
@@ -21,6 +21,7 @@ namespace Sequence.EcosystemWallet
     
     internal class SessionSigner
     {
+        [Preserve]
         public struct CallContractData
         {
             public Address to;
@@ -104,7 +105,6 @@ namespace Sequence.EcosystemWallet
             if (permissionIndex < 0)
                 return (-1, null);
             
-            Debug.Log($"permissionIndex {permissionIndex}");
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
@@ -170,7 +170,6 @@ namespace Sequence.EcosystemWallet
 
         private bool CheckCallForIncrementUsageLimit(Call call)
         {
-            Debug.Log($"{ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])")}");
             return call.data.Length > 4 &&
                    ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
                    ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])");
@@ -249,11 +248,7 @@ namespace Sequence.EcosystemWallet
                 }
             });
 
-            var usageLimit = ABI.ABI.Decode<BigInteger>(response, "uint256");
-            
-            Debug.Log($"GetCurrentUsageLimit: {usageLimit}");
-            
-            return usageLimit;
+            return ABI.ABI.Decode<BigInteger>(response, "uint256");
         }
         
         private byte[] GetValueUsageHash()
