@@ -66,6 +66,12 @@ namespace Sequence.Boilerplates
                 b => b.Show(wallet, onClose));
         }
         
+        public static FeeOptionWindow OpenFeeOptionSelection(Transform parent, Sequence.Relayer.FeeOption[] feeOptions, Action<Sequence.Relayer.FeeOption> onSelected)
+        {
+            return GetOrSpawnBoilerplate<FeeOptionWindow>("EcosystemWallet/Transactions/FeeOptionsWindow", parent, 
+                b => b.WaitForSelection(feeOptions, onSelected));
+        }
+        
         /// <summary>
         /// Open the Login UI Boilerplate from a Prefab inside the Resources folder.
         /// </summary>

@@ -33,6 +33,7 @@ namespace Sequence.Boilerplates
         }
         
         [Header("Transactions")]
+        [SerializeField] private EcosystemWalletTransactions _transactionsWindow;
         [SerializeField] private Chain _chain = Chain.TestnetArbitrumSepolia;
         [SerializeField] private bool _allowTransactionThroughEcosystem;
         [SerializeField] private bool _useFeeOptions;
@@ -95,7 +96,7 @@ namespace Sequence.Boilerplates
                 try
                 {
                     var feeOptions = await _wallet.GetFeeOption(_chain, transaction);
-                    EcosystemFeatureSelection.Instance.OpenFeeOptionWindow(feeOptions, async feeOption =>
+                    BoilerplateFactory.OpenFeeOptionSelection(_transactionsWindow.transform.parent, feeOptions, async feeOption =>
                     {
                         if (feeOption != null)
                             await TrySendTransaction(transaction, feeOption);

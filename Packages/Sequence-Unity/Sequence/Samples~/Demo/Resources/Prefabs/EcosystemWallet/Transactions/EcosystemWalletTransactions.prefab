@@ -2390,6 +2390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa388a969190426facba008de2b8c43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _transactionsWindow: {fileID: 2069837365693184587}
   _chain: 42161
   _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 1
@@ -3438,6 +3439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa388a969190426facba008de2b8c43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _transactionsWindow: {fileID: 2069837365693184587}
   _chain: 421614
   _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 0
@@ -4624,6 +4626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fa388a969190426facba008de2b8c43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _transactionsWindow: {fileID: 2069837365693184587}
   _chain: 421614
   _allowTransactionThroughEcosystem: 0
   _useFeeOptions: 0

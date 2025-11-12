@@ -47,10 +47,5 @@ namespace Sequence.Boilerplates
             _featureSelection.SetActive(false);
             _transactions.Show(_wallet, OpenFeatureSelection);
         }
-
-        public void OpenFeeOptionWindow(FeeOption[] feeOptions, Action<FeeOption> onSelected)
-        {
-            _feeOptionWindow.WaitForSelection(feeOptions, onSelected);
-        }
     }
 }
