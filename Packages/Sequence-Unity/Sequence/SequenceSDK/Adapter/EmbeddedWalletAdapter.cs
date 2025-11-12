@@ -279,6 +279,7 @@ namespace Sequence.Adapter
         
         private void OnLoginFailed(string error, LoginMethod method, string email, List<LoginMethod> loginMethods)
         {
+            SequenceLog.Error($"Login failed with method {method} and email {email}: {error}");
             SetLoginResult(false, true);
         }
         
