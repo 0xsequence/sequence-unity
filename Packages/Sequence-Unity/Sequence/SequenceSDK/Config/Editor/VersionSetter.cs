@@ -1,7 +1,6 @@
 using UnityEditor;
 using System.IO;
 using UnityEditor.Callbacks;
-using UnityEngine;
 
 namespace Sequence.Config.Editor
 {
@@ -12,8 +11,6 @@ namespace Sequence.Config.Editor
         [DidReloadScripts]
         private static void InjectSDKVersionIntoResources()
         {
-            Debug.Log("Injecting SDK version into Resources 2");
-            
             string version = PackageVersionReader.GetVersion();
             string versionFilePath = "Assets/Resources/sequence-unity-version.txt";
 
