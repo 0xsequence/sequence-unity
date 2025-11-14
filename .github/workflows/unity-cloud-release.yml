@@ -3,7 +3,7 @@ name: Unity Build Automation Release
 on:
   push:
     branches:
-      - Feature/build-automation
+      - master
 
 jobs:
   run-on-merge:
