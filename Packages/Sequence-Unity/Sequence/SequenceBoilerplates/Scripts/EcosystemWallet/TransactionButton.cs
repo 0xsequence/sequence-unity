@@ -137,7 +137,6 @@ namespace Sequence.Boilerplates
         private void ShowError(string message)
         {
             _messagePopup.Show(message, true);
-            Debug.LogError($"{message}");
         }
 
         private async Task CheckSupportedTransaction()

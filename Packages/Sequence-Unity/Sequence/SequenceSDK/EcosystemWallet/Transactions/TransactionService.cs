@@ -85,7 +85,6 @@ namespace Sequence.EcosystemWallet
                     continue;
                 
                 var increment = await kvPair.Key.PrepareIncrements(chain, kvPair.Value.ToArray(), _state.SessionsTopology);
-                Debug.Log($"Increment {increment?.UsageHash}, {increment?.UsageAmount}");
                 if (increment != null)
                     increments.Add(increment);
             }

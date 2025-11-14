@@ -121,6 +121,9 @@ namespace Sequence.EcosystemWallet
             var origin = RedirectOrigin.GetOriginString();
             
             var walletUrl = SequenceConfig.GetConfig().WalletAppUrl;
+            if (!walletUrl.StartsWith("https://"))
+                throw new Exception("Invalid Wallet App Url. Please check your SequenceConfig file.");
+            
             walletUrl = walletUrl.RemoveTrailingSlash();
             
             var url = $"{walletUrl}/request/{path}";

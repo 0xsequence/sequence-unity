@@ -28,9 +28,9 @@ namespace Sequence.EcosystemWallet.Browser
                     throw new Exception($"Incoming request id '{id}' does not match id '{Id}'");
 
                 if (queryString["error"] != null)
-                    throw new Exception($"Error during request: {queryString["error"]}");
+                    throw new Exception($"Error during request: {ParseParameterToJson(queryString["error"])}");
                 
-                var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(queryString["payload"]));
+                var responsePayloadJson = ParseParameterToJson(queryString["payload"]);
                 var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
                 
                 SequenceLog.Info(responsePayloadJson);

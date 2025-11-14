@@ -30,9 +30,9 @@ namespace Sequence.EcosystemWallet.Browser
                 throw new Exception("Invalid request id");
 
             if (data.TryGetValue("error", out var error))
-                throw new Exception(error);
+                throw new Exception(ParseParameterToJson(error));
             
-            var responsePayloadJson = Encoding.UTF8.GetString(Convert.FromBase64String(Uri.UnescapeDataString(data["payload"])));
+            var responsePayloadJson = ParseParameterToJson(data["payload"]);
             var responsePayload = JsonConvert.DeserializeObject<TResponse>(responsePayloadJson);
 
             return (true, responsePayload);

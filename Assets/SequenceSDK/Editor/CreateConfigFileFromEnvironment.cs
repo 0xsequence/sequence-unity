@@ -31,6 +31,7 @@ namespace Sequence.Editor
             var asset = ScriptableObject.CreateInstance<SequenceConfig>();
             asset.BuilderAPIKey = accessKey;
             asset.WaaSConfigKey = Environment.GetEnvironmentVariable("WAAS_KEY");
+            asset.WalletAppUrl = Environment.GetEnvironmentVariable("WALLET_APP_URL");
             asset.UrlScheme = Environment.GetEnvironmentVariable("URL_SCHEME");
             asset.GoogleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
             asset.GoogleClientIdIOS = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID_IOS");
