@@ -19,9 +19,10 @@ namespace Sequence.Editor
                 return;
 
             var exportPath = report.summary.outputPath;
-            var ipaPath = Path.GetFullPath(Path.Combine(exportPath, "../.build/last/ios-production/build.ipa"));
+            var ipaPath = Path.GetFullPath(Path.Combine(exportPath, "../.build/last/ios-production"));
+            var ipaFile = Path.Combine(ipaPath, "build.ipa");
             
-            Debug.Log($"Uploading iOS binary to TestFlight from {ipaPath}");
+            Debug.Log($"Uploading iOS binary to TestFlight from {ipaFile}");
 
             var keyId = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_KEY_ID");
             var issuerId = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_ISSUER_ID");
@@ -34,7 +35,8 @@ namespace Sequence.Editor
             var keyPath = Path.Combine(keyDir, $"AuthKey_{keyId}.p8");
             File.WriteAllText(keyPath, privateKey);
 
-            var cmd = $"xcrun altool --upload-app -f \"{ipaPath}\" -t ios --apiKey {keyId} --apiIssuer {issuerId}";
+            var cmd = $"xcrun altool --upload-app -f \"{ipaFile}\" -t ios --apiKey {keyId} --apiIssuer {issuerId}";
+            RunCommand("/bin/bash", $"ls {ipaPath}");
             RunCommand("/bin/bash", $"-c \"{cmd}\"");
         }
 
