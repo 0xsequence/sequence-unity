@@ -12,7 +12,7 @@ namespace Sequence.Config.Editor
         [DidReloadScripts]
         private static void InjectSDKVersionIntoResources()
         {
-            Debug.Log("Injecting SDK version into Resources");
+            Debug.Log("Injecting SDK version into Resources 2");
             
             string version = PackageVersionReader.GetVersion();
             string versionFilePath = "Assets/Resources/sequence-unity-version.txt";
