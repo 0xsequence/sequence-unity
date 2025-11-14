@@ -26,6 +26,7 @@ namespace Sequence.Editor
             var keyId = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_KEY_ID");
             var issuerId = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_ISSUER_ID");
             var privateKey = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_P8");
+            privateKey = privateKey?.Replace("\\n", "\n");
             
             var keyDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".appstoreconnect/private_keys");
             
