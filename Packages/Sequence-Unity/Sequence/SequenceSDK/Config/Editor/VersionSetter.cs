@@ -1,23 +1,14 @@
 using UnityEditor;
 using System.IO;
-using UnityEngine;
+using UnityEditor.Callbacks;
 
 namespace Sequence.Config.Editor
 {
-    [InitializeOnLoad]
     public static class VersionSetter
     {
-        static VersionSetter()
-        {
-            UpdateVersionFileOnImport();
-        }
-
-        private static void UpdateVersionFileOnImport()
-        {
-            EditorApplication.delayCall += InjectSDKVersionIntoResources;
-        }
-
         // Because of the InitializeOnLoad attribute, this method will be called whenever code is recompiled in the editor
+        
+        [DidReloadScripts]
         private static void InjectSDKVersionIntoResources()
         {
             string version = PackageVersionReader.GetVersion();

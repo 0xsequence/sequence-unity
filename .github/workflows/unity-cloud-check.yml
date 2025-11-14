@@ -1,0 +1,56 @@
+name: Unity Build Automation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    environment: github-pages
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - mac-desktop
+          - windows-desktop
+          - ios
+          - android
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # ✅ Step 2 — Trigger Cloud Build for this target
+      - name: Trigger Cloud Build
+        id: trigger
+        run: |
+          branch_name="${{ github.head_ref || github.ref_name }}"
+          
+          build_number=$(curl -s -X POST \
+            -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"clean\": true, \"delay\": 0, \"commit\": null, \"headless\": true, \"branch\": \"$branch_name\"}" \
+            https://build-api.cloud.unity3d.com/api/v1/orgs/6872789246035/projects/5fac262b-e52e-42f7-a9d6-d4464b2ff80e/buildtargets/${{ matrix.target }}/builds \
+            | jq '.[0].build' )
+
+          echo "build_number=$build_number" >> $GITHUB_OUTPUT
+
+      # 📡 Step 3 — Poll Cloud Build result
+      - name: Poll Build Status
+        run: |
+          for i in {1..60}; do
+            status=$(curl -s \
+              -H "Authorization: Basic ${{ secrets.UNITY_API_KEY }}" \
+              https://build-api.cloud.unity3d.com/api/v1/orgs/6872789246035/projects/5fac262b-e52e-42f7-a9d6-d4464b2ff80e/buildtargets/${{ matrix.target }}/builds/${{ steps.trigger.outputs.build_number }} | jq -r '.buildStatus')
+
+            echo "Status: $status"
+
+            if [ "$status" = "success" ]; then exit 0; fi
+            if [ "$status" = "failed" ]; then exit 1; fi
+
+            sleep 60
+          done
+
+          echo "Build timed out"
+          exit 1
