@@ -1,9 +1,7 @@
-name: Run on merge to master
+name: Unity Build Automation Release
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - Feature/build-automation
 
