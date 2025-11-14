@@ -18,8 +18,8 @@ namespace Sequence.Editor
                 Environment.GetEnvironmentVariable("ENABLE_TESTFLIGHT_UPLOAD") != "TRUE")
                 return;
 
-            var exportPath = report.summary.outputPath;
-            var ipaPath = Path.GetFullPath(Path.Combine(exportPath, "../.build/last/ios-production"));
+            var workspace = Environment.GetEnvironmentVariable("WORKSPACE") ?? "";
+            var ipaPath = Path.GetFullPath(Path.Combine(workspace, ".build/last/ios-production"));
             var ipaFile = Path.Combine(ipaPath, "build.ipa");
             
             Debug.Log($"Uploading iOS binary to TestFlight from {ipaFile}");
@@ -36,8 +36,6 @@ namespace Sequence.Editor
             File.WriteAllText(keyPath, privateKey);
 
             var cmd = $"xcrun altool --upload-app -f \"{ipaFile}\" -t ios --apiKey {keyId} --apiIssuer {issuerId}";
-            RunCommand("/bin/bash", $"-c \"ls -l {ipaPath}\"");
-            RunCommand("/bin/bash", $"-c \"find '{exportPath}/..' -name '*.ipa'\"");
             RunCommand("/bin/bash", $"-c \"{cmd}\"");
         }
 
