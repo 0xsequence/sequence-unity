@@ -51,7 +51,7 @@ namespace Sequence.Editor
             
             Debug.Log($"Updated Unity Project Version to {version}");
             
-            var buildNumberStr = Environment.GetEnvironmentVariable("BUILD_TARGET_BUILD_NUMBER");
+            var buildNumberStr = Environment.GetEnvironmentVariable("UCB_BUILD_NUMBER");
             var buildNumber = int.TryParse(buildNumberStr, out var num) ? num : 0;
 
             PlayerSettings.iOS.buildNumber = buildNumber.ToString();
