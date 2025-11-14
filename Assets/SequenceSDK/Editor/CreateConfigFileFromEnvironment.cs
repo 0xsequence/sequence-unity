@@ -50,6 +50,14 @@ namespace Sequence.Editor
             PlayerSettings.bundleVersion = version;
             
             Debug.Log($"Updated Unity Project Version to {version}");
+            
+            var buildNumberStr = Environment.GetEnvironmentVariable("BUILD_NUMBER");
+            var buildNumber = int.TryParse(buildNumberStr, out var num) ? num : 0;
+
+            PlayerSettings.iOS.buildNumber = buildNumber.ToString();
+            PlayerSettings.Android.bundleVersionCode = buildNumber;
+            
+            Debug.Log($"Updated Android/iOS Bundle Versions to {buildNumber}");
         }
     }
 }
