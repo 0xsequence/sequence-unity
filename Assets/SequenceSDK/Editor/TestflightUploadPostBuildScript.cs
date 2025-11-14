@@ -36,6 +36,7 @@ namespace Sequence.Editor
             File.WriteAllText(keyPath, privateKey);
 
             var cmd = $"xcrun altool --upload-app -f \"{ipaFile}\" -t ios --apiKey {keyId} --apiIssuer {issuerId}";
+            RunCommand("/bin/bash", $"-c \"find '{workspace}' -name '*.ipa'\"");
             RunCommand("/bin/bash", $"-c \"{cmd}\"");
         }
 
