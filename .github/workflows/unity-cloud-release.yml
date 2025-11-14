@@ -16,8 +16,6 @@ jobs:
         target:
           - ios-production
     
-    if: github.event.pull_request.merged == true
-    
     steps:
       - uses: actions/checkout@v3
 
