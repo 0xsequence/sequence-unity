@@ -33,9 +33,9 @@ namespace Sequence.Editor
             asset.WaaSConfigKey = Environment.GetEnvironmentVariable("WAAS_KEY");
             asset.UrlScheme = Environment.GetEnvironmentVariable("URL_SCHEME");
             asset.GoogleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
-            asset.GoogleClientIdIOS = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            asset.GoogleClientIdIOS = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID_IOS");
             asset.AppleClientId = Environment.GetEnvironmentVariable("APPLE_CLIENT_ID");
-            asset.AppleClientIdIOS = Environment.GetEnvironmentVariable("APPLE_CLIENT_ID");
+            asset.AppleClientIdIOS = Environment.GetEnvironmentVariable("APPLE_CLIENT_ID_IOS");
             asset.EditorStoreSessionPrivateKeyInSecureStorage = true;
             asset.StoreSessionPrivateKeyInSecureStorage = true;
 
@@ -45,6 +45,11 @@ namespace Sequence.Editor
             AssetDatabase.SaveAssets();
 
             Debug.Log("ScriptableObject created at: " + assetPath);
+
+            var version = PackageVersionReader.GetVersion();
+            PlayerSettings.bundleVersion = version;
+            
+            Debug.Log($"Updated Unity Project Version to {version}");
         }
     }
 }

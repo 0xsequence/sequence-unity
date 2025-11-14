@@ -17,17 +17,17 @@ namespace Sequence.Editor
             if (report.summary.platform != BuildTarget.iOS ||
                 Environment.GetEnvironmentVariable("ENABLE_TESTFLIGHT_UPLOAD") != "TRUE")
                 return;
-            
-            Debug.Log("Uploading iOS binary to TestFlight...");
 
             var exportPath = report.summary.outputPath;
-            var ipaPath = Path.Combine(exportPath, "../.build/last/ios-production/build.ipa");
+            var ipaPath = Path.GetFullPath(Path.Combine(exportPath, "../.build/last/ios-production/build.ipa"));
+            
+            Debug.Log($"Uploading iOS binary to TestFlight from {ipaPath}");
 
             var keyId = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_KEY_ID");
             var issuerId = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_ISSUER_ID");
             var privateKey = Environment.GetEnvironmentVariable("APPSTORE_CONNECT_P8");
             
-            var keyDir = Path.Combine("BUILD_PATH", ".appstoreconnect/private_keys");
+            var keyDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".appstoreconnect/private_keys");
             
             Directory.CreateDirectory(keyDir);
             var keyPath = Path.Combine(keyDir, $"AuthKey_{keyId}.p8");
