@@ -1,10 +1,12 @@
 name: Unity Build Automation
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   test-and-build:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: github-pages
 
