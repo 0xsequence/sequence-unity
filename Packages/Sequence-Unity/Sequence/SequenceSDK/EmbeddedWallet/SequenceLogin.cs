@@ -51,10 +51,13 @@ namespace Sequence.EmbeddedWallet
             {
                 _instance = new SequenceLogin(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress);
             }
+            
             if (connectedWalletAddress != null)
             {
                 _instance.SetConnectedWalletAddress(connectedWalletAddress);
             }
+            
+            _instance.SetupAuthenticator();
             return _instance;
         }
 
