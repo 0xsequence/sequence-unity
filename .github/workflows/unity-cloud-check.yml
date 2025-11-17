@@ -6,7 +6,7 @@ on:
 
 jobs:
   test-and-build:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.run_attempt > 1
     runs-on: ubuntu-latest
     environment: github-pages
 
