@@ -9,7 +9,7 @@ namespace Sequence.Boilerplates
     {
         public static EcosystemFeatureSelection Instance;
         
-        [SerializeField] private SequenceEcosystemWalletWindow _login;
+        [SerializeField] private EcosystemWalletLoginWindow _login;
         [SerializeField] private GameObject _featureSelection;
         [SerializeField] private EcosystemWalletProfile _profile;
         [SerializeField] private EcosystemWalletTransactions _transactions;

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Sequence.Boilerplates.Login
 {
-    public class SequenceLoginWindow : MonoBehaviour
+    public class EmbeddedWalletLoginWindow : MonoBehaviour
     {
         [SerializeField] private Button _closeButton;
         [SerializeField] private Button _emailLoginButton;

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Sequence.Boilerplates
 {
-    public class SequenceEcosystemWalletWindow : MonoBehaviour
+    public class EcosystemWalletLoginWindow : MonoBehaviour
     {
         private enum ImplicitSessionType
         {

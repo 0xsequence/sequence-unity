@@ -45,7 +45,7 @@ namespace Sequence.Boilerplates
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 ShowDefaultWindow();
-                BoilerplateFactory.CloseWindow<SequenceLoginWindow>();
+                BoilerplateFactory.CloseWindow<EmbeddedWalletLoginWindow>();
                 _walletSelection?.gameObject.SetActive(false);
                 
                 wallet.OnDropSessionComplete += s =>
@@ -63,7 +63,7 @@ namespace Sequence.Boilerplates
             EcosystemWallet.SequenceWallet.Disconnected += OpenWalletSelection;
             EcosystemWallet.SequenceWallet.WalletCreated += wallet =>
             {
-                BoilerplateFactory.CloseWindow<SequenceEcosystemWalletWindow>();
+                BoilerplateFactory.CloseWindow<EcosystemWalletLoginWindow>();
                 BoilerplateFactory.OpenEcosystemWalletHome(transform, wallet);
             };
             

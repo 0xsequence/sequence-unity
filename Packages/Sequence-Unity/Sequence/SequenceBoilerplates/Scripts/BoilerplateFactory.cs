@@ -42,9 +42,9 @@ namespace Sequence.Boilerplates
                 b => b.Show());
         }
         
-        public static SequenceEcosystemWalletWindow OpenEcosystemWalletLogin(Transform parent, Action onClose = null)
+        public static EcosystemWalletLoginWindow OpenEcosystemWalletLogin(Transform parent, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceEcosystemWalletWindow>("EcosystemWallet/EcosystemWalletLogin", parent, 
+            return GetOrSpawnBoilerplate<EcosystemWalletLoginWindow>("EcosystemWallet/EcosystemWalletLogin", parent, 
                 b => b.Show(onClose));
         }
         
@@ -78,9 +78,9 @@ namespace Sequence.Boilerplates
         /// <param name="parent">Transform inside of a Canvas object.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window or when an account was successfully federated.</param>
         /// <returns></returns>
-        public static SequenceLoginWindow OpenEmbeddedWalletLogin(Transform parent, Action onClose = null)
+        public static EmbeddedWalletLoginWindow OpenEmbeddedWalletLogin(Transform parent, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceLoginWindow>("EmbeddedWallet/Login/SequenceLoginWindow", parent, 
+            return GetOrSpawnBoilerplate<EmbeddedWalletLoginWindow>("EmbeddedWallet/Login/SequenceLoginWindow", parent, 
                 b => b.Show(onClose));
         }
 
