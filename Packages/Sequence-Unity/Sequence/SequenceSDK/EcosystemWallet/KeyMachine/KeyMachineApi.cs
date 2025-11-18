@@ -1,15 +1,12 @@
-using System.Numerics;
 using System.Threading.Tasks;
 using Sequence.EcosystemWallet.KeyMachine.Models;
-using Sequence.EcosystemWallet.Primitives;
 using Sequence.Utils;
-using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
     internal class KeyMachineApi
     {
-        private const string DefaultHost = "https://v3-keymachine.sequence-dev.app";
+        private const string DefaultHost = "https://keymachine.sequence.app";
         
         private readonly string _host;
         private readonly HttpClient _httpClient;
