@@ -91,7 +91,6 @@ namespace Sequence.EcosystemWallet.Primitives
                 {
                     if (signerLeaf.address.Equals(address))
                     {
-                        Debug.Log($"return signer leaf {signerLeaf.address}");
                         return signerLeaf;
                     }
                 }

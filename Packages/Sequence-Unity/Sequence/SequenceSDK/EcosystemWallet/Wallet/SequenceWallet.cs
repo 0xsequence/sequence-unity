@@ -174,14 +174,14 @@ namespace Sequence.EcosystemWallet
             }
             catch (Exception e)
             {
-                SequenceLog.Exception(e);
+                SequenceLog.Info(e.Message);
                 return false;
             }
         }
 
         public async Task<string> SendTransactionThroughEcosystem(Chain chain, ITransaction transaction)
         {
-            var chainId = BigInteger.Parse(ChainDictionaries.ChainIdOf[chain]);
+            var chainId = chain.AsBigInteger();
             var call = transaction.GetCall();
             
             var args = new SendWalletTransactionArgs

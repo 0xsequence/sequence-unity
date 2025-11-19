@@ -195,7 +195,6 @@ namespace Sequence.EcosystemWallet
             });
             
             Nonce = response == "0x" ? 0 : response.HexStringToBigInteger();
-            Debug.Log($"Nonce {Nonce}");
         }
 
         private string RetrieveString(string key)
