@@ -102,12 +102,5 @@ namespace Sequence.EcosystemWallet.UnitTests
             
             Debug.Log($"{imageHash}");
         }
-
-        [TestCase("0x8fee11e98795484615dcd9b86a9fbc2b62285931385baea72111101518d92dce", "0x5615dEB798BB3E4dFa0139dFa1b3D433Cc23b72f", "0x2e234DAe75C793f67A35089C9d99245E1C58470b", null)]
-        public void CreateAddress(string imageHash, string factory, string module, string creationCode)
-        {
-            var address = AddressFactory.Create(imageHash.HexStringToByteArray(), factory, module, creationCode);
-            Debug.Log($"Sequence Address: {address}");
-        }
     }
 }

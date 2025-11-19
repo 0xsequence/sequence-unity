@@ -108,19 +108,21 @@ namespace Sequence.EcosystemWallet
             return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
         }
 
-        public SessionCallSignature SignCall(Chain chain, Call call, int callIdx, SessionsTopology topology, BigInteger space, BigInteger nonce)
+        public SessionCallSignature SignCall(Chain chain, Calls payload, int callIdx, SessionsTopology topology, BigInteger space, BigInteger nonce)
         {
             var pvKey = _credentials.privateKey;
             var eoaWallet = new EOAWallet(pvKey);
             
-            var hashedCall = HashCallWithReplayProtection(chain, call, callIdx, space, nonce);
+            var hashedCall = HashCallWithReplayProtection(ParentAddress, chain, payload, callIdx, space, nonce);
             var signedCall = EthSignature.Sign(hashedCall, eoaWallet.privKey);
 
             var rsy = RSY.UnpackFrom65(signedCall.HexStringToByteArray());
 
             if (IsExplicit)
             {
+                var call = payload.calls[callIdx];
                 var permissionIndex = 0;
+                
                 if (!CheckCallForIncrementUsageLimit(call))
                 {
                     permissionIndex = FindSupportedPermission(call, topology).Index;
@@ -175,15 +177,11 @@ namespace Sequence.EcosystemWallet
                    ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])");
         }
         
-        private byte[] HashCallWithReplayProtection(Chain chain, Call call, BigInteger callIdx, BigInteger space, BigInteger nonce)
+        private byte[] HashCallWithReplayProtection(Address wallet, Chain chain, Calls calls, BigInteger callIdx, BigInteger space, BigInteger nonce)
         {
-            var chainBytes = BigInteger.Parse(chain.GetChainId()).ByteArrayFromNumber(32);
-            var spaceBytes = space.ByteArrayFromNumber(32);
-            var nonceBytes = nonce.ByteArrayFromNumber(32);
+            var payloadHash = calls.Hash(wallet, chain.AsBigInteger());
             var callIdxBytes = callIdx.ByteArrayFromNumber(32);
-            var callHashBytes = call.Hash().HexStringToByteArray();
-
-            var concatenated = ByteArrayExtensions.ConcatenateByteArrays(chainBytes, spaceBytes, nonceBytes, callIdxBytes, callHashBytes);
+            var concatenated = ByteArrayExtensions.ConcatenateByteArrays(payloadHash, callIdxBytes);
             return SequenceCoder.KeccakHash(concatenated);
         }
 

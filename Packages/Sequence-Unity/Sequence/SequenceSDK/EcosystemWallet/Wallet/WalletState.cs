@@ -2,11 +2,13 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto.Tls;
 using Sequence.EcosystemWallet.KeyMachine.Models;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.Provider;
 using Sequence.Utils;
 using Sequence.Utils.SecureStorage;
+using UnityEngine;
 using ConfigUpdate = Sequence.EcosystemWallet.KeyMachine.Models.ConfigUpdate;
 
 namespace Sequence.EcosystemWallet
@@ -193,6 +195,7 @@ namespace Sequence.EcosystemWallet
             });
             
             Nonce = response == "0x" ? 0 : response.HexStringToBigInteger();
+            Debug.Log($"Nonce {Nonce}");
         }
 
         private string RetrieveString(string key)

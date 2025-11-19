@@ -120,6 +120,12 @@ namespace Sequence.EcosystemWallet.Primitives
             return encoder.Encode();
         }
 
+        public byte[] Hash(Address wallet, BigInteger chainId)
+        {
+            var typedData = new TypedDataToSign(wallet, chainId, new Parented(Array.Empty<Address>(), this));
+            return typedData.GetSignPayload();
+        }
+
         public static Calls Decode(byte[] packed, Address self = null)
         {
             CallsDecoder decoder = new CallsDecoder(packed);
