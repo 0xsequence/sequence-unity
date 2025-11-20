@@ -36,7 +36,7 @@ namespace Sequence.EcosystemWallet
     public class ModuleAddresses
     {
         public bool isMap;
-        public string[][] data;
+        public Address[][] data;
     }
     
     [Preserve]

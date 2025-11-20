@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -10,11 +12,12 @@ namespace Sequence.EcosystemWallet
 {
     public class GuardSigner
     {
-        private readonly Address _guardSigner = ExtensionsFactory.Current.Guard;
+        private readonly Address _guardSigner;
         private readonly GuardService _service;
         
         public GuardSigner(GuardConfig config)
         {
+            _guardSigner = GetGuardSignerAddress(config);
             _service = new GuardService(config.url);
         }
         
@@ -115,6 +118,18 @@ namespace Sequence.EcosystemWallet
             }
             
             throw new System.Exception("Unknown signature type");
+        }
+
+        private Address GetGuardSignerAddress(GuardConfig config)
+        {
+            var setOther = new HashSet<Address>(ExtensionsFactory.Current.GuardSigners);
+            var overlapped = config.moduleAddresses.data
+                .SelectMany(row => row)
+                .Where(value => setOther.Contains(value))
+                .Distinct()
+                .ToList().First();
+            
+            return overlapped;
         }
     }
 }

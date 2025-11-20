@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Sequence.Utils.SecureStorage;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet
 {
@@ -10,6 +11,7 @@ namespace Sequence.EcosystemWallet
         public GuardConfig GetConfig(Address address)
         {
             var json = _storage.RetrieveString(BuildStorageKey(address));
+            Debug.Log($"{json}");
             return string.IsNullOrEmpty(json) ? null : 
                 JsonConvert.DeserializeObject<GuardConfig>(json);
         }
