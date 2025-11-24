@@ -32,6 +32,8 @@ namespace Sequence
         [Obsolete("Chain is not currently supported")]
         XR1 = 273,
         Somnia = 5031,
+        Monad = 143,
+        Incentiv = 24101,
 
         // Testnets
         TestnetSepolia = 11155111,
@@ -58,6 +60,7 @@ namespace Sequence
         TestnetTelos = 41,
         TestnetMoonbaseAlpha = 1287,
         TestnetEtherlink = 128123,
+        TestnetEtherlinkShadownet = 127823,
         TestnetMonad = 10143,
         TestnetSomnia = 50312,
         TestnetIncentivV2 = 28802,
