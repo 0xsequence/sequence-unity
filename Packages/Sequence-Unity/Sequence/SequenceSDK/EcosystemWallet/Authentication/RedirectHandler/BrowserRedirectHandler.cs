@@ -10,6 +10,13 @@ namespace Sequence.EcosystemWallet.Browser
 {
     internal class BrowserRedirectHandler : RedirectHandler
     {
+        private class NativeReceiveArgs
+        {
+            public string url;
+            public string action;
+            public object payload;
+        }
+        
         private class ResponseErrorData
         {
             public string error;
@@ -32,7 +39,12 @@ namespace Sequence.EcosystemWallet.Browser
                 var go = new GameObject("SequenceNativeReceiver");
                 _receiver = go.AddComponent<NativeReceiver>();
                 
-                var response = await _receiver.WaitForResponse(JsonConvert.SerializeObject(new {url, action, payload}));
+                var response = await _receiver.WaitForResponse(JsonConvert.SerializeObject(new NativeReceiveArgs
+                {
+                    url = url, 
+                    action = action, 
+                    payload = payload
+                }));
                 
                 GameObject.Destroy(_receiver.gameObject);
                 
