@@ -18,6 +18,13 @@ namespace Sequence.Boilerplates
         
         public void Show(string message, bool error = false)
         {
+            gameObject.SetActive(true);
+            if (!gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning($"Could not start animation because {name} is inactive in this hierarchy.");
+                return;
+            }
+            
             _tweenAnimation ??= GetComponent<ITween>();
             _tweenAnimation.AnimateIn(0.3f);
             
@@ -32,6 +39,13 @@ namespace Sequence.Boilerplates
 
         public void Hide()
         {
+            if (!gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning($"Could not start animation because {name} is inactive in this hierarchy.");
+                gameObject.SetActive(false);
+                return;
+            }
+            
             _tweenAnimation.AnimateOut(0.3f);
         }
 

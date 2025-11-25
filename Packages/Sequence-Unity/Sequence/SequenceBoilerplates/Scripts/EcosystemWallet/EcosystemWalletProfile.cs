@@ -98,8 +98,8 @@ namespace Sequence.Boilerplates
         private void ShowError(string error)
         {
             Debug.LogError(error);
-            _messagePopup.Show(error, true);
             SetLoading(false);
+            _messagePopup.Show(error, true);
         }
         
         private void SetLoading(bool value)
