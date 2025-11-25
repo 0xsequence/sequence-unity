@@ -10,14 +10,14 @@ namespace Sequence.Boilerplates
 
         private Action<FeeOption> _onSelected;
 
-        public void WaitForSelection(FeeOption[] feeOptions, Action<FeeOption> onSelected)
+        public void WaitForSelection(Address walletAddress, FeeOption[] feeOptions, Action<FeeOption> onSelected)
         {
             gameObject.SetActive(true);
             _onSelected = onSelected;
             
             _tilePool.Cleanup();
             foreach (var feeOption in feeOptions)
-                _tilePool.GetObject().Load(feeOption, SelectFee);
+                _tilePool.GetObject().Load(walletAddress, feeOption, SelectFee);
         }
 
         public void Close()

@@ -96,7 +96,7 @@ namespace Sequence.Boilerplates
                 try
                 {
                     var feeOptions = await _wallet.GetFeeOption(_chain, transaction);
-                    BoilerplateFactory.OpenFeeOptionSelection(_transactionsWindow.transform.parent, feeOptions, async feeOption =>
+                    BoilerplateFactory.OpenFeeOptionSelection(_transactionsWindow.transform.parent, _wallet.Address, feeOptions, async feeOption =>
                     {
                         if (feeOption != null)
                             await TrySendTransaction(transaction, feeOption);

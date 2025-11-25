@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Sequence.Boilerplates.DailyRewards;
 using Sequence.Boilerplates.InGameShop;
 using Sequence.Boilerplates.Inventory;
@@ -66,10 +67,10 @@ namespace Sequence.Boilerplates
                 b => b.Show(wallet, onClose));
         }
         
-        public static FeeOptionWindow OpenFeeOptionSelection(Transform parent, Sequence.Relayer.FeeOption[] feeOptions, Action<Sequence.Relayer.FeeOption> onSelected)
+        public static FeeOptionWindow OpenFeeOptionSelection(Transform parent, Address walletAddress, Sequence.Relayer.FeeOption[] feeOptions, Action<Sequence.Relayer.FeeOption> onSelected)
         {
             return GetOrSpawnBoilerplate<FeeOptionWindow>("EcosystemWallet/Transactions/FeeOptionsWindow", parent, 
-                b => b.WaitForSelection(feeOptions, onSelected));
+                b => b.WaitForSelection(walletAddress, feeOptions, onSelected));
         }
         
         /// <summary>
