@@ -87,10 +87,17 @@ namespace Sequence.Boilerplates.InGameShop
         private async Task UpdatePaymentTokenAsync()
         {
             PaymentToken = await _saleContract.GetPaymentTokenAsync(_client);
-
-            var contract = new ERC20(PaymentToken);
-            PaymentTokenSymbol = await contract.Symbol(_client);
-            PaymentTokenDecimals = await contract.Decimals(_client);
+            if (PaymentToken.IsZeroAddress())
+            {
+                PaymentTokenSymbol = ChainDictionaries.GasCurrencyOf[_chain];
+                PaymentTokenDecimals = 18;
+            }
+            else
+            {
+                var contract = new ERC20(PaymentToken);
+                PaymentTokenSymbol = await contract.Symbol(_client);
+                PaymentTokenDecimals = await contract.Decimals(_client);   
+            }
             
             await UserPaymentTokenBalanceAsync();
         }
