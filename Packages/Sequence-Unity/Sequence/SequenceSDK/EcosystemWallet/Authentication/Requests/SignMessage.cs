@@ -1,12 +1,9 @@
-using Sequence.EcosystemWallet.Primitives.Common;
-
 namespace Sequence.EcosystemWallet
 {
-    
     public struct SignMessageArgs
     {
         public Address address;
-        public BigInt chainId;
+        public string chainId;
         public string message;
     }
 

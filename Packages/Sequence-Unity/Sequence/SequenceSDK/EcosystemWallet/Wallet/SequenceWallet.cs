@@ -75,7 +75,7 @@ namespace Sequence.EcosystemWallet
             var args = new SignMessageArgs
             { 
                 address = Address, 
-                chainId = new BigInt((int)chain), 
+                chainId = ((int)chain).ToString(), 
                 message = message
             };
             
