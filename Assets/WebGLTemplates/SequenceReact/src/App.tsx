@@ -27,10 +27,10 @@ function App() {
     isLoaded,
     loadingProgression,
   } = useUnityContext({
-    loaderUrl: "Build/webgl.loader.js",
-    dataUrl: "Build/webgl.data.unityweb",
-    frameworkUrl: "Build/webgl.framework.js.unityweb",
-    codeUrl: "Build/webgl.wasm.unityweb",
+      loaderUrl: "Build/<ReplaceWithDirectoryName>.loader.js",
+      dataUrl: "Build/<ReplaceWithDirectoryName>.data",
+      frameworkUrl: "Build/<ReplaceWithDirectoryName>.framework.js",
+      codeUrl: "Build/<ReplaceWithDirectoryName>.wasm",
   });
 
   const loadingPercentage = Math.round(loadingProgression * 100);

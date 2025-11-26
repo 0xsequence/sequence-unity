@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace Sequence.EcosystemWallet.Browser
 {
@@ -17,11 +18,13 @@ namespace Sequence.EcosystemWallet.Browser
             public object payload;
         }
         
+        [Preserve]
         private class ResponseErrorData
         {
             public string error;
         }
         
+        [Preserve]
         private class ResponseData
         {
             public string id;
