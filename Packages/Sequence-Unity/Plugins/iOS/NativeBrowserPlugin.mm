@@ -5,6 +5,23 @@
 #import <objc/message.h>
 
 static SFSafariViewController *safariVC = nil;
+static id<SFSafariViewControllerDelegate> safariDelegate = nil;
+
+@interface SafariCloseDelegate : NSObject <SFSafariViewControllerDelegate>
+@end
+
+@implementation SafariCloseDelegate
+
+- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller
+{
+    NSLog(@"[SafariPlugin] User closed SafariViewController");
+
+    UnitySendMessage("SequenceNativeReceiver", "HandleResponse", "User cancelled the operation manually.");
+
+    safariVC = nil;
+}
+
+@end
 
 extern "C" {
     void OpenWalletApp(const char *urlCString)
@@ -14,12 +31,16 @@ extern "C" {
         if (!url) return;
 
         UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
+
         safariVC = [[SFSafariViewController alloc] initWithURL:url];
-        
+
+        safariDelegate = [SafariCloseDelegate new];
+        safariVC.delegate = safariDelegate;
+
         if (@available(iOS 11.0, *)) {
             safariVC.dismissButtonStyle = SFSafariViewControllerDismissButtonStyleCancel;
         }
-        
+
         if (@available(iOS 13.0, *)) {
             safariVC.modalInPresentation = YES;
         }
