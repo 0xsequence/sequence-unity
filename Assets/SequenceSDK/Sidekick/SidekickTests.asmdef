@@ -1,0 +1,24 @@
+{
+    "name": "SidekickTests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f7fd4ba36aabd1d499450c174865e70b",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:c8f59a655c1ffd54cac5a528235b9f1c",
+        "GUID:13065393405843745b1313eb7159f82a"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
