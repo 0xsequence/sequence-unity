@@ -20,13 +20,15 @@ namespace Sequence.Utils
             NullValueHandling = NullValueHandling.Ignore
         };
         
-        public HttpClient(string baseUrl)
+        public HttpClient(string baseUrl, bool acceptSignature = false)
         {
             _baseUrl = baseUrl;
             _defaultHeaders = new Dictionary<string, string>();
             _defaultHeaders["Content-Type"] = "application/json";
             _defaultHeaders["Accept"] = "application/json";
-            _defaultHeaders["Accept-Signature"] = "sig=()";
+            
+            if (acceptSignature)
+                _defaultHeaders["Accept-Signature"] = "sig=()";
         }
         
         public async Task<TResponse> SendPostRequest<TArgs, TResponse>(string path, TArgs args, Dictionary<string, string> headers = null)
