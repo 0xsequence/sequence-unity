@@ -1,6 +1,4 @@
 using System.Threading.Tasks;
-using Sequence.EcosystemWallet.Primitives;
-using UnityEngine.Assertions;
 
 namespace Sequence.EcosystemWallet
 {
@@ -25,7 +23,6 @@ namespace Sequence.EcosystemWallet
         
         public async Task<IWallet> SignInWithPasskey(IPermissions permissions)
         {
-            Assert.IsNotNull(permissions, "Permissions cannot be null when you sign in with passkey.");
             return await SignIn(permissions, "passkey", null);
         }
         
