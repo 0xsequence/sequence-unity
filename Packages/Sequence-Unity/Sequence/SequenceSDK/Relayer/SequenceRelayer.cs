@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Config;
 using Sequence.Utils;
 
 namespace Sequence.Relayer
@@ -10,7 +11,7 @@ namespace Sequence.Relayer
 
         private readonly Dictionary<string, string> _headers = new()
         {
-            // { "X-Access-Key", SequenceConfig.GetConfig().BuilderAPIKey }
+            { "X-Access-Key", SequenceConfig.GetConfig().BuilderAPIKey }
         };
 
         public SequenceRelayer(Chain chain)
