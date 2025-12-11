@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sequence.Config;
 using Sequence.EcosystemWallet.KeyMachine.Models;
 using Sequence.Utils;
 
@@ -6,6 +8,11 @@ namespace Sequence.EcosystemWallet
 {
     internal class KeyMachineApi
     {
+        private readonly Dictionary<string, string> _headers = new()
+        {
+            { "X-Access-Key", SequenceConfig.GetConfig().BuilderAPIKey }
+        };
+        
         private const string DefaultHost = "https://keymachine.sequence.app";
         
         private readonly string _host;
@@ -43,7 +50,7 @@ namespace Sequence.EcosystemWallet
 
         private async Task<TReturn> SendRequest<TArgs, TReturn>(string endpoint, TArgs args)
         {
-            return await _httpClient.SendPostRequest<TArgs, TReturn>("rpc/Sessions/" + endpoint, args);
+            return await _httpClient.SendPostRequest<TArgs, TReturn>("rpc/Sessions/" + endpoint, args, _headers);
         }
     }
 }
