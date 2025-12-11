@@ -16,7 +16,7 @@ namespace Sequence.Relayer
         public SequenceRelayer(Chain chain)
         {
             var path = ChainDictionaries.PathOf[chain];
-            var relayerUrl = $"https://dev-{path}-relayer.sequence.app/rpc/Relayer";
+            var relayerUrl = $"https://{path}-relayer.sequence.app/rpc/Relayer";
             _httpClient = new HttpClient(relayerUrl);
         }
 
