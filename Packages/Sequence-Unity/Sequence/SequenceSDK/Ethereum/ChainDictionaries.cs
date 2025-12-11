@@ -53,6 +53,8 @@ namespace Sequence
             new (Chain.Etherlink, "42793", "Etherlink", "etherlink", "https://explorer.etherlink.com/", "XTZ", "0x0000000000000000000000000000000000000000"),
             new (Chain.XR1, "273", "XR1", "xr1", "", "XR1", "0x0000000000000000000000000000000000000000"),
             new (Chain.Somnia, "5031", "Somnia", "somnia", "https://mainnet.somnia.w3us.site/", "STT", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Monad, "143", "Monad", "monad", "https://mainnet-beta.monvision.io/", "MON", "0x0000000000000000000000000000000000000000"),
+            new (Chain.Incentiv, "24101", "Incentiv", "incentiv", "https://explorer.incentiv.io/", "CENT", "0x0000000000000000000000000000000000000000"),
 
             // --- TESTNETS ---
             new (Chain.TestnetSepolia, "11155111", "Sepolia", "sepolia", "https://sepolia.etherscan.io/", "ETH", "0x0000000000000000000000000000000000000000"),
@@ -77,6 +79,7 @@ namespace Sequence
             new (Chain.TestnetTelos, "41", "Telos Testnet", "telos-testnet", "https://testnet.teloscan.io/", "TLOS", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetMoonbaseAlpha, "1287", "Moonbase Alpha", "moonbase-alpha", "https://moonbase.moonscan.io/", "DEV", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetEtherlink, "128123", "Etherlink Testnet", "etherlink-testnet", "https://testnet.explorer.etherlink.com/", "XTZ", "0x0000000000000000000000000000000000000000"),
+            new (Chain.TestnetEtherlinkShadownet, "127823", "Etherlink Shadownet Testnet", "etherlink-shadownet-testnet", "https://shadownet.explorer.etherlink.com/", "XTZ", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetMonad, "10143", "Monad Testnet", "monad-testnet", "https://testnet.monadexplorer.com/", "MON", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetSomnia, "50312", "Somnia Testnet", "somnia-testnet", "https://somnia-testnet.socialscan.io/", "STT", "0x0000000000000000000000000000000000000000"),
             new (Chain.TestnetIncentivV2, "28802", "Incentiv Testnet v2", "incentiv-testnet-v2", "https://explorer.testnet.incentiv.net/", "TCENT", "0x0000000000000000000000000000000000000000"),
