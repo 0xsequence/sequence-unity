@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System;
 using Sequence.Utils;
+using UnityEngine;
 
 
 namespace Sequence.ABI
@@ -42,7 +43,7 @@ namespace Sequence.ABI
             throw new System.NotImplementedException();
         }
         
-        public string EncodeToString(object value, string[] evmTypes)
+        public string EncodeToString(object value, string[] evmTypes, bool parentIsArray = false)
         {
             if (evmTypes == null)
             {
@@ -93,61 +94,48 @@ namespace Sequence.ABI
                 {
                     //Statics: head(X(i)) = enc(X(i) and tail(X(i)) = "" (the empty string)
                     case ABIType.BOOLEAN:
-                        SequenceLog.Info("object in tuple array: boolean");
                         head_i = _booleanCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.NUMBER:
-                        SequenceLog.Info("object in tuple array: number");
                         head_i = _numberCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.ADDRESS:
-                        SequenceLog.Info("object in tuple array: address");
                         head_i = _addressCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.FIXEDBYTES:
-                        SequenceLog.Info("object in tuple array: static bytes");
                         head_i = _staticBytesCoder.EncodeToString(valueTuple[i]);
                         break;
                     //Dynamics: head(X(i)) = enc(len( head(X(1)) ... head(X(k)) tail(X(1)) ... tail(X(i-1)) )) tail(X(i)) = enc(X(i))
                     case ABIType.BYTES:
-                        SequenceLog.Info("object in tuple array: bytes");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = _fixedBytesCoder.EncodeToString(valueTuple[i]);
                         break;
                     case ABIType.STRING:
-                        SequenceLog.Info("object in tuple array: string");
                         Encoding utf8 = Encoding.UTF8;
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = _fixedBytesCoder.EncodeToString(utf8.GetBytes((string)valueTuple[i]));
                         break;
                     case ABIType.DYNAMICARRAY:
-                        SequenceLog.Info("object in tuple array: dynamic array");
                         head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
-                        SequenceLog.Info("dynamic array head: " + head_i);
                         //intList.Cast<object>().ToList();
                         int numberCount = 0;
                         if (valueTuple[i] != null)
                         {
                             numberCount = ((IList)valueTuple[i]).Count;
                         }
-                        SequenceLog.Info("number count:" + numberCount);
 
                         string numberCountEncoded = _numberCoder.EncodeToString(numberCount);
-                        SequenceLog.Info("dynamic array tail number count: " + numberCountEncoded);
                         tail_i = numberCountEncoded + EncodeToString(valueTuple[i], 
-                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount));
-
-                        SequenceLog.Info("dynamic array tail: " + tail_i);
+                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount),true);
+                        
                         break;
                     case ABIType.FIXEDARRAY:
-                        SequenceLog.Info("object in tuple array: fixed array");
                         numberCount = ABI.GetInnerValue(evmTypes[i]);
                         head_i = EncodeToString(valueTuple[i], 
-                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount));
+                            ArrayUtils.BuildArrayWithRepeatedValue(ABI.GetUnderlyingCollectionTypeName(evmTypes[i]), numberCount), true);
                         break;
                     case ABIType.TUPLE:
-                        SequenceLog.Info("object in tuple array: tuple");
-                        head_i = _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
+                        head_i = parentIsArray ? "" : _numberCoder.EncodeToString((object)(headerTotalByteLength + tailLength));
                         tail_i = EncodeToString(valueTuple[i], ABI.GetTupleTypes(evmTypes[i]));
                         break;
                     case ABIType.NONE:

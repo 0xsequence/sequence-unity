@@ -58,12 +58,26 @@ namespace Sequence.ABI
         {
             try
             {
-                //The BigInteger structure does not include constructors with a parameter of type Byte, Int16, SByte, or UInt16. However, the Int32 type supports the implicit conversion of 8-bit and 16-bit signed and unsigned integers to signed 32-bit integers.
                 byte[] encoded = { };
-                if ((number is int) || (number is BigInteger))
+                if (number is BigInteger)
                 {
                     encoded = EncodeSignedInt((BigInteger)number, 32);
-
+                }else if (BigInteger.TryParse(number.ToString(), out BigInteger bigInt))
+                {
+                    encoded = EncodeSignedInt(bigInt, 32);
+                }
+                else if (number is int intValue)
+                {
+                    encoded = EncodeSignedInt(new BigInteger(intValue), 32);
+                }
+                else if (number is uint uintValue)
+                {
+                    encoded = EncodeUnsignedInt(new BigInteger(uintValue), 32);
+                }
+                else
+                {
+                    Debug.LogError($"Unsupported number type: {number.GetType()}");
+                    return null;
                 }
                 // TODO: Make sure Big Endian
                 /*if (BitConverter.IsLittleEndian)
@@ -170,11 +184,11 @@ namespace Sequence.ABI
                 string encodedString;
                 if (number.Sign > -1)
                 {
-                    encodedString = new string('0', length - hex.Length) + hex;
+                    encodedString = new string('0', Math.Max(0, length - hex.Length)) + hex;
                 }
                 else
                 {
-                    encodedString = new string('f', length - hex.Length) + hex;
+                    encodedString = new string('f', Math.Max(0, length - hex.Length)) + hex;
                 }
                 return encodedString;
             }
@@ -219,7 +233,7 @@ namespace Sequence.ABI
             try
             {
                 var hex = number.ToString("x");
-                string encodedString = new string('0', length - hex.Length) + hex;
+                string encodedString = new string('0', Math.Max(0, length - hex.Length)) + hex;
                 return encodedString;
             }
             catch (Exception ex)

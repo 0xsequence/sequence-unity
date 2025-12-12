@@ -7,6 +7,14 @@ namespace Sequence.Utils
 {
     public static class ArrayUtils
     {
+        public static T[] Unshift<T>(this T[] array, T newItem)
+        {
+            T[] newArray = new T[array.Length + 1];
+            newArray[0] = newItem;
+            Array.Copy(array, 0, newArray, 1, array.Length);
+            return newArray;
+        }
+        
         public static T[] ConvertToTArray<T,T2>(this T2 value)
         {
             if (value is Array array)
@@ -85,6 +93,25 @@ namespace Sequence.Utils
             return newList;
         }
         
+        public static T[] AddToArray<T>(this T[] array, T item)
+        {
+            if (array == null)
+                return new T[] { item };
+
+            T[] result = new T[array.Length + 1];
+            Array.Copy(array, result, array.Length);
+            result[array.Length] = item;
+            return result;
+        }
+        
+        public static T[] AddToArray<T>(T[] array1, T[] array2)
+        {
+            T[] result = new T[array1.Length + array2.Length];
+            Array.Copy(array1, 0, result, 0, array1.Length);
+            Array.Copy(array2, 0, result, array1.Length, array2.Length);
+            return result;
+        }
+        
         public static T[] CombineArrays<T>(T[] arr1, T[] arr2)
         {
             int length1 = arr1.Length;
@@ -113,6 +140,34 @@ namespace Sequence.Utils
             }
             newArr[length] = obj;
             return newArr;
+        }
+        
+        public static T[] Slice<T>(this T[] input, int start)
+        {
+            if (input == null || start >= input.Length)
+                return Array.Empty<T>();
+
+            int length = input.Length - start;
+            T[] result = new T[length];
+            Array.Copy(input, start, result, 0, length);
+            return result;
+        }
+        
+        public static T[] SubArray<T>(this T[] array, int startIndex, int? length = null)
+        {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+            if (startIndex < 0 || startIndex > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+
+            int actualLength = length ?? (array.Length - startIndex);
+
+            if (actualLength < 0 || startIndex + actualLength > array.Length)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            T[] result = new T[actualLength];
+            Array.Copy(array, startIndex, result, 0, actualLength);
+            return result;
         }
     }
 }

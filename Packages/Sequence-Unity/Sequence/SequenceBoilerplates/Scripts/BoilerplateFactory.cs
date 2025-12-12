@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Sequence.Boilerplates.DailyRewards;
 using Sequence.Boilerplates.InGameShop;
 using Sequence.Boilerplates.Inventory;
@@ -25,6 +26,52 @@ namespace Sequence.Boilerplates
         {
             _objects.Clear();
         }
+
+        public static void CloseWindow<T>() where T : MonoBehaviour
+        {
+            var type = typeof(T);
+            if (!_objects.ContainsKey(type))
+                return;
+            
+            var cachedBoilerplate = _objects[type].GetComponent<T>();
+            cachedBoilerplate.gameObject.SetActive(false);
+        }
+
+        public static WalletSelection OpenWalletSelection(Transform parent)
+        {
+            return GetOrSpawnBoilerplate<WalletSelection>("WalletSelection", parent, 
+                b => b.Show());
+        }
+        
+        public static EcosystemWalletLoginWindow OpenEcosystemWalletLogin(Transform parent, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<EcosystemWalletLoginWindow>("EcosystemWallet/EcosystemWalletLogin", parent, 
+                b => b.Show(onClose));
+        }
+        
+        public static EcosystemWalletHome OpenEcosystemWalletHome(Transform parent, EcosystemWallet.IWallet wallet)
+        {
+            return GetOrSpawnBoilerplate<EcosystemWalletHome>("EcosystemWallet/EcosystemWalletHome", parent,
+                b => b.Show(wallet));
+        }
+        
+        public static EcosystemWalletProfile OpenEcosystemWalletProfile(Transform parent, EcosystemWallet.IWallet wallet, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<EcosystemWalletProfile>("EcosystemWallet/Profile/EcosystemWalletProfile", parent, 
+                b => b.Show(wallet, onClose));
+        }
+        
+        public static EcosystemWalletTransactions OpenEcosystemWalletTransactions(Transform parent, EcosystemWallet.IWallet wallet, Action onClose = null)
+        {
+            return GetOrSpawnBoilerplate<EcosystemWalletTransactions>("EcosystemWallet/Transactions/EcosystemWalletTransactions", parent, 
+                b => b.Show(wallet, onClose));
+        }
+        
+        public static FeeOptionWindow OpenFeeOptionSelection(Transform parent, Address walletAddress, Sequence.Relayer.FeeOption[] feeOptions, Action<Sequence.Relayer.FeeOption> onSelected)
+        {
+            return GetOrSpawnBoilerplate<FeeOptionWindow>("EcosystemWallet/Transactions/FeeOptionsWindow", parent, 
+                b => b.WaitForSelection(walletAddress, feeOptions, onSelected));
+        }
         
         /// <summary>
         /// Open the Login UI Boilerplate from a Prefab inside the Resources folder.
@@ -32,9 +79,9 @@ namespace Sequence.Boilerplates
         /// <param name="parent">Transform inside of a Canvas object.</param>
         /// <param name="onClose">(Optional) Callback when the user closes this window or when an account was successfully federated.</param>
         /// <returns></returns>
-        public static SequenceLoginWindow OpenSequenceLoginWindow(Transform parent, Action onClose = null)
+        public static EmbeddedWalletLoginWindow OpenEmbeddedWalletLogin(Transform parent, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceLoginWindow>("Login/SequenceLoginWindow", parent, 
+            return GetOrSpawnBoilerplate<EmbeddedWalletLoginWindow>("EmbeddedWallet/Login/SequenceLoginWindow", parent, 
                 b => b.Show(onClose));
         }
 
@@ -48,7 +95,7 @@ namespace Sequence.Boilerplates
         /// <returns>Instance of SequencePlayerProfile which was instantiated as a child of <paramref name="parent"/></returns>
         public static SequencePlayerProfile OpenSequencePlayerProfile(Transform parent, Address currency = null, string currencySymbol = null, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequencePlayerProfile>("PlayerProfile/SequencePlayerProfile", parent, 
+            return GetOrSpawnBoilerplate<SequencePlayerProfile>("EmbeddedWallet/PlayerProfile/SequencePlayerProfile", parent, 
                 b => b.Show(currency, currencySymbol, onClose));
         }
 
@@ -61,7 +108,7 @@ namespace Sequence.Boilerplates
         /// <returns>Instance of SequenceDailyRewards which was instantiated as a child of <paramref name="parent"/></returns>
         public static SequenceDailyRewards OpenSequenceDailyRewards(Transform parent, string apiUrl, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceDailyRewards>("DailyRewards/SequenceDailyRewards", parent, 
+            return GetOrSpawnBoilerplate<SequenceDailyRewards>("EmbeddedWallet/DailyRewards/SequenceDailyRewards", parent, 
                 b => b.Show(apiUrl, onClose));
         }
         
@@ -74,7 +121,7 @@ namespace Sequence.Boilerplates
         /// <returns>Instance of SequenceInventory which was instantiated as a child of <paramref name="parent"/></returns>
         public static SequenceInventory OpenSequenceInventory(Transform parent, string[] collections, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceInventory>("Inventory/SequenceInventory", parent, 
+            return GetOrSpawnBoilerplate<SequenceInventory>("EmbeddedWallet/Inventory/SequenceInventory", parent, 
                 b => b.Show(collections, onClose));
         }
         
@@ -90,7 +137,7 @@ namespace Sequence.Boilerplates
         public static SequenceInGameShop OpenSequenceInGameShop(Transform parent, string tokenContractAddress, 
             string saleContractAddress, int[] itemsForSale, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceInGameShop>("InGameShop/SequenceInGameShop", parent, 
+            return GetOrSpawnBoilerplate<SequenceInGameShop>("EmbeddedWallet/InGameShop/SequenceInGameShop", parent, 
                 b => b.Show(tokenContractAddress, saleContractAddress, itemsForSale, onClose));
         }
         
@@ -105,7 +152,7 @@ namespace Sequence.Boilerplates
         /// <returns>Instance of ViewMarketplaceListingsPanel which was instantiated as a child of <paramref name="parent"/></returns>
         public static ViewMarketplaceListingsPage OpenViewMarketplaceListingsPanel(Transform parent, IWallet wallet, Chain chain, Address marketplaceCollectionAddress, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<ViewMarketplaceListingsPage>("Marketplace/ViewMarketplaceListingsPanel", parent, 
+            return GetOrSpawnBoilerplate<ViewMarketplaceListingsPage>("EmbeddedWallet/Marketplace/ViewMarketplaceListingsPanel", parent, 
                 b => b.Show(wallet, chain, marketplaceCollectionAddress, onClose));
         }
 
@@ -121,27 +168,27 @@ namespace Sequence.Boilerplates
         public static CheckoutPage OpenCheckoutPanel(Transform parent, Chain chain, ICheckoutHelper checkoutHelper,
             IFiatCheckout fiatCheckout, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<CheckoutPage>("Checkout/CheckoutPanel", parent,
+            return GetOrSpawnBoilerplate<CheckoutPage>("EmbeddedWallet/Checkout/CheckoutPanel", parent,
                 b => b.Show(chain, checkoutHelper, fiatCheckout, onClose));
         }
 
         public static ListItemPage OpenListItemPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<ListItemPage>("Checkout/ListItemPanel", parent, b => b.Open(checkout, item));
+            return GetOrSpawnBoilerplate<ListItemPage>("EmbeddedWallet/Checkout/ListItemPanel", parent, b => b.Open(checkout, item));
         }
         
         public static CreateOfferPage OpenCreateOfferPanel(Transform parent, ICheckout checkout, TokenBalance item, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<CreateOfferPage>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
+            return GetOrSpawnBoilerplate<CreateOfferPage>("EmbeddedWallet/Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
         }
         public static CreateOfferPage OpenCreateOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<CreateOfferPage>("Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
+            return GetOrSpawnBoilerplate<CreateOfferPage>("EmbeddedWallet/Checkout/CreateOfferPanel", parent, b => b.Open(checkout, item));
         }
 
         public static SellOfferPage OpenSellOfferPanel(Transform parent, ICheckout checkout, CollectibleOrder item, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SellOfferPage>("Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
+            return GetOrSpawnBoilerplate<SellOfferPage>("EmbeddedWallet/Checkout/SellOfferPanel", parent, b => b.Open(checkout, item));
         }
         /// <summary>
         /// Open the UI Boilerplate to sign messages from a Prefab inside the Resources folder.
@@ -153,7 +200,7 @@ namespace Sequence.Boilerplates
         /// <returns>Instance of SequenceSignMessage which was instantiated as a child of <paramref name="parent"/></returns>
         public static SequenceSignMessage OpenSequenceSignMessage(Transform parent, Action onClose = null)
         {
-            return GetOrSpawnBoilerplate<SequenceSignMessage>("SignMessage/SequenceSignMessage", parent, 
+            return GetOrSpawnBoilerplate<SequenceSignMessage>("EmbeddedWallet/SignMessage/SequenceSignMessage", parent, 
                 b => b.Show(onClose));
         }
         
@@ -163,17 +210,17 @@ namespace Sequence.Boilerplates
             if (_objects.ContainsKey(type))
             {
                 var cachedBoilerplate = _objects[type].GetComponent<T>();
-                show.Invoke(cachedBoilerplate);
+                show?.Invoke(cachedBoilerplate);
                 return cachedBoilerplate;
             }
             
-            var prefab = ((GameObject)Resources.Load($"Prefabs/{path}")).GetComponent<T>();
+            var prefab = ((GameObject)Resources.Load($"Prefabs/{path}"))?.GetComponent<T>();
             if (prefab == null)
                 throw new Exception($"Prefab at {path} not found in Resources folder");
             
             var boilerplate = Object.Instantiate(prefab, parent);
             _objects.Add(type, boilerplate.gameObject);
-            show.Invoke(boilerplate);
+            show?.Invoke(boilerplate);
             return boilerplate;
         }
     }

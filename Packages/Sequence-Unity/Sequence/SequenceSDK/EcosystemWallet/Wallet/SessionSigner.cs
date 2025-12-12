@@ -1,0 +1,263 @@
+using System;
+using System.Numerics;
+using System.Threading.Tasks;
+using Nethereum.ABI.FunctionEncoding;
+using Nethereum.ABI.Model;
+using Sequence.ABI;
+using Sequence.EcosystemWallet.Primitives;
+using Sequence.Provider;
+using Sequence.Signer;
+using Sequence.Utils;
+using Sequence.Wallet;
+using UnityEngine.Scripting;
+
+namespace Sequence.EcosystemWallet
+{
+    internal class UsageLimit
+    {
+        public string UsageHash;
+        public BigInteger UsageAmount;
+    }
+    
+    internal class SessionSigner
+    {
+        [Preserve]
+        public struct CallContractData
+        {
+            public Address to;
+            public string data;
+        }
+        
+        private static readonly Address ValueTrackingAddress = new ("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+        
+        public Address ParentAddress { get; }
+        public Address Address { get; }
+        public Chain Chain { get; }
+        public bool IsExplicit { get; }
+        public Attestation Attestation => _credentials.attestation;
+
+        public Address IdentitySigner
+        {
+            get
+            {
+                if (IsExplicit)
+                    throw new Exception("no identity signer for explicit sessions");
+
+                var attestationHash = _credentials.attestation.Hash();
+                var pub = EthCrypto.RecoverPublicKey(_credentials.signature.Pack(), attestationHash);
+                var pubXY = EthCrypto.PublicKeyXY(pub);
+                var address = EthCrypto.AddressFromPublicKey(pubXY);
+                
+                return new Address(address);
+            }
+        }
+        
+        private readonly SessionCredentials _credentials;
+        
+        internal SessionSigner(SessionCredentials credentials)
+        {
+            _credentials = credentials;
+            ParentAddress = credentials.address;
+            Address = new EOAWallet(credentials.privateKey).GetAddress();
+            Chain = string.IsNullOrEmpty(credentials.chainId) ? Chain.None : ChainDictionaries.ChainById[credentials.chainId];
+            IsExplicit = credentials.isExplicit;
+        }
+
+        public async Task<bool> IsSupportedCall(Call call, Chain chain, SessionsTopology topology)
+        {
+            if (IsExplicit)
+            {
+                if (Chain != chain)
+                    return false;
+
+                if (CheckCallForIncrementUsageLimit(call))
+                    return true;
+                
+                var supportedPermission = FindSupportedPermission(call, topology);
+                return supportedPermission.Index >= 0;
+            }
+
+            return await CheckAcceptImplicitRequest(chain, call);
+        }
+        
+        private (int Index, Permission Permission) FindSupportedPermission(Call call, SessionsTopology topology)
+        {
+            var sessionPermissions = topology.GetPermissions(Address);
+            if (sessionPermissions == null || ChainDictionaries.ChainById[sessionPermissions.chainId.ToString()] != Chain)
+                return (-1, null);
+
+            // TODO: Read current usage limit, use ValueTrackingAddress
+            var exceededLimit = call.value > 0 && call.value > sessionPermissions.valueLimit;
+            if (exceededLimit)
+                return (-1, null);
+
+            var permissionIndex = -1;
+            for (var i = 0; i < sessionPermissions.permissions.Length; i++)
+            {
+                var permission = sessionPermissions.permissions[i];
+                if (!permission.target.Equals(call.to)) 
+                    continue;
+                
+                permissionIndex = i;
+                break;
+            }
+            
+            if (permissionIndex < 0)
+                return (-1, null);
+            
+            return (permissionIndex, sessionPermissions.permissions[permissionIndex]);
+        }
+
+        public SessionCallSignature SignCall(Chain chain, Calls payload, int callIdx, SessionsTopology topology, BigInteger space, BigInteger nonce)
+        {
+            var pvKey = _credentials.privateKey;
+            var eoaWallet = new EOAWallet(pvKey);
+            
+            var hashedCall = HashCallWithReplayProtection(ParentAddress, chain, payload, callIdx, space, nonce);
+            var signedCall = EthSignature.Sign(hashedCall, eoaWallet.privKey);
+
+            var rsy = RSY.UnpackFrom65(signedCall.HexStringToByteArray());
+
+            if (IsExplicit)
+            {
+                var call = payload.calls[callIdx];
+                var permissionIndex = 0;
+                
+                if (!CheckCallForIncrementUsageLimit(call))
+                {
+                    permissionIndex = FindSupportedPermission(call, topology).Index;
+                    if (permissionIndex == -1)
+                        throw new Exception("Invalid permission");
+                }
+                
+                return new ExplicitSessionCallSignature
+                {
+                    permissionIndex = permissionIndex,
+                    sessionSignature = rsy
+                };
+            }
+            
+            return new ImplicitSessionCallSignature
+            {
+                attestation = _credentials.attestation,
+                identitySignature = _credentials.signature,
+                sessionSignature = rsy
+            };
+        }
+
+        public async Task<UsageLimit> PrepareIncrements(Chain chain, Call[] calls, SessionsTopology topology)
+        {
+            var usageValueHash = GetValueUsageHash();
+            var currentUsage = await GetCurrentUsageLimit(chain, usageValueHash);
+            
+            BigInteger valueUsed = currentUsage;
+            foreach (var call in calls)
+            {
+                var permission = FindSupportedPermission(call, topology);
+                if (permission.Index < 0)
+                    continue;
+                
+                valueUsed += call.value;
+            }
+
+            if (valueUsed == 0)
+                return null;
+
+            return new UsageLimit
+            {
+                UsageHash = usageValueHash.ByteArrayToHexStringWithPrefix(),
+                UsageAmount = valueUsed
+            };
+        }
+
+        private bool CheckCallForIncrementUsageLimit(Call call)
+        {
+            return call.data.Length > 4 &&
+                   ByteArrayExtensions.Slice(call.data, 0, 4).ByteArrayToHexStringWithPrefix() ==
+                   ABI.ABI.FunctionSelector("incrementUsageLimit((bytes32,uint256)[])");
+        }
+        
+        private byte[] HashCallWithReplayProtection(Address wallet, Chain chain, Calls calls, BigInteger callIdx, BigInteger space, BigInteger nonce)
+        {
+            var payloadHash = calls.Hash(wallet, chain.AsBigInteger());
+            var callIdxBytes = callIdx.ByteArrayFromNumber(32);
+            var concatenated = ByteArrayExtensions.ConcatenateByteArrays(payloadHash, callIdxBytes);
+            return SequenceCoder.KeccakHash(concatenated);
+        }
+
+        private async Task<bool> CheckAcceptImplicitRequest(Chain chain, Call call)
+        {
+            try
+            {
+                var response = await new SequenceEthClient(chain).CallContract(new object[]
+                {
+                    new CallContractData
+                    {
+                        to = call.to,
+                        data = GetAcceptImplicitRequestFunctionAbi(call)
+                    }
+                });
+                
+                var expectedResult = GenerateImplicitRequestMagic(ParentAddress, _credentials.attestation);
+                return response == expectedResult;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+        
+        private string GetAcceptImplicitRequestFunctionAbi(Call call)
+        {
+            var attestation = _credentials.attestation;
+            var attestationData = new Tuple<Address, FixedByte, FixedByte, FixedByte, Byte[], Tuple<string, BigInteger>>(
+                attestation.approvedSigner,
+                new FixedByte(4, attestation.identityType.Data), new FixedByte(32, attestation.issuerHash.Data), new FixedByte(32, attestation.audienceHash.Data), attestation.applicationData.Data,
+                new Tuple<string, BigInteger>(attestation.authData.redirectUrl, attestation.authData.issuedAt));
+
+            var callData = new Tuple<Address, BigInteger, Byte[], BigInteger, bool, bool, BigInteger>(call.to, call.value, 
+                call.data, call.gasLimit, call.delegateCall, call.onlyFallback, (int)call.behaviorOnError);
+            
+            return ABI.ABI.Pack(
+                "acceptImplicitRequest(address,(address,bytes4,bytes32,bytes32,bytes,(string,uint64)),(address,uint256,bytes,uint256,bool,bool,uint256))",
+                ParentAddress, attestationData, callData);
+        }
+
+        private string GenerateImplicitRequestMagic(Address address, Attestation attestation)
+        {
+            return SequenceCoder.KeccakHash(
+                ByteArrayExtensions.ConcatenateByteArrays(
+                    SequenceCoder.KeccakHash("acceptImplicitRequest".ToByteArray()),
+                    address.Value.HexStringToByteArray(20),
+                    attestation.audienceHash.Data,
+                    attestation.issuerHash.Data))
+                .ByteArrayToHexStringWithPrefix();
+        }
+        
+        private async Task<BigInteger> GetCurrentUsageLimit(Chain chain, byte[] valueUsageHash)
+        {
+            var response = await new SequenceEthClient(chain).CallContract(new object[] {
+                new CallContractData
+                {
+                    to = ExtensionsFactory.Current.Sessions,
+                    data = ABI.ABI.Pack("getLimitUsage(address,bytes32)", 
+                        ParentAddress, 
+                        new FixedByte(32, valueUsageHash))
+                }
+            });
+
+            return ABI.ABI.Decode<BigInteger>(response, "uint256");
+        }
+        
+        private byte[] GetValueUsageHash()
+        {
+            var encoder = new ParametersEncoder();
+            var encoded = encoder.EncodeParameters(
+                new Parameter[] { new Parameter("address"), new Parameter("address") }, 
+                new object[] { Address.Value, "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" }
+            );
+            
+            return SequenceCoder.KeccakHash(encoded);
+        }
+    }
+}

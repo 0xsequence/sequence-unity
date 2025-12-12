@@ -141,5 +141,10 @@ namespace Sequence.EmbeddedWallet
             var result = await _wallet.IsValidMessageSignature(chain, message, signature);
             return result.isValid;
         }
+
+        public string SignWithoutPrefixesOrHashing(byte[] message)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

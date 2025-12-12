@@ -164,6 +164,7 @@ namespace Sequence.Contracts
             };
             return toSendParams;
         }
+        
         private string GetData(string functionName, params object[] args)
         {
             string data;

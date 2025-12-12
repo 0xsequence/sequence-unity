@@ -154,7 +154,7 @@ namespace Sequence.EmbeddedWallet
             }
             
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
-            _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
+            _intentSender = new IntentSender(new HttpClient(WaaSWithAuthUrl, true), _sessionWallet, _sessionId, _waasProjectId, _waasVersion);
 
             if (authenticator != null)
             {

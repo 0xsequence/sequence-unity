@@ -88,7 +88,7 @@ namespace Sequence.EmbeddedWallet
                 throw SequenceConfig.MissingConfigError("Builder API Key");
             }
 
-            return _httpClient.SendRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
+            return _httpClient.SendPostRequest<IsValidMessageSignatureArgs, IsValidMessageSignatureReturn>(
                 "API/IsValidMessageSignature", new IsValidMessageSignatureArgs(network, _address, message, signature),
             new Dictionary<string, string>() {{"X-Access-Key", _builderApiKey}}); 
         }

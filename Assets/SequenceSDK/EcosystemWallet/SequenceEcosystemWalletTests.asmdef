@@ -1,0 +1,33 @@
+{
+    "name": "SequenceEcosystemWalletTests",
+    "rootNamespace": "Sequence.EcosystemWallet.Tests",
+    "references": [
+        "GUID:68e161619428e430bba22d7d0a9548ab",
+        "GUID:f7fd4ba36aabd1d499450c174865e70b",
+        "GUID:8cb4ab25ee18e4b4da9647cf481addbb",
+        "GUID:f78a27d6a73d94c4baf04337e0add4dc",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:a35e3a53d4439435f8b36ed2c6158cd8",
+        "GUID:403077141e1554429a890cbc129df651",
+        "GUID:b4f9c0f8f363f439b9e337f79050f189",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:94b67778c44684afdab21990eebf60aa"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll",
+        "Nethereum.ABI.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

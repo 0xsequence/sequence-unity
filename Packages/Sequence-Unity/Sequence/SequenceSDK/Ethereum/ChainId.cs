@@ -24,6 +24,11 @@ namespace Sequence
             return ChainDictionaries.ChainIdOf[chain];
         }
 
+        public static BigInteger AsBigInteger(this Chain chain)
+        {
+            return BigInteger.Parse(GetChainId(chain));
+        }
+
         public static bool IsActive(this Chain chain)
         {
             return !(chain == Chain.None || chain == Chain.AstarZKEvm || chain == Chain.TestnetAstarZKyoto ||

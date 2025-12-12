@@ -33,7 +33,7 @@ namespace Sequence.Boilerplates
 
         private EmbeddedWalletAdapter _adapter;
         
-        private SequenceLoginWindow _loginWindow;
+        private WalletSelection _walletSelection;
         private SequencePlayerProfile _playerProfile;
         private Chain _chain;
         private GameObject _loadingScreen;
@@ -45,9 +45,8 @@ namespace Sequence.Boilerplates
             SequenceWallet.OnWalletCreated += wallet =>
             {
                 ShowDefaultWindow();
-                
-                if (_loginWindow)
-                    _loginWindow.gameObject.SetActive(false);
+                BoilerplateFactory.CloseWindow<EmbeddedWalletLoginWindow>();
+                _walletSelection?.gameObject.SetActive(false);
                 
                 wallet.OnDropSessionComplete += s =>
                 {
@@ -56,9 +55,16 @@ namespace Sequence.Boilerplates
                         if (_playerProfile)
                             _playerProfile.gameObject.SetActive(false);
                         
-                        TryRecoverSessionToOpenLoginWindow();
+                        OpenWalletSelection();
                     }
                 };
+            };
+
+            EcosystemWallet.SequenceWallet.Disconnected += OpenWalletSelection;
+            EcosystemWallet.SequenceWallet.WalletCreated += wallet =>
+            {
+                BoilerplateFactory.CloseWindow<EcosystemWalletLoginWindow>();
+                BoilerplateFactory.OpenEcosystemWalletHome(transform, wallet);
             };
             
             _adapter = EmbeddedWalletAdapter.GetInstance();
@@ -67,7 +73,14 @@ namespace Sequence.Boilerplates
         private void Start()
         {
             SetupScene();
-            TryRecoverSessionToOpenLoginWindow();
+            Application.targetFrameRate = 60;
+            
+            _featureSelection.SetActive(false);
+            var ecosystemWallet = EcosystemWallet.SequenceWallet.RecoverFromStorage();
+            if (ecosystemWallet == null)
+                TryRecoverSessionToOpenLoginWindow();
+            else
+                BoilerplateFactory.OpenEcosystemWalletHome(transform, ecosystemWallet);
         }
 
 #if UNITY_EDITOR
@@ -110,7 +123,12 @@ namespace Sequence.Boilerplates
         private void OnFailedToRecoverSession(string error)
         {
             Debug.Log($"There's no session to recover from storage. Reason: {error}");
-            _loginWindow = BoilerplateFactory.OpenSequenceLoginWindow(transform);
+            OpenWalletSelection();
+        }
+
+        private void OpenWalletSelection()
+        {
+            _walletSelection = BoilerplateFactory.OpenWalletSelection(transform);
         }
 
         private void SetupScene()

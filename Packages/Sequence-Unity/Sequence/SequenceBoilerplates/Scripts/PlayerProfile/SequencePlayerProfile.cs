@@ -95,7 +95,7 @@ namespace Sequence.Boilerplates.PlayerProfile
         public void OpenLoginWindowForFederation()
         {
             gameObject.SetActive(false);
-            BoilerplateFactory.OpenSequenceLoginWindow(transform.parent, 
+            BoilerplateFactory.OpenEmbeddedWalletLogin(transform.parent, 
                 () => gameObject.SetActive(true));
         }
 

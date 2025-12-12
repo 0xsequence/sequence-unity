@@ -31,7 +31,7 @@ namespace Sequence.EmbeddedWallet
             try
             {
                 var client = new HttpClient(ApiUrl);
-                var response = await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
+                var response = await client.SendPostRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
                     "GetLinkedWallets", new LinkedWalletsRequestData
                     {
                         signatureChainId = _chain.GetChainId(),
@@ -58,7 +58,7 @@ namespace Sequence.EmbeddedWallet
             try
             {
                 var client = new HttpClient(ApiUrl);
-                await client.SendRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
+                await client.SendPostRequest<LinkedWalletsRequestData, LinkedWalletsResponseData>(
                     "RemoveLinkedWallet", new LinkedWalletsRequestData
                     {
                         signatureChainId = _chain.GetChainId(),
@@ -83,7 +83,7 @@ namespace Sequence.EmbeddedWallet
             {
                 var client = new HttpClient(NonceGenerationLink);
                 NonceResponseData nonceResponse =
-                    await client.SendRequest<NonceRequestData, NonceResponseData>("",
+                    await client.SendPostRequest<NonceRequestData, NonceResponseData>("",
                         new NonceRequestData(_wallet.GetWalletAddress()),
                         new Dictionary<string, string>()
                         {

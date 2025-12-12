@@ -67,6 +67,8 @@ namespace Sequence
         TestnetSandbox = 6252,
         TestnetArc = 5042002,
         
+        LocalChain = 31337, // A chain running locally on your system
+
         TestnetXaiSepolia = -1, // Xai Sepolia's testnet's chain ID is too large to fit inside an int
         
         // Null

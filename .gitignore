@@ -12,14 +12,14 @@
 
 # Plugins
 
-/[Aa]ssets/TextMesh Pro/
-/[Aa]ssets/TextMesh Pro.meta
+# /[Aa]ssets/TextMesh Pro/
+# /[Aa]ssets/TextMesh Pro.meta
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/
 
 # Package Manager formatting
-/[Aa]ssets/TextMesh Pro
+# /[Aa]ssets/TextMesh Pro
 /[Aa]ssets/Resources
 /[Aa]ssets/Resources.meta
 /[Aa]ssets/Samples
@@ -122,5 +122,4 @@ Assets/SequenceSDK/WaaS/Tests/Resources/
 # Foundry
 
 /testchain/lib
-/testchain/artifacts/*
 

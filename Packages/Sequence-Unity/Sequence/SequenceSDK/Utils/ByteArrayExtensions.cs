@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Numerics;
 using System.Text;
 using UnityEngine;
 
@@ -30,6 +32,28 @@ namespace Sequence.Utils
                 SequenceLog.Error($"Error converting byte array to hexadecimal string: {ex.Message}");
                 return string.Empty;
             }
+        }
+        
+        public static BigInteger ToBigInteger(this byte[] data)
+        {
+            if (data == null || data.Length == 0)
+                return BigInteger.Zero;
+            
+            var unsignedLittleEndian = ConcatenateByteArrays(data.Reverse().ToArray(), new byte[] { 0x00 });
+            return new BigInteger(unsignedLittleEndian);
+        }
+        
+        public static int ToInteger(this byte[] data)
+        {
+            if (data == null || data.Length == 0)
+                return 0;
+
+            if (data.Length > 4)
+                throw new ArgumentOutOfRangeException(nameof(data), "Too many bytes to fit into an int (max 4).");
+
+            byte[] padded = new byte[4];
+            Array.Copy(data.Reverse().ToArray(), 0, padded, 0, data.Length);
+            return BitConverter.ToInt32(padded, 0);
         }
 
         public static bool HasPrefix(this byte[] b, byte[] prefix) {
@@ -76,6 +100,92 @@ namespace Sequence.Utils
                 Buffer.BlockCopy(value, 0, result, i, value.Length);
             }
 
+            return result;
+        }
+        
+        public static byte[] PadLeft(this byte[] input, int totalSize)
+        {
+            if (input.Length > totalSize)
+            {
+                return input;
+            }
+
+            byte[] result = new byte[totalSize];
+            Buffer.BlockCopy(input, 0, result, totalSize - input.Length, input.Length);
+            return result;
+        }
+        
+        public static byte[] PadRight(this byte[] input, int totalSize)
+        {
+            if (input.Length > totalSize)
+                throw new ArgumentException("Input is larger than total size");
+
+            byte[] result = new byte[totalSize];
+            Buffer.BlockCopy(input, 0, result, 0, input.Length);
+            return result;
+        }
+
+        public static byte[] ByteArrayFromNumber(this BigInteger value, int? size = null)
+        {
+            if (value < 0)
+                throw new ArgumentException("Value must be non-negative");
+
+            byte[] rawBytes = value.ToByteArray(isUnsigned: true, isBigEndian: true);
+
+            if (size.HasValue)
+            {
+                if (rawBytes.Length > size.Value)
+                    throw new ArgumentException("Value is too large to fit in the specified size");
+
+                return PadLeft(rawBytes, size.Value);
+            }
+
+            return rawBytes;
+        }
+
+        public static int MinBytesFor(this int value)
+        {
+            return MinBytesFor(new BigInteger(value));
+        }
+        
+        public static int MinBytesFor(this BigInteger value)
+        {
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "Value must be non-negative.");
+
+            var hex = value.BigIntegerToHexString().WithoutHexPrefix();
+            return (int)Math.Ceiling(hex.Length / 2.0);
+        }
+        
+        public static byte[] ByteArrayFromNumber(this int value, int size)
+        {
+            if (size < 1 || size > 4)
+                throw new ArgumentOutOfRangeException(nameof(size), "Size must be between 1 and 4 bytes for an int.");
+
+            byte[] bytes = BitConverter.GetBytes(value); 
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            return bytes[^size..]; 
+        }
+        
+        public static byte[] ByteArrayFromNumber(this int value)
+        {
+            byte[] bytes = BitConverter.GetBytes(value); 
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            return bytes; 
+        }
+
+        public static byte[] Slice(this byte[] source, int start, int length)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (start < 0 || length < 0 || start + length > source.Length)
+                throw new ArgumentOutOfRangeException("Invalid slice range.");
+
+            byte[] result = new byte[length];
+            Buffer.BlockCopy(source, start, result, 0, length);
             return result;
         }
     }

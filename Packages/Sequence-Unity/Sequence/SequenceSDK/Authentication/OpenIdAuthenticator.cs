@@ -46,7 +46,7 @@ namespace Sequence.Authentication
         {
             SequenceConfig config = SequenceConfig.GetConfig(SequenceService.None);
 
-            _urlScheme = config.UrlScheme;
+            _urlScheme = string.IsNullOrEmpty(config.UrlScheme) ? UrlSchemeFactory.CreateFromAppIdentifier() : config.UrlScheme;
             SetClientIds(config);
             
 #if UNITY_EDITOR

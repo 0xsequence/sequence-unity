@@ -23,14 +23,23 @@ namespace Sequence.Utils.SecureStorage
         public void StoreString(string key, string value)
         {
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-            byte[] data = Util.EncryptData(value, Encoding.UTF8.GetBytes(key));
-
-            using (FileStream fs = new FileStream(DataFile, FileMode.OpenOrCreate, FileAccess.Write))
+            try
             {
-                using (BinaryWriter bw = new BinaryWriter(fs))
+                CheckFileExists();
+                
+                byte[] data = Util.EncryptData(value, Encoding.UTF8.GetBytes(key));
+
+                using (FileStream fs = new FileStream(DataFile, FileMode.OpenOrCreate, FileAccess.Write))
                 {
-                    bw.Write(data);
+                    using (BinaryWriter bw = new BinaryWriter(fs))
+                    {
+                        bw.Write(data);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
 #endif
         }
@@ -41,19 +50,35 @@ namespace Sequence.Utils.SecureStorage
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 
-            byte[] data = null;
-            using (FileStream fs = new FileStream(DataFile, FileMode.Open, FileAccess.Read))
+            try
             {
-                using (BinaryReader br = new BinaryReader(fs))
+                CheckFileExists();
+                
+                byte[] data = null;
+                using (FileStream fs = new FileStream(DataFile, FileMode.Open, FileAccess.Read))
                 {
-                    data = br.ReadBytes((int)br.BaseStream.Length);
+                    using (BinaryReader br = new BinaryReader(fs))
+                    {
+                        data = br.ReadBytes((int)br.BaseStream.Length);
+                    }
                 }
-            }
 
-            value = Util.DecryptData(data, Encoding.UTF8.GetBytes(key));
+                value = Util.DecryptData(data, Encoding.UTF8.GetBytes(key));
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return null;
+            }
 #endif
 
             return value;
+        }
+
+        private void CheckFileExists()
+        {
+            if (!File.Exists(DataFile))
+                File.Create(DataFile).Dispose();
         }
     }
 }

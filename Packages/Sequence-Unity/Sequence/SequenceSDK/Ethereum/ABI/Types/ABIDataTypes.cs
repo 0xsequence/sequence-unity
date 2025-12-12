@@ -15,6 +15,48 @@ namespace Sequence.ABI
         public bool IsFixedSize { get; } = true;
         public bool IsReadOnly { get; }
         private static readonly string ConstructorExceptionMessage = "ABIByte type length should be [0,32]";
+        
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is FixedByte))
+            {
+                return false;
+            }
+            
+            FixedByte other = (FixedByte)obj;
+            if (Data != null)
+            {
+                if (other.Data == null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (other.Data != null)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            int dataLength = Data.Length;
+            if (dataLength != other.Data.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < dataLength; i++)
+            {
+                if (!Data[i].Equals(other.Data[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public FixedByte(int count, string str)
         {
