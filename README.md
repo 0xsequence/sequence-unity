@@ -1,22 +1,34 @@
+![header](https://github.com/user-attachments/assets/170d9147-3f2c-4b50-bccb-0e1d5a4b2aad)
+
 # Sequence Unity SDK
+
 The Sequence Unity Embedded Wallet SDK provides full Sequence Embedded Wallet and Indexer integration for your Unity Games, integrated with our own purpose-built for Unity SequenceEthereum library.
 
-## Documentation
-https://docs.sequence.xyz/sdk/unity/overview
+[![Docs](https://img.shields.io/badge/Documentation-7334f8)](https://docs.sequence.xyz/sdk/unity/overview)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap%20your%20Game-7334f8)](https://docs.sequence.xyz/sdk/unity/bootstrap)
+[![Build a Game](https://img.shields.io/badge/How%20to%20Build%20a%20Game-7334f8)](https://docs.sequence.xyz/guides/jelly-forest-unity-guide/)
 
-## Building a game guide
-https://docs.sequence.xyz/guides/jelly-forest-unity-guide/
+## Demos
 
-## Requirements
-Unity 2021.3.6f1 or later
+Check out our public demos on your device!
+
+[![iOS](https://img.shields.io/badge/iOS-7334f8)](https://testflight.apple.com/join/fgHtPdMb)
+[![Android](https://img.shields.io/badge/Android-7334f8)](https://play.google.com/store/apps/details?id=app.sequence.unitysdkdemo)
+[![WebGL](https://img.shields.io/badge/WebGL-7334f8)](https://sequence-unity.pages.dev/)
 
 ## Supported Platforms
 
-- Android
-- iOS
+![Unity](https://img.shields.io/badge/Unity%20Engine%202021.3.6f1%20or%20later-6c5d8c)
+![Mac](https://img.shields.io/badge/Mac-6c5d8c)
+![Windows](https://img.shields.io/badge/Windows-6c5d8c)
+![Android](https://img.shields.io/badge/Android-6c5d8c)
+![iOS](https://img.shields.io/badge/iOS-6c5d8c)
+![WebGL+WebGPU](https://img.shields.io/badge/WebGL-6c5d8c)
+
+## Platform Details
+
 - PC standalone -> (Mono builds only when using OpenIdAuthentication -> the platform specific setup requires system commands that don't work on IL2CPP -> see OpenIdAuthentication.PlatformSpecificSetup)
 - Mac standalone -> (Mono builds only when using OpenIdAuthentication -> in our testing MacOS doesn't pick up custom URL schemes automatically unless you run some system commands first; these system commands that don't work on IL2CPP -> see OpenIdAuthentication.PlatformSpecificSetup)
-- WebGL + WebGPU
 
 ## Contributing
 
@@ -90,10 +102,6 @@ If you don't define any feature in the url, all boilerplates are enabled.
 
 The SDK is split into a number of assemblies with different purposes. Each assembly also has a Test assembly or assembly reference containing tests - this way, our tests aren't included in builds.
 
-### SequenceFrontend
-
-This contains front-end and example code. Front-end/UI code is considered "example" code for the purposes of this SDK, though it may still be used in production applications.
-
 ### SequenceAuthentication
 
 This contains code related to authentication via Email + OTP, [OIDC](https://openid.net/developers/how-connect-works/), or other means.
@@ -102,9 +110,13 @@ This contains code related to authentication via Email + OTP, [OIDC](https://ope
 
 Defines the `SequenceConfig` scriptable object and scripts needed to read it. Configuration is done in conjunction with the [Sequence Builder](https://sequence.build/).
 
+### SequenceEcosystemWallet
+
+The integration with our [Ecosystem Wallet](https://docs.sequence.xyz/solutions/wallets/developers/ecosystem-wallet/unity-quickstart). Used to provide users with a seemless and invisible Web3 wallet experience.
+
 ### SequenceEmbeddedWallet
 
-The integration with our [WaaS/Embedded Wallet API](https://docs.sequence.xyz/solutions/wallets/embedded-wallet/overview). Used to provide users with a seemless and invisible Web3 wallet experience.
+The integration with our [Embedded Wallet](https://docs.sequence.xyz/solutions/wallets/developers/embedded-wallet/overview). Used to provide users with a seemless and invisible Web3 wallet experience.
 
 ### SequenceEthereum
 
@@ -141,32 +153,5 @@ EthWallet implements a standard EOA wallet. A wallet keeps track of its own priv
 
 ### Transaction
 A transaction, as implemented in EthTransaction, contains all the data and parameters for an EVM transaction. The object is used for initiating its RLP encoding (transactions must be signed and RLP encoded when submitted). Note that all transactions are encoded with a chain Id included to protect against replay attacks, see [EIP-155](https://eips.ethereum.org/EIPS/eip-155).
-
-### Contract
-A contract is responsible for creating transactions (for method calls) and messages (for queries) agaisnt it. These transactions are later signed by the wallet + signer and submitted (along with query messages) using a client.
-
-## Sample UI
-A sample UI scene can be found under `Assets > Sequence > SequenceFrontend > Scenes > Demo.unity`
-This scene contains sample Sequence UI (with integration) for login flow and wallet view, settings, and transaction flow.
-
-### How It Works
-The sample Sequence UI is comprised of a few important components.
-
-#### UIPage
-A `UIPage` is the base implementation of a "page" in the sample UI. Example pages: `LoginPage`, `TokenInfoPage`
-It is responsible for opening/closing the page and managing the chosen `ITween`.
-
-#### ITween
-An `ITween` is an interface for an animation (in/out) that can be applied to a `RectTransform` (a required component of a `UIPage`).
-
-#### UIPanel
-Inherriting from `UIPage`, a `UIPanel` is the base implementation of a "panel" in the sample UI. Example panels: `LoginPanel`, `WalletPanel`
-In addition to `UIPage` responsibilities, UIPanels maintain a stack of UIPages and `object[]` (open arguments) and are responsible for managing any required event listeners and UI transitions between their child pages (according to Scene inspector heirarchy), including handling the "Back" button.
-
-#### SequenceSampleUI
-`SequenceSampleUI` can be thought of as the "manager" of the sample UI. It holds a reference to all the UIPanels and is responsible for opening them as needed, including at `Start()`. If you are integrating all or part of the provided sample UI into your project, you may find it more practical to replace `SequenceSampleUI` with your own UI "manager".
-
-### Customizations + Color Schemes
-As a Made-With-Unity UI, the sample UI is cross platform and easily customizable.
 To make customization even easier, the sample UI comes equipped with a Color Scheme Manager. This monobehaviour script is attached to the `SequenceCanvas` gameObject. By attaching a `ColorScheme` scriptable object and clicking the `Apply` button in the Inspector, the `ColorSchemeManager` will quickly apply the desired color scheme, allowing for faster UI iterations.
 To create a `ColorScheme` scriptable object, go to `Assets > Create > Sequence > Color Scheme`. From here, you can give the color scheme a name, move it to the desired directory, and choose your colors.
