@@ -118,6 +118,8 @@ namespace Sequence.Utils
             var request = UnityWebRequest.Get(url);
             request.method = UnityWebRequest.kHttpVerbGET;
             SetHeaders(request, headers);
+            
+            SequenceLog.Info($">> {url}");
 
             try
             {

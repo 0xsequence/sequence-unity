@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Sequence.EcosystemWallet.Primitives;
 using Sequence.EcosystemWallet.Primitives.Common;
 using Sequence.Utils;
+using UnityEngine;
 
 namespace Sequence.EcosystemWallet.UnitTests
 {
@@ -16,6 +17,17 @@ namespace Sequence.EcosystemWallet.UnitTests
         public void Disconnect()
         {
             SequenceWallet.RecoverFromStorage().Disconnect();
+        }
+        
+        [Test]
+        public async Task TestGetEcosystemConfig()
+        {
+            var config = await new SequenceConnect().GetEcosystemConfig();
+            
+            Debug.Log($"Ecosystem Name: {config.name}");
+            
+            foreach (var provider in config.enabledProviders)
+                Debug.Log($"Provider: {provider}");
         }
         
         [Test]

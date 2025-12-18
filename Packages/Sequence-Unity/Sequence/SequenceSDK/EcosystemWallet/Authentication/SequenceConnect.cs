@@ -1,10 +1,19 @@
 using System.Threading.Tasks;
+using Sequence.Config;
+using Sequence.Utils;
 
 namespace Sequence.EcosystemWallet
 {
     public class SequenceConnect : IConnect
     {
         private readonly EcosystemClient _client = new();
+
+        public async Task<EcosystemConfig> GetEcosystemConfig()
+        {
+            var walletUrl= SequenceConfig.GetConfig().WalletAppUrl;
+            var client = new HttpClient(walletUrl);
+            return await client.SendGetRequest<EcosystemConfig>("api/wallet-configuration");
+        }
         
         public async Task<IWallet> SignInWithEmail(string email, IPermissions permissions)
         {
