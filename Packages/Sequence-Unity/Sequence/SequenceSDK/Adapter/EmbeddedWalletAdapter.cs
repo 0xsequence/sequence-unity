@@ -14,11 +14,14 @@ namespace Sequence.Adapter
 {
     public class EmbeddedWalletAdapter : IEmbeddedWalletAdapter, IDisposable
     {
+        public delegate void OnWalletUpdatedHandler(IWallet wallet);
+        
         private static EmbeddedWalletAdapter _instance;
         
         public IWallet Wallet { get; private set; }
 
         public Address WalletAddress { get; private set; }
+        public event OnWalletUpdatedHandler OnWalletUpdated;
 
         private SequenceLogin _loginHandler;
         private SequenceLogin LoginHandler
@@ -327,6 +330,8 @@ namespace Sequence.Adapter
             
             _checkout = new Checkout(wallet, _chain);
             LoginHandler.SetConnectedWalletAddress(wallet.GetWalletAddress());
+            
+            OnWalletUpdated?.Invoke(wallet);
         }
         
         private void EnsureWalletReferenceExists()
