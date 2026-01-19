@@ -48,13 +48,13 @@ function App() {
     return '';
   }, []);
 
-  const [messageToSend, setMessageToSend] = useState<{ functionName: string; value: string; } | undefined>(undefined);
+  const [messageToSend, setMessageToSend] = useState<{ gameObject: string; functionName: string; value: string; } | undefined>(undefined);
 
   useEffect(() => {
     if (messageToSend) {
       const message = messageToSend;
       setMessageToSend(undefined);
-      sendMessage("SequenceNativeReceiver", message.functionName, message.value);
+      sendMessage(message.gameObject, message.functionName, message.value);
     }
   }, [messageToSend]);
 
@@ -83,6 +83,7 @@ function App() {
 
     const handleGoogleLogin = async (tokenResponse: CredentialResponse) => {
         setMessageToSend({
+            gameObject: "WebBrowserMessageReceiver",
             functionName: "OnGoogleSignIn",
             value: tokenResponse.credential!,
         });
@@ -136,6 +137,7 @@ function App() {
         console.log(data);
 
         setMessageToSend({
+          gameObject: "SequenceNativeReceiver",
           functionName: "HandleResponse",
           value: JSON.stringify(data)
         });
