@@ -459,19 +459,20 @@ namespace Sequence.EmbeddedWallet
             }
             catch (Exception e)
             {
-                if (e.Message.Contains(EmailInUseError))
+                var emailInUse = e.Message.Contains(EmailInUseError);
+                if (emailInUse)
                 {
                     List<LoginMethod> associatedLoginMethods = ParseLoginMethods(e.Message);
                     OnLoginFailed?.Invoke("Error registering session: " + e.Message, method, email, associatedLoginMethods);
+                    _failedLoginIntent = loginIntent;
+                    _failedLoginMethod = method;
+                    _failedLoginEmail = email;
                 }
                 else
                 {
                     OnLoginFailed?.Invoke("Error registering session: " + e.Message, method, email);
                 }
                 _isLoggingIn = false;
-                _failedLoginIntent = loginIntent;
-                _failedLoginMethod = method;
-                _failedLoginEmail = email;
                 return;
             }
 
@@ -632,6 +633,9 @@ namespace Sequence.EmbeddedWallet
 
         private async Task ForceCreateWaaSAccount()
         {
+            if (string.IsNullOrEmpty(_failedLoginEmail))
+                throw new Exception("Failed to force create account.");
+            
             _failedLoginIntent.forceCreateAccount = true;
             
             await ConnectToWaaS(_failedLoginIntent, _failedLoginMethod, _failedLoginEmail);
