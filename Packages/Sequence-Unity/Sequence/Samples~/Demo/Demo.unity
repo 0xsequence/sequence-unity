@@ -402,6 +402,7 @@ MonoBehaviour:
   _rewardsIcon: {fileID: 21300000, guid: 82879c3ba7bc442e4ba005c2796d26a3, type: 3}
   _inventoryIcon: {fileID: 21300000, guid: f0e436623e1e543a8beec46d5fad499e, type: 3}
   _shopIcon: {fileID: 21300000, guid: 9c26d7e82bb9145d5860621299fbfc83, type: 3}
+  _marketplaceIcon: {fileID: 21300000, guid: 22f2048fb78f84a1384f37e3561ccfb3, type: 3}
 --- !u!1 &220330147
 GameObject:
   m_ObjectHideFlags: 0

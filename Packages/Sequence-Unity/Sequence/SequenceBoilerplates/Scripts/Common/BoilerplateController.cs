@@ -29,6 +29,7 @@ namespace Sequence.Boilerplates
         [SerializeField] private Sprite _rewardsIcon;
         [SerializeField] private Sprite _inventoryIcon;
         [SerializeField] private Sprite _shopIcon;
+        [SerializeField] private Sprite _marketplaceIcon;
         
         private EmbeddedWalletAdapter _adapter;
         
@@ -189,9 +190,6 @@ namespace Sequence.Boilerplates
                 ShowSecondarySaleButton();
             }
             
-            if (_config.checkout)
-                _buttonPool.GetObject().Show(_shopIcon, "Checkout Panel", OpenCheckoutPanel);
-            
             _titleText.SetActive(true);
         }
 
@@ -217,7 +215,7 @@ namespace Sequence.Boilerplates
 
         private void ShowSecondarySaleButton()
         {
-            _buttonPool.GetObject().Show(_shopIcon, "Marketplace", OpenViewMarketplaceListingsPage);
+            _buttonPool.GetObject().Show(_marketplaceIcon, "Marketplace", OpenViewMarketplaceListingsPage);
         }
         
         private void ShowPrimarySaleButton(PrimarySaleConfig sale)
