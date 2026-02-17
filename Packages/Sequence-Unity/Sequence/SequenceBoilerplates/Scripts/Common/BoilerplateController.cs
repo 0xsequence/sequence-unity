@@ -18,19 +18,18 @@ namespace Sequence.Boilerplates
         [SerializeField] private BoilerplateConfigData _config;
         
         [Header("Components")]
+        [SerializeField] private GameObject _titleText;
         [SerializeField] private GameObject _featureSelection;
         [SerializeField] private GenericObjectPool<FeatureSelectionButton> _buttonPool;
         [SerializeField] private GameObject _loadingScreenPrefab;
         
-        [Header("Texts")]
-        [SerializeField] private string _playerProfileDescription = "Send & Receive ETH. Manage linked wallets & Sign Out.";
-        [SerializeField] private string _signMessageDescription = "Sign messages with your wallet.";
-        [SerializeField] private string _dailyRewardsDescription = "Get rewarded for consecutive days and claim one token every day!";
-        [SerializeField] private string _inventoryDescription = "View all items you own for a specified contract address.";
-        [SerializeField] private string _saleDescription = "Buy ERC1155 tokens via a Primary Sale contract.";
-        [SerializeField] private string _marketplaceDescription = "Browse and interact with listings on a Peer-to-Peer, Secondary Sales marketplace.";
-        [SerializeField] private string _checkoutDescription = "Buy an ERC1155 token via a Primary Sales contract using the Checkout Panel - pay with crypto or fiat.";
-
+        [Header("Icons")]
+        [SerializeField] private Sprite _profileIcon;
+        [SerializeField] private Sprite _signIcon;
+        [SerializeField] private Sprite _rewardsIcon;
+        [SerializeField] private Sprite _inventoryIcon;
+        [SerializeField] private Sprite _shopIcon;
+        
         private EmbeddedWalletAdapter _adapter;
         
         private WalletSelection _walletSelection;
@@ -191,37 +190,39 @@ namespace Sequence.Boilerplates
             }
             
             if (_config.checkout)
-                _buttonPool.GetObject().Show("Checkout Panel", _checkoutDescription, OpenCheckoutPanel);
+                _buttonPool.GetObject().Show(_shopIcon, "Checkout Panel", OpenCheckoutPanel);
+            
+            _titleText.SetActive(true);
         }
 
         private void ShowPlayerProfileButton()
         {
-            _buttonPool.GetObject().Show("Player Profile", _playerProfileDescription, OpenPlayerProfilePanel);
+            _buttonPool.GetObject().Show(_profileIcon, "Wallet Profile", OpenPlayerProfilePanel);
         }
         
         private void ShowSignMessageButton()
         {
-            _buttonPool.GetObject().Show("Sign Message", _signMessageDescription, OpenSignMessage);
+            _buttonPool.GetObject().Show(_signIcon, "Sign Messages", OpenSignMessage);
         }
         
         private void ShowDailyRewardsButton()
         {
-            _buttonPool.GetObject().Show("Daily Rewards", _dailyRewardsDescription, OpenDailyRewardsPanel);
+            _buttonPool.GetObject().Show(_rewardsIcon, "Daily Rewards", OpenDailyRewardsPanel);
         }
         
         private void ShowInventoryButton()
         {
-            _buttonPool.GetObject().Show("Inventory", _inventoryDescription, OpenInventoryPanel);
+            _buttonPool.GetObject().Show(_inventoryIcon, "Inventory", OpenInventoryPanel);
         }
 
         private void ShowSecondarySaleButton()
         {
-            _buttonPool.GetObject().Show("Secondary Sales Marketplace", _marketplaceDescription, OpenViewMarketplaceListingsPage);
+            _buttonPool.GetObject().Show(_shopIcon, "Marketplace", OpenViewMarketplaceListingsPage);
         }
         
         private void ShowPrimarySaleButton(PrimarySaleConfig sale)
         {
-            _buttonPool.GetObject().Show($"{sale.name} Shop", _saleDescription, () =>
+            _buttonPool.GetObject().Show(_shopIcon, $"{sale.name} Shop", () =>
             {
                 OpenInGameShopPanel(sale);
             });
