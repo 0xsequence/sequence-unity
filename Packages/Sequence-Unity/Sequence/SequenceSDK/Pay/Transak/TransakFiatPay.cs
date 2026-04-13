@@ -32,7 +32,7 @@ namespace Sequence.Pay.Transak
 
         public async Task<string> GetOnRampLink()
         {
-            return _onRamp.GetTransakLink();
+            return await _onRamp.GetTransakLink();
         }
 
         public Task<string> GetNftCheckoutLink(CollectibleOrder order, ulong amount, NFTType nftType = NFTType.ERC721,
