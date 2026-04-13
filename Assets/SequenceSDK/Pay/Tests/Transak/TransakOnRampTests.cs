@@ -23,10 +23,10 @@ namespace Sequence.Pay.Tests.Transak
         }
 
         [Test]
-        public void TestGetTransakLink()
+        public async Task TestGetTransakLink()
         {
             TransakOnRamp onRamp = new TransakOnRamp("0xc683a014955b75F5ECF991d4502427c8fa1Aa249");
-            string transakOnRampLink = onRamp.GetTransakLink();
+            string transakOnRampLink = await onRamp.GetTransakLink();
             Assert.IsNotNull(transakOnRampLink);
         }
     }

@@ -1,17 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sequence.Config;
 using Sequence.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
+using HttpClient = Sequence.Utils.HttpClient;
 
 namespace Sequence.Pay.Transak
 {
     public class TransakOnRamp
     {
+        private readonly Dictionary<string, string> _headers = new()
+        {
+            { "X-Access-Key", SequenceConfig.GetConfig().BuilderAPIKey }
+        };
+        
         private Address _walletAddress;
 
         public TransakOnRamp(Address walletAddress)
@@ -78,16 +86,45 @@ namespace Sequence.Pay.Transak
             }
         }
         
-        public string GetTransakLink(string fiatCurrency = "USD", string defaultFiatAmount = "50", string defaultCryptoCurrency = AddFundsSettings.DefaultCryptoCurrency, string networks = AddFundsSettings.DefaultNetworks, bool disableWalletAddressForm = true)
+        public async Task<string> GetTransakLink(string fiatCurrency = "USD", string defaultFiatAmount = "50", string defaultCryptoCurrency = AddFundsSettings.DefaultCryptoCurrency, string networks = AddFundsSettings.DefaultNetworks, bool disableWalletAddressForm = true)
         {
             AddFundsSettings addFundsSettings = new AddFundsSettings(_walletAddress, fiatCurrency, defaultFiatAmount, defaultCryptoCurrency, networks);
             OnOffRampQueryParameters queryParameters = new OnOffRampQueryParameters(_walletAddress, addFundsSettings, disableWalletAddressForm);
-            return $"https://global.transak.com?{queryParameters.AsQueryParameters()}";
+            
+            return await GetTransakWidgetUrl(queryParameters);
         }
         
-        public void OpenTransakLink(string fiatCurrency = "USD", string defaultFiatAmount = "50", string defaultCryptoCurrency = AddFundsSettings.DefaultCryptoCurrency, string networks = AddFundsSettings.DefaultNetworks, bool disableWalletAddressForm = true)
+        public async Task OpenTransakLink(string fiatCurrency = "USD", string defaultFiatAmount = "50", string defaultCryptoCurrency = AddFundsSettings.DefaultCryptoCurrency, string networks = AddFundsSettings.DefaultNetworks, bool disableWalletAddressForm = true)
         {
-            Application.OpenURL(GetTransakLink(fiatCurrency, defaultFiatAmount, defaultCryptoCurrency, networks, disableWalletAddressForm));
+            var url = await GetTransakLink(fiatCurrency, defaultFiatAmount, defaultCryptoCurrency, networks,
+                disableWalletAddressForm);
+            
+            Application.OpenURL(url);
+        }
+
+        private async Task<string> GetTransakWidgetUrl(OnOffRampQueryParameters @params)
+        {
+            const string path = "rpc/API/TransakGetWidgetURL";
+            
+#if SEQUENCE_DEV_STACK || SEQUENCE_DEV
+            const string baseUrl = "https://dev-api.sequence.app";
+#else
+            const string baseUrl = "https://api.sequence.app";
+#endif
+
+            var args = new Dictionary<string, object>
+            {
+                { "params", @params }
+            };
+
+            var client = new HttpClient(baseUrl);
+            
+            var response = await client.SendPostRequest<
+                Dictionary<string, object>, 
+                Dictionary<string, string>
+            >(path, args, _headers);
+            
+            return response.TryGetValue("url", out var url) ?  url : string.Empty;
         }
     }
 }
