@@ -41,6 +41,28 @@ namespace Sequence.EmbeddedWallet
 
         private static SequenceLogin _instance;
 
+        // Empty for the default (singleton) instance. Isolated instances persist their session under their own key
+        // and don't raise the static SequenceWallet events, so they can run alongside the default instance.
+        private readonly string _storageNamespace = "";
+        private LoginMethod _lastLoginMethod = LoginMethod.None;
+
+        /// <summary>
+        /// True for instances created with <see cref="CreateIsolatedInstance"/>.
+        /// </summary>
+        public bool IsIsolated => !string.IsNullOrEmpty(_storageNamespace);
+
+        /// <summary>
+        /// Raised when this instance creates or restores a wallet session. Raised for both default and isolated
+        /// instances. The default instance also raises <see cref="SequenceWallet.OnWalletCreated"/>.
+        /// </summary>
+        public event Action<SequenceWallet> OnSessionWalletCreated;
+
+        /// <summary>
+        /// Raised when this instance fails to restore a stored session. The default instance also raises
+        /// <see cref="SequenceWallet.OnFailedToRecoverSession"/>.
+        /// </summary>
+        public event Action<string> OnSessionRecoveryFailed;
+
         private string _verifierToReject; // Since email auth is two separate requests, an invalid signature error may go unnoticed. So, we cache the verifier used in an initiateAuth attempt that had an invalid signature and reject the corresponding openSession attempt if it uses the same verifier.
 
         public static SequenceLogin GetInstance(IValidator validator = null, IAuthenticator authenticator = null,
@@ -89,9 +111,45 @@ namespace Sequence.EmbeddedWallet
             _connectedWalletAddress = null;
         }
 
+        /// <summary>
+        /// Create a login instance that is independent of <see cref="GetInstance"/>. Use it to hold a second wallet
+        /// session (for example, an existing email account) while the default instance keeps the current guest session.
+        /// The instance stores its session under its own namespace, does not raise the static
+        /// <see cref="SequenceWallet.OnWalletCreated"/> / <see cref="SequenceWallet.OnFailedToRecoverSession"/> events
+        /// (use <see cref="OnSessionWalletCreated"/> / <see cref="OnSessionRecoveryFailed"/>), does not federate
+        /// accounts automatically and does not touch the PlayerPrefs used for the last login method.
+        /// Call <see cref="PromoteToDefaultSession"/> to make its wallet the app's active session.
+        /// </summary>
+        /// <param name="storageNamespace">Non-empty name unique to this instance, e.g. "user".</param>
+        public static SequenceLogin CreateIsolatedInstance(string storageNamespace, IValidator validator = null,
+            IAuthenticator authenticator = null)
+        {
+            if (string.IsNullOrWhiteSpace(storageNamespace))
+            {
+                throw new ArgumentException("An isolated instance needs a non-empty storage namespace.", nameof(storageNamespace));
+            }
+
+            var login = new SequenceLogin(validator, authenticator, null, false, null, storageNamespace);
+            if (login._storeSessionWallet)
+            {
+                // The constructor only configures endpoints when session storage is enabled; GetInstance() completes
+                // the setup for the default instance the same way.
+                login.SetupAuthenticator(validator, authenticator);
+            }
+            return login;
+        }
+
         [Obsolete("Use GetInstance() instead.")]
         public SequenceLogin(IValidator validator = null, IAuthenticator authenticator = null, IWaaSConnector connector = null, bool automaticallyFederateAccountsWhenPossible = true, Address connectedWalletAddress = null)
+            : this(validator, authenticator, connector, automaticallyFederateAccountsWhenPossible, connectedWalletAddress, "")
         {
+        }
+
+        private SequenceLogin(IValidator validator, IAuthenticator authenticator, IWaaSConnector connector,
+            bool automaticallyFederateAccountsWhenPossible, Address connectedWalletAddress, string storageNamespace)
+        {
+            _storageNamespace = storageNamespace ?? "";
+
             if (connector == null)
             {
                 connector = this;
@@ -191,8 +249,8 @@ namespace Sequence.EmbeddedWallet
             
             var done = false;
             SequenceWallet wallet = null;
-            SequenceWallet.OnFailedToRecoverSession += HandleFailedToRecover;
-            SequenceWallet.OnWalletCreated += HandleRecoveredWallet;
+            OnSessionRecoveryFailed += HandleFailedToRecover;
+            OnSessionWalletCreated += HandleRecoveredWallet;
 
             TryToRestoreSession();
             SetupAuthenticator();
@@ -201,14 +259,14 @@ namespace Sequence.EmbeddedWallet
                 await Task.Yield();
 
             return (true, wallet);
-            
+
             void HandleRecoveredWallet(SequenceWallet newWallet)
             {
                 wallet = newWallet;
                 done = true;
-                
-                SequenceWallet.OnFailedToRecoverSession -= HandleFailedToRecover;
-                SequenceWallet.OnWalletCreated -= HandleRecoveredWallet;
+
+                OnSessionRecoveryFailed -= HandleFailedToRecover;
+                OnSessionWalletCreated -= HandleRecoveredWallet;
             }
 
             void HandleFailedToRecover(string error)
@@ -299,6 +357,7 @@ namespace Sequence.EmbeddedWallet
             _sessionId = IntentDataOpenSession.CreateSessionId(_sessionWallet.GetAddress());
             
             SequenceWallet wallet = new SequenceWallet(new Address(walletInfo.Item2), _sessionId, new IntentSender(new HttpClient(WaaSWithAuthUrl), walletInfo.Item1, _sessionId, _waasProjectId, _waasVersion), walletInfo.Item3);
+            wallet.AttachSession(this, walletInfo.Item1);
 
             EnsureSessionIsValid(wallet);
         }
@@ -306,8 +365,46 @@ namespace Sequence.EmbeddedWallet
         private void FailedLoginWithStoredSessionWallet(string error)
         {
             CreateWallet();
-            SequenceWallet.OnFailedToRecoverSession?.Invoke(error);
+            NotifyRecoveryFailed(error);
         }
+
+        private void NotifyWalletCreated(SequenceWallet wallet)
+        {
+            OnSessionWalletCreated?.Invoke(wallet);
+            if (!IsIsolated)
+            {
+                SequenceWallet.OnWalletCreated?.Invoke(wallet);
+            }
+        }
+
+        private void NotifyRecoveryFailed(string error)
+        {
+            OnSessionRecoveryFailed?.Invoke(error);
+            if (!IsIsolated)
+            {
+                SequenceWallet.OnFailedToRecoverSession?.Invoke(error);
+            }
+        }
+
+        private void PersistLastLoginMethod(LoginMethod method, string email)
+        {
+            _lastLoginMethod = method;
+            if (IsIsolated)
+            {
+                return;
+            }
+            PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
+            PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
+            PlayerPrefs.Save();
+        }
+
+        private static string StorageKeyFor(string storageNamespace)
+        {
+            string prefix = Application.companyName + "-" + Application.productName + "-";
+            return string.IsNullOrEmpty(storageNamespace) ? prefix + _walletKey : prefix + storageNamespace + "-" + _walletKey;
+        }
+
+        private string SessionStorageKey => StorageKeyFor(_storageNamespace);
 
         private async Task EnsureSessionIsValid(SequenceWallet wallet)
         {
@@ -324,7 +421,7 @@ namespace Sequence.EmbeddedWallet
             {
                 if (activeSessions[i].id == expectedSessionId)
                 {
-                    SequenceWallet.OnWalletCreated?.Invoke(wallet);
+                    NotifyWalletCreated(wallet);
                     return;
                 }
             }
@@ -335,7 +432,7 @@ namespace Sequence.EmbeddedWallet
         private (EOAWallet, string, string) AttemptToCreateWalletFromSecureStorage()
         {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
-            string walletInfo = secureStorage.RetrieveString(Application.companyName + "-" + Application.productName + "-" + _walletKey);
+            string walletInfo = secureStorage.RetrieveString(SessionStorageKey);
             if (string.IsNullOrEmpty(walletInfo))
             {
                 return (null, "", "");
@@ -444,9 +541,8 @@ namespace Sequence.EmbeddedWallet
                 walletAddress = registerSessionResponse.wallet;
                 OnLoginSuccess?.Invoke(sessionId, walletAddress);
                 SequenceWallet wallet = new SequenceWallet(new Address(walletAddress), sessionId, new IntentSender(new HttpClient(SequenceLogin.WaaSWithAuthUrl), _sessionWallet, sessionId, _waasProjectId, _waasVersion), email);
-                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
-                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
-                PlayerPrefs.Save();
+                wallet.AttachSession(this, _sessionWallet);
+                PersistLastLoginMethod(method, email);
                 _isLoggingIn = false;
                 wallet.OnDropSessionComplete += session =>
                 {
@@ -455,7 +551,7 @@ namespace Sequence.EmbeddedWallet
                         _connectedWalletAddress = null;
                     }
                 };
-                SequenceWallet.OnWalletCreated?.Invoke(wallet);
+                NotifyWalletCreated(wallet);
             }
             catch (Exception e)
             {
@@ -639,10 +735,8 @@ namespace Sequence.EmbeddedWallet
             _failedLoginIntent.forceCreateAccount = true;
             
             await ConnectToWaaS(_failedLoginIntent, _failedLoginMethod, _failedLoginEmail);
-            
-            PlayerPrefs.SetInt(WaaSLoginMethod, (int)_failedLoginMethod);
-            PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, _failedLoginEmail);
-            PlayerPrefs.Save();
+
+            PersistLastLoginMethod(_failedLoginMethod, _failedLoginEmail);
         }
 
         public async Task ConnectToWaaSViaPlayFab(string titleId, string sessionTicket, string email)
@@ -671,12 +765,70 @@ namespace Sequence.EmbeddedWallet
 
         internal void StoreWalletSecurely(string waasWalletAddress, string email)
         {
-            if (!_storeSessionWallet || !SecureStorageFactory.IsSupportedPlatform()) return;
+            StoreSessionSecurely(_sessionWallet, waasWalletAddress, email);
+        }
+
+        /// <summary>
+        /// Persist the given session key under this instance's storage namespace.
+        /// </summary>
+        internal void StoreSessionSecurely(EOAWallet sessionKey, string waasWalletAddress, string email)
+        {
+            if (!_storeSessionWallet || !SecureStorageFactory.IsSupportedPlatform() || sessionKey == null) return;
+            WriteSession(SessionStorageKey, sessionKey, waasWalletAddress, email);
+        }
+
+        private static void WriteSession(string storageKey, EOAWallet sessionKey, string waasWalletAddress, string email)
+        {
             ISecureStorage secureStorage = SecureStorageFactory.CreateSecureStorage();
             byte[] privateKeyBytes = new byte[32];
-            _sessionWallet.privKey.WriteToSpan(privateKeyBytes);
+            sessionKey.privKey.WriteToSpan(privateKeyBytes);
             string privateKey = privateKeyBytes.ByteArrayToHexString();
-            secureStorage.StoreString(Application.companyName + "-" + Application.productName + "-" + _walletKey, privateKey + "-" + waasWalletAddress + "-" + email);
+            secureStorage.StoreString(storageKey, privateKey + "-" + waasWalletAddress + "-" + email);
+        }
+
+        /// <summary>
+        /// Remove the session stored under this instance's namespace. The backend session is not closed; use
+        /// <see cref="SequenceWallet.DropThisSession"/> for that.
+        /// </summary>
+        public void ClearStoredSession()
+        {
+            if (!SecureStorageFactory.IsSupportedPlatform()) return;
+            SecureStorageFactory.CreateSecureStorage().StoreString(SessionStorageKey, "");
+        }
+
+        /// <summary>
+        /// Make a wallet created by this isolated instance the app's active session: it is stored under the default
+        /// session key (replacing whatever is stored there), removed from this instance's namespace, and announced via
+        /// <see cref="SequenceWallet.OnWalletCreated"/> so <c>EmbeddedWalletAdapter</c> and
+        /// <see cref="SessionManager"/> switch to it. Close the previous default session (e.g. the guest) yourself,
+        /// after any transfers from it have been confirmed.
+        /// </summary>
+        public void PromoteToDefaultSession(SequenceWallet wallet)
+        {
+            if (!IsIsolated)
+            {
+                throw new InvalidOperationException("Only isolated instances can promote a session.");
+            }
+            if (wallet == null)
+            {
+                throw new ArgumentNullException(nameof(wallet));
+            }
+            if (!ReferenceEquals(wallet.Owner, this) || wallet.SessionKey == null)
+            {
+                throw new ArgumentException("The wallet was not created by this login instance.", nameof(wallet));
+            }
+
+            SequenceLogin defaultLogin = _instance ?? GetInstance();
+            if (_storeSessionWallet && SecureStorageFactory.IsSupportedPlatform())
+            {
+                WriteSession(StorageKeyFor(""), wallet.SessionKey, wallet.GetWalletAddress(), wallet.Email);
+                ClearStoredSession();
+            }
+
+            defaultLogin.RemoveConnectedWalletAddress();
+            defaultLogin.PersistLastLoginMethod(_lastLoginMethod, wallet.Email);
+            wallet.AttachSession(defaultLogin, wallet.SessionKey);
+            SequenceWallet.OnWalletCreated?.Invoke(wallet);
         }
 
         public async Task FederateAccount(IntentDataFederateAccount federateAccount, LoginMethod method, string email)
@@ -692,9 +844,7 @@ namespace Sequence.EmbeddedWallet
                     throw new Exception($"Email received from WaaS server doesn't match, received {responseEmail}, sent {email}");
                 }
                 
-                PlayerPrefs.SetInt(WaaSLoginMethod, (int)method);
-                PlayerPrefs.SetString(OpenIdAuthenticator.LoginEmail, email);
-                PlayerPrefs.Save();
+                PersistLastLoginMethod(method, email);
                 _failedLoginEmail = "";
                 _failedLoginIntent = null;
                 _failedLoginMethod = LoginMethod.None;
