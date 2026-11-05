@@ -21,7 +21,8 @@ namespace Sequence.Editor.Verification
     ///   ... -dualPhase final
     ///
     /// Env: SEQ_WAAS_CONFIG_KEY, SEQ_BUILDER_KEY (written into Assets/Resources/SequenceConfig.asset, git-ignored),
-    ///      DUAL_STATE_FILE (where phase results are kept between processes).
+    ///      DUAL_STATE_FILE (optional, where phase results are kept between processes; default
+    ///      Logs/dual-session-state.json, OTP read from "$DUAL_STATE_FILE.otp"), DUAL_EMAIL (email phases).
     /// Not run through the NUnit runner on purpose: SequenceConfig.StoreSessionKey() disables session storage while
     /// a test is executing, and storage is what this harness checks.
     /// </summary>
@@ -333,7 +334,8 @@ namespace Sequence.Editor.Verification
             AssetDatabase.SaveAssets();
         }
 
-        private static string StateFile => Environment.GetEnvironmentVariable("DUAL_STATE_FILE") ?? "Temp/dual-session-state.json";
+        // Not under Temp/: the editor deletes Temp/ on exit, and the state must survive between phase processes.
+        private static string StateFile => Environment.GetEnvironmentVariable("DUAL_STATE_FILE") ?? "Logs/dual-session-state.json";
         private static void SaveState(State s) => File.WriteAllText(StateFile, JsonUtility.ToJson(s));
         private static State LoadState() => JsonUtility.FromJson<State>(File.ReadAllText(StateFile));
 
