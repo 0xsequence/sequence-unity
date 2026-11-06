@@ -19,6 +19,7 @@ namespace Sequence.Editor.Verification
     ///   Unity -batchmode -projectPath . -executeMethod Sequence.Editor.Verification.DualSessionVerification.Run -dualPhase setup
     ///   ... -dualPhase restart
     ///   ... -dualPhase final
+    ///   ... -dualPhase social-routing   (no network sign-in; social sign-in callback routing between two instances)
     ///
     /// Env: SEQ_WAAS_CONFIG_KEY, SEQ_BUILDER_KEY (written into Assets/Resources/SequenceConfig.asset, git-ignored),
     ///      DUAL_STATE_FILE (optional, where phase results are kept between processes; default
@@ -53,6 +54,7 @@ namespace Sequence.Editor.Verification
                 "final" => Final(),
                 "email-create" => EmailCreate(),
                 "email-merge" => EmailMerge(),
+                "social-routing" => SocialRouting(),
                 _ => throw new ArgumentException("unknown phase " + phase),
             };
 
@@ -291,6 +293,76 @@ namespace Sequence.Editor.Verification
             login.OnLoginFailed -= Failed;
             return result;
         }
+
+        // Social sign-in on the isolated instance while the default instance is alive. The callback deep link is
+        // delivered through Unity's own dispatcher (Application.InvokeDeepLinkActivated), the path a deep link takes on
+        // Android and desktop, so every subscribed instance receives it. Only the instance that started the sign-in
+        // should react; the other must not report a login failure.
+        private static Task SocialRouting()
+        {
+            SequenceLogin defaultLogin = SequenceLogin.GetInstance();
+            SequenceLogin isolated = SequenceLogin.CreateIsolatedInstance(UserNamespace);
+            OpenIdAuthenticator defaultAuth = AuthenticatorOf(defaultLogin);
+            OpenIdAuthenticator isolatedAuth = AuthenticatorOf(isolated);
+            Check(defaultAuth != null && isolatedAuth != null && defaultAuth != isolatedAuth,
+                "each instance has its own OpenIdAuthenticator");
+
+            // What GoogleSignIn() does before opening the browser: issue a fresh state token on the starting instance.
+            string defaultToken = Guid.NewGuid().ToString();
+            string isolatedToken = Guid.NewGuid().ToString();
+            defaultAuth.InjectStateTokenForTesting(defaultToken);
+            isolatedAuth.InjectStateTokenForTesting(isolatedToken);
+
+            var defaultFailures = new List<string>();
+            int defaultSignedIn = 0, isolatedSignedIn = 0;
+            void DefaultFailed(string error, LoginMethod m, string email, List<LoginMethod> methods) => defaultFailures.Add(error);
+            void DefaultSignedIn(OpenIdAuthenticationResult r) => defaultSignedIn++;
+            void IsolatedSignedIn(OpenIdAuthenticationResult r) => isolatedSignedIn++;
+            defaultLogin.OnLoginFailed += DefaultFailed;
+            defaultAuth.SignedIn += DefaultSignedIn;
+            isolatedAuth.SignedIn += IsolatedSignedIn;
+            void Reset() { defaultFailures.Clear(); defaultSignedIn = 0; isolatedSignedIn = 0; }
+
+            // Fake id_token: the receiving instance then fails at WaaS with it, which is irrelevant here.
+            string isolatedLink = $"testscheme://callback?state=testscheme---{isolatedToken}Google&id_token=not.a.jwt";
+            const System.Reflection.BindingFlags anyStatic =
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public;
+
+            // 1. Broadcast delivery (Application.deepLinkActivated: Android, macOS, WebGL).
+            var dispatch = typeof(Application).GetMethod("InvokeDeepLinkActivated", anyStatic);
+            Check(dispatch != null, "found Unity's deep link dispatcher Application.InvokeDeepLinkActivated");
+            dispatch?.Invoke(null, new object[] { isolatedLink });
+            Check(isolatedSignedIn == 1, $"broadcast: isolated instance (started the sign-in) received the id token (count {isolatedSignedIn})");
+            Check(defaultSignedIn == 0, $"broadcast: default instance did not receive the id token (count {defaultSignedIn})");
+            Check(defaultFailures.Count == 0,
+                $"broadcast: default instance raised no login failure (got {defaultFailures.Count}: {string.Join(" | ", defaultFailures)})");
+
+            // 2. Single-receiver delivery (Windows IPC listener, iOS authentication session): the callback reaches
+            //    one authenticator only, here the default one (Windows starts the listener on the first authenticator).
+            Reset();
+            var route = typeof(OpenIdAuthenticator).GetMethod("RouteDeepLink", anyStatic);
+            if (route != null) route.Invoke(null, new object[] { isolatedLink, defaultAuth });
+            else defaultAuth.HandleDeepLink(isolatedLink); // what the listener did before routing existed
+            Check(isolatedSignedIn == 1, $"single receiver: isolated instance received the id token (count {isolatedSignedIn})");
+            Check(defaultFailures.Count == 0,
+                $"single receiver: default instance raised no login failure (got {defaultFailures.Count}: {string.Join(" | ", defaultFailures)})");
+
+            // 3. A link no instance issued still fails as before.
+            Reset();
+            dispatch?.Invoke(null, new object[] { $"testscheme://callback?state=testscheme---{Guid.NewGuid()}Google&id_token=not.a.jwt" });
+            Check(defaultSignedIn == 0 && isolatedSignedIn == 0, "unknown state: no instance accepted the link");
+            Check(defaultFailures.Count == 1 && defaultFailures[0].Contains("State token mismatch"),
+                $"unknown state: default instance still reports the mismatch (got {defaultFailures.Count}: {string.Join(" | ", defaultFailures)})");
+
+            defaultLogin.OnLoginFailed -= DefaultFailed;
+            defaultAuth.SignedIn -= DefaultSignedIn;
+            isolatedAuth.SignedIn -= IsolatedSignedIn;
+            return Task.CompletedTask;
+        }
+
+        private static OpenIdAuthenticator AuthenticatorOf(SequenceLogin login) =>
+            typeof(SequenceLogin).GetField("_authenticator", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                ?.GetValue(login) as OpenIdAuthenticator;
 
         private static async Task<bool> HasSession(SequenceWallet wallet)
         {
