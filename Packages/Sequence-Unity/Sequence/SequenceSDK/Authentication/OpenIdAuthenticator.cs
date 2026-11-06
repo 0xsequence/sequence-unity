@@ -28,6 +28,10 @@ namespace Sequence.Authentication
 
         private string _stateToken = Guid.NewGuid().ToString();
 
+        // Latest state token issued by each authenticator. Several authenticators exist when there is more than one
+        // SequenceLogin (SequenceLogin.CreateIsolatedInstance); sign-in callbacks are routed to the one that issued the state.
+        private static readonly Dictionary<string, OpenIdAuthenticator> IssuedStateTokens = new Dictionary<string, OpenIdAuthenticator>();
+
         private IBrowser _browser;
         
         private static bool _windowsSetup = false;
@@ -208,7 +212,7 @@ namespace Sequence.Authentication
 
         private string GenerateState(LoginMethod method)
         {
-            _stateToken = Guid.NewGuid().ToString();
+            SetStateToken(Guid.NewGuid().ToString());
             string state = $"{_urlScheme + "---" + _stateToken + method}";
             return state;
         }
@@ -353,7 +357,7 @@ namespace Sequence.Authentication
                                 {
                                     syncContext.Post((data) =>
                                     {
-                                        HandleDeepLink((string)data);
+                                        RouteDeepLink((string)data, this);
                                     }, msg);
                                 }
                             }
@@ -383,6 +387,12 @@ namespace Sequence.Authentication
                 method = GetMethodFromState(state);
                 if (!state.Contains(_stateToken))
                 {
+                    OpenIdAuthenticator issuer = FindStateIssuer(state);
+                    if (issuer != null && issuer != this)
+                    {
+                        // Started by another SequenceLogin instance, which receives the same link.
+                        return;
+                    }
                     OnSignInFailed?.Invoke("State token mismatch", method);
                     return;
                 }
@@ -432,12 +442,62 @@ namespace Sequence.Authentication
 #if UNITY_EDITOR
         public void InjectStateTokenForTesting(string stateToken)
         {
-            _stateToken = stateToken;
+            SetStateToken(stateToken);
         }
 #endif
         internal void BrowserModifyStateToken(string stateToken)
         {
-            _stateToken = stateToken;
+            SetStateToken(stateToken);
+        }
+
+        private void SetStateToken(string stateToken)
+        {
+            lock (IssuedStateTokens)
+            {
+                if (IssuedStateTokens.TryGetValue(_stateToken, out OpenIdAuthenticator previous) && previous == this)
+                {
+                    IssuedStateTokens.Remove(_stateToken);
+                }
+                _stateToken = stateToken;
+                if (!string.IsNullOrEmpty(stateToken))
+                {
+                    IssuedStateTokens[stateToken] = this;
+                }
+            }
+        }
+
+        private static OpenIdAuthenticator FindStateIssuer(string state)
+        {
+            if (string.IsNullOrEmpty(state))
+            {
+                return null;
+            }
+            lock (IssuedStateTokens)
+            {
+                foreach (var issued in IssuedStateTokens)
+                {
+                    if (state.Contains(issued.Key))
+                    {
+                        return issued.Value;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// For callbacks delivered to a single authenticator (Windows IPC, iOS authentication session): hand the link
+        /// to the authenticator that issued its state, or to <paramref name="fallback"/> if none did.
+        /// </summary>
+        public static void RouteDeepLink(string link, OpenIdAuthenticator fallback)
+        {
+            OpenIdAuthenticator issuer = null;
+            Dictionary<string, string> queryParams = link?.RemoveTrailingSlash().ExtractQueryAndHashParameters();
+            if (queryParams != null && queryParams.TryGetValue("state", out string state))
+            {
+                issuer = FindStateIssuer(state);
+            }
+            (issuer ?? fallback).HandleDeepLink(link);
         }
     }
 }
