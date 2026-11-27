@@ -7,8 +7,10 @@ namespace Sequence.Authentication
     public class IosBrowser : IBrowser
     {
 #if UNITY_IOS && !UNITY_EDITOR
-        private IAuthenticator _authenticator;
-        private static IosBrowser _instance;
+        private OpenIdAuthenticator _authenticator;
+        // Browser that started the current authentication session; the native completion callback is static.
+        // One browser per authenticator, so a second SequenceLogin (CreateIsolatedInstance) doesn't take over the first one's callbacks.
+        private static IosBrowser _activeSession;
         
         private IosBrowser(OpenIdAuthenticator authenticator)
         {
@@ -22,13 +24,7 @@ namespace Sequence.Authentication
                 throw new ArgumentNullException(nameof(authenticator));
             }
 
-            if (_instance == null)
-            {
-                _instance = new IosBrowser(authenticator);
-                return _instance;
-            }
-            _instance._authenticator = authenticator;
-            return _instance;
+            return new IosBrowser(authenticator);
         }
         
         public void Authenticate(string url, string redirectUrl = "")
@@ -38,6 +34,7 @@ namespace Sequence.Authentication
                 throw new ArgumentNullException(nameof(url));
             }
             
+            _activeSession = this;
             IntPtr sessionPointer = Auth_ASWebAuthenticationSession_InitWithURL(url, redirectUrl,
                 OnAuthenticationSessionCompleted);
             Auth_ASWebAuthenticationSession_SetPrefersEphemeralWebBrowserSession(sessionPointer, 0);
@@ -83,7 +80,7 @@ namespace Sequence.Authentication
             }
             else
             {
-                _authenticator.HandleDeepLink(callbackUrl);
+                OpenIdAuthenticator.RouteDeepLink(callbackUrl, _authenticator);
             }
         }
         
@@ -91,7 +88,7 @@ namespace Sequence.Authentication
         private static void OnAuthenticationSessionCompleted(IntPtr session, string callbackUrl, 
             int errorCode, string errorMessage)
         {
-            _instance.mOnAuthenticationSessionCompleted(session, callbackUrl, errorCode, errorMessage);
+            _activeSession?.mOnAuthenticationSessionCompleted(session, callbackUrl, errorCode, errorMessage);
         }
 
         public void SetState(string state)

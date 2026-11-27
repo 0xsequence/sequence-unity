@@ -43,9 +43,35 @@ namespace Sequence.EmbeddedWallet
                 {
                     _email = account.email;
 
-                    SequenceLogin.GetInstance().StoreWalletSecurely(_address, _email);
+                    if (Owner != null)
+                    {
+                        // Store this wallet's own session key under its login's namespace.
+                        Owner.StoreSessionSecurely(SessionKey, _address, _email);
+                    }
+                    else
+                    {
+                        SequenceLogin.GetInstance().StoreWalletSecurely(_address, _email);
+                    }
                 }
             };
+        }
+
+        /// <summary>
+        /// The login instance that created (or adopted) this wallet session, if known.
+        /// </summary>
+        internal SequenceLogin Owner { get; private set; }
+
+        /// <summary>
+        /// The session signing key backing this wallet, if known.
+        /// </summary>
+        internal Sequence.Wallet.EOAWallet SessionKey { get; private set; }
+
+        internal string Email => _email;
+
+        internal void AttachSession(SequenceLogin owner, Sequence.Wallet.EOAWallet sessionKey)
+        {
+            Owner = owner;
+            SessionKey = sessionKey;
         }
 
         public Address GetWalletAddress()
